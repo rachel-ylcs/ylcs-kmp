@@ -148,7 +148,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
                         while (true) {
                             if (!Coroutines.isActive()) break
                             currentPosition = player.currentPosition
-                            delay(PROGRESS_UPDATE_INTERVAL)
+                            delay(engine.interval)
                         }
                     } else null
                 }

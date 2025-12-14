@@ -194,7 +194,7 @@ private class WindowsMusicPlayer : PlatformMusicPlayer() {
                             while (true) {
                                 if (!Coroutines.isActive()) break
                                 currentPosition = controller.position
-                                delay(PROGRESS_UPDATE_INTERVAL)
+                                delay(engine.interval)
                             }
                         }
                     }

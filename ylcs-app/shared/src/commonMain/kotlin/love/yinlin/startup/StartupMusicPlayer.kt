@@ -17,7 +17,6 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
-import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.list
 import love.yinlin.extension.parseJsonValue
@@ -31,10 +30,6 @@ import love.yinlin.platform.lyrics.LyricsEngineHost
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 @Stable
 abstract class StartupMusicPlayer : AsyncStartup() {
-    companion object {
-        const val PROGRESS_UPDATE_INTERVAL = 150L
-    }
-
     // 接口
     abstract val isInit: Boolean
     abstract val error: Throwable?

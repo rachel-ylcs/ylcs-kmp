@@ -28,7 +28,6 @@ import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.ClickIcon
-import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
 private class VideoPlayerState {
@@ -51,7 +50,7 @@ private class VideoPlayerState {
                         while (true) {
                             if (!Coroutines.isActive()) break
                             position = player.currentPosition
-                            delay(StartupMusicPlayer.PROGRESS_UPDATE_INTERVAL)
+                            delay(100L)
                         }
                     } else null
                 }

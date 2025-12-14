@@ -95,22 +95,26 @@ private fun LyricsLrcLine(text: String, offset: Int) {
 
 @Stable
 internal class LineLyricsEngine : LyricsEngine {
+    override val interval: Long = 150L
     override val type: LyricsEngineType = LyricsEngineType.Line
 
     private var lines: List<LrcLine>? by mutableRefStateOf(null)
     private var currentIndex by mutableIntStateOf(-1)
     private val currentText by derivedStateOf { lines?.getOrNull(currentIndex)?.text ?: "" }
 
+    private val listState = LazyListState()
+    private var isDragging by mutableStateOf(false)
+
     override suspend fun load(rootPath: Path): Boolean = catchingDefault(false) {
         val source = Path(rootPath, type.resType.filename).readText()
         lines = source?.let { LrcParser(it).paddingLyrics }
+        currentIndex = -1
         return lines != null
     }
 
-    override suspend fun reset() {
+    override fun reset() {
         lines = null
         currentIndex = -1
-        listState.scrollToItem(0)
     }
 
     override fun update(position: Long) {
@@ -120,9 +124,6 @@ internal class LineLyricsEngine : LyricsEngine {
         } ?: -1
         currentIndex = newIndex
     }
-
-    private val listState = LazyListState()
-    private var isDragging by mutableStateOf(false)
 
     @Composable
     override fun LyricsCanvas(modifier: Modifier, config: LyricsEngineConfig, host: LyricsEngineHost) {

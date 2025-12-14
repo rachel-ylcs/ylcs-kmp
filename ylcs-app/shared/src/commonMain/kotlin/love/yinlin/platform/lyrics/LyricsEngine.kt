@@ -8,10 +8,11 @@ import kotlinx.io.files.Path
 
 @Stable
 interface LyricsEngine {
+    val interval: Long
     val type: LyricsEngineType
 
     suspend fun load(rootPath: Path): Boolean
-    suspend fun reset()
+    fun reset()
     fun update(position: Long)
 
     @Composable

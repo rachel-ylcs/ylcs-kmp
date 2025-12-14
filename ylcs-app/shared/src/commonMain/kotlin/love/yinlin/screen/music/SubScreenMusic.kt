@@ -737,7 +737,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 	override suspend fun initialize() {
 		monitor(state = { mp.currentPosition }) { position ->
 			// 处理进度条
-			if (abs(position - currentDebounceTime) > 1000L - StartupMusicPlayer.PROGRESS_UPDATE_INTERVAL) currentDebounceTime = position
+			if (abs(position - currentDebounceTime) > 1000L - mp.engine.interval) currentDebounceTime = position
 			// 处理歌词
 			mp.engine.update(position)
 			if (mp.floatingLyrics.isAttached) mp.floatingLyrics.update()
@@ -747,18 +747,23 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 			// 重置引擎
 			mp.engine.reset()
 
-			if (musicInfo != null) catching {
+			if (musicInfo != null) {
 				Coroutines.io {
-					// 按引擎顺序依次检查是否成功加载
-					val rootPath = musicInfo.path(Paths.modPath)
-					for (engineType in app.config.lyricsEngineOrder) {
-						mp.engine = LyricsEngine[engineType]
-						if (mp.engine.load(rootPath)) break
-					}
+					catching {
+						// 按引擎顺序依次检查是否成功加载
+						val rootPath = musicInfo.path(Paths.modPath)
+						for (engineType in app.config.lyricsEngineOrder) {
+							val newEngine = LyricsEngine[engineType]
+							if (newEngine.load(rootPath)) {
+								mp.engine = newEngine
+								break
+							}
+						}
 
-					// 更新状态标志
-					hasAnimation = musicInfo.path(Paths.modPath, ModResourceType.Animation).isFile
-					hasVideo = musicInfo.path(Paths.modPath, ModResourceType.Video).isFile
+						// 更新状态标志
+						hasAnimation = musicInfo.path(Paths.modPath, ModResourceType.Animation).isFile
+						hasVideo = musicInfo.path(Paths.modPath, ModResourceType.Video).isFile
+					}
 				}
 			}
 			else {
