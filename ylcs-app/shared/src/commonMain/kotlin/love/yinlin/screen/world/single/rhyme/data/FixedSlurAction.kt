@@ -262,7 +262,7 @@ class FixedSlurAction(
                     image(blockMap, imgRect, it)
                 }
                 // 动画
-                drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.5f, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
+                drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.25f, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
             }
             is State.Releasing -> {
                 val lastHeadProgress = currentState.lastHeadProgress
@@ -274,7 +274,7 @@ class FixedSlurAction(
                     image(blockMap, imgRect, it, alpha = releasingAlpha)
                 }
                 // 动画
-                drawPlainAnimation(track, lastHeadProgress, longRelease, currentState.animation, scaleRatio = 1.5f, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
+                drawPlainAnimation(track, lastHeadProgress, longRelease, currentState.animation, scaleRatio = 1.25f, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
                 val headProgress = currentState.headProgress
