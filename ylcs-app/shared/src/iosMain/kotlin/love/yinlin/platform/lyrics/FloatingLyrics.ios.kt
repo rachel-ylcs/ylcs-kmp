@@ -1,9 +1,7 @@
 package love.yinlin.platform.lyrics
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -107,7 +105,7 @@ actual class FloatingLyrics {
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    app.mp.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, textStyle = MaterialTheme.typography.labelLarge)
+                    app.mp.engine.FloatingLyricsCanvas(config = app.config.lyricsEngineConfig, textStyle = MaterialTheme.typography.labelLarge)
                 }
             }
         }

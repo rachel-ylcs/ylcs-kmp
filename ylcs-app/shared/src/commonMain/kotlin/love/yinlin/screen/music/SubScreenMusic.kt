@@ -523,13 +523,10 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 	@Composable
 	private fun LyricsLayout(modifier: Modifier = Modifier) {
 		Box(modifier = modifier) {
-			mp.lyrics.Content(
+			mp.engine.LyricsCanvas(
 				modifier = Modifier.fillMaxSize(),
-				onLyricsClick = {
-					launch {
-						mp.seekTo(it)
-					}
-				}
+				config = app.config.lyricsEngineConfig,
+				host = mp.engineHost
 			)
 		}
 	}
@@ -740,24 +737,16 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 			// 处理进度条
 			if (abs(position - currentDebounceTime) > 1000L - StartupMusicPlayer.PROGRESS_UPDATE_INTERVAL) currentDebounceTime = position
 			// 处理歌词
-			mp.lyrics.updateIndex(position)
-			if (mp.floatingLyrics.isAttached) {
-                mp.engine.update(position)
-                mp.floatingLyrics.update()
-            }
+			mp.engine.update(position)
+			if (mp.floatingLyrics.isAttached) mp.floatingLyrics.update()
 		}
+
 		monitor(state = { mp.currentMusic }) { musicInfo ->
-			mp.lyrics.reset()
 			mp.engine.reset()
 
 			if (musicInfo != null) catching {
 				Coroutines.io {
-					// 加载歌词
-					musicInfo.path(Paths.modPath, ModResourceType.LineLyrics).readText()?.let {
-						mp.lyrics.load(it)
-					}
-
-					// 加载悬浮歌词, 加载失败则回退到默认歌词引擎
+					// 加载歌词, 加载失败则回退到默认歌词引擎
 					val rootPath = musicInfo.path(Paths.modPath)
 					if (!mp.engine.load(rootPath)) {
 						mp.engine = LyricsEngine.Default
@@ -777,6 +766,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 
 			if (isAnimationBackground && !hasAnimation) isAnimationBackground = false
 		}
+
 		monitor(state = { mp.error }) { error ->
 			error?.let { slot.tip.error(it.message) }
 		}

@@ -122,7 +122,7 @@ actual class FloatingLyrics {
                         modifier = Modifier.padding(start = start, end = end, top = CustomTheme.padding.verticalExtraSpace * 4f * config.android.top).fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        app.mp.engine.LyricsCanvas(config = config, textStyle = MaterialTheme.typography.labelLarge)
+                        app.mp.engine.FloatingLyricsCanvas(config = config, textStyle = MaterialTheme.typography.labelLarge)
                     }
                 }
             }

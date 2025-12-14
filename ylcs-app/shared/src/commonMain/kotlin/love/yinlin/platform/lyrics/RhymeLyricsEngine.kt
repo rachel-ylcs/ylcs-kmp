@@ -14,7 +14,7 @@ internal class RhymeLyricsEngine : LyricsEngine {
         return false
     }
 
-    override fun reset() {
+    override suspend fun reset() {
 
     }
 
@@ -23,7 +23,12 @@ internal class RhymeLyricsEngine : LyricsEngine {
     }
 
     @Composable
-    override fun LyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle) {
+    override fun LyricsCanvas(modifier: Modifier, config: LyricsEngineConfig, host: LyricsEngineHost) {
+
+    }
+
+    @Composable
+    override fun FloatingLyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle) {
 
     }
 }

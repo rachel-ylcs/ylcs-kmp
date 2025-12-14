@@ -2,6 +2,7 @@ package love.yinlin.platform.lyrics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import kotlinx.io.files.Path
 
@@ -10,11 +11,14 @@ interface LyricsEngine {
     val type: LyricsEngineType
 
     suspend fun load(rootPath: Path): Boolean
-    fun reset()
+    suspend fun reset()
     fun update(position: Long)
 
     @Composable
-    fun LyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle)
+    fun LyricsCanvas(modifier: Modifier, config: LyricsEngineConfig, host: LyricsEngineHost)
+
+    @Composable
+    fun FloatingLyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle)
 
     companion object {
         private val Line = LineLyricsEngine()

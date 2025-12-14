@@ -98,7 +98,7 @@ actual class FloatingLyrics {
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.BottomCenter
                         ) {
-                            app.mp.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, textStyle = MaterialTheme.typography.displayLarge)
+                            app.mp.engine.FloatingLyricsCanvas(config = app.config.lyricsEngineConfig, textStyle = MaterialTheme.typography.displayLarge)
                         }
                     }
                 }

@@ -23,8 +23,8 @@ import love.yinlin.extension.readText
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.ioContext
 import love.yinlin.platform.lyrics.FloatingLyrics
-import love.yinlin.platform.lyrics.LrcLayout
 import love.yinlin.platform.lyrics.LyricsEngine
+import love.yinlin.platform.lyrics.LyricsEngineHost
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 @Stable
@@ -59,7 +59,9 @@ abstract class StartupMusicPlayer : AsyncStartup() {
     protected abstract suspend fun initController(context: Context)
 
     // 歌词引擎
-    val lyrics = LrcLayout()
+    val engineHost = object : LyricsEngineHost {
+        override suspend fun seekTo(position: Long) = this@StartupMusicPlayer.seekTo(position)
+    }
     var engine by mutableRefStateOf(LyricsEngine.Default)
     val floatingLyrics: FloatingLyrics = FloatingLyrics()
 
