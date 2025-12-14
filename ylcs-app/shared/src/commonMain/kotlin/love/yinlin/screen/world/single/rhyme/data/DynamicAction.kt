@@ -30,9 +30,9 @@ sealed class DynamicAction(
         val deadline = ActionResult.BAD.endRange(HIT_RATIO) // 死线
 
         val BlockSize = Size(256f, 85f)
-        fun calcBlockRect(scale: Int, base: Int): Pair<Rect, Rect> {
-            val left = Rect(Offset(0f, (scale + base) * BlockSize.height), BlockSize)
-            val center = Rect(Offset(BlockSize.width, (scale + base) * BlockSize.height), BlockSize)
+        fun calcBlockRect(scale: Int): Pair<Rect, Rect> {
+            val left = Rect(Offset(0f, scale * BlockSize.height), BlockSize)
+            val center = Rect(Offset(BlockSize.width, scale * BlockSize.height), BlockSize)
             return left to center
         }
 
@@ -99,12 +99,12 @@ sealed class DynamicAction(
         RhymeDifficulty.Extra -> 2000L
     }
     protected val baseDurationF = baseDuration.toFloat()
-
-    protected val Float.asUncheckedActual: Float get() = this / (PERSPECTIVE_K + this * (1 - PERSPECTIVE_K))
-    protected val Float.asActual: Float get() = this.coerceIn(0f, 1f).asUncheckedActual.coerceIn(0f, 1f)
-    protected val Float.asUncheckedVirtual: Float get() = PERSPECTIVE_K * this / (1 + this * (PERSPECTIVE_K - 1))
-    protected val Float.asVirtual: Float get() = this.coerceIn(0f, 1f).asUncheckedVirtual.coerceIn(0f, 1f)
 }
+
+internal val Float.asUncheckedActual: Float get() = this / (DynamicAction.PERSPECTIVE_K + this * (1 - DynamicAction.PERSPECTIVE_K))
+internal val Float.asActual: Float get() = this.coerceIn(0f, 1f).asUncheckedActual.coerceIn(0f, 1f)
+internal val Float.asUncheckedVirtual: Float get() = DynamicAction.PERSPECTIVE_K * this / (1 + this * (DynamicAction.PERSPECTIVE_K - 1))
+internal val Float.asVirtual: Float get() = this.coerceIn(0f, 1f).asUncheckedVirtual.coerceIn(0f, 1f)
 
 // 音符透视
 internal fun Drawer.noteTransform(ratio: Float, track: Track, block: Drawer.(srcRect: Rect) -> Unit) {
