@@ -238,7 +238,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 					MusicRecord(
 						musicInfo = it,
 						modifier = Modifier.fillMaxSize(fraction = 0.75f)
-                            .clickable { navigate(::ScreenMusicDetails, it.id) }
+                            .clickableNoRipple { navigate(::ScreenMusicDetails, it.id) }
 							.zIndex(2f)
 					)
 				}
