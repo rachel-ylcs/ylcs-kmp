@@ -265,7 +265,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 			) {
 				Text(
 					text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
-					color = MaterialTheme.colorScheme.primary,
+					color = Colors.White,
 					style = MaterialTheme.typography.titleLarge,
 					textAlign = TextAlign.Center,
 					maxLines = 1,
@@ -293,7 +293,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 		) {
 			Text(
 				text = musicInfo?.name ?: stringResource(Res.string.no_audio_source),
-				color = MaterialTheme.colorScheme.primary,
+				color = Colors.White,
 				style = MaterialTheme.typography.displayMedium,
 				textAlign = TextAlign.Center,
 				maxLines = 2,

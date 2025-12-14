@@ -100,26 +100,34 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
         val type: ModResourceType,
         val size: Int?
     ) {
-        fun brush(alpha: Float): Brush = Brush.linearGradient(when (type) {
-            ModResourceType.Config -> listOf(Colors.Yellow5, Colors.Yellow3, Colors.Yellow5)
-            ModResourceType.Audio -> listOf(Colors.Pink4, Colors.Pink2, Colors.Pink4)
-            ModResourceType.Record -> listOf(Colors.Purple4, Colors.Purple2, Colors.Purple4)
-            ModResourceType.Background -> listOf(Colors.Blue5, Colors.Blue3, Colors.Blue5)
-            ModResourceType.LineLyrics -> listOf(Colors.Green7, Colors.Green5, Colors.Green7)
-            ModResourceType.Animation -> listOf(Colors.Orange5, Colors.Orange3, Colors.Orange5)
-            ModResourceType.Video -> listOf(Colors.Green5, Colors.Green3, Colors.Green5)
-            ModResourceType.Rhyme -> listOf(Colors.Cyan5, Colors.Cyan3, Colors.Cyan5)
-        }.map { it.copy(alpha = alpha) })
+        val brushColors by lazy {
+            when (type) {
+                ModResourceType.Config -> listOf(Colors.Yellow5, Colors.Yellow3, Colors.Yellow5)
+                ModResourceType.Audio -> listOf(Colors.Pink4, Colors.Pink2, Colors.Pink4)
+                ModResourceType.Record -> listOf(Colors.Purple4, Colors.Purple2, Colors.Purple4)
+                ModResourceType.Background -> listOf(Colors.Blue5, Colors.Blue3, Colors.Blue5)
+                ModResourceType.LineLyrics -> listOf(Colors.Green7, Colors.Green5, Colors.Green7)
+                ModResourceType.Animation -> listOf(Colors.Orange5, Colors.Orange3, Colors.Orange5)
+                ModResourceType.Video -> listOf(Colors.Green5, Colors.Green3, Colors.Green5)
+                ModResourceType.Rhyme -> listOf(Colors.Cyan5, Colors.Cyan3, Colors.Cyan5)
+            }
+        }
 
-        val icon: ImageVector get() = when (type) {
-            ModResourceType.Config -> Icons.Outlined.Construction
-            ModResourceType.Audio -> Icons.Outlined.AudioFile
-            ModResourceType.Record -> Icons.Outlined.Album
-            ModResourceType.Background -> Icons.Outlined.Image
-            ModResourceType.LineLyrics -> Icons.Outlined.Lyrics
-            ModResourceType.Animation -> Icons.Outlined.GifBox
-            ModResourceType.Video -> Icons.Outlined.Movie
-            ModResourceType.Rhyme -> Icons.Outlined.MusicNote
+        val normalBrush: Brush by lazy { Brush.linearGradient(brushColors.map { it.copy(alpha = 0.5f) }) }
+
+        val lockedBrush: Brush by lazy { Brush.linearGradient(brushColors.map { it.copy(alpha = 0.25f) }) }
+
+        val icon: ImageVector by lazy {
+            when (type) {
+                ModResourceType.Config -> Icons.Outlined.Construction
+                ModResourceType.Audio -> Icons.Outlined.AudioFile
+                ModResourceType.Record -> Icons.Outlined.Album
+                ModResourceType.Background -> Icons.Outlined.Image
+                ModResourceType.LineLyrics -> Icons.Outlined.Lyrics
+                ModResourceType.Animation -> Icons.Outlined.GifBox
+                ModResourceType.Video -> Icons.Outlined.Movie
+                ModResourceType.Rhyme -> Icons.Outlined.MusicNote
+            }
         }
     }
 
@@ -449,7 +457,9 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     private fun ResourceItemLayout(item: ResourceItem, remote: Boolean) {
         Column(modifier = Modifier
             .fillMaxWidth()
-            .background(brush = remember(item, remote) { item.brush(if (remote) 0.5f else 1f) })
+            .background(brush = remember(item, remote) {
+                if (remote) item.lockedBrush else item.normalBrush
+            })
             .clickable {
                 if (remote) remoteSong?.let { downloadModResource(item, it) }
             }
