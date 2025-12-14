@@ -137,13 +137,13 @@ abstract class RichContainer(type: String) : RichObject(type) {
 
 		override val width: Float get() = when (emoji?.type) {
 			null -> 1f
-            EmojiType.Lottie -> 1.25f
+            EmojiType.Lottie -> 2f
 			else -> 3f
 		}
 
 		override val height: Float get() = when (emoji?.type) {
 			null -> 1f
-            EmojiType.Lottie -> 1.25f
+            EmojiType.Lottie -> 2f
 			else -> 3f
 		}
 
