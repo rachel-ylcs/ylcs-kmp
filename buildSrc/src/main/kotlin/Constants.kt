@@ -32,7 +32,7 @@ class Constants(project: Project) {
     }
 
     // Gradle版本
-    val gradleVersion = project.gradle.gradleVersion
+    val gradleVersion: String = project.gradle.gradleVersion
 
     // Java版本
     val javaVersion = System.getProperty("java.version") ?: ""

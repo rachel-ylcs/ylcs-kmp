@@ -4,10 +4,12 @@ package love.yinlin.platform
 import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Stable
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionCommands
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.shared.R
 
@@ -20,36 +22,36 @@ object CustomCommands {
     val SetMode = SessionCommand("SetMode", Bundle.EMPTY)
     val Stop = SessionCommand("Stop", Bundle.EMPTY)
 
-    val NotificationPlayerCommands get() = MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
+    val NotificationPlayerCommands: Player.Commands get() = MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
         .build()
 
-    val SessionCommands get() = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
+    val SessionCommands: SessionCommands get() = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
         .add(SetMode)
         .add(Stop)
         .build()
 
-    val OrderModeButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    val OrderModeButton: CommandButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
         .setDisplayName("顺序播放")
         .setCustomIconResId(R.drawable.icon_player_mode_order)
         .setSessionCommand(SetMode)
         .setSlots(CommandButton.SLOT_FORWARD_SECONDARY)
         .build()
 
-    val LoopModeButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    val LoopModeButton: CommandButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
         .setDisplayName("单曲循环")
         .setCustomIconResId(R.drawable.icon_player_mode_loop)
         .setSessionCommand(SetMode)
         .setSlots(CommandButton.SLOT_FORWARD_SECONDARY)
         .build()
 
-    val RandomModeButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    val RandomModeButton: CommandButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
         .setDisplayName("随机播放")
         .setCustomIconResId(R.drawable.icon_player_mode_random)
         .setSessionCommand(SetMode)
         .setSlots(CommandButton.SLOT_FORWARD_SECONDARY)
         .build()
 
-    val StopButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
+    val StopButton: CommandButton = CommandButton.Builder(CommandButton.ICON_UNDEFINED)
         .setDisplayName("停止播放")
         .setCustomIconResId(R.drawable.icon_player_stop)
         .setSessionCommand(Stop)

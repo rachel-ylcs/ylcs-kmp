@@ -118,7 +118,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                     val newConfig = RhymeLyricsConfig(
                         id = musicInfo.id,
                         duration = 0L,
-                        chorus = musicInfo.chorus?.map { Chorus(it, it) } ?: emptyList(),
+                        chorus = musicInfo.chorus?.map { v -> Chorus(v, v) } ?: emptyList(),
                         lyrics = emptyList(),
                         offset = 0,
                     )

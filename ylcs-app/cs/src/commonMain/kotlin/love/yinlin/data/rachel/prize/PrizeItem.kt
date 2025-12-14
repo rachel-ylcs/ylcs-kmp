@@ -1,10 +1,8 @@
 package love.yinlin.data.rachel.prize
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import love.yinlin.api.ServerRes
 import love.yinlin.Local
-import love.yinlin.api.APIFile
 
 @Stable
 @Serializable

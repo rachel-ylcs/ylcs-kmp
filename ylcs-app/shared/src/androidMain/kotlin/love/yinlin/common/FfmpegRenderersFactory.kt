@@ -20,7 +20,7 @@ import java.util.ArrayList
 @Stable
 class FfmpegRenderersFactory(context: Context) : DefaultRenderersFactory(context) {
     companion object {
-        fun build(context: Context, keepFocus: Boolean) = ExoPlayer.Builder(context)
+        fun build(context: Context, keepFocus: Boolean): ExoPlayer = ExoPlayer.Builder(context)
             .setAudioAttributes(AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)
                 .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)

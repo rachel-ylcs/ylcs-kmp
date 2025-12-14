@@ -2,7 +2,6 @@ package love.yinlin.data.rachel.game
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.Local
 import love.yinlin.api.ServerRes
 
 @Stable

@@ -1,19 +1,14 @@
 package love.yinlin.api
 
 import love.yinlin.api.APIConfig.coercePageNum
-import love.yinlin.api.FailureException
 import love.yinlin.api.user.AN
 import love.yinlin.api.user.VN
 import love.yinlin.api.user.throwGetUser
 import love.yinlin.data.rachel.prize.Prize
-import love.yinlin.data.rachel.prize.Prizedata
-import love.yinlin.data.rachel.prize.PrizeDraw
 import love.yinlin.data.rachel.prize.PrizeItem
-import love.yinlin.data.rachel.prize.PrizeItemdata
 import love.yinlin.data.rachel.prize.PrizeItemPic
 import love.yinlin.data.rachel.prize.PrizeResult
 import love.yinlin.data.rachel.prize.PrizeStatus
-import love.yinlin.data.rachel.prize.VerifyDrawResult
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Int
@@ -23,13 +18,10 @@ import love.yinlin.extension.String
 import love.yinlin.extension.StringNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.extension.makeArray
 import love.yinlin.extension.makeObject
 import love.yinlin.server.currentTS
-import love.yinlin.server.currentUniqueId
 import love.yinlin.server.deleteSQL
 import love.yinlin.server.querySQLSingle
-import java.sql.Timestamp
 import java.time.format.DateTimeFormatter
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
@@ -103,7 +95,7 @@ fun APIScope.prizeAPI() {
             INSERT INTO prize(title, content, organizer_uid, status, deadline, drawtime, draw_num, mix_app_level, total_slots, ts)
             ${values(10)}
         """, prizedata.title, prizedata.content, uid,
-            PrizeStatus.draft.name, prizedata.deadline, prizedata.drawtime,
+            PrizeStatus.Draft.name, prizedata.deadline, prizedata.drawtime,
             0, prizedata.mixAppLevel, prizedata.totalSlots, currentTS).toInt()
         
         result(pid)
@@ -123,7 +115,7 @@ fun APIScope.prizeAPI() {
             SELECT status, organizer_uid FROM prize WHERE pid = ?
         """, pid)
         
-        if (prize["status"].String != PrizeStatus.draft.name) {
+        if (prize["status"].String != PrizeStatus.Draft.name) {
             failure("只能修改草稿状态的抽奖")
         }
         
@@ -153,7 +145,7 @@ fun APIScope.prizeAPI() {
             SELECT status, organizer_uid FROM prize WHERE pid = ?
         """, pid)
         
-        if (prize["status"].String != PrizeStatus.draft.name) {
+        if (prize["status"].String != PrizeStatus.Draft.name) {
             failure("只能删除草稿状态的抽奖，当前状态为：${prize["status"].String}")
         }
         
@@ -205,7 +197,7 @@ fun APIScope.prizeAPI() {
             SELECT status, organizer_uid FROM prize WHERE pid = ?
         """, pid)
         
-        if (prize["status"].String != PrizeStatus.draft.name) {
+        if (prize["status"].String != PrizeStatus.Draft.name) {
             failure("只能为草稿状态的抽奖添加奖品")
         }
         
@@ -261,7 +253,7 @@ fun APIScope.prizeAPI() {
             SELECT status FROM prize WHERE pid = ?
         """, pid)
         
-        if (prize["status"].String != PrizeStatus.draft.name) {
+        if (prize["status"].String != PrizeStatus.Draft.name) {
             failure("只能删除草稿状态的抽奖中的奖品")
         }
         
@@ -320,7 +312,7 @@ fun APIScope.prizeAPI() {
             SELECT status, organizer_uid FROM prize WHERE pid = ?
         """, pid)
 
-        if (prize["status"].String != PrizeStatus.draft.name) {
+        if (prize["status"].String != PrizeStatus.Draft.name) {
             failure("只能修改草稿状态的抽奖中的奖品")
         }
 
@@ -329,7 +321,7 @@ fun APIScope.prizeAPI() {
         }
 
         var finalPicName: String? = null
-        val picName = db.throwTransaction {
+        db.throwTransaction {
             // 处理图片更新
             val picNameValue = when {
                 pic != null && !pic.isEmpty -> {
@@ -382,7 +374,6 @@ fun APIScope.prizeAPI() {
             """, totalCount, pid)
 
             finalPicName = picNameValue
-            Unit
         }
         result(PrizeItemPic(itemID,finalPicName))
     }
@@ -397,7 +388,7 @@ fun APIScope.prizeAPI() {
             SELECT pid, organizer_uid, status FROM prize WHERE pid = ?
         """, pid)
 
-        if (prize["status"].String != PrizeStatus.draft.name) failure("只能发布草稿状态的抽奖")
+        if (prize["status"].String != PrizeStatus.Draft.name) failure("只能发布草稿状态的抽奖")
 
         // 验证抽奖是否有奖品
         val items = db.throwQuerySQL("""
@@ -435,7 +426,7 @@ fun APIScope.prizeAPI() {
         // 种子将在抽签时揭晓，揭晓前的种子值保持为空
         db.throwExecuteSQL("""
             UPDATE prize SET status = ?, seed = ?, seed_commitment = ? WHERE pid = ?
-        """, PrizeStatus.published.name, seedBase64, commitmentBase64, pid)
+        """, PrizeStatus.Published.name, seedBase64, commitmentBase64, pid)
 
         result("pid:$pid 发布成功")
 
@@ -448,14 +439,14 @@ fun APIScope.prizeAPI() {
         if (!UserPrivilege.vipPrize(user["privilege"].Int)) failure("无权限")
 
         val prize=db.throwQuerySQLSingle("SELECT status FROM prize WHERE pid = ?", pid)
-        if(prize["status"].String != PrizeStatus.published.name) failure("抽奖不存在或状态不为published，无法取消")
+        if(prize["status"].String != PrizeStatus.Published.name) failure("抽奖不存在或状态不为published，无法取消")
 
         db.updateSQL("""
             UPDATE prize SET status = ? WHERE pid = ?
-        """, PrizeStatus.cancelled.name, pid)
+        """, PrizeStatus.Cancelled.name, pid)
         db.updateSQL("""
             UPDATE prize_draw SET result=? WHERE pid = ?
-        """, PrizeResult.cancelled.name,pid)
+        """, PrizeResult.Cancelled.name,pid)
 
         result("pid:$pid 成功被取消")
     }
@@ -471,7 +462,7 @@ fun APIScope.prizeAPI() {
             FROM prize WHERE pid = ?
         """, pid, pid)
 
-        if (prize["status"].String != PrizeStatus.published.name) failure("只能参加已发布的抽奖")
+        if (prize["status"].String != PrizeStatus.Published.name) failure("只能参加已发布的抽奖")
 
         // 检查截止日期 - 比较日期时间字符串
         val deadline = prize["deadline"].String
@@ -503,7 +494,7 @@ fun APIScope.prizeAPI() {
         db.throwExecuteSQL("""
             INSERT INTO prize_draw(pid, uid, result, ts, name, prize_level)
             ${values(6)}
-        """, pid, uid, PrizeResult.notdrawn.name, currentTS, userName,null)
+        """, pid, uid, PrizeResult.Notdrawn.name, currentTS, userName,null)
     }
 
     ApiPrizeGetWinners.response { pid ->
@@ -514,7 +505,7 @@ fun APIScope.prizeAPI() {
             SELECT  status FROM prize WHERE pid = ?
         """, pid)
 
-        if (prize["status"].String != PrizeStatus.closed.name) failure("还未开奖或已被取消")
+        if (prize["status"].String != PrizeStatus.Closed.name) failure("还未开奖或已被取消")
 
         val winners = db.throwQuerySQL("""
             SELECT id AS drawid, pid, uid, result, prize_level AS prizeLevel , name,
@@ -522,7 +513,7 @@ fun APIScope.prizeAPI() {
             FROM prize_draw
             WHERE pid = ? AND result = ?
             ORDER BY prize_level ASC, drawid ASC
-        """, pid, PrizeResult.win.name)
+        """, pid, PrizeResult.Win.name)
 
         result(winners.to())
     }
@@ -553,7 +544,7 @@ fun APIScope.prizeAPI() {
             FROM prize WHERE pid = ?
         """, pid)
 
-        if (prize["status"].String != PrizeStatus.published.name) failure("只能对已发布的抽奖进行开奖")
+        if (prize["status"].String != PrizeStatus.Published.name) failure("只能对已发布的抽奖进行开奖")
         if (prize["revealed_seed"].StringNull != null) failure("该抽奖已经开过奖了")
 
         val seed = prize["seed"].StringNull ?: failure("抽奖种子未生成，请联系管理员")
@@ -663,7 +654,7 @@ fun APIScope.prizeAPI() {
             it.throwExecuteSQL(
                 """
                 UPDATE prize SET revealed_seed = ?, status = ? WHERE pid = ?
-            """, seed, PrizeStatus.closed.name, pid
+            """, seed, PrizeStatus.Closed.name, pid
             )
 
             //这里有 N+1 问题，之后需要找时间解决
@@ -671,14 +662,14 @@ fun APIScope.prizeAPI() {
                 it.throwExecuteSQL(
                     """
                     UPDATE prize_draw SET result = ?, prize_level = ? WHERE pid = ? AND uid = ?
-                """, PrizeResult.win.name, prizeLevel, pid, winnerUid
+                """, PrizeResult.Win.name, prizeLevel, pid, winnerUid
                 )
             }
             if (participants.size >= drawNum) {
                 it.throwExecuteSQL(
                     """
                 UPDATE prize_draw SET result = ? WHERE pid = ? AND result = ?
-            """, PrizeResult.loss.name, pid, PrizeResult.notdrawn.name
+            """, PrizeResult.Loss.name, pid, PrizeResult.Notdrawn.name
                 )
             }
         }

@@ -67,8 +67,6 @@ afterEvaluate {
             package love.yinlin
             
             import love.yinlin.data.AppInfo
-            import love.yinlin.platform.Platform
-            import love.yinlin.platform.platform
             
             // 由构建脚本自动生成，请勿手动修改
             object Local {

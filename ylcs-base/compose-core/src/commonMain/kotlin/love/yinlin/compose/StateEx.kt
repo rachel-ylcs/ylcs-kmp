@@ -12,7 +12,6 @@ import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import love.yinlin.extension.BaseLazyReference
-import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 fun <T> mutableRefStateOf(value: T) = mutableStateOf(value, referentialEqualityPolicy())

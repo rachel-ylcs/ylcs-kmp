@@ -2,7 +2,6 @@ package love.yinlin.data.rachel.song
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.Local
 import love.yinlin.api.ServerRes
 import love.yinlin.data.rachel.profile.UserLevel
 

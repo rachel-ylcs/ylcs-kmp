@@ -1,28 +1,28 @@
 package love.yinlin.data.rachel.prize
+
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
 
+// 开奖结果,win表示中奖,loss表示没中奖,notdrawn表示还没开奖
 @Stable
 @Serializable
-
-//开奖结果,win表示中奖,loss表示没中奖,notdrawn表示还没开奖
 enum class PrizeResult {
-    win,
-    loss,
-    notdrawn,
-    cancelled,
+    Win,
+    Loss,
+    Notdrawn,
+    Cancelled,
 }
 
 @Stable
 @Serializable
 data class PrizeDraw(
-    val drawid :Int, //参与记录的id，自增
-    val pid :Int, //关联抽奖事件id
-    val uid :Int, //参与者id
-    val result :PrizeResult=PrizeResult.notdrawn, //状态，默认为未开奖状态
-    val prizeLevel:Int?, //奖品等级，一二三等奖，只有在抽奖中设置了等级这里才会有，否则是空
-    val name :String?, //参与者姓名
-    val ts :String //参与抽奖的时间
+    val drawid: Int, // 参与记录的id，自增
+    val pid: Int, // 关联抽奖事件id
+    val uid: Int, // 参与者id
+    val result: PrizeResult = PrizeResult.Notdrawn, // 状态，默认为未开奖状态
+    val prizeLevel: Int?, // 奖品等级，一二三等奖，只有在抽奖中设置了等级这里才会有，否则是空
+    val name: String?, // 参与者姓名
+    val ts: String // 参与抽奖的时间
 )
 
 @Stable

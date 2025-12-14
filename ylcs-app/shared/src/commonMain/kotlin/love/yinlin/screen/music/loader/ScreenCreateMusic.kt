@@ -41,7 +41,6 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.mkdir
-import love.yinlin.extension.read
 import love.yinlin.extension.readByteArray
 import love.yinlin.extension.write
 import love.yinlin.extension.writeText

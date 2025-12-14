@@ -345,19 +345,12 @@ class Drawer(
                     val g = (dx3 * dy2 - dx2 * dy3) / det1
                     val h = (dx1 * dy3 - dx3 * dy1) / det1
 
-                    val a = x1 - x0 + g * x1
-                    val b = x3 - x0 + h * x3
-                    val c = x0
-                    val d = y1 - y0 + g * y1
-                    val e = y3 - y0 + h * y3
-                    val f = y0
-
-                    values[Matrix.ScaleX] = a
-                    values[Matrix.SkewX]  = b
-                    values[Matrix.TranslateX] = c
-                    values[Matrix.SkewY]  = d
-                    values[Matrix.ScaleY] = e
-                    values[Matrix.TranslateY] = f
+                    values[Matrix.ScaleX] = x1 - x0 + g * x1
+                    values[Matrix.SkewX] = x3 - x0 + h * x3
+                    values[Matrix.TranslateX] = x0
+                    values[Matrix.SkewY] = y1 - y0 + g * y1
+                    values[Matrix.ScaleY] = y3 - y0 + h * y3
+                    values[Matrix.TranslateY] = y0
                     values[Matrix.Perspective0] = g
                     values[Matrix.Perspective1] = h
                     values[Matrix.Perspective2] = 1f
