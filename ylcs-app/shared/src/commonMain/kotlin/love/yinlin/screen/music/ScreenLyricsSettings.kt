@@ -4,7 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -19,7 +23,7 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.platform.lyrics.FloatingLyrics
 
 @Composable
-expect fun ScreenLyricsSettings.PlatformContent(device: Device)
+expect fun ScreenLyricsSettings.PlatformContent()
 
 @Stable
 class ScreenLyricsSettings(manager: ScreenManager) : Screen(manager) {
@@ -39,7 +43,18 @@ class ScreenLyricsSettings(manager: ScreenManager) : Screen(manager) {
     }
 
     @Composable
-    override fun Content(device: Device) = PlatformContent(device)
+    override fun Content(device: Device) {
+        Column(
+            modifier = Modifier
+                .padding(LocalImmersivePadding.current)
+                .fillMaxSize()
+                .padding(CustomTheme.padding.equalExtraValue)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
+        ) {
+            PlatformContent()
+        }
+    }
 
     @Composable
     internal fun RowLayout(
