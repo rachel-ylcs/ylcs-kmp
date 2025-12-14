@@ -31,7 +31,7 @@ class NoteAction(
         }
         @Stable
         class Clicking(frameCount: Int, val result: ActionResult, val lastProgress: Float) : State { // 点击中
-            val animation = LineFrameAnimation(frameCount, adapter = SpeedAdapter(0.5f)).also { it.start() }
+            val animation = LineFrameAnimation(frameCount).also { it.start() }
         }
         @Stable
         class Missing(frameCount: Int, lastProgress: Float) : State { // 错过中
@@ -44,7 +44,7 @@ class NoteAction(
 
     private val trackIndex = mapTrackIndex(action.scale)
     private val noteScale = mapNoteScale(action.scale)
-    private val blockRect = calcBlockRect(noteScale, 0)
+    private val blockRect = calcBlockRect(noteScale)
 
     private var state: State by mutableStateOf(State.Ready) // 状态
 
@@ -122,17 +122,19 @@ class NoteAction(
             }
             is State.Clicking -> {
                 val lastProgress = currentState.lastProgress
+                val blockAlpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f)
                 // 按键
                 noteTransform(lastProgress, track) {
-                    image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f))
+                    if (blockAlpha > 0f) image(blockMap, imgRect, it, alpha = blockAlpha)
                 }
                 // 动画
                 drawPlainAnimation(track, lastProgress, noteClick, currentState.animation, colorFilter = ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
+                val missAlpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f)
                 // 按键
                 noteTransform(currentState.progress, track) {
-                    image(blockMap, imgRect, it, alpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f))
+                    if (missAlpha > 0f) image(blockMap, imgRect, it, alpha = missAlpha)
                     drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = NoteColorFilters[noteScale])
                 }
             }
