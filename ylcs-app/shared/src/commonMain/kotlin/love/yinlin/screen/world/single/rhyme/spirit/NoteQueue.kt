@@ -7,6 +7,7 @@ import love.yinlin.compose.game.traits.*
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
+import love.yinlin.screen.world.single.rhyme.RhymePlayConfig
 import love.yinlin.screen.world.single.rhyme.RhymeSound
 import love.yinlin.screen.world.single.rhyme.data.ActionCallback
 import love.yinlin.screen.world.single.rhyme.data.ActionResult
@@ -19,6 +20,7 @@ import love.yinlin.screen.world.single.rhyme.data.Tracks
 @Stable
 class NoteQueue(
     rhymeManager: RhymeManager,
+    playConfig: RhymePlayConfig,
     private val lyricsConfig: RhymeLyricsConfig,
     private val scoreBoard: ScoreBoard,
     private val comboBoard: ComboBoard,
@@ -40,12 +42,18 @@ class NoteQueue(
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + lineStart
                 val end = action.end + lineStart
                 val dynamicAction = when (action) {
-                    is RhymeAction.Note -> NoteAction(rhymeManager.assets, start, action) // 单音
+                    is RhymeAction.Note -> { // 单音
+                        NoteAction(rhymeManager.assets, playConfig, start, end, action)
+                    }
                     is RhymeAction.Slur -> {
                         // 不同音级但同音高的仍然算做延音
                         val first = DynamicAction.mapTrackIndex(action.scale.first())
-                        if (action.scale.all { first == DynamicAction.mapTrackIndex(it) }) FixedSlurAction(rhymeManager.assets, start, end, action) // 延音
-                        else OffsetSlurAction(rhymeManager.assets, start, end, action) // 连音
+                        if (action.scale.all { first == DynamicAction.mapTrackIndex(it) }) { // 延音
+                            FixedSlurAction(rhymeManager.assets, playConfig, start, end, action)
+                        }
+                        else { // 连音
+                            OffsetSlurAction(rhymeManager.assets, playConfig, start, end, action)
+                        }
                     }
                 }
                 add(dynamicAction)

@@ -15,14 +15,16 @@ import love.yinlin.compose.onLine
 import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.screen.world.single.rhyme.RhymeAssets
+import love.yinlin.screen.world.single.rhyme.RhymePlayConfig
 
 @Stable
 class FixedSlurAction(
     assets: RhymeAssets,
-    private val start: Long,
-    private val end: Long,
+    playConfig: RhymePlayConfig,
+    start: Long,
+    end: Long,
     override val action: RhymeAction.Slur
-) : DynamicAction {
+) : DynamicAction(assets, playConfig, start, end) {
     @Stable
     private sealed interface State {
         @Stable
@@ -68,20 +70,15 @@ class FixedSlurAction(
         data object Done : State // 已完成
     }
 
-    private val blockMap = assets.blockMap()
-    private val noteDismiss = assets.noteDismiss()
-    private val longPress = assets.longPress()
-    private val longRelease = assets.longRelease()
-
-    private val trackIndex = DynamicAction.mapTrackIndex(action.scale.first())
-    private val noteScale = DynamicAction.mapNoteScale(action.scale.first())
-    private val blockRect = DynamicAction.calcBlockRect(noteScale, 3)
+    private val trackIndex = mapTrackIndex(action.scale.first())
+    private val noteScale = mapNoteScale(action.scale.first())
+    private val blockRect = calcBlockRect(noteScale, 3)
 
     private var state: State by mutableStateOf(State.Ready) // 状态
 
     override var bindId: Long? = null
 
-    override val appearance: Long = start - (DynamicAction.BASE_DURATION * DynamicAction.HIT_RATIO.asUncheckedVirtual).toLong()
+    override val appearance: Long = start - (baseDuration * HIT_RATIO.asUncheckedVirtual).toLong()
     private val actionDuration = end - start
     private val tailAppearance: Long = appearance + actionDuration
 
@@ -105,19 +102,19 @@ class FixedSlurAction(
             State.Ready, State.Done -> { } // 就绪或完成状态不更新
             is State.Moving -> {
                 // 更新进度
-                val headProgress = ((tick - appearance) / DynamicAction.BASE_DURATION_F).asActual
-                val tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F).asActual
+                val headProgress = ((tick - appearance) / baseDurationF).asActual
+                val tailProgress = ((tick - tailAppearance) / baseDurationF).asActual
                 currentState.headProgress = headProgress
                 currentState.tailProgress = tailProgress
                 // 超出死线仍未处理的音符标记错过
-                if (headProgress > DynamicAction.deadline) {
+                if (headProgress > deadline) {
                     state = State.Missing(noteDismiss.frameCount, headProgress, tailProgress)
                     callback.updateResult(ActionResult.MISS)
                 }
             }
             is State.Pressing -> {
                 currentState.animation.update()
-                currentState.tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F).asActual
+                currentState.tailProgress = ((tick - tailAppearance) / baseDurationF).asActual
                 val lastHeadProgress = currentState.lastHeadProgress
                 val tailProgress = currentState.tailProgress
                 // 尾部到达头部时自动结算
@@ -139,8 +136,8 @@ class FixedSlurAction(
             }
             is State.Missing -> {
                 if (!currentState.animation.update()) state = State.Done
-                currentState.headProgress = ((tick - appearance) / DynamicAction.BASE_DURATION_F).asUncheckedActual.coerceAtMost(0.95f)
-                currentState.tailProgress = ((tick - tailAppearance) / DynamicAction.BASE_DURATION_F).asUncheckedActual.coerceAtMost(0.95f)
+                currentState.headProgress = ((tick - appearance) / baseDurationF).asUncheckedActual.coerceAtMost(0.95f)
+                currentState.tailProgress = ((tick - tailAppearance) / baseDurationF).asUncheckedActual.coerceAtMost(0.95f)
             }
         }
     }
@@ -151,7 +148,7 @@ class FixedSlurAction(
         if (track.index != trackIndex || currentState !is State.Moving) return false
         val headProgress = currentState.headProgress
         val tailProgress = currentState.tailProgress
-        return ActionResult.inRange(DynamicAction.HIT_RATIO, headProgress)?.also { result ->
+        return ActionResult.inRange(HIT_RATIO, headProgress)?.also { result ->
             state = if (result == ActionResult.MISS) { // 错过
                 callback.updateResult(result)
                 State.Missing(noteDismiss.frameCount, headProgress, tailProgress)
@@ -195,7 +192,7 @@ class FixedSlurAction(
             val tailLeft = Tracks.Vertices.onLine(track.bottomTailLeft, tailProgress)
             val tailRight = Tracks.Vertices.onLine(track.bottomTailRight, tailProgress)
             path(
-                brush = DynamicAction.SlurTailBrushes[noteScale],
+                brush = SlurTailBrushes[noteScale],
                 path = Path(arrayOf(headLeft, tailLeft, tailRight, headRight)),
                 alpha = alpha
             )
@@ -262,7 +259,7 @@ class FixedSlurAction(
                     image(blockMap, imgRect, it)
                 }
                 // 动画
-                drawPlainAnimation(track, DynamicAction.HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.25f, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
+                drawPlainAnimation(track, HIT_RATIO, longPress, currentState.animation, scaleRatio = 1.25f, colorFilter = ResultColorFilters[currentState.result.ordinal])
             }
             is State.Releasing -> {
                 val lastHeadProgress = currentState.lastHeadProgress
@@ -274,7 +271,7 @@ class FixedSlurAction(
                     image(blockMap, imgRect, it, alpha = releasingAlpha)
                 }
                 // 动画
-                drawPlainAnimation(track, lastHeadProgress, longRelease, currentState.animation, scaleRatio = 1.25f, colorFilter = DynamicAction.ResultColorFilters[currentState.result.ordinal])
+                drawPlainAnimation(track, lastHeadProgress, longRelease, currentState.animation, scaleRatio = 1.25f, colorFilter = ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
                 val headProgress = currentState.headProgress
@@ -284,7 +281,7 @@ class FixedSlurAction(
                 // 按键
                 noteTransform(headProgress, track) {
                     image(blockMap, imgRect, it, alpha = missAlpha)
-                    drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = DynamicAction.SlurColorFilters[noteScale])
+                    drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = SlurColorFilters[noteScale])
                 }
             }
         }
