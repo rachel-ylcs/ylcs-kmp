@@ -86,16 +86,12 @@ class ScreenImagePreview(manager: ScreenManager, images: List<Picture>, initInde
 		) {
 			HorizontalPager(
 				state = pagerState,
-				key = {
-					val preview = previews[it]
-					if (preview.isSource) preview.pic.source else preview.pic.image
-				},
+				key = { previews[it].pic.image },
 				beyondViewportPageCount = 1,
 				modifier = Modifier.fillMaxWidth().weight(1f)
 			) {
-				val preview = previews[it]
 				ZoomWebImage(
-					uri = if (preview.isSource) preview.pic.source else preview.pic.image,
+					uri = previews[it].pic.image,
 					modifier = Modifier.fillMaxSize()
 				)
 			}
@@ -133,9 +129,8 @@ class ScreenImagePreview(manager: ScreenManager, images: List<Picture>, initInde
 				modifier = Modifier.weight(1f).fillMaxHeight(),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {
-				val preview = previews[current]
 				ZoomWebImage(
-					uri = if (preview.isSource) preview.pic.source else preview.pic.image,
+					uri = previews[current].pic.image,
 					modifier = Modifier.fillMaxWidth().weight(1f)
 				)
 				PreviewControls(
