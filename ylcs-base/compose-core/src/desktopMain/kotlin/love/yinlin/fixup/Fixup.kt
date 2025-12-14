@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.window.FrameWindowScope
 import kotlinx.coroutines.delay
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.Platform
@@ -16,9 +17,9 @@ import java.awt.Rectangle
 actual data object Fixup {
     // See https://youtrack.jetbrains.com/issue/CMP-2285/Min-Max-size-window
     @Composable
-    fun swingWindowMinimize(window: ComposeWindow, minSize: DpSize) {
+    fun swingWindowMinimize(scope: FrameWindowScope, minSize: DpSize) {
         LaunchedEffect(LocalDensity.current) {
-            window.minimumSize = Dimension(minSize.width.value.toInt(), minSize.height.value.toInt())
+            scope.window.minimumSize = Dimension(minSize.width.value.toInt(), minSize.height.value.toInt())
         }
     }
 

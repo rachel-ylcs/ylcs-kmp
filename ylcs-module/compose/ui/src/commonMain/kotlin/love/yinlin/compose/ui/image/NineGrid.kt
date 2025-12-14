@@ -9,12 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
+import love.yinlin.collection.StableList
 import love.yinlin.compose.*
 import love.yinlin.data.compose.Picture
 
 @Composable
 fun NineGrid(
-    pics: List<Picture>,
+    pics: StableList<Picture>,
     padding: Dp = CustomTheme.padding.littleSpace,
     modifier: Modifier = Modifier,
     onImageClick: (Int) -> Unit,

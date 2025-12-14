@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import love.yinlin.collection.StableList
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.image.MiniIcon
 
@@ -35,7 +36,7 @@ private fun BreadcrumbItem(
 
 @Composable
 fun <T> Breadcrumb(
-    items: List<T>,
+    items: StableList<T>,
     key: ((Int, T) -> Any)? = null,
     modifier: Modifier = Modifier,
     onClick: (Int) -> Unit

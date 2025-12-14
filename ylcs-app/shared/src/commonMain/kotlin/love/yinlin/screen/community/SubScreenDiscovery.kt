@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.api.*
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
@@ -52,8 +53,7 @@ private enum class DiscoveryItem(
     Discussion(Comment.Section.DISCUSSION, Icons.AutoMirrored.Filled.Chat);
 
     companion object {
-        @Stable
-        val items = DiscoveryItem.entries.fastMap { Comment.Section.sectionName(it.id) to it.icon }
+        val items = DiscoveryItem.entries.fastMap { Comment.Section.sectionName(it.id) to it.icon }.toStableList()
     }
 }
 

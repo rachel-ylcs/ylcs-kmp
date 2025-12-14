@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.datetime.*
+import love.yinlin.collection.StableMap
+import love.yinlin.collection.emptyStableMap
 import love.yinlin.compose.*
 import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.node.condition
@@ -130,7 +132,7 @@ private fun CalendarWeekGrid(modifier: Modifier = Modifier) {
 @Composable
 private fun CalendarDayGrid(
     state: CalendarState,
-    events: Map<LocalDate, String>,
+    events: StableMap<LocalDate, String>,
     modifier: Modifier = Modifier,
     onEventClick: (LocalDate) -> Unit
 ) {
@@ -205,7 +207,7 @@ private fun CalendarDayGrid(
 @Composable
 fun Calendar(
     state: CalendarState = remember { CalendarState() },
-    events: Map<LocalDate, String> = remember { emptyMap() },
+    events: StableMap<LocalDate, String> = remember { emptyStableMap() },
     modifier: Modifier = Modifier,
     actions: @Composable ActionScope.() -> Unit = {},
     onEventClick: (LocalDate) -> Unit

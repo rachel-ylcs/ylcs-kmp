@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import kotlinx.coroutines.delay
+import love.yinlin.collection.StableList
 import love.yinlin.compose.*
 
 @Composable
@@ -42,7 +43,7 @@ private fun BannerIndicator(
 
 @Composable
 fun <T> Banner(
-	pics: List<T>,
+	pics: StableList<T>,
 	interval: Long = 0L,
 	gap: Float = 0.2f,
 	state: PagerState = rememberPagerState { pics.size },

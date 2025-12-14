@@ -24,6 +24,8 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
+import love.yinlin.collection.StableList
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.data.rachel.game.GameConfig
@@ -98,7 +100,7 @@ private enum class CharacterBlockInputMode {
 @Composable
 private fun CharacterBlock(
     blockSize: Int,
-    data: List<BlockCharacter>,
+    data: StableList<BlockCharacter>,
     enabled: Boolean = true,
     writeMode: Boolean,
     onCharacterSelected: suspend (Char?) -> Char? = { null },
@@ -256,7 +258,7 @@ fun ColumnScope.BlockTextCardQuestionAnswer(game: GameDetailsWithName) {
                     BTConfig.CHAR_BLOCK -> BlockCharacter(ch2, true)
                     else -> BlockCharacter(ch2, false)
                 }
-            }
+            }.toStableList()
         }
     }
     answer?.let { (blockSize, data) ->
@@ -309,7 +311,7 @@ fun ColumnScope.BlockTextRecordCard(answer: JsonElement, info: JsonElement) {
         BlockTextRecordResult(actualResult)
         CharacterBlock(
             blockSize = blockSize,
-            data = data,
+            data = remember(data) { data.toStableList() },
             enabled = false,
             writeMode = false,
             modifier = Modifier.fillMaxWidth()
@@ -361,7 +363,7 @@ class BlockTextCreateGameState(val slot: ScreenSlot) : CreateGameState {
         )
         CharacterBlock(
             blockSize = gridSize,
-            data = data,
+            data = remember(data) { data.toStableList() },
             writeMode = true,
             onCharacterSelected = { characterInputDialog.openSuspend(it?.toString() ?: "")?.firstOrNull() },
             onStringSelected = { stringInputDialog.openSuspend() },
@@ -444,7 +446,7 @@ class BlockTextPlayGameState(val slot: ScreenSlot) : PlayGameState {
         preflight?.let { (gridSize) ->
             CharacterBlock(
                 blockSize = gridSize,
-                data = data,
+                data = remember(data) { data.toStableList() },
                 writeMode = false,
                 onCharacterSelected = { characterInputDialog.openSuspend(it?.toString() ?: "")?.firstOrNull() },
                 onStringSelected = { stringInputDialog.openSuspend() },

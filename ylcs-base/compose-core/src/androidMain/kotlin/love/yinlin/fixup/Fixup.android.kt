@@ -33,7 +33,7 @@ actual data object Fixup {
 
     // See https://stackoverflow.com/questions/38382283/change-status-bar-text-color-when-primarydark-is-white/66197063#66197063
     @Composable
-    fun statusBarAutoTheme(window: Window, isDarkMode: Boolean) {
+    fun StatusBarAutoTheme(window: Window, isDarkMode: Boolean) {
         LaunchedEffect(window, isDarkMode) {
             WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = !isDarkMode
         }

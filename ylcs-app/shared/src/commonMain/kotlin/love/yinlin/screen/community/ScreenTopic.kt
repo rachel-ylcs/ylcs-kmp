@@ -26,6 +26,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import love.yinlin.api.*
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -345,7 +346,7 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
 
     @Composable
     private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
-        val pics = remember(details, topic) { details.pics.fastMap { Picture(topic.picPath(it).url) } }
+        val pics = remember(details, topic) { details.pics.fastMap { Picture(topic.picPath(it).url) }.toStableList() }
 
         Column(
             modifier = modifier,

@@ -18,6 +18,7 @@ import love.yinlin.api.ApiTopicSendTopic
 import love.yinlin.api.apiFile
 import love.yinlin.api.request
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.compose.graphics.PlatformImage
@@ -192,7 +193,7 @@ class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {
                 Text(text = "图片", style = MaterialTheme.typography.titleMedium)
                 ImageAdder(
                     maxNum = 9,
-                    pics = input.pics,
+                    pics = remember(input.pics) { input.pics.toStableList() },
                     size = CustomTheme.size.microCellWidth,
                     modifier = Modifier.fillMaxWidth(),
                     onAdd = { launch { pickPictures() } },

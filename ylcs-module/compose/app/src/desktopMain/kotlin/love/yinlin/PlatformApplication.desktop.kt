@@ -134,7 +134,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     }
                 }
 
-                Fixup.swingWindowMinimize(window, minSize)
+                Fixup.swingWindowMinimize(this, minSize)
 
                 Layout {
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {

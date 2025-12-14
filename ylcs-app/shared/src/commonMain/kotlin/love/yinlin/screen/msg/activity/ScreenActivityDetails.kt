@@ -26,6 +26,7 @@ import love.yinlin.api.ApiActivityDeleteActivity
 import love.yinlin.api.request
 import love.yinlin.api.url
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.common.ExtraIcons
 import love.yinlin.uri.Uri
 import love.yinlin.compose.*
@@ -342,7 +343,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 			}
 
 			val pics = remember(activity) {
-				activity.photo.posters.fastMap { Picture(activity.photo.posterPath(it).url) }
+				activity.photo.posters.fastMap { Picture(activity.photo.posterPath(it).url) }.toStableList()
 			}
 			Text(
 				text = "海报",

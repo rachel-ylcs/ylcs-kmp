@@ -29,7 +29,7 @@ abstract class ComposeActivity : ComponentActivity() {
 
         setContent {
             instance.Layout {
-                Fixup.statusBarAutoTheme(window, LocalDarkMode.current)
+                Fixup.StatusBarAutoTheme(window, LocalDarkMode.current)
 
                 instance.BeginContent(this)
                 instance.Content()

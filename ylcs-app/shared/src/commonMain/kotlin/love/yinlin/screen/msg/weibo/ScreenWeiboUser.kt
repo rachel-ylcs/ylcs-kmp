@@ -21,6 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
+import love.yinlin.collection.StableList
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ItemKey
 import love.yinlin.compose.screen.Screen
@@ -167,7 +169,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
     private var items by mutableRefStateOf(emptyList<Weibo>())
     private val listState = LazyStaggeredGridState()
     private var user: WeiboUser? by mutableRefStateOf(null)
-    private var albums: List<WeiboAlbum>? by mutableRefStateOf(null)
+    private var albums: StableList<WeiboAlbum>? by mutableRefStateOf(null)
 
     private fun onFollowClick(user: WeiboUser, isFollow: Boolean) {
         val weiboUsers = app.config.weiboUsers
@@ -233,7 +235,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
     @Composable
     private fun Portrait(
         user: WeiboUser,
-        albums: List<WeiboAlbum>?
+        albums: StableList<WeiboAlbum>?
     ) {
         LazyColumn(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             item(key = ItemKey("UserInfoCard")) {
@@ -290,7 +292,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
     @Composable
     private fun Landscape(
         user: WeiboUser,
-        albums: List<WeiboAlbum>?
+        albums: StableList<WeiboAlbum>?
     ) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             Surface(
@@ -348,7 +350,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
                     WeiboGrid(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
-                        items = items,
+                        items = remember(items) { items.toStableList() },
                         onPicturesDownload = ::onPicturesDownload,
                         onVideoDownload = ::onVideoDownload
                     )
@@ -372,7 +374,7 @@ class ScreenWeiboUser(manager: ScreenManager, private val userId: String) : Scre
             }
         }
         launch {
-            albums = WeiboAPI.getWeiboUserAlbum(userId)
+            albums = WeiboAPI.getWeiboUserAlbum(userId)?.toStableList()
         }
     }
 

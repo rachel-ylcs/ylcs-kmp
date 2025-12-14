@@ -19,12 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
+import love.yinlin.collection.StableList
 import love.yinlin.compose.*
 
 @Composable
 fun <T> ImageAdder(
     maxNum: Int,
-    pics: List<T>,
+    pics: StableList<T>,
     size: Dp,
     space: Dp = CustomTheme.padding.equalSpace,
     modifier: Modifier = Modifier,

@@ -17,6 +17,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.readByteArray
 import love.yinlin.api.*
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
@@ -526,7 +527,7 @@ class ScreenModifyActivity(manager: ScreenManager, private val aid: Int) : Scree
 			)
 			ImageAdder(
 				maxNum = 9,
-				pics = photo.posters,
+				pics = remember(photo.posters) { photo.posters.toStableList() },
 				size = CustomTheme.size.microCellWidth,
 				modifier = Modifier.fillMaxWidth(),
 				onAdd = {

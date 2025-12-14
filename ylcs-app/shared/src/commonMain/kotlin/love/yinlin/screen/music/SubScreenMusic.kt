@@ -34,6 +34,8 @@ import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import love.yinlin.app
+import love.yinlin.collection.StableList
+import love.yinlin.collection.toStableList
 import love.yinlin.common.*
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.BasicScreen
@@ -338,7 +340,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 	@Composable
 	private fun MusicChorus(
 		duration: Long,
-		chorus: List<Long>,
+		chorus: StableList<Long>,
 		modifier: Modifier = Modifier
 	) {
 		Box(modifier = modifier) {
@@ -371,7 +373,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 	private fun MusicProgressBar(
 		currentTime: Long,
 		duration: Long,
-		chorus: List<Long>?,
+		chorus: StableList<Long>?,
 		modifier: Modifier = Modifier
 	) {
 		ProgressSlider(
@@ -411,7 +413,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 			MusicProgressBar(
 				currentTime = currentDebounceTime,
 				duration = mp.currentDuration,
-				chorus = mp.currentMusic?.chorus,
+				chorus = remember(mp.currentMusic) { mp.currentMusic?.chorus?.toStableList() },
 				modifier = Modifier.fillMaxWidth().height(CustomTheme.size.progressHeight * 2)
 			)
 		}

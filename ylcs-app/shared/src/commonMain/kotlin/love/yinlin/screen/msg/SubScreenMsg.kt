@@ -27,6 +27,8 @@ import love.yinlin.api.ApiActivityGetActivities
 import love.yinlin.api.request
 import love.yinlin.api.url
 import love.yinlin.app
+import love.yinlin.collection.toStableList
+import love.yinlin.collection.toStableMap
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
 import love.yinlin.data.compose.ItemKey
@@ -104,7 +106,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
         shape: Shape,
         modifier: Modifier = Modifier
     ) {
-        val pics by rememberDerivedState { activities.fastFilter { it.photo.coverPath != null } }
+        val pics by rememberDerivedState { activities.fastFilter { it.photo.coverPath != null }.toStableList() }
         BoxWithConstraints(modifier = modifier) {
             Banner(
                 pics = pics,
@@ -175,7 +177,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
         modifier: Modifier = Modifier,
         actions: @Composable (ActionScope.() -> Unit)
     ) {
-        val events: Map<LocalDate, String> by rememberDerivedState {
+        val events by rememberDerivedState {
             val events = mutableMapOf<LocalDate, String>()
             for (activity in activities) {
                 val ts = activity.ts
@@ -186,7 +188,7 @@ class SubScreenMsg(parent: BasicScreen) : SubScreen(parent) {
                     }
                 }
             }
-            events
+            events.toStableMap()
         }
 
         Surface(

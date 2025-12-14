@@ -17,6 +17,7 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
 import love.yinlin.api.*
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -186,7 +187,7 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
                         tab = FollowTabItem.fromInt(it)
                         launch { if (items.isEmpty()) requestNewData() }
                     },
-                    items = remember { FollowTabItem.entries.fastMap { it.title } },
+                    items = remember { FollowTabItem.entries.fastMap { it.title }.toStableList() },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

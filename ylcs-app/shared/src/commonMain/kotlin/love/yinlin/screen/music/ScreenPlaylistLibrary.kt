@@ -25,6 +25,7 @@ import love.yinlin.api.ApiBackupDownloadPlaylist
 import love.yinlin.api.ApiBackupUploadPlaylist
 import love.yinlin.api.request
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
@@ -111,7 +112,7 @@ private fun ReorderableCollectionItemScope.MusicStatusCard(
 class ScreenPlaylistLibrary(manager: ScreenManager) : Screen(manager) {
     private val mp = app.mp
     private val playlistLibrary = app.config.playlistLibrary
-    private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key } }
+    private val tabs by derivedStateOf { playlistLibrary.map { key, _ -> key }.toStableList() }
     private var currentPage: Int by mutableIntStateOf(if (tabs.isEmpty()) -1 else 0)
     private val library = mutableStateListOf<MusicStatusPreview>()
 

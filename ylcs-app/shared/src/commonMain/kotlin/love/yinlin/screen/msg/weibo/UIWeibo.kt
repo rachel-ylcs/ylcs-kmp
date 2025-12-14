@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import love.yinlin.collection.StableList
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.weibo.Weibo
@@ -175,7 +177,7 @@ fun WeiboLayout(
     Spacer(modifier = Modifier.height(CustomTheme.padding.verticalExtraSpace))
     if (weibo.pictures.isNotEmpty()) {
         NineGrid(
-            pics = weibo.pictures,
+            pics = remember(weibo) { weibo.pictures.toStableList() },
             modifier = Modifier.fillMaxWidth(),
             onImageClick = { processor.onWeiboPicClick(weibo.pictures, it) },
             onVideoClick = { processor.onWeiboVideoClick(it) }
@@ -247,7 +249,7 @@ fun WeiboCard(
 @Composable
 fun WeiboGrid(
     state: LazyStaggeredGridState,
-    items: List<Weibo>,
+    items: StableList<Weibo>,
     modifier: Modifier = Modifier,
     onPicturesDownload: ((List<Picture>) -> Unit)?,
     onVideoDownload: ((String) -> Unit)?

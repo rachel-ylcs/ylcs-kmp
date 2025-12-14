@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
@@ -138,7 +139,7 @@ open class RichEditorState {
             TabBar(
                 currentPage = emojiClassify.ordinal,
                 onNavigate = { emojiClassify = EmojiType.fromInt(it) },
-                items = remember { EmojiType.entries.map { it.title } },
+                items = remember { EmojiType.entries.map { it.title }.toStableList() },
                 modifier = Modifier.fillMaxWidth()
             )
 

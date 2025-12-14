@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
+import love.yinlin.collection.StableList
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.image.MiniIcon
 import kotlin.jvm.JvmName
@@ -25,7 +26,7 @@ private fun <T> TabBar(
     currentPage: Int,
     onNavigate: (Int) -> Unit,
     onLongClick: ((Int) -> Unit)? = null,
-    items: List<T>,
+    items: StableList<T>,
     modifier: Modifier = Modifier,
     content: @Composable (Boolean, T) -> Unit,
 ) {
@@ -69,7 +70,7 @@ fun TabBar(
     currentPage: Int,
     onNavigate: (Int) -> Unit,
     onLongClick: ((Int) -> Unit)? = null,
-    items: List<Pair<String, ImageVector>>,
+    items: StableList<Pair<String, ImageVector>>,
     modifier: Modifier = Modifier
 ) {
     TabBar(
@@ -103,7 +104,7 @@ fun TabBar(
     currentPage: Int,
     onNavigate: (Int) -> Unit,
     onLongClick: ((Int) -> Unit)? = null,
-    items: List<String>,
+    items: StableList<String>,
     modifier: Modifier = Modifier
 ) {
     TabBar(

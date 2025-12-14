@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
@@ -86,7 +87,7 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
 
                 WeiboGrid(
                     state = gridState,
-                    items = items,
+                    items = remember(items) { items.toStableList() },
                     modifier = Modifier.fillMaxSize(),
                     onPicturesDownload = { pics ->
                         Platform.use(
