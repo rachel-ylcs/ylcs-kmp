@@ -21,10 +21,10 @@ interface LyricsEngine {
     fun FloatingLyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle)
 
     companion object {
-        private val Line = LineLyricsEngine()
-        private val Rhyme = RhymeLyricsEngine()
+        private val Line by lazy { LineLyricsEngine() }
+        private val Rhyme by lazy { RhymeLyricsEngine() }
 
-        val Default: LyricsEngine = Line
+        val Default: LyricsEngine by lazy { Line }
 
         operator fun get(type: LyricsEngineType): LyricsEngine = when (type) {
             LyricsEngineType.Line -> Line

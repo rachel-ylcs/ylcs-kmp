@@ -9,17 +9,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.app
+import love.yinlin.collection.toStableList
 import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.input.SortingBox
+import love.yinlin.extension.moveItem
 import love.yinlin.platform.lyrics.FloatingLyrics
 
 @Composable
@@ -52,7 +57,19 @@ class ScreenLyricsSettings(manager: ScreenManager) : Screen(manager) {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
         ) {
-            PlatformContent()
+            ColumnLayout("歌词引擎优先级") {
+                SortingBox(
+                    items = remember(app.config.lyricsEngineOrder) { app.config.lyricsEngineOrder.toStableList() },
+                    onMove = { from, to -> app.config.lyricsEngineOrder = app.config.lyricsEngineOrder.toMutableList().also { it.moveItem(from, to) } },
+                    title = { it.title },
+                    icon = { it.icon },
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
+                )
+            }
+            ColumnLayout("悬浮歌词设置") {
+                PlatformContent()
+            }
         }
     }
 

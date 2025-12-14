@@ -39,6 +39,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.mutableRefStateOf
 import love.yinlin.compose.ui.node.fadingEdges
+import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.readText
 import kotlin.math.abs
 
@@ -100,7 +101,7 @@ internal class LineLyricsEngine : LyricsEngine {
     private var currentIndex by mutableIntStateOf(-1)
     private val currentText by derivedStateOf { lines?.getOrNull(currentIndex)?.text ?: "" }
 
-    override suspend fun load(rootPath: Path): Boolean {
+    override suspend fun load(rootPath: Path): Boolean = catchingDefault(false) {
         val source = Path(rootPath, type.resType.filename).readText()
         lines = source?.let { LrcParser(it).paddingLyrics }
         return lines != null

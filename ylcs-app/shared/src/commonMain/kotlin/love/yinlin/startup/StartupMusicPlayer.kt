@@ -17,6 +17,8 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
+import love.yinlin.extension.catching
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.list
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.readText
@@ -83,9 +85,10 @@ abstract class StartupMusicPlayer : AsyncStartup() {
         // 更新播放模式
         updatePlayMode(app.config.musicPlayMode)
         // 更新歌词引擎
-        LyricsEngine[app.config.lyricsEngineType].let {
-            if (engine != it) engine = it
-        }
+        catchingError {
+            val firstEngine = LyricsEngine[app.config.lyricsEngineOrder.first()]
+            if (engine != firstEngine) engine = firstEngine
+        }?.let { engine = LyricsEngine.Default }
         // 恢复上一次播放
         app.config.playlistLibrary[app.config.lastPlaylist]?.let {
             startPlaylist(it, app.config.lastMusic.ifEmpty { null }, false)

@@ -744,15 +744,16 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
 		}
 
 		monitor(state = { mp.currentMusic }) { musicInfo ->
+			// 重置引擎
 			mp.engine.reset()
 
 			if (musicInfo != null) catching {
 				Coroutines.io {
-					// 加载歌词, 加载失败则回退到默认歌词引擎
+					// 按引擎顺序依次检查是否成功加载
 					val rootPath = musicInfo.path(Paths.modPath)
-					if (!mp.engine.load(rootPath)) {
-						mp.engine = LyricsEngine.Default
-						mp.engine.load(rootPath)
+					for (engineType in app.config.lyricsEngineOrder) {
+						mp.engine = LyricsEngine[engineType]
+						if (mp.engine.load(rootPath)) break
 					}
 
 					// 更新状态标志

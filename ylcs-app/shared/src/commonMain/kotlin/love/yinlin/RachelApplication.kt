@@ -86,7 +86,7 @@ class StartupAppConfig : StartupConfig() {
     // 歌词引擎配置
     var lyricsEngineConfig by jsonState { LyricsEngineConfig() }
     // 歌词引擎类型
-    var lyricsEngineType by enumState(LyricsEngineType.Line)
+    var lyricsEngineOrder by jsonState { LyricsEngineType.DefaultOrder }
 
     /* ------------------  社区  ------------------ */
 
