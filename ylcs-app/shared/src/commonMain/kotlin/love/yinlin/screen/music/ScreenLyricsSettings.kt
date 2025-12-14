@@ -19,11 +19,11 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.platform.lyrics.FloatingLyrics
 
 @Composable
-expect fun ScreenFloatingLyrics.PlatformContent(device: Device)
+expect fun ScreenLyricsSettings.PlatformContent(device: Device)
 
 @Stable
-class ScreenFloatingLyrics(manager: ScreenManager) : Screen(manager) {
-    override val title: String = "悬浮歌词"
+class ScreenLyricsSettings(manager: ScreenManager) : Screen(manager) {
+    override val title: String = "歌词设置"
 
     internal var config by mutableRefStateOf(app.config.lyricsEngineConfig)
 

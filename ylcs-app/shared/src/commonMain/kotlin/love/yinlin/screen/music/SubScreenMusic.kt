@@ -166,7 +166,7 @@ class SubScreenMusic(parent: BasicScreen) : SubScreen(parent) {
                     tip = "歌词",
                     color = Colors.White
                 ) {
-                    if (mp.isInit) navigate(::ScreenFloatingLyrics)
+                    if (mp.isInit) navigate(::ScreenLyricsSettings)
                     else slot.tip.warning("播放器尚未初始化")
                 }
             },

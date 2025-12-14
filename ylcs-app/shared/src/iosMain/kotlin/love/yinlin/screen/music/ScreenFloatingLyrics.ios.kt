@@ -20,7 +20,7 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.SplitLayout
 
 @Composable
-actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
+actual fun ScreenLyricsSettings.PlatformContent(device: Device) {
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()

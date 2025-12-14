@@ -20,7 +20,7 @@ private fun FloatingLyrics.toggle() {
 }
 
 @Composable
-actual fun ScreenFloatingLyrics.PlatformContent(device: Device) {
+actual fun ScreenLyricsSettings.PlatformContent(device: Device) {
     Column(modifier = Modifier
         .padding(LocalImmersivePadding.current)
         .fillMaxSize()

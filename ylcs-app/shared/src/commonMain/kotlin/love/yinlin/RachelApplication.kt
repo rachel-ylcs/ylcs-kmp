@@ -221,13 +221,12 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
             // 听歌
             screen(::ScreenMusicLibrary)
             screen(::ScreenPlaylistLibrary)
-            screen(::ScreenFloatingLyrics)
+            screen(::ScreenLyricsSettings)
             screen(::ScreenMusicDetails)
             screen(::ScreenModCenter)
             screen(::ScreenImportMusic)
             screen(::ScreenCreateMusic)
             screen(::ScreenPlatformMusic)
-
 
             // 世界
             screen(::ScreenGameHall)
