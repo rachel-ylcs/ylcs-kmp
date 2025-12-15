@@ -43,8 +43,8 @@ class NoteAction(
     }
 
     private val trackIndex = mapTrackIndex(action.scale)
-    private val noteScale = mapNoteScale(action.scale)
-    private val blockRect = calcBlockRect(noteScale)
+    private val noteLevel = mapNoteLevel(action.scale)
+    private val blockRect = calcBlockRect(noteLevel)
 
     private var state: State by mutableStateOf(State.Ready) // 状态
 
@@ -128,14 +128,14 @@ class NoteAction(
                     if (blockAlpha > 0f) image(blockMap, imgRect, it, alpha = blockAlpha)
                 }
                 // 动画
-                drawPlainAnimation(track, lastProgress, noteClick, currentState.animation, colorFilter = ResultColorFilters[currentState.result.ordinal])
+                drawPlainAnimation(track, lastProgress, noteClick, currentState.animation, scaleRatio = 1.25f, colorFilter = ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
                 val missAlpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f)
                 // 按键
                 noteTransform(currentState.progress, track) {
                     if (missAlpha > 0f) image(blockMap, imgRect, it, alpha = missAlpha)
-                    drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = NoteColorFilters[noteScale])
+                    drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = NoteColorFilters[noteLevel])
                 }
             }
         }

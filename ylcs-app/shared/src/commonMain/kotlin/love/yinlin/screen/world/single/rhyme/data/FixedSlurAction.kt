@@ -6,13 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import love.yinlin.compose.Colors
-import love.yinlin.compose.Path
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.LineFrameAnimation
 import love.yinlin.compose.game.animation.SpeedAdapter
-import love.yinlin.compose.onLine
-import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.screen.world.single.rhyme.RhymeAssets
 import love.yinlin.screen.world.single.rhyme.RhymePlayConfig
@@ -77,8 +73,8 @@ class FixedSlurAction(
     }
 
     private val trackIndex = mapTrackIndex(action.scale.first())
-    private val noteScale = mapNoteScale(action.scale.first())
-    private val blockRect = calcBlockRect(noteScale + 3)
+    private val noteLevel = mapNoteLevel(action.scale.first())
+    private val blockRect = calcBlockRect(noteLevel + 3)
 
     private var state: State by mutableStateOf(State.Ready) // 状态
 
@@ -157,10 +153,9 @@ class FixedSlurAction(
             state = if (result == ActionResult.MISS) { // 错过
                 callback.updateResult(result)
                 State.Missing(noteDismiss.frameCount, headProgress, tailProgress)
-            }
-            else { // 长按
+            } else { // 长按
                 State.Pressing(
-                    longPress.frameCount,
+                    frameCount = longPress.frameCount,
                     pressTick = tick,
                     result = result,
                     lastHeadProgress = headProgress,
@@ -189,54 +184,6 @@ class FixedSlurAction(
 
     override fun onTrackTransfer(oldTrack: Track, newTrack: Track, tick: Long, callback: ActionCallback): Boolean = false
 
-    private fun Drawer.drawTrailing(track: Track, headProgress: Float, tailProgress: Float, alpha: Float = 1f) {
-        if (headProgress <= tailProgress || alpha <= 0f) return
-        // 绘制拖尾
-        val headLeft = Tracks.Vertices.onLine(track.bottomTailLeft, headProgress)
-        val headRight = Tracks.Vertices.onLine(track.bottomTailRight, headProgress)
-        val tailLeft = Tracks.Vertices.onLine(track.bottomTailLeft, tailProgress)
-        val tailRight = Tracks.Vertices.onLine(track.bottomTailRight, tailProgress)
-        path(
-            brush = SlurTailBrushes[noteScale],
-            path = Path(arrayOf(headLeft, tailLeft, tailRight, headRight)),
-            alpha = alpha
-        )
-        // 绘制侧边
-        val sideWidth = 10f
-        path(
-            color = Colors.Ghost.copy(alpha = 0.8f),
-            path = Path(arrayOf(headLeft, tailLeft, tailLeft.translate(x = sideWidth * tailProgress), headLeft.translate(x = sideWidth * headProgress))),
-            alpha = alpha
-        )
-        path(
-            color = Colors.Ghost.copy(alpha = 0.8f),
-            path = Path(arrayOf(headRight, tailRight, tailRight.translate(x = -sideWidth * tailProgress), headRight.translate(x = -sideWidth * headProgress))),
-            alpha = alpha
-        )
-        // 绘制终端
-        val miniRatio = 0.01f
-        val miniHeadProgress = headProgress - miniRatio
-        val miniTailProgress = tailProgress + miniRatio
-        if (tailProgress < miniHeadProgress) {
-            val terminalLeft = Tracks.Vertices.onLine(track.bottomTailLeft, miniHeadProgress)
-            val terminalRight = Tracks.Vertices.onLine(track.bottomTailRight, miniHeadProgress)
-            path(
-                color = Colors.Ghost.copy(alpha = 0.8f),
-                path = Path(arrayOf(terminalLeft, headLeft, headRight, terminalRight)),
-                alpha = alpha
-            )
-        }
-        if (headProgress > miniTailProgress) {
-            val terminalLeft = Tracks.Vertices.onLine(track.bottomTailLeft, miniTailProgress)
-            val terminalRight = Tracks.Vertices.onLine(track.bottomTailRight, miniTailProgress)
-            path(
-                color = Colors.Ghost.copy(alpha = 0.8f),
-                path = Path(arrayOf(terminalLeft, tailLeft, tailRight, terminalRight)),
-                alpha = alpha
-            )
-        }
-    }
-
     override fun Drawer.onDraw() {
         val currentState = state
         if (currentState == State.Ready || currentState == State.Done) return // 就绪或完成状态不渲染
@@ -248,7 +195,7 @@ class FixedSlurAction(
             is State.Moving -> {
                 val headProgress = currentState.headProgress
                 // 拖尾
-                drawTrailing(track, headProgress, currentState.tailProgress)
+                drawTrailing(track, noteLevel, headProgress, currentState.tailProgress)
                 // 按键
                 noteTransform(headProgress, track) {
                     image(blockMap, imgRect, it)
@@ -257,7 +204,7 @@ class FixedSlurAction(
             is State.Pressing -> {
                 val headProgress = currentState.lastHeadProgress
                 // 拖尾
-                drawTrailing(track, headProgress, currentState.tailProgress)
+                drawTrailing(track, noteLevel, headProgress, currentState.tailProgress)
                 // 按键
                 val blockAlpha = (1 - currentState.blockAnimation.progress * 2f).coerceAtLeast(0f)
                 noteTransform(headProgress, track) {
@@ -270,19 +217,19 @@ class FixedSlurAction(
                 val lastHeadProgress = currentState.lastHeadProgress
                 val releasingAlpha = (1 - currentState.animation.progress * 1.5f).coerceAtLeast(0f)
                 // 拖尾
-                drawTrailing(track, lastHeadProgress, currentState.lastTailProgress, alpha = releasingAlpha)
+                drawTrailing(track, noteLevel, lastHeadProgress, currentState.lastTailProgress, alpha = releasingAlpha)
                 // 动画
-                drawPlainAnimation(track, lastHeadProgress, longRelease, currentState.animation, colorFilter = ResultColorFilters[currentState.result.ordinal])
+                drawPlainAnimation(track, lastHeadProgress, longRelease, currentState.animation, scaleRatio = 1.25f, colorFilter = ResultColorFilters[currentState.result.ordinal])
             }
             is State.Missing -> {
                 val headProgress = currentState.headProgress
                 val missAlpha = (1 - currentState.animation.progress * 2f).coerceAtLeast(0f)
                 // 拖尾
-                drawTrailing(track, headProgress, currentState.tailProgress, alpha = missAlpha)
+                drawTrailing(track, noteLevel, headProgress, currentState.tailProgress, alpha = missAlpha)
                 // 按键
                 noteTransform(headProgress, track) {
                     if (missAlpha > 0f) image(blockMap, imgRect, it, alpha = missAlpha)
-                    drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = SlurColorFilters[noteScale])
+                    drawPerspectiveAnimation(track, it, noteDismiss, currentState.animation, colorFilter = SlurColorFilters[noteLevel])
                 }
             }
         }
