@@ -25,7 +25,7 @@ internal sealed interface GameState {
     @Stable
     data class MusicDetails(val entry: RhymeMusic) : GameState // 音乐详情
     @Stable
-    data object Playing : GameState // 游戏中
+    data class Playing(val playConfig: RhymePlayConfig, val musicInfo: MusicInfo) : GameState // 游戏中
     @Stable
     data class Settling(val result: RhymeResult) : GameState // 结算
 }

@@ -27,7 +27,8 @@ class ScoreBoard(
     override val size: Size = Size(200f, 40f)
 
     // 游戏得分
-    private var score: Int by mutableIntStateOf(0)
+    var score: Int by mutableIntStateOf(0)
+        private set
     private val scoreText: String by derivedStateOf { score.toString().padStart(4, ' ').toList().fastJoinToString(" ") }
 
     private val textCache = TextDrawer.Cache()

@@ -15,7 +15,7 @@ import love.yinlin.screen.world.single.rhyme.spirit.Scene
 @Stable
 class RhymeManager(
     context: Context,
-    onComplete: () -> Unit,
+    onComplete: (RhymePlayResult) -> Unit,
     val onPause: () -> Unit
 ) : Manager() {
     override val size: Size = Size(RhymeConfig.WIDTH, RhymeConfig.HEIGHT)
@@ -25,8 +25,8 @@ class RhymeManager(
     override val assets: RhymeAssets = RhymeAssets()
 
     private val mp = AudioPlayer(context) {
+        (scene as? Scene)?.playResult?.let(onComplete)
         stop()
-        onComplete()
     }
 
     private val sp = SoundPlayer()
