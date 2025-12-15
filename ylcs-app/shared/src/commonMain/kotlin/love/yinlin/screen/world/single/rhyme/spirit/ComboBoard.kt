@@ -29,7 +29,7 @@ class ComboBoard(
     override val preTransform: List<Transform> = listOf(Transform.Translate(1450f, 150f))
     override val size: Size = Size(400f, 200f)
 
-    private val statistics = IntArray(ActionResult.entries.size) { 0 }
+    val statistics = IntArray(ActionResult.entries.size)
 
     private var result by mutableStateOf<ActionResult?>(null)
     private var combo by mutableIntStateOf(0)

@@ -15,6 +15,7 @@ import love.yinlin.compose.game.traits.Transform
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 import love.yinlin.screen.world.single.rhyme.RhymePlayConfig
+import love.yinlin.screen.world.single.rhyme.RhymePlayResult
 
 @Stable
 private class LeftUI(
@@ -98,5 +99,10 @@ class Scene(
         screenEnvironment,
         LeftUI(rhymeManager, playConfig, name, scoreBoard),
         RightUI(rhymeManager, lyricsConfig),
+    )
+
+    val playResult: RhymePlayResult get() = RhymePlayResult(
+        score = scoreBoard.score,
+        statistics = comboBoard.statistics.toList()
     )
 }

@@ -39,7 +39,7 @@ abstract class Manager {
     abstract val currentTick: Long
     abstract val assets: Assets
 
-    private var scene: Spirit? = null // 主场景
+    protected var scene: Spirit? = null // 主场景
 
     private val pointers = mutableLongObjectMapOf<Offset>() // 指针集
 

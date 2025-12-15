@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
@@ -62,6 +63,7 @@ import love.yinlin.platform.NetClient
 import love.yinlin.platform.ioContext
 import love.yinlin.screen.world.game.GameSlider
 import love.yinlin.screen.world.game.cast
+import love.yinlin.screen.world.single.rhyme.data.ActionResult
 import love.yinlin.shared.resources.Res
 import love.yinlin.shared.resources.rhyme
 import org.jetbrains.compose.resources.Font
@@ -122,7 +124,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                         audio = info.path(Paths.modPath, ModResourceType.Audio)
                     )
                 }
-                state = GameState.Playing
+                state = GameState.Playing(playConfig, info)
             }.errorTip
         }
     }
@@ -132,8 +134,14 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
         state = GameState.Start
     }
 
-    private fun completeGame() {
-        state = GameState.Settling(RhymeResult(0))
+    private fun completeGame(playResult: RhymePlayResult) {
+        (state as? GameState.Playing)?.let {
+            state = GameState.Settling(RhymeResult(
+                playConfig = it.playConfig,
+                musicInfo = it.musicInfo,
+                playResult = playResult
+            ))
+        }
     }
 
     private fun pauseGame(newState: GameLockState) {
@@ -414,10 +422,11 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                     )
                 }
                 Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
-
-                }
-                Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
-
+                    Text(
+                        text = "排行榜",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Colors.White
+                    )
                 }
             }
         }
@@ -444,8 +453,28 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
     }
 
     @Composable
-    private fun GameOverlaySettling() {
-
+    private fun GameOverlaySettling(result: RhymeResult) {
+        RhymeOverlayLayout(
+            title = "结算",
+            onBack = ::onBack,
+            action = {
+                RhymeButton(
+                    icon = Icons.Outlined.CloudUpload,
+                    transparent = false,
+                    onClick = {
+                        slot.tip.info("记录上传敬请期待")
+                    }
+                )
+            }
+        ) {
+            Column {
+                Text(text = "难度: ${result.playConfig.difficulty.title}")
+                Text(text = "得分: ${result.playResult.score}")
+                ActionResult.entries.fastForEachIndexed { index, actionResult ->
+                    Text(text = "${actionResult.title}: ${result.playResult.statistics[index]}")
+                }
+            }
+        }
     }
 
     override val title: String? = null
@@ -537,7 +566,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
                         is GameState.MusicLibrary -> GameOverlayMusicLibrary()
                         is GameState.MusicDetails -> GameOverlayMusicDetails(it.entry)
                         is GameState.Playing -> GameOverlayPlaying()
-                        is GameState.Settling -> GameOverlaySettling()
+                        is GameState.Settling -> GameOverlaySettling(it.result)
                     }
                 }
 
