@@ -11,11 +11,11 @@ import love.yinlin.compose.Colors
 @Stable
 data object About {
     internal val updateInfo = UpdateInfo(
-        platform = "Android/Windows修复更新",
-        title = "新版本更新加速进行中... 与粼粼一起前进吧!",
+        platform = "Android/Windows/Web 先行发布",
+        title = "音游内测上线, 动态歌词引擎支持, 抽奖活动即将上线",
         force = true,
-        maintenance = true,
-        date = LocalDate(2025, 11, 16),
+        maintenance = false,
+        date = LocalDate(2025, 12, 15),
         groups = listOf(
             UpdateRecordGroup(
                 type = "新功能",
@@ -23,8 +23,10 @@ data object About {
                 color = Colors.Steel4,
                 background = Colors.Steel2,
                 records = listOf(
-                    "预热1: 音游即将上线, 银临全曲集陆续支持...",
-                    "预热2: 抽奖活动上线, 节日活动或福利抽奖均在APP中进行..."
+                    "1. 音游内测上线, 内测期将陆续支持银临全曲集, 公测后将开放玩家排行榜",
+                    "2. 动态歌词引擎支持, 现在歌词播放与悬浮歌词将支持逐字歌词",
+                    "3. 抽奖活动上线, 节日活动将会在APP中发放福利抽奖",
+                    "",
                 )
             ),
             UpdateRecordGroup(
@@ -33,11 +35,13 @@ data object About {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = listOf(
-                    "1. 在线曲库上线, 所有歌曲MOD均可在线下载, 按需更新资源包",
-                    "2. MOD歌曲详情页、在线详情页、歌评页合并, 一览无余",
-                    "3. 演出活动页UI重绘, 更加丰富的演出信息展示",
-                    "4. 曲库按钮平铺, 更容易操作",
-                    "5. APP优化, 大幅度减小包体积"
+                    "1. Windows端减少20M包体积, 移除vlc依赖(可手动删除)",
+                    "2. Android端减少10M包体积",
+                    "3. 活动页新增隐藏活动预告",
+                    "4. 美图图集页标题也加入搜索范围",
+                    "5. 优化美图图集图片加载, 选择原图后需要下载才能生效",
+                    "6. 优化歌曲详情页配色与布局",
+                    "7. 增大编辑器表情的显示大小",
                 )
             ),
             UpdateRecordGroup(
@@ -46,8 +50,18 @@ data object About {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复具有多行输入的文本框取消其IME回车响应的问题",
-                    "2. 修复微博和超话加载异常的问题",
+                    "1. 修复只有一首歌曲循环播放结束时悬浮歌词不消失的问题",
+                    "2. 修复修改密码显示不一致的问题",
+                    "3. 修复服务器总是返回非法异常的问题",
+                    "4. 修复歌单云备份错误未提示的问题",
+                    "5. 修复社区和微博页滚动时卡死的问题",
+                    "6. 修复拖拽悬浮歌词配置异常的问题",
+                    "7. 修复Windows音乐播放器进度间隔固定的问题",
+                    "8. 修复退出视频页后声音仍在播放的问题",
+                    "9. 修复音频播放器结束时未停止的问题",
+                    "10. 修复初始服务未加载完成时操作崩溃的问题",
+                    "11. 修复账号有效期异常退出登录的问题",
+                    "12. 修复网页端微博和超话显示异常的问题"
                 )
             )
         )
