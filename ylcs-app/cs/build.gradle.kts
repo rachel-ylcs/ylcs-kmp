@@ -53,8 +53,6 @@ kotlin {
             kotlin.srcDir(C.root.cs.srcGenerated)
             useApi(
                 projects.ylcsBase.csCore,
-            )
-            useLib(
                 libs.compose.runtime,
             )
         }

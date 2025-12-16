@@ -66,11 +66,10 @@ abstract class NavigationScreen(manager: ScreenManager) : BasicScreen(manager) {
 
             LaunchedEffect(pageIndex) {
                 val info = subs[pageIndex]
-                launch {
-                    info.flag(
-                        update = info.screen::update,
-                        init = info.screen::initialize
-                    )
+                info.flag({
+                    launch { info.screen.update() }
+                }) {
+                    launch { info.screen.initialize() }
                 }
             }
         }
