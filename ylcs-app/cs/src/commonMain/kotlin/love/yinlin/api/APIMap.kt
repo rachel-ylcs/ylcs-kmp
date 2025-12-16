@@ -27,6 +27,7 @@ import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.platform.Platform
+import love.yinlin.data.rachel.rhyme.RhymeRank
 import love.yinlin.data.rachel.prize.Prize
 import love.yinlin.data.rachel.prize.PrizeItemdata
 import love.yinlin.data.rachel.prize.PrizeDraw
@@ -484,6 +485,19 @@ val ApiPrizeGetAllParticipators by API.post.i<Int, Int, Int>().o<List<PrizeDraw>
 val ApiPrizeDrawPrize by API.post.i<String, Int>().o<String>()
 //管理员手动开奖，生成中奖名单
 //使用承诺-揭示机制确保公平性
+
+@APIParam("token")
+@APIParam("sid")
+@APIParam("difficulty")
+@APIParam("score")
+val ApiRhymeUploadRecord by API.post.i<String, Int, Int, Int>().o()
+
+@APIParam("sid")
+@APIParam("difficulty")
+@APIParam("score")
+@APIParam("uid", default = "0")
+@APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
+val ApiRhymeGetSongRank by API.post.i<Int, Int, Int, Int, Int>().o<List<RhymeRank>>()
 
 
 

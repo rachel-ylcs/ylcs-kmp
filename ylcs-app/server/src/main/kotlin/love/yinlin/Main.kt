@@ -50,7 +50,8 @@ fun main() = object : ServerEngine() {
         ::profileAPI,
         ::topicAPI,
         ::songAPI,
-        ::prizeAPI
+        ::prizeAPI,
+        ::rhymeAPI
     )
 
     override val proxy = Proxy(name = APIConfig.PROXY_NAME, whitelist = listOf(
