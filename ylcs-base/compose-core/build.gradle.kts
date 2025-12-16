@@ -63,6 +63,13 @@ kotlin {
             )
         }
 
+        commonTest.configure {
+            useLib(
+                libs.test,
+                libs.kotlinx.coroutines.test,
+            )
+        }
+
         androidMain.configure {
             useSourceSet(commonMain)
             useApi(
