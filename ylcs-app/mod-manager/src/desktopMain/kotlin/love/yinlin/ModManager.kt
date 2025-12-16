@@ -14,7 +14,7 @@ import love.yinlin.screen.ScreenRhyme
 class MainApplication : PlatformApplication<MainApplication>(appReference, PlatformContextDelegate) {
     override val title: String = "MOD管理器 第${ModFactory.VERSION}版"
     override val initSize: DpSize = DpSize(1200.dp, 800.dp)
-    override val actionMaximize: Boolean = false
+    override val actionMinimize: Boolean = false
 
     val rootPath = Path(System.getProperty("user.dir"))
     val libraryPath = Path(rootPath, "library")

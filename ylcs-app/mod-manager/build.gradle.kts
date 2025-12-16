@@ -15,13 +15,16 @@ kotlin {
     }
     
     sourceSets {
+        val commonMain by getting {
+            useLib(libs.compose.components.resources)
+        }
+
         val desktopMain by getting {
             useLib(
                 projects.ylcsApp.mod,
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
                 projects.ylcsModule.compose.component.urlImage,
-                libs.compose.components.resources,
             )
         }
     }

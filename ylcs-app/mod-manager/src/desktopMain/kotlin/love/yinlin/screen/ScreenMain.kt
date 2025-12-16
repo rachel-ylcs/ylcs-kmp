@@ -53,6 +53,8 @@ import love.yinlin.extension.*
 import love.yinlin.mod.ModFactory
 import love.yinlin.platform.Coroutines
 import org.jetbrains.compose.resources.stringResource
+import java.awt.Desktop
+import java.io.File
 
 @Stable
 class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
@@ -215,6 +217,9 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
                         }
                     })
                 }
+                add(ContextMenuItem("打开所在目录") {
+                    Desktop.getDesktop().open(File(item.path.toString()))
+                })
                 add(ContextMenuItem("音游编辑") {
                     launch {
                         navigate(::ScreenRhyme, item.path.toString())
