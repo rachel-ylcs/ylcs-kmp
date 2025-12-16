@@ -423,9 +423,19 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     }
 
     @Composable
-    private fun ActionScope.ResourceItemActionLayout(type: ModResourceType) {
-        // TODO: 等待重做
-        when (type) {
+    private fun ActionScope.DeleteActionLayout(item: ResourceItem) {
+        val type = item.type
+        ActionSuspend(Icons.Outlined.Delete, "删除") {
+            if (slot.confirm.openSuspend(content = "删除${type.description}资源")) {
+                clientResources.remove(item)
+                clientSong?.clientPath(type)?.delete()
+            }
+        }
+    }
+
+    @Composable
+    private fun ActionScope.ResourceItemActionLayout(item: ResourceItem) {
+        when (val type = item.type) {
             ModResourceType.Config -> {
 
             }
@@ -445,10 +455,10 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
 
             }
             ModResourceType.Video -> {
-
+                DeleteActionLayout(item)
             }
             ModResourceType.Rhyme -> {
-
+                DeleteActionLayout(item)
             }
         }
     }
@@ -495,7 +505,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
             }
             if (!remote) {
                 ActionScope.Right.ActionLayout(modifier = Modifier.fillMaxWidth()) {
-                    ResourceItemActionLayout(item.type)
+                    ResourceItemActionLayout(item)
                 }
             }
         }
