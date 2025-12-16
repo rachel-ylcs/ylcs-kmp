@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.drawscope.DrawTransform
 import androidx.compose.ui.graphics.drawscope.Fill
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.Manager
+import kotlin.math.min
 
 @Stable
 abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, Visible, Dynamic, Trigger {
@@ -94,6 +95,17 @@ abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, V
     final override fun Drawer.onDraw() {
         transform(::clientDrawTransform) { onClientDraw() }
     }
+
+    protected val topLeft: Offset get() = Offset.Zero
+    protected val topRight: Offset get() = Offset(size.width, 0f)
+    protected val bottomLeft: Offset get() = Offset(0f, size.height)
+    protected val bottomRight: Offset get() = Offset(size.width, size.height)
+    protected val leftCenter: Offset get() = Offset(0f, size.height / 2)
+    protected val topCenter: Offset get() = Offset(size.width / 2, 0f)
+    protected val bottomCenter: Offset get() = Offset(size.width / 2, size.height)
+    protected val rightCenter: Offset get() = Offset(size.width, size.height / 2)
+    protected val center: Offset get() = Offset(size.width / 2, size.height / 2)
+    protected val radius: Float get() = min(size.width, size.height) / 2
 
     protected fun Drawer.circle(color: Color, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) = circle(color, Offset.Zero, radius, alpha, style, blendMode)
     protected fun Drawer.circle(brush: Brush, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) = circle(brush, Offset.Zero, radius, alpha, style, blendMode)
