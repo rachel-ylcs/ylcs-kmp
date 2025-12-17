@@ -70,6 +70,7 @@ import love.yinlin.screen.msg.activity.ScreenActivityLink
 import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.platform.QrcodeScanner
 import love.yinlin.data.Data
+import love.yinlin.data.compose.ImageQuality
 import love.yinlin.extension.catchingError
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -225,6 +226,9 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         ) {
             Item("抽奖", ExtraIcons.Gift) {
 
+            }
+            Item("招新", Icons.Outlined.Campaign) {
+                posterSheet.open()
             }
             Item("水群", ExtraIcons.QQ) {
                 launch {
@@ -564,6 +568,21 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
                     )
                 }
             }
+        }
+    }
+
+    val posterSheet = this land object : FloatingSheet() {
+        override val maxHeightRatio: Float = 1f
+        override val initFullScreen: Boolean = true
+
+        @Composable
+        override fun Content() {
+            WebImage(
+                uri = remember { ServerRes.Assets.Poster.url },
+                modifier = Modifier.fillMaxSize(),
+                quality = ImageQuality.Full,
+                contentScale = ContentScale.Crop
+            )
         }
     }
 }
