@@ -49,9 +49,7 @@ class Constants(project: Project) {
     // kotlin 特性
     val features = listOf(
         "-Xexpect-actual-classes",
-        "-Xnested-type-aliases",
         "-Xwasm-kclass-fqn",
-        "-Xdata-flow-based-exhaustiveness",
         "-Xes-long-as-bigint",
     )
 
