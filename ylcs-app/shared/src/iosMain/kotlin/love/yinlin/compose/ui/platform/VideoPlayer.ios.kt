@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import cocoapods.MobileVLCKit.*
 import kotlinx.cinterop.ExperimentalForeignApi
-import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.ClickIcon
@@ -22,20 +21,23 @@ import platform.UIKit.UIColor
 import platform.UIKit.UIView
 import platform.darwin.NSObject
 
-@ExperimentalForeignApi
 @Stable
-private class VideoPlayerView(var player: VLCMediaPlayer?) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
+@OptIn(ExperimentalForeignApi::class)
+private class VideoPlayerWrapper : PlatformView<UIView>() {
+    private val player = VLCMediaPlayer()
     var isPlaying by mutableStateOf(false)
+        private set
     var position by mutableLongStateOf(0L)
+        private set
     var duration by mutableLongStateOf(0L)
+        private set
 
-    private val playerDelegate: VLCMediaPlayerDelegateProtocol
-
-    init {
-        backgroundColor = UIColor.blackColor
-        player?.drawable = this
-        playerDelegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {
-            override fun mediaPlayerStateChanged(aNotification: NSNotification) = withPlayer { player ->
+    override fun build(): UIView {
+        val uiView = UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))
+        uiView.backgroundColor = UIColor.blackColor
+        player.drawable = uiView
+        player.delegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {
+            override fun mediaPlayerStateChanged(aNotification: NSNotification) {
                 if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
                     Coroutines.startMain {
                         player.media = player.media?.url?.let { VLCMedia.mediaWithURL(it) }
@@ -49,106 +51,75 @@ private class VideoPlayerView(var player: VLCMediaPlayer?) : UIView(CGRectMake(0
                 }
             }
 
-            override fun mediaPlayerTimeChanged(aNotification: NSNotification) = withPlayer { player ->
+            override fun mediaPlayerTimeChanged(aNotification: NSNotification) {
                 position = player.time.intValue.toLong()
             }
         }
-        player?.delegate = playerDelegate
+        return uiView
     }
 
-    fun release() {
-        player?.stop()
-        player?.delegate = null
-        player?.drawable = null
-        player = null
+    override fun release(view: UIView) {
+        player.stop()
+        player.drawable = null
+        player.delegate = null
     }
 
-    inline fun withPlayer(block: (player: VLCMediaPlayer) -> Unit) {
-        player?.let(block)
+    fun setMedia(url: String) {
+        val media = VLCMedia(url.let {
+            if (url.startsWith("http")) {
+                NSURL.URLWithString(it)!!
+            } else {
+                NSURL.fileURLWithPath(it)
+            }
+        })
+        player.media = media
+        player.play()
+    }
+
+    fun playOrPause() {
+        if (player.isPlaying()) player.pause()
+        else player.play()
+    }
+
+    fun playOrPause(isForeground: Boolean) {
+        if (isForeground) player.play()
+        else player.pause()
+    }
+
+    fun seekTo(position: Long) {
+        player.time = VLCTime.timeWithInt(position.toInt())
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,
     onBack: () -> Unit
 ) {
-    var wasMusicPlaying by rememberFalse()
-    val state = rememberRefState<VideoPlayerView?> { null }
+    val wrapper = remember { VideoPlayerWrapper() }
 
-    if (app.config.audioFocus) {
-        DisposableEffect(Unit) {
-            wasMusicPlaying = app.mp.isPlaying
-            if (wasMusicPlaying) {
-                Coroutines.startMain {
-                    app.mp.pause()
-                }
-            }
-            onDispose {
-                if (wasMusicPlaying) {
-                    Coroutines.startMain {
-                        app.mp.play()
-                    }
-                }
-            }
-        }
-    }
+    LaunchedEffect(url) { wrapper.setMedia(url) }
 
-    OffScreenEffect { isForeground ->
-        state.value?.player?.let {
-            if (isForeground) it.play()
-            else it.pause()
-        }
-    }
+    OffScreenEffect { wrapper.playOrPause(it) }
 
     Box(modifier = modifier) {
         Box(Modifier.matchParentSize().background(Colors.Black).zIndex(1f))
-        PlatformView(
-            view = state,
-            modifier = Modifier.fillMaxSize().zIndex(2f),
-            factory = {
-                val player = VLCMediaPlayer()
-                val media = VLCMedia(url.let {
-                    if (url.startsWith("http")) {
-                        NSURL.URLWithString(it)!!
-                    } else {
-                        NSURL.fileURLWithPath(it)
-                    }
-                })
-                player.media = media
-                player.play()
-                VideoPlayerView(player)
-            },
-            release = { player, onRelease ->
-                player.release()
-                onRelease()
+        wrapper.Content(Modifier.fillMaxSize().zIndex(2f))
+        VideoPlayerControls(
+            modifier = Modifier.fillMaxSize().zIndex(3f),
+            isPlaying = wrapper.isPlaying,
+            onPlayClick = { wrapper.playOrPause() },
+            position = wrapper.position,
+            duration = wrapper.duration,
+            onProgressClick = { wrapper.seekTo(it) },
+            topBar = {
+                ClickIcon(
+                    icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                    color = Colors.White,
+                    onClick = onBack
+                )
             }
         )
-        state.value?.let {
-            VideoPlayerControls(
-                modifier = Modifier.fillMaxSize().zIndex(3f),
-                isPlaying = it.isPlaying,
-                onPlayClick = {
-                    it.withPlayer { player ->
-                        if (player.isPlaying()) player.pause()
-                        else player.play()
-                    }
-                },
-                position = it.position,
-                duration = it.duration,
-                onProgressClick = { position ->
-                    it.withPlayer { player -> player.time = VLCTime.timeWithInt(position.toInt()) }
-                },
-                topBar = {
-                    ClickIcon(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
-                        color = Colors.White,
-                        onClick = onBack
-                    )
-                }
-            )
-        }
     }
 }

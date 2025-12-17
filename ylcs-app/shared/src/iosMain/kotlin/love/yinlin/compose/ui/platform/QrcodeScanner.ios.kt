@@ -10,10 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import cocoapods.SGQRCode.*
+import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.launch
-import kotlinx.io.readByteArray
-import love.yinlin.app
 import love.yinlin.extension.colorWithHex
 import love.yinlin.compose.*
 import love.yinlin.extension.toNSData
@@ -30,9 +29,8 @@ import platform.UIKit.UIDeviceOrientation
 import platform.UIKit.UIImage
 import platform.UIKit.UIView
 
-@ExperimentalForeignApi
-@Stable
-private class QrScanView(val scanCode: SGScanCode) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
+@OptIn(ExperimentalForeignApi::class)
+private class QrcodeView(private val onRectOfInterest: (CValue<CGRect>) -> Unit) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
     val scanView: SGScanView = SGScanView(frame, SGScanViewConfigure().apply {
         scanline = "scan_scanline_qq"
         scanlineStep = 2.0
@@ -76,52 +74,64 @@ private class QrScanView(val scanCode: SGScanCode) : UIView(CGRectMake(0.0, 0.0,
         }
 
         if (CGRectGetWidth(scanView.scanFrame) == 0.0 && CGRectGetHeight(scanView.scanFrame) == 0.0) {
-            scanCode.setRectOfInterest(CGRectMake(0.0, 0.0, 1.0, 1.0))
+            onRectOfInterest(CGRectMake(0.0, 0.0, 1.0, 1.0))
         } else {
             previewLayer?.metadataOutputRectOfInterestForRect(scanView.scanFrame)?.let {
-                scanCode.setRectOfInterest(it)
+                onRectOfInterest(it)
             }
         }
     }
 }
 
 @OptIn(ExperimentalForeignApi::class)
-@Composable
-actual fun QrcodeScanner(
-    modifier: Modifier,
-    onResult: (String) -> Unit
-) {
-    val scope = rememberCoroutineScope()
-    val scanCode = remember {
-        SGScanCode().apply {
-            delegate = object : SGScanCodeDelegateProtocol, NSObject() {
-                override fun scanCode(scanCode: SGScanCode?, result: String?) {
-                    scanCode?.stopRunning()
-                    scanCode?.playSoundEffect("SGQRCode.bundle/scan_end_sound.caf")
-                    onResult(result!!)
-                }
+@Stable
+private class QrcodeScannerWrapper(private val onResult: (String) -> Unit) : PlatformView<QrcodeView>() {
+    val scanCode = SGScanCode().apply {
+        delegate = object : SGScanCodeDelegateProtocol, NSObject() {
+            override fun scanCode(scanCode: SGScanCode?, result: String?) {
+                scanCode?.stopRunning()
+                scanCode?.playSoundEffect("SGQRCode.bundle/scan_end_sound.caf")
+                onResult(result!!)
             }
         }
     }
-    val state: MutableState<QrScanView?> = rememberRefState { null }
+
+    override fun build(): QrcodeView {
+        val qrcodeView = QrcodeView { scanCode.setRectOfInterest(it) }
+        scanCode.preview = qrcodeView
+        Coroutines.startIO { scanCode.startRunning() }
+        qrcodeView.scanView.startScanning()
+        return qrcodeView
+    }
+
+    override fun release(view: QrcodeView) {
+        view.scanView.stopScanning()
+        scanCode.stopRunning()
+    }
+
+    suspend fun parseByteArray(data: ByteArray) {
+        val image = UIImage(data.toNSData())
+        scanCode.readQRCode(image) { text ->
+            if (text != null) {
+                scanCode.playSoundEffect("SGQRCode.bundle/scan_end_sound.caf")
+                Coroutines.startMain { onResult(text) }
+            }
+        }
+    }
+}
+
+@Composable
+actual fun QrcodeScanner(
+    modifier: Modifier,
+    onAlbumPick: suspend () -> ByteArray?,
+    onResult: (String) -> Unit
+) {
+    val wrapper = remember { QrcodeScannerWrapper() }
+
+    val scope = rememberCoroutineScope()
 
     Box(modifier = modifier) {
-        PlatformView(
-            view = state,
-            modifier = Modifier.fillMaxSize().zIndex(1f),
-            factory = {
-                val view = QrScanView(scanCode)
-                scanCode.preview = view
-                Coroutines.startIO { scanCode.startRunning() }
-                view.scanView.startScanning()
-                view
-            },
-            release = { view, onRelease ->
-                view.scanView.stopScanning()
-                scanCode.stopRunning()
-                onRelease()
-            }
-        )
+        wrapper.Content(Modifier.fillMaxSize().zIndex(1f))
         Row(
             modifier = Modifier.fillMaxWidth()
                 .align(Alignment.BottomCenter)
@@ -140,16 +150,7 @@ actual fun QrcodeScanner(
                 onClick = {
                     scope.launch {
                         Coroutines.io {
-                            app.picker.pickPicture()?.use { picture ->
-                                val data = picture.readByteArray().toNSData()
-                                val image = UIImage(data)
-                                scanCode.readQRCode(image) { text ->
-                                    if (text != null) {
-                                        scanCode.playSoundEffect("SGQRCode.bundle/scan_end_sound.caf")
-                                        Coroutines.startMain { onResult(text) }
-                                    }
-                                }
-                            }
+                            onAlbumPick()?.let { wrapper.parseByteArray(it) }
                         }
                     }
                 }

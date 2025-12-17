@@ -2,39 +2,43 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import java.awt.Component
 
-@Composable
-fun <T : Component> PlatformView(
-    view: MutableState<T?>,
-    modifier: Modifier = Modifier,
-    factory: () -> T,
-    update: ((T) -> Unit)? = null,
-    release: (T, () -> Unit) -> Unit = { _, onRelease -> onRelease() }
-) {
-    DisposableEffect(view, release) {
-        onDispose {
-            view.value?.let {
-                release(it) {
-                    view.value = null
+@Stable
+abstract class PlatformView<T : Component> {
+    protected abstract fun build(): T
+    protected open fun release(view: T) { }
+    protected open fun update(view: T) { }
+
+    private var view: T? = null
+    private val lock = SynchronizedObject()
+
+    @Composable
+    fun Content(modifier: Modifier = Modifier) {
+        DisposableEffect(Unit) {
+            onDispose {
+                synchronized(lock) {
+                    view?.let { release(it) }
+                    view = null
                 }
             }
         }
-    }
 
-    SwingPanel(
-        background = Color.Transparent,
-        modifier = modifier,
-        factory = {
-            view.value ?: factory().let {
-                view.value = it
-                it
-            }
-        },
-        update = { update?.invoke(it) }
-    )
+        SwingPanel(
+            background = Color.Transparent,
+            factory = {
+                synchronized(lock) {
+                    view ?: build().also { view = it }
+                }
+            },
+            update = ::update,
+            modifier = modifier
+        )
+    }
 }

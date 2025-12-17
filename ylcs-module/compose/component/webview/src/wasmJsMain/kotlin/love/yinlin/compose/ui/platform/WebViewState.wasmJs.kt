@@ -2,12 +2,12 @@ package love.yinlin.compose.ui.platform
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import love.yinlin.compose.mutableRefStateOf
+import kotlinx.browser.document
+import love.yinlin.platform.PlatformView
 import org.w3c.dom.HTMLIFrameElement
 
 @Stable
-actual class WebViewState actual constructor(val settings: WebViewConfig, initUrl: String) {
-    internal val webview = mutableRefStateOf<HTMLIFrameElement?>(null)
+actual class WebViewState actual constructor(val settings: WebViewConfig, initUrl: String) : PlatformView<HTMLIFrameElement>() {
     actual var url: String = initUrl
     actual val loadingState: WebViewLoadingState = WebViewLoadingState.Finished
     actual val title: String = ""
@@ -18,4 +18,12 @@ actual class WebViewState actual constructor(val settings: WebViewConfig, initUr
     actual fun goBack() {}
     actual fun goForward() {}
     actual fun evaluateJavaScript(script: String) {}
+
+    override fun build(): HTMLIFrameElement {
+        val iframe = document.createElement("iframe") as HTMLIFrameElement
+        iframe.frameBorder = "0"
+        iframe.referrerPolicy = "no-referrer"
+        iframe.src = url
+        return iframe
+    }
 }

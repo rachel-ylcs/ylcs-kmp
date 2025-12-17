@@ -1,45 +1,43 @@
 package love.yinlin.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitInteropInteractionMode
 import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import androidx.compose.ui.viewinterop.UIKitView
+import kotlinx.atomicfu.locks.SynchronizedObject
+import kotlinx.atomicfu.locks.synchronized
 import platform.UIKit.UIView
 
-@Composable
-fun <T : UIView> PlatformView(
-    view: MutableState<T?>,
-    modifier: Modifier = Modifier,
-    factory: () -> T,
-    update: ((T) -> Unit)? = null,
-    reset: ((T) -> Unit)? = null,
-    release: (T, () -> Unit) -> Unit = { _, onRelease -> onRelease() }
-) {
-    DisposableEffect(view, release) {
-        onDispose {
-            view.value?.let {
-                release(it) {
-                    view.value = null
-                }
-            }
-        }
-    }
+@Stable
+abstract class PlatformView<T : UIView> {
+    protected abstract fun build(): T
+    protected open fun release(view: T) { }
+    protected open fun update(view: T) { }
+    protected open fun reset(view: T) { }
 
-    UIKitView(
-        modifier = modifier,
-        properties = UIKitInteropProperties(
-            interactionMode = UIKitInteropInteractionMode.NonCooperative
-        ),
-        factory = {
-            view.value ?: factory().let {
-                view.value = it
-                it
-            }
-        },
-        update = { update?.invoke(it) },
-        onReset = reset
-    )
+    protected var view: T? = null
+    private val lock = SynchronizedObject()
+
+    @Composable
+    fun Content(modifier: Modifier = Modifier) {
+        UIKitView(
+            modifier = modifier,
+            factory = {
+                synchronized(lock) {
+                    view ?: build().also { view = it }
+                }
+            },
+            update = ::update,
+            onReset = if (this is ResetPlatformView) ::reset else null,
+            onRelease = {
+                synchronized(lock) {
+                    release(it)
+                    view = null
+                }
+            },
+            properties = UIKitInteropProperties(interactionMode = UIKitInteropInteractionMode.NonCooperative)
+        )
+    }
 }

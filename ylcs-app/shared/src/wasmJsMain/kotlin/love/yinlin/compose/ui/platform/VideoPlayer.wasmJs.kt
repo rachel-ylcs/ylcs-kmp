@@ -1,15 +1,43 @@
-@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.compose.ui.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kotlinx.browser.document
 import love.yinlin.compose.OffScreenEffect
-import love.yinlin.compose.rememberRefState
 import love.yinlin.data.MimeType
 import love.yinlin.platform.PlatformView
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
+
+@Stable
+private class VideoPlayerWrapper : PlatformView<HTMLVideoElement>() {
+    override fun build(): HTMLVideoElement {
+        val video = document.createElement("video") as HTMLVideoElement
+        val source = document.createElement("source") as HTMLSourceElement
+        video.autoplay = true
+        video.controls = true
+        video.loop = true
+        video.muted = false
+        source.type = MimeType.MP4
+        video.appendChild(source)
+        return video
+    }
+
+    fun load(url: String) {
+        (view?.firstElementChild as? HTMLSourceElement)?.src = url
+    }
+
+    @OptIn(ExperimentalWasmJsInterop::class)
+    fun playOrPause(isForeground: Boolean) {
+        view?.let {
+            if (isForeground) it.play()
+            else it.pause()
+        }
+    }
+}
 
 @Composable
 actual fun VideoPlayer(
@@ -17,32 +45,11 @@ actual fun VideoPlayer(
     modifier: Modifier,
     onBack: () -> Unit
 ) {
-    val view = rememberRefState<HTMLVideoElement?> { null }
+    val wrapper = remember { VideoPlayerWrapper() }
 
-    OffScreenEffect { isForeground ->
-        view.value?.let { video ->
-            if (isForeground) video.play()
-            else video.pause()
-        }
-    }
+    wrapper.Content(modifier)
 
-    PlatformView(
-        view = view,
-        factory = {
-            (document.createElement("video") as HTMLVideoElement).also { video ->
-                video.autoplay = true
-                video.controls = true
-                video.loop = true
-                video.muted = false
-                (document.createElement("source") as HTMLSourceElement).also { source ->
-                    source.type = MimeType.MP4
-                    video.appendChild(source)
-                }
-            }
-        },
-        update = { view ->
-            (view.firstElementChild as? HTMLSourceElement)?.src = url
-        },
-        modifier = modifier,
-    )
+    LaunchedEffect(url) { wrapper.load(url) }
+
+    OffScreenEffect { wrapper.playOrPause(it) }
 }

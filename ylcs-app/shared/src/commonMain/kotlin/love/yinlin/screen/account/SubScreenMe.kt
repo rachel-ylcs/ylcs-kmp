@@ -30,6 +30,7 @@ import kotlinx.atomicfu.atomic
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
+import kotlinx.io.readByteArray
 import love.yinlin.api.*
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
@@ -375,6 +376,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
         override fun Content() {
             QrcodeScanner(
                 modifier = Modifier.fillMaxWidth(),
+                onAlbumPick = { app.picker.pickPicture()?.use { it.readByteArray() } },
                 onResult = { result ->
                     catchingError {
                         val uri = Uri.parse(result)!!

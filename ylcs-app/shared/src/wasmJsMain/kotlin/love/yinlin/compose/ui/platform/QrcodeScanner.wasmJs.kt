@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 @Composable
 actual fun QrcodeScanner(
     modifier: Modifier,
+    onAlbumPick: suspend () -> ByteArray?,
     onResult: (String) -> Unit
 ) {
     UnsupportedPlatformComponent(modifier)

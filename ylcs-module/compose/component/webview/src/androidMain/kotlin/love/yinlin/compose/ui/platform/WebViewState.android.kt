@@ -1,42 +1,47 @@
 package love.yinlin.compose.ui.platform
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebViewClient
+import androidx.activity.result.ActivityResultRegistry
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.lifecycle.LifecycleOwner
 import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.platform.PlatformView
+
+private typealias AndroidWebView = android.webkit.WebView
 
 @Stable
-actual class WebViewState actual constructor(val settings: WebViewConfig, initUrl: String) {
-    internal val webview = mutableRefStateOf<AndroidWebView?>(null)
-
-    internal var mUrl: String by mutableStateOf(initUrl)
+actual class WebViewState actual constructor(val settings: WebViewConfig, initUrl: String) : PlatformView<AndroidWebView>() {
+    private var mUrl: String by mutableStateOf(initUrl)
     actual var url: String get() = mUrl
-        set(value) { webview.value?.loadUrl(value) }
+        set(value) { view?.loadUrl(value) }
 
-    internal var mLoadingState: WebViewLoadingState by mutableRefStateOf(WebViewLoadingState.Initializing)
+    private var mLoadingState: WebViewLoadingState by mutableRefStateOf(WebViewLoadingState.Initializing)
     actual val loadingState: WebViewLoadingState by derivedStateOf { mLoadingState }
 
-    internal var mTitle: String by mutableStateOf("")
+    private var mTitle: String by mutableStateOf("")
     actual val title: String by derivedStateOf { mTitle }
 
-    internal var mIcon: BitmapPainter? by mutableRefStateOf(null)
+    private var mIcon: BitmapPainter? by mutableRefStateOf(null)
     actual val icon: BitmapPainter? by derivedStateOf { mIcon }
 
-    internal var mCanGoBack: Boolean by mutableStateOf(false)
+    private var mCanGoBack: Boolean by mutableStateOf(false)
     actual val canGoBack: Boolean by derivedStateOf { mCanGoBack }
 
-    internal var mCanGoForward: Boolean by mutableStateOf(false)
+    private var mCanGoForward: Boolean by mutableStateOf(false)
     actual val canGoForward: Boolean by derivedStateOf { mCanGoForward }
 
-    internal var mError: WebViewError? by mutableRefStateOf(null)
+    private var mError: WebViewError? by mutableRefStateOf(null)
     actual val error: WebViewError? by derivedStateOf { mError }
 
-    internal val client = object : WebViewClient() {
+    private val client = object : WebViewClient() {
         override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
             url?.let { mUrl = it }
@@ -65,7 +70,7 @@ actual class WebViewState actual constructor(val settings: WebViewConfig, initUr
         }
     }
 
-    internal val chromeClient = object : WebChromeClient() {
+    private val chromeClient = object : WebChromeClient() {
         override fun onReceivedTitle(view: AndroidWebView?, title: String?) {
             super.onReceivedTitle(view, title)
             title?.let { mTitle = it }
@@ -83,18 +88,51 @@ actual class WebViewState actual constructor(val settings: WebViewConfig, initUr
     }
 
     actual fun goBack() {
-        webview.value?.let {
+        view?.let {
             if (it.canGoBack()) it.goBack()
         }
     }
 
     actual fun goForward() {
-        webview.value?.let {
+        view?.let {
             if (it.canGoForward()) it.goForward()
         }
     }
 
     actual fun evaluateJavaScript(script: String) {
-        webview.value?.evaluateJavascript(script, null)
+        view?.evaluateJavascript(script, null)
+    }
+
+    override fun build(context: Context, lifecycleOwner: LifecycleOwner, activityResultRegistry: ActivityResultRegistry?): AndroidWebView {
+        val webView = AndroidWebView(context)
+        webView.setBackgroundColor(Color.TRANSPARENT)
+        webView.settings.apply {
+            javaScriptEnabled = settings.enableJavaScript
+            javaScriptCanOpenWindowsAutomatically = settings.enableJavaScriptOpenWindow
+            domStorageEnabled = settings.enableDomStorage
+            allowFileAccess = settings.enableFileAccess
+            allowContentAccess = settings.enableContentAccess
+
+            blockNetworkImage = false
+            blockNetworkLoads = false
+            loadsImagesAutomatically = true
+            useWideViewPort = true
+
+            builtInZoomControls = true
+            displayZoomControls = false
+            mediaPlaybackRequiresUserGesture = false
+
+            setSupportMultipleWindows(true)
+            setSupportZoom(true)
+            setGeolocationEnabled(true)
+        }
+        webView.webViewClient = client
+        webView.webChromeClient = chromeClient
+        if (mUrl.isNotEmpty()) webView.loadUrl(mUrl)
+        return webView
+    }
+
+    override fun release(view: AndroidWebView) {
+        view.destroy()
     }
 }
