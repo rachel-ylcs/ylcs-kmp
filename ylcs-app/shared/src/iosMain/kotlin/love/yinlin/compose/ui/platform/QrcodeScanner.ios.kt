@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui.platform
 
 import androidx.compose.foundation.layout.*
@@ -29,7 +30,6 @@ import platform.UIKit.UIDeviceOrientation
 import platform.UIKit.UIImage
 import platform.UIKit.UIView
 
-@OptIn(ExperimentalForeignApi::class)
 private class QrcodeView(private val onRectOfInterest: (CValue<CGRect>) -> Unit) : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
     val scanView: SGScanView = SGScanView(frame, SGScanViewConfigure().apply {
         scanline = "scan_scanline_qq"
@@ -83,7 +83,6 @@ private class QrcodeView(private val onRectOfInterest: (CValue<CGRect>) -> Unit)
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
 @Stable
 private class QrcodeScannerWrapper(private val onResult: (String) -> Unit) : PlatformView<QrcodeView>() {
     val scanCode = SGScanCode().apply {
@@ -126,7 +125,7 @@ actual fun QrcodeScanner(
     onAlbumPick: suspend () -> ByteArray?,
     onResult: (String) -> Unit
 ) {
-    val wrapper = remember { QrcodeScannerWrapper() }
+    val wrapper = remember { QrcodeScannerWrapper(onResult) }
 
     val scope = rememberCoroutineScope()
 
