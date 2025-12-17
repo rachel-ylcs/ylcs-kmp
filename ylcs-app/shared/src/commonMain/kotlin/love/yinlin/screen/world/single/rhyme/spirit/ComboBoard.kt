@@ -103,7 +103,7 @@ class ComboBoard(
 
     fun updateAction(newResult: ActionResult, scoreRatio: Float = 1f): Int {
         // 统计
-        ++statistics[newResult.ordinal]
+        statistics[newResult.ordinal] += 1
         // 重置进度
         result = newResult
         // 计算得分

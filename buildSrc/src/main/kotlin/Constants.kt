@@ -49,8 +49,8 @@ class Constants(project: Project) {
     // kotlin 特性
     val features = listOf(
         "-Xexpect-actual-classes",
-        "-Xwasm-kclass-fqn",
         "-Xes-long-as-bigint",
+        "-Xreturn-value-checker=check",
     )
 
     // 排除资源

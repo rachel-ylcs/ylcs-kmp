@@ -4,11 +4,9 @@ import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.*
-import kotlin.time.ExperimentalTime
 
 @Stable
 data object DouyinAPI {
-    @OptIn(ExperimentalTime::class)
     private fun getDouyinVideo(json: JsonObject): DouyinVideo {
         val time = (json["create_time"].Long * 1000).toLocalDateTime!!
         val video = json.obj("video")
