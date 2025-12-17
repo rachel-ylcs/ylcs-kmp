@@ -145,7 +145,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
         path?.let {
             if (!slot.confirm.openSuspend(content = "替换音游配置到库")) return
             val rhymePath = Path(it, ModResourceType.Rhyme.filename)
-            rhymePath.writeText(rhymeConfig.toJsonString())
+            rhymePath.writeText(prettyJson.encodeToString(rhymeConfig))
             slot.tip.success("保存成功")
         }
     }
