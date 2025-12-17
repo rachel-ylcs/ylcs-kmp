@@ -225,7 +225,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
             title = "推广"
         ) {
             Item("抽奖", ExtraIcons.Gift) {
-
+                navigate(::ScreenPrice)
             }
             Item("招新", Icons.Outlined.Campaign) {
                 posterSheet.open()

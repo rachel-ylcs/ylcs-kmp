@@ -218,6 +218,8 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
             screen(::ScreenMail)
             screen(::ScreenSettings)
 
+            screen(::ScreenPrice)
+
             // 听歌
             screen(::ScreenMusicLibrary)
             screen(::ScreenPlaylistLibrary)
