@@ -3,7 +3,6 @@ package love.yinlin.platform.lyrics
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowScope
 import androidx.compose.ui.window.WindowState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -23,15 +21,10 @@ import kotlinx.coroutines.flow.onEach
 import love.yinlin.Context
 import love.yinlin.app
 import love.yinlin.compose.Colors
+import love.yinlin.compose.platform.DragArea
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.extension.NativeLib
 import love.yinlin.platform.setWindowClickThrough
-
-@Composable
-private fun WindowScope.DragArea(enabled: Boolean, content: @Composable () -> Unit) {
-    if (enabled) WindowDraggableArea(content = content)
-    else content()
-}
 
 @Stable
 actual class FloatingLyrics {

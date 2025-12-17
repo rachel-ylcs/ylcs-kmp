@@ -2,7 +2,6 @@ package love.yinlin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +18,8 @@ import androidx.compose.ui.window.*
 import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.DefaultIcon
 import love.yinlin.compose.LaunchFlag
+import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.platform.DragArea
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.image.MiniImage
@@ -93,6 +94,37 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun ApplicationScope.MultipleWindow() {}
 
+    @Stable
+    private sealed interface MaximizeState {
+        val showText: String
+        fun toggle(windowState: WindowState): MaximizeState
+
+        @Stable
+        data object Normal : MaximizeState {
+            override val showText: String = "最大化"
+
+            override fun toggle(windowState: WindowState): MaximizeState {
+                val newState = Maximized(windowState.size, windowState.position)
+                windowState.placement = WindowPlacement.Maximized
+                return newState
+            }
+        }
+
+        @Stable
+        data class Maximized(val lastSize: DpSize, val lastPosition: WindowPosition) : MaximizeState {
+            override val showText: String = "还原"
+
+            override fun toggle(windowState: WindowState): MaximizeState {
+                windowState.placement = WindowPlacement.Floating
+                windowState.size = lastSize
+                windowState.position = lastPosition
+                return Normal
+            }
+        }
+    }
+
+    private var maximizeState: MaximizeState by mutableRefStateOf(MaximizeState.Normal)
+
     private var windowVisible by mutableStateOf(true)
     private var alwaysOnTop by mutableStateOf(false)
 
@@ -120,7 +152,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 icon = icon?.let { painterResource(it) } ?: rememberVectorPainter(DefaultIcon),
                 visible = windowVisible,
                 undecorated = true,
-                resizable = true,
+                resizable = maximizeState is MaximizeState.Normal,
                 transparent = true,
                 alwaysOnTop = alwaysOnTop,
                 state = windowState
@@ -138,7 +170,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
                 Layout {
                     Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
-                        WindowDraggableArea(modifier = Modifier.fillMaxWidth()) {
+                        DragArea(maximizeState is MaximizeState.Normal) {
                             TopBar {
                                 if (actionAlwaysOnTop) {
                                     Action(
@@ -163,10 +195,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                                 if (actionMaximize) {
                                     Action(
                                         icon = Icons.Outlined.CropSquare,
-                                        tip = "最大化",
+                                        tip = maximizeState.showText,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     ) {
-                                        windowState.placement = if (windowState.placement == WindowPlacement.Floating) WindowPlacement.Maximized else WindowPlacement.Floating
+                                        maximizeState = maximizeState.toggle(windowState)
                                     }
                                 }
 
