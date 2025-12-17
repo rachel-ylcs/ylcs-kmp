@@ -63,6 +63,7 @@ import love.yinlin.data.music.RhymeLine
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
+import love.yinlin.util.QrcDecrypter
 import org.jetbrains.compose.resources.Font
 import ylcs_kmp.ylcs_app.mod_manager.generated.resources.Res
 import ylcs_kmp.ylcs_app.mod_manager.generated.resources.music
@@ -129,18 +130,6 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
 
     override val title: String by derivedStateOf { name }
 
-    private suspend fun parseConfig() {
-        parseDialog.openSuspend()?.let { text ->
-            Coroutines.cpu {
-                catchingError {
-                    if (text.isEmpty()) slot.tip.warning("平台歌词为空")
-                    if (text.contains("QrcInfos")) parseQrc(text)
-                    else slot.tip.warning("不支持的平台歌词")
-                }.errorTip
-            }
-        }
-    }
-
     private suspend fun saveConfig() {
         path?.let {
             if (!slot.confirm.openSuspend(content = "替换音游配置到库")) return
@@ -185,7 +174,6 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
 
     @Composable
     override fun ActionScope.RightActions() {
-        ActionSuspend(Icons.Outlined.UploadFile, onClick = ::parseConfig)
         ActionSuspend(Icons.Outlined.Done, enabled = useFile, onClick = ::saveConfig)
         ActionSuspend(Icons.Outlined.Delete, enabled = useFile, onClick = ::deleteConfig)
     }
@@ -451,7 +439,25 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                 Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                     when (selectedTab) {
                         "歌词" -> {
-                            Box(modifier = Modifier.fillMaxSize()) {
+                            Box(modifier = Modifier.fillMaxSize().dragAndDropTarget(
+                                shouldStartDragAndDrop = { event ->
+                                    val transferable = event.awtTransferable
+                                    transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+                                },
+                                target = remember { object : DragAndDropTarget {
+                                    override fun onDrop(event: DragAndDropEvent): Boolean {
+                                        val transferable = event.awtTransferable
+                                        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                                            catchingError {
+                                                val files = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
+                                                parseQrc(QrcDecrypter.decrypt((files.first() as File).readBytes())!!)
+                                            }?.let { slot.tip.error("解析失败") }
+                                            return true
+                                        }
+                                        return false
+                                    }
+                                } }
+                            )) {
                                 ContextMenuDataProvider({
                                     listOf(
                                         ContextMenuItem("全选自动复制") {
@@ -510,8 +516,6 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
             ConfigEditor(Modifier.weight(2f).fillMaxHeight(), rhymeConfig)
         }
     }
-
-    private val parseDialog = this land FloatingDialogInput(hint = "平台歌词解析", maxLines = Int.MAX_VALUE, clearButton = false)
 
     private val inputDialog = this land FloatingDialogInput()
 }
