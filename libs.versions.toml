@@ -1,15 +1,15 @@
 [versions]
 
 # Plugins #
-kotlin = "2.3.0-RC3"
-cmp = "1.10.0-rc02"
+kotlin = "2.3.0"
+cmp = "1.11.0-alpha01"
 agp = "8.12.3"
 
 # Libs #
 
 # Common
 lifecycle = "2.10.0-alpha07"
-material3 = "1.10.0-alpha05"
+material3 = "1.11.0-alpha01"
 material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
 ktor = "3.3.3"
