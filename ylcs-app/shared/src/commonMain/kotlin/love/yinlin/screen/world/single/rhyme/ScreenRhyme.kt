@@ -468,10 +468,11 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
             }
         ) {
             Column {
-                Text(text = "难度: ${result.playConfig.difficulty.title}")
-                Text(text = "得分: ${result.playResult.score}")
+                Text(text = "结算页尚未完成设计, 仅供参考", color = Colors.White)
+                Text(text = "难度: ${result.playConfig.difficulty.title}", color = Colors.White)
+                Text(text = "得分: ${result.playResult.score}", color = Colors.White)
                 ActionResult.entries.fastForEachIndexed { index, actionResult ->
-                    Text(text = "${actionResult.title}: ${result.playResult.statistics[index]}")
+                    Text(text = "${actionResult.title}: ${result.playResult.statistics[index]}", color = Colors.White)
                 }
             }
         }
