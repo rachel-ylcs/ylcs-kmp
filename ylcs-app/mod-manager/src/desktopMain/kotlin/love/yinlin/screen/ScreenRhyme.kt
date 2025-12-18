@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.zIndex
@@ -56,6 +57,7 @@ import love.yinlin.compose.ui.input.SingleSelector
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.Chorus
@@ -414,6 +416,25 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                 LoadingClickText(text = "偏移: ${config.offset}", onClick = {
                     inputDialog.openSuspend()?.let { text -> rhymeConfig = config.copy(offset = text.toIntOrNull() ?: 0) }
                 })
+
+                Text(text = "副歌段", style = MaterialTheme.typography.titleMedium)
+                Space()
+                config.chorus.fastForEachIndexed { index, chorus ->
+                    Text(
+                        text = "[${index + 1}] ${chorus.start} -> ${chorus.end}",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            launch {
+                                if (slot.confirm.openSuspend(content = "删除此条目")) {
+                                    val newChorus = config.chorus.toMutableList()
+                                    newChorus.removeAt(index)
+                                    rhymeConfig = config.copy(chorus = newChorus)
+                                }
+                            }
+                        }.padding(CustomTheme.padding.value)
+                    )
+                    Space()
+                }
             }
             VerticalDivider(modifier = Modifier.fillMaxHeight())
             Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
