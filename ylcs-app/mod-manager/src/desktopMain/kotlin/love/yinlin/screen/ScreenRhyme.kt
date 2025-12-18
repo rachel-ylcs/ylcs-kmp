@@ -14,6 +14,8 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.AlignHorizontalLeft
+import androidx.compose.material.icons.automirrored.outlined.AlignHorizontalRight
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -219,7 +221,16 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                         rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
                     }
                 })
-                ClickIcon(tip = "标记副歌结尾", icon = Icons.Outlined.BookmarkAdded, color = MaterialTheme.colorScheme.primary, onClick = {
+                ClickIcon(tip = "添加副歌开始", icon = Icons.AutoMirrored.Outlined.AlignHorizontalLeft, color = MaterialTheme.colorScheme.primary, onClick = {
+                    val lineStart = line.start
+                    val chorus = config.chorus
+                    var findIndex = chorus.indexOfFirst { lineStart <= it.start }
+                    if (findIndex == -1) findIndex = 0
+                    val newChorus = chorus.toMutableList()
+                    newChorus.add(findIndex, Chorus(lineStart, lineStart))
+                    rhymeConfig = config.copy(chorus = newChorus)
+                })
+                ClickIcon(tip = "标记副歌结尾", icon = Icons.AutoMirrored.Outlined.AlignHorizontalRight, color = MaterialTheme.colorScheme.primary, onClick = {
                     val lineEnd = line.theme.last().end + line.start
                     val chorus = config.chorus
                     var findIndex = chorus.lastIndex
