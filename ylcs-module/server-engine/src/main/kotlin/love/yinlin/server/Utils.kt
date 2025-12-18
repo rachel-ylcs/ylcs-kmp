@@ -19,8 +19,9 @@ internal fun copyResources(classLoader: ClassLoader, root: String) {
         }
     }
 
-    val targetFile = File(root)
+    val targetFile = File(System.getProperty("user.dir"), root)
     val publicResourceUrl = classLoader.getResource(root)!!
+    println(targetFile)
     if (publicResourceUrl.protocol == "jar") {
         val jarFile = (publicResourceUrl.openConnection() as JarURLConnection).jarFile
         val entries = jarFile.entries()

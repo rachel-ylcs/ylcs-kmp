@@ -26,21 +26,19 @@ kotlin {
     }
 }
 
-val desktopJvmArgs = buildList {
-    if ("desktopRun" in currentTaskName) {
-        val desktopWorkSpace = C.root.work.desktop.asFile
-        desktopWorkSpace.mkdirs()
-        add("-Duser.dir=$desktopWorkSpace")
-        add("-Djava.library.path=${C.root.native.libs}")
-    }
-    add("--enable-native-access=ALL-UNNAMED")
-}
-
 compose.desktop {
     application {
         mainClass = C.app.mainClass
 
-        jvmArgs += desktopJvmArgs
+        jvmArgs += buildList {
+            if ("desktopRun" in currentTaskName) {
+                val desktopWorkSpace = C.root.work.desktop.asFile
+                desktopWorkSpace.mkdirs()
+                add("-Duser.dir=$desktopWorkSpace")
+                add("-Djava.library.path=${C.root.native.libs}")
+            }
+            add("--enable-native-access=ALL-UNNAMED")
+        }
 
         buildTypes.release.proguard {
             version = C.proguard.version

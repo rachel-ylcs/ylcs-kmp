@@ -34,7 +34,14 @@ compose.desktop {
     application {
         mainClass = C.modManager.mainClass
 
-        jvmArgs += "--enable-native-access=ALL-UNNAMED"
+        jvmArgs += buildList {
+            if ("modManagerRun" in currentTaskName) {
+                val desktopWorkSpace = C.root.work.modManager.asFile
+                desktopWorkSpace.mkdirs()
+                add("-Duser.dir=$desktopWorkSpace")
+            }
+            add("--enable-native-access=ALL-UNNAMED")
+        }
 
         buildTypes.release.proguard {
             version = C.proguard.version

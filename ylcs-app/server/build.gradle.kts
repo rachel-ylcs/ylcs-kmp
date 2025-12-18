@@ -23,7 +23,14 @@ application {
     mainClass.set(C.app.mainClass)
     applicationName = C.app.name
 
-    if ("serverPublish" !in currentTaskName) C.root.server.workspace.asFile.mkdir()
+    applicationDefaultJvmArgs = buildList {
+        if ("serverPublish" !in currentTaskName) {
+            val desktopWorkSpace = C.root.work.server.asFile
+            desktopWorkSpace.mkdirs()
+            add("-Duser.dir=$desktopWorkSpace")
+        }
+        add("--enable-native-access=ALL-UNNAMED")
+    }
 }
 
 ktor {
@@ -56,6 +63,13 @@ afterEvaluate {
 
     val buildFatJar = tasks.named("buildFatJar")
     buildFatJar.get().mustRunAfter(cleanFatJar)
+
+    // 运行服务端
+    val run by tasks.named("run")
+
+    val serverRun by tasks.registering {
+        dependsOn(run)
+    }
 
     // 发布服务端
     val serverPublish by tasks.registering {

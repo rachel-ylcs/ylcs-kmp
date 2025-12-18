@@ -28,6 +28,8 @@ class ScriptNode(root: RootProjectNode) : Directory by root.dir("script")
 
 class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
     val desktop: Directory = dir("desktop")
+    val server: Directory = dir("server")
+    val modManager: Directory = dir("modManager")
 }
 
 class CSNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("cs") {
@@ -83,7 +85,6 @@ class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
 }
 
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
-    val workspace: Directory = dir("build").dir("serverRun")
     val outputs = root.outputs
     val outputFile: RegularFile = outputs.file(c.server.outputName)
 }
