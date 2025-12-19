@@ -1,26 +1,26 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
+    install(
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.composeMultiplatform,
+        libs.plugins.composeCompiler,
+        libs.plugins.kotlinSerialization,
+    )
 }
 
-kotlin {
-    C.useCompilerFeatures(this)
+template(object : KotlinMultiplatformTemplate() {
+    override val androidTarget: Boolean = false
+    override val iosTarget: Boolean = false
+    override val webTarget: Boolean = false
 
-    jvm("desktop") {
-        C.jvmTarget(this)
-    }
-    
-    sourceSets {
-        val commonMain by getting {
-            useLib(libs.compose.components.resources)
+    override fun KotlinMultiplatformSourceSetsScope.source() {
+        commonMain.configure {
+            lib(libs.compose.components.resources)
         }
 
-        val desktopMain by getting {
-            useLib(
+        desktopMain.configure(commonMain) {
+            lib(
                 projects.ylcsApp.mod,
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
@@ -28,69 +28,41 @@ kotlin {
             )
         }
     }
-}
 
-compose.desktop {
-    application {
-        mainClass = C.modManager.mainClass
+    override val desktopPackageName: String = C.modManager.name
+    override val desktopMainClass: String = C.modManager.mainClass
+    override val desktopJvmArgs: List<String> = buildList {
+        if ("modManagerRun" in currentTaskName) {
+            val desktopWorkSpace = C.root.work.modManager.asFile
+            desktopWorkSpace.mkdirs()
+            add("-Duser.dir=$desktopWorkSpace")
+        }
+    }
+    override val desktopModules: List<String> = C.desktop.modules.toList()
+    override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = {}
 
-        jvmArgs += buildList {
-            if ("modManagerRun" in currentTaskName) {
-                val desktopWorkSpace = C.root.work.modManager.asFile
-                desktopWorkSpace.mkdirs()
-                add("-Duser.dir=$desktopWorkSpace")
-            }
-            add("--enable-native-access=ALL-UNNAMED")
+    override fun Project.actions() {
+        val run = tasks.named("run")
+        val createReleaseDistributable = tasks.named("createReleaseDistributable")
+
+        // 运行 桌面程序 Debug
+        val modManagerRunDebug by tasks.registering {
+            dependsOn(run)
         }
 
-        buildTypes.release.proguard {
-            version = C.proguard.version
-            isEnabled = true
-            optimize = true
-            obfuscate = true
-            joinOutputJars = true
-            configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
-        }
-
-        nativeDistributions {
-            packageName = C.modManager.name
-            packageVersion = C.app.versionName
-            description = C.app.description
-            copyright = C.app.copyright
-            vendor = C.app.vendor
-
-            targetFormats(TargetFormat.Exe)
-
-            modules(*C.desktop.modules)
-
-            windows {
-                console = false
+        val modManagerCopyDir by tasks.registering {
+            mustRunAfter(createReleaseDistributable)
+            doLast {
+                copy {
+                    from(C.root.modManager.originOutput)
+                    into(C.root.outputs)
+                }
             }
         }
-    }
-}
 
-afterEvaluate {
-    val run = tasks.named("run")
-    val createReleaseDistributable = tasks.named("createReleaseDistributable")
-
-    // 运行 桌面程序 Debug
-    val modManagerRunDebug by tasks.registering {
-        dependsOn(run)
-    }
-
-    val modManagerCopyDir by tasks.registering {
-        mustRunAfter(createReleaseDistributable)
-        doLast {
-            copy {
-                from(C.root.modManager.originOutput)
-                into(C.root.outputs)
-            }
+        val modManagerPublish by tasks.registering {
+            dependsOn(createReleaseDistributable)
+            dependsOn(modManagerCopyDir)
         }
     }
-
-    val modManagerPublish by tasks.registering {
-        dependsOn(createReleaseDistributable)
-        dependsOn(modManagerCopyDir)
-    }
-}
+})

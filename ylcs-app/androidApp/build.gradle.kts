@@ -1,46 +1,28 @@
+import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.build.gradle.internal.dsl.SigningConfig
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidApplication)
+    install(
+        libs.plugins.kotlinAndroid,
+        libs.plugins.androidApplication,
+        libs.plugins.composeCompiler,
+        libs.plugins.kotlinSerialization,
+    )
 }
 
-dependencies {
-    implementation(projects.ylcsApp.shared)
-}
+template(object : KotlinAndroidTemplate() {
+    override val packageName: String = C.app.packageName
+    override val packageVersion: Int = C.app.version
+    override val packageVersionName: String = C.app.versionName
 
-kotlin {
-    C.useCompilerFeatures(this)
-
-    compilerOptions {
-        jvmTarget = C.jvm.androidTarget
-    }
-}
-
-android {
-    namespace = C.app.packageName
-    compileSdk = C.android.compileSdk
-
-    compileOptions {
-        sourceCompatibility = C.jvm.compatibility
-        targetCompatibility = C.jvm.compatibility
-    }
-
-    defaultConfig {
-        applicationId = C.app.packageName
-        minSdk = C.android.minSdk
-        targetSdk = C.android.targetSdk
-        versionCode = C.app.version
-        versionName = C.app.versionName
-
-        ndk {
-            for (abi in C.android.ndkAbi) abiFilters += abi
+    override fun KotlinAndroidSourceSetsScope.source() {
+        main.configure {
+            lib(projects.ylcsApp.shared)
         }
     }
 
-    val androidSigningConfig = try {
+    override fun BaseAppModuleExtension.sign(): SigningConfig? = try {
         val localProperties = Properties().also { p ->
             C.root.localProperties.asFile.inputStream().use { p.load(it) }
         }
@@ -60,60 +42,26 @@ android {
         null
     }
 
-    buildTypes {
-        debug {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            isDebuggable = true
-            signingConfig = androidSigningConfig
-        }
+    override fun Project.actions() {
+        val assembleDebug = tasks.named("assembleDebug")
 
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            isDebuggable = false
-            proguardFiles(
-                getDefaultProguardFile(C.proguard.defaultRule),
-                C.root.shared.commonR8Rule, C.root.shared.androidR8Rule
-            )
-            signingConfig = androidSigningConfig
-        }
-    }
+        val assembleRelease = tasks.named("assembleRelease")
 
-    packaging {
-        resources {
-            excludes += C.excludes
-        }
-
-        dex {
-            useLegacyPackaging = true
-        }
-
-        jniLibs {
-            useLegacyPackaging = true
-        }
-    }
-}
-
-afterEvaluate {
-    val assembleDebug = tasks.named("assembleDebug")
-
-    val assembleRelease = tasks.named("assembleRelease")
-
-    val androidCopyAPK by tasks.registering {
-        mustRunAfter(assembleRelease)
-        doLast {
-            copy {
-                from(C.root.androidApp.originOutput)
-                into(C.root.outputs)
-                rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.APK" }
+        val androidCopyAPK by tasks.registering {
+            mustRunAfter(assembleRelease)
+            doLast {
+                copy {
+                    from(C.root.androidApp.originOutput)
+                    into(C.root.outputs)
+                    rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.APK" }
+                }
             }
         }
-    }
 
-    // 发布安卓安装包
-    val androidPublish by tasks.registering {
-        dependsOn(assembleRelease)
-        dependsOn(androidCopyAPK)
+        // 发布安卓安装包
+        val androidPublish by tasks.registering {
+            dependsOn(assembleRelease)
+            dependsOn(androidCopyAPK)
+        }
     }
-}
+})

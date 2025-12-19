@@ -1,20 +1,14 @@
 plugins {
-    alias(libs.plugins.kotlinJvm)
-    alias(libs.plugins.kotlinSerialization)
+    install(
+        libs.plugins.kotlinJvm,
+        libs.plugins.kotlinSerialization,
+    )
 }
 
-kotlin {
-    C.useCompilerFeatures(this)
-    C.jvmTarget(this)
-
-    sourceSets {
+template(object : KotlinJvmTemplate() {
+    override fun KotlinJvmSourceSetsScope.source() {
         main.configure {
-            useApi(
-                projects.ylcsBase.csCore,
-                libs.logback,
-                libs.ktor.server,
-            )
-            useLib(
+            lib(
                 libs.mysql,
                 libs.mysql.pool,
                 libs.redis,
@@ -27,7 +21,11 @@ kotlin {
                 libs.ktor.server.config,
                 libs.ktor.server.host,
                 libs.ktor.server.websockets,
+                ExportLib,
+                projects.ylcsBase.csCore,
+                libs.logback,
+                libs.ktor.server,
             )
         }
     }
-}
+})

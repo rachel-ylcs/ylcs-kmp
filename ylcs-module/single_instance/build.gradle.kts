@@ -1,16 +1,14 @@
 plugins {
-    alias(libs.plugins.kotlinJvm)
+    install(libs.plugins.kotlinJvm)
 }
 
-kotlin {
-    C.useCompilerFeatures(this)
-    C.jvmTarget(this)
-
-    sourceSets {
+template(object : KotlinJvmTemplate() {
+    override fun KotlinJvmSourceSetsScope.source() {
         main.configure {
-            useApi(
+            lib(
+                ExportLib,
                 projects.ylcsBase.core,
             )
         }
     }
-}
+})

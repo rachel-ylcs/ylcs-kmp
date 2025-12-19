@@ -1,105 +1,34 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
-import kotlin.collections.set
-
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinCocoapods)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.androidLibrary1)
+    install(
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinCocoapods,
+        libs.plugins.androidLibraryNew,
+        libs.plugins.kotlinSerialization,
+    )
 }
 
-kotlin {
-    C.useCompilerFeatures(this)
+template(object : KotlinMultiplatformTemplate() {
+    override val namespace: String = "module.compose.service.mmkv_kmp"
+    override val buildCocoapods: Boolean = true
 
-    android {
-        namespace = "${C.app.packageName}.module.compose.service.mmkv_kmp"
-        compileSdk = C.android.compileSdk
-        minSdk = C.android.minSdk
-        lint.targetSdk = C.android.targetSdk
-
-        compilations.configureEach {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(C.jvm.androidTarget)
-                }
-            }
-        }
-    }
-
-    iosArm64()
-    if (C.platform == BuildPlatform.Mac) {
-        when (C.architecture) {
-            BuildArchitecture.AARCH64 -> iosSimulatorArm64()
-            BuildArchitecture.X86_64 -> iosX64()
-            else -> {}
-        }
-    }
-
-    cocoapods {
-        version = C.app.versionName
-        ios.deploymentTarget = C.ios.target
-
-        if (C.platform == BuildPlatform.Mac) {
-            pod("MMKV") {
-                version = libs.versions.mmkv.get()
-                extraOpts += listOf("-compiler-option", "-fmodules")
-            }
-        }
-
-        podfile = C.root.iosApp.podfile.asFile
-
-        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
-        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
-    }
-
-    jvm("desktop") {
-        C.jvmTarget(this)
-    }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-        binaries.executable()
-        binaries.library()
-    }
-
-    sourceSets {
-        val commonMain by getting {
-            useApi(
-                projects.ylcsBase.core,
+    override fun KotlinMultiplatformSourceSetsScope.source() {
+        commonMain.configure {
+            lib(
+                ExportLib,
                 projects.ylcsModule.compose.startup,
             )
         }
 
-        androidMain.configure {
-            useSourceSet(commonMain)
-            useLib(
-                libs.mmkv.android,
-            )
+        androidMain.configure(commonMain) {
+            lib(libs.mmkv.android)
         }
 
-        val iosMain = iosMain.get().apply {
-            useSourceSet(commonMain)
-        }
+        iosMain.configure(commonMain)
 
-        buildList {
-            add(iosArm64Main)
-            if (C.platform == BuildPlatform.Mac) {
-                when (C.architecture) {
-                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
-                    BuildArchitecture.X86_64 -> add(iosX64Main)
-                    else -> {}
-                }
-            }
-        }.forEach {
-            it.configure {
-                useSourceSet(iosMain)
-            }
-        }
+        iosMainList.configure(iosMain)
     }
-}
+
+    override val cocoapodsList: List<Pod> = listOf(
+        Pod("MMKV", version = libs.versions.mmkv)
+    )
+})

@@ -1,67 +1,28 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.androidLibrary1)
+    install(
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.androidLibraryNew,
+        libs.plugins.kotlinSerialization,
+    )
 }
 
-kotlin {
-    C.useCompilerFeatures(this)
+template(object : KotlinMultiplatformTemplate() {
+    override val namespace: String = "cs"
 
-    android {
-        namespace = "${C.app.packageName}.cs"
-        compileSdk = C.android.compileSdk
-        minSdk = C.android.minSdk
-        lint.targetSdk = C.android.targetSdk
-
-        compilations.configureEach {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(C.jvm.androidTarget)
-                }
-            }
-        }
-    }
-
-    iosArm64()
-    if (C.platform == BuildPlatform.Mac) {
-        when (C.architecture) {
-            BuildArchitecture.AARCH64 -> iosSimulatorArm64()
-            BuildArchitecture.X86_64 -> iosX64()
-            else -> {}
-        }
-    }
-
-    jvm("desktop") {
-        C.jvmTarget(this)
-    }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-        binaries.executable()
-        binaries.library()
-    }
-
-    sourceSets {
+    override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             kotlin.srcDir(C.root.cs.srcGenerated)
-            useApi(
+            lib(
+                ExportLib,
                 projects.ylcsBase.csCore,
                 libs.compose.runtime,
             )
         }
     }
-}
 
-afterEvaluate {
-    val generateConstants by tasks.registering {
-        val content = """
+    override fun Project.actions() {
+        val generateConstants by tasks.registering {
+            val content = """
             package love.yinlin
             
             import love.yinlin.data.AppInfo
@@ -83,24 +44,25 @@ afterEvaluate {
                 const val API_BASE_URL: String = "${C.host.apiUrl}"
             }
         """.trimIndent()
-        val constantsFile = C.root.cs.generatedLocalFile.let {
-            outputs.file(it)
-            it.asFile
+            val constantsFile = C.root.cs.generatedLocalFile.let {
+                outputs.file(it)
+                it.asFile
+            }
+            outputs.upToDateWhen {
+                constantsFile.takeIf { it.exists() }?.readText() == content
+            }
+            doLast {
+                constantsFile.parentFile.mkdirs()
+                constantsFile.writeText(content, Charsets.UTF_8)
+            }
         }
-        outputs.upToDateWhen {
-            constantsFile.takeIf { it.exists() }?.readText() == content
-        }
-        doLast {
-            constantsFile.parentFile.mkdirs()
-            constantsFile.writeText(content, Charsets.UTF_8)
-        }
-    }
 
-    rootProject.tasks.named("prepareKotlinBuildScriptModel").configure {
-        dependsOn(generateConstants)
-    }
+        rootProject.tasks.named("prepareKotlinBuildScriptModel").configure {
+            dependsOn(generateConstants)
+        }
 
-    tasks.matching { it.name.startsWith("compile") }.configureEach {
-        dependsOn(generateConstants)
+        tasks.matching { it.name.startsWith("compile") }.configureEach {
+            dependsOn(generateConstants)
+        }
     }
-}
+})

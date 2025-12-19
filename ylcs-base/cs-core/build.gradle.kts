@@ -1,58 +1,20 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.androidLibrary1)
+    install(
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.androidLibraryNew,
+        libs.plugins.kotlinSerialization,
+    )
 }
 
-kotlin {
-    C.useCompilerFeatures(this)
+template(object : KotlinMultiplatformTemplate() {
+    override val namespace: String = "base.cs_core"
 
-    android {
-        namespace = "${C.app.packageName}.base.cs_core"
-        compileSdk = C.android.compileSdk
-        minSdk = C.android.minSdk
-        lint.targetSdk = C.android.targetSdk
-
-        compilations.configureEach {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(C.jvm.androidTarget)
-                }
-            }
-        }
-    }
-
-    iosArm64()
-    if (C.platform == BuildPlatform.Mac) {
-        when (C.architecture) {
-            BuildArchitecture.AARCH64 -> iosSimulatorArm64()
-            BuildArchitecture.X86_64 -> iosX64()
-            else -> {}
-        }
-    }
-
-    jvm("desktop") {
-        C.jvmTarget(this)
-    }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-        binaries.executable()
-        binaries.library()
-    }
-
-    sourceSets {
+    override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
-            useApi(
+            lib(
+                ExportLib,
                 projects.ylcsBase.core,
             )
         }
     }
-}
+})

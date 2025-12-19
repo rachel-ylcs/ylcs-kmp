@@ -1,102 +1,34 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidLibrary)
+    install(
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.composeMultiplatform,
+        libs.plugins.composeCompiler,
+        libs.plugins.androidLibrary,
+        libs.plugins.kotlinSerialization,
+    )
 }
 
-kotlin {
-    C.useCompilerFeatures(this)
+template(object : KotlinMultiplatformTemplate() {
+    override val namespace: String = "module.compose.animated_webp_decoder"
+    override val androidOldLibrary: Boolean = true
+    override val buildNDK: Boolean = true
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(C.jvm.androidTarget)
+    override fun KotlinMultiplatformSourceSetsScope.source() {
+        commonMain.configure {
+            lib(
+                ExportLib,
+                projects.ylcsBase.composeCore,
+            )
         }
+
+        androidMain.configure(commonMain)
+
+        val skikoMain by create(commonMain)
+
+        iosMainList.configure(skikoMain)
+
+        desktopMain.configure(skikoMain)
+
+        wasmJsMain.configure(skikoMain)
     }
-
-    iosArm64()
-    if (C.platform == BuildPlatform.Mac) {
-        when (C.architecture) {
-            BuildArchitecture.AARCH64 -> iosSimulatorArm64()
-            BuildArchitecture.X86_64 -> iosX64()
-            else -> {}
-        }
-    }
-
-    jvm("desktop") {
-        C.jvmTarget(this)
-    }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-        binaries.executable()
-        binaries.library()
-    }
-
-    sourceSets {
-        val commonMain by getting {
-            useLib(projects.ylcsBase.composeCore)
-        }
-
-        androidMain.configure {
-            useSourceSet(commonMain)
-        }
-
-        val skikoMain by creating {
-            useSourceSet(commonMain)
-        }
-
-        buildList {
-            add(iosArm64Main)
-            if (C.platform == BuildPlatform.Mac) {
-                when (C.architecture) {
-                    BuildArchitecture.AARCH64 -> add(iosSimulatorArm64Main)
-                    BuildArchitecture.X86_64 -> add(iosX64Main)
-                    else -> {}
-                }
-            }
-        }.forEach {
-            it.configure {
-                useSourceSet(skikoMain)
-            }
-        }
-
-        val desktopMain by getting {
-            useSourceSet(skikoMain)
-        }
-
-        wasmJsMain.configure {
-            useSourceSet(skikoMain)
-        }
-    }
-}
-
-android {
-    namespace = "${C.app.packageName}.module.compose.animated_webp_decoder"
-    compileSdk = C.android.compileSdk
-
-    defaultConfig {
-        minSdk = C.android.minSdk
-        lint.targetSdk = C.android.targetSdk
-
-        ndk {
-            for (abi in C.android.ndkAbi) abiFilters += abi
-        }
-    }
-
-    ndkVersion = "29.0.14206865"
-
-    externalNativeBuild {
-        cmake {
-            path = file("src/androidMain/cpp/CMakeLists.txt")
-        }
-    }
-}
+})

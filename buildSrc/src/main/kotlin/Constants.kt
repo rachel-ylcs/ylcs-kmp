@@ -50,7 +50,7 @@ class Constants(project: Project) {
     val features = listOf(
         "-Xexpect-actual-classes",
         "-Xes-long-as-bigint",
-        "-Xreturn-value-checker=check",
+        "-Xreturn-value-checker=check"
     )
 
     // 排除资源
@@ -88,7 +88,8 @@ class Constants(project: Project) {
         minSdk = 29,
         compileSdk = 36,
         targetSdk = 36,
-        ndkAbi = arrayOf("arm64-v8a")
+        ndkAbi = arrayOf("arm64-v8a"),
+        ndkVersion = "29.0.14206865",
     )
 
     // iOS 配置
@@ -189,6 +190,7 @@ class AndroidConfig(
     val compileSdk: Int,
     val targetSdk: Int,
     val ndkAbi: Array<String>,
+    val ndkVersion: String,
 )
 
 data class IosConfig(
@@ -229,3 +231,7 @@ class HostConfig(
 
 val projectMap = mutableMapOf<Project, Constants>()
 val Project.C: Constants get() = projectMap.getOrPut(this) { Constants(this) }
+
+// 获取当前任务名
+
+val Project.currentTaskName: String get() = this.gradle.startParameter.taskNames.firstOrNull() ?: "sync"
