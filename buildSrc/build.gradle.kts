@@ -10,13 +10,16 @@ dependencies {
     implementation(libs.gradle.plugin.android)
     implementation(libs.gradle.plugin.compose)
     implementation(libs.gradle.plugin.composeCompiler)
+    implementation(libs.gradle.plugin.serialization)
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    sourceCompatibility = JavaVersion.VERSION_25.toString()
-    targetCompatibility = JavaVersion.VERSION_25.toString()
-}
+tasks.apply {
+    withType<JavaCompile>().configureEach {
+        sourceCompatibility = JavaVersion.VERSION_25.toString()
+        targetCompatibility = JavaVersion.VERSION_25.toString()
+    }
 
-tasks.withType<KotlinJvmCompile>().configureEach {
-    compilerOptions.jvmTarget = JvmTarget.JVM_24
+    withType<KotlinJvmCompile>().configureEach {
+        compilerOptions.jvmTarget = JvmTarget.JVM_24
+    }
 }

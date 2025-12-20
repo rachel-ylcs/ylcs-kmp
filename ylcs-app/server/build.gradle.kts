@@ -13,10 +13,6 @@ ktor {
     }
 }
 
-tasks.withType<Jar> {
-    excludes += C.excludes
-}
-
 template(object : KotlinJvmTemplate() {
     override fun KotlinJvmSourceSetsScope.source() {
         main.configure {
@@ -27,7 +23,6 @@ template(object : KotlinJvmTemplate() {
         }
     }
 
-    override val isApplication: Boolean = true
     override val jvmName: String = C.app.name
     override val jvmMainClass: String = C.app.mainClass
     override val jvmArgs: List<String> = buildList {
@@ -40,6 +35,10 @@ template(object : KotlinJvmTemplate() {
 
     override fun Project.actions() {
         tasks.apply {
+            withType<Jar> {
+                excludes += C.excludes
+            }
+
             distTar { enabled = false }
             distZip { enabled = false }
             shadowDistTar { enabled = false }

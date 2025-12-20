@@ -10,7 +10,6 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val androidTarget: Boolean = false
     override val iosTarget: Boolean = false
     override val desktopTarget: Boolean = false
 

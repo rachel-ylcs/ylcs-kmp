@@ -4,7 +4,10 @@ import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
@@ -12,6 +15,7 @@ import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 import org.jetbrains.compose.resources.ResourcesExtension
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -25,7 +29,7 @@ import java.io.File
 
 class KotlinMultiplatformSourceSetsScope(
     private val p: Project,
-    val extension: KotlinMultiplatformExtension,
+    private val extension: KotlinMultiplatformExtension,
     set: NamedDomainObjectContainer<KotlinSourceSet>
 ) : KotlinSourceSetsScope(set) {
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
@@ -49,6 +53,8 @@ class KotlinMultiplatformSourceSetsScope(
     }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
+
+    val composeOSLib: String get() = extension.extensions.getByType<ComposePlugin.Dependencies>().desktop.currentOs
 }
 
 data class Pod(
@@ -63,21 +69,19 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     // SourceSets
     open fun KotlinMultiplatformSourceSetsScope.source() { }
 
-    // Resource
+    // Compose
     open val resourceName: String? = null
+    open fun ComposeCompilerGradlePluginExtension.composeCompiler() { }
 
     // Android
-    open val androidTarget: Boolean = true
     open val namespace: String? = null
     open fun KotlinMultiplatformAndroidLibraryTarget.android() { }
-    open val androidOldLibrary: Boolean = false
+    open fun LibraryExtension.android() { }
     open val buildNDK: Boolean = false
-    open fun LibraryExtension.oldAndroid() { }
 
     // iOS
     open val iosTarget: Boolean = true
     open fun KotlinNativeTarget.ios() { }
-    open val buildCocoapods: Boolean = false
     open val cocoapodsList: List<Pod> = emptyList()
     open fun CocoapodsExtension.cocoapods() { }
 
@@ -106,10 +110,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             }
 
             // Android
-            if (androidTarget) {
+            val oldAndroidPlugin = this@build.extensions.findByType<LibraryExtension>()
+            val newAndroidPlugin = extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()
+            if (oldAndroidPlugin != null || newAndroidPlugin != null) {
                 val androidNamespace = this@KotlinMultiplatformTemplate.namespace?.let { "${C.app.packageName}.$it" } ?: C.app.packageName
 
-                if (androidOldLibrary) {
+                oldAndroidPlugin?.apply {
                     @Suppress("Deprecation")
                     androidTarget {
                         compilerOptions {
@@ -117,54 +123,51 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         }
                     }
 
-                    this@build.extensions.configure<LibraryExtension> {
-                        this.namespace = androidNamespace
-                        compileSdk = C.android.compileSdk
+                    this.namespace = androidNamespace
+                    compileSdk = C.android.compileSdk
 
-                        defaultConfig {
-                            minSdk = C.android.minSdk
-                            lint.targetSdk = C.android.targetSdk
-
-                            ndk {
-                                for (abi in C.android.ndkAbi) abiFilters += abi
-                            }
-                        }
-
-                        if (buildNDK) {
-                            ndkVersion = C.android.ndkVersion
-
-                            externalNativeBuild {
-                                cmake {
-                                    path = file("src/androidMain/cpp/CMakeLists.txt")
-                                }
-                            }
-                        }
-
-                        oldAndroid()
-                    }
-                }
-                else {
-                    extensions.configure<KotlinMultiplatformAndroidLibraryTarget>("android") {
-                        this.namespace = androidNamespace
-                        compileSdk = C.android.compileSdk
+                    defaultConfig {
                         minSdk = C.android.minSdk
                         lint.targetSdk = C.android.targetSdk
 
-                        compilations.configureEach {
-                            compileTaskProvider.configure {
-                                compilerOptions {
-                                    jvmTarget.set(C.jvm.androidTarget)
-                                }
+                        ndk {
+                            for (abi in C.android.ndkAbi) abiFilters += abi
+                        }
+                    }
+
+                    if (buildNDK) {
+                        ndkVersion = C.android.ndkVersion
+
+                        externalNativeBuild {
+                            cmake {
+                                path = file("src/androidMain/cpp/CMakeLists.txt")
                             }
                         }
-
-                        if (resourceName != null) {
-                            @Suppress("UnstableApiUsage")
-                            androidResources.enable = true
-                        }
-
-                        android()
                     }
+
+                    android()
+                }
+
+                newAndroidPlugin?.apply {
+                    this.namespace = androidNamespace
+                    compileSdk = C.android.compileSdk
+                    minSdk = C.android.minSdk
+                    lint.targetSdk = C.android.targetSdk
+
+                    compilations.configureEach {
+                        compileTaskProvider.configure {
+                            compilerOptions {
+                                jvmTarget.set(C.jvm.androidTarget)
+                            }
+                        }
+                    }
+
+                    if (resourceName != null) {
+                        @Suppress("UnstableApiUsage")
+                        androidResources.enable = true
+                    }
+
+                    android()
                 }
             }
 
@@ -179,25 +182,24 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
                 }
 
-                if (buildCocoapods) {
-                    extensions.configure<CocoapodsExtension> {
-                        version = C.app.versionName
-                        ios.deploymentTarget = C.ios.target
-                        podfile = C.root.iosApp.podfile.asFile
+                // Use Cocoapods
+                extensions.findByType<CocoapodsExtension>()?.apply {
+                    version = C.app.versionName
+                    ios.deploymentTarget = C.ios.target
+                    podfile = C.root.iosApp.podfile.asFile
 
-                        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
-                        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
+                    xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
+                    xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
 
-                        cocoapods()
+                    cocoapods()
 
-                        if (C.platform == BuildPlatform.Mac) {
-                            for (item in cocoapodsList) {
-                                pod(item.name) {
-                                    if (item.moduleName != null) moduleName = item.moduleName
-                                    if (item.version != null) version = item.version.get()
-                                    extraOpts += item.extraOpts
-                                    if (item.source != null) source = path(item.source)
-                                }
+                    if (C.platform == BuildPlatform.Mac) {
+                        for (item in cocoapodsList) {
+                            pod(item.name) {
+                                if (item.moduleName != null) moduleName = item.moduleName
+                                if (item.version != null) version = item.version.get()
+                                extraOpts += item.extraOpts
+                                if (item.source != null) source = path(item.source)
                             }
                         }
                     }
@@ -241,6 +243,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             KotlinMultiplatformSourceSetsScope(this@build, extension, sourceSets).source()
 
             action()
+        }
+
+        extensions.findByType<ComposeCompilerGradlePluginExtension>()?.apply {
+            composeCompiler()
         }
 
         resourceName?.let { name ->
@@ -306,6 +312,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                     settings()
                                 }
                             }
+
+                            targetFormats(*targetList.toTypedArray())
 
                             desktopPackage()
                         }

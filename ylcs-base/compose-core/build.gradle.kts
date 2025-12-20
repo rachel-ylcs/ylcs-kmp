@@ -54,7 +54,7 @@ template(object : KotlinMultiplatformTemplate() {
         desktopMain.configure(skikoMain) {
             lib(
                 ExportLib,
-                extension.compose.desktop.currentOs
+                composeOSLib
             )
         }
 

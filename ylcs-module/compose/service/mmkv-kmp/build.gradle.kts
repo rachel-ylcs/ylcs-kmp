@@ -9,7 +9,6 @@ plugins {
 
 template(object : KotlinMultiplatformTemplate() {
     override val namespace: String = "module.compose.service.mmkv_kmp"
-    override val buildCocoapods: Boolean = true
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {

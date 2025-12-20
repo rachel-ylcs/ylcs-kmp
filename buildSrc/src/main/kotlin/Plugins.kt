@@ -6,17 +6,22 @@ private val PrebuildPlugins = mutableListOf<String>()
 
 fun PluginDependenciesSpecScope.install(vararg plugins: Provider<PluginDependency>) {
     for (plugin in plugins) {
-        val id = plugin.get().pluginId
-        if (id in PrebuildPlugins) id(id)
+        val pluginId = plugin.get().pluginId
+        if (pluginId in PrebuildPlugins) id(pluginId)
         else alias(plugin)
     }
 }
 
-fun PluginDependenciesSpecScope.install(prebuildPlugins: List<Provider<PluginDependency>>, vararg plugins: Provider<PluginDependency>) {
-    PrebuildPlugins += prebuildPlugins.map { it.get().pluginId }
-    for (plugin in plugins) {
-        val id = plugin.get().pluginId
-        if (id in PrebuildPlugins) id(id).apply(false)
-        else alias(plugin).apply(false)
+fun PluginDependenciesSpecScope.install(
+    prebuildPlugins: List<Provider<PluginDependency>>,
+    customPlugins: List<Provider<PluginDependency>>,
+) {
+    for (plugin in prebuildPlugins) {
+        val pluginId = plugin.get().pluginId
+        PrebuildPlugins += pluginId
+        id(pluginId).apply(false)
+    }
+    for (plugin in customPlugins) {
+        alias(plugin).apply(false)
     }
 }

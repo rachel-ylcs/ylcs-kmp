@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
@@ -12,12 +13,6 @@ plugins {
     )
 }
 
-composeCompiler {
-    stabilityConfigurationFiles.add(C.root.config.stability)
-    reportsDestination = C.root.shared.composeCompilerReport
-    metricsDestination = C.root.shared.composeCompilerReport
-}
-
 template(object : KotlinMultiplatformTemplate() {
     override val namespace: String = "shared"
     override val resourceName: String = "shared"
@@ -30,7 +25,6 @@ template(object : KotlinMultiplatformTemplate() {
         }
     }
 
-    override val buildCocoapods: Boolean = true
     override val cocoapodsList: List<Pod> = listOf(
         Pod("YLCSCore", moduleName = "YLCSCore", source = C.root.iosApp.core.asFile),
         Pod("MMKV", version = libs.versions.mmkv),
@@ -99,6 +93,12 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         wasmJsMain.configure(commonMain)
+    }
+
+    override fun ComposeCompilerGradlePluginExtension.composeCompiler() {
+        stabilityConfigurationFiles.add(C.root.config.stability)
+        reportsDestination = C.root.shared.composeCompilerReport
+        metricsDestination = C.root.shared.composeCompilerReport
     }
 
     override fun Project.actions() {

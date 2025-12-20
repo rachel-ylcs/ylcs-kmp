@@ -10,19 +10,12 @@ plugins {
             libs.plugins.androidApplication,
             libs.plugins.androidLibrary,
             libs.plugins.androidLibraryNew,
-            libs.plugins.kotlinCocoapods
+            libs.plugins.kotlinCocoapods,
+            libs.plugins.kotlinSerialization,
         ),
-        libs.plugins.kotlinMultiplatform,
-        libs.plugins.kotlinAndroid,
-        libs.plugins.kotlinJvm,
-        libs.plugins.composeMultiplatform,
-        libs.plugins.composeCompiler,
-        libs.plugins.androidApplication,
-        libs.plugins.androidLibrary,
-        libs.plugins.androidLibraryNew,
-        libs.plugins.kotlinCocoapods,
-        libs.plugins.kotlinSerialization,
-        libs.plugins.ktor,
+        listOf(
+            libs.plugins.ktor,
+        )
     )
 }
 

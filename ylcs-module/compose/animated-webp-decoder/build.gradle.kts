@@ -10,7 +10,6 @@ plugins {
 
 template(object : KotlinMultiplatformTemplate() {
     override val namespace: String = "module.compose.animated_webp_decoder"
-    override val androidOldLibrary: Boolean = true
     override val buildNDK: Boolean = true
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
