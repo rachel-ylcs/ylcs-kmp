@@ -34,7 +34,9 @@ class KotlinMultiplatformSourceSetsScope(
 ) : KotlinSourceSetsScope(set) {
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
     val commonTest: KotlinSourceSet by lazy { with(extension) { set.commonTest.get() } }
+    val nativeMain: KotlinSourceSet by lazy { with(extension) { set.nativeMain.get() } }
     val androidMain: KotlinSourceSet by lazy { with(extension) { set.androidMain.get() } }
+    val androidNativeMain: KotlinSourceSet by lazy { with(extension) { set.androidNativeArm64Main.get() } }
     val appleMain: KotlinSourceSet by lazy { with(extension) { set.appleMain.get() } }
     val iosMain: KotlinSourceSet by lazy { with(extension) { set.iosMain.get() } }
     val iosMainList: List<KotlinSourceSet> by lazy {
@@ -52,6 +54,9 @@ class KotlinMultiplatformSourceSetsScope(
         }
     }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
+    val windowsNativeMain: KotlinSourceSet by lazy { with(extension) { set.mingwX64Main.get() } }
+    val linuxNativeMain: KotlinSourceSet by lazy { with(extension) { set.linuxX64Main.get() } }
+    val macOSNativeMain: KotlinSourceSet by lazy { with(extension) { set.macosArm64Main.get() } }
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
 
     val composeOSLib: String get() = extension.extensions.getByType<ComposePlugin.Dependencies>().desktop.currentOs

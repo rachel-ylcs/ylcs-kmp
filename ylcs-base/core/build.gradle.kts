@@ -25,7 +25,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         val clientMain by create(commonMain)
 
-        val nativeMain by create(commonMain)
+        val kotlinMain by create(commonMain)
 
         val jvmMain by create(clientMain)
 
@@ -38,7 +38,7 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        iosMain.configure(appleMain, nativeMain)
+        iosMain.configure(appleMain, kotlinMain)
 
         iosMainList.configure(iosMain)
 
@@ -50,7 +50,7 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        wasmJsMain.configure(skikoMain, nativeMain) {
+        wasmJsMain.configure(skikoMain, kotlinMain) {
             lib(
                 ExportLib,
                 libs.kotlinx.broswer
