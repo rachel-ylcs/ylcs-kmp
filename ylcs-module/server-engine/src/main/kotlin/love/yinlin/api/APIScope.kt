@@ -27,6 +27,7 @@ import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import love.yinlin.extension.toJsonString
 import love.yinlin.platform.Coroutines
 import love.yinlin.server.Database
 import love.yinlin.server.Redis
@@ -525,9 +526,7 @@ abstract class APIScope internal constructor(
             }
             dataList = dataItems.sortedBy { it.first }.map { it.second }
             fileList = fileItems.toList().sortedBy { it.first }.map { (_, items) ->
-                items.sortedBy { it.first }.map { it.second }.ifEmpty { null }?.let { files ->
-                    object : APIFile { override val files: List<String> = files }
-                }
+                items.sortedBy { it.first }.map { it.second }.ifEmpty { null }?.let(::ServerAPIFile)
             }
         }
 

@@ -6,10 +6,18 @@ import java.io.File
 
 val EmptyAPIFile = object : APIFile {
     override val files: List<String> = emptyList()
+
+    override fun toString(): String = "[]"
 }
 
 private class SingleAPIFile(path: String) : APIFile {
     override val files: List<String> = listOf(path)
+
+    override fun toString(): String = files.joinToString(prefix = "[", postfix = "]")
+}
+
+internal class ServerAPIFile(override val files: List<String>) : APIFile {
+    override fun toString(): String = files.joinToString(prefix = "[", postfix = "]")
 }
 
 private val APIFile.first: File get() = File(files.first())

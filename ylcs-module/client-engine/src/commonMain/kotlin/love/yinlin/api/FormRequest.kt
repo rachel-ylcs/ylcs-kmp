@@ -51,7 +51,7 @@ class APIFormScope {
                 when (val value = i.value) {
                     is ByteArray -> internalAddByteArray("${index++}", value)
                     is RawSource -> internalAddRawSource("${index++}", value)
-                    is Sources<out RawSource> -> value.forEachIndexed { i, source -> internalAddRawSource("${index++}:$i", source) }
+                    is Sources<out RawSource> -> value.forEachIndexed { i, source -> internalAddRawSource("${index}:$i", source) }
                     else -> error("unsupported file type ${value::class.qualifiedName}")
                 }
             }
