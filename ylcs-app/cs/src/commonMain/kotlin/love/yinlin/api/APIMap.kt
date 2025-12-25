@@ -31,8 +31,6 @@ import love.yinlin.data.rachel.rhyme.RhymeRank
 import love.yinlin.data.rachel.prize.Prize
 import love.yinlin.data.rachel.prize.PrizeItemdata
 import love.yinlin.data.rachel.prize.PrizeDraw
-import love.yinlin.data.rachel.prize.PrizeItemPic
-import love.yinlin.data.rachel.prize.PrizeStatus
 import love.yinlin.data.rachel.prize.Prizedata
 
 // Common
@@ -407,37 +405,29 @@ val ApiSongSendSongComment by API.post.i<String, String, String>().o<Long>()
 @APIParam("cid")
 val ApiSongDeleteSongComment by API.post.i<String, Long>().o()
 
-
+//prize
 @APIParam("pid")
 @APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
-@APIParam("PrizeStatus")
-@APIParam("token")
-val ApiPrizeGetPrize by API.post.i<Int, Int, PrizeStatus, String>().o<List<Prize>>()
-//支持懒加载，传入token是为了保证只有管理员可以看到处于草稿状态的prize
+val ApiPrizeGetPrize by API.post.i<Int, Int>().o<List<Prize>>()
 
 @APIParam("token")
 @APIParam("Prizedata")
 val ApiPrizeCreatePrize by API.post.i<String, Prizedata>().o<Int>()
-//创建抽奖的草稿主体，不包含奖品部分
 
 @APIParam("token")
 @APIParam("pid")
 @APIParam("Prizedata")
 val ApiPrizeUpdatePrize by API.post.i<String, Int, Prizedata>().o()
-//修改抽奖的主体
 
 @APIParam("token")
 @APIParam("pid")
-val ApiPrizeDeletePrizeDraft by API.post.i<String, Int>().o()
-//删除抽奖的草稿，如果有奖品也会一并删除
+val ApiPrizeDeletePrize by API.post.i<String, Int>().o<Int>()
 
 @APIParam("token")
 @APIParam("pid")
 @APIParam("pic")
 @APIParam("PrizeItemdata")
-@APIReturn("PrizeItemPic")
-val ApiPrizeAddItem by API.form.i<String, Int, APIFile?, PrizeItemdata>().o<PrizeItemPic>()
-
+val ApiPrizeAddItem by API.form.i<String, Int, APIFile?, PrizeItemdata>().o<Int>()
 
 @APIParam("token")
 @APIParam("pid")
@@ -448,43 +438,22 @@ val ApiPrizeDeleteItem by API.post.i<String, Int, Int>().o()
 @APIParam("itemID")
 @APIParam("pic")
 @APIParam("PrizeItemdata")
-@APIReturn("PrizeItemPic")
-val ApiPrizeUpdateItem by API.form.i<String, Int, APIFile?, PrizeItemdata>().o<PrizeItemPic>()
-
-
-@APIParam("pid")
-@APIParam("token")
-val ApiPrizePublish by API.post.i<Int, String>().o<String>()
-//正式发布抽奖
-
-@APIParam("token")
-@APIParam("pid")
-val ApiPrizeCancelPrize by API.post.i<String, Int>().o<String>()
-
+val ApiPrizeUpdateItem by API.form.i<String, Int, APIFile?, PrizeItemdata>().o<Int>()
 
 @APIParam("token")
 @APIParam("pid")
 val ApiPrizeParticipate by API.post.i<String, Int>().o()
-//用户参加Prize
 
 
 @APIParam("pid")
-@APIReturn("List<PrizeDraw>")
-val ApiPrizeGetWinners by API.post.i<Int>().o<List<PrizeDraw>>()
-//展示一个抽奖里所有抽中的人员的信息
+@APIReturn("Map<Int, List<Int>>") // {itemid1:[uid1,uid2], itemid2:[uid3], ...}
+val ApiPrizeGetWinners by API.post.i<Int>().o<String>()
 
-
-@APIParam("pid")
-@APIParam("drawid")
-@APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
-val ApiPrizeGetAllParticipators by API.post.i<Int, Int, Int>().o<List<PrizeDraw>>()
-//支持懒加载，按参加时间的从晚到早排序，越新的时间越靠前，时间相同按照uid降序
 
 @APIParam("token")
 @APIParam("pid")
 val ApiPrizeDrawPrize by API.post.i<String, Int>().o<String>()
 //管理员手动开奖，生成中奖名单
-//使用承诺-揭示机制确保公平性
 
 @APIParam("token")
 @APIParam("sid")

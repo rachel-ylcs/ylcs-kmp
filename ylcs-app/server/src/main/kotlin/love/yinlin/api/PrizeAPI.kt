@@ -6,11 +6,9 @@ import love.yinlin.api.user.VN
 import love.yinlin.api.user.throwGetUser
 import love.yinlin.data.rachel.prize.Prize
 import love.yinlin.data.rachel.prize.PrizeItem
-import love.yinlin.data.rachel.prize.PrizeItemPic
-import love.yinlin.data.rachel.prize.PrizeResult
-import love.yinlin.data.rachel.prize.PrizeStatus
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserPrivilege
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.Int
 import love.yinlin.extension.IntNull
 import love.yinlin.extension.Object
@@ -20,12 +18,9 @@ import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.makeObject
 import love.yinlin.server.currentTS
-import love.yinlin.server.deleteSQL
 import love.yinlin.server.querySQLSingle
-import java.time.format.DateTimeFormatter
 import love.yinlin.server.throwExecuteSQL
 import love.yinlin.server.throwInsertSQLGeneratedKey
-import love.yinlin.server.throwQuerySQL
 import love.yinlin.server.throwQuerySQLSingle
 import love.yinlin.server.values
 import java.security.MessageDigest
@@ -34,31 +29,26 @@ import java.util.Base64
 import java.math.BigInteger
 
 fun APIScope.prizeAPI() {
-    ApiPrizeGetPrize.response { pid, num, status,token ->
+    ApiPrizeGetPrize.response { pid, num ->
         VN.throwId(pid)
-        val uid = AN.throwExpireToken(token)
-        val user = db.throwGetUser(uid, "privilege")
-
-        if (!UserPrivilege.vipPrize(user["privilege"].Int) && status.name=="draft") throw FailureException("只有prize发布者才可以查看草稿")
-
         val prizebody = db.throwQuerySQL("""
-                SELECT pid, title, content, organizer_uid AS organizerUid, status,
-                    DATE_FORMAT(deadline, '%Y-%m-%d %H:%i:%s') AS deadline,
-                    DATE_FORMAT(drawtime, '%Y-%m-%d %H:%i:%s') AS drawtime,
+                SELECT pid, title, content, organizer_uid AS organizerUid,
+                    deadline, drawtime,
                     draw_num AS drawNum, mix_app_level AS mixAppLevel , total_slots AS totalSlots,
-                    DATE_FORMAT(ts, '%Y-%m-%d %H:%i:%s') AS ts,
-                    seed_commitment AS seedCommitment, revealed_seed AS revealedSeed
+                    ts,
+                    seed_commitment AS seedCommitment, revealed_seed AS revealedSeed,
+                    IF(COALESCE(is_drawn, 0) = 1, TRUE, FALSE) AS isDrawn
                 FROM prize
-                WHERE pid < ? AND status = ?
+                WHERE pid < ?
                 ORDER BY pid DESC
                 LIMIT ?
-            """, pid, status.name, num.coercePageNum)
+            """, pid, num.coercePageNum)
 
         // 对每个prizeitem进行单独处理
         val result = prizebody.map { prizeRow ->
             val prizePid = prizeRow.Object["pid"].Int
             val prizeItemsRows = db.throwQuerySQL("""
-                SELECT item_id AS itemID, pid, prize_level AS prizeLevel, name, description, pic, count
+                SELECT item_id AS itemID, pid, name, description, pic, count
                 FROM prize_item
                 WHERE pid = ?
             """, prizePid)
@@ -68,8 +58,11 @@ fun APIScope.prizeAPI() {
             }
 
             // 为prizeItems构建json对象
+            // 转换isDrawn从0/1到布尔值
+            val isDrawnValue = prizeRow.Object["isDrawn"].Int == 1
             val prizeJson = makeObject {
                 merge(prizeRow.Object)
+                "isDrawn" with isDrawnValue
                 arr("prizeItems") {
                     for (item in prizeItems) {
                         add(item.toJson())
@@ -90,18 +83,27 @@ fun APIScope.prizeAPI() {
         
         VN.throwEmpty(prizedata.title, prizedata.content)
         
-        // 创建草稿，drawNum初始为0，后续添加奖品后会自动更新
+        // 创建 32-byte的随机数种子和 SHA256 的公开承诺
+        val seed = ByteArray(32)
+        SecureRandom().nextBytes(seed)
+        val seedBase64 = Base64.getEncoder().encodeToString(seed)
+        
+        val commitment = MessageDigest.getInstance("SHA-256").digest(seed)
+        val commitmentBase64 = Base64.getEncoder().encodeToString(commitment)
+        
+        // 创建并发布抽奖，存储种子（私密）和承诺（公开）
+        // 种子将在抽签时揭晓，揭晓前的种子值保持为空（实际存储在seed字段中，但revealed_seed为空）
+        // drawNum初始为0，后续添加奖品后会自动更新
         val pid = db.throwInsertSQLGeneratedKey("""
-            INSERT INTO prize(title, content, organizer_uid, status, deadline, drawtime, draw_num, mix_app_level, total_slots, ts)
-            ${values(10)}
+            INSERT INTO prize(title, content, organizer_uid, deadline, drawtime, draw_num, mix_app_level, total_slots, seed, seed_commitment, ts)
+            ${values(11)}
         """, prizedata.title, prizedata.content, uid,
-            PrizeStatus.Draft.name, prizedata.deadline, prizedata.drawtime,
-            0, prizedata.mixAppLevel, prizedata.totalSlots, currentTS).toInt()
+            prizedata.deadline, prizedata.drawtime,
+            0, prizedata.mixAppLevel, prizedata.totalSlots, seedBase64, commitmentBase64, currentTS).toInt()
         
         result(pid)
     }
-    
-    // 修改抽奖主体
+
     ApiPrizeUpdatePrize.response { token, pid, prizedata ->
         VN.throwId(pid)
         val uid = AN.throwExpireToken(token)
@@ -110,20 +112,16 @@ fun APIScope.prizeAPI() {
         
         VN.throwEmpty(prizedata.title, prizedata.content)
         
-        // 检查抽奖状态和权限
+        // 检查是否已开奖
         val prize = db.throwQuerySQLSingle("""
-            SELECT status, organizer_uid FROM prize WHERE pid = ?
+            SELECT is_drawn FROM prize WHERE pid = ?
         """, pid)
-        
-        if (prize["status"].String != PrizeStatus.Draft.name) {
-            failure("只能修改草稿状态的抽奖")
+
+        if (prize["is_drawn"].Int == 1) {
+            failure("已开奖的抽奖无法修改")
         }
         
-        if (prize["organizer_uid"].Int != uid) {
-            failure("只有创建者可以修改")
-        }
-        
-        // 更新抽奖主体信息
+
         db.throwExecuteSQL("""
             UPDATE prize 
             SET title = ?, content = ?, deadline = ?, drawtime = ?, mix_app_level = ?, total_slots = ?
@@ -132,57 +130,8 @@ fun APIScope.prizeAPI() {
             prizedata.mixAppLevel, prizedata.totalSlots, pid)
 
     }
-    
-    // 删除抽奖草稿（包括所有关联的奖品）
-    ApiPrizeDeletePrizeDraft.response { token, pid ->
-        VN.throwId(pid)
-        val uid = AN.throwExpireToken(token)
-        val user = db.throwGetUser(uid, "privilege")
-        if (!UserPrivilege.vipPrize(user["privilege"].Int)) failure("无权限")
-        
-        // 检查抽奖状态和权限
-        val prize = db.throwQuerySQLSingle("""
-            SELECT status, organizer_uid FROM prize WHERE pid = ?
-        """, pid)
-        
-        if (prize["status"].String != PrizeStatus.Draft.name) {
-            failure("只能删除草稿状态的抽奖，当前状态为：${prize["status"].String}")
-        }
-        
-        if (prize["organizer_uid"].Int != uid) {
-            failure("只有创建者可以删除")
-        }
-        
-        db.throwTransaction {
-            // 获取所有奖品的图片，用于删除文件
-            val items = it.throwQuerySQL("""
-                SELECT item_id, pic FROM prize_item WHERE pid = ?
-            """, pid)
-            
-            // 删除奖品图片文件
-            items.forEach { itemRow ->
-                val itemId = itemRow.Object["item_id"].Int
-                val pic = itemRow.Object["pic"].StringNull
-                if (pic != null) {
-                    try {
-                        val picFile = ServerRes.Prize.prize(itemId)
-                        picFile.delete()
-                    } catch (e: Exception) {
-                        // 文件删除失败不影响数据库操作
-                    }
-                }
-            }
-            
-            // 删除所有奖品
-            it.deleteSQL("DELETE FROM prize_item WHERE pid = ?", pid)
-            
-            // 删除抽奖主体
-            it.throwExecuteSQL("DELETE FROM prize WHERE pid = ?", pid)
-        }
 
-    }
 
-    // 添加奖品到指定抽奖
     ApiPrizeAddItem.response { token, pid, pic, itemdata ->
         VN.throwId(pid)
         val uid = AN.throwExpireToken(token)
@@ -192,37 +141,31 @@ fun APIScope.prizeAPI() {
         VN.throwEmpty(itemdata.name)
         if (itemdata.count <= 0) failure("奖品数量必须大于0")
         
-        // 检查抽奖状态和权限
+        // 检查抽奖权限和是否已开奖
         val prize = db.throwQuerySQLSingle("""
-            SELECT status, organizer_uid FROM prize WHERE pid = ?
+            SELECT is_drawn FROM prize WHERE pid = ?
         """, pid)
         
-        if (prize["status"].String != PrizeStatus.Draft.name) {
-            failure("只能为草稿状态的抽奖添加奖品")
+        // 只要没开奖就可以添加奖品
+        if (prize["is_drawn"].Int == 1) {
+            failure("已开奖的抽奖无法添加奖品")
         }
         
-        if (prize["organizer_uid"].Int != uid) {
-            failure("只有创建者可以添加奖品")
-        }
-        
-        val (itemId, picName) = db.throwTransaction {
+        val itemId = db.throwTransaction {
             // 插入奖品
             val itemIdValue = it.throwInsertSQLGeneratedKey("""
-                INSERT INTO prize_item(pid, prize_level, name, description, pic, count)
-                ${values(6)}
-            """, pid, itemdata.prizeLevel, itemdata.name, itemdata.description, null, itemdata.count).toInt()
+                INSERT INTO prize_item(pid, name, description, pic, count)
+                ${values(5)}
+            """, pid, itemdata.name, itemdata.description, null, itemdata.count).toInt()
             
             // 处理图片
-            val picNameValue = if (pic != null && !pic.isEmpty) {
+            if (pic != null && !pic.isEmpty) {
                 val picName = itemIdValue.toString()
                 val prizePic = ServerRes.Prize.prize(itemIdValue)
                 pic.copy(prizePic)
                 it.throwExecuteSQL("""
                     UPDATE prize_item SET pic = ? WHERE item_id = ?
                 """, picName, itemIdValue)
-                picName
-            } else {
-                null
             }
             
             // 更新抽奖的 drawNum（所有奖品数量的总和）
@@ -234,13 +177,13 @@ fun APIScope.prizeAPI() {
                 UPDATE prize SET draw_num = ? WHERE pid = ?
             """, totalCount, pid)
             
-            itemIdValue to picNameValue
+            itemIdValue
         }
         
-        result(PrizeItemPic(itemId, picName))
+        result(itemId)
     }
-    
-    // 删除奖品
+
+
     ApiPrizeDeleteItem.response { token, pid, itemID ->
         VN.throwId(pid)
         VN.throwId(itemID)
@@ -248,13 +191,14 @@ fun APIScope.prizeAPI() {
         val user = db.throwGetUser(uid, "privilege")
         if (!UserPrivilege.vipPrize(user["privilege"].Int)) failure("无权限")
         
-        // 检查抽奖状态和权限
+        // 检查抽奖是否已开奖
         val prize = db.throwQuerySQLSingle("""
-            SELECT status FROM prize WHERE pid = ?
+            SELECT is_drawn FROM prize WHERE pid = ?
         """, pid)
         
-        if (prize["status"].String != PrizeStatus.Draft.name) {
-            failure("只能删除草稿状态的抽奖中的奖品")
+        // 只要没开奖就可以删除奖品
+        if (prize["is_drawn"].Int == 1) {
+            failure("已开奖的抽奖无法删除奖品")
         }
         
         db.throwTransaction {
@@ -262,18 +206,7 @@ fun APIScope.prizeAPI() {
             val item = it.querySQLSingle("""
                 SELECT pic FROM prize_item WHERE item_id = ? AND pid = ?
             """, itemID, pid) ?: failure("奖品不存在")
-            
-            // 删除图片文件
-            val pic = item["pic"].StringNull
-            if (pic != null) {
-                try {
-                    val picFile = ServerRes.Prize.prize(itemID)
-                    picFile.delete()
-                } catch (e: Exception) {
-                    // 文件删除失败不影响数据库操作
-                }
-            }
-            
+
             // 删除奖品
             it.throwExecuteSQL("DELETE FROM prize_item WHERE item_id = ? AND pid = ?", itemID, pid)
             
@@ -307,20 +240,16 @@ fun APIScope.prizeAPI() {
         val pid = item["pid"].Int
         val oldPic = item["pic"].StringNull
 
-        // 检查抽奖状态和权限
+        // 检查抽奖权限和是否已开奖
         val prize = db.throwQuerySQLSingle("""
-            SELECT status, organizer_uid FROM prize WHERE pid = ?
+            SELECT  is_drawn FROM prize WHERE pid = ?
         """, pid)
 
-        if (prize["status"].String != PrizeStatus.Draft.name) {
-            failure("只能修改草稿状态的抽奖中的奖品")
+        // 只要没开奖就可以修改奖品
+        if (prize["is_drawn"].Int == 1) {
+            failure("已开奖的抽奖无法修改奖品")
         }
 
-        if (prize["organizer_uid"].Int != uid) {
-            failure("只有创建者可以修改奖品")
-        }
-
-        var finalPicName: String? = null
         db.throwTransaction {
             // 处理图片更新
             val picNameValue = when {
@@ -342,12 +271,11 @@ fun APIScope.prizeAPI() {
                     newPicName
                 }
                 pic == null && oldPic != null -> {
-                    // pic传入null表示删除图片
+                    // pic传入null表示无图片
                     try {
                         val prizePic = ServerRes.Prize.prize(itemID)
                         prizePic.delete()
                     } catch (e: Exception) {
-                        // 忽略删除失败
                     }
                     null
                 }
@@ -360,9 +288,9 @@ fun APIScope.prizeAPI() {
             // 更新奖品信息
             it.throwExecuteSQL("""
                 UPDATE prize_item 
-                SET prize_level = ?, name = ?, description = ?, pic = ?, count = ?
+                SET name = ?, description = ?, pic = ?, count = ?
                 WHERE item_id = ?
-            """, itemdata.prizeLevel, itemdata.name, itemdata.description, picNameValue, itemdata.count, itemID)
+            """, itemdata.name, itemdata.description, picNameValue, itemdata.count, itemID)
 
             // 更新抽奖的 drawNum
             val totalCount = it.throwQuerySQLSingle("""
@@ -373,101 +301,60 @@ fun APIScope.prizeAPI() {
                 UPDATE prize SET draw_num = ? WHERE pid = ?
             """, totalCount, pid)
 
-            finalPicName = picNameValue
         }
-        result(PrizeItemPic(itemID,finalPicName))
+        result(itemID)
     }
 
-    ApiPrizePublish.response { pid, token ->
+    ApiPrizeDeletePrize.response { token, pid ->
         VN.throwId(pid)
         val uid = AN.throwExpireToken(token)
         val user = db.throwGetUser(uid, "privilege")
         if (!UserPrivilege.vipPrize(user["privilege"].Int)) failure("无权限")
-
-        val prize = db.throwQuerySQLSingle("""
-            SELECT pid, organizer_uid, status FROM prize WHERE pid = ?
-        """, pid)
-
-        if (prize["status"].String != PrizeStatus.Draft.name) failure("只能发布草稿状态的抽奖")
-
-        // 验证抽奖是否有奖品
-        val items = db.throwQuerySQL("""
-            SELECT prize_level, count FROM prize_item WHERE pid = ? ORDER BY prize_level
-        """, pid)
-
-        if (items.isEmpty()) {
-            failure("抽奖至少需要一个奖品")
+        
+        // 检查抽奖是否存在
+        val prize = db.querySQLSingle("""
+            SELECT organizer_uid FROM prize WHERE pid = ?
+        """, pid) ?: failure("抽奖不存在")
+        
+        // 使用事务删除所有相关数据
+        db.throwTransaction {
+            // 1. 删除参与记录（prize_draw表）
+            it.throwExecuteSQL("DELETE FROM prize_draw WHERE pid = ?", pid)
+            
+            // 2. 删除奖品（prize_item表）
+            it.throwExecuteSQL("DELETE FROM prize_item WHERE pid = ?", pid)
+            
+            // 3. 删除抽奖主体（prize表）
+            it.throwExecuteSQL("DELETE FROM prize WHERE pid = ?", pid)
         }
-
-        // 验证奖品等级：必须按 1, 2, 3 排序，不允许 null
-        val levels = items.mapNotNull { it.Object["prize_level"].IntNull }
-
-        if (levels.size != items.size) {
-            failure("所有奖品必须设置等级（1, 2, 3...）")
-        }
-
-        val uniqueLevels = levels.distinct().sorted()
-
-        // 检查是否从1开始连续
-        val expectedLevels = (1..uniqueLevels.size).toList()
-        if (uniqueLevels != expectedLevels) {
-            failure("奖品等级必须从1开始连续排序（1, 2, 3...），不允许跳过或重复。当前等级：${uniqueLevels.joinToString(", ")}")
-        }
-
-        // 创建 32-byte的随机数种子和 SHA256 的公开承诺
-        val seed = ByteArray(32)
-        SecureRandom().nextBytes(seed)
-        val seedBase64 = Base64.getEncoder().encodeToString(seed)
-
-        val commitment = MessageDigest.getInstance("SHA-256").digest(seed)
-        val commitmentBase64 = Base64.getEncoder().encodeToString(commitment)
-
-        // 存储种子（私密）和承诺（公开）
-        // 种子将在抽签时揭晓，揭晓前的种子值保持为空
-        db.throwExecuteSQL("""
-            UPDATE prize SET status = ?, seed = ?, seed_commitment = ? WHERE pid = ?
-        """, PrizeStatus.Published.name, seedBase64, commitmentBase64, pid)
-
-        result("pid:$pid 发布成功")
-
-    }
-
-    ApiPrizeCancelPrize.response { token, pid ->
-        VN.throwId(pid)
-        val uid = AN.throwExpireToken(token)
-        val user = db.throwGetUser(uid, "privilege")
-        if (!UserPrivilege.vipPrize(user["privilege"].Int)) failure("无权限")
-
-        val prize=db.throwQuerySQLSingle("SELECT status FROM prize WHERE pid = ?", pid)
-        if(prize["status"].String != PrizeStatus.Published.name) failure("抽奖不存在或状态不为published，无法取消")
-
-        db.updateSQL("""
-            UPDATE prize SET status = ? WHERE pid = ?
-        """, PrizeStatus.Cancelled.name, pid)
-        db.updateSQL("""
-            UPDATE prize_draw SET result=? WHERE pid = ?
-        """, PrizeResult.Cancelled.name,pid)
-
-        result("pid:$pid 成功被取消")
+        
+        result(pid)
     }
 
     ApiPrizeParticipate.response { token, pid ->
         VN.throwId(pid)
         val uid = AN.throwExpireToken(token)
 
-        //检查是否存在
+        //检查抽奖是否存在并获取信息
         val prize = db.throwQuerySQLSingle("""
-            SELECT status, deadline, mix_app_level, total_slots,
+            SELECT seed_commitment, is_drawn, deadline, mix_app_level, total_slots,
                 (SELECT COUNT(*) FROM prize_draw WHERE pid = ?) AS current_participants
             FROM prize WHERE pid = ?
         """, pid, pid)
 
-        if (prize["status"].String != PrizeStatus.Published.name) failure("只能参加已发布的抽奖")
+        // 这是一次保险，检查公开承诺是否存在，即抽奖是否正常
+        if (prize["seed_commitment"].StringNull == null) {
+            failure("该抽奖尚未发布")
+        }
+
+        // 检查是否已开奖
+        if (prize["is_drawn"].Int == 1) {
+            failure("该抽奖已开奖，无法参加")
+        }
 
         // 检查截止日期 - 比较日期时间字符串
         val deadline = prize["deadline"].String
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val currentTSString = currentTS.toLocalDateTime().format(dateTimeFormatter)
+        val currentTSString = DateEx.CurrentString
         if (deadline <= currentTSString) failure("抽奖已截止")
 
         // 检查是否重复参加
@@ -490,48 +377,44 @@ fun APIScope.prizeAPI() {
 
         val userName = db.throwGetUser(uid, "name")["name"].String
 
-        // 执行插入操作
+        // 执行插入操作 - 只记录参与信息
         db.throwExecuteSQL("""
-            INSERT INTO prize_draw(pid, uid, result, ts, name, prize_level)
-            ${values(6)}
-        """, pid, uid, PrizeResult.Notdrawn.name, currentTS, userName,null)
+            INSERT INTO prize_draw(pid, uid, name, ts)
+            ${values(4)}
+        """, pid, uid, userName, currentTS)
     }
 
     ApiPrizeGetWinners.response { pid ->
         VN.throwId(pid)
 
-        // 检查是否手动开奖
+        // 检查是否已开奖
         val prize = db.throwQuerySQLSingle("""
-            SELECT  status FROM prize WHERE pid = ?
+            SELECT is_drawn FROM prize WHERE pid = ?
         """, pid)
 
-        if (prize["status"].String != PrizeStatus.Closed.name) failure("还未开奖或已被取消")
+        if (prize["is_drawn"].Int == 0) {
+            failure("还未开奖")
+        }
 
-        val winners = db.throwQuerySQL("""
-            SELECT id AS drawid, pid, uid, result, prize_level AS prizeLevel , name,
-                DATE_FORMAT(ts, '%Y-%m-%d %H:%i:%s') AS ts
-            FROM prize_draw
-            WHERE pid = ? AND result = ?
-            ORDER BY prize_level ASC, drawid ASC
-        """, pid, PrizeResult.Win.name)
+        // 查询所有中奖者数据（按 itemid 分组）
+        val winnersData = db.throwQuerySQL("""
+            SELECT itemid, CAST(winner_list AS CHAR) AS winner_list FROM prize_winner WHERE pid = ?
+        """, pid)
 
-        result(winners.to())
+        // 构造返回格式：{itemid1:[uid1,uid2], itemid2:[uid3], ...}
+        val resultJson = winnersData.joinToString(
+            prefix = "{",
+            postfix = "}",
+            separator = ","
+        ) { row ->
+            val itemid = row.Object["itemid"].Int
+            val winnerListJson = row.Object["winner_list"].String
+            """"$itemid":$winnerListJson"""
+        }
+
+        result(resultJson)
     }
 
-    ApiPrizeGetAllParticipators.response { pid, drawid, num ->
-        VN.throwId(pid)
-        VN.throwId(drawid)
-        // 按参与的先后顺序对参与者进行降序排序（最新参与的会放在最前面，确保用户可以看在参与列表里看到自己最新的操作），时间相同则安装uid降序
-        val participators = db.throwQuerySQL("""
-            SELECT id AS drawid, pid, uid, result , prize_level AS prizeLevel, name,
-                DATE_FORMAT(ts, '%Y-%m-%d %H:%i:%s') AS ts
-            FROM prize_draw
-            WHERE pid = ? AND id < ?
-            ORDER BY ts DESC, uid DESC
-            LIMIT ?
-        """, pid, drawid, num.coercePageNum)
-        result(participators.to())
-    }
 
     ApiPrizeDrawPrize.response { token, pid ->
         VN.throwId(pid)
@@ -540,144 +423,115 @@ fun APIScope.prizeAPI() {
         if (!UserPrivilege.vipPrize(user["privilege"].Int)) failure("无权限")
 
         val prize = db.throwQuerySQLSingle("""
-            SELECT pid, status, seed, seed_commitment, draw_num, revealed_seed
+            SELECT seed, seed_commitment, draw_num, is_drawn
             FROM prize WHERE pid = ?
         """, pid)
 
-        if (prize["status"].String != PrizeStatus.Published.name) failure("只能对已发布的抽奖进行开奖")
-        if (prize["revealed_seed"].StringNull != null) failure("该抽奖已经开过奖了")
+        // 检查是否已发布（seed_commitment 不为空表示已发布）
+        if (prize["seed_commitment"].StringNull == null) {
+            failure("该抽奖尚未发布，无法开奖")
+        }
+
+        // 检查是否已开奖
+        if (prize["is_drawn"].Int == 1) {
+            failure("该抽奖已经开过奖了")
+        }
 
         val seed = prize["seed"].StringNull ?: failure("抽奖种子未生成，请联系管理员")
         val drawNum = prize["draw_num"].Int
 
-        // Get all participants sorted by uid
+        // 获取所有奖品及其数量
+        val prizeItems = db.throwQuerySQL("""
+            SELECT item_id, count FROM prize_item WHERE pid = ? ORDER BY item_id ASC
+        """, pid)
+
+        if (prizeItems.isEmpty()) failure("没有设置奖品，无法开奖")
+
+        // 获取所有参与者（按 uid 排序以保证确定性）
         val participants = db.throwQuerySQL("""
-            SELECT id, uid FROM prize_draw WHERE pid = ? ORDER BY uid ASC
+            SELECT uid FROM prize_draw WHERE pid = ? ORDER BY uid ASC
         """, pid)
 
         if (participants.isEmpty()) failure("没有参与者，无法开奖")
 
-        // 获取奖品等级信息，用于分配奖项
-        val prizeItems = db.throwQuerySQL("""
-            SELECT prize_level, count FROM prize_item WHERE pid = ? AND prize_level IS NOT NULL ORDER BY prize_level ASC
-        """, pid)
-
-        // 构建奖品等级分配列表：每个等级对应其数量
-        val prizeLevelDistribution = mutableListOf<Int>()
-        for (item in prizeItems) {
-            val level = item.Object["prize_level"].Int
-            val count = item.Object["count"].Int
-            repeat(count) {
-                prizeLevelDistribution.add(level)
-            }
-        }
-
-        // 使用承诺揭示机制进行绘图
+        // 使用承诺揭示机制打乱参与者顺序
         val sortedUids = participants.map { it.Object["uid"].Int }
         val seedBytes = Base64.getDecoder().decode(seed)
 
-        val winners = mutableListOf<Int>()
+        // 生成初始随机源：种子+排序uid列表
+        val uidString = sortedUids.joinToString(",")
+        val initialData = seedBytes + uidString.toByteArray()
+        var currentHash = MessageDigest.getInstance("SHA-256").digest(initialData)
 
-        // 特殊情况：当参与人数少于开奖人数时，所有参与者都获奖
-        if (participants.size < drawNum) {
-            winners.addAll(sortedUids)
-        } else {
-            // 正常情况：使用随机算法抽取中奖者
-            // 生成初始随机源：种子+排序uid列表
-            val uidString = sortedUids.joinToString(",")
-            val initialData = seedBytes + uidString.toByteArray()
-            var currentHash = MessageDigest.getInstance("SHA-256").digest(initialData)
-
-            val remainingUids = sortedUids.toMutableList()
-
-            repeat(drawNum) {
-                //将哈希转换为BigInteger
-                val bigInt = BigInteger(1, currentHash)
-                // 计算胜者指数
-                val winnerIndex = (bigInt.mod(BigInteger.valueOf(remainingUids.size.toLong()))).toInt()
-
-                winners.add(remainingUids[winnerIndex])
-                remainingUids.removeAt(winnerIndex)
-
-                //更新随机源：使用之前的哈希值作为新的输入
-                currentHash = MessageDigest.getInstance("SHA-256").digest(currentHash)
-            }
+        // 使用 Fisher-Yates 洗牌算法打乱参与者顺序
+        val shuffledUids = sortedUids.toMutableList()
+        for (i in shuffledUids.size - 1 downTo 1) {
+            val bigInt = BigInteger(1, currentHash)
+            val j = (bigInt.mod(BigInteger.valueOf((i + 1).toLong()))).toInt()
+            
+            // 交换 shuffledUids[i] 和 shuffledUids[j]
+            val temp = shuffledUids[i]
+            shuffledUids[i] = shuffledUids[j]
+            shuffledUids[j] = temp
+            
+            // 更新随机源
+            currentHash = MessageDigest.getInstance("SHA-256").digest(currentHash)
         }
 
-        // 为 winners 随机分配奖品等级
-        val winnersWithLevels = mutableListOf<Pair<Int, Int?>>() // (uid, prizeLevel)
+        // 从左往右按照奖品顺序分配中奖者
+        val itemWinners = mutableMapOf<Int, MutableList<Int>>()
+        var currentIndex = 0
+        var totalWinners = 0
 
-        if (prizeLevelDistribution.isEmpty()) {
-            for (winnerUid in winners) {
-                winnersWithLevels.add(winnerUid to null)
-            }
-        } else {
-            // 有设置等级的奖品，需要随机分配
-            val remainingLevels = prizeLevelDistribution.toMutableList()
-            // 使用排序后的 winners 列表
-            val sortedWinners = winners.sorted()
-            val remainingWinners = sortedWinners.toMutableList()
+        for (itemRow in prizeItems) {
+            val itemId = itemRow.Object["item_id"].Int
+            val count = itemRow.Object["count"].Int
+            val winners = mutableListOf<Int>()
 
-            // 使用额外的哈希值来分配等级（基于已选出的中奖者列表）
-            // 使用 winners 列表的字符串表示作为额外随机源
-            val winnersString = sortedWinners.joinToString(",")
-            val levelAllocationData = seedBytes + winnersString.toByteArray()
-            var levelHash = MessageDigest.getInstance("SHA-256").digest(levelAllocationData)
-
-            // 为每个中奖者随机分配等级
-            while (remainingWinners.isNotEmpty() && remainingLevels.isNotEmpty()) {
-                // 随机选择一个中奖者
-                val winnerBigInt = BigInteger(1, levelHash)
-                val winnerIndex = (winnerBigInt.mod(BigInteger.valueOf(remainingWinners.size.toLong()))).toInt()
-                val winnerUid = remainingWinners[winnerIndex]
-                remainingWinners.removeAt(winnerIndex)
-                levelHash = MessageDigest.getInstance("SHA-256").digest(levelHash)
-
-                // 随机选择一个等级
-                val levelBigInt = BigInteger(1, levelHash)
-                val levelIndex = (levelBigInt.mod(BigInteger.valueOf(remainingLevels.size.toLong()))).toInt()
-                val prizeLevel = remainingLevels[levelIndex]
-                remainingLevels.removeAt(levelIndex)
-                levelHash = MessageDigest.getInstance("SHA-256").digest(levelHash)
-
-                winnersWithLevels.add(winnerUid to prizeLevel)
+            // 分配该奖品的中奖者
+            repeat(count) {
+                if (currentIndex < shuffledUids.size) {
+                    winners.add(shuffledUids[currentIndex])
+                    currentIndex++
+                    totalWinners++
+                }
+                // 如果参与人数不足，该奖品空缺
             }
 
-            // 如果还有剩余的中奖者但没有等级了（理论上不应该发生，因为 drawNum = 总奖品数）,这里把剩余的winner设置为null,依旧符合随机过程
-            for (remainingWinner in remainingWinners) {
-                winnersWithLevels.add(remainingWinner to null)
-            }
+            itemWinners[itemId] = winners
         }
 
-        // 用transaction更新数据库，确保原子性，防止出现开奖了但是没有正常选出中奖者的情况
+        // 用transaction更新数据库，确保原子性
         db.throwTransaction {
+            // 设置开奖状态，公开种子
             it.throwExecuteSQL(
                 """
-                UPDATE prize SET revealed_seed = ?, status = ? WHERE pid = ?
-            """, seed, PrizeStatus.Closed.name, pid
+                UPDATE prize SET revealed_seed = ?, is_drawn = 1 WHERE pid = ?
+            """, seed, pid
             )
 
-            //这里有 N+1 问题，之后需要找时间解决
-            for ((winnerUid, prizeLevel) in winnersWithLevels) {
-                it.throwExecuteSQL(
-                    """
-                    UPDATE prize_draw SET result = ?, prize_level = ? WHERE pid = ? AND uid = ?
-                """, PrizeResult.Win.name, prizeLevel, pid, winnerUid
+            // 插入中奖者记录到 prize_winner 表（按 itemid 存储）
+            for ((itemId, winners) in itemWinners) {
+                // 将 winners 列表转换为 JSON 数组字符串 [uid1,uid2,uid3]
+                val winnerListJson = winners.joinToString(
+                    prefix = "[",
+                    postfix = "]",
+                    separator = ","
                 )
-            }
-            if (participants.size >= drawNum) {
+                
                 it.throwExecuteSQL(
                     """
-                UPDATE prize_draw SET result = ? WHERE pid = ? AND result = ?
-            """, PrizeResult.Loss.name, pid, PrizeResult.Notdrawn.name
+                    INSERT INTO prize_winner(pid, itemid, winner_list)
+                    ${values(3)}
+                """, pid, itemId, winnerListJson
                 )
             }
         }
 
         val message = if (participants.size < drawNum) {
-            "开奖成功，参与人数(${participants.size})少于开奖人数($drawNum)，所有参与者均获奖，共${winners.size}位中奖者"
+            "开奖成功，参与人数(${participants.size})少于奖品总数($drawNum)，已分配${totalWinners}个奖品，剩余${drawNum - totalWinners}个奖品空缺"
         } else {
-            "开奖成功，共抽取${winners.size}位中奖者"
+            "开奖成功，共分配${totalWinners}个奖品给${totalWinners}位中奖者"
         }
         result(message)
     }
