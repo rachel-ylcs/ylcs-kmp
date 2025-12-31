@@ -64,6 +64,8 @@ include(
     "ylcs-module:auto-update",
     "ylcs-module:single_instance",
 
+    "ylcs-module:native:platform-lib",
+
     /* -----------------  [3] 结构模块  ----------------- */
 
     "ylcs-app:mod",

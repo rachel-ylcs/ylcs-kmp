@@ -9,6 +9,10 @@ plugins {
 template(object : KotlinMultiplatformTemplate() {
     override val namespace: String = "base.core"
 
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
@@ -56,5 +60,11 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.kotlinx.broswer
             )
         }
+
+        windowsMain.configure(kotlinMain)
+
+        linuxMain.configure(kotlinMain)
+
+        macosMain.configure(kotlinMain)
     }
 })

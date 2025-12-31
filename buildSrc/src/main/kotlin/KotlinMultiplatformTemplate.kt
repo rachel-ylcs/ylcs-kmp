@@ -54,10 +54,13 @@ class KotlinMultiplatformSourceSetsScope(
         }
     }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
-    val windowsNativeMain: KotlinSourceSet by lazy { with(extension) { set.mingwX64Main.get() } }
-    val linuxNativeMain: KotlinSourceSet by lazy { with(extension) { set.linuxX64Main.get() } }
-    val macOSNativeMain: KotlinSourceSet by lazy { with(extension) { set.macosArm64Main.get() } }
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
+    val windowsMain: KotlinSourceSet by lazy { set.getByName("windowsMain") }
+    val windowsTest: KotlinSourceSet by lazy { set.getByName("windowsTest") }
+    val linuxMain: KotlinSourceSet by lazy { set.getByName("linuxMain") }
+    val linuxTest: KotlinSourceSet by lazy { set.getByName("linuxTest") }
+    val macosMain: KotlinSourceSet by lazy { set.getByName("macosMain") }
+    val macosTest: KotlinSourceSet by lazy { set.getByName("macosTest") }
 
     val composeOSLib: String get() = extension.extensions.getByType<ComposePlugin.Dependencies>().desktop.currentOs
 }
@@ -106,6 +109,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open val webTarget: Boolean = true
     open fun KotlinWasmJsTargetDsl.wasmJs() { }
     open fun KotlinWebpackConfig.webpack() { }
+
+    // DesktopNative
+    open val windowsTarget: Boolean = false
+    open val linuxTarget: Boolean = false
+    open val macosTarget: Boolean = false
+    open fun KotlinNativeTarget.desktopNative() { }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
@@ -243,6 +252,11 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     wasmJs()
                 }
             }
+
+            // DesktopNative
+            if (windowsTarget) mingwX64("windows") { desktopNative() }
+            if (linuxTarget) linuxX64("linux") { desktopNative() }
+            if (macosTarget) macosArm64("macos") { desktopNative() }
 
             // SourceSet
             KotlinMultiplatformSourceSetsScope(this@build, extension, sourceSets).source()
