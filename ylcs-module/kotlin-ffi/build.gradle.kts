@@ -6,7 +6,15 @@ template(object : KotlinJvmTemplate() {
     override fun KotlinJvmSourceSetsScope.source() {
         main.configure {
             lib(
-                projects.ylcsModule.kotlinFfi,
+                ExportLib,
+                projects.ylcsBase.core,
+            )
+        }
+
+        test.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test,
             )
         }
     }

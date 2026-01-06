@@ -8,6 +8,14 @@ abstract class KotlinNativeLibTemplate : KotlinNativeTemplate() {
         binaries {
             sharedLib {
                 baseName = libName
+                linkerOpts += listOf(
+                    "-O3",
+                    "-DNDEBUG",
+                    "-flto",
+                    "-Wl,--gc-sections",
+                    "-Wl,--strip-debug",
+                    "-Wl,-s",
+                )
                 sharedLib()
             }
         }

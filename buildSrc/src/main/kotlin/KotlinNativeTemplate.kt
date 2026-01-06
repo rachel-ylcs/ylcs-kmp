@@ -10,6 +10,8 @@ class KotlinNativeSourceSetsScope(
     set: NamedDomainObjectContainer<KotlinSourceSet>
 ) : KotlinSourceSetsScope(set) {
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
+    val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
+    val androidNativeTest: KotlinSourceSet by lazy { set.getByName("androidNativeTest") }
     val windowsMain: KotlinSourceSet by lazy { set.getByName("windowsMain") }
     val windowsTest: KotlinSourceSet by lazy { set.getByName("windowsTest") }
     val linuxMain: KotlinSourceSet by lazy { set.getByName("linuxMain") }
@@ -23,6 +25,7 @@ abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtensio
     abstract val libName: String
     open fun KotlinNativeSourceSetsScope.source() { }
 
+    open val androidNativeTarget: Boolean = false
     open val windowsTarget: Boolean = false
     open val linuxTarget: Boolean = false
     open val macosTarget: Boolean = false
@@ -34,9 +37,14 @@ abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtensio
                 useLanguageFeature()
             }
 
-            if (windowsTarget) mingwX64("windows") { native() }
-            if (linuxTarget) linuxX64("linux") { native() }
-            if (macosTarget) macosArm64("macos") { native() }
+            buildList {
+                if (androidNativeTarget) add(androidNativeArm64("androidNative"))
+                if (windowsTarget) add(mingwX64("windows"))
+                if (linuxTarget) add(linuxX64("linux"))
+                if (macosTarget) add(macosArm64("macos"))
+            }.forEach { target ->
+                target.native()
+            }
 
             // SourceSet
             KotlinNativeSourceSetsScope(this@build, extension, sourceSets).source()

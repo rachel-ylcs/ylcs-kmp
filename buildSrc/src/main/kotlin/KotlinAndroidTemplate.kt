@@ -10,6 +10,7 @@ class KotlinAndroidSourceSetsScope(
     set: NamedDomainObjectContainer<KotlinSourceSet>
 ) : KotlinSourceSetsScope(set) {
     val main: KotlinSourceSet by lazy { set.named("main").get() }
+    val test: KotlinSourceSet by lazy { set.named("test").get() }
 }
 
 abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() {

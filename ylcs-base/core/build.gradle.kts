@@ -9,6 +9,7 @@ plugins {
 template(object : KotlinMultiplatformTemplate() {
     override val namespace: String = "base.core"
 
+    override val androidNativeTarget: Boolean = true
     override val windowsTarget: Boolean = true
     override val linuxTarget: Boolean = true
     override val macosTarget: Boolean = true

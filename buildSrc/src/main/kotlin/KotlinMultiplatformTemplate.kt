@@ -36,7 +36,6 @@ class KotlinMultiplatformSourceSetsScope(
     val commonTest: KotlinSourceSet by lazy { with(extension) { set.commonTest.get() } }
     val nativeMain: KotlinSourceSet by lazy { with(extension) { set.nativeMain.get() } }
     val androidMain: KotlinSourceSet by lazy { with(extension) { set.androidMain.get() } }
-    val androidNativeMain: KotlinSourceSet by lazy { with(extension) { set.androidNativeArm64Main.get() } }
     val appleMain: KotlinSourceSet by lazy { with(extension) { set.appleMain.get() } }
     val iosMain: KotlinSourceSet by lazy { with(extension) { set.iosMain.get() } }
     val iosMainList: List<KotlinSourceSet> by lazy {
@@ -55,6 +54,9 @@ class KotlinMultiplatformSourceSetsScope(
     }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
+
+    val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
+    val androidNativeTest: KotlinSourceSet by lazy { set.getByName("androidNativeTest") }
     val windowsMain: KotlinSourceSet by lazy { set.getByName("windowsMain") }
     val windowsTest: KotlinSourceSet by lazy { set.getByName("windowsTest") }
     val linuxMain: KotlinSourceSet by lazy { set.getByName("linuxMain") }
@@ -111,10 +113,11 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinWebpackConfig.webpack() { }
 
     // DesktopNative
+    open val androidNativeTarget: Boolean = false
     open val windowsTarget: Boolean = false
     open val linuxTarget: Boolean = false
     open val macosTarget: Boolean = false
-    open fun KotlinNativeTarget.desktopNative() { }
+    open fun KotlinNativeTarget.native() { }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
@@ -266,6 +269,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
             // DesktopNative
             buildList {
+                if (androidNativeTarget) add(androidNativeArm64("androidNative"))
                 if (windowsTarget) add(mingwX64("windows"))
                 if (linuxTarget) add(linuxX64("linux"))
                 if (macosTarget) add(macosArm64("macos"))
@@ -273,7 +277,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 target.compilerOptions {
                     useLanguageFeature()
                 }
-                target.desktopNative()
+                target.native()
             }
 
             // SourceSet

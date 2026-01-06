@@ -9,6 +9,7 @@ class KotlinJvmSourceSetsScope(
     set: NamedDomainObjectContainer<KotlinSourceSet>
 ) : KotlinSourceSetsScope(set) {
     val main: KotlinSourceSet by lazy { set.named("main").get() }
+    val test: KotlinSourceSet by lazy { set.named("test").get() }
 }
 
 abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
