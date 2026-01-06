@@ -46,13 +46,6 @@ class Constants(project: Project) {
     // 可用内存
     val freeMemory = Runtime.getRuntime().freeMemory()
 
-    // kotlin 特性
-    val features = listOf(
-        "-Xexpect-actual-classes",
-        "-Xes-long-as-bigint",
-        "-Xreturn-value-checker=check"
-    )
-
     // 排除资源
     val excludes = listOf(
         "/META-INF/{AL2.0,LGPL2.1}",

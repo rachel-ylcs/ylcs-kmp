@@ -20,6 +20,7 @@ class KotlinNativeSourceSetsScope(
 
 abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
     // SourceSets
+    abstract val libName: String
     open fun KotlinNativeSourceSetsScope.source() { }
 
     open val windowsTarget: Boolean = false
@@ -30,7 +31,7 @@ abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtensio
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
             compilerOptions {
-                freeCompilerArgs.addAll(C.features)
+                useLanguageFeature()
             }
 
             if (windowsTarget) mingwX64("windows") { native() }

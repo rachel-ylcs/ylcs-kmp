@@ -118,11 +118,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
-            // 开启 kotlin 编译器特性
-            compilerOptions {
-                freeCompilerArgs.addAll(C.features)
-            }
-
             // Android
             val oldAndroidPlugin = this@build.extensions.findByType<LibraryExtension>()
             val newAndroidPlugin = extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()
@@ -133,6 +128,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     @Suppress("Deprecation")
                     androidTarget {
                         compilerOptions {
+                            useLanguageFeature()
                             jvmTarget.set(C.jvm.androidTarget)
                         }
                     }
@@ -171,6 +167,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     compilations.configureEach {
                         compileTaskProvider.configure {
                             compilerOptions {
+                                useLanguageFeature()
                                 jvmTarget.set(C.jvm.androidTarget)
                             }
                         }
@@ -187,13 +184,20 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
             // iOS
             if (iosTarget) {
-                iosArm64 { ios() }
-                if (C.platform == BuildPlatform.Mac) {
-                    when (C.architecture) {
-                        BuildArchitecture.AARCH64 -> iosSimulatorArm64 { ios() }
-                        BuildArchitecture.X86_64 -> iosX64 { ios() }
-                        else -> { }
+                buildList {
+                    add(iosArm64())
+                    if (C.platform == BuildPlatform.Mac) {
+                        when (C.architecture) {
+                            BuildArchitecture.AARCH64 -> add(iosSimulatorArm64())
+                            BuildArchitecture.X86_64 -> add(iosX64())
+                            else -> { }
+                        }
                     }
+                }.forEach { target ->
+                    target.compilerOptions {
+                        useLanguageFeature()
+                    }
+                    target.ios()
                 }
 
                 // Use Cocoapods
@@ -224,6 +228,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             if (desktopTarget) {
                 jvm("desktop") {
                     compilerOptions {
+                        useLanguageFeature()
                         jvmTarget.set(C.jvm.target)
                     }
 
@@ -235,6 +240,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             if (webTarget) {
                 @OptIn(ExperimentalWasmDsl::class)
                 wasmJs {
+                    compilerOptions {
+                        useLanguageFeature(
+                            "-Xes-long-as-bigint"
+                        )
+                    }
+
                     browser {
                         testTask {
                             enabled = false
@@ -254,9 +265,16 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             }
 
             // DesktopNative
-            if (windowsTarget) mingwX64("windows") { desktopNative() }
-            if (linuxTarget) linuxX64("linux") { desktopNative() }
-            if (macosTarget) macosArm64("macos") { desktopNative() }
+            buildList {
+                if (windowsTarget) add(mingwX64("windows"))
+                if (linuxTarget) add(linuxX64("linux"))
+                if (macosTarget) add(macosArm64("macos"))
+            }.forEach { target ->
+                target.compilerOptions {
+                    useLanguageFeature()
+                }
+                target.desktopNative()
+            }
 
             // SourceSet
             KotlinMultiplatformSourceSetsScope(this@build, extension, sourceSets).source()

@@ -22,7 +22,7 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
     final override fun Project.build(extension: KotlinJvmExtension) {
         with(extension) {
             compilerOptions {
-                freeCompilerArgs.addAll(C.features)
+                useLanguageFeature()
                 jvmTarget.set(C.jvm.target)
             }
 

@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
@@ -7,16 +5,9 @@ plugins {
     )
 }
 
-template(object : KotlinNativeTemplate() {
+template(object : KotlinNativeLibTemplate() {
+    override val libName: String = "platform_lib"
     override val windowsTarget: Boolean = true
-
-    override fun KotlinNativeTarget.native() {
-        binaries {
-            sharedLib {
-                baseName = "platform_lib"
-            }
-        }
-    }
 
     override fun KotlinNativeSourceSetsScope.source() {
         windowsMain.configure {

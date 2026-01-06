@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.HasKotlinDependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
@@ -65,6 +66,14 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
                 }
             }
         }
+    }
+
+    fun KotlinCommonCompilerOptions.useLanguageFeature(vararg features: String) {
+        freeCompilerArgs.addAll(
+            "-Xexpect-actual-classes",
+            "-Xreturn-value-checker=check",
+            *features
+        )
     }
 }
 

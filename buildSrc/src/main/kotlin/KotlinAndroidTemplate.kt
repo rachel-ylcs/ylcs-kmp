@@ -24,7 +24,7 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
     final override fun Project.build(extension: KotlinAndroidExtension) {
         with(extension) {
             compilerOptions {
-                freeCompilerArgs.addAll(C.features)
+                useLanguageFeature()
                 jvmTarget.set(C.jvm.androidTarget)
             }
 
