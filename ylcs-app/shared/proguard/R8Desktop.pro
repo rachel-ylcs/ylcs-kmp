@@ -8,9 +8,9 @@
 
 # ----------------------------------------- FFI ----------------------------------------------- #
 
--keepclassmembers class * {
-    @java.lang.invoke.MethodHandle$PolymorphicSignature <methods>;
-}
+-keep class java.lang.invoke.** { *; }
+-keep class java.lang.foreign.** { *; }
+-dontwarn java.lang.invoke.MethodHandle
 
 # ----------------------------------- NativeMusicPlayer ----------------------------------------- #
 
