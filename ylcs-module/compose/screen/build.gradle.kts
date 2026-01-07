@@ -9,8 +9,7 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "module.compose.screen"
-    override val resourceName: String = "compose.screen"
+    override val exportResource: Boolean = true
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {

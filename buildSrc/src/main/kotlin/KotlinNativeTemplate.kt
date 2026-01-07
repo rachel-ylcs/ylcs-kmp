@@ -5,10 +5,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 class KotlinNativeSourceSetsScope(
-    private val p: Project,
+    p: Project,
     private val extension: KotlinMultiplatformExtension,
     set: NamedDomainObjectContainer<KotlinSourceSet>
-) : KotlinSourceSetsScope(set) {
+) : KotlinSourceSetsScope(p, set) {
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
     val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
     val androidNativeTest: KotlinSourceSet by lazy { set.getByName("androidNativeTest") }
@@ -33,16 +33,15 @@ abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtensio
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
-            compilerOptions {
-                useLanguageFeature()
-            }
-
             buildList {
                 if (androidNativeTarget) add(androidNativeArm64("androidNative"))
                 if (windowsTarget) add(mingwX64("windows"))
                 if (linuxTarget) add(linuxX64("linux"))
                 if (macosTarget) add(macosArm64("macos"))
             }.forEach { target ->
+                target.compilerOptions {
+                    useLanguageFeature()
+                }
                 target.native()
             }
 

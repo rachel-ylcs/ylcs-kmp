@@ -9,14 +9,12 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "module.compose.theme"
-
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
                 libs.compose.components.resources,
                 ExportLib,
-                projects.ylcsBase.composeCore,
+                projects.ylcsModule.core.compose,
             )
         }
     }

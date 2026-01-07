@@ -13,7 +13,7 @@ template(object : KotlinNativeLibTemplate() {
         windowsMain.configure {
             lib(
                 ExportLib,
-                projects.ylcsBase.core,
+                projects.ylcsModule.core.base,
             )
         }
 

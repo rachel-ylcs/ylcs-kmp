@@ -9,8 +9,6 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "module.compose.component.all"
-
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(

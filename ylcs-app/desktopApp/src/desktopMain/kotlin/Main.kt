@@ -60,7 +60,6 @@ fun main() = object : RachelApplication(PlatformContextDelegate) {
         }
     }
 
-    @StartupNative
     private val setupSingleInstance by sync(priority = StartupDelegate.HIGH7) { SingleInstance.run("${Local.info.appName}.lock") }
 
     private val setComposeRender by service(factory = ::StartupComposeSwingRender)

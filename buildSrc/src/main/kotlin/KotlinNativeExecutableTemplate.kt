@@ -9,10 +9,7 @@ abstract class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
             executable {
                 baseName = libName
                 entryPoint = "main"
-                linkerOpts += listOf(
-                    "-O2",
-                    "-DNDEBUG",
-                )
+
                 executable()
             }
         }

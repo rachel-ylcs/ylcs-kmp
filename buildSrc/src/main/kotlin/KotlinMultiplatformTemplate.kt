@@ -28,10 +28,10 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
 
 class KotlinMultiplatformSourceSetsScope(
-    private val p: Project,
+    p: Project,
     private val extension: KotlinMultiplatformExtension,
     set: NamedDomainObjectContainer<KotlinSourceSet>
-) : KotlinSourceSetsScope(set) {
+) : KotlinSourceSetsScope(p, set) {
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
     val commonTest: KotlinSourceSet by lazy { with(extension) { set.commonTest.get() } }
     val nativeMain: KotlinSourceSet by lazy { with(extension) { set.nativeMain.get() } }
@@ -80,11 +80,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinMultiplatformSourceSetsScope.source() { }
 
     // Compose
-    open val resourceName: String? = null
+    open val exportResource: Boolean = false
     open fun ComposeCompilerGradlePluginExtension.composeCompiler() { }
 
     // Android
-    open val namespace: String? = null
     open fun KotlinMultiplatformAndroidLibraryTarget.android() { }
     open fun LibraryExtension.android() { }
     open val buildNDK: Boolean = false
@@ -119,24 +118,39 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open val macosTarget: Boolean = false
     open fun KotlinNativeTarget.native() { }
 
+    private val Project.moduleNameSpace: String get() {
+        var topModule: Project = this
+        while (topModule.parent != this.rootProject) {
+            topModule = topModule.parent!!
+        }
+        var ns = this.path.removePrefix(":").removeSuffix(":") // 去除首尾项目控制器[:]
+        ns = ns.removePrefix("${topModule.name}:") // 去除顶层模块和控制器[:]
+        ns = ns.replace('-', '_') // 连字符[-]替换成下划线[_]
+        ns = ns.replace(':', '.') // 控制器[:]替换成点[.]
+        return ns
+    }
+
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
+            compilerOptions {
+                useLanguageFeature()
+            }
+
             // Android
             val oldAndroidPlugin = this@build.extensions.findByType<LibraryExtension>()
             val newAndroidPlugin = extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()
             if (oldAndroidPlugin != null || newAndroidPlugin != null) {
-                val androidNamespace = this@KotlinMultiplatformTemplate.namespace?.let { "${C.app.packageName}.$it" } ?: C.app.packageName
+                val androidNamespace = "${C.app.packageName}.$moduleNameSpace"
 
                 oldAndroidPlugin?.apply {
                     @Suppress("Deprecation")
                     androidTarget {
                         compilerOptions {
-                            useLanguageFeature()
                             jvmTarget.set(C.jvm.androidTarget)
                         }
                     }
 
-                    this.namespace = androidNamespace
+                    namespace = androidNamespace
                     compileSdk = C.android.compileSdk
 
                     defaultConfig {
@@ -162,7 +176,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 }
 
                 newAndroidPlugin?.apply {
-                    this.namespace = androidNamespace
+                    namespace = androidNamespace
                     compileSdk = C.android.compileSdk
                     minSdk = C.android.minSdk
                     lint.targetSdk = C.android.targetSdk
@@ -170,13 +184,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     compilations.configureEach {
                         compileTaskProvider.configure {
                             compilerOptions {
-                                useLanguageFeature()
                                 jvmTarget.set(C.jvm.androidTarget)
                             }
                         }
                     }
 
-                    if (resourceName != null) {
+                    if (exportResource) {
                         @Suppress("UnstableApiUsage")
                         androidResources.enable = true
                     }
@@ -197,9 +210,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         }
                     }
                 }.forEach { target ->
-                    target.compilerOptions {
-                        useLanguageFeature()
-                    }
                     target.ios()
                 }
 
@@ -231,7 +241,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             if (desktopTarget) {
                 jvm("desktop") {
                     compilerOptions {
-                        useLanguageFeature()
                         jvmTarget.set(C.jvm.target)
                     }
 
@@ -274,9 +283,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 if (linuxTarget) add(linuxX64("linux"))
                 if (macosTarget) add(macosArm64("macos"))
             }.forEach { target ->
-                target.compilerOptions {
-                    useLanguageFeature()
-                }
                 target.native()
             }
 
@@ -290,11 +296,11 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             composeCompiler()
         }
 
-        resourceName?.let { name ->
+        if (exportResource) {
             extensions.configure<ComposeExtension> {
                 this.configure<ResourcesExtension> {
                     publicResClass = true
-                    packageOfResClass = "${C.app.packageName}.$name.resources"
+                    packageOfResClass = "${C.app.packageName}.$moduleNameSpace.resources"
                 }
             }
         }

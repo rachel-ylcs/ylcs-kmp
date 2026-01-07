@@ -159,7 +159,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             ) {
                 LaunchedEffect(Unit) {
                     Fixup.swingWindowMaximizeBounds(window)
-                    context.bindWindow(window)
+                    context.bindWindow(window.windowHandle)
 
                     windowStarter {
                         openService(later = true, immediate = false)

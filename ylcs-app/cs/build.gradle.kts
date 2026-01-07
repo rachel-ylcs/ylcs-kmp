@@ -7,14 +7,12 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "cs"
-
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             kotlin.srcDir(C.root.cs.srcGenerated)
             lib(
                 ExportLib,
-                projects.ylcsBase.csCore,
+                projects.ylcsModule.core.cs,
                 libs.compose.runtime,
             )
         }

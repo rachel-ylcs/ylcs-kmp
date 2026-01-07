@@ -9,14 +9,12 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "module.compose.service.config"
-
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
                 ExportLib,
-                projects.ylcsModule.compose.startup,
-                projects.ylcsModule.compose.service.mmkvKmp,
+                projects.ylcsModule.core.compose,
+                projects.ylcsModule.foundation.service.mmkvKmp,
             )
         }
     }

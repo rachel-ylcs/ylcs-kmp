@@ -9,8 +9,7 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "module.compose.ui"
-    override val resourceName: String = "compose.ui"
+    override val exportResource: Boolean = true
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
@@ -18,7 +17,7 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.compose.components.resources,
                 libs.compose.navigation.event,
                 ExportLib,
-                projects.ylcsModule.compose.context,
+                projects.ylcsModule.foundation.framework.context,
                 projects.ylcsModule.compose.device,
                 projects.ylcsModule.compose.theme,
                 libs.compose.material3,

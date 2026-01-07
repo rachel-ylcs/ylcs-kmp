@@ -18,7 +18,7 @@ template(object : KotlinJvmTemplate() {
         main.configure {
             lib(
                 projects.ylcsApp.cs,
-                projects.ylcsModule.serverEngine,
+                projects.ylcsModule.foundation.net.serverEngine,
             )
         }
     }

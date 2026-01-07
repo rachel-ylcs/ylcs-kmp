@@ -14,8 +14,7 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "shared"
-    override val resourceName: String = "shared"
+    override val exportResource: Boolean = true
 
     override fun KotlinNativeTarget.ios() {
         if (C.platform == BuildPlatform.Mac) {
@@ -46,9 +45,9 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 projects.ylcsApp.mod,
+                projects.ylcsModule.foundation.net.clientEngine,
                 projects.ylcsModule.compose.component.all,
-                projects.ylcsModule.compose.game,
-                projects.ylcsModule.clientEngine,
+                projects.ylcsModule.compose.plugin.game,
                 libs.compose.components.resources,
                 libs.lottie,
                 libs.lottie.network,
@@ -57,10 +56,11 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.tool.reorder,
                 libs.tool.qrcode,
                 ExportLib,
+                projects.ylcsApp.cs,
+                projects.ylcsModule.foundation.service.all,
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
                 projects.ylcsModule.compose.service.all,
-                projects.ylcsApp.cs,
             )
         }
 

@@ -13,7 +13,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 // 在 ExportLib 后面的库将会被导出给其他模块可见
 data object ExportLib
 
-abstract class KotlinSourceSetsScope(private val set: NamedDomainObjectContainer<KotlinSourceSet>) {
+abstract class KotlinSourceSetsScope(
+    private val p: Project,
+    private val set: NamedDomainObjectContainer<KotlinSourceSet>
+) {
     fun find(
         vararg parents: KotlinSourceSet,
         block: KotlinSourceSet.() -> Unit = {}

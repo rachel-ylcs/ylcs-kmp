@@ -23,8 +23,8 @@ template(object : KotlinMultiplatformTemplate() {
         desktopMain.configure(commonMain) {
             lib(
                 projects.ylcsApp.shared,
-                projects.ylcsModule.autoUpdate,
-                projects.ylcsModule.singleInstance,
+                projects.ylcsModule.foundation.os.autoUpdate,
+                projects.ylcsModule.foundation.os.singleInstance,
             )
         }
     }

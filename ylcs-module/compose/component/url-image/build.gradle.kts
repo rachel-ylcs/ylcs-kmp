@@ -9,13 +9,12 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val namespace: String = "module.compose.component.url_image"
-    override val resourceName: String = "compose.component.url_image"
+    override val exportResource: Boolean = true
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                projects.ylcsModule.clientEngine,
+                projects.ylcsModule.foundation.net.clientEngine,
                 libs.sketch,
                 libs.sketch.http,
                 libs.sketch.resources,
@@ -25,8 +24,8 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.sketch.zoom,
                 libs.compose.components.resources,
                 ExportLib,
+                projects.ylcsModule.foundation.framework.startup,
                 projects.ylcsModule.compose.ui,
-                projects.ylcsModule.compose.startup,
             )
         }
 

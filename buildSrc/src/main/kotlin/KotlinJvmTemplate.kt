@@ -6,8 +6,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 class KotlinJvmSourceSetsScope(
+    p: Project,
     set: NamedDomainObjectContainer<KotlinSourceSet>
-) : KotlinSourceSetsScope(set) {
+) : KotlinSourceSetsScope(p, set) {
     val main: KotlinSourceSet by lazy { set.named("main").get() }
     val test: KotlinSourceSet by lazy { set.named("test").get() }
 }
@@ -27,7 +28,7 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
                 jvmTarget.set(C.jvm.target)
             }
 
-            KotlinJvmSourceSetsScope(sourceSets).source()
+            KotlinJvmSourceSetsScope(this@build, sourceSets).source()
 
             action()
         }

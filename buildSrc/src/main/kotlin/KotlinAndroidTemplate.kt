@@ -7,8 +7,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 class KotlinAndroidSourceSetsScope(
+    p: Project,
     set: NamedDomainObjectContainer<KotlinSourceSet>
-) : KotlinSourceSetsScope(set) {
+) : KotlinSourceSetsScope(p, set) {
     val main: KotlinSourceSet by lazy { set.named("main").get() }
     val test: KotlinSourceSet by lazy { set.named("test").get() }
 }
@@ -29,7 +30,7 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
                 jvmTarget.set(C.jvm.androidTarget)
             }
 
-            KotlinAndroidSourceSetsScope(sourceSets).source()
+            KotlinAndroidSourceSetsScope(this@build, sourceSets).source()
 
             action()
         }
