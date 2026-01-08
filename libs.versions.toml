@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins #
-kotlin = "2.3.0"
+kotlin = "2.3.20-Beta1"
 cmp = "1.11.0-alpha01"
 agp = "8.12.3"
 
@@ -16,7 +16,7 @@ ktor = "3.3.3"
 sketch = "4.4.0-alpha01"
 mmkv = "2.3.0"
 lottie = "2.0.2"
-skiko = "0.9.39"
+skiko = "0.9.40"
 
 # Android
 cmp-android = "1.10.0"
