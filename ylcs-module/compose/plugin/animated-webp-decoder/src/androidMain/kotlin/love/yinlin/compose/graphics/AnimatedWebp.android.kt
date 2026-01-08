@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.toAndroidRectF
 import love.yinlin.data.compose.ImageFormat
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.catchingThrow
 import androidx.core.graphics.createBitmap
 import java.nio.ByteBuffer
 
@@ -69,9 +68,7 @@ actual class AnimatedWebp internal constructor(
 
         actual fun decode(data: ByteArray): AnimatedWebp? = catchingNull {
             var handle = 0L
-            catchingThrow(
-                clean = { nativeAnimatedWebpRelease(handle) }
-            ) {
+            try {
                 handle = nativeAnimatedWebpCreate(data)
                 require(handle != 0L)
                 val width = nativeAnimatedWebpGetWidth(handle)
@@ -120,6 +117,9 @@ actual class AnimatedWebp internal constructor(
 
                 mergeBitmap.isMutable
                 AnimatedWebp(width, height, frameCount, row, col, paint, mergeBitmap)
+            }
+            finally {
+                nativeAnimatedWebpRelease(handle)
             }
         }
     }

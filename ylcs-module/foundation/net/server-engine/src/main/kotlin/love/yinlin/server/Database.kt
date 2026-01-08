@@ -10,7 +10,6 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.catchingThrow
 import love.yinlin.extension.json
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJson
@@ -76,16 +75,15 @@ class Database internal constructor(config: Config) {
 
     fun <R : Any> throwTransaction(call: (Connection) -> R): R = connection.use {
         it.autoCommit = false
-        catchingThrow(
-            clean = { it.autoCommit = true },
-            onError = { _ ->
-                it.rollback()
-                null
-            }
-        ) {
+        try {
             val result = call(it)
             it.commit()
             result
+        } catch (e: Throwable) {
+            it.rollback()
+            throw e
+        } finally {
+            it.autoCommit = true
         }
     }
 }
@@ -149,16 +147,14 @@ fun Connection.updateSQL(sql: String, vararg args: Any?): Boolean {
 
 fun Connection.deleteSQL(sql: String, vararg args: Any?): Boolean = updateSQL(sql, *args)
 
-fun Connection.throwInsertSQLDuplicateKey(sql: String, vararg args: Any?): Boolean = catchingThrow(
-    onError = { err ->
-        if (err is SQLIntegrityConstraintViolationException && err.errorCode == 1062) true
-        else null
-    }
-) {
+fun Connection.throwInsertSQLDuplicateKey(sql: String, vararg args: Any?): Boolean = try {
     val statement = this.prepareStatement(sql)
     args.forEachIndexed { index, arg -> statement.setObject(index + 1, arg) }
-    if (statement.executeUpdate() <= 0) throw Throwable("NoAffect ${args.joinToString()}")
+    if (statement.executeUpdate() <= 0) throw IllegalStateException("NoAffect ${args.joinToString()}")
     false
+} catch(e: Throwable) {
+    if (e is SQLIntegrityConstraintViolationException && e.errorCode == 1062) true
+    else throw e
 }
 
 fun Connection.throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long {

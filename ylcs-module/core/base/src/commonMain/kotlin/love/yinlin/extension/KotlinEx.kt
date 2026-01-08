@@ -55,23 +55,12 @@ inline fun catching(block: () -> Unit): Unit = try {
 }
 catch (_: Throwable) { }
 
-// 返回异常, clean 清理
+// 返回异常
 inline fun catchingError(block: () -> Unit): Throwable? = try {
     block()
     null
 }
 catch (e: Throwable) { e }
-
-// onError 返回 null 则重抛异常, clean 清理
-inline fun <R : Any> catchingThrow(clean: () -> Unit = {}, onError: (Throwable) -> R? = { null }, block: () -> R): R = try {
-    block()
-}
-catch (e: Throwable) {
-    onError(e) ?: throw e
-}
-finally {
-    clean()
-}
 
 // 无视异常, 返回 null
 inline fun <R> catchingNull(block: () -> R): R? = try {

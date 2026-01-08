@@ -2,7 +2,6 @@ package love.yinlin
 
 import androidx.compose.runtime.Stable
 import kotlinx.coroutines.launch
-import love.yinlin.extension.catchingThrow
 import love.yinlin.platform.Coroutines
 import kotlin.jvm.JvmName
 
@@ -53,35 +52,20 @@ open class Service {
             for (delegate in free.sortedByDescending { it.priority }) {
                 launch {
                     with(delegate) {
-                        catchingThrow(onError = {
-                            println("[Startup] $delegate initStartup error")
-                            null
-                        }) {
-                            this@launch.initStartup(context, later)
-                        }
+                        this@launch.initStartup(context, later)
                     }
                 }
             }
         }
 
         for (delegate in sync.sortedByDescending { it.priority }) {
-            catchingThrow(onError = {
-                println("[Startup] $delegate initStartup error")
-                null
-            }) {
-                delegate.initStartup(context, later)
-            }
+            delegate.initStartup(context, later)
         }
 
         Coroutines.startMain {
             for (delegate in async.sortedByDescending { it.priority }) {
                 with(delegate) {
-                    catchingThrow(onError = {
-                        println("[Startup] $delegate initStartup error")
-                        null
-                    }) {
-                        this@startMain.initStartup(context, later)
-                    }
+                    this@startMain.initStartup(context, later)
                 }
             }
             if (immediate && !later) initService(context, later = true, immediate = false)
