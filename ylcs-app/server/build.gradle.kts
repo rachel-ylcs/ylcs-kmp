@@ -1,6 +1,5 @@
 plugins {
     install(
-        libs.plugins.gradleApplication,
         libs.plugins.kotlinJvm,
         libs.plugins.kotlinSerialization,
         libs.plugins.ktor
@@ -34,41 +33,24 @@ template(object : KotlinJvmTemplate() {
     }
 
     override fun Project.actions() {
-        tasks.apply {
-            withType<Jar> {
-                excludes += C.excludes
-            }
-
-            distTar { enabled = false }
-            distZip { enabled = false }
-            shadowDistTar { enabled = false }
-            shadowDistZip { enabled = false }
-            jar { enabled = false }
-            shadowJar {
-                destinationDirectory = C.root.server.outputs
-            }
-        }
-
-        val cleanFatJar by tasks.registering {
-            doLast {
-                delete(C.root.server.outputFile)
-            }
-        }
-
-        val buildFatJar = tasks.named("buildFatJar")
-        buildFatJar.get().mustRunAfter(cleanFatJar)
-
         // 运行服务端
-        val run by tasks.named("run")
-
         val serverRun by tasks.registering {
-            dependsOn(run)
+            dependsOn(tasks.named("run"))
+        }
+
+        tasks.named("shadowJar") {
+            doLast {
+                delete(C.root.outputs.file(C.server.outputName))
+                copy {
+                    from(C.root.server.originOutput)
+                    into(C.root.outputs)
+                }
+            }
         }
 
         // 发布服务端
         val serverPublish by tasks.registering {
-            dependsOn(cleanFatJar)
-            dependsOn(buildFatJar)
+            dependsOn(tasks.named("buildFatJar"))
         }
     }
 })

@@ -27,7 +27,6 @@ vlcKit = "3.6.1b1"
 sgQrcode = "4.1.0"
 
 [plugins]
-gradleApplication = { id = "org.gradle.application" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }

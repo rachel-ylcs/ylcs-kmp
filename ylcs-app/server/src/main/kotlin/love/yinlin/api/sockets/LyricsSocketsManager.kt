@@ -161,13 +161,11 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
             val winnerResult = if (isWinner1) result1 else result2
             val winnerAnswer = if (isWinner1) answers1 else answers2
             if (winnerResult.count >= (LyricsSockets.QUESTION_COUNT * 0.6f).toInt()) {
-                runCatching {
-                    db.throwInsertSQLGeneratedKey("INSERT INTO game_alone_record (type, uid, question, answer, result) ${values(5)}",
-                        Game.GuessLyrics.ordinal, winnerResult.player.uid,
-                        room.questions.toJsonString(), winnerAnswer.toJsonString(),
-                        LyricsSockets.StorageResult(winnerResult.count, winnerResult.duration).toJsonString()
-                    )
-                }
+                db.throwInsertSQLGeneratedKey("INSERT INTO game_alone_record (type, uid, question, answer, result) ${values(5)}",
+                    Game.GuessLyrics.ordinal, winnerResult.player.uid,
+                    room.questions.toJsonString(), winnerAnswer.toJsonString(),
+                    LyricsSockets.StorageResult(winnerResult.count, winnerResult.duration).toJsonString()
+                )
             }
         }
     }

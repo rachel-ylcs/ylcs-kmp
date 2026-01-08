@@ -74,8 +74,7 @@ class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
 }
 
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
-    val outputs = root.outputs
-    val outputFile: RegularFile = outputs.file(c.server.outputName)
+    val originOutput: RegularFile = dir("build").dir("libs").file(c.server.outputName)
 }
 
 class ModManagerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("mod-manager") {
