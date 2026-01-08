@@ -30,7 +30,6 @@ import love.yinlin.platform.Platform
 import love.yinlin.data.rachel.rhyme.RhymeRank
 import love.yinlin.data.rachel.prize.Prize
 import love.yinlin.data.rachel.prize.PrizeItemdata
-import love.yinlin.data.rachel.prize.PrizeDraw
 import love.yinlin.data.rachel.prize.Prizedata
 
 // Common

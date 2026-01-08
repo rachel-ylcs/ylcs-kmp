@@ -203,7 +203,7 @@ fun APIScope.prizeAPI() {
         
         db.throwTransaction {
             // 获取奖品信息
-            val item = it.querySQLSingle("""
+            it.querySQLSingle("""
                 SELECT pic FROM prize_item WHERE item_id = ? AND pid = ?
             """, itemID, pid) ?: failure("奖品不存在")
 
@@ -312,7 +312,7 @@ fun APIScope.prizeAPI() {
         if (!UserPrivilege.vipPrize(user["privilege"].Int)) failure("无权限")
         
         // 检查抽奖是否存在
-        val prize = db.querySQLSingle("""
+        db.querySQLSingle("""
             SELECT organizer_uid FROM prize WHERE pid = ?
         """, pid) ?: failure("抽奖不存在")
         

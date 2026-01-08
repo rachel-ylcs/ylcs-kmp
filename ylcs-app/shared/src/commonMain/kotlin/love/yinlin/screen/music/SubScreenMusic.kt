@@ -58,7 +58,6 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.platform.lyrics.LyricsEngine
 import love.yinlin.screen.common.ScreenVideo
-import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
