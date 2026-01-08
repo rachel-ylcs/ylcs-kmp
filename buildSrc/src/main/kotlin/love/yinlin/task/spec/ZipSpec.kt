@@ -1,3 +1,5 @@
+package love.yinlin.task.spec
+
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 import java.io.File
@@ -6,7 +8,6 @@ import java.io.FileOutputStream
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-
 
 class ZipSpec {
     private lateinit var file: RegularFile

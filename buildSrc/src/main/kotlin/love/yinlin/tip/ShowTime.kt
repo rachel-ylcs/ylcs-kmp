@@ -1,3 +1,7 @@
+package love.yinlin.tip
+
+import C
+import currentTaskName
 import org.gradle.api.Project
 
 fun buildLyrics(): List<String> {

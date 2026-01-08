@@ -1,3 +1,5 @@
+package love.yinlin.project
+
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 

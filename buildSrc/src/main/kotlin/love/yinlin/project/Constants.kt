@@ -1,3 +1,6 @@
+package love.yinlin.project
+
+import BuildEnvironment
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -139,28 +142,6 @@ class Constants(project: Project) {
     val root = RootProjectNode(rootProject.layout.projectDirectory, this)
 }
 
-enum class BuildEnvironment { Dev, Prod }
-
-enum class BuildPlatform {
-    Windows, Linux, Mac;
-
-    override fun toString(): String = when (this) {
-        Windows -> "win"
-        Linux -> "linux"
-        Mac -> "mac"
-    }
-}
-
-enum class BuildArchitecture {
-    X86_64, ARM, AARCH64;
-
-    override fun toString(): String = when (this) {
-        X86_64 -> "x86_64"
-        ARM -> "arm"
-        AARCH64 -> "aarch64"
-    }
-}
-
 data class Application(
     val name: String,
     val projectName: String,
@@ -228,10 +209,3 @@ class HostConfig(
         BuildEnvironment.Prod -> "https://$apiHost"
     }
 }
-
-val projectMap = mutableMapOf<Project, Constants>()
-val Project.C: Constants get() = projectMap.getOrPut(this) { Constants(this) }
-
-// 获取当前任务名
-
-val Project.currentTaskName: String get() = this.gradle.startParameter.taskNames.firstOrNull() ?: "sync"

@@ -1,3 +1,5 @@
+import love.yinlin.tip.showtime
+
 plugins {
     install(
         // 这里的插件在 buildSrc 中已经注册, 在主项目模块中通过 id 引用, 而不是 alias

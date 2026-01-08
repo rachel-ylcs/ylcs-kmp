@@ -1,3 +1,5 @@
+import love.yinlin.task.GenerateCodeTask
+
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
@@ -19,40 +21,31 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        val generateConstants by tasks.registering {
-            val content = """
-            package love.yinlin
-            
-            import love.yinlin.data.AppInfo
-            
-            // 由构建脚本自动生成，请勿手动修改
-            object Local {
-                val info = AppInfo(
-                    appName = "${C.app.name}",
-                    name = "${C.app.displayName}",
-                    version = ${C.app.version},
-                    versionName = "${C.app.versionName}",
-                    minVersion = ${C.app.minVersion},
-                    minVersionName = "${C.app.minVersionName}",
-                    packageName = "${C.app.packageName}",
-                )
-                
-                const val MAIN_HOST: String = "${C.host.mainHost}"
-                const val API_HOST: String = "${C.host.apiHost}"
-                const val API_BASE_URL: String = "${C.host.apiUrl}"
-            }
-        """.trimIndent()
-            val constantsFile = C.root.cs.generatedLocalFile.let {
-                outputs.file(it)
-                it.asFile
-            }
-            outputs.upToDateWhen {
-                constantsFile.takeIf { it.exists() }?.readText() == content
-            }
-            doLast {
-                constantsFile.parentFile.mkdirs()
-                constantsFile.writeText(content, Charsets.UTF_8)
-            }
+        val generateConstants by tasks.registering(GenerateCodeTask::class) {
+            code = """
+package love.yinlin
+
+import love.yinlin.data.AppInfo
+
+// 由构建脚本自动生成，请勿手动修改
+object Local {
+    val info = AppInfo(
+        appName = "${C.app.name}",
+        name = "${C.app.displayName}",
+        version = ${C.app.version},
+        versionName = "${C.app.versionName}",
+        minVersion = ${C.app.minVersion},
+        minVersionName = "${C.app.minVersionName}",
+        packageName = "${C.app.packageName}",
+    )
+    
+    const val MAIN_HOST: String = "${C.host.mainHost}"
+    const val API_HOST: String = "${C.host.apiHost}"
+    const val API_BASE_URL: String = "${C.host.apiUrl}"
+}
+            """.trimIndent()
+            title = "Local Variable"
+            outputFile.set(C.root.cs.generatedLocalFile)
         }
 
         rootProject.tasks.named("prepareKotlinBuildScriptModel").configure {

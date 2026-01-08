@@ -1,3 +1,4 @@
+import love.yinlin.task.spec.zip
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings

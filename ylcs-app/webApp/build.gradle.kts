@@ -1,3 +1,4 @@
+import love.yinlin.task.spec.zip
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {

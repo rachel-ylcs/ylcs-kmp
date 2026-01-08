@@ -1,3 +1,5 @@
+package love.yinlin.tip
+
 internal val library = arrayOf(
     """
 于盛夏之末入夜仍灼热
