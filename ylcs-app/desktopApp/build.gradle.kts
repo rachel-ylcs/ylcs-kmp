@@ -95,11 +95,11 @@ template(object : KotlinMultiplatformTemplate() {
                 }
                 zip {
                     from(C.root.outputs.dir(C.app.name).dir("app"))
-                    to(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
+                    into(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
                 }
                 zip {
                     from(C.root.outputs.dir(C.app.name))
-                    to(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
+                    into(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
                 }
                 delete {
                     delete(C.root.outputs.dir(C.app.name))

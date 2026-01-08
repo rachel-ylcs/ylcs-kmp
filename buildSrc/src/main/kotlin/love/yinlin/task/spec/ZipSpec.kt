@@ -14,7 +14,7 @@ class ZipSpec {
     private lateinit var folder: Directory
 
     fun from(folder: Directory) { this.folder = folder }
-    fun to(file: RegularFile) { this.file = file }
+    fun into(file: RegularFile) { this.file = file }
 
     private fun addDirectory(directory: File, basePath: String, zos: ZipOutputStream) {
         for (file in directory.listFiles()!!) {

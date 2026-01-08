@@ -53,7 +53,7 @@ template(object : KotlinMultiplatformTemplate() {
                 }
                 zip {
                     from(C.root.webApp.output)
-                    to(C.root.outputs.file("[Web]${C.app.displayName}${C.app.versionName}.zip"))
+                    into(C.root.outputs.file("[Web]${C.app.displayName}${C.app.versionName}.zip"))
                 }
                 delete {
                     delete(C.root.webApp.output)

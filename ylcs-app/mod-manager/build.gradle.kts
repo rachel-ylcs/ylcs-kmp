@@ -1,3 +1,4 @@
+import love.yinlin.task.spec.zip
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 
 plugins {
@@ -41,27 +42,26 @@ template(object : KotlinMultiplatformTemplate() {
     override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = {}
 
     override fun Project.actions() {
-        val run = tasks.named("run")
-        val createReleaseDistributable = tasks.named("createReleaseDistributable")
-
         // 运行 桌面程序 Debug
         val modManagerRunDebug by tasks.registering {
-            dependsOn(run)
+            dependsOn(tasks.named("run"))
         }
 
-        val modManagerCopyDir by tasks.registering {
-            mustRunAfter(createReleaseDistributable)
+        val modManagerPublish by tasks.registering {
+            dependsOn(tasks.named("createReleaseDistributable"))
+
             doLast {
+                delete(C.root.outputs.dir(desktopPackageName))
                 copy {
                     from(C.root.modManager.originOutput)
                     into(C.root.outputs)
                 }
+                zip {
+                    from(C.root.outputs.dir(desktopPackageName))
+                    into(C.root.outputs.file("$desktopPackageName.zip"))
+                }
+                delete(C.root.outputs.dir(desktopPackageName))
             }
-        }
-
-        val modManagerPublish by tasks.registering {
-            dependsOn(createReleaseDistributable)
-            dependsOn(modManagerCopyDir)
         }
     }
 })
