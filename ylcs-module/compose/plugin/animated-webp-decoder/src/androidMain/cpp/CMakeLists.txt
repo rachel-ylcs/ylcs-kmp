@@ -13,7 +13,12 @@ set_target_properties(webpdemux PROPERTIES
 )
 
 add_library(webp_jni SHARED libwebp_jni.c)
+set_target_properties(webp_jni PROPERTIES
+    OUTPUT_NAME webp
+)
+
 target_include_directories(webp_jni PRIVATE include)
 target_compile_options(webp_jni PRIVATE -O2 -DNDEBUG)
 target_link_options(webp_jni PRIVATE -Wl,--gc-sections -Wl,-s)
 target_link_libraries(webp_jni webp webpdemux)
+

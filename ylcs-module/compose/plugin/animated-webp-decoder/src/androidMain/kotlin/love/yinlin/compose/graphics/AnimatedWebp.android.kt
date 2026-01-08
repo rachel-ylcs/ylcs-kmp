@@ -17,6 +17,7 @@ import love.yinlin.data.compose.ImageFormat
 import love.yinlin.data.compose.ImageQuality
 import love.yinlin.extension.catchingNull
 import androidx.core.graphics.createBitmap
+import love.yinlin.platform.NativeLibLoader
 import java.nio.ByteBuffer
 
 @Stable
@@ -63,7 +64,7 @@ actual class AnimatedWebp internal constructor(
 
     actual companion object {
         init {
-            System.loadLibrary("webp_jni")
+            NativeLibLoader.env("webp")
         }
 
         actual fun decode(data: ByteArray): AnimatedWebp? = catchingNull {

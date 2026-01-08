@@ -19,7 +19,11 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        androidMain.configure(commonMain)
+        androidMain.configure(commonMain) {
+            lib(
+                projects.ylcsModule.platform.nativeLibLoader
+            )
+        }
 
         val skikoMain by create(commonMain)
 
