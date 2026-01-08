@@ -20,6 +20,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.DisableCacheInKotlinVersion
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCacheApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
@@ -205,12 +207,25 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     if (C.platform == BuildPlatform.Mac) {
                         when (C.architecture) {
                             BuildArchitecture.AARCH64 -> add(iosSimulatorArm64())
-                            BuildArchitecture.X86_64 -> add(iosX64())
+                            // https://blog.jetbrains.com/kotlin/2023/02/update-regarding-kotlin-native-targets/
+                            BuildArchitecture.X86_64 -> @Suppress("Deprecation") add(iosX64())
                             else -> { }
                         }
                     }
                 }.forEach { target ->
                     target.ios()
+
+                    // https://youtrack.jetbrains.com/issue/KT-80715
+                    if (C.platform == BuildPlatform.Mac) {
+                        target.binaries.framework {
+                            @OptIn(KotlinNativeCacheApi::class)
+                            disableNativeCache(
+                                version = DisableCacheInKotlinVersion.`2_3_20`,
+                                reason = "cache bug",
+                                issueUrl = java.net.URI("https://youtrack.jetbrains.com/issue/KT-80715")
+                            )
+                        }
+                    }
                 }
 
                 // Use Cocoapods
