@@ -11,6 +11,12 @@ plugins {
     )
 }
 
+val desktopNativeList = listOf(
+    projects.ylcsModule.foundation.os.desktopPlayer,
+    projects.ylcsModule.foundation.service.mmkvKmp,
+    projects.ylcsModule.foundation.service.picker,
+)
+
 template(object : KotlinMultiplatformTemplate() {
     override val iosTarget: Boolean = false
     override val webTarget: Boolean = false
@@ -37,7 +43,9 @@ template(object : KotlinMultiplatformTemplate() {
             val desktopWorkSpace = C.root.work.desktop.asFile
             desktopWorkSpace.mkdirs()
             add("-Duser.dir=$desktopWorkSpace")
-            add("-Djava.library.path=${C.root.resources.desktopNative}")
+            // 不使用资源方式加载 native 库
+            add("-Dnative.library.resource.disabled=true")
+            add("-Djava.library.path=${C.root.artifacts.desktopNative}")
         }
     }
     override val desktopModules: List<String> = C.desktop.modules.toList()
@@ -59,16 +67,13 @@ template(object : KotlinMultiplatformTemplate() {
         // 复制桌面动态库
         val desktopCopyNativeLib by tasks.registering {
             doFirst {
-                val libDir = C.root.resources.desktopNative.asFile
-                val outputDir = C.root.resources.dir(C.resourceTag).asFile
-                outputDir.deleteRecursively()
-                outputDir.mkdirs()
-                for (module in listOf(
-                    projects.ylcsModule.foundation.service.picker,
-                )) {
+                val libDir = C.root.artifacts.desktopNative.asFile
+                val packageResourcesDir = project.layout.projectDirectory.dir("packageResources").dir(C.resourceTag).asFile
+                packageResourcesDir.mkdirs()
+                for (module in desktopNativeList) {
                     val libName = System.mapLibraryName(module.name.replace('-', '_'))
                     val libFile = libDir.resolve(libName)
-                    val outputFile = outputDir.resolve(libName)
+                    val outputFile = packageResourcesDir.resolve(libName)
                     libFile.copyTo(outputFile, true)
                 }
             }

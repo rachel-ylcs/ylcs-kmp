@@ -19,6 +19,7 @@ import love.yinlin.extension.bufferedSink
 import love.yinlin.extension.bufferedSource
 import love.yinlin.extension.delete
 import love.yinlin.extension.safeSources
+import love.yinlin.platform.NativeLibLoader
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 
@@ -26,6 +27,12 @@ import love.yinlin.uri.RegularUri
 @NativeLib
 @Stable
 actual class StartupPicker : SyncStartup() {
+    companion object {
+        init {
+            NativeLibLoader.resource("picker")
+        }
+    }
+
     private lateinit var context: Context
     private val handle: Long get() = context.handle
 

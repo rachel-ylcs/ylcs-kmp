@@ -27,7 +27,6 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.fixup.Fixup
-import love.yinlin.platform.SharedLibs
 import org.jetbrains.compose.resources.*
 import kotlin.system.exitProcess
 
@@ -141,8 +140,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     private val windowStarter = LaunchFlag()
 
     fun run() {
-        SharedLibs.load()
-
         openService(later = false, immediate = false)
 
         application(exitProcessOnExit = false) {

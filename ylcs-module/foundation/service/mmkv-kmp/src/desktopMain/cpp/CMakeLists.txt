@@ -5,7 +5,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     message(FATAL_ERROR "不允许直接在源码树中构建, 请在build目录中构建, 或使用build.bat/build.sh脚本")
 endif()
 
-project(picker)
+project(mmkv)
 
 if(MSVC)
     set(LINK_STATIC_MSVC_LIBS ON CACHE BOOL "")
@@ -28,28 +28,28 @@ if(NOT Java_FOUND)
 endif()
 find_package(JNI REQUIRED)
 
-add_subdirectory(nativefiledialog)
+add_subdirectory(mmkv)
 
-add_library(picker SHARED
+add_library(mmkv SHARED
     main.cpp
 )
 
-target_include_directories(picker PRIVATE
+target_include_directories(mmkv PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${JNI_INCLUDE_DIRS}
     ${NATIVE_JNI_DIR}
 )
 
-target_link_libraries(picker
+target_link_libraries(mmkv
     ${JNI_LIBRARIES}
-    nfd
+    core
 )
 
 if(WIN32)
-    target_compile_definitions(picker PRIVATE UNICODE _UNICODE)
+    target_compile_definitions(mmkv PRIVATE UNICODE _UNICODE)
 endif()
 
-set_target_properties(picker PROPERTIES
+set_target_properties(mmkv PROPERTIES
     CXX_STANDARD 20
     CXX_EXTENSIONS OFF
     POSITION_INDEPENDENT_CODE ON

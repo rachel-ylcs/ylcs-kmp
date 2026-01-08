@@ -15,6 +15,7 @@ import kotlinx.atomicfu.locks.SynchronousMutex
 import kotlinx.atomicfu.locks.withLock
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.extension.NativeLib
 import love.yinlin.extension.catching
 import love.yinlin.platform.Coroutines
 import love.yinlin.platform.WindowsNativePlaybackState
@@ -29,7 +30,9 @@ import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
 
 @Stable
+@NativeLib
 private class VideoPlayerState(val url: String) {
+    @NativeLib
     private val controller = WindowsNativeVideoPlayer()
 
     var isPlaying by mutableStateOf(false)
@@ -112,6 +115,7 @@ private class VideoPlayerState(val url: String) {
 }
 
 @Composable
+@NativeLib
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,

@@ -88,6 +88,8 @@ template(object : KotlinMultiplatformTemplate() {
 
         desktopMain.configure(jvmMain) {
             lib(
+                projects.ylcsModule.foundation.os.window,
+                projects.ylcsModule.foundation.os.desktopPlayer,
                 fileTree(mapOf("dir" to "libs/desktop", "include" to listOf("*.jar")))
             )
         }

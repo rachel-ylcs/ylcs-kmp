@@ -2,7 +2,7 @@ package love.yinlin.platform
 
 import java.lang.invoke.MethodHandles
 
-internal object MacOSSingleInstance : SingleInstance, NativeLibrary("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation") {
+internal object MacOSSingleInstance : SingleInstanceImpl, NativeLibrary("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation") {
     val CFStringCreateWithCString by func(
         NativeType.Pointer,
         NativeType.Pointer,

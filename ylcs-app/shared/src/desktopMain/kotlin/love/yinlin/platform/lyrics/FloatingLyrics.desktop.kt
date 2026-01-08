@@ -23,8 +23,7 @@ import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.platform.DragArea
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.extension.NativeLib
-import love.yinlin.platform.setWindowClickThrough
+import love.yinlin.platform.NativeWindow
 
 @Stable
 actual class FloatingLyrics {
@@ -71,8 +70,7 @@ actual class FloatingLyrics {
             alwaysOnTop = true
         ) {
             LaunchedEffect(canMove) {
-                @NativeLib
-                setWindowClickThrough(window.windowHandle, !canMove)
+                NativeWindow.updateClickThrough(window.windowHandle, !canMove)
             }
 
             LaunchedEffect(windowState) {

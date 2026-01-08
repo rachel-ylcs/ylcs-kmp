@@ -1,6 +1,6 @@
 package love.yinlin.platform
 
-internal object WindowsSingleInstance : SingleInstance, NativeLibrary("kernel32") {
+internal object WindowsSingleInstance : SingleInstanceImpl, NativeLibrary("kernel32") {
     val CreateEventW by func(
         Win32Type.POINTER,
         Win32Type.BOOL,

@@ -333,7 +333,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                             modules(*desktopModules.toTypedArray())
 
-                            appResourcesRootDir.set(C.root.resources)
+                            appResourcesRootDir.set(project.layout.projectDirectory.dir("packageResources"))
 
                             val targetList = mutableListOf<TargetFormat>()
 

@@ -8,6 +8,12 @@ plugins {
     )
 }
 
+val desktopNativeList = listOf(
+    projects.ylcsModule.foundation.os.desktopPlayer,
+    projects.ylcsModule.foundation.service.mmkvKmp,
+    projects.ylcsModule.foundation.service.picker,
+)
+
 template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         val jvmMain by create(commonMain)
@@ -35,12 +41,18 @@ template(object : KotlinMultiplatformTemplate() {
     private fun buildCMakeLists(execOpt: ExecOperations, outputDir: File, module: DelegatingProjectDependency) {
         // 确定输入和输出目录
         val modulePath = module.path.removePrefix(":").split(":").joinToString(File.separator)
-        val sourceDir = rootProject.layout.projectDirectory.asFile.resolve(modulePath).resolve("src/desktopMain/cpp")
+        val moduleDir = rootProject.layout.projectDirectory.asFile.resolve(modulePath)
+
+        var sourceDir = moduleDir.resolve("src/desktopMain/cpp") // Kotlin Multiplatform
+        if (!sourceDir.exists()) sourceDir = moduleDir.resolve("src/main/cpp") // Kotlin Jvm
+        if (!sourceDir.exists()) throw GradleException("This Project does not contain cpp directory!")
+
         val moduleName = module.name.replace('-', '_')
         val libName = System.mapLibraryName(moduleName)
 
         // Native build dir
         val nativeBuildDir = sourceDir.resolve("build")
+        nativeBuildDir.deleteRecursively()
         nativeBuildDir.mkdir()
 
         val cmakeArgs = buildList {
@@ -59,7 +71,7 @@ template(object : KotlinMultiplatformTemplate() {
             // 检查工具链
             val vsPath = System.getenv("VS_PATH") ?: throw GradleException("can not find Visual Studio from VS_PATH environment variable!")
             val vcPath = File(vsPath).resolve("VC/Auxiliary/Build/vcvars64.bat")
-            if (!vcPath.exists()) throw GradleException("can not find Visual Studio from VS_PATH environment variable!")
+            if (!vcPath.exists()) throw GradleException("Can not find Visual Studio from \"VS_PATH\" environment variable!")
 
             // Windows 调用 Ninja 使用 MSBuild 构建
             execOpt.exec(nativeBuildDir, "cmd", "/c", buildArgs(
@@ -85,14 +97,12 @@ template(object : KotlinMultiplatformTemplate() {
 
             // 编译 CMake Native 库
             doLast {
-                val outputDir = C.root.resources.desktopNative.asFile
+                val outputDir = C.root.artifacts.desktopNative.asFile
                 outputDir.mkdirs()
 
                 val execOpt = project.serviceOf<ExecOperations>()
 
-                for (module in listOf(
-                    projects.ylcsModule.foundation.service.picker,
-                )) buildCMakeLists(execOpt, outputDir, module)
+                for (module in desktopNativeList) buildCMakeLists(execOpt, outputDir, module)
             }
         }
     }

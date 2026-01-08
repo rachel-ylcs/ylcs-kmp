@@ -17,12 +17,20 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         androidMain.configure(commonMain) {
-            lib(libs.mmkv.android)
+            lib(
+                libs.mmkv.android
+            )
         }
 
         iosMain.configure(commonMain)
 
         iosMainList.configure(iosMain)
+
+        desktopMain.configure(commonMain) {
+            lib(
+                projects.ylcsModule.platform.nativeLibLoader
+            )
+        }
     }
 
     override val cocoapodsList: List<Pod> = listOf(

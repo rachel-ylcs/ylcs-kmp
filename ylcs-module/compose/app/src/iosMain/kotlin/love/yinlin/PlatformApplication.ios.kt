@@ -5,7 +5,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
 import androidx.compose.ui.window.ComposeUIViewController
 import love.yinlin.extension.BaseLazyReference
-import love.yinlin.platform.SharedLibs
 import platform.UIKit.UIViewController
 
 @Stable
@@ -19,7 +18,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun buildDelegate(): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {}
 
     fun run(): UIViewController {
-        SharedLibs.load()
         openService(later = false, immediate = true)
 
         val uiViewController = ComposeUIViewController(

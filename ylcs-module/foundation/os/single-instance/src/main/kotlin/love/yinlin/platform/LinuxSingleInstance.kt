@@ -1,6 +1,6 @@
 package love.yinlin.platform
 
-internal object LinuxSingleInstance : SingleInstance, NativeLibrary() {
+internal object LinuxSingleInstance : SingleInstanceImpl, NativeLibrary() {
     val open by func(
         NativeType.string,
         NativeType.Int,

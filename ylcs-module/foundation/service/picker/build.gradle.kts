@@ -18,5 +18,11 @@ template(object : KotlinMultiplatformTemplate() {
         iosMain.configure(commonMain)
 
         iosMainList.configure(iosMain)
+
+        desktopMain.configure(commonMain) {
+            lib(
+                projects.ylcsModule.platform.nativeLibLoader
+            )
+        }
     }
 })

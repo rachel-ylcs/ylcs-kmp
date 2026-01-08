@@ -15,6 +15,12 @@ import love.yinlin.platform.*
 @NativeLib
 @Stable
 actual class StartupKV : SyncStartup() {
+    companion object {
+        init {
+            NativeLibLoader.resource("mmkv_kmp")
+        }
+    }
+
     var nativeHandle: Long = 0
 
     actual override fun init(context: Context, args: StartupArgs) {

@@ -19,10 +19,8 @@ class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 
 class ScriptNode(root: RootProjectNode) : Directory by root.dir("script")
 
-class ResourcesNode(root: RootProjectNode, c: Constants) : Directory by root.dir("resources") {
-    val desktopNative: Directory = dir("desktopnative")
-    val common: Directory = dir("common")
-    val platform: Directory = dir(c.resourceTag)
+class ArtifactsNode(root: RootProjectNode) : Directory by root.dir("artifacts") {
+    val desktopNative: Directory = dir("desktopNative")
 }
 
 class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
@@ -89,7 +87,7 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val docs = DocsNode(this)
     val outputs = OutputsNode(this)
     val script = ScriptNode(this)
-    val resources = ResourcesNode(this, c)
+    val artifacts = ArtifactsNode(this)
     val work = WorkNode(this)
     val cs = CSNode(this)
     val shared = SharedNode(this, c)
