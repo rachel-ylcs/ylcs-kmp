@@ -98,8 +98,7 @@ jobs:
 
       - name: Build
         run: |
-          cd native && ./build.bat
-          cd ..
+          ./gradlew ylcs-module:platform:native-lib-loader:buildNativeLib
           ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Compress
@@ -138,8 +137,7 @@ jobs:
 
       - name: Build
         run: |
-          cd native && ./build.sh
-          cd ..
+          ./gradlew ylcs-module:platform:native-lib-loader:buildNativeLib
           ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Compress
@@ -172,8 +170,7 @@ jobs:
 
       - name: Build
         run: |
-          cd native && ./build.sh
-          cd ..
+          ./gradlew ylcs-module:platform:native-lib-loader:buildNativeLib
           ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Compress

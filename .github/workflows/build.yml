@@ -69,7 +69,6 @@ jobs:
               - 'ylcs-app/iosApp/**'
             desktop:
               - *client
-              - 'native/**'
               - 'ylcs-app/shared/proguard/R8Desktop.pro'
               - 'ylcs-app/shared/src/jvmMain/**'
               - 'ylcs-app/shared/src/desktopMain/**'
@@ -162,16 +161,6 @@ jobs:
         uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x64
-
-      - name: Build Native (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          cd native && ./build.bat
-
-      - name: Build Native (macOS/Linux)
-        if: runner.os != 'Windows'
-        run: |
-          cd native && ./build.sh
 
       - name: Build Desktop
         run: ./gradlew ylcs-app:desktopApp:desktopJar
