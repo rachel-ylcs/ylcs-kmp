@@ -43,12 +43,15 @@ template(object : KotlinAndroidTemplate() {
     }
 
     override fun Project.actions() {
-        val assembleDebug = tasks.named("assembleDebug")
+        // 安卓打包
+        val androidPackage by tasks.registering {
+            dependsOn(tasks.named("assembleDebug"))
+        }
 
-        val assembleRelease = tasks.named("assembleRelease")
+        // 发布安卓安装包
+        val androidPublish by tasks.registering {
+            dependsOn(tasks.named("assembleRelease"))
 
-        val androidCopyAPK by tasks.registering {
-            mustRunAfter(assembleRelease)
             doLast {
                 copy {
                     from(C.root.androidApp.originOutput)
@@ -56,12 +59,6 @@ template(object : KotlinAndroidTemplate() {
                     rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.APK" }
                 }
             }
-        }
-
-        // 发布安卓安装包
-        val androidPublish by tasks.registering {
-            dependsOn(assembleRelease)
-            dependsOn(androidCopyAPK)
         }
     }
 })
