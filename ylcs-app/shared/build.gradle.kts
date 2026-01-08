@@ -30,6 +30,7 @@ template(object : KotlinMultiplatformTemplate() {
         Pod("MobileVLCKit", version = libs.versions.vlcKit),
         Pod("SGQRCode", version = libs.versions.sgQrcode),
     )
+
     override fun CocoapodsExtension.cocoapods() {
         name = C.app.projectName
         summary = C.app.description

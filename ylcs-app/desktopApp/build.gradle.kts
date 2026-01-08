@@ -61,10 +61,6 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        val run = tasks.named("run")
-        val runRelease = tasks.named("runRelease")
-        val suggestRuntimeModules = tasks.named("suggestRuntimeModules")
-
         // 复制桌面动态库
         val desktopCopyNativeLib by tasks.registering {
             doFirst {
@@ -95,25 +91,23 @@ template(object : KotlinMultiplatformTemplate() {
                 }
                 zip (C.root.outputs.dir(C.app.name).dir("app"), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
                 zip (C.root.outputs.dir(C.app.name), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
-                delete {
-                    delete(C.root.outputs.dir(C.app.name))
-                }
+                delete(C.root.outputs.dir(C.app.name))
             }
         }
 
         // 运行 桌面程序 Debug
         val desktopRunDebug by tasks.registering {
-            dependsOn(run)
+            dependsOn(tasks.named("run"))
         }
 
         // 运行 桌面程序 Release
         val desktopRunRelease by tasks.registering {
-            dependsOn(runRelease)
+            dependsOn(tasks.named("runRelease"))
         }
 
         // 检查桌面模块完整性
         val desktopCheckModules by tasks.registering {
-            dependsOn(suggestRuntimeModules)
+            dependsOn(tasks.named("suggestRuntimeModules"))
         }
 
         // 发布桌面应用程序
