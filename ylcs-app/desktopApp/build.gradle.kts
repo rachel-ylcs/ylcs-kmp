@@ -1,4 +1,5 @@
 import love.yinlin.task.spec.zip
+import love.yinlin.task.spec.registerCopyDesktopNative
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
@@ -11,12 +12,6 @@ plugins {
         libs.plugins.kotlinSerialization,
     )
 }
-
-val desktopNativeList = listOf(
-    projects.ylcsModule.foundation.os.desktopPlayer,
-    projects.ylcsModule.foundation.service.mmkvKmp,
-    projects.ylcsModule.foundation.service.picker,
-)
 
 template(object : KotlinMultiplatformTemplate() {
     override val iosTarget: Boolean = false
@@ -62,38 +57,7 @@ template(object : KotlinMultiplatformTemplate() {
 
     override fun Project.actions() {
         // 复制桌面动态库
-        val desktopCopyNativeLib by tasks.registering {
-            doFirst {
-                val libDir = C.root.artifacts.desktopNative.asFile
-                val packageResourcesDir = project.layout.projectDirectory.dir("packageResources").dir(C.resourceTag).asFile
-                packageResourcesDir.mkdirs()
-                for (module in desktopNativeList) {
-                    val libName = System.mapLibraryName(module.name.replace('-', '_'))
-                    val libFile = libDir.resolve(libName)
-                    val outputFile = packageResourcesDir.resolve(libName)
-                    libFile.copyTo(outputFile, true)
-                }
-            }
-        }
-
-        val createReleaseDistributable = tasks.named("createReleaseDistributable") {
-            dependsOn(desktopCopyNativeLib)
-
-            doLast {
-                copy {
-                    from(C.root.desktopApp.originOutput)
-                    into(C.root.outputs)
-                }
-                val platformName = when (C.platform) {
-                    BuildPlatform.Windows -> "[Windows]"
-                    BuildPlatform.Linux -> "[Linux]"
-                    BuildPlatform.Mac -> "[MacOS]"
-                }
-                zip (C.root.outputs.dir(C.app.name).dir("app"), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
-                zip (C.root.outputs.dir(C.app.name), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
-                delete(C.root.outputs.dir(C.app.name))
-            }
-        }
+        registerCopyDesktopNative(this)
 
         // 运行 桌面程序 Debug
         val desktopRunDebug by tasks.registering {
@@ -112,7 +76,22 @@ template(object : KotlinMultiplatformTemplate() {
 
         // 发布桌面应用程序
         val desktopPublish by tasks.registering {
-            dependsOn(createReleaseDistributable)
+            dependsOn(tasks.named("createReleaseDistributable"))
+
+            doLast {
+                copy {
+                    from(C.root.desktopApp.originOutput)
+                    into(C.root.outputs)
+                }
+                val platformName = when (C.platform) {
+                    BuildPlatform.Windows -> "[Windows]"
+                    BuildPlatform.Linux -> "[Linux]"
+                    BuildPlatform.Mac -> "[MacOS]"
+                }
+                zip (C.root.outputs.dir(C.app.name).dir("app"), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
+                zip (C.root.outputs.dir(C.app.name), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
+                delete(C.root.outputs.dir(C.app.name))
+            }
         }
     }
 })
