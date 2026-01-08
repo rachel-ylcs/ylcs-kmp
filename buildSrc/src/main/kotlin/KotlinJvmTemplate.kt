@@ -1,3 +1,4 @@
+import love.yinlin.task.spec.checkBuildDesktopNative
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaApplication
@@ -45,6 +46,9 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
 
         afterEvaluate {
             actions()
+
+            // 检查是否需要编译 Desktop Native
+            checkBuildDesktopNative(this)
         }
     }
 }

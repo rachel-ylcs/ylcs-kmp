@@ -22,6 +22,7 @@ class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 class ScriptNode(root: RootProjectNode) : Directory by root.dir("script")
 
 class ArtifactsNode(root: RootProjectNode) : Directory by root.dir("artifacts") {
+    val include: Directory = dir("include")
     val desktopNative: Directory = dir("desktopNative")
 }
 
