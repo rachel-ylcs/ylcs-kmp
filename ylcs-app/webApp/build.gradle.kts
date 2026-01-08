@@ -36,40 +36,24 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        val wasmJsBrowserDevelopmentRun = tasks.named("wasmJsBrowserDevelopmentRun")
-        val wasmJsBrowserDistribution = tasks.named("wasmJsBrowserDistribution")
+        // 运行 Web 应用程序
+        val webRun by tasks.registering {
+            dependsOn(tasks.named("wasmJsBrowserDevelopmentRun"))
+        }
 
-        val webCopyDir by tasks.registering {
-            mustRunAfter(wasmJsBrowserDistribution)
+        // 发布 Web 应用程序
+        val webPublish by tasks.registering {
+            dependsOn(tasks.named("wasmJsBrowserDistribution"))
+
             doLast {
                 copy {
                     from(C.root.webApp.originOutput)
                     into(C.root.webApp.output)
                 }
-                delete {
-                    delete(*C.root.webApp.output.asFile.listFiles {
-                        it.extension == "map" || it.extension == "txt"
-                    }.map { C.root.webApp.output.file(it.name) }.toTypedArray())
-                }
-                zip {
-                    from(C.root.webApp.output)
-                    into(C.root.outputs.file("[Web]${C.app.displayName}${C.app.versionName}.zip"))
-                }
-                delete {
-                    delete(C.root.webApp.output)
-                }
+                delete(*C.root.webApp.output.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(C.root.webApp.output, C.root.outputs.file("[Web]${C.app.displayName}${C.app.versionName}.zip"))
+                delete(C.root.webApp.output)
             }
-        }
-
-        // 运行 Web 应用程序
-        val webRun by tasks.registering {
-            dependsOn(wasmJsBrowserDevelopmentRun)
-        }
-
-        // 发布 Web 应用程序
-        val webPublish by tasks.registering {
-            dependsOn(wasmJsBrowserDistribution)
-            dependsOn(webCopyDir)
         }
     }
 })

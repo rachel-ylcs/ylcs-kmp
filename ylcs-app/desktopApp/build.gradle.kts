@@ -93,14 +93,8 @@ template(object : KotlinMultiplatformTemplate() {
                     BuildPlatform.Linux -> "[Linux]"
                     BuildPlatform.Mac -> "[MacOS]"
                 }
-                zip {
-                    from(C.root.outputs.dir(C.app.name).dir("app"))
-                    into(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
-                }
-                zip {
-                    from(C.root.outputs.dir(C.app.name))
-                    into(C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
-                }
+                zip (C.root.outputs.dir(C.app.name).dir("app"), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
+                zip (C.root.outputs.dir(C.app.name), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
                 delete {
                     delete(C.root.outputs.dir(C.app.name))
                 }
