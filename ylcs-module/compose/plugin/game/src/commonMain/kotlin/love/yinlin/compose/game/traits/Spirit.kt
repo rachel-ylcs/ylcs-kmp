@@ -16,7 +16,7 @@ import love.yinlin.compose.game.Manager
 import kotlin.math.min
 
 @Stable
-abstract class Spirit(val manager: Manager): Positionable, PreTransform, AABB, Visible, Dynamic, Trigger {
+abstract class Spirit(val manager: Manager) : Positionable, PreTransform, AABB, Visible, Dynamic, Trigger {
     // Dynamic
     protected open fun onClientUpdate(tick: Long) { }
 

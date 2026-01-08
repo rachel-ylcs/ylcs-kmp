@@ -316,9 +316,9 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                         buildTypes.release.proguard {
                             version.set(C.proguard.version)
-                            isEnabled.set(true)
-                            optimize.set(true)
-                            obfuscate.set(true)
+                            isEnabled.set(false)
+                            optimize.set(false)
+                            obfuscate.set(false)
                             joinOutputJars.set(true)
                             configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
                         }
@@ -332,6 +332,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                             licenseFile.set(C.root.license)
 
                             modules(*desktopModules.toTypedArray())
+
+                            appResourcesRootDir.set(C.root.resources)
 
                             val targetList = mutableListOf<TargetFormat>()
 

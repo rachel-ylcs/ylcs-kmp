@@ -15,14 +15,8 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val jvmMain by create(commonMain)
-
-        androidMain.configure(jvmMain)
-
         iosMain.configure(commonMain)
 
         iosMainList.configure(iosMain)
-
-        desktopMain.configure(jvmMain)
     }
 })

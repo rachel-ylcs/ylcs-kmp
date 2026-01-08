@@ -57,6 +57,7 @@ include(
     "ylcs-module:foundation:service:picker",
     "ylcs-module:native:platform-lib",
     "ylcs-module:platform:kotlin-ffi",
+    "ylcs-module:platform:native-lib-loader",
 
     /* -----------------  应用模块  ----------------- */
 

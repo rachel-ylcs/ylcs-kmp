@@ -23,6 +23,7 @@ template(object : KotlinMultiplatformTemplate() {
         desktopMain.configure(commonMain) {
             lib(
                 projects.ylcsApp.shared,
+                projects.ylcsModule.platform.nativeLibLoader,
                 projects.ylcsModule.foundation.os.autoUpdate,
                 projects.ylcsModule.foundation.os.singleInstance,
             )
@@ -36,7 +37,7 @@ template(object : KotlinMultiplatformTemplate() {
             val desktopWorkSpace = C.root.work.desktop.asFile
             desktopWorkSpace.mkdirs()
             add("-Duser.dir=$desktopWorkSpace")
-            add("-Djava.library.path=${C.root.native.libs}")
+            add("-Djava.library.path=${C.root.resources.desktopNative}")
         }
     }
     override val desktopModules: List<String> = C.desktop.modules.toList()
@@ -53,38 +54,33 @@ template(object : KotlinMultiplatformTemplate() {
     override fun Project.actions() {
         val run = tasks.named("run")
         val runRelease = tasks.named("runRelease")
-        val createReleaseDistributable = tasks.named("createReleaseDistributable")
         val suggestRuntimeModules = tasks.named("suggestRuntimeModules")
 
-        // 运行 桌面程序 Debug
-        val desktopRunDebug by tasks.registering {
-            dependsOn(run)
+        // 复制桌面动态库
+        val desktopCopyNativeLib by tasks.registering {
+            doFirst {
+                val libDir = C.root.resources.desktopNative.asFile
+                val outputDir = C.root.resources.dir(C.resourceTag).asFile
+                outputDir.deleteRecursively()
+                outputDir.mkdirs()
+                for (module in listOf(
+                    projects.ylcsModule.foundation.service.picker,
+                )) {
+                    val libName = System.mapLibraryName(module.name.replace('-', '_'))
+                    val libFile = libDir.resolve(libName)
+                    val outputFile = outputDir.resolve(libName)
+                    libFile.copyTo(outputFile, true)
+                }
+            }
         }
 
-        // 运行 桌面程序 Release
-        val desktopRunRelease by tasks.registering {
-            dependsOn(runRelease)
-        }
+        val createReleaseDistributable = tasks.named("createReleaseDistributable") {
+            dependsOn(desktopCopyNativeLib)
 
-        // 检查桌面模块完整性
-        val desktopCheckModules by tasks.registering {
-            dependsOn(suggestRuntimeModules)
-        }
-
-        val desktopCopyDir by tasks.registering {
-            mustRunAfter(createReleaseDistributable)
             doLast {
                 copy {
                     from(C.root.desktopApp.originOutput)
                     into(C.root.outputs)
-                }
-                copy {
-                    from(C.root.native.libs)
-                    into(C.root.desktopApp.libOutput)
-                }
-                copy {
-                    from(C.root.config.currentPackages)
-                    into(C.root.desktopApp.packagesOutput)
                 }
                 val platformName = when (C.platform) {
                     BuildPlatform.Windows -> "[Windows]"
@@ -105,10 +101,24 @@ template(object : KotlinMultiplatformTemplate() {
             }
         }
 
+        // 运行 桌面程序 Debug
+        val desktopRunDebug by tasks.registering {
+            dependsOn(run)
+        }
+
+        // 运行 桌面程序 Release
+        val desktopRunRelease by tasks.registering {
+            dependsOn(runRelease)
+        }
+
+        // 检查桌面模块完整性
+        val desktopCheckModules by tasks.registering {
+            dependsOn(suggestRuntimeModules)
+        }
+
         // 发布桌面应用程序
         val desktopPublish by tasks.registering {
             dependsOn(createReleaseDistributable)
-            dependsOn(desktopCopyDir)
         }
     }
 })

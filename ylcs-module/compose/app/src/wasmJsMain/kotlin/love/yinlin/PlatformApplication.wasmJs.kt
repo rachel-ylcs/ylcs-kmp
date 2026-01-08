@@ -7,6 +7,7 @@ import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
 import love.yinlin.extension.BaseLazyReference
+import love.yinlin.platform.SharedLibs
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
@@ -18,6 +19,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
+        SharedLibs.load()
         openService(later = false, immediate = true)
 
         // 有待考证

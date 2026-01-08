@@ -26,6 +26,6 @@ data class PointerUpEvent(override val id: Long, override val position: Offset, 
 
 // 指针偏移
 @Stable
-data class PointerMoveEvent(override val id: Long, override val position: Offset, val rawPosition: Offset): PointerEvent {
+data class PointerMoveEvent(override val id: Long, override val position: Offset, val rawPosition: Offset) : PointerEvent {
     fun reset(p: Offset, raw: Offset) = PointerMoveEvent(id, p, raw)
 }

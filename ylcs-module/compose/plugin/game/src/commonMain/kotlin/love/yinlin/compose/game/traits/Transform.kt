@@ -17,5 +17,5 @@ sealed interface Transform {
     data class Rotate(val degrees: Float, val pivot: Offset? = null) : Transform
 
     @Stable
-    data class Matrix(val matrix: androidx.compose.ui.graphics.Matrix): Transform
+    data class Matrix(val matrix: androidx.compose.ui.graphics.Matrix) : Transform
 }

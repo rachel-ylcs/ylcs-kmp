@@ -6,7 +6,7 @@ import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.toByteArray
 
-class ArrayBufferSource(buffer: ArrayBuffer): RawSource {
+class ArrayBufferSource(buffer: ArrayBuffer) : RawSource {
     private var position = 0
     private val bufferArray = Int8Array(buffer)
 

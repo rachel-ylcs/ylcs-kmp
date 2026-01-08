@@ -22,12 +22,19 @@ Pods/
 **/Version.xcconfig
 
 # native
+**/.cxx/
+resources/common/
+resources/windows-x64/
+resources/linux-x64/
+resources/macos-arm64/
+resources/macos-x64/
+
 native/**/vs/
 native/**/build/
 native/**/cmake-build-debug/
 native/**/cmake-build-release/
 native/libs/
-**/.cxx/
+
 
 # 编译目录
 **/build/

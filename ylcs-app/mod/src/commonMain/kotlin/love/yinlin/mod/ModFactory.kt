@@ -179,7 +179,7 @@ object ModFactory {
     }
 
     @Stable
-    class Preview(source: Source): BaseRelease(source) {
+    class Preview(source: Source) : BaseRelease(source) {
         @Stable
         data class ResourceItem(
             val type: ModResourceType,

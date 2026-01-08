@@ -4,9 +4,6 @@ import org.gradle.api.file.RegularFile
 class BuildSrcNode(root: RootProjectNode) : Directory by root.dir("buildSrc")
 
 class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("config") {
-    private val packages: Directory = dir("packages")
-    val currentPackages: Directory = packages.dir("${c.platform}-${c.architecture}")
-
     val stability: RegularFile = file("stability.conf")
     val icon: RegularFile = file(when (c.platform) {
         BuildPlatform.Windows -> "icon.ico"
@@ -18,13 +15,15 @@ class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("c
 
 class DocsNode(root: RootProjectNode) : Directory by root.dir("docs")
 
-class NativeNode(root: RootProjectNode) : Directory by root.dir("native") {
-    val libs: Directory = dir("libs")
-}
-
 class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 
 class ScriptNode(root: RootProjectNode) : Directory by root.dir("script")
+
+class ResourcesNode(root: RootProjectNode, c: Constants) : Directory by root.dir("resources") {
+    val desktopNative: Directory = dir("desktopnative")
+    val common: Directory = dir("common")
+    val platform: Directory = dir(c.resourceTag)
+}
 
 class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
     val desktop: Directory = dir("desktop")
@@ -48,7 +47,7 @@ class SharedNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
     val composeCompilerReport: Directory = build.dir("composeCompiler")
 }
 
-class AndroidAppNode(root: RootProjectNode, c: Constants): Directory by root.dir("ylcs-app").dir("androidApp") {
+class AndroidAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("androidApp") {
     private val build: Directory = dir("build")
 
     val originOutput: RegularFile = build.dir("outputs").dir("apk").dir("release").file("androidApp-release.apk")
@@ -65,16 +64,6 @@ class DesktopAppNode(root: RootProjectNode, c: Constants) : Directory by root.di
     private val build: Directory = dir("build")
 
     val originOutput: Directory = build.dir("compose").dir("binaries").dir("main-release").dir("app")
-    val libOutput: Directory = root.outputs.dir(when (c.platform) {
-        BuildPlatform.Windows -> "${c.app.name}/app"
-        BuildPlatform.Linux -> "${c.app.name}/lib/app"
-        BuildPlatform.Mac -> "${c.app.name}.app/Contents/app"
-    })
-    val packagesOutput: Directory = root.outputs.dir(when (c.platform) {
-        BuildPlatform.Windows -> c.app.name
-        BuildPlatform.Linux -> "${c.app.name}/bin"
-        BuildPlatform.Mac -> "${c.app.name}.app/Contents/MacOS"
-    })
 }
 
 class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("webApp") {
@@ -98,9 +87,9 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val buildSrc = BuildSrcNode(this)
     val config = ConfigNode(this, c)
     val docs = DocsNode(this)
-    val native = NativeNode(this)
     val outputs = OutputsNode(this)
     val script = ScriptNode(this)
+    val resources = ResourcesNode(this, c)
     val work = WorkNode(this)
     val cs = CSNode(this)
     val shared = SharedNode(this, c)
