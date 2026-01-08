@@ -104,7 +104,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build Android
-        run: ./gradlew ylcs-app:androidApp:assembleDebug
+        run: ./gradlew ylcs-app:androidApp:androidPackage
 
   build-ios:
     name: Build iOS
@@ -207,4 +207,4 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build Server
-        run: ./gradlew ylcs-app:server:build
+        run: ./gradlew ylcs-app:server:serverPublish
