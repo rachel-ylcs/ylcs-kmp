@@ -12,7 +12,8 @@ class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("c
         BuildPlatform.Linux -> "icon.png"
         BuildPlatform.Mac -> "icon.icns"
     })
-    val androidKey: RegularFile = file("androidKey.jks")
+    val secret: Directory = dir("secret")
+    val androidKey: RegularFile = secret.file("androidKey.jks")
 }
 
 class DocsNode(root: RootProjectNode) : Directory by root.dir("docs")

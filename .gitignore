@@ -32,8 +32,7 @@ Pods/
 **/outputs/
 
 # 本地配置
-*.jks
+config/secret/
 **/config.json
 *.properties
 !**/gradle-wrapper.properties
-config/maven/
