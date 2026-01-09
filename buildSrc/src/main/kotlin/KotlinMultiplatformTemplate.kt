@@ -1,12 +1,14 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.dsl.LibraryExtension
-import love.yinlin.task.spec.checkBuildDesktopNative
+import com.android.build.gradle.internal.tasks.factory.dependsOn
+import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
@@ -391,7 +393,20 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             actions()
 
             // 检查是否需要编译 Desktop Native
-            checkBuildDesktopNative(this)
+            val libName = System.mapLibraryName(name.replace('-', '_'))
+            val moduleDir = layout.projectDirectory.asFile
+            val sourceDir = moduleDir.resolve("src/desktopMain/cpp")
+            val nativeBuildTmpDir = layout.buildDirectory.dir("desktopNative").get()
+            if (sourceDir.exists()) {
+                val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
+                    inputDir.set(sourceDir)
+                    outputFile.set(C.root.artifacts.desktopNative.file(libName))
+                    platform.set(C.platform)
+                    nativeBuildDir.set(nativeBuildTmpDir.asFile)
+                    nativeJniDir.set(C.root.artifacts.include.asFile)
+                }
+                tasks.named("desktopJar").dependsOn(buildNativeTask)
+            }
         }
     }
 }

@@ -38,7 +38,10 @@ template(object : KotlinJvmTemplate() {
             dependsOn(tasks.named("run"))
         }
 
-        tasks.named("shadowJar") {
+        // 发布服务端
+        val serverPublish by tasks.registering {
+            dependsOn(tasks.named("buildFatJar"))
+
             doLast {
                 delete(C.root.outputs.file(C.server.outputName))
                 copy {
@@ -46,11 +49,6 @@ template(object : KotlinJvmTemplate() {
                     into(C.root.outputs)
                 }
             }
-        }
-
-        // 发布服务端
-        val serverPublish by tasks.registering {
-            dependsOn(tasks.named("buildFatJar"))
         }
     }
 })
