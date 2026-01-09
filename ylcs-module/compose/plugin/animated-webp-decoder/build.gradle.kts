@@ -5,12 +5,12 @@ plugins {
         libs.plugins.composeCompiler,
         libs.plugins.androidLibrary,
         libs.plugins.kotlinSerialization,
+        libs.plugins.mavenPublish,
     )
 }
 
 template(object : KotlinMultiplatformTemplate() {
     override val buildNDK: Boolean = true
-
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(

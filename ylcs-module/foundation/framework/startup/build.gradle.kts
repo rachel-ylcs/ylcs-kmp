@@ -3,6 +3,7 @@ plugins {
         libs.plugins.kotlinMultiplatform,
         libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
+        libs.plugins.mavenPublish,
     )
 }
 

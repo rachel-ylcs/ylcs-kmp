@@ -1,9 +1,11 @@
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.NamedDomainObjectCollectionDelegateProvider
 import org.gradle.kotlin.dsl.NamedDomainObjectContainerCreatingDelegateProvider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.creating
+import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
@@ -24,12 +26,6 @@ class BackendInfo(namespace: String, selector: String, path: String) {
 
     override fun toString(): String = "Template(name=$uniqueName, module=$uniqueModuleName, path=$uniquePath)"
 }
-
-data class Maven(
-    val description: String,
-    val inceptionYear: Int,
-    val authors: List<Pair<String, String>> = emptyList()
-)
 
 abstract class KotlinSourceSetsScope(
     private val p: Project,
@@ -92,8 +88,6 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
     // /path/to/ylcs-kmp/ylcs-module/compose/platform-view
     val uniquePath: String get() = internalBackendInfo!!.uniquePath
 
-    open val maven: Maven? = null
-
     open fun Project.build(extension: T) { extension.action() }
 
     fun HasKotlinDependencies.lib(vararg libs: Any) {
@@ -116,6 +110,40 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
             *features
         )
     }
+
+    fun Project.publishMaven() {
+        extensions.findByType<MavenPublishBaseExtension>()?.apply {
+            publishToMavenCentral()
+            signAllPublications()
+            coordinates(uniqueGroupName, uniqueName, C.app.versionName)
+
+            pom {
+                name.set(uniqueName)
+                description.set(uniqueModuleName)
+                inceptionYear.set("2025")
+                url.set("https://love.yinlin")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/license/MIT")
+                        distribution.set("https://opensource.org/license/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set(C.app.name)
+                        name.set(C.app.displayName)
+                        url.set(C.app.homepage)
+                    }
+                }
+                scm {
+                    url.set(C.app.homepage)
+                    connection.set("scm:git:git${C.app.homepage.removePrefix("https")}.git")
+                    developerConnection.set("scm:git:git${C.app.homepage.removePrefix("https")}.git")
+                }
+            }
+        }
+    }
 }
 
 inline fun <reified T : KotlinBaseExtension> Project.template(t: KotlinTemplate<T>) {
@@ -124,5 +152,7 @@ inline fun <reified T : KotlinBaseExtension> Project.template(t: KotlinTemplate<
         extensions.configure<T> {
             build(this)
         }
+
+        publishMaven()
     }
 }

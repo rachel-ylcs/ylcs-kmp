@@ -4,6 +4,7 @@ plugins {
         libs.plugins.kotlinCocoapods,
         libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
+        libs.plugins.mavenPublish,
     )
 }
 

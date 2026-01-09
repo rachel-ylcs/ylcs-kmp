@@ -1,5 +1,8 @@
 plugins {
-    install(libs.plugins.kotlinJvm)
+    install(
+        libs.plugins.kotlinJvm,
+        libs.plugins.mavenPublish,
+    )
 }
 
 template(object : KotlinJvmTemplate() {

@@ -2,6 +2,7 @@ plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
+        libs.plugins.mavenPublish,
     )
 }
 

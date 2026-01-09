@@ -5,6 +5,7 @@ plugins {
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
+        libs.plugins.mavenPublish,
     )
 }
 
