@@ -47,7 +47,12 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 projects.ylcsApp.mod,
                 projects.ylcsModule.foundation.net.clientEngine,
-                projects.ylcsModule.compose.component.all,
+                projects.ylcsModule.foundation.service.exception,
+                projects.ylcsModule.foundation.service.mmkvKmp,
+                projects.ylcsModule.compose.platformView,
+                projects.ylcsModule.compose.component.paginationLayout,
+                projects.ylcsModule.compose.component.urlImage,
+                projects.ylcsModule.compose.component.webview,
                 projects.ylcsModule.compose.plugin.game,
                 libs.compose.components.resources,
                 libs.lottie,
@@ -58,10 +63,11 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.tool.qrcode,
                 ExportLib,
                 projects.ylcsApp.cs,
-                projects.ylcsModule.foundation.service.all,
+                projects.ylcsModule.foundation.service.os,
+                projects.ylcsModule.foundation.service.picker,
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
-                projects.ylcsModule.compose.service.all,
+                projects.ylcsModule.compose.service.config,
             )
         }
 

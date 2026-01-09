@@ -28,7 +28,6 @@ include(
     /* -----------------  库模块  ----------------- */
 
     "ylcs-module:compose:app",
-    "ylcs-module:compose:component:all",
     "ylcs-module:compose:component:pagination-layout",
     "ylcs-module:compose:component:url-image",
     "ylcs-module:compose:component:webview",
@@ -37,7 +36,6 @@ include(
     "ylcs-module:compose:plugin:animated-webp-decoder",
     "ylcs-module:compose:plugin:game",
     "ylcs-module:compose:screen",
-    "ylcs-module:compose:service:all",
     "ylcs-module:compose:service:config",
     "ylcs-module:compose:theme",
     "ylcs-module:compose:ui",
@@ -52,7 +50,6 @@ include(
     "ylcs-module:foundation:os:desktop-player",
     "ylcs-module:foundation:os:single-instance",
     "ylcs-module:foundation:os:window",
-    "ylcs-module:foundation:service:all",
     "ylcs-module:foundation:service:exception",
     "ylcs-module:foundation:service:mmkv-kmp",
     "ylcs-module:foundation:service:os",
