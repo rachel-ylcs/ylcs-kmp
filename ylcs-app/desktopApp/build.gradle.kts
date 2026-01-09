@@ -1,5 +1,4 @@
 import love.yinlin.task.CopyDesktopNativeTask
-import love.yinlin.task.CopyDesktopNativeTask.Companion.moduleDependencies
 import love.yinlin.task.spec.zip
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
@@ -73,15 +72,7 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         // 复制桌面动态库
-        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class) {
-            moduleList = moduleDependencies.map { it.substringAfterLast(':').replace('-', '_') }
-            libDir = C.root.artifacts.desktopNative.asFile
-            outputDir = packageResourcesDir.dir(C.resourceTag)
-
-            doLast {
-                delete(packageResourcesDir)
-            }
-        }
+        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class)
 
         tasks.named("prepareAppResources") {
             dependsOn(desktopCopyNativeLib)
@@ -92,6 +83,7 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("createReleaseDistributable"))
 
             doLast {
+                delete(packageResourcesDir)
                 copy {
                     from(C.root.desktopApp.originOutput)
                     into(C.root.outputs)

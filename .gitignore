@@ -23,7 +23,6 @@ Pods/
 
 # native
 **/.cxx/
-**/packageResources/
 
 # 编译目录
 **/build/

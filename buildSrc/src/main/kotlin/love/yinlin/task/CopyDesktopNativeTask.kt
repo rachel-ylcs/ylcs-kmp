@@ -1,59 +1,50 @@
 package love.yinlin.task
 
+import C
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
+import packageResourcesDir
 import kotlin.io.resolve
 
 abstract class CopyDesktopNativeTask : DefaultTask() {
-    @get:Input
-    abstract val moduleList: ListProperty<String>
-
-    @get:Input
-    abstract val libDir: Property<File>
-
-    @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
-
-    @TaskAction
-    fun copyNative() {
-        val packageResourcesDir = outputDir.get().asFile
-        val libSourceDir = libDir.get()
-        packageResourcesDir.mkdirs()
-
-        val libOutputList = mutableListOf<String>()
-        for (moduleName in moduleList.get()) {
-            val libName = System.mapLibraryName(moduleName)
-            val libFile = libSourceDir.resolve(libName)
-            val outputFile = packageResourcesDir.resolve(libName)
-            if (libFile.exists()) {
-                libOutputList += libName
-                libFile.copyTo(outputFile, true)
-            }
-        }
-        println("Copy Desktop Native Library: $libOutputList")
+    init {
+        outputs.upToDateWhen { false }
     }
 
-    companion object {
-        val Project.moduleDependencies: List<String> get() {
-            val projectDeps = mutableSetOf<String>()
-            configurations.forEach { config ->
-                if (config.isCanBeResolved) {
-                    runCatching {
-                        config.incoming.resolutionResult.allComponents.forEach {
-                            if (it.id is ProjectComponentIdentifier) projectDeps += it.id.displayName
+    @TaskAction
+    fun copyNativeLibs() {
+        // 解析项目依赖的 native 库
+        val moduleList = mutableSetOf<String>()
+        project.configurations.forEach { config ->
+            if (config.isCanBeResolved) {
+                runCatching {
+                    config.incoming.resolutionResult.allComponents.forEach {
+                        if (it.id is ProjectComponentIdentifier) {
+                            val moduleName = it.id.displayName.substringAfterLast(':').replace('-', '_')
+                            moduleList += System.mapLibraryName(moduleName)
                         }
                     }
                 }
             }
-            return projectDeps.toList()
         }
+
+        // 确定 native 库目录和 appResources 目录
+        val libSourceDir = project.C.root.artifacts.desktopNative.asFile
+        val targetResourcesDir = project.packageResourcesDir.dir(project.C.resourceTag).asFile
+        targetResourcesDir.mkdirs()
+
+        // 复制 native 库
+        val libOutputList = mutableListOf<String>()
+        for (moduleName in moduleList) {
+            val libFile = libSourceDir.resolve(moduleName)
+            val outputFile = targetResourcesDir.resolve(moduleName)
+            if (libFile.exists()) {
+                libOutputList += moduleName
+                libFile.copyTo(outputFile, true)
+            }
+        }
+
+        println("[CopyDesktopNative] copy desktop native library: $libOutputList")
     }
 }

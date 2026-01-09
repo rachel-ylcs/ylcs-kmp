@@ -50,19 +50,11 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
             actions()
 
             // 检查是否需要编译 Desktop Native
-            val libName = System.mapLibraryName(name.replace('-', '_'))
-            val moduleDir = layout.projectDirectory.asFile
-            val sourceDir = moduleDir.resolve("src/main/cpp")
-            val nativeBuildTmpDir = layout.buildDirectory.dir("desktopNative").get()
+            val sourceDir = layout.projectDirectory.asFile.resolve("src/main/cpp")
             if (sourceDir.exists()) {
                 val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
                     inputDir.set(sourceDir)
-                    outputFile.set(C.root.artifacts.desktopNative.file(libName))
-                    platform.set(C.platform)
-                    nativeBuildDir.set(nativeBuildTmpDir.asFile)
-                    nativeJniDir.set(C.root.artifacts.include.asFile)
                 }
-
                 tasks.named("jar") {
                     dependsOn(buildNativeTask)
                 }

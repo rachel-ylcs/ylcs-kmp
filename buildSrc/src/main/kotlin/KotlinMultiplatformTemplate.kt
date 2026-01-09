@@ -3,7 +3,6 @@ import com.android.build.api.dsl.LibraryExtension
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
@@ -134,8 +133,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
         ns = ns.replace(':', '.') // 控制器[:]替换成点[.]
         return ns
     }
-
-    val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().dir("packageResources")
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
@@ -395,17 +392,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             actions()
 
             // 检查是否需要编译 Desktop Native
-            val libName = System.mapLibraryName(name.replace('-', '_'))
-            val moduleDir = layout.projectDirectory.asFile
-            val sourceDir = moduleDir.resolve("src/desktopMain/cpp")
-            val nativeBuildTmpDir = layout.buildDirectory.dir("desktopNative").get()
+            val sourceDir = layout.projectDirectory.asFile.resolve("src/desktopMain/cpp")
             if (sourceDir.exists()) {
                 val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
                     inputDir.set(sourceDir)
-                    outputFile.set(C.root.artifacts.desktopNative.file(libName))
-                    platform.set(C.platform)
-                    nativeBuildDir.set(nativeBuildTmpDir.asFile)
-                    nativeJniDir.set(C.root.artifacts.include.asFile)
                 }
 
                 tasks.named("desktopJar") {

@@ -1,5 +1,6 @@
 import love.yinlin.project.Constants
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 
 enum class BuildEnvironment { Dev, Prod }
 
@@ -29,3 +30,6 @@ val Project.C: Constants get() = projectMap.getOrPut(this) { Constants(this) }
 
 // 获取当前任务名
 val Project.currentTaskName: String get() = this.gradle.startParameter.taskNames.firstOrNull() ?: "sync"
+
+// KMP 项目资源目录
+val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().dir("packageResources")

@@ -17,11 +17,15 @@ abstract class GenerateCodeTask : DefaultTask() {
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
+    init {
+        title.convention("unnamed")
+    }
+
     @TaskAction
     fun generate() {
         val file = outputFile.get().asFile
         file.parentFile.mkdirs()
         file.writeText(code.get(), Charsets.UTF_8)
-        println("Generated code for ${title.get()}: ${file.absolutePath}")
+        println("[GenerateCode] generated code for ${title.get()}: ${file.absolutePath}")
     }
 }

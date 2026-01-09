@@ -92,7 +92,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Setup MSVC
-        uses: TheMrMilchmann/setup-msvc-dev@v3
+        uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
           arch: x64
           export-path-to-vs: VS_PATH
