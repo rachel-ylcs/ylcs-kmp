@@ -79,7 +79,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
 
             // Windows 调用 Ninja 使用 MSBuild 构建
             execOperations.exec(buildDir, "cmd", "/c", buildArgs(
-                "call $vcPath",
+                "call \"$vcPath\"",
                 "cmake \"${cmakelistsDir.absolutePath}\" -G Ninja $cmakeArgsText",
                 "cmake --build . --config Release"
             ))
@@ -87,7 +87,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
         else {
             // Linux / macOS 直接 build
             execOperations.exec(buildDir, "sh", "-c", buildArgs(
-                "cmake ${cmakelistsDir.absolutePath} $cmakeArgsText",
+                "cmake \"${cmakelistsDir.absolutePath}\" $cmakeArgsText",
                 "make -j 4"
             ))
         }
