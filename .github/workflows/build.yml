@@ -164,7 +164,7 @@ jobs:
           export-path-to-vs: VS_PATH
 
       - name: Build Desktop
-        run: echo %VS_PATH% && ./gradlew ylcs-app:desktopApp:desktopJar
+        run: ./gradlew ylcs-app:desktopApp:desktopJar
 
   build-web:
     name: Build Web
