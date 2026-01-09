@@ -36,3 +36,4 @@ Pods/
 **/config.json
 *.properties
 !**/gradle-wrapper.properties
+config/maven/

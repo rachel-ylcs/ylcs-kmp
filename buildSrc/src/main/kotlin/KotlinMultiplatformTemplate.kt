@@ -392,11 +392,44 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
         }
 
         maven?.let { mavenInfo ->
-//            extensions.configure<MavenPublishBaseExtension> {
-//                publishToMavenCentral()
-//                signAllPublications()
-//                coordinates()
-//            }
+            extensions.configure<MavenPublishBaseExtension> {
+                publishToMavenCentral()
+                signAllPublications()
+                coordinates(uniqueGroupName, uniqueName, C.app.versionName)
+
+                pom {
+                    name.set(uniqueName)
+                    description.set(mavenInfo.description)
+                    inceptionYear.set(mavenInfo.inceptionYear.toString())
+                    url.set("https://love.yinlin")
+                    licenses {
+                        license {
+                            name.set("MIT License")
+                            url.set("https://opensource.org/license/MIT")
+                            distribution.set("https://opensource.org/license/MIT")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set(C.app.name)
+                            name.set(C.app.displayName)
+                            url.set(C.app.homepage)
+                        }
+                        for ((author, homepage) in mavenInfo.authors) {
+                            developer {
+                                id.set(author)
+                                name.set(author)
+                                url.set(homepage)
+                            }
+                        }
+                    }
+                    scm {
+                        url.set(C.app.homepage)
+                        connection.set("scm:git:git${C.app.homepage.removePrefix("https")}.git")
+                        developerConnection.set("scm:git:git${C.app.homepage.removePrefix("https")}.git")
+                    }
+                }
+            }
         }
     }
 }

@@ -19,13 +19,16 @@ class BackendInfo(namespace: String, selector: String, path: String) {
     val uniqueSafeName: String = uniqueName.replace('-', '_')
     val uniqueModuleName: String = "$namespace.${selector.removePrefix(":").removeSuffix(":").substringAfter(':').replace(':', '.')}"
     val uniqueSafeModuleName: String = uniqueModuleName.replace('-', '_')
+    val uniqueGroupName: String = uniqueModuleName.removeSuffix(".$uniqueName")
     val uniquePath: String = path
 
-    override fun toString(): String = "Template($uniqueName, $uniqueModuleName, $uniquePath)"
+    override fun toString(): String = "Template(name=$uniqueName, module=$uniqueModuleName, path=$uniquePath)"
 }
 
 data class Maven(
-    val description: String
+    val description: String,
+    val inceptionYear: Int,
+    val authors: List<Pair<String, String>> = emptyList()
 )
 
 abstract class KotlinSourceSetsScope(
@@ -84,6 +87,8 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
     val uniqueModuleName: String get() = internalBackendInfo!!.uniqueModuleName
     // love.yinlin.compose.platform_view
     val uniqueSafeModuleName: String get() = internalBackendInfo!!.uniqueSafeModuleName
+    // love.yinlin.compose
+    val uniqueGroupName: String get() = internalBackendInfo!!.uniqueGroupName
     // /path/to/ylcs-kmp/ylcs-module/compose/platform-view
     val uniquePath: String get() = internalBackendInfo!!.uniquePath
 

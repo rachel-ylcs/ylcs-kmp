@@ -13,6 +13,11 @@ template(object : KotlinMultiplatformTemplate() {
     override val linuxTarget: Boolean = true
     override val macosTarget: Boolean = true
 
+    override val maven: Maven = Maven(
+        description = "core base module",
+        inceptionYear = 2025,
+    )
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
@@ -60,6 +65,8 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.kotlinx.broswer
             )
         }
+
+        androidNativeMain.configure(kotlinMain)
 
         windowsMain.configure(kotlinMain)
 
