@@ -13,6 +13,21 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 // 在 ExportLib 后面的库将会被导出给其他模块可见
 data object ExportLib
 
+class BackendInfo(namespace: String, selector: String, path: String) {
+    val uniqueSelector: String = selector
+    val uniqueName: String = selector.removeSuffix(":").substringAfterLast(':')
+    val uniqueSafeName: String = uniqueName.replace('-', '_')
+    val uniqueModuleName: String = "$namespace.${selector.removePrefix(":").removeSuffix(":").substringAfter(':').replace(':', '.')}"
+    val uniqueSafeModuleName: String = uniqueModuleName.replace('-', '_')
+    val uniquePath: String = path
+
+    override fun toString(): String = "Template($uniqueName, $uniqueModuleName, $uniquePath)"
+}
+
+data class Maven(
+    val description: String
+)
+
 abstract class KotlinSourceSetsScope(
     private val p: Project,
     private val set: NamedDomainObjectContainer<KotlinSourceSet>
@@ -56,6 +71,24 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
     protected open fun T.action() { }
     protected open fun Project.actions() { }
 
+    var internalBackendInfo: BackendInfo? = null
+
+    // 下面的值只能在 Template 的非 init 中使用
+    // :ylcs-module:compose:platform-view
+    val uniqueSelector: String get() = internalBackendInfo!!.uniqueSelector
+    // platform-view
+    val uniqueName: String get() = internalBackendInfo!!.uniqueName
+    // platform_view
+    val uniqueSafeName: String get() = internalBackendInfo!!.uniqueSafeName
+    // love.yinlin.compose.platform-view
+    val uniqueModuleName: String get() = internalBackendInfo!!.uniqueModuleName
+    // love.yinlin.compose.platform_view
+    val uniqueSafeModuleName: String get() = internalBackendInfo!!.uniqueSafeModuleName
+    // /path/to/ylcs-kmp/ylcs-module/compose/platform-view
+    val uniquePath: String get() = internalBackendInfo!!.uniquePath
+
+    open val maven: Maven? = null
+
     open fun Project.build(extension: T) { extension.action() }
 
     fun HasKotlinDependencies.lib(vararg libs: Any) {
@@ -81,6 +114,7 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
 }
 
 inline fun <reified T : KotlinBaseExtension> Project.template(t: KotlinTemplate<T>) {
+    t.internalBackendInfo = BackendInfo(C.namespace, this.path, this.layout.projectDirectory.asFile.absolutePath)
     with(t) {
         extensions.configure<T> {
             build(this)

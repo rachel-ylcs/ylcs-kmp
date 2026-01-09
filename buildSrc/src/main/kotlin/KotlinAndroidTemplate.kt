@@ -17,7 +17,7 @@ class KotlinAndroidSourceSetsScope(
 abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() {
     open fun KotlinAndroidSourceSetsScope.source() { }
 
-    abstract val packageName: String
+    open val packageName: String get() = uniqueSafeModuleName
     abstract val packageVersion: Int
     abstract val packageVersionName: String
     open fun BaseAppModuleExtension.sign(): SigningConfig? = null

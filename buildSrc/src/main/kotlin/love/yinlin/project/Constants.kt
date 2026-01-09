@@ -34,6 +34,9 @@ class Constants(project: Project) {
         }
     }
 
+    // 命名空间
+    val namespace = "love.yinlin"
+
     // 资源标签
     val resourceTag = when (platform) {
         BuildPlatform.Windows -> "windows-x64"
@@ -75,7 +78,7 @@ class Constants(project: Project) {
         vendor = "银临茶舍",
         copyright = "© 2024-2025 银临茶舍 版权所有",
         homepage = "https://github.com/rachel-ylcs/ylcs-kmp",
-        packageName = "love.yinlin"
+        packageName = namespace
     )
 
     // JVM 配置

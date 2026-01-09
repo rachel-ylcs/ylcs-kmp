@@ -38,7 +38,7 @@ template(object : KotlinAndroidTemplate() {
         }
         signingConfigs.getByName(androidKeyName)
     } catch (e: Throwable) {
-        println("Can't load android signing config, error: ${e.message}")
+        println("[AndroidSigning] can't load android signing config, error: ${e.message}")
         null
     }
 

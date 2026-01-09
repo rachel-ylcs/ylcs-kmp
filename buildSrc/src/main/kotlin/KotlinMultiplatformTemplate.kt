@@ -1,5 +1,6 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.dsl.LibraryExtension
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -30,6 +31,14 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
+
+data class Pod(
+    val name: String,
+    val moduleName: String? = null,
+    val version: Provider<String>? = null,
+    val extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+    val source: File? = null,
+)
 
 class KotlinMultiplatformSourceSetsScope(
     p: Project,
@@ -70,14 +79,6 @@ class KotlinMultiplatformSourceSetsScope(
 
     val composeOSLib: String get() = extension.extensions.getByType<ComposePlugin.Dependencies>().desktop.currentOs
 }
-
-data class Pod(
-    val name: String,
-    val moduleName: String? = null,
-    val version: Provider<String>? = null,
-    val extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
-    val source: File? = null,
-)
 
 abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
     // SourceSets
@@ -122,18 +123,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open val macosTarget: Boolean = false
     open fun KotlinNativeTarget.native() { }
 
-    private val Project.moduleNameSpace: String get() {
-        var topModule: Project = this
-        while (topModule.parent != this.rootProject) {
-            topModule = topModule.parent!!
-        }
-        var ns = this.path.removePrefix(":").removeSuffix(":") // 去除首尾项目控制器[:]
-        ns = ns.removePrefix("${topModule.name}:") // 去除顶层模块和控制器[:]
-        ns = ns.replace('-', '_') // 连字符[-]替换成下划线[_]
-        ns = ns.replace(':', '.') // 控制器[:]替换成点[.]
-        return ns
-    }
-
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
             compilerOptions {
@@ -144,8 +133,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             val oldAndroidPlugin = this@build.extensions.findByType<LibraryExtension>()
             val newAndroidPlugin = extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()
             if (oldAndroidPlugin != null || newAndroidPlugin != null) {
-                val androidNamespace = "${C.app.packageName}.$moduleNameSpace"
-
                 oldAndroidPlugin?.apply {
                     @Suppress("Deprecation")
                     androidTarget {
@@ -154,7 +141,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         }
                     }
 
-                    namespace = androidNamespace
+                    namespace = uniqueSafeModuleName
                     compileSdk = C.android.compileSdk
 
                     defaultConfig {
@@ -180,7 +167,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 }
 
                 newAndroidPlugin?.apply {
-                    namespace = androidNamespace
+                    namespace = uniqueSafeModuleName
                     compileSdk = C.android.compileSdk
                     minSdk = C.android.minSdk
                     lint.targetSdk = C.android.targetSdk
@@ -317,7 +304,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             extensions.configure<ComposeExtension> {
                 this.configure<ResourcesExtension> {
                     publicResClass = true
-                    packageOfResClass = "${C.app.packageName}.$moduleNameSpace.resources"
+                    packageOfResClass = "$uniqueSafeModuleName.resources"
                 }
             }
         }
@@ -402,6 +389,14 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     dependsOn(buildNativeTask)
                 }
             }
+        }
+
+        maven?.let { mavenInfo ->
+//            extensions.configure<MavenPublishBaseExtension> {
+//                publishToMavenCentral()
+//                signAllPublications()
+//                coordinates()
+//            }
         }
     }
 }

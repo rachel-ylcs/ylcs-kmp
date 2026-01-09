@@ -7,7 +7,7 @@ abstract class KotlinNativeLibTemplate : KotlinNativeTemplate() {
     final override fun KotlinNativeTarget.native() {
         binaries {
             sharedLib {
-                baseName = libName
+                baseName = uniqueSafeName
 
                 sharedLib()
             }

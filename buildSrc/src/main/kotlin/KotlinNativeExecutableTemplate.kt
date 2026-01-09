@@ -7,7 +7,7 @@ abstract class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
     final override fun KotlinNativeTarget.native() {
         binaries {
             executable {
-                baseName = libName
+                baseName = uniqueSafeName
                 entryPoint = "main"
 
                 executable()

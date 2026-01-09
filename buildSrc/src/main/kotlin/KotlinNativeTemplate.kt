@@ -22,7 +22,6 @@ class KotlinNativeSourceSetsScope(
 
 abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
     // SourceSets
-    abstract val libName: String
     open fun KotlinNativeSourceSetsScope.source() { }
 
     open val androidNativeTarget: Boolean = false
@@ -33,15 +32,16 @@ abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtensio
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
+            compilerOptions {
+                useLanguageFeature()
+            }
+
             buildList {
                 if (androidNativeTarget) add(androidNativeArm64("androidNative"))
                 if (windowsTarget) add(mingwX64("windows"))
                 if (linuxTarget) add(linuxX64("linux"))
                 if (macosTarget) add(macosArm64("macos"))
             }.forEach { target ->
-                target.compilerOptions {
-                    useLanguageFeature()
-                }
                 target.native()
             }
 

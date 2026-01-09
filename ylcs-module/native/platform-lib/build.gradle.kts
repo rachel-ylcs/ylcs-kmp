@@ -6,7 +6,6 @@ plugins {
 }
 
 template(object : KotlinNativeLibTemplate() {
-    override val libName: String = "platform_lib"
     override val windowsTarget: Boolean = true
 
     override fun KotlinNativeSourceSetsScope.source() {

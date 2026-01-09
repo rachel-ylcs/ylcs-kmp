@@ -19,7 +19,7 @@ class KotlinJvmSourceSetsScope(
 abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
     open fun KotlinJvmSourceSetsScope.source() { }
 
-    open val jvmName: String? = null
+    open val jvmName: String get() = uniqueSafeName
     open val jvmMainClass: String? = null
     open val jvmArgs: List<String> = emptyList()
     open fun JavaApplication.application() { }
@@ -38,7 +38,7 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
 
         extensions.findByType<JavaApplication>()?.apply {
             mainClass.set(jvmMainClass)
-            applicationName = jvmName ?: ""
+            applicationName = jvmName
             applicationDefaultJvmArgs = buildList {
                 addAll(jvmArgs)
                 add("--enable-native-access=ALL-UNNAMED")

@@ -14,6 +14,7 @@ plugins {
             libs.plugins.androidLibraryNew,
             libs.plugins.kotlinCocoapods,
             libs.plugins.kotlinSerialization,
+            libs.plugins.mavenPublish,
         ),
         listOf(
             libs.plugins.ktor,

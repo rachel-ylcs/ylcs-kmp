@@ -8,6 +8,7 @@ dependencies {
     implementation(libs.gradle.plugin.compose)
     implementation(libs.gradle.plugin.composeCompiler)
     implementation(libs.gradle.plugin.serialization)
+    implementation(libs.gradle.plugin.mavenPublish)
 }
 
 kotlin {
