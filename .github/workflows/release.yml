@@ -95,6 +95,7 @@ jobs:
         uses: TheMrMilchmann/setup-msvc-dev@v3
         with:
           arch: x64
+          export-path-to-vs: VS_PATH
 
       - name: Build
         run: |
