@@ -1,9 +1,9 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.dsl.LibraryExtension
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
@@ -134,6 +134,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
         ns = ns.replace(':', '.') // 控制器[:]替换成点[.]
         return ns
     }
+
+    val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().dir("packageResources")
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
@@ -351,7 +353,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                             modules(*desktopModules.toTypedArray())
 
-                            appResourcesRootDir.set(project.layout.projectDirectory.dir("packageResources"))
+                            appResourcesRootDir.set(project.packageResourcesDir)
 
                             val targetList = mutableListOf<TargetFormat>()
 
@@ -405,7 +407,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     nativeBuildDir.set(nativeBuildTmpDir.asFile)
                     nativeJniDir.set(C.root.artifacts.include.asFile)
                 }
-                tasks.named("desktopJar").dependsOn(buildNativeTask)
+
+                tasks.named("desktopJar") {
+                    dependsOn(buildNativeTask)
+                }
             }
         }
     }

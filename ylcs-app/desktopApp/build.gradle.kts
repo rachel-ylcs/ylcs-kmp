@@ -1,5 +1,6 @@
+import love.yinlin.task.CopyDesktopNativeTask
+import love.yinlin.task.CopyDesktopNativeTask.Companion.moduleDependencies
 import love.yinlin.task.spec.zip
-import love.yinlin.task.spec.registerCopyDesktopNative
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
@@ -56,9 +57,6 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        // 复制桌面动态库
-        registerCopyDesktopNative(this)
-
         // 运行 桌面程序 Debug
         val desktopRunDebug by tasks.registering {
             dependsOn(tasks.named("run"))
@@ -72,6 +70,21 @@ template(object : KotlinMultiplatformTemplate() {
         // 检查桌面模块完整性
         val desktopCheckModules by tasks.registering {
             dependsOn(tasks.named("suggestRuntimeModules"))
+        }
+
+        // 复制桌面动态库
+        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class) {
+            moduleList = moduleDependencies.map { it.substringAfterLast(':').replace('-', '_') }
+            libDir = C.root.artifacts.desktopNative.asFile
+            outputDir = packageResourcesDir.dir(C.resourceTag)
+
+            doLast {
+                delete(packageResourcesDir)
+            }
+        }
+
+        tasks.named("prepareAppResources") {
+            dependsOn(desktopCopyNativeLib)
         }
 
         // 发布桌面应用程序

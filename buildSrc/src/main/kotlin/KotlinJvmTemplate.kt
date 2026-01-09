@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.tasks.factory.dependsOn
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -63,7 +62,10 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
                     nativeBuildDir.set(nativeBuildTmpDir.asFile)
                     nativeJniDir.set(C.root.artifacts.include.asFile)
                 }
-                tasks.named("jar").dependsOn(buildNativeTask)
+
+                tasks.named("jar") {
+                    dependsOn(buildNativeTask)
+                }
             }
         }
     }
