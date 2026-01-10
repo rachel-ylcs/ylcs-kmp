@@ -11,7 +11,7 @@ plugins {
 template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
-            kotlin.srcDir(C.root.cs.srcGenerated)
+            kotlin.srcDir(generateSourceDir)
             lib(
                 ExportLib,
                 projects.ylcsModule.core.cs,
@@ -22,6 +22,7 @@ template(object : KotlinMultiplatformTemplate() {
 
     override fun Project.actions() {
         val generateConstants by tasks.registering(GenerateCodeTask::class) {
+            className = "love.yinlin.Local"
             code = """
 package love.yinlin
 
@@ -44,8 +45,6 @@ object Local {
     const val API_BASE_URL: String = "${C.host.apiUrl}"
 }
             """.trimIndent()
-            title = "Local Variable"
-            outputFile.set(C.root.cs.generatedLocalFile)
         }
 
         rootProject.tasks.named("prepareKotlinBuildScriptModel").configure {

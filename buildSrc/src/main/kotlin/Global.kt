@@ -25,11 +25,14 @@ enum class BuildArchitecture {
 }
 
 val projectMap = mutableMapOf<Project, Constants>()
-// 获取当前项目常量
+// 当前项目常量
 val Project.C: Constants get() = projectMap.getOrPut(this) { Constants(this) }
 
-// 获取当前任务名
+// 当前任务名
 val Project.currentTaskName: String get() = this.gradle.startParameter.taskNames.firstOrNull() ?: "sync"
 
 // KMP 项目资源目录
 val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().dir("packageResources")
+
+// 生成代码源目录
+val Project.generateSourceDir: Directory get() = layout.buildDirectory.get().dir("generated").dir("kotlin")

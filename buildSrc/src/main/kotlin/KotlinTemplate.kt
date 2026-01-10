@@ -147,7 +147,11 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
 }
 
 inline fun <reified T : KotlinBaseExtension> Project.template(t: KotlinTemplate<T>) {
-    t.internalBackendInfo = BackendInfo(C.namespace, this.path, this.layout.projectDirectory.asFile.absolutePath)
+    t.internalBackendInfo = BackendInfo(C.namespace, this.path, this.layout.projectDirectory.asFile.absolutePath).also {
+        group = it.uniqueGroupName
+        version = C.app.version
+    }
+
     with(t) {
         extensions.configure<T> {
             build(this)

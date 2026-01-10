@@ -1,8 +1,6 @@
 package love.yinlin.data.rachel.prize
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.api.ServerRes
-import love.yinlin.Local
 
 @Stable
 @Serializable
@@ -14,9 +12,7 @@ data class PrizeItem(
     val description:String?,//奖品描述
     val pic:String?, //图片描述
     val count:Int ,//奖品数量
-){
-    fun picPath(itemID: Int) : String ="${Local.API_BASE_URL}/${ServerRes.Prize.prize(itemID)}"
-}
+)
 
 //API参数限制在5以下，所以把需要输入的属性提取出来做一个新类，这个类为不含APIFile的数据类，APIFile在API处会单独传入，特殊处理
 @Serializable

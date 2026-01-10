@@ -1,5 +1,6 @@
 package love.yinlin.task
 
+import generateSourceDir
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -12,13 +13,18 @@ abstract class GenerateCodeTask : DefaultTask() {
     abstract val code: Property<String>
 
     @get:Input
-    abstract val title: Property<String>
+    abstract val className: Property<String>
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
     init {
-        title.convention("unnamed")
+        outputFile.convention {
+            val classPath = className.get().split('.')
+            var outputFilePath = project.generateSourceDir
+            for (i in 0 ..< classPath.size - 1) outputFilePath = outputFilePath.dir(classPath[i])
+            outputFilePath.file("${classPath.last()}.kt").asFile
+        }
     }
 
     @TaskAction
@@ -26,6 +32,6 @@ abstract class GenerateCodeTask : DefaultTask() {
         val file = outputFile.get().asFile
         file.parentFile.mkdirs()
         file.writeText(code.get(), Charsets.UTF_8)
-        println("[GenerateCode] generated code for ${title.get()}: ${file.absolutePath}")
+        println("[GenerateCode] generated code for ${className.get()} in ${file.absolutePath}")
     }
 }

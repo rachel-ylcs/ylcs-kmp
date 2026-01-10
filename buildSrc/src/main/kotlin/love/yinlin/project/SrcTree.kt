@@ -33,12 +33,6 @@ class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
     val modManager: Directory = dir("modManager")
 }
 
-class CSNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("cs") {
-    private val build: Directory = dir("build")
-    val srcGenerated: Directory = build.dir("generated").dir("kotlin")
-    val generatedLocalFile: RegularFile = srcGenerated.dir("love").dir("yinlin").file("Local.kt")
-}
-
 class SharedNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("shared") {
     private val proguard: Directory = dir("proguard")
     val commonR8Rule: RegularFile = proguard.file("R8Common.pro")
@@ -92,7 +86,6 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val script = ScriptNode(this)
     val artifacts = ArtifactsNode(this)
     val work = WorkNode(this)
-    val cs = CSNode(this)
     val shared = SharedNode(this, c)
     val androidApp = AndroidAppNode(this, c)
     val iosApp = IosAppNode(this, c)
