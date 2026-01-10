@@ -1,4 +1,5 @@
 import love.yinlin.task.GenerateCodeTask
+import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile
 
 plugins {
     install(
@@ -47,11 +48,11 @@ object Local {
             """.trimIndent()
         }
 
-        rootProject.tasks.named("prepareKotlinBuildScriptModel").configure {
+        rootProject.tasks.named("prepareKotlinBuildScriptModel") {
             dependsOn(generateConstants)
         }
 
-        tasks.matching { it.name.startsWith("compile") }.configureEach {
+        tasks.withType<AbstractKotlinCompile<*>>().configureEach {
             dependsOn(generateConstants)
         }
     }
