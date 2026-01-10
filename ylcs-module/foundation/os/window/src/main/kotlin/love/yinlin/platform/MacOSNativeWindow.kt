@@ -1,5 +1,9 @@
 package love.yinlin.platform
 
+import love.yinlin.platform.ffi.Native
+import love.yinlin.platform.ffi.NativeLibrary
+import love.yinlin.platform.ffi.NativeType
+
 internal object MacOSNativeWindow : NativeWindowImpl, NativeLibrary("/usr/lib/libobjc.A.dylib") {
     val sel_registerName by func(
         NativeType.Pointer,

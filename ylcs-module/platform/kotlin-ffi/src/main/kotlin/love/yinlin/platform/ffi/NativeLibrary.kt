@@ -1,4 +1,4 @@
-package love.yinlin.platform
+package love.yinlin.platform.ffi
 
 import love.yinlin.extension.lazyName
 import java.lang.foreign.Arena

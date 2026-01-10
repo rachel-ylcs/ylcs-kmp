@@ -1,4 +1,4 @@
-package love.yinlin.platform
+package love.yinlin.platform.ffi
 
 object Win32 {
     typealias BOOL = Int

@@ -1,4 +1,4 @@
-package love.yinlin.platform
+package love.yinlin.platform.ffi
 
 object Linux {
     const val O_CREAT = 64

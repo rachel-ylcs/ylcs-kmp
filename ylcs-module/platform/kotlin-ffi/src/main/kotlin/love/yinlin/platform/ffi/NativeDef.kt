@@ -1,6 +1,5 @@
-package love.yinlin.platform
+package love.yinlin.platform.ffi
 
-import love.yinlin.platform.Native.Type
 import java.lang.foreign.Arena
 import java.lang.foreign.MemoryLayout
 import java.lang.foreign.MemorySegment
@@ -15,19 +14,19 @@ object Native {
 }
 
 object NativeType {
-    val Boolean: Type = ValueLayout.JAVA_BOOLEAN
-    val Byte: Type = ValueLayout.JAVA_BYTE
-    val Char: Type = ValueLayout.JAVA_CHAR
-    val Int: Type = ValueLayout.JAVA_INT
-    val Short: Type = ValueLayout.JAVA_SHORT
-    val Long: Type = ValueLayout.JAVA_LONG
-    val Float: Type = ValueLayout.JAVA_FLOAT
-    val Double: Type = ValueLayout.JAVA_DOUBLE
-    val Pointer: Type = ValueLayout.ADDRESS
+    val Boolean: Native.Type = ValueLayout.JAVA_BOOLEAN
+    val Byte: Native.Type = ValueLayout.JAVA_BYTE
+    val Char: Native.Type = ValueLayout.JAVA_CHAR
+    val Int: Native.Type = ValueLayout.JAVA_INT
+    val Short: Native.Type = ValueLayout.JAVA_SHORT
+    val Long: Native.Type = ValueLayout.JAVA_LONG
+    val Float: Native.Type = ValueLayout.JAVA_FLOAT
+    val Double: Native.Type = ValueLayout.JAVA_DOUBLE
+    val Pointer: Native.Type = ValueLayout.ADDRESS
 
 
-    val string: Type = Pointer
-    val wstring: Type = Pointer
+    val string: Native.Type = Pointer
+    val wstring: Native.Type = Pointer
 }
 
 val Native.Pointer.isNull get() = this == Native.NULL

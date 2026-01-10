@@ -9,8 +9,15 @@ template(object : KotlinJvmTemplate() {
     override fun KotlinJvmSourceSetsScope.source() {
         main.configure {
             lib(
-                projects.ylcsModule.platform.kotlinFfiWin32,
-                projects.ylcsModule.platform.kotlinFfiPosix,
+                ExportLib,
+                projects.ylcsModule.platform.kotlinFfi,
+            )
+        }
+
+        test.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test,
             )
         }
     }

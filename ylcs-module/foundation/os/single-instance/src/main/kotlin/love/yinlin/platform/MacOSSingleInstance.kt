@@ -1,5 +1,11 @@
 package love.yinlin.platform
 
+import love.yinlin.platform.ffi.MacOS
+import love.yinlin.platform.ffi.Native
+import love.yinlin.platform.ffi.NativeLibrary
+import love.yinlin.platform.ffi.NativeType
+import love.yinlin.platform.ffi.aString
+import love.yinlin.platform.ffi.isNotNull
 import java.lang.invoke.MethodHandles
 
 internal object MacOSSingleInstance : SingleInstanceImpl, NativeLibrary("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation") {

@@ -1,5 +1,14 @@
 package love.yinlin.platform
 
+import love.yinlin.platform.ffi.Native
+import love.yinlin.platform.ffi.NativeLibrary
+import love.yinlin.platform.ffi.NativeType
+import love.yinlin.platform.ffi.Win32
+import love.yinlin.platform.ffi.Win32Type
+import love.yinlin.platform.ffi.isNotNull
+import love.yinlin.platform.ffi.isNull
+import love.yinlin.platform.ffi.wString
+
 internal object WindowsSingleInstance : SingleInstanceImpl, NativeLibrary("kernel32") {
     val CreateEventW by func(
         Win32Type.POINTER,

@@ -1,5 +1,10 @@
 package love.yinlin.platform
 
+import love.yinlin.platform.ffi.Linux
+import love.yinlin.platform.ffi.NativeLibrary
+import love.yinlin.platform.ffi.NativeType
+import love.yinlin.platform.ffi.aString
+
 internal object LinuxSingleInstance : SingleInstanceImpl, NativeLibrary() {
     val open by func(
         NativeType.string,

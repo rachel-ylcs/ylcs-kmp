@@ -1,5 +1,11 @@
 package love.yinlin.platform
 
+import love.yinlin.platform.ffi.Native
+import love.yinlin.platform.ffi.NativeLibrary
+import love.yinlin.platform.ffi.NativeType
+import love.yinlin.platform.ffi.Win32
+import love.yinlin.platform.ffi.Win32Type
+
 internal object WindowsNativeWindow : NativeWindowImpl, NativeLibrary("user32") {
     val GetWindowLongW by func(
         Win32Type.HWND,
