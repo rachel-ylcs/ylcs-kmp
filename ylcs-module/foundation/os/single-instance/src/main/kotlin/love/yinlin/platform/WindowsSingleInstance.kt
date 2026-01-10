@@ -1,41 +1,16 @@
 package love.yinlin.platform
 
-import love.yinlin.platform.ffi.Native
-import love.yinlin.platform.ffi.NativeLibrary
-import love.yinlin.platform.ffi.NativeType
+import love.yinlin.platform.ffi.Address
+import love.yinlin.platform.ffi.Kernel32Library
 import love.yinlin.platform.ffi.Win32
-import love.yinlin.platform.ffi.Win32Type
-import love.yinlin.platform.ffi.isNotNull
-import love.yinlin.platform.ffi.isNull
-import love.yinlin.platform.ffi.wString
 
-internal object WindowsSingleInstance : SingleInstanceImpl, NativeLibrary("kernel32") {
-    val CreateEventW by func(
-        Win32Type.POINTER,
-        Win32Type.BOOL,
-        Win32Type.BOOL,
-        NativeType.wstring,
-        retType = Win32Type.HANDLE,
-    )
-
-    val OpenEventW by func(
-        Win32Type.DWORD,
-        Win32Type.BOOL,
-        NativeType.wstring,
-        retType = Win32Type.HANDLE,
-    )
-
-    val CloseHandle by func(
-        Win32Type.HANDLE,
-        retType = Win32Type.BOOL,
-    )
-
-    var appEvent: Win32.HANDLE = Native.NULL
+internal object WindowsSingleInstance : SingleInstanceImpl, Kernel32Library() {
+    var appEvent: Win32.HANDLE = Address.NULL
 
     override fun lock(key: String): Boolean = useMemory { arena ->
-        appEvent = OpenEventW(Win32.EVENT_ALL_ACCESS, Win32.FALSE, arena.wString(key)) as Win32.HANDLE
+        appEvent = OpenEventW(Win32.EVENT_ALL_ACCESS, Win32.FALSE, arena.wstr(key)) as Win32.HANDLE
         if (appEvent.isNull) {
-            appEvent = CreateEventW(Native.NULL, Win32.FALSE, Win32.FALSE, arena.wString(key)) as Win32.HANDLE
+            appEvent = CreateEventW(Address.NULL, Win32.FALSE, Win32.FALSE, arena.wstr(key)) as Win32.HANDLE
             true
         }
         else false
@@ -44,7 +19,7 @@ internal object WindowsSingleInstance : SingleInstanceImpl, NativeLibrary("kerne
     override fun unlock() {
         if (appEvent.isNotNull) {
             CloseHandle(appEvent)
-            appEvent = Native.NULL
+            appEvent = Address.NULL
         }
     }
 }

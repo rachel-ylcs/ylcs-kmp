@@ -1,6 +1,6 @@
 package love.yinlin.platform.ffi
 
-object Linux {
+object Posix {
     const val O_CREAT = 64
     const val O_RDWR = 2
     const val LOCK_EX = 2
@@ -8,6 +8,6 @@ object Linux {
     const val LOCK_UN = 8
 }
 
-object LinuxType {
+object PosixType {
 
 }

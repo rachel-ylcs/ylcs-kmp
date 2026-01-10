@@ -3,8 +3,8 @@ package love.yinlin.platform.ffi
 object Win32 {
     typealias BOOL = Int
     typealias DWORD = Int
-    typealias POINTER = Native.Pointer
-    typealias HANDLE = Native.Pointer
+    typealias POINTER = Address
+    typealias HANDLE = Address
 
     const val TRUE: DWORD = 1
     const val FALSE: DWORD = 0
@@ -18,9 +18,9 @@ object Win32 {
 }
 
 object Win32Type {
-    val BOOL: Native.Type = NativeType.Int
-    val DWORD: Native.Type = NativeType.Int
-    val POINTER: Native.Type = NativeType.Pointer
-    val HWND: Native.Type = NativeType.Pointer
-    val HANDLE: Native.Type = NativeType.Pointer
+    val BOOL: Layout = NativeType.Int
+    val DWORD: Layout = NativeType.Int
+    val POINTER: Layout = NativeType.Pointer
+    val HWND: Layout = NativeType.Pointer
+    val HANDLE: Layout = NativeType.Pointer
 }

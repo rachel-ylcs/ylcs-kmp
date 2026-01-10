@@ -1,11 +1,8 @@
 package love.yinlin.platform
 
-import love.yinlin.platform.ffi.MacOS
-import love.yinlin.platform.ffi.Native
+import love.yinlin.platform.ffi.Address
 import love.yinlin.platform.ffi.NativeLibrary
 import love.yinlin.platform.ffi.NativeType
-import love.yinlin.platform.ffi.aString
-import love.yinlin.platform.ffi.isNotNull
 import java.lang.invoke.MethodHandles
 
 internal object MacOSSingleInstance : SingleInstanceImpl, NativeLibrary("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation") {
@@ -15,7 +12,6 @@ internal object MacOSSingleInstance : SingleInstanceImpl, NativeLibrary("/System
         NativeType.Int,
         retType = NativeType.Pointer
     )
-
     val CFMessagePortCreateLocal by func(
         NativeType.Pointer,
         NativeType.Pointer,
@@ -24,26 +20,19 @@ internal object MacOSSingleInstance : SingleInstanceImpl, NativeLibrary("/System
         NativeType.Pointer,
         retType = NativeType.Pointer,
     )
-
-    val CFMessagePortInvalidate by func(
-        NativeType.Pointer,
-    )
-
-    val CFRelease by func(
-        NativeType.Pointer,
-    )
+    val CFMessagePortInvalidate by func(NativeType.Pointer)
+    val CFRelease by func(NativeType.Pointer)
 
     @JvmStatic
     @Suppress("FunctionName", "unused")
-    private fun MessageCallback(port: Native.Pointer, msgid: Int, data: Native.Pointer, info: Native.Pointer): Native.Pointer {
-        return Native.NULL
-    }
+    private fun MessageCallback(port: Address, msgid: Int, data: Address, info: Address): Address = Address.NULL
 
-    var appMessagePort: Native.Pointer = Native.NULL
+    var appMessagePort: Address = Address.NULL
 
     override fun lock(key: String): Boolean = useMemory { arena ->
-        val cStr = arena.aString(key)
-        val name = CFStringCreateWithCString(Native.NULL, cStr, MacOS.KCFSTRINGENCODINGUTF8) as Native.Pointer
+        val cStr = arena.astr(key)
+        val kcfStringEncodingUTF8 = 0x08000100
+        val name = CFStringCreateWithCString(Address.NULL, cStr, kcfStringEncodingUTF8) as Address
 
         val function = declare(
             NativeType.Pointer,
@@ -55,14 +44,14 @@ internal object MacOSSingleInstance : SingleInstanceImpl, NativeLibrary("/System
         val handle = MethodHandles.lookup().unreflect(
             MacOSSingleInstance::class.java.getDeclaredMethod(
                 "MessageCallback",
-                Native.Pointer::class.java,
+                Address::class.java,
                 Int::class.java,
-                Native.Pointer::class.java,
-                Native.Pointer::class.java,
+                Address::class.java,
+                Address::class.java,
             )
         )
         val callback = upcall(handle, function)
-        appMessagePort = CFMessagePortCreateLocal(Native.NULL, name, callback, Native.NULL, Native.NULL) as Native.Pointer
+        appMessagePort = CFMessagePortCreateLocal(Address.NULL, name, callback, Address.NULL, Address.NULL) as Address
         appMessagePort.isNotNull
     }
 
@@ -70,7 +59,7 @@ internal object MacOSSingleInstance : SingleInstanceImpl, NativeLibrary("/System
         if (appMessagePort.isNotNull) {
             CFMessagePortInvalidate(appMessagePort)
             CFRelease(appMessagePort)
-            appMessagePort = Native.NULL
+            appMessagePort = Address.NULL
         }
     }
 }
