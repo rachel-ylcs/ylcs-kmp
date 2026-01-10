@@ -1,6 +1,3 @@
-import love.yinlin.task.GenerateCodeTask
-import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile
-
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
@@ -22,7 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        val generateConstants by tasks.registering(GenerateCodeTask::class) {
+        setupGenerateCode("generateConstants") {
             className = "love.yinlin.Local"
             code = """
 package love.yinlin
@@ -46,14 +43,6 @@ object Local {
     const val API_BASE_URL: String = "${C.host.apiUrl}"
 }
             """.trimIndent()
-        }
-
-        rootProject.tasks.named("prepareKotlinBuildScriptModel") {
-            dependsOn(generateConstants)
-        }
-
-        tasks.withType<AbstractKotlinCompile<*>>().configureEach {
-            dependsOn(generateConstants)
         }
     }
 })

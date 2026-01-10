@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import love.yinlin.task.GenerateCodeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.NamedDomainObjectCollectionDelegateProvider
@@ -7,10 +8,13 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getting
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.HasKotlinDependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 // 在 ExportLib 后面的库将会被导出给其他模块可见
 data object ExportLib
@@ -90,6 +94,7 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
 
     open fun Project.build(extension: T) { extension.action() }
 
+    // 引入依赖
     fun HasKotlinDependencies.lib(vararg libs: Any) {
         dependencies {
             var isExport = false
@@ -103,6 +108,7 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
         }
     }
 
+    // 启用编译器实验性特性
     fun KotlinCommonCompilerOptions.useLanguageFeature(vararg features: String) {
         freeCompilerArgs.addAll(
             "-Xexpect-actual-classes",
@@ -111,6 +117,18 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
         )
     }
 
+    // 需要生成代码
+    fun Project.setupGenerateCode(taskName: String, block: GenerateCodeTask.() -> Unit) {
+        val generateTask = tasks.register(taskName, GenerateCodeTask::class, configurationAction = block)
+        rootProject.tasks.findByName("prepareKotlinBuildScriptModel")?.apply {
+            dependsOn(generateTask)
+        }
+        tasks.withType<AbstractKotlinCompileTool<*>>().configureEach {
+            dependsOn(generateTask)
+        }
+    }
+
+    // 发布 maven
     fun Project.publishMaven() {
         extensions.findByType<MavenPublishBaseExtension>()?.apply {
             publishToMavenCentral()
