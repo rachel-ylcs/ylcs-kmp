@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
@@ -22,6 +24,12 @@ template(object : KotlinNativeLibTemplate() {
                 libs.test,
                 libs.kotlinx.coroutines.test,
             )
+        }
+    }
+
+    override fun KotlinNativeTarget.native() {
+        compilations.getByName("main") {
+            val win32 by cinterops.creating
         }
     }
 })

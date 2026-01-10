@@ -1,13 +1,20 @@
 package love.yinlin
 
-import kotlinx.datetime.LocalDateTime
-import kotlinx.io.files.Path
-import love.yinlin.win32.createTime
+import love.yinlin.win32.DriverInfo
+import love.yinlin.win32.StandardPath
 import kotlin.test.Test
 
 class WindowsTest {
     @Test
-    fun test() {
-        Path("C:\\Users\\Administrator\\Desktop\\123.txt").createTime = LocalDateTime(2025, 9, 12, 12, 31, 45)
+    fun testStandardPath() {
+        println(StandardPath.Windows.path)
+        println(StandardPath.Desktop.path)
+        println(StandardPath.Running.path)
+        println(StandardPath.Temp.path)
+    }
+
+    @Test
+    fun testDiskName() {
+        println(DriverInfo.entries)
     }
 }

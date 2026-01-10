@@ -1,0 +1,20 @@
+package = love.yinlin.win32
+language = C
+
+---
+#include <Windows.h>
+
+typedef struct {
+    DWORD       HeaderSize;
+    GUID        LinkCLSID;
+    DWORD       Flags;
+    DWORD       FileAttributes;
+    FILETIME    CreationTime;
+    FILETIME    AccessTime;
+    FILETIME    WriteTime;
+    DWORD       FileSize;
+    DWORD       IconIndex;
+    DWORD       ShowCommand;
+    WORD        Hotkey;
+    BYTE        retain[10];
+} LINKFILE_HEADER;

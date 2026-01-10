@@ -28,7 +28,7 @@ abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtensio
     open val windowsTarget: Boolean = false
     open val linuxTarget: Boolean = false
     open val macosTarget: Boolean = false
-    open fun KotlinNativeTarget.native() { }
+    open fun KotlinNativeTarget.baseNative() { }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
@@ -42,7 +42,7 @@ abstract class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtensio
                 if (linuxTarget) add(linuxX64("linux"))
                 if (macosTarget) add(macosArm64("macos"))
             }.forEach { target ->
-                target.native()
+                target.baseNative()
             }
 
             // SourceSet

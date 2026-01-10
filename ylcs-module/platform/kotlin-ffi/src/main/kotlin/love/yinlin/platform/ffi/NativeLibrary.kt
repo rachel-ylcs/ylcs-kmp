@@ -39,6 +39,6 @@ abstract class NativeLibrary(private val libName: String? = null) {
     val Address.isNull get() = this == Address.NULL
     val Address.isNotNull get() = this != Address.NULL
 
-    val Long.reinterpret: Address get() = Address.ofAddress(this)
-    val Address.reinterpret: Long get() = this.address()
+    val Long.asAddress: Address get() = Address.ofAddress(this)
+    val Address.asLong: Long get() = this.address()
 }

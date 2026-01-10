@@ -47,17 +47,29 @@ fun Path.rename(filename: String): Path? = catchingNull {
     newPath
 }
 
+val Path.fileSize: Long get() = catchingDefault(0L) {
+    val metadata = SystemFileSystem.metadataOrNull(this)
+    if (metadata?.isRegularFile == true) metadata.size else 0L
+}
+
 val Path.size: Long get() = catchingDefault(0L) {
     var size = 0L
-    val queue = ArrayDeque<Path>()
-    queue.add(this)
-    while (queue.isNotEmpty()) {
-        val front = queue.removeFirst()
-        val metadata = SystemFileSystem.metadataOrNull(front)
-        when {
-            metadata == null -> {}
-            metadata.isRegularFile -> size += metadata.size
-            metadata.isDirectory -> queue.addAll(SystemFileSystem.list(front))
+    val metadata = SystemFileSystem.metadataOrNull(this)
+    when {
+        metadata == null -> {}
+        metadata.isRegularFile -> size += metadata.size
+        metadata.isDirectory -> {
+            val queue = ArrayDeque<Path>()
+            queue.add(this)
+            while (queue.isNotEmpty()) {
+                val front = queue.removeFirst()
+                val metadata = SystemFileSystem.metadataOrNull(front)
+                when {
+                    metadata == null -> {}
+                    metadata.isRegularFile -> size += metadata.size
+                    metadata.isDirectory -> queue.addAll(SystemFileSystem.list(front))
+                }
+            }
         }
     }
     size

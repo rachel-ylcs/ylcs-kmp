@@ -3,8 +3,9 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 abstract class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
     open fun Executable.executable() { }
+    open fun KotlinNativeTarget.native() { }
 
-    final override fun KotlinNativeTarget.native() {
+    override fun KotlinNativeTarget.baseNative() {
         binaries {
             executable {
                 baseName = uniqueSafeName
@@ -13,5 +14,7 @@ abstract class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
                 executable()
             }
         }
+
+        native()
     }
 }
