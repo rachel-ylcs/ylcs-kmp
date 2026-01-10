@@ -119,7 +119,7 @@ val Path.shorcutTarget: Path? get() = memScoped {
     return null
 }
 
-// 取驱动操作
+// 驱动器操作
 data class DriverInfo(
     val name: Path, // 驱动器路径
     val totalSpace: Long, // 总空间 Byte
