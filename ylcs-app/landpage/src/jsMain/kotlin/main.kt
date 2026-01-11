@@ -201,12 +201,12 @@ fun TagConsumer<HTMLElement>.renderSection1() {
 }
 
 fun TagConsumer<HTMLElement>.renderSection2() {
-    section("relative py-40 overflow-hidden z-10") {
+    section("relative py-20 border-b border-gray-300 dark:border-gray-800 transition-colors z-10") {
         id = "scroll-trigger-section-2"
         div(Styles.container + " relative grid grid-cols-1 md:grid-cols-12 gap-12 items-center") {
             div("md:col-span-4 flex flex-col justify-center order-2 md:order-1") {
                 id = "text-box-2"
-                h2("text-5xl md:text-7xl font-black text-gray-900 dark:text-emerald-400 mb-6 leading-none") {
+                h2("text-4xl md:text-6xl font-black text-gray-900 dark:text-emerald-400 mb-6 leading-none") {
                     +"无损音质听歌"
                 }
                 p("text-xl md:text-2xl text-gray-500 dark:text-gray-400 font-bold tracking-wide leading-relaxed") {
@@ -232,7 +232,7 @@ fun TagConsumer<HTMLElement>.renderSection2() {
 }
 
 fun TagConsumer<HTMLElement>.renderSection3() {
-    section("py-40 relative z-10") {
+    section("relative py-20 border-b border-gray-300 dark:border-gray-800 transition-colors z-10") {
         div(Styles.container) {
             div("text-center") {
                 h2(Styles.h2) { +"更多功能即将到来" }
