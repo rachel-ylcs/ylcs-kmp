@@ -62,6 +62,7 @@ include(
 
     /* -----------------  应用模块  ----------------- */
 
+    "ylcs-app:landpage",
     "ylcs-app:mod",
     "ylcs-app:cs",
     "ylcs-app:shared",

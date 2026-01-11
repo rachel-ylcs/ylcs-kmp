@@ -262,9 +262,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
 
                     browser {
-                        testTask {
-                            enabled = false
-                        }
                         commonWebpackConfig {
                             cssSupport {
                                 enabled.set(true)
