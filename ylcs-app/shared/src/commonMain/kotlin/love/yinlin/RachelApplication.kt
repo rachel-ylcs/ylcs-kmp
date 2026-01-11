@@ -113,7 +113,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     )
 
     private val createDirectories by sync {
-        Platform.useNot(Platform.WebWasm) {
+        Platform.useNot(*Platform.Web) {
             os.storage.dataPath.mkdir()
             os.storage.cachePath.mkdir()
             Paths.modPath.mkdir()
@@ -130,7 +130,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     )
 
     val urlImage by service(
-        useNotPlatformStartupLazyFetcher(Platform.WebWasm) { os.storage.cachePath.parent!! },
+        useNotPlatformStartupLazyFetcher(*Platform.Web) { os.storage.cachePath.parent!! },
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
         ImageQuality.Medium,
         factory = ::StartupUrlImage
@@ -159,7 +159,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : PlatformAp
     )
 
     val mp by service(
-        useNotPlatformStartupLazyFetcher(Platform.WebWasm) { Paths.modPath },
+        useNotPlatformStartupLazyFetcher(*Platform.Web) { Paths.modPath },
         factory = ::buildMusicPlayer
     )
 

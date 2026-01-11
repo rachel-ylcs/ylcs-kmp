@@ -101,7 +101,11 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        wasmJsMain.configure(commonMain)
+        webMain.configure(commonMain)
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
     }
 
     override fun ComposeCompilerGradlePluginExtension.composeCompiler() {

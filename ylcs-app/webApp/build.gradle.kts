@@ -15,9 +15,13 @@ template(object : KotlinMultiplatformTemplate() {
     override val desktopTarget: Boolean = false
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
-        wasmJsMain.configure {
+        webMain.configure(commonMain) {
             lib(projects.ylcsApp.shared)
         }
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
     }
 
     override fun KotlinWebpackConfig.webpack() {

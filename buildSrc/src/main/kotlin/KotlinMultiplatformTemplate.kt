@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.DisableCacheInKotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCacheApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
@@ -65,6 +66,8 @@ class KotlinMultiplatformSourceSetsScope(
         }
     }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
+    val webMain: KotlinSourceSet by lazy { with(extension) { set.webMain.get() } }
+    val jsMain: KotlinSourceSet by lazy { with(extension) { set.jsMain.get() } }
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
 
     val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
@@ -113,6 +116,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     // Web
     open val webTarget: Boolean = true
     open fun KotlinWasmJsTargetDsl.wasmJs() { }
+    open fun KotlinJsTargetDsl.js() { }
     open fun KotlinWebpackConfig.webpack() { }
 
     // DesktopNative
@@ -256,6 +260,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 @OptIn(ExperimentalWasmDsl::class)
                 wasmJs {
                     compilerOptions {
+                        target.set("es2015")
                         useLanguageFeature(
                             "-Xes-long-as-bigint"
                         )
@@ -272,7 +277,30 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
                     binaries.executable()
 
+                    js()
                     wasmJs()
+                }
+
+                js {
+                    compilerOptions {
+                        target.set("es2015")
+                        useLanguageFeature(
+                            "-Xes-long-as-bigint"
+                        )
+                    }
+
+                    browser {
+                        commonWebpackConfig {
+                            cssSupport {
+                                enabled.set(true)
+                            }
+
+                            webpack()
+                        }
+                    }
+                    binaries.executable()
+
+                    js()
                 }
             }
 

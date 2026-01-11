@@ -50,7 +50,7 @@ class StartupUrlImage : SyncStartup() {
             components {
                 registerComponent()
             }
-            Platform.useNot(Platform.WebWasm) {
+            Platform.useNot(*Platform.Web) {
                 require(cachePath != null)
                 downloadCacheOptions {
                     DiskCache.Options(
@@ -76,7 +76,7 @@ class StartupUrlImage : SyncStartup() {
     }
 
     fun clearCache() {
-        Platform.useNot(Platform.WebWasm) {
+        Platform.useNot(*Platform.Web) {
             sketch.downloadCache.clear()
             sketch.resultCache.clear()
         }

@@ -541,8 +541,14 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
     override fun ActionScope.RightActions() {
         if (clientResources.isEmpty() && remoteSong != null) {
             ActionSuspend(Icons.Outlined.Download, "下载") {
-                if (platform == Platform.WebWasm) slot.tip.warning(UnsupportedPlatformText)
-                else if (slot.confirm.openSuspend(content = "下载该MOD?")) downloadMod()
+                Platform.use(*Platform.Web,
+                    ifTrue = {
+                        slot.tip.warning(UnsupportedPlatformText)
+                             },
+                    ifFalse = {
+                        if (slot.confirm.openSuspend(content = "下载该MOD?")) downloadMod()
+                    }
+                )
             }
         }
         Action(Icons.Outlined.Share, "分享") {

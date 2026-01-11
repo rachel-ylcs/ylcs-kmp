@@ -31,6 +31,10 @@ template(object : KotlinMultiplatformTemplate() {
 
         desktopMain.configure(skikoMain)
 
-        wasmJsMain.configure(skikoMain)
+        webMain.configure(skikoMain)
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
     }
 })

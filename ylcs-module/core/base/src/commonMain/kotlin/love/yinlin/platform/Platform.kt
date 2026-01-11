@@ -9,6 +9,7 @@ enum class Platform {
     Windows,
     Linux,
     MacOS,
+    WebJs,
     WebWasm,
     AndroidNative,
     WindowsNative,
@@ -19,6 +20,7 @@ enum class Platform {
         val Phone = arrayOf(Android, IOS)
         val Desktop = arrayOf(Windows, Linux, MacOS)
         val DesktopNative = arrayOf(WindowsNative, LinuxNative, MacOSNative)
+        val Web = arrayOf(WebJs, WebWasm)
         val Native = arrayOf(AndroidNative, *DesktopNative)
 
         fun fromInt(value: Int): Platform? = when (value) {
@@ -27,6 +29,7 @@ enum class Platform {
             Windows.ordinal -> Windows
             Linux.ordinal -> Linux
             MacOS.ordinal -> MacOS
+            WebJs.ordinal -> WebJs
             WebWasm.ordinal -> WebWasm
             AndroidNative.ordinal -> AndroidNative
             WindowsNative.ordinal -> WindowsNative

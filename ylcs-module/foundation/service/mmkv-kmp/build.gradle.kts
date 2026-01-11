@@ -32,6 +32,12 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.platform.nativeLibLoader
             )
         }
+
+        webMain.configure(commonMain)
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
     }
 
     override val cocoapodsList: List<Pod> = listOf(

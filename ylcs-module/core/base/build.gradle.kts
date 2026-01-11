@@ -54,12 +54,16 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        wasmJsMain.configure(skikoMain, kotlinMain) {
+        webMain.configure(skikoMain, kotlinMain) {
             lib(
                 ExportLib,
                 libs.kotlinx.broswer
             )
         }
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
 
         androidNativeMain.configure(kotlinMain)
 

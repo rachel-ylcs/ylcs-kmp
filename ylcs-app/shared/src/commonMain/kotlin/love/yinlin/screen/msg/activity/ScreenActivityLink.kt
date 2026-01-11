@@ -32,7 +32,7 @@ class ScreenActivityLink(manager: ScreenManager) : Screen(manager) {
     @Composable
     override fun Content(device: Device) {
         Platform.use(
-            Platform.WebWasm, *Platform.Desktop,
+            *Platform.Web, *Platform.Desktop,
             ifTrue = {
                 UnsupportedPlatformComponent(modifier = Modifier.fillMaxSize())
             },

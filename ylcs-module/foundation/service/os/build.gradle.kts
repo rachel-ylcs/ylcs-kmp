@@ -19,5 +19,11 @@ template(object : KotlinMultiplatformTemplate() {
         iosMain.configure(commonMain)
 
         iosMainList.configure(iosMain)
+
+        webMain.configure(commonMain)
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
     }
 })

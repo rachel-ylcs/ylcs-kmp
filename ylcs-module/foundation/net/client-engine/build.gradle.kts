@@ -40,8 +40,12 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        wasmJsMain.configure(commonMain) {
+        webMain.configure(commonMain) {
             lib(libs.ktor.js)
         }
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
     }
 })

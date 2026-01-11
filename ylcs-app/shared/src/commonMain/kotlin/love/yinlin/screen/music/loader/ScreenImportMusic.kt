@@ -51,7 +51,7 @@ class ScreenImportMusic(manager: ScreenManager, private val deeplink: Uri?) : Sc
 
     private suspend fun loadModFile() {
         Platform.use(
-            Platform.WebWasm,
+            *Platform.Web,
             ifTrue = {
                 slot.tip.warning(UnsupportedPlatformText)
             },

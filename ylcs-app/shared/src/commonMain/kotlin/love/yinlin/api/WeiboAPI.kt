@@ -24,12 +24,12 @@ import love.yinlin.compose.ui.text.buildRichString
 
 @Stable
 data object WeiboAPI {
-	private fun proxy(url: String) = Platform.use(Platform.WebWasm,
+	private fun proxy(url: String) = Platform.use(*Platform.Web,
 		ifTrue = { ClientEngine.proxy(APIConfig.PROXY_NAME, url) },
 		ifFalse = { url }
 	)
 
-	private fun proxyRes(url: String) = Platform.use(Platform.WebWasm,
+	private fun proxyRes(url: String) = Platform.use(*Platform.Web,
 		ifTrue = {
 			val cookie = "SUB=${weiboCookie?.sub};SUBP=${weiboCookie?.subp};XSRF-TOKEN=${weiboCookie?.xsrfToken}"
 			val referer = "https://m.weibo.cn"
@@ -240,7 +240,7 @@ data object WeiboAPI {
 				HttpHeaders.Cookie to "SUB=${cookie.sub};SUBP=${cookie.subp};XSRF-TOKEN=${cookie.xsrfToken}",
 				HttpHeaders.Referrer to "https://m.weibo.cn"
 			)
-			Platform.use(Platform.WebWasm,
+			Platform.use(*Platform.Web,
 				ifTrue = { append("VHeaders", extraHeaders.toJsonString().encodeBase64()) },
 				ifFalse = { appendAll(extraHeaders) }
 			)

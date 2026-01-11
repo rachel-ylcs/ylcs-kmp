@@ -13,16 +13,16 @@
 平台列表如下：
 
 - Android
-
 - IOS
-
 - Windows
-
 - Linux
-
 - MacOS
-
+- WebJs
 - WebWasm
+- AndroidNative
+- WindowsNative
+- LinuxNative
+- MacOSNative
 
 其中`Android`, `IOS`还归属于`Phone`，`Windows`, `Linux`, `MacOS`归属于`Desktop`。
 
