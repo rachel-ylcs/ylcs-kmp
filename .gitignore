@@ -23,6 +23,9 @@ Pods/
 
 # native
 **/.cxx/
+artifacts/**/*.dll
+artifacts/**/*.so
+artifacts/**/*.dylib
 
 # 编译目录
 **/build/
