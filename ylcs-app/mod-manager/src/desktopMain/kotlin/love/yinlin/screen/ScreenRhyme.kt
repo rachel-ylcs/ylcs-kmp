@@ -69,8 +69,8 @@ import love.yinlin.extension.*
 import love.yinlin.platform.Coroutines
 import love.yinlin.util.QrcDecrypter
 import org.jetbrains.compose.resources.Font
-import ylcs_kmp.ylcs_app.mod_manager.generated.resources.Res
-import ylcs_kmp.ylcs_app.mod_manager.generated.resources.music
+import love.yinlin.mod_manager.generated.resources.Res
+import love.yinlin.mod_manager.generated.resources.music
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection

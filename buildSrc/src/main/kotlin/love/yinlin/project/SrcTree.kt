@@ -69,6 +69,13 @@ class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
     val output: Directory = root.outputs.dir("web")
 }
 
+class LandpageNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("landpage") {
+    private val build: Directory = dir("build")
+
+    val originOutput: Directory = build.dir("dist").dir("js").dir("productionExecutable")
+    val output: Directory = root.outputs.dir("landpage")
+}
+
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
     val originOutput: RegularFile = dir("build").dir("libs").file(c.server.outputName)
 }
@@ -91,6 +98,7 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val iosApp = IosAppNode(this, c)
     val desktopApp = DesktopAppNode(this, c)
     val webApp = WebAppNode(this, c)
+    val landpage = LandpageNode(this, c)
     val server = ServerNode(this, c)
     val modManager = ModManagerNode(this, c)
     val libsVersion: RegularFile = file("libs.version.toml")
