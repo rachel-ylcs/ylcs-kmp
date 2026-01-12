@@ -139,7 +139,7 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
                 name.set(uniqueName)
                 description.set(uniqueModuleName)
                 inceptionYear.set("2025")
-                url.set("https://yinlin.love")
+                url.set(C.app.homepage)
                 licenses {
                     license {
                         name.set("MIT License")
