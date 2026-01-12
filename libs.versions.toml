@@ -9,6 +9,7 @@ mavenPublish = "0.35.0"
 # Libs #
 
 # Common
+skiko = "0.9.39"
 lifecycle = "2.10.0-alpha07"
 material3 = "1.11.0-alpha01"
 material3-icon-old = "1.7.3"
@@ -17,7 +18,7 @@ ktor = "3.3.3"
 sketch = "4.4.0-alpha01"
 mmkv = "2.3.0"
 lottie = "2.0.2"
-skiko = "0.9.39"
+cryptography = "0.5.0"
 
 # Android
 cmp-android = "1.10.0"
@@ -103,6 +104,9 @@ tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.1" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
+tool-cryptography = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }
+tool-cryptography-provider = { module = "dev.whyoleg.cryptography:cryptography-provider-optimal", version.ref = "cryptography" }
+tool-cryptography-asn1 = { module = "dev.whyoleg.cryptography:cryptography-serialization-asn1-modules", version.ref = "cryptography" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

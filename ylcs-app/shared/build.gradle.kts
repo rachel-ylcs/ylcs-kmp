@@ -61,6 +61,9 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.tool.blur,
                 libs.tool.reorder,
                 libs.tool.qrcode,
+                libs.tool.cryptography,
+                libs.tool.cryptography.provider,
+                libs.tool.cryptography.asn1,
                 ExportLib,
                 projects.ylcsApp.cs,
                 projects.ylcsModule.foundation.service.os,
@@ -106,6 +109,13 @@ template(object : KotlinMultiplatformTemplate() {
         jsMain.configure(webMain)
 
         wasmJsMain.configure(webMain)
+
+        commonTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test,
+            )
+        }
     }
 
     override fun ComposeCompilerGradlePluginExtension.composeCompiler() {
