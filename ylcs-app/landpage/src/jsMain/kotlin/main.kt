@@ -278,8 +278,24 @@ fun TagConsumer<HTMLElement>.renderFooter() {
     }
 }
 
+private fun setupTailwindcss() = js("""
+{
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Inter', 'system-ui', 'sans-serif'],
+                },
+            }
+        }
+    };
+}
+""")
+
 fun main() {
     window.onload = {
+        setupTailwindcss()
         document.documentElement?.className = "w-full min-h-full m-0 p-0 dark"
         document.body?.apply {
             className = "w-full min-h-full m-0 p-0 ${Styles.globalBg}"
