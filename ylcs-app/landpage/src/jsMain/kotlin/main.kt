@@ -73,8 +73,7 @@ class ScrollAnimationManager(
         val element = document.getElementById(sectionId) as? HTMLElement ?: return
         val rect = element.getBoundingClientRect()
         val windowHeight = window.innerHeight.toDouble()
-        val startTrigger = windowHeight * 0.8
-        val progress = ((startTrigger - rect.top) / (windowHeight + element.clientHeight / 2)).coerceIn(0.0, 1.0)
+        val progress = ((windowHeight - rect.top) / (windowHeight + rect.height)).coerceIn(0.0, 1.0)
         onUpdate(progress)
     }
 }
@@ -101,7 +100,7 @@ fun TagConsumer<HTMLElement>.renderHeader() {
                         }
                     }
                     a(href = "#", classes = "flex items-center space-x-4") {
-                        img(src = "favicon.ico", alt = "logo", classes = "w-auto h-[2em]")
+                        img(src = "favicon.ico", classes = "w-auto h-[2em]")
                         span("font-bold text-xl") { +"银临茶舍" }
                     }
                     div("hidden md:flex space-x-10 font-medium") {
@@ -112,8 +111,9 @@ fun TagConsumer<HTMLElement>.renderHeader() {
                 div("flex items-center space-x-5") {
                     button(classes = "p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors") {
                         onClickFunction = {
-                            val html = document.documentElement
-                            if (html?.classList?.contains("dark") == true) html.classList.remove("dark") else html?.classList?.add("dark")
+                            document.documentElement?.classList?.let {
+                                if (it.contains("dark")) it.remove("dark") else it.add("dark")
+                            }
                         }
                         i("fas fa-moon dark:hidden")
                         i("fas fa-sun hidden dark:block text-yellow-400")
@@ -142,9 +142,7 @@ fun TagConsumer<HTMLElement>.renderHero() {
                     h2(Styles.h2) {
                         span(Styles.primaryGradient) { +"APP跨端版本 上线!" }
                     }
-                    p("${Styles.pLarge} my-6") {
-                        +"集资讯、听歌、美图、社交于一体的小银子聚集地。"
-                    }
+                    p("${Styles.pLarge} my-6") { +"集资讯、听歌、美图、社交于一体的小银子聚集地。" }
                     div("flex flex-wrap gap-4") {
                         button(classes = Styles.btnPrimary) {
                             +"客户端下载"
@@ -160,10 +158,9 @@ fun TagConsumer<HTMLElement>.renderHero() {
                         span("text-gray-500") { +DateEx.TodayString }
                     }
                 }
-
                 div("w-full md:w-1/2 relative") {
                     div("relative z-10 rounded-2xl overflow-hidden shadow-2xl transform md:rotate-2 hover:rotate-0 transition-transform duration-500 border border-gray-200 dark:border-gray-700") {
-                        img(src = "preview.png", alt = "Preview", classes = "aspect-[16/9] object-cover")
+                        img(src = "preview.webp", loading = ImgLoading.lazy, classes = "aspect-[16/9] object-cover")
                     }
                 }
             }
@@ -173,12 +170,10 @@ fun TagConsumer<HTMLElement>.renderHero() {
 
 fun TagConsumer<HTMLElement>.renderSection1() {
     section("py-20 bg-transparent border-b border-gray-300 dark:border-gray-800 transition-colors") {
-        div(Styles.container) {
-            div("flex justify-between items-end mb-12") {
-                div {
-                    h2(Styles.h2) { +"支持平台" }
-                    p("text-gray-500 text-lg") { +"银临茶舍APP是基于Rachel框架开发的多端跨平台APP，目前基本支持了所有主流平台。" }
-                }
+        div("${Styles.container} space-y-6") {
+            h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"支持平台" }
+            div("flex justify-between items-end") {
+                p("text-gray-500 text-lg") { +"银临茶舍APP是基于Rachel框架开发的多端跨平台APP，目前基本支持了所有主流平台。" }
                 a(href = GITHUB_URL, target = ATarget.blank, classes = "text-[#16a34a] font-semibold hover:underline hidden sm:block") { +"查看Github开源代码 >>" }
             }
             div("grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6") {
@@ -202,18 +197,14 @@ fun TagConsumer<HTMLElement>.renderSection1() {
 
 fun TagConsumer<HTMLElement>.renderSection2() {
     section("relative py-20 border-b border-gray-300 dark:border-gray-800 transition-colors z-10") {
-        id = "scroll-trigger-section-2"
-        div(Styles.container + " relative grid grid-cols-1 md:grid-cols-12 gap-12 items-center") {
-            div("md:col-span-4 flex flex-col justify-center order-2 md:order-1") {
+        id = "section-2-container"
+        div( "${Styles.container} relative grid grid-cols-1 md:grid-cols-12 gap-12 items-center") {
+            div("md:col-span-3 space-y-6 flex flex-col justify-center order-2 md:order-1") {
                 id = "text-box-2"
-                h2("text-4xl md:text-6xl font-black text-gray-900 dark:text-emerald-400 mb-6 leading-none") {
-                    +"无损音质听歌"
-                }
-                p("text-xl md:text-2xl text-gray-500 dark:text-gray-400 font-bold tracking-wide leading-relaxed") {
-                    +"曲库包含银临歌曲集中200多首无损曲目，搭配动态播放器畅享音乐人生。"
-                }
+                h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"无损音质听歌" }
+                p("text-lg text-gray-500 dark:text-gray-400 leading-relaxed") { +"曲库包含银临歌曲集中200多首最高音质曲目，搭配动态播放器畅享音乐人生。" }
             }
-            div("md:col-span-8 relative flex items-center justify-center order-1 md:order-2") {
+            div("md:col-span-9 relative flex items-center justify-center order-1 md:order-2") {
                 div("relative w-full aspect-video bg-zinc-200 dark:bg-zinc-800 rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl transition-all duration-75") {
                     id = "monitor-frame"
                     style = "transform: scale(1.1);"
@@ -232,21 +223,143 @@ fun TagConsumer<HTMLElement>.renderSection2() {
 }
 
 fun TagConsumer<HTMLElement>.renderSection3() {
-    section("relative py-20 border-b border-gray-300 dark:border-gray-800 transition-colors z-10") {
-        div(Styles.container) {
-            div("text-center") {
-                h2(Styles.h2) { +"更多功能即将到来" }
-                p(Styles.pLarge + " mx-auto") { +"我们致力于为每一个用户提供最好的跨平台开发体验。" }
+    section("relative py-24 border-b border-gray-300 dark:border-gray-800 transition-all duration-1000 opacity-0 transform translate-y-10 z-10") {
+        id = "section-3-container"
+        div( "${Styles.container} grid grid-cols-1 md:grid-cols-12 items-start") {
+            div("md:col-span-3 space-y-6") {
+                h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"银临最新资讯" }
+                p("text-lg text-gray-500 dark:text-gray-400 leading-relaxed") { +"实时同步微博、超话、抖音等信息流，无需登录也能浏览和下载" }
             }
-            div("grid grid-cols-1 md:grid-cols-3 gap-10 mt-24") {
-                (1..3).forEach { i ->
-                    div("h-80 bg-gray-50 dark:bg-zinc-800/50 rounded-[2rem] border border-gray-100 dark:border-zinc-700 p-10") {
-                        div("w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-2xl flex items-center justify-center mb-8 text-2xl") {
-                            i("fas fa-rocket")
+            div("md:col-span-9 relative h-[500px] md:h-[750px] flex items-center justify-center overflow-visible") {
+                id = "gallery-stack"
+                div("absolute w-[70%] aspect-[12/7] rounded-3xl overflow-hidden shadow-xl border-2 border-white/20 dark:border-zinc-800 transition-transform duration-100 ease-out") {
+                    id = "img-layer-1"
+                    style = "transform: rotate(-10deg) translateX(-45%) translateY(-10%); z-index: 10;"
+                    img(src = "section3_1.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                }
+                div("absolute w-[22%] aspect-[9/20] rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 dark:border-zinc-800 transition-transform duration-100 ease-out") {
+                    id = "img-layer-2"
+                    style = "transform: rotate(15deg) translateX(-110%) translateY(25%); z-index: 20;"
+                    img(src = "section3_2.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                }
+                div("absolute w-[45%] aspect-[12/7] rounded-3xl overflow-hidden shadow-2xl border-2 border-white/20 dark:border-zinc-800 transition-transform duration-100 ease-out") {
+                    id = "img-layer-3"
+                    style = "transform: rotate(8deg) translateX(75%) translateY(-30%); z-index: 15;"
+                    img(src = "section3_3.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                }
+                div("absolute w-[25%] aspect-[9/20] rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 dark:border-zinc-800 transition-transform duration-100 ease-out") {
+                    id = "img-layer-4"
+                    style = "transform: rotate(-12deg) translateX(120%) translateY(15%); z-index: 25;"
+                    img(src = "section3_4.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                }
+                div("absolute w-[32%] aspect-[9/20] rounded-3xl overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.6)] border-4 border-white dark:border-zinc-700 transition-transform duration-100 ease-out") {
+                    id = "img-layer-5"
+                    style = "transform: rotate(0deg) translateX(20%) translateY(0%); z-index: 30;"
+                    img(src = "section3_5.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                }
+            }
+        }
+    }
+}
+
+fun TagConsumer<HTMLElement>.renderSection4() {
+    section("relative py-24 border-b border-gray-300 dark:border-gray-800 transition-colors z-10 overflow-hidden") {
+        id = "section-4-container"
+        div("absolute inset-0 pointer-events-none") {
+            div("absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-blue-500/5 to-transparent blur-3xl") {}
+        }
+        div("${Styles.container} flex flex-col items-center") {
+            div("text-center relative z-20 space-y-6") {
+                h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") {
+                    +"演出活动抢先知"
+                }
+                p("text-lg text-gray-500 dark:text-gray-400 leading-relaxed") { +"银临演出消息灵通，社区丰富氛围轻松" }
+            }
+            div("relative w-full max-w-7xl h-[700px] md:h-[800px] flex justify-center items-start perspective-container -mt-20 -md:mt-30") {
+                style = "perspective: 2500px;"
+                div("grid grid-cols-3 gap-x-16 gap-y-8 md:gap-x-32 md:gap-y-16 transform-style-3d") {
+                    id = "section-4-grid"
+                    style = "transform: rotateX(20deg) rotateZ(-8deg) skewY(2deg) translateX(0%);"
+                    (1..6).forEach { i ->
+                        div("relative w-[180px] h-[380px] md:w-[260px] md:h-[540px] bg-white dark:bg-zinc-900 rounded-[2.5rem] border-[6px] border-gray-200 dark:border-zinc-700 shadow-[0_30px_60px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-100") {
+                            id = "s4-phone-$i"
+                            img(src = "section4_$i.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                            div("absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none") {}
                         }
-                        h4("text-2xl font-bold mb-4") { +"模块 $i" }
-                        p("text-gray-400") { +"占位描述内容，详细功能请关注后续更新。" }
                     }
+                }
+            }
+        }
+    }
+}
+
+fun TagConsumer<HTMLElement>.renderSection5() {
+    section("relative py-32 border-b border-gray-300 dark:border-gray-800 transition-colors z-10 overflow-hidden") {
+        id = "section-5-container"
+        div( "${Styles.container} grid grid-cols-1 md:grid-cols-12 items-start") {
+            div("md:col-span-3 space-y-6 flex flex-col justify-center") {
+                h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"银临美图相册" }
+                p("text-lg text-gray-500 dark:text-gray-400 leading-relaxed") { +"全网演出官摄图集收录，每一张都是绝美壁纸。" }
+                div("flex gap-4 pt-4") {
+                    div("flex flex-col space-y-2") {
+                        span("text-3xl font-black text-emerald-500") { +"1000+" }
+                        span("text-lg text-gray-400 uppercase tracking-tighter") { +"4K超清美图" }
+                    }
+                    div("w-[1px] h-10 bg-gray-200 dark:bg-gray-800")
+                    div("flex flex-col space-y-2") {
+                        span("text-3xl font-black text-blue-500") { +"Realtime" }
+                        span("text-lg text-gray-400 uppercase tracking-tighter") { +"实时更新" }
+                    }
+                }
+            }
+            div("md:col-span-9 relative w-full h-[500px] md:h-[850px] flex items-center justify-center overflow-visible mt-10") {
+                div("absolute top-0 right-[-5%] w-[85%] md:w-[80%] aspect-[3/2] bg-gray-50 dark:bg-zinc-800 rounded-[1rem] lg:rounded-[3rem] shadow-2xl border border-gray-200 dark:border-zinc-700 overflow-hidden z-10 transition-transform duration-75 ease-out") {
+                    id = "s5-card-2"
+                    img(src = "section5_2.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity")
+                }
+                div("absolute bottom-[-5%] left-[-5%] w-[85%] md:w-[80%] aspect-[3/2] bg-white dark:bg-zinc-900 rounded-[1rem] lg:rounded-[3rem] shadow-[0_60px_120px_rgba(0,0,0,0.5)] border border-gray-200 dark:border-zinc-700 overflow-hidden z-20 transition-transform duration-75 ease-out") {
+                    id = "s5-card-1"
+                    img(src = "section5_1.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                }
+            }
+        }
+    }
+}
+
+fun TagConsumer<HTMLElement>.renderSection6() {
+    section("relative py-32 border-b border-gray-300 dark:border-gray-800 transition-colors z-10 overflow-hidden") {
+        id = "section-6-container"
+        div("${Styles.container} flex flex-col lg:flex-row items-center justify-between space-x-0 lg:space-x-12 relative z-10") {
+            div("relative w-full lg:w-[60%] h-[400px] lg:h-[600px] flex items-center justify-center") {
+                id = "s6-visual-group"
+                div("absolute inset-0 bg-slate-100 dark:bg-slate-900/80 border border-gray-300 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden transform-gpu") {
+                    id = "s6-main-card"
+                    div("w-full h-full bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center") {
+                        img(src = "section6_1.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                    }
+                }
+                div("absolute -bottom-6 -right-2 lg:-right-8 w-32 h-64 lg:w-48 lg:h-96 bg-black border-4 border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden z-20 transform-gpu") {
+                    id = "s6-phone-1"
+                    div("w-full h-full bg-slate-800 flex items-center justify-center") {
+                        img(src = "section6_2.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                    }
+                }
+                div("absolute -bottom-12 right-12 lg:right-28 w-32 h-64 lg:w-48 lg:h-96 bg-black border-4 border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden z-10 transform-gpu") {
+                    id = "s6-phone-2"
+                    div("w-full h-full bg-slate-800 flex items-center justify-center") {
+                        img(src = "section6_3.webp", loading = ImgLoading.lazy, classes = "w-full h-full object-cover")
+                    }
+                }
+            }
+            div("w-full lg:w-[30%] relative mt-16 lg:mt-0") {
+                id = "s6-text-content"
+                div("absolute -top-12 -left-12 w-48 h-48 opacity-10 dark:opacity-20 pointer-events-none") {
+                    id = "s6-decor-bg"
+                    i("fa-solid fa-gamepad text-[12rem] text-emerald-500")
+                }
+                div("relative z-20 text-left space-y-6") {
+                    h2("text-4xl md:text-5xl font-black text-gray-900 dark:text-emerald-400") { +"主题游戏世界" }
+                    p("text-lg text-gray-500 dark:text-gray-400 leading-relaxed") { +"各类银临歌曲相关的互动或对抗游戏，享受冲榜的乐趣。在音乐的节奏中体验竞技的快感。" }
                 }
             }
         }
@@ -306,6 +419,9 @@ fun main() {
                     renderSection1()
                     renderSection2()
                     renderSection3()
+                    renderSection4()
+                    renderSection5()
+                    renderSection6()
                     renderFooter()
                 }
             }
@@ -329,18 +445,91 @@ fun main() {
             }
         }
 
-        val section2Manager = ScrollAnimationManager("scroll-trigger-section-2") { progress ->
-            val monitor = document.getElementById("monitor-frame") as HTMLElement
-            val phone = document.getElementById("layer-phone-2") as HTMLElement
-            val currentScale = 1.1 - (progress * 0.2)
+        val section2Manager = ScrollAnimationManager("section-2-container") { progress ->
+            val monitor = document.getElementById("monitor-frame") as? HTMLElement ?: return@ScrollAnimationManager
+            val phone = document.getElementById("layer-phone-2") as? HTMLElement ?: return@ScrollAnimationManager
+            val smoothProgress = (progress * 1.5).coerceIn(0.0, 1.0)
+            val currentScale = 1.1 - (smoothProgress * 0.2)
             monitor.style.transform = "scale($currentScale)"
-            val phoneX = 150 - (progress * 300)
+            val phoneX = 150 - (smoothProgress * 300)
             phone.style.transform = "translateX(${phoneX.coerceAtLeast(0.0)}vw)"
-            phone.style.opacity = "${(progress * 6.0).coerceAtMost(1.0)}"
+            phone.style.opacity = "${(smoothProgress * 6.0).coerceAtMost(1.0)}"
+        }
+
+        val section3Manager = ScrollAnimationManager("section-3-container") { progress ->
+            val container = document.getElementById("section-3-container") as HTMLElement
+            val l1 = document.getElementById("img-layer-1") as HTMLElement
+            val l2 = document.getElementById("img-layer-2") as HTMLElement
+            val l3 = document.getElementById("img-layer-3") as HTMLElement
+            val l4 = document.getElementById("img-layer-4") as HTMLElement
+            val l5 = document.getElementById("img-layer-5") as HTMLElement
+
+            val opacity = (progress * 2).coerceIn(0.0, 1.0)
+            container.style.opacity = opacity.toString()
+            container.style.transform = "translateY(${(1.0 - opacity) * 50}px)"
+
+            val offset = progress * 100
+            l1.style.transform = "rotate(${-10 + progress * 2}deg) translateX(${-45 + progress * 5}%) translateY(${offset * 0.3}px)"
+            l2.style.transform = "rotate(${15 - progress * 5}deg) translateX(${-110 + progress * 15}%) translateY(${-offset * 0.2}px)"
+            l3.style.transform = "rotate(${8 + progress * 2}deg) translateX(${75 - progress * 10}%) translateY(${-offset * 0.5}px)"
+            l4.style.transform = "rotate(${-12 + progress * 4}deg) translateX(${120 - progress * 15}%) translateY(${offset * 0.4}px)"
+            l5.style.transform = "rotate(${0 - progress * 2}deg) translateX(${20 - progress * 5}%) translateY(${-offset * 0.1}px)"
+        }
+
+        val section4Manager = ScrollAnimationManager("section-4-container") { progress ->
+            val grid = document.getElementById("section-4-grid") as? HTMLElement ?: return@ScrollAnimationManager
+            val containerY = (0.5 - progress) * 100
+            grid.style.transform = "rotateX(20deg) rotateZ(-8deg) skewY(2deg) translateX(0%) translateY(${containerY}px)"
+            (1..6).forEach { i ->
+                val phone = document.getElementById("s4-phone-$i") as? HTMLElement ?: return@forEach
+                val wave = kotlin.math.sin(progress * 4.0 + i * 0.8) * 20
+                val lift = (1.0 - progress) * 100
+                phone.style.transform = "translateY(${wave + lift}px)"
+            }
+        }
+
+        val section5Manager = ScrollAnimationManager("section-5-container") { progress ->
+            val card1 = document.getElementById("s5-card-1") as? HTMLElement ?: return@ScrollAnimationManager
+            val card2 = document.getElementById("s5-card-2") as? HTMLElement ?: return@ScrollAnimationManager
+            val offset = (progress - 0.5) * 120
+
+            card1.style.transform = "translateY(${-offset}px) translateX(${offset * 0.5}px)"
+            card2.style.transform = "translateY(${offset}px) translateX(${-offset * 0.5}px)"
+        }
+
+        val section6Manager = ScrollAnimationManager("section-6-container") { progress ->
+            val mainCard = document.getElementById("s6-main-card") as? HTMLElement ?: return@ScrollAnimationManager
+            val phone1 = document.getElementById("s6-phone-1") as? HTMLElement ?: return@ScrollAnimationManager
+            val phone2 = document.getElementById("s6-phone-2") as? HTMLElement ?: return@ScrollAnimationManager
+            val textContent = document.getElementById("s6-text-content") as? HTMLElement ?: return@ScrollAnimationManager
+            val decorBg = document.getElementById("s6-decor-bg") as? HTMLElement ?: return@ScrollAnimationManager
+
+            val mainOpacity = (progress * 2.0).coerceIn(0.0, 1.0)
+            val mainScale = 0.9 + (progress * 0.1).coerceAtMost(0.1)
+            val mainTranslate = (1.0 - progress) * 60
+            mainCard.style.transform = "scale($mainScale) translateY(${mainTranslate}px)"
+
+            val p1Progress = (progress * 1.5).coerceIn(0.0, 1.0)
+            val p1Translate = (1.0 - p1Progress) * 50
+            phone1.style.transform = "translateY(${p1Translate}px) rotate(5deg)"
+
+            val p2Progress = (progress * 1.3 - 0.1).coerceIn(0.0, 1.0)
+            val p2Translate = (1.0 - p2Progress) * 150
+            phone2.style.transform = "translateY(${p2Translate}px) rotate(-3deg)"
+
+            val textAlpha = (progress * 1.8 - 0.4).coerceIn(0.0, 1.0)
+            textContent.style.transform = "translateX(${(1.0 - textAlpha) * 40}px)"
+
+            val decorRotate = progress * 180.0
+            decorBg.style.transform = "rotate(${decorRotate}deg)"
         }
 
         window.onscroll = {
             section2Manager.handleScroll()
+            section3Manager.handleScroll()
+            section4Manager.handleScroll()
+            section5Manager.handleScroll()
+            section6Manager.handleScroll()
         }
     }
 }
