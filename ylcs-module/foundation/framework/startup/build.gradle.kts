@@ -8,6 +8,10 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(

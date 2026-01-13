@@ -7,12 +7,19 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
+    override val androidNativeTarget: Boolean = true
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
+        val posixMain by create(commonMain)
+
         val jvmMain by create(commonMain)
 
         androidMain.configure(jvmMain)
 
-        iosMain.configure(commonMain)
+        iosMain.configure(posixMain)
 
         iosMainList.configure(iosMain)
 
@@ -23,5 +30,13 @@ template(object : KotlinMultiplatformTemplate() {
         jsMain.configure(webMain)
 
         wasmJsMain.configure(webMain)
+
+        androidNativeMain.configure(posixMain)
+
+        windowsMain.configure(commonMain)
+
+        linuxMain.configure(posixMain)
+
+        macosMain.configure(posixMain)
     }
 })
