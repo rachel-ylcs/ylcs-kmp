@@ -133,6 +133,12 @@ kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 # Web
 ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 
+# AndroidNative
+ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+
+# Windows
+ktor-windows = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
+
 # Server
 ktor-server = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
 ktor-server-host = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }

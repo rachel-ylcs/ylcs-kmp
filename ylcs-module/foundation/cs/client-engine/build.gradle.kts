@@ -8,6 +8,11 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
+    override val androidNativeTarget: Boolean = true
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
@@ -21,23 +26,19 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         androidMain.configure(commonMain) {
-            lib(
-                ExportLib,
-                libs.ktor.okhttp,
-            )
+            lib(libs.ktor.okhttp)
         }
 
-        iosMain.configure(commonMain) {
+        val appleMain by create(commonMain) {
             lib(libs.ktor.apple)
         }
+
+        iosMain.configure(appleMain)
 
         iosMainList.configure(iosMain)
 
         desktopMain.configure(commonMain) {
-            lib(
-                ExportLib,
-                libs.ktor.okhttp,
-            )
+            lib(libs.ktor.okhttp)
         }
 
         webMain.configure(commonMain) {
@@ -47,5 +48,19 @@ template(object : KotlinMultiplatformTemplate() {
         jsMain.configure(webMain)
 
         wasmJsMain.configure(webMain)
+
+        androidNativeMain.configure(commonMain) {
+            lib(libs.ktor.cio)
+        }
+
+        windowsMain.configure(commonMain) {
+            lib(libs.ktor.windows)
+        }
+
+        linuxMain.configure(commonMain) {
+            lib(libs.ktor.cio)
+        }
+
+        macosMain.configure(appleMain)
     }
 })
