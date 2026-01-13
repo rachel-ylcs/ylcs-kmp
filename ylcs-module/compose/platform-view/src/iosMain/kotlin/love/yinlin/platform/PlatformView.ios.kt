@@ -2,6 +2,7 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitInteropInteractionMode
 import androidx.compose.ui.viewinterop.UIKitInteropProperties
@@ -20,6 +21,7 @@ abstract class PlatformView<T : UIView> {
     protected var view: T? = null
     private val lock = SynchronizedObject()
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun Content(modifier: Modifier = Modifier) {
         UIKitView(
@@ -37,7 +39,8 @@ abstract class PlatformView<T : UIView> {
                     view = null
                 }
             },
-            properties = UIKitInteropProperties(interactionMode = UIKitInteropInteractionMode.NonCooperative)
+            // https://kotlinlang.org/docs/multiplatform/whats-new-compose-110.html#overlay-placement-for-interop-views
+            properties = UIKitInteropProperties(interactionMode = UIKitInteropInteractionMode.NonCooperative, placedAsOverlay = true)
         )
     }
 }
