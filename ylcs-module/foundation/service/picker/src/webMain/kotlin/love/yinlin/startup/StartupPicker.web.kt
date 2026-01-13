@@ -1,7 +1,6 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
 import kotlinx.browser.document
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
@@ -31,7 +30,6 @@ import kotlin.js.JsArray
 import kotlin.js.toJsArray
 import kotlin.js.toList
 
-@Stable
 actual class StartupPicker : SyncStartup() {
     actual override fun init(context: Context, args: StartupArgs) {}
 

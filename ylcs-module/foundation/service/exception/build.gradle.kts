@@ -1,8 +1,6 @@
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
-        libs.plugins.composeMultiplatform,
-        libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
@@ -10,6 +8,11 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
+    override val androidNativeTarget: Boolean = true
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
@@ -33,5 +36,15 @@ template(object : KotlinMultiplatformTemplate() {
         jsMain.configure(webMain)
 
         wasmJsMain.configure(webMain)
+
+        nativeMain.configure(commonMain)
+
+        androidNativeMain.configure(nativeMain)
+
+        windowsMain.configure(nativeMain)
+
+        linuxMain.configure(nativeMain)
+
+        macosMain.configure(nativeMain)
     }
 })

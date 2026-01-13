@@ -1,11 +1,9 @@
 package love.yinlin
 
-import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-@Stable
 class StartupDelegate<S : Startup>(
     type: StartupType,
     val priority: Int,

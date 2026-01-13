@@ -1,6 +1,5 @@
 package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
 import love.yinlin.platform.*
 import love.yinlin.Context
 import love.yinlin.StartupArg
@@ -8,7 +7,6 @@ import love.yinlin.StartupArgs
 import love.yinlin.SyncStartup
 
 @StartupArg(index = 0, name = "appName", type = String::class)
-@Stable
 class StartupOS : SyncStartup() {
     lateinit var application: OSApplication
         private set

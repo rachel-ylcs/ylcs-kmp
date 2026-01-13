@@ -1,6 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
 import love.yinlin.Context
 import love.yinlin.extension.deleteRecursively
@@ -12,7 +11,6 @@ import platform.Foundation.NSSearchPathDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSUserDomainMask
 
-@Stable
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
     override val appPath: Path get() = unsupportedPlatform()
 

@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.asSink
@@ -26,7 +25,6 @@ import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import java.util.UUID
 
-@Stable
 actual class StartupPicker : SyncStartup() {
     private lateinit var activity: ComponentActivity
     private lateinit var resolver: ContentResolver

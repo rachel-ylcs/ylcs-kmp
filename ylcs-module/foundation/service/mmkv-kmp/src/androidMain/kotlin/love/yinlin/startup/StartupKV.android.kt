@@ -1,6 +1,5 @@
 package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
 import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVLogLevel
 import kotlinx.io.files.Path
@@ -10,7 +9,6 @@ import love.yinlin.StartupFetcher
 import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
-@Stable
 actual class StartupKV : SyncStartup() {
     lateinit var mmkv: MMKV
 

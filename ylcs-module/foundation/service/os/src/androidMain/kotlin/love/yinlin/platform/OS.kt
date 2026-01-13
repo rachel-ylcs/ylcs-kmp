@@ -2,11 +2,9 @@ package love.yinlin.platform
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.Stable
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toAndroidUri
 
-@Stable
 internal data object OSUtil {
     fun openUri(context: Context, uri: Uri) {
         val intent = Intent(Intent.ACTION_VIEW, uri.toAndroidUri())

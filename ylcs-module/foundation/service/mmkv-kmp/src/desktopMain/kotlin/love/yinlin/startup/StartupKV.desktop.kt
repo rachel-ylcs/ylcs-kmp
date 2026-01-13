@@ -1,6 +1,5 @@
 package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
 import love.yinlin.Context
 import love.yinlin.StartupArgs
@@ -13,7 +12,6 @@ import love.yinlin.platform.*
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 @StartupNative
 @NativeLib
-@Stable
 actual class StartupKV : SyncStartup() {
     companion object {
         init {

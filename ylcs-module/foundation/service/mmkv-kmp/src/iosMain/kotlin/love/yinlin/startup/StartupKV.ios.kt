@@ -1,6 +1,5 @@
 package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
 import cocoapods.MMKV.MMKV
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.files.Path
@@ -13,7 +12,6 @@ import love.yinlin.SyncStartup
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 @OptIn(ExperimentalForeignApi::class)
-@Stable
 actual class StartupKV : SyncStartup() {
     lateinit var mmkv: MMKV
 

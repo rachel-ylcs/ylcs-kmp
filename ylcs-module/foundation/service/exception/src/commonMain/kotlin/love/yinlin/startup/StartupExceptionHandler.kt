@@ -1,6 +1,5 @@
 package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
 import love.yinlin.Context
 import love.yinlin.StartupArg
 import love.yinlin.StartupArgs
@@ -15,9 +14,7 @@ import love.yinlin.SyncStartup
     returnType = Unit::class,
     String::class, Throwable::class, String::class
 )
-@Stable
 expect class StartupExceptionHandler() : SyncStartup {
-    @Stable
     fun interface Handler {
         fun handle(key: String, e: Throwable, error: String)
     }

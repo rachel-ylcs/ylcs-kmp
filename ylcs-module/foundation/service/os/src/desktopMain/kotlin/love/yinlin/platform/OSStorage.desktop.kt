@@ -1,6 +1,5 @@
 package love.yinlin.platform
 
-import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
 import love.yinlin.Context
 import love.yinlin.extension.deleteRecursively
@@ -9,7 +8,6 @@ import love.yinlin.extension.size
 import love.yinlin.extension.toNioPath
 import java.nio.file.Files
 
-@Stable
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {
     override val appPath: Path = run {
         val workingDir = Path(System.getProperty("user.dir"))

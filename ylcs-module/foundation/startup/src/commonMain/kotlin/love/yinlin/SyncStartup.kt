@@ -1,9 +1,7 @@
 package love.yinlin
 
-import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 
-@Stable
 abstract class SyncStartup : Startup() {
     override fun toString(): String = "(Sync|${this::class.qualifiedName})"
 

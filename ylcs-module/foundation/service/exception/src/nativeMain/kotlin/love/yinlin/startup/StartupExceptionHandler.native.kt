@@ -5,6 +5,7 @@ import love.yinlin.StartupArg
 import love.yinlin.StartupArgs
 import love.yinlin.StartupHandler
 import love.yinlin.SyncStartup
+import kotlin.experimental.ExperimentalNativeApi
 
 @StartupArg(index = 0, name = "crashKey", type = String::class)
 @StartupHandler(
@@ -23,10 +24,11 @@ actual class StartupExceptionHandler : SyncStartup() {
 
     actual val crashKey: String get() = mCrashKey
 
+    @OptIn(ExperimentalNativeApi::class)
     actual override fun init(context: Context, args: StartupArgs) {
         mCrashKey = args[0]
         val handler: Handler = args[1]
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+        setUnhandledExceptionHook { e ->
             handler.handle(crashKey, e, e.stackTraceToString())
         }
     }

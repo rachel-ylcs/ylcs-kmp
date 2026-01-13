@@ -3,9 +3,7 @@ package love.yinlin
 import android.app.Application
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultRegistry
-import androidx.compose.runtime.Stable
 
-@Stable
 actual class Context actual constructor(delegate: PlatformContextDelegate) {
     // 在 init 后可用
     val application: Application = delegate
