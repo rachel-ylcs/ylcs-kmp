@@ -98,7 +98,7 @@ object MainPage : Page {
         window.onscroll = {}
     }
 
-    private fun TagConsumer<HTMLElement>.renderHero() {
+    private fun TagConsumer<HTMLElement>.renderSection0() {
         section(Styles.section) {
             id = "section-0-container"
             div {
@@ -331,7 +331,7 @@ object MainPage : Page {
     }
 
     override fun TagConsumer<HTMLElement>.render() {
-        renderHero()
+        renderSection0()
         renderSection1()
         renderSection2()
         renderSection3()

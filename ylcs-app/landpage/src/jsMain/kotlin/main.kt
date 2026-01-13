@@ -3,11 +3,18 @@ import kotlinx.browser.window
 import kotlinx.html.*
 import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
+import love.yinlin.uri.Uri
 import org.w3c.dom.HTMLElement
 
 var currentPage: Page? = null
 
-fun navigate(page: Page) {
+fun navigate(pageName: String) {
+    val page = when (pageName) {
+        DocPage::class.simpleName -> DocPage
+        RecruitmentPage::class.simpleName -> RecruitmentPage
+        else -> MainPage
+    }
+
     document.getElementById("root")?.let { root ->
         currentPage?.onDestroy()
         root.innerHTML = ""
@@ -16,8 +23,11 @@ fun navigate(page: Page) {
         root.append {
             with(page) { render() }
         }
+        window.history.pushState(null, "", "?page=${page::class.simpleName!!}")
     }
 }
+
+fun navigate(page: Page) = navigate(page::class.simpleName!!)
 
 private fun setupTailwindcss() = js("""
 {
@@ -146,6 +156,8 @@ fun TagConsumer<HTMLElement>.renderFooter() {
 }
 
 fun main() {
+    val page = Uri.parse(window.location.href)?.params?.get("page")
+
     window.onload = {
         setupTailwindcss()
         document.documentElement?.className = "w-full min-h-full m-0 p-0 dark"
@@ -169,6 +181,6 @@ fun main() {
             }
         }
 
-        navigate(MainPage)
+        page?.let(::navigate) ?: navigate(MainPage)
     }
 }
