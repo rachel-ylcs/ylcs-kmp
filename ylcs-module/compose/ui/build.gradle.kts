@@ -24,7 +24,6 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.compose.material3,
                 libs.compose.material3.icons,
                 libs.compose.material3.iconsExtended,
-                libs.compose.ui,
             )
         }
 

@@ -25,6 +25,12 @@ template(object : KotlinMultiplatformTemplate() {
 
         iosMainList.configure(iosMain)
 
+        desktopMain.configure(commonMain) {
+            lib(
+                composeOSLib
+            )
+        }
+
         webMain.configure(commonMain)
 
         jsMain.configure(webMain)

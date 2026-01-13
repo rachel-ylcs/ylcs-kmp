@@ -16,7 +16,7 @@ template(object : KotlinMultiplatformTemplate() {
                 ExportLib,
                 projects.ylcsModule.core.base,
                 libs.compose.runtime,
-                libs.compose.foundation,
+                libs.compose.ui,
                 libs.compose.collection,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
@@ -50,12 +50,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         iosMainList.configure(iosMain)
 
-        desktopMain.configure(skikoMain) {
-            lib(
-                ExportLib,
-                composeOSLib
-            )
-        }
+        desktopMain.configure(skikoMain)
 
         webMain.configure(skikoMain)
 
