@@ -46,7 +46,7 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 projects.ylcsApp.mod,
-                projects.ylcsModule.foundation.net.clientEngine,
+                projects.ylcsModule.foundation.cs.clientEngine,
                 projects.ylcsModule.foundation.service.exception,
                 projects.ylcsModule.foundation.service.mmkvKmp,
                 projects.ylcsModule.compose.platformView,

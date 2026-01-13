@@ -18,7 +18,7 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.compose.components.resources,
                 libs.compose.navigation.event,
                 ExportLib,
-                projects.ylcsModule.foundation.framework.context,
+                projects.ylcsModule.foundation.context,
                 projects.ylcsModule.compose.device,
                 projects.ylcsModule.compose.theme,
                 libs.compose.material3,

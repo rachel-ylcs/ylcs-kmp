@@ -15,7 +15,7 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                projects.ylcsModule.foundation.net.clientEngine,
+                projects.ylcsModule.foundation.cs.clientEngine,
                 libs.sketch,
                 libs.sketch.http,
                 libs.sketch.resources,
@@ -25,7 +25,7 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.sketch.zoom,
                 libs.compose.components.resources,
                 ExportLib,
-                projects.ylcsModule.foundation.framework.startup,
+                projects.ylcsModule.foundation.startup,
                 projects.ylcsModule.compose.ui,
             )
         }
