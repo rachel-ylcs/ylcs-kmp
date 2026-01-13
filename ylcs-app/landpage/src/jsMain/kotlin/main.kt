@@ -3,8 +3,6 @@ import kotlinx.browser.window
 import kotlinx.html.*
 import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
 var currentPage: Page? = null
@@ -37,16 +35,44 @@ private fun setupTailwindcss() = js("""
 """)
 
 fun TagConsumer<HTMLElement>.renderHeaderMenu() {
-    a(href = DOWNLOAD_URL, target = ATarget.blank, classes = Styles.link) { +"客户端下载" }
-    a(href = WEBAPP_URL, classes = Styles.link) { +"网页版" }
-    button(classes = Styles.link) {
-        +"使用教程"
-        onClickFunction = { navigate(DocPage) }
+    val hideMenu = {
+        document.getElementById("mobile-menu")?.classList?.add("hidden") ?: Unit
     }
-    a(href = GITHUB_URL, target = ATarget.blank, classes = Styles.link) { +"Github开源" }
-    button(classes = Styles.link) {
+
+    div(classes = Styles.link) {
+        +"客户端下载"
+        onClickFunction = {
+            window.open(DOWNLOAD_URL, ATarget.blank)
+            hideMenu()
+        }
+    }
+    div(classes = Styles.link) {
+        +"网页版"
+        onClickFunction = {
+            window.open(WEBAPP_URL, ATarget.blank)
+            hideMenu()
+        }
+    }
+    div(classes = Styles.link) {
+        +"使用教程"
+        onClickFunction = {
+            navigate(DocPage)
+            hideMenu()
+        }
+    }
+    div(classes = Styles.link) {
+        +"Github开源"
+        onClickFunction = {
+            window.open(GITHUB_URL, ATarget.blank)
+            hideMenu()
+        }
+    }
+    div(classes = Styles.link) {
         +"茶舍招新"
-        onClickFunction = { navigate(RecruitmentPage) }
+        onClickFunction = {
+            navigate(RecruitmentPage)
+            hideMenu()
+        }
     }
 }
 
@@ -58,6 +84,10 @@ fun TagConsumer<HTMLElement>.renderHeader() {
                     button(classes = "md:hidden mr-5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors") {
                         id = "mobile-menu-btn"
                         i("fas fa-bars text-lg")
+                        onClickFunction = {
+                            it.stopPropagation()
+                            document.getElementById("mobile-menu")?.classList?.toggle("hidden")
+                        }
                     }
                     button(classes = "flex items-center md:mr-10 space-x-4") {
                         onClickFunction = { navigate(MainPage) }
@@ -133,20 +163,10 @@ fun main() {
             }
         }
 
-        val mobileMenuBtn = document.getElementById("mobile-menu-btn") as HTMLButtonElement
-        val mobileMenu = document.getElementById("mobile-menu") as HTMLDivElement
-
-        mobileMenuBtn.onclick = { event ->
-            event.stopPropagation()
-            mobileMenu.classList.toggle("hidden")
-        }
-
-        mobileMenu.onclick = { event ->
-            event.stopPropagation()
-        }
-
         window.onclick = {
-            if (!mobileMenu.classList.contains("hidden")) mobileMenu.classList.add("hidden")
+            document.getElementById("mobile-menu")?.classList?.let {
+                if (!it.contains("hidden")) it.add("hidden")
+            }
         }
 
         navigate(MainPage)
