@@ -117,4 +117,4 @@
 
 # ----------------------------------------- App ----------------------------------------------- #
 
--keep class * extends love.yinlin.api.APIRes
+-keep class * extends love.yinlin.cs.APIRes

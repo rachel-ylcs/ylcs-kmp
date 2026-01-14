@@ -37,7 +37,7 @@ extern "C" {
         return JNI_VERSION_1_6;
     }
 
-	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_NativePickerKt_openFileDialog(
+	JNIEXPORT jstring JNICALL Java_love_yinlin_startup_NativePickerKt_openFileDialog(
 		JNIEnv* env,
 		jobject,
 		jlong parent,
@@ -65,7 +65,7 @@ extern "C" {
 		return nullptr;
 	}
 
-	JNIEXPORT jobjectArray JNICALL Java_love_yinlin_platform_NativePickerKt_openMultipleFileDialog(
+	JNIEXPORT jobjectArray JNICALL Java_love_yinlin_startup_NativePickerKt_openMultipleFileDialog(
 		JNIEnv* env,
 		jobject,
 		jlong parent,
@@ -107,7 +107,7 @@ extern "C" {
 		return arr;
 	}
 
-	JNIEXPORT jstring JNICALL Java_love_yinlin_platform_NativePickerKt_saveFileDialog(
+	JNIEXPORT jstring JNICALL Java_love_yinlin_startup_NativePickerKt_saveFileDialog(
 		JNIEnv* env,
 		jobject,
 		jlong parent,
