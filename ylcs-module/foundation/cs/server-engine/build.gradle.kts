@@ -3,6 +3,7 @@ plugins {
         libs.plugins.kotlinJvm,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 

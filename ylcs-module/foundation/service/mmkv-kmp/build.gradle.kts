@@ -5,6 +5,7 @@ plugins {
         libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 

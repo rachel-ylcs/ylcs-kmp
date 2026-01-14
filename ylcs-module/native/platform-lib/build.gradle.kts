@@ -5,6 +5,7 @@ plugins {
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 

@@ -2,6 +2,7 @@ plugins {
     install(
         libs.plugins.kotlinJvm,
         libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 

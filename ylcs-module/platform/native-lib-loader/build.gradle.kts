@@ -3,6 +3,7 @@ plugins {
         libs.plugins.kotlinMultiplatform,
         libs.plugins.androidLibraryNew,
         libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 
