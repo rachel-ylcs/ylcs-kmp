@@ -38,7 +38,7 @@ jobs:
       - name: Build Dokka
         run: |
           mkdir -p ylcs-docs/docs/overrides
-          ./gradlew :dokkaGenerateHtml
+          ./gradlew dokkaGenerateHtml
 
       - uses: actions/cache@v4
         with:
