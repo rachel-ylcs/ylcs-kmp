@@ -39,3 +39,6 @@ config/secret/
 **/config.json
 *.properties
 !**/gradle-wrapper.properties
+
+# 文档
+ylcs-docs/docs/overrides/dokka

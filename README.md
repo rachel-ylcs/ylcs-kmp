@@ -46,8 +46,11 @@
 ```kotlin
 implementation("love.yinlin.compose:app:x.x.x")
 ```
-更多模块详情可见：
-### [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
+
+### 入门指引文档: [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
+
+### API文档: [模块API合集](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)
+
 
 # 案例：银临茶舍跨平台 App
 

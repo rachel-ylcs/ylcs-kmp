@@ -47,8 +47,10 @@ the simplest application can only import the app module (note the version number
 ```kotlin
 implementation("love.yinlin.compose:app:x.x.x")
 ```
-More details of the module can be found here:
-### [Rachel Framework Development Guidance](https://rachel-ylcs.github.io/ylcs-kmp)
+
+### Getting Started Documentation: [Rachel Framework Development Wizard](https://rachel-ylcs.github.io/ylcs-kmp)
+
+### API Documentation: [Module API](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)
 
 # Sample: 银临茶舍 Cross-Platform App
 

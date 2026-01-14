@@ -10,6 +10,7 @@ import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.HasKotlinDependencies
@@ -127,9 +128,29 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
             dependsOn(generateTask)
         }
     }
+}
 
-    // 发布 maven
-    fun Project.publishMaven() {
+inline fun <reified T : KotlinBaseExtension> Project.template(t: KotlinTemplate<T>) {
+    t.internalBackendInfo = BackendInfo(C.namespace, this.path, this.layout.projectDirectory.asFile.absolutePath).also {
+        group = it.uniqueGroupName
+        version = C.app.version
+    }
+
+    with(t) {
+        extensions.configure<T> {
+            build(this)
+        }
+
+        // Dokka
+        extensions.findByType<DokkaExtension>()?.apply {
+            dokkaPublications.named("html") {
+                moduleName.set(t.uniqueModuleName)
+                moduleVersion.set(C.app.versionName)
+                failOnWarning.set(false)
+            }
+        }
+
+        // Maven
         extensions.findByType<MavenPublishBaseExtension>()?.apply {
             publishToMavenCentral()
             signAllPublications()
@@ -161,20 +182,5 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
                 }
             }
         }
-    }
-}
-
-inline fun <reified T : KotlinBaseExtension> Project.template(t: KotlinTemplate<T>) {
-    t.internalBackendInfo = BackendInfo(C.namespace, this.path, this.layout.projectDirectory.asFile.absolutePath).also {
-        group = it.uniqueGroupName
-        version = C.app.version
-    }
-
-    with(t) {
-        extensions.configure<T> {
-            build(this)
-        }
-
-        publishMaven()
     }
 }

@@ -16,7 +16,12 @@ class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("c
     val androidKey: RegularFile = secret.file("androidKey.jks")
 }
 
-class DocsNode(root: RootProjectNode) : Directory by root.dir("docs")
+class DocsNode(root: RootProjectNode) : Directory by root.dir("ylcs-docs") {
+    val mkdocs: RegularFile = file("mkdocs.yml")
+    val docs: Directory = dir("docs")
+    val overrides: Directory = docs.dir("overrides")
+    val dokka: Directory = overrides.dir("dokka")
+}
 
 class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 
