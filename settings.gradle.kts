@@ -56,9 +56,9 @@ include(
     "ylcs-module:foundation:service:picker",
     "ylcs-module:foundation:startup",
     "ylcs-module:native:platform-lib",
-    "ylcs-module:platform:kotlin-ffi",
-    "ylcs-module:platform:kotlin-ffi-posix",
-    "ylcs-module:platform:kotlin-ffi-win32",
+    "ylcs-module:platform:ffi:core",
+    "ylcs-module:platform:ffi:posix",
+    "ylcs-module:platform:ffi:win32",
     "ylcs-module:platform:native-lib-loader",
 
     /* -----------------  应用模块  ----------------- */

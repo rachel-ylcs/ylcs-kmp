@@ -10,8 +10,8 @@ template(object : KotlinJvmTemplate() {
     override fun KotlinJvmSourceSetsScope.source() {
         main.configure {
             lib(
-                projects.ylcsModule.platform.kotlinFfiWin32,
-                projects.ylcsModule.platform.kotlinFfiPosix,
+                projects.ylcsModule.platform.ffi.posix,
+                projects.ylcsModule.platform.ffi.win32,
             )
         }
     }
