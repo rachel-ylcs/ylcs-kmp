@@ -1,4 +1,4 @@
-package = love.yinlin.win32
+package = love.yinlin.native.win32
 language = C
 
 ---

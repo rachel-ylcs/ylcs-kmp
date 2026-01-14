@@ -55,7 +55,7 @@ include(
     "ylcs-module:foundation:service:os",
     "ylcs-module:foundation:service:picker",
     "ylcs-module:foundation:startup",
-    "ylcs-module:native:platform-lib",
+    "ylcs-module:native:win32:core",
     "ylcs-module:platform:ffi:core",
     "ylcs-module:platform:ffi:posix",
     "ylcs-module:platform:ffi:win32",

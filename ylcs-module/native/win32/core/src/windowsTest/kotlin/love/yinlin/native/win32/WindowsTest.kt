@@ -1,7 +1,5 @@
-package love.yinlin
+package love.yinlin.native.win32
 
-import love.yinlin.win32.DriverInfo
-import love.yinlin.win32.StandardPath
 import kotlin.test.Test
 
 class WindowsTest {

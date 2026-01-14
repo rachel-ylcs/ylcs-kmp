@@ -1,5 +1,5 @@
 @file:OptIn(ExperimentalForeignApi::class)
-package love.yinlin.win32
+package love.yinlin.native.win32
 
 import kotlinx.cinterop.*
 import platform.windows.*
