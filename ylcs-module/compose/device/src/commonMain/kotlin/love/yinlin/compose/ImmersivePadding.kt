@@ -14,6 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import love.yinlin.compose.extension.localComposition
+import love.yinlin.compose.extension.rememberRefState
 
 @Stable
 data class ImmersivePadding(

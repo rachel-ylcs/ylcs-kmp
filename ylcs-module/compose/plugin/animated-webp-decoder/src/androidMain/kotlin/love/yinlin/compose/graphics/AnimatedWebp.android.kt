@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.asAndroidColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toAndroidRectF
-import love.yinlin.data.compose.ImageFormat
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.compose.data.ImageFormat
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.catchingNull
 import androidx.core.graphics.createBitmap
 import love.yinlin.platform.NativeLibLoader

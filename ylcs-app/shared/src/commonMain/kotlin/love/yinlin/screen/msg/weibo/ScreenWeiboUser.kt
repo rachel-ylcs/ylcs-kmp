@@ -21,13 +21,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
-import love.yinlin.collection.StableList
-import love.yinlin.collection.toStableList
-import love.yinlin.compose.*
-import love.yinlin.data.compose.ItemKey
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.collection.StableList
+import love.yinlin.compose.collection.toStableList
+import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.data.Picture
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.compose.Picture
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
@@ -46,6 +49,8 @@ import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
+import love.yinlin.coroutines.Coroutines
+import love.yinlin.cs.NetClient
 
 @Composable
 private fun UserInfoCard(

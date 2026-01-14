@@ -14,7 +14,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState

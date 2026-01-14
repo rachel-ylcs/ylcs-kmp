@@ -4,6 +4,7 @@ import android.media.AudioAttributes
 import android.media.SoundPool
 import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
 
 actual class SoundPlayer {

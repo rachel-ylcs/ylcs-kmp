@@ -2,6 +2,7 @@ package love.yinlin
 
 import android.content.Intent
 import android.os.Build
+import love.yinlin.compose.ComposeApplication
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri

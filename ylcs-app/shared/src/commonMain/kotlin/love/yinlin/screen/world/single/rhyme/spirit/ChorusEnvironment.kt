@@ -7,13 +7,13 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import love.yinlin.compose.Colors
-import love.yinlin.compose.Path
+import love.yinlin.compose.extension.Path
+import love.yinlin.compose.extension.translate
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.TextDrawer
 import love.yinlin.compose.game.animation.ReverseCurveFrameAnimation
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Spirit
-import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 

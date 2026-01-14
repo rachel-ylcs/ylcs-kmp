@@ -18,15 +18,18 @@ import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.common.Paths
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.uri.ImplicitUri
-import love.yinlin.compose.*
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.crop
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.MimeType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
@@ -38,6 +41,7 @@ import love.yinlin.compose.ui.floating.FloatingDialogCrop
 import love.yinlin.compose.ui.image.ReplaceableImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.mkdir
@@ -45,7 +49,6 @@ import love.yinlin.extension.readByteArray
 import love.yinlin.extension.write
 import love.yinlin.extension.writeText
 import love.yinlin.extension.writeTo
-import love.yinlin.platform.Coroutines
 import love.yinlin.platform.lyrics.LrcParser
 
 @Stable

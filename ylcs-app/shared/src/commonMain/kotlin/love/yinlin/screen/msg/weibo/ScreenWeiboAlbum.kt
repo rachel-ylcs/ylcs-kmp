@@ -14,10 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import love.yinlin.api.WeiboAPI
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.data.Picture
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.compose.Picture
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.BoxState

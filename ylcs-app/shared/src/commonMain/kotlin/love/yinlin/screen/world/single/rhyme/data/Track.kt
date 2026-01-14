@@ -6,12 +6,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import love.yinlin.compose.Colors
-import love.yinlin.compose.Path
+import love.yinlin.compose.extension.*
 import love.yinlin.compose.game.Drawer
-import love.yinlin.compose.onCenter
-import love.yinlin.compose.onLine
-import love.yinlin.compose.slope
-import love.yinlin.compose.translate
 
 // 轨道
 @Stable

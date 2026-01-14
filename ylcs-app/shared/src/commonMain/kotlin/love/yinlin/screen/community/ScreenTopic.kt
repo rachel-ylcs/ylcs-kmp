@@ -24,16 +24,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
-import love.yinlin.api.*
 import love.yinlin.app
-import love.yinlin.collection.toStableList
+import love.yinlin.compose.collection.toStableList
 import love.yinlin.compose.*
+import love.yinlin.compose.data.Picture
+import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.floating.FloatingDialogChoice
 import love.yinlin.compose.ui.floating.FloatingSheet
-import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.SubComment
@@ -48,7 +50,6 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.SplitActionLayout
-import love.yinlin.compose.ui.platform.UnsupportedPlatformComponent
 import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.common.ScreenWebpage
@@ -57,6 +58,7 @@ import love.yinlin.compose.ui.text.RichEditor
 import love.yinlin.compose.ui.text.RichEditorState
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.RichText
+import love.yinlin.cs.*
 
 @Composable
 private fun CoinLayout(

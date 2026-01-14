@@ -2,7 +2,7 @@ package love.yinlin.data.rachel.photo
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.api.ServerRes
+import love.yinlin.cs.ServerRes
 
 @Stable
 @Serializable

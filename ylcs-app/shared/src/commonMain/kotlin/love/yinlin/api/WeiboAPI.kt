@@ -22,16 +22,17 @@ import io.ktor.util.encodeBase64
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.compose.data.Picture
 import love.yinlin.uri.Uri
-import love.yinlin.data.compose.Picture
 import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
-import love.yinlin.platform.NetClient
 import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.text.RichContainer
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.buildRichString
-import love.yinlin.platform.RequestScope
+import love.yinlin.cs.APIConfig
+import love.yinlin.cs.ClientEngine
+import love.yinlin.cs.NetClient
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -388,7 +389,7 @@ object WeiboAPI {
 		)
 	}
 
-	private suspend inline fun <reified R : Any> weiboRequest(url: String, crossinline onRequest: RequestScope.() -> Unit = {}, crossinline onResponse: suspend (JsonObject) -> R): R? {
+	private suspend inline fun <reified R : Any> weiboRequest(url: String, crossinline onRequest: () -> Unit = {}, crossinline onResponse: suspend (JsonObject) -> R): R? {
 		val extraHeaders = prepareWeiboHeaders() ?: return null
 		return NetClient.request(url, {
 			headers {

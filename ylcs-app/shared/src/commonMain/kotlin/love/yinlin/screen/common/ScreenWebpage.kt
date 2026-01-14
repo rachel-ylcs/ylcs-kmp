@@ -13,9 +13,9 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.compose.ui.platform.WebView
-import love.yinlin.compose.ui.platform.WebViewConfig
-import love.yinlin.compose.ui.platform.WebViewState
+import love.yinlin.compose.ui.WebView
+import love.yinlin.compose.ui.WebViewConfig
+import love.yinlin.compose.ui.WebViewState
 import love.yinlin.platform.Platform
 
 @Stable

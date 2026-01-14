@@ -6,12 +6,12 @@ import kotlinx.io.Source
 import kotlinx.io.files.Path
 import kotlinx.io.readByteArray
 import kotlinx.io.readTo
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.mod.ModMetadata
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
-import love.yinlin.platform.Coroutines
 import kotlin.random.Random
 
 object ModFactory {

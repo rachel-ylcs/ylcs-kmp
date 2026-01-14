@@ -5,13 +5,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.io.files.Path
-import love.yinlin.api.ServerRes
-import love.yinlin.api.url
 import love.yinlin.common.downloadCache
 import love.yinlin.common.downloadCacheWithPath
 import love.yinlin.compose.game.asset.Assets
+import love.yinlin.cs.NetClient
+import love.yinlin.cs.ServerRes
+import love.yinlin.cs.url
 import love.yinlin.extension.lazyName
-import love.yinlin.platform.NetClient
 
 @Stable
 class RhymeAssets : Assets() {

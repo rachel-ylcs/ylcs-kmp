@@ -25,11 +25,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import love.yinlin.AndroidContext
-import love.yinlin.Context
 import love.yinlin.app
-import love.yinlin.compose.CustomTheme
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.extension.catching
+import love.yinlin.foundation.AndroidContext
+import love.yinlin.foundation.Context
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toAndroidUri

@@ -22,14 +22,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.coroutines.delay
-import love.yinlin.api.SocketsConnection
-import love.yinlin.api.sockets.LyricsSockets
-import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.ExtraIcons
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.*
 import love.yinlin.compose.ui.image.ClickIcon
@@ -43,7 +43,9 @@ import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.rememberTextInputState
-import love.yinlin.platform.Coroutines
+import love.yinlin.coroutines.Coroutines
+import love.yinlin.cs.sockets.LyricsSockets
+import love.yinlin.cs.*
 
 @Composable
 private fun UserItem(

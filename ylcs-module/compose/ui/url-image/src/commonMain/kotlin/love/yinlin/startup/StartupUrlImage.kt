@@ -1,0 +1,85 @@
+package love.yinlin.startup
+
+import androidx.compose.runtime.Stable
+import com.github.panpf.sketch.ComponentRegistry
+import com.github.panpf.sketch.SingletonSketch
+import com.github.panpf.sketch.Sketch
+import com.github.panpf.sketch.cache.CachePolicy
+import com.github.panpf.sketch.cache.DiskCache
+import com.github.panpf.sketch.decode.AnimatedWebpDecoder
+import com.github.panpf.sketch.decode.GifDecoder
+import com.github.panpf.sketch.fetch.ComposeResourceUriFetcher
+import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
+import com.github.panpf.sketch.request.ImageOptions
+import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
+import com.github.panpf.sketch.util.Logger
+import kotlinx.io.files.Path
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.foundation.Context
+import love.yinlin.foundation.StartupArg
+import love.yinlin.foundation.StartupArgs
+import love.yinlin.foundation.StartupFetcher
+import love.yinlin.foundation.SyncStartup
+import love.yinlin.platform.Platform
+import okio.Path.Companion.toPath
+
+@StartupFetcher(index = 0, name = "cachePath", returnType = Path::class, nullable = true)
+@StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
+@StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
+@Stable
+class StartupUrlImage : SyncStartup() {
+    private lateinit var sketch: Sketch
+
+    private fun ComponentRegistry.Builder.registerComponent() {
+        addFetcher(ComposeResourceUriFetcher.Factory())
+        addFetcher(KtorHttpUriFetcher.Factory())
+
+        addDecoder(GifDecoder.Factory())
+        addDecoder(AnimatedWebpDecoder.Factory())
+
+        addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
+    }
+
+    override fun init(context: Context, args: StartupArgs) {
+        val cachePath: Path? = args.fetch(0)
+        val maxCacheSize: Int = args[1]
+        val imageQuality: ImageQuality = args[2]
+        sketch = buildSketch(context).apply {
+            logger(level = Logger.Level.Error)
+            componentLoaderEnabled(false)
+            components {
+                registerComponent()
+            }
+            Platform.useNot(*Platform.Web) {
+                require(cachePath != null)
+                downloadCacheOptions {
+                    DiskCache.Options(
+                        appCacheDirectory = cachePath.toString().toPath(),
+                        maxSize = maxCacheSize * 1024 * 1024L
+                    )
+                }
+                resultCacheOptions {
+                    DiskCache.Options(
+                        appCacheDirectory = cachePath.toString().toPath(),
+                        maxSize = maxCacheSize * 1024 * 1024L
+                    )
+                }
+            }
+            globalImageOptions(ImageOptions {
+                downloadCachePolicy(CachePolicy.ENABLED)
+                resultCachePolicy(CachePolicy.ENABLED)
+                memoryCachePolicy(CachePolicy.ENABLED)
+                sizeMultiplier(imageQuality.sizeMultiplier)
+            })
+        }.build()
+        SingletonSketch.setSafe { sketch }
+    }
+
+    fun clearCache() {
+        Platform.useNot(*Platform.Web) {
+            sketch.downloadCache.clear()
+            sketch.resultCache.clear()
+        }
+    }
+}
+

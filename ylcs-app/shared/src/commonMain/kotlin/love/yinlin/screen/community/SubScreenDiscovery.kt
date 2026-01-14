@@ -20,11 +20,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
-import love.yinlin.api.*
-import love.yinlin.collection.toStableList
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.collection.StableList
+import love.yinlin.compose.collection.stableListOf
+import love.yinlin.compose.collection.toStableList
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
@@ -37,6 +40,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.container.TabBar
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
+import love.yinlin.cs.*
 
 @Stable
 @Serializable
@@ -53,7 +57,7 @@ private enum class DiscoveryItem(
     Discussion(Comment.Section.DISCUSSION, Icons.AutoMirrored.Filled.Chat);
 
     companion object {
-        val items = DiscoveryItem.entries.fastMap { Comment.Section.sectionName(it.id) to it.icon }.toStableList()
+        val items = entries.fastMap { Comment.Section.sectionName(it.id) to it.icon }.toStableList()
     }
 }
 
@@ -248,7 +252,7 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
 
     override val fabIcon: ImageVector? by derivedStateOf { if (fabCanExpand) Icons.Outlined.Add else Icons.Outlined.ArrowUpward }
 
-    override val fabMenus: Array<FABAction> = arrayOf(
+    override val fabMenus: StableList<FABAction> = stableListOf(
         FABAction(Icons.Outlined.Edit, "发表主题") {
             navigate(::ScreenAddTopic)
         },

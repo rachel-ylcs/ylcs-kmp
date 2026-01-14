@@ -4,6 +4,7 @@ package love.yinlin.platform
 import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
 import love.yinlin.compatible.ByteArrayCompatible
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
 import org.khronos.webgl.ArrayBuffer
 import kotlin.js.ExperimentalWasmJsInterop

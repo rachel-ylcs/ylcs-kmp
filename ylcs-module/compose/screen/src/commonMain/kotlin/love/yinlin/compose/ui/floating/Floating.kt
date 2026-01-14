@@ -16,7 +16,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalAnimationSpeed
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.ui.layout.NavigationBack
 import love.yinlin.compose.ui.node.clickableNoRipple
 

@@ -5,10 +5,10 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.cs.NetClient
 import love.yinlin.platform.lyrics.LrcParser
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
-import love.yinlin.platform.NetClient
 
 @Stable
 data object NetEaseCloudAPI {

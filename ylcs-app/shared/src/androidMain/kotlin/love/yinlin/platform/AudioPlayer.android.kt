@@ -7,8 +7,8 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.io.files.Path
-import love.yinlin.Context
 import love.yinlin.common.FfmpegRenderersFactory
+import love.yinlin.foundation.Context
 
 @Stable
 actual class AudioPlayer actual constructor(private val context: Context, private val onEndListener: () -> Unit) {

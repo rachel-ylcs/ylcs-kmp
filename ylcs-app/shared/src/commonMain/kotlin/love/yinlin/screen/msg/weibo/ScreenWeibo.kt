@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.api.WeiboAPI
 import love.yinlin.app
-import love.yinlin.collection.toStableList
+import love.yinlin.compose.collection.toStableList
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
@@ -27,6 +27,8 @@ import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 import love.yinlin.compose.ui.image.PauseLoading
+import love.yinlin.coroutines.Coroutines
+import love.yinlin.cs.NetClient
 
 @Stable
 class ScreenWeibo(manager: ScreenManager) : Screen(manager) {

@@ -11,7 +11,7 @@ template(object : KotlinJvmTemplate() {
         main.configure {
             lib(
                 ExportLib,
-                projects.ylcsModule.core.base,
+                projects.ylcsModule.core,
             )
         }
 

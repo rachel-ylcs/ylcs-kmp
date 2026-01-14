@@ -8,13 +8,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.Colors
-import love.yinlin.compose.Path
+import love.yinlin.compose.extension.Path
+import love.yinlin.compose.extension.onLine
+import love.yinlin.compose.extension.slope
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.BoxBody
 import love.yinlin.compose.game.traits.Transform
-import love.yinlin.compose.onLine
-import love.yinlin.compose.slope
 import love.yinlin.screen.world.single.rhyme.RhymeDifficulty
 import love.yinlin.screen.world.single.rhyme.RhymeManager
 import love.yinlin.screen.world.single.rhyme.RhymePlayConfig

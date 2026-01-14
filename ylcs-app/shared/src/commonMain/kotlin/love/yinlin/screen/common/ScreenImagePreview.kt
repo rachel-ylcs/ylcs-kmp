@@ -19,17 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import love.yinlin.app
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.data.Picture
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.data.compose.Picture
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.extension.filenameOrRandom
-import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.image.ZoomWebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
+import love.yinlin.coroutines.Coroutines
 
 @Stable
 class ScreenImagePreview(manager: ScreenManager, images: List<Picture>, initIndex: Int) : Screen(manager) {

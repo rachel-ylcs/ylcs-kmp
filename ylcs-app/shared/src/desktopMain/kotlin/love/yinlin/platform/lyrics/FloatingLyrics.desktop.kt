@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import love.yinlin.Context
 import love.yinlin.app
 import love.yinlin.compose.Colors
-import love.yinlin.compose.platform.DragArea
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.compose.ui.window.DragArea
+import love.yinlin.foundation.Context
 import love.yinlin.platform.NativeWindow
 
 @Stable

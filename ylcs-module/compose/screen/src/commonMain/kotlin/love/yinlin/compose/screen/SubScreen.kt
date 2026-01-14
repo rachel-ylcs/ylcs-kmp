@@ -6,6 +6,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.compose.Device
+import love.yinlin.compose.collection.StableList
+import love.yinlin.compose.collection.emptyStableList
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.floating.FloatingDialog
@@ -35,7 +37,7 @@ abstract class SubScreen(val parent: BasicScreen) {
 
     open val fabIcon: ImageVector? = null
 	open val fabCanExpand: Boolean = false
-	open val fabMenus: Array<FABAction> = emptyArray()
+	open val fabMenus: StableList<FABAction> = emptyStableList()
 	open suspend fun onFabClick() {}
 
 	@Composable

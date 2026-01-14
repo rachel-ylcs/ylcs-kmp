@@ -1,6 +1,0 @@
-<resources>
-    <string name="loading_state_string">加载中...</string>
-    <string name="empty_state_string">空空如也...</string>
-    <string name="network_error_state_string">世界上最遥远的距离就是没有网络...</string>
-    <string name="network_error_retry_string">重试</string>
-</resources>

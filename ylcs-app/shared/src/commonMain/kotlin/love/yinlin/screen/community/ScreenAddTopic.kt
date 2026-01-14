@@ -14,23 +14,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
 import kotlinx.io.readByteArray
-import love.yinlin.api.ApiTopicSendTopic
-import love.yinlin.api.apiFile
-import love.yinlin.api.request
 import love.yinlin.app
-import love.yinlin.collection.toStableList
-import love.yinlin.compose.*
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.collection.toStableList
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.data.Picture
 import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
 import love.yinlin.compose.graphics.thumbnail
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
-import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
@@ -43,6 +42,7 @@ import love.yinlin.screen.common.ScreenImagePreview
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.compose.ui.text.RichEditor
 import love.yinlin.compose.ui.text.RichEditorState
+import love.yinlin.cs.*
 
 @Stable
 class ScreenAddTopic(manager: ScreenManager) : Screen(manager) {

@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import io.github.alexzhirkevich.compottie.*
 import kotlinx.serialization.json.*
 import love.yinlin.compose.*
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.extension.*
 import love.yinlin.compose.ui.image.MiniImage

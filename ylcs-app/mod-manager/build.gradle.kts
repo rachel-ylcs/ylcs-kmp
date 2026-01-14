@@ -24,7 +24,8 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsApp.mod,
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
-                projects.ylcsModule.compose.component.urlImage,
+                projects.ylcsModule.compose.ui.rachel,
+                projects.ylcsModule.compose.ui.urlImage,
             )
         }
     }

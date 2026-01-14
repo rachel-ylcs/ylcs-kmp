@@ -4,11 +4,11 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.cs.NetClient
 import love.yinlin.platform.lyrics.LrcParser
 import love.yinlin.uri.Uri
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
-import love.yinlin.platform.NetClient
 import kotlin.io.encoding.Base64
 
 @Stable

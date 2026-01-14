@@ -19,7 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinNativeTarget.ios() {
         if (C.platform == BuildPlatform.Mac) {
             compilations.getByName("main") {
-                val nskeyvalueobserving by cinterops.creating
+                val nsKeyValueObserving by cinterops.creating
             }
         }
     }
@@ -46,14 +46,13 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 projects.ylcsApp.mod,
-                projects.ylcsModule.foundation.cs.clientEngine,
-                projects.ylcsModule.foundation.service.exception,
-                projects.ylcsModule.foundation.service.mmkvKmp,
-                projects.ylcsModule.compose.platformView,
-                projects.ylcsModule.compose.component.paginationLayout,
-                projects.ylcsModule.compose.component.urlImage,
-                projects.ylcsModule.compose.component.webview,
                 projects.ylcsModule.compose.plugin.game,
+                projects.ylcsModule.compose.ui.paginationLayout,
+                projects.ylcsModule.compose.ui.platformView,
+                projects.ylcsModule.compose.ui.urlImage,
+                projects.ylcsModule.compose.ui.webview,
+                projects.ylcsModule.cs.clientEngine,
+                projects.ylcsModule.startup.exception,
                 libs.compose.components.resources,
                 libs.lottie,
                 libs.lottie.network,
@@ -66,11 +65,12 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.tool.cryptography.asn1,
                 ExportLib,
                 projects.ylcsApp.cs,
-                projects.ylcsModule.foundation.service.os,
-                projects.ylcsModule.foundation.service.picker,
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
-                projects.ylcsModule.compose.service.config,
+                projects.ylcsModule.compose.startup.config,
+                projects.ylcsModule.compose.ui.rachel,
+                projects.ylcsModule.startup.os,
+                projects.ylcsModule.startup.picker,
             )
         }
 
@@ -98,8 +98,8 @@ template(object : KotlinMultiplatformTemplate() {
 
         desktopMain.configure(jvmMain) {
             lib(
-                projects.ylcsModule.foundation.os.window,
-                projects.ylcsModule.foundation.os.desktopPlayer,
+                projects.ylcsModule.platform.os.window,
+                projects.ylcsModule.platform.os.desktopPlayer,
                 fileTree(mapOf("dir" to "libs/desktop", "include" to listOf("*.jar")))
             )
         }

@@ -19,11 +19,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import love.yinlin.api.*
 import love.yinlin.app
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
@@ -34,6 +36,7 @@ import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
+import love.yinlin.cs.*
 
 @Stable
 class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(manager) {

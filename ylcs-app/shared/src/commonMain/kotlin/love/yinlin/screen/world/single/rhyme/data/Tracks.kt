@@ -2,7 +2,7 @@ package love.yinlin.screen.world.single.rhyme.data
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
-import love.yinlin.compose.translate
+import love.yinlin.compose.extension.translate
 import love.yinlin.screen.world.single.rhyme.RhymeConfig
 
 @Stable

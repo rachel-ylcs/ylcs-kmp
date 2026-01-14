@@ -2,7 +2,7 @@ package love.yinlin.data.rachel.activity
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.api.ServerRes
+import love.yinlin.cs.ServerRes
 import kotlin.getValue
 
 @Stable

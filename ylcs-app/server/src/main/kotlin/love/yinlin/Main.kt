@@ -2,12 +2,12 @@ package love.yinlin
 
 import io.ktor.server.application.PipelineCall
 import io.ktor.server.request.uri
-import love.yinlin.api.*
-import love.yinlin.api.user.AN
+import love.yinlin.cs.*
+import love.yinlin.cs.service.Redis
+import love.yinlin.cs.user.AN
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.catchingError
-import love.yinlin.server.Redis
 
 val APIScope.callMap by lazy { buildCallBackMap<Mail.Filter, MailEntry, String>() }
 

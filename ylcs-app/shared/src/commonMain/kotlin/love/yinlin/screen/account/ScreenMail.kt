@@ -18,11 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.api.*
 import love.yinlin.app
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.extension.findAssign
 import love.yinlin.compose.ui.input.ClickText
@@ -35,6 +36,7 @@ import love.yinlin.screen.common.ScreenWebpage
 import love.yinlin.screen.community.BoxText
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.RichText
+import love.yinlin.cs.*
 
 @Stable
 class ScreenMail(manager: ScreenManager) : Screen(manager) {

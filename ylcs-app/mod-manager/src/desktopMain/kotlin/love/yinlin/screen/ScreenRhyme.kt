@@ -43,12 +43,13 @@ import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import kotlinx.serialization.json.Json
 import love.yinlin.compose.Colors
-import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
-import love.yinlin.compose.mutableRefStateOf
-import love.yinlin.compose.rememberFalse
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.ZoomWebImage
@@ -58,7 +59,7 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.Space
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.Chorus
 import love.yinlin.data.music.MusicInfo
@@ -66,7 +67,6 @@ import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLine
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.*
-import love.yinlin.platform.Coroutines
 import love.yinlin.util.QrcDecrypter
 import org.jetbrains.compose.resources.Font
 import love.yinlin.mod_manager.generated.resources.Res

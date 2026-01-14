@@ -2,11 +2,11 @@ package love.yinlin.common
 
 import kotlinx.io.files.Path
 import love.yinlin.app
+import love.yinlin.cs.NetClient
 import love.yinlin.extension.bufferedSink
 import love.yinlin.extension.isFile
 import love.yinlin.extension.readByteArray
 import love.yinlin.extension.size
-import love.yinlin.platform.NetClient
 
 fun urlDigest32(s: String): String {
     fun mix64(x: Long): Long {

@@ -2,8 +2,9 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
-import love.yinlin.Context
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.NativeLib
+import love.yinlin.foundation.Context
 
 @Stable
 @NativeLib

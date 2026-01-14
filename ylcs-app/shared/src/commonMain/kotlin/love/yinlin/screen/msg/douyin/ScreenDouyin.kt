@@ -18,25 +18,29 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.api.DouyinAPI
 import love.yinlin.app
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.extension.rememberIntState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
+import love.yinlin.compose.ui.HeadlessWebView
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.parseJson
-import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
-import love.yinlin.compose.ui.platform.HeadlessWebView
 import love.yinlin.screen.common.ScreenVideo
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
+import love.yinlin.coroutines.Coroutines
 
 @Stable
 class ScreenDouyin(manager: ScreenManager) : Screen(manager) {

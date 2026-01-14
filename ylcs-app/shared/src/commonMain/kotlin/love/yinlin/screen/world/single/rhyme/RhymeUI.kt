@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.common.Paths
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.data.mod.ModResourceType
 

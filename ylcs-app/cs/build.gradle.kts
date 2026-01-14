@@ -12,7 +12,7 @@ template(object : KotlinMultiplatformTemplate() {
             kotlin.srcDir(generateSourceDir)
             lib(
                 ExportLib,
-                projects.ylcsModule.core.cs,
+                projects.ylcsModule.cs.core,
                 libs.compose.runtime,
             )
         }

@@ -18,7 +18,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
-import love.yinlin.compose.*
+import love.yinlin.compose.LocalAnimationSpeed
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.collection.StableList
+import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.layout.NavigationBack
 import love.yinlin.compose.ui.node.clickableNoRipple
@@ -97,7 +101,7 @@ fun FABLayout(
     icon: ImageVector,
     canExpand: Boolean,
     onClick: suspend () -> Unit,
-    menus: Array<FABAction>
+    menus: StableList<FABAction>
 ) {
     Box(
         modifier = Modifier

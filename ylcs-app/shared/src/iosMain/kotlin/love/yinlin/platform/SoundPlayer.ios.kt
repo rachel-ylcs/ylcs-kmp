@@ -3,6 +3,7 @@ package love.yinlin.platform
 import androidx.compose.ui.util.fastMap
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.files.Path
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
 import love.yinlin.extension.toNSData
 import platform.AVFAudio.AVAudioPlayer

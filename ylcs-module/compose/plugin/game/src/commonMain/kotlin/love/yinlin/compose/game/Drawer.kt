@@ -30,10 +30,9 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
-import love.yinlin.compose.Path
+import love.yinlin.compose.extension.roundToIntOffset
+import love.yinlin.compose.extension.translate
 import love.yinlin.compose.graphics.AnimatedWebp
-import love.yinlin.compose.roundToIntOffset
-import love.yinlin.compose.translate
 
 @Stable
 class Drawer(
@@ -107,11 +106,11 @@ class Drawer(
     }
 
     fun quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope.drawPath(path = Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
+        scope.drawPath(path = love.yinlin.compose.extension.Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope.drawPath(path = Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
+        scope.drawPath(path = love.yinlin.compose.extension.Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {

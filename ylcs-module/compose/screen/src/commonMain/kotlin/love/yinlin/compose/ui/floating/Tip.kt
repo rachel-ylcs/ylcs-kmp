@@ -2,8 +2,6 @@ package love.yinlin.compose.ui.floating
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -19,6 +17,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.CustomTheme
+import love.yinlin.compose.ui.icon.M3Icons
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.node.clickableNoRipple
 
@@ -92,10 +92,10 @@ open class Tip(private val scope: CoroutineScope) {
                 ) {
                     MiniIcon(
                         icon = when (type) {
-                            Type.INFO -> Icons.Outlined.Lightbulb
-                            Type.SUCCESS -> Icons.Outlined.Check
-                            Type.WARNING -> Icons.Outlined.Warning
-                            Type.ERROR -> Icons.Outlined.Error
+                            Type.INFO -> M3Icons.Lightbulb
+                            Type.SUCCESS -> M3Icons.Check
+                            Type.WARNING -> M3Icons.Warning
+                            Type.ERROR -> M3Icons.Error
                         },
                         color = contentColor
                     )

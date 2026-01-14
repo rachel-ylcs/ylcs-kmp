@@ -1,8 +1,8 @@
 package love.yinlin.data.rachel.emoji
 
 import androidx.compose.runtime.Stable
-import love.yinlin.api.ServerRes
-import love.yinlin.api.url
+import love.yinlin.cs.ServerRes
+import love.yinlin.cs.url
 
 @Stable
 data class Emoji(

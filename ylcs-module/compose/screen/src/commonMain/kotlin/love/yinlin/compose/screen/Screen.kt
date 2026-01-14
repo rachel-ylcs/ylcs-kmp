@@ -1,8 +1,6 @@
 package love.yinlin.compose.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -12,8 +10,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.rememberImmersivePadding
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.floating.Floating
+import love.yinlin.compose.ui.icon.M3Icons
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.NavigationBack
@@ -74,7 +77,7 @@ abstract class Screen(manager: ScreenManager) : BasicScreen(manager) {
                                 left = {
                                     ClickIcon(
                                         modifier = Modifier.padding(start = CustomTheme.padding.horizontalSpace),
-                                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                                        icon = M3Icons.ArrowBack,
                                         tip = "返回",
                                         onClick = ::onBack
                                     )

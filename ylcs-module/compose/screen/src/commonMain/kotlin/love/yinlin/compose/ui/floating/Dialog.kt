@@ -7,9 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowRight
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,19 +20,22 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.extension.catchingNull
-import love.yinlin.platform.Coroutines
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.text.InputType
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.compose.ui.layout.LoadingBox
 import love.yinlin.compose.screen.resources.Res
 import love.yinlin.compose.screen.resources.*
-import love.yinlin.platform.SyncFuture
+import love.yinlin.compose.ui.CustomTheme
+import love.yinlin.compose.ui.animation.LoadingAnimation
+import love.yinlin.compose.ui.icon.M3Icons
+import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.SyncFuture
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -315,7 +317,7 @@ abstract class FloatingDialogChoice(
         fun fromItems(items: List<String>, title: String? = null) = object : ListDialogChoice(title) {
             override val num: Int = items.size
             override fun nameFactory(index: Int): String = items[index]
-            override fun iconFactory(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
+            override fun iconFactory(index: Int): ImageVector = M3Icons.ArrowRight
         }
 
         @Stable
@@ -354,7 +356,7 @@ open class FloatingDialogDynamicChoice(title: String? = null) : ListDialogChoice
     private var items: List<String> = emptyList()
     override val num: Int get() = items.size
     override fun nameFactory(index: Int): String = items[index]
-    override fun iconFactory(index: Int): ImageVector = Icons.AutoMirrored.Outlined.ArrowRight
+    override fun iconFactory(index: Int): ImageVector = M3Icons.ArrowRight
 
     suspend fun openSuspend(items: List<String>): Int? = if (items.isNotEmpty()) {
         this.items = items
@@ -432,6 +434,8 @@ class FloatingDialogLoading : FloatingDialog<Unit>() {
     override val dismissOnBackPress: Boolean = false
     override val dismissOnClickOutside: Boolean = false
 
+    var title: String by mutableStateOf("正在加载中...")
+
     suspend fun openSuspend() {
         Coroutines.startCurrent { awaitResult() }
     }
@@ -444,7 +448,26 @@ class FloatingDialogLoading : FloatingDialog<Unit>() {
                 shadowElevation = CustomTheme.shadow.surface,
                 modifier = Modifier.size(CustomTheme.size.dialogWidth)
             ) {
-                LoadingBox()
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace)
+                        ) {
+                            LoadingAnimation()
+                            Text(
+                                text = title,
+                                color = LocalContentColor.current
+                            )
+                        }
+                    }
+                }
             }
         }
     }

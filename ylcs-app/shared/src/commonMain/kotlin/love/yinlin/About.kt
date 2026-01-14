@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.datetime.LocalDate
 import love.yinlin.compose.Colors
+import love.yinlin.compose.collection.stableListOf
 
 @Stable
 data object About {
@@ -69,7 +70,7 @@ data object About {
         )
     )
 
-    internal val contributors = arrayOf(
+    internal val contributors = stableListOf(
         ContributorGroup("设计", Icons.Outlined.Brush, Colors.Pink4, listOf(
             Contributor("方旖旎", 7),
             Contributor("木棠", 1563),

@@ -22,18 +22,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ApiSongGetSongs
-import love.yinlin.api.ApiSongSearchSongs
-import love.yinlin.api.ServerRes
-import love.yinlin.api.request
-import love.yinlin.api.url
 import love.yinlin.app
-import love.yinlin.compose.CustomTheme
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
@@ -41,6 +35,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationGrid
+import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.SongPreview
 

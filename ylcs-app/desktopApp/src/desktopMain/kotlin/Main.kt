@@ -9,7 +9,10 @@ import androidx.compose.ui.window.ApplicationScope
 import kotlinx.coroutines.runBlocking
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.layout.ActionScope
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.MimeType
+import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.StartupDelegate
 import love.yinlin.platform.*
 import love.yinlin.shared.resources.*
 import love.yinlin.startup.StartupComposeSwingRender

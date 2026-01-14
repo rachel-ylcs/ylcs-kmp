@@ -2,6 +2,8 @@ package love.yinlin.compose
 
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Stable
+import love.yinlin.compose.ui.ModeShape
+import love.yinlin.compose.ui.shape
 
 @Stable
 data class ShapeSystem(

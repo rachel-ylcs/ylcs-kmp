@@ -5,11 +5,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import love.yinlin.app
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.input.DockedColorPicker
 import love.yinlin.compose.ui.input.ProgressSlider
 import love.yinlin.compose.ui.layout.SplitLayout
-import love.yinlin.fixup.Fixup
 import love.yinlin.platform.lyrics.FloatingLyrics
 
 private fun FloatingLyrics.toggle() {

@@ -2,8 +2,8 @@ package love.yinlin.data.weibo
 
 import androidx.compose.runtime.Stable
 import kotlinx.datetime.LocalDateTime
+import love.yinlin.compose.data.Picture
 import love.yinlin.compose.ui.text.RichString
-import love.yinlin.data.compose.Picture
 import love.yinlin.extension.DateEx
 
 @Stable

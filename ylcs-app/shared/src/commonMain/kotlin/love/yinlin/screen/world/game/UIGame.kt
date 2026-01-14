@@ -19,13 +19,13 @@ import androidx.compose.ui.util.fastForEach
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.Local
-import love.yinlin.api.url
-import love.yinlin.compose.*
 import love.yinlin.compose.screen.ScreenSlot
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.*
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.CylinderSlider
 import love.yinlin.compose.ui.input.NormalText
+import love.yinlin.cs.url
 import love.yinlin.screen.community.BoxText
 
 @Stable

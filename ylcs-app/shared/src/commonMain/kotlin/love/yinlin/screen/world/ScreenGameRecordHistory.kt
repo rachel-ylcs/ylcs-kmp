@@ -18,17 +18,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.Local
-import love.yinlin.api.APIConfig
-import love.yinlin.api.ApiGameGetUserGameRecords
-import love.yinlin.api.request
-import love.yinlin.api.requestNull
-import love.yinlin.api.url
 import love.yinlin.app
+import love.yinlin.compose.Colors
 import love.yinlin.shared.resources.*
 import love.yinlin.compose.Device
-import love.yinlin.compose.*
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.GameRecordWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.extension.Array
@@ -45,6 +42,7 @@ import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.compose.ui.layout.StatusBox
+import love.yinlin.cs.*
 import love.yinlin.screen.world.game.GameRecordCard
 
 @Stable

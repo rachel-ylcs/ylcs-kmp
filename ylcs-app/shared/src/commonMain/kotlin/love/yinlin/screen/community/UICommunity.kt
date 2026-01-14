@@ -25,9 +25,8 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import love.yinlin.api.url
 import love.yinlin.app
-import love.yinlin.compose.*
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
@@ -39,6 +38,7 @@ import love.yinlin.compose.ui.layout.EqualRow
 import love.yinlin.compose.ui.layout.EqualRowScope
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.cs.url
 import kotlin.math.max
 
 @Composable

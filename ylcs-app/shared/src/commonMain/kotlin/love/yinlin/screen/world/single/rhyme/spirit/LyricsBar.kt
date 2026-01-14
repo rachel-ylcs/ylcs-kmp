@@ -17,7 +17,6 @@ import love.yinlin.compose.game.traits.Spirit
 import love.yinlin.compose.game.traits.Transform
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.screen.world.single.rhyme.RhymeManager
-import kotlin.text.ifEmpty
 
 @Stable
 class LyricsBar(

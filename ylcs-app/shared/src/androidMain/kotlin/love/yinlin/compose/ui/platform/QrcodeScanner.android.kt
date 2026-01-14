@@ -24,11 +24,13 @@ import com.king.zxing.DecodeFormatManager
 import com.king.zxing.analyze.QRCodeAnalyzer
 import com.king.zxing.util.CodeUtils
 import kotlinx.coroutines.launch
-import love.yinlin.compose.*
-import love.yinlin.platform.Coroutines
+import love.yinlin.compose.Colors
+import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.ui.CustomTheme
+import love.yinlin.compose.ui.PlatformView
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
-import love.yinlin.platform.PlatformView
+import love.yinlin.coroutines.Coroutines
 import java.util.UUID
 
 @Stable

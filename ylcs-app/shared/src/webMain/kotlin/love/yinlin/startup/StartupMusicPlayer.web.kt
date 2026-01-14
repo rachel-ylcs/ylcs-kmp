@@ -2,10 +2,10 @@ package love.yinlin.startup
 
 import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
-import love.yinlin.Context
-import love.yinlin.StartupFetcher
+import love.yinlin.foundation.StartupFetcher
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlayMode
+import love.yinlin.foundation.Context
 
 @StartupFetcher(index = 0, name = "rootPath", returnType = Path::class, nullable = true)
 @Stable

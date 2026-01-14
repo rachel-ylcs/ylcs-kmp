@@ -26,8 +26,8 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 projects.ylcsApp.shared,
                 projects.ylcsModule.platform.nativeLibLoader,
-                projects.ylcsModule.foundation.os.autoUpdate,
-                projects.ylcsModule.foundation.os.singleInstance,
+                projects.ylcsModule.platform.os.autoUpdate,
+                projects.ylcsModule.platform.os.singleInstance,
             )
         }
     }

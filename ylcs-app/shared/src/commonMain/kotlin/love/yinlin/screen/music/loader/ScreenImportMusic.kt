@@ -11,11 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import love.yinlin.app
 import love.yinlin.common.Paths
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
-import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.animation.LoadingAnimation
 import love.yinlin.compose.ui.mod.ModPreviewLayout
 import love.yinlin.data.MimeType
@@ -25,6 +28,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
 import love.yinlin.compose.ui.node.dragAndDrop
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.toImplicitUri
 import love.yinlin.uri.Uri

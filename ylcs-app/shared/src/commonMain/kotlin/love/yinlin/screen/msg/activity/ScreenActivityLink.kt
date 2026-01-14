@@ -9,18 +9,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
+import love.yinlin.compose.ui.WebView
+import love.yinlin.compose.ui.WebViewConfig
+import love.yinlin.compose.ui.WebViewLoadingState
+import love.yinlin.compose.ui.WebViewState
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.input.ClickText
-import love.yinlin.compose.ui.platform.WebView
-import love.yinlin.compose.ui.platform.WebViewConfig
-import love.yinlin.compose.ui.platform.WebViewLoadingState
-import love.yinlin.compose.ui.platform.WebViewState
-import love.yinlin.compose.ui.platform.UnsupportedPlatformComponent
+import love.yinlin.compose.ui.layout.UnsupportedPlatformComponent
 
 @Stable
 class ScreenActivityLink(manager: ScreenManager) : Screen(manager) {

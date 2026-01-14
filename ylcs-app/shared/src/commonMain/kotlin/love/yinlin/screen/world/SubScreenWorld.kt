@@ -33,12 +33,17 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import love.yinlin.Local
-import love.yinlin.api.url
 import love.yinlin.app
 import love.yinlin.common.*
-import love.yinlin.compose.*
+import love.yinlin.compose.Colors
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalAnimationSpeed
+import love.yinlin.compose.LocalDarkMode
+import love.yinlin.compose.collection.StableList
+import love.yinlin.compose.collection.stableListOf
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameType
@@ -48,6 +53,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.image.colorfulImageVector
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.cs.url
 import love.yinlin.screen.community.BoxText
 import love.yinlin.screen.world.battle.ScreenGuessLyrics
 import love.yinlin.screen.world.single.rhyme.ScreenRhyme
@@ -347,7 +353,7 @@ class SubScreenWorld(parent: BasicScreen) : SubScreen(parent) {
 
 	override val fabIcon: ImageVector = Icons.Outlined.Add
 
-	override val fabMenus: Array<FABAction> = arrayOf(
+	override val fabMenus: StableList<FABAction> = stableListOf(
 		FABAction(Icons.Outlined.History, "我的战绩") {
 			navigate(::ScreenGameRecordHistory)
 		},

@@ -2,7 +2,7 @@ package love.yinlin.platform.lyrics
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import love.yinlin.Context
+import love.yinlin.foundation.Context
 
 @Stable
 actual class FloatingLyrics {

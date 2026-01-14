@@ -14,10 +14,11 @@ import androidx.compose.ui.zIndex
 import kotlinx.atomicfu.locks.SynchronousMutex
 import kotlinx.atomicfu.locks.withLock
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.catching
-import love.yinlin.platform.Coroutines
 import love.yinlin.platform.WindowsNativePlaybackState
 import love.yinlin.platform.WindowsNativeVideoPlayer
 import org.jetbrains.skia.Bitmap

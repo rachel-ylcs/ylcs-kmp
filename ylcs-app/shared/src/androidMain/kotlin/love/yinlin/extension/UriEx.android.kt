@@ -1,6 +1,6 @@
 package love.yinlin.extension
 
-import love.yinlin.Context
+import love.yinlin.foundation.Context
 import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.Uri

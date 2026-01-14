@@ -17,9 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.Colors
-import love.yinlin.compose.CustomTheme
+import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.layout.Space
-import love.yinlin.data.compose.ItemKey
 import love.yinlin.extension.fileSizeString
 import love.yinlin.mod.ModFactory.Preview.PreviewResult
 

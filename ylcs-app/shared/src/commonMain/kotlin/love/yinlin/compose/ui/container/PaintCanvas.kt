@@ -24,6 +24,9 @@ import androidx.compose.ui.util.packFloats
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.info.PaintPath
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.node.condition

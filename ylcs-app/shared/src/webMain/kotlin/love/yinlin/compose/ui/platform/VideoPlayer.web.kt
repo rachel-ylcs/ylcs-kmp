@@ -7,8 +7,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import kotlinx.browser.document
 import love.yinlin.compose.OffScreenEffect
+import love.yinlin.compose.ui.PlatformView
 import love.yinlin.data.MimeType
-import love.yinlin.platform.PlatformView
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
 import kotlin.js.ExperimentalWasmJsInterop

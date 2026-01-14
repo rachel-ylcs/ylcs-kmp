@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import love.yinlin.app
 import love.yinlin.compose.*
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.input.ProgressSlider
 import love.yinlin.compose.ui.input.DockedColorPicker
 import love.yinlin.compose.ui.input.Switch

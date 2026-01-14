@@ -18,7 +18,8 @@ import love.yinlin.Contributor
 import love.yinlin.ContributorGroup
 import love.yinlin.Local
 import love.yinlin.UpdateInfo
-import love.yinlin.compose.*
+import love.yinlin.compose.collection.StableList
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.image.MiniIcon
 import love.yinlin.compose.ui.input.NormalText
@@ -27,7 +28,7 @@ import love.yinlin.screen.community.BoxText
 
 @Composable
 internal fun ContributorList(
-    contributors: Array<ContributorGroup>,
+    contributors: StableList<ContributorGroup>,
     modifier: Modifier = Modifier,
     onClick: (Contributor) -> Unit
 ) {

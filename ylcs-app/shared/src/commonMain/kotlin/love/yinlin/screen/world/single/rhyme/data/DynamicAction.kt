@@ -7,13 +7,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
 import love.yinlin.compose.Colors
-import love.yinlin.compose.Path
+import love.yinlin.compose.extension.Path
+import love.yinlin.compose.extension.onLine
+import love.yinlin.compose.extension.translate
 import love.yinlin.compose.game.Drawer
 import love.yinlin.compose.game.animation.FrameAnimation
 import love.yinlin.compose.graphics.AnimatedWebp
 import love.yinlin.compose.graphics.SolidColorFilter
-import love.yinlin.compose.onLine
-import love.yinlin.compose.translate
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.screen.world.single.rhyme.RhymeAssets
 import love.yinlin.screen.world.single.rhyme.RhymeDifficulty

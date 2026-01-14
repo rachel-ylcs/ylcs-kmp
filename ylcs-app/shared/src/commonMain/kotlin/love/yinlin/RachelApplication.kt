@@ -2,19 +2,20 @@ package love.yinlin
 
 import androidx.compose.runtime.*
 import kotlinx.io.files.Path
-import love.yinlin.api.ClientEngine
 import love.yinlin.common.Paths
 import love.yinlin.compose.DefaultAnimationSpeed
-import love.yinlin.compose.LazyStateReference
 import love.yinlin.compose.LocalAnimationSpeed
+import love.yinlin.compose.PlatformApplication
 import love.yinlin.compose.ThemeMode
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.compose.config.Patches
+import love.yinlin.compose.config.patches
+import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.extension.LazyStateReference
 import love.yinlin.compose.screen.AppScreen
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.floating.localBalloonTipEnabled
-import love.yinlin.config.Patches
-import love.yinlin.config.patches
+import love.yinlin.cs.ClientEngine
 import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.music.PlatformMusicType
@@ -23,6 +24,7 @@ import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.mkdir
+import love.yinlin.foundation.*
 import love.yinlin.platform.Platform
 import love.yinlin.platform.lyrics.LyricsEngineConfig
 import love.yinlin.platform.lyrics.LyricsEngineType

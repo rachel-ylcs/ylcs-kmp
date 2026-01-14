@@ -16,6 +16,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.collection.StableList
+import love.yinlin.compose.collection.emptyStableList
 import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.floating.FABLayout
@@ -33,7 +35,7 @@ abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
 
     protected open val fabIcon: ImageVector? = null
     protected open val fabCanExpand: Boolean = false
-    protected open val fabMenus: Array<FABAction> = emptyArray()
+    protected open val fabMenus: StableList<FABAction> = emptyStableList()
     protected open suspend fun onFabClick() {}
 
     @Composable

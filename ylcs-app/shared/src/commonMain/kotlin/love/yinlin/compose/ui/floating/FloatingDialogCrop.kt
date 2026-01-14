@@ -6,7 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.*
-import love.yinlin.data.compose.ImageCropResult
+import love.yinlin.compose.data.ImageCropResult
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.image.CropImage
 import love.yinlin.compose.ui.image.CropState

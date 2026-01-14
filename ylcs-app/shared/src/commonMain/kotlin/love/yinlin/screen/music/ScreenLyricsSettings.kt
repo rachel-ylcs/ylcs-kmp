@@ -19,10 +19,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.app
-import love.yinlin.collection.toStableList
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.collection.toStableList
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.input.SortingBox
 import love.yinlin.extension.moveItem
 import love.yinlin.platform.lyrics.FloatingLyrics

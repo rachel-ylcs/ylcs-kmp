@@ -21,7 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.compose.*
+import love.yinlin.compose.Colors
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.ScreenSlot
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState

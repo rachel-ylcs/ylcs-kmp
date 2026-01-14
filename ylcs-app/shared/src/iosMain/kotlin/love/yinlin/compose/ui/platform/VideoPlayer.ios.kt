@@ -11,9 +11,9 @@ import androidx.compose.ui.zIndex
 import cocoapods.MobileVLCKit.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.compose.*
-import love.yinlin.platform.Coroutines
+import love.yinlin.compose.ui.PlatformView
 import love.yinlin.compose.ui.image.ClickIcon
-import love.yinlin.platform.PlatformView
+import love.yinlin.coroutines.Coroutines
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSNotification
 import platform.Foundation.NSURL

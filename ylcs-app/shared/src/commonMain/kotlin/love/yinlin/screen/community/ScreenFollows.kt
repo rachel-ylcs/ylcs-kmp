@@ -15,12 +15,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.Serializable
-import love.yinlin.api.*
 import love.yinlin.app
-import love.yinlin.collection.toStableList
+import love.yinlin.compose.collection.toStableList
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
@@ -33,6 +34,7 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationGrid
+import love.yinlin.cs.*
 
 @Stable
 enum class FollowTabItem(val title: String) {

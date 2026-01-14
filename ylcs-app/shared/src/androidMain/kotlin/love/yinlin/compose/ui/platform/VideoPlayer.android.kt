@@ -26,8 +26,10 @@ import kotlinx.coroutines.delay
 import love.yinlin.app
 import love.yinlin.common.FfmpegRenderersFactory
 import love.yinlin.compose.*
-import love.yinlin.platform.Coroutines
+import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.coroutines.Coroutines
 
 @Stable
 private class VideoPlayerState {

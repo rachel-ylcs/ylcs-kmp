@@ -23,8 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
-import love.yinlin.compose.*
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.ScreenSlot
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.text.TextInput
 import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.data.rachel.game.GameConfig

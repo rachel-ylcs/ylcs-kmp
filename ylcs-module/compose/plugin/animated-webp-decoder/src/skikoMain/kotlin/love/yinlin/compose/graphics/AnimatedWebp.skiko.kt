@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toSkiaRect
 import love.yinlin.data.MimeType
-import love.yinlin.data.compose.ImageFormat
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.compose.data.ImageFormat
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.catchingNull
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas

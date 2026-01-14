@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.DpRect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Colors
-import love.yinlin.compose.CustomTheme
-import love.yinlin.compose.mutableRefStateOf
+import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.node.fadingEdges
 import kotlin.math.abs
 

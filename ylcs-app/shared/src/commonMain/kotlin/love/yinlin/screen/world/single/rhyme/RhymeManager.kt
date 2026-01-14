@@ -4,10 +4,10 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.files.Path
-import love.yinlin.Context
 import love.yinlin.compose.game.Manager
 import love.yinlin.compose.game.asset.ImageAsset
 import love.yinlin.data.music.RhymeLyricsConfig
+import love.yinlin.foundation.Context
 import love.yinlin.platform.AudioPlayer
 import love.yinlin.platform.SoundPlayer
 import love.yinlin.screen.world.single.rhyme.spirit.Scene

@@ -17,18 +17,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import love.yinlin.Local
-import love.yinlin.api.ApiGameGetGameRank
-import love.yinlin.api.request
-import love.yinlin.api.url
 import love.yinlin.common.ExtraIcons
-import love.yinlin.compose.*
+import love.yinlin.compose.Device
+import love.yinlin.compose.LocalDevice
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank
 import love.yinlin.compose.ui.image.MiniImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.cs.*
 import love.yinlin.screen.community.ScreenUserCard
 
 @Stable

@@ -7,8 +7,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import love.yinlin.data.compose.ImageFormat
-import love.yinlin.data.compose.ImageQuality
+import love.yinlin.compose.data.ImageFormat
+import love.yinlin.compose.data.ImageQuality
 import kotlin.math.*
 
 @Stable
