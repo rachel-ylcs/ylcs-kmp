@@ -41,7 +41,13 @@
 - **模块化**：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
 - **高协作**：框架支持前后端协作开发，共享数据组织结构。
 
-## 文档： [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
+## 文档
+因为Rachel框架模块较多，功能丰富，一个最简单的应用程序可以仅导入app模块（注意版本号）：
+```kotlin
+implementation("love.yinlin.compose:app:x.x.x")
+```
+更多模块详情可见：
+### [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
 
 # 案例：银临茶舍跨平台 App
 

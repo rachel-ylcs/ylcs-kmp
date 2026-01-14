@@ -41,7 +41,14 @@ It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)` and other
 - **Modularization**: The entire framework is modularized, with clear dependencies between modules, allowing applications to introduce modules as needed.
 - **High Collaboration**: The framework supports front-end and back-end collaborative development, sharing data organizational structures.
 
-## Document： [Rachel Framework Development guidance](https://rachel-ylcs.github.io/ylcs-kmp)
+## Document
+Because Rachel has many framework modules and rich functions,
+the simplest application can only import the app module (note the version number):
+```kotlin
+implementation("love.yinlin.compose:app:x.x.x")
+```
+More details of the module can be found here:
+### [Rachel Framework Development Guidance](https://rachel-ylcs.github.io/ylcs-kmp)
 
 # Sample: 银临茶舍 Cross-Platform App
 

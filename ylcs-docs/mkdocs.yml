@@ -35,8 +35,6 @@ nav:
         - 9. 插件: rachel/4_server/plugin.md
     - 模块:
         - 1. 模块库: rachel/5_module/entry.md
-        - 2. 单实例: rachel/5_module/single_instance.md
-        - 3. 一键更新: rachel/5_module/auto_update.md
 
 
 site_name: Rachel框架开发向导
