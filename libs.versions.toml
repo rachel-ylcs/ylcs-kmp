@@ -5,6 +5,7 @@ kotlin = "2.3.20-Beta1"
 cmp = "1.11.0-alpha01"
 agp = "8.12.3"
 mavenPublish = "0.35.0"
+dokka = "2.1.0"
 
 # Libs #
 
@@ -41,6 +42,7 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 androidLibraryNew = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
 [libraries]
 
@@ -51,6 +53,7 @@ gradle-plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin"
 gradle-plugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 gradle-plugin-serialization = { module = "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin", version.ref = "kotlin" }
 gradle-plugin-mavenPublish = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "mavenPublish" }
+gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 
 # Tooling
 compose-ui-graphics-android = { module = "androidx.compose.ui:ui-graphics-android", version.ref = "cmp-android" }

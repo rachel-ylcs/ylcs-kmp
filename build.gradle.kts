@@ -15,6 +15,7 @@ plugins {
             libs.plugins.kotlinCocoapods,
             libs.plugins.kotlinSerialization,
             libs.plugins.mavenPublish,
+            libs.plugins.dokka,
         ),
         listOf(
             libs.plugins.ktor,

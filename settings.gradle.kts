@@ -42,6 +42,7 @@ include(
     "ylcs-module:core:base",
     "ylcs-module:core:compose",
     "ylcs-module:core:cs",
+    "ylcs-module:dokka",
     "ylcs-module:foundation:context",
     "ylcs-module:foundation:cs:client-engine",
     "ylcs-module:foundation:cs:server-engine",
