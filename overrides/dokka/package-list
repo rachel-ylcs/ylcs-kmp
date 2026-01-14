@@ -1,0 +1,26 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:love.yinlin.compose//rememberDerivedState/#kotlin.Any?#kotlin.Function0[TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/love.yinlin.core.compose/love.yinlin.compose/[common]remember-derived-state.html
+$dokka.location:love.yinlin.compose//rememberRefState/#kotlin.Any?#kotlin.Function0[TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/love.yinlin.core.compose/love.yinlin.compose/[common]remember-ref-state.html
+$dokka.location:love.yinlin.compose//rememberState/#kotlin.Any?#kotlin.Function0[TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/love.yinlin.core.compose/love.yinlin.compose/[common]remember-state.html
+$dokka.location:love.yinlin.data.compose/ItemKey.Serializer///PointingToDeclaration/love.yinlin.core.compose/love.yinlin.data.compose/-item-key/[skiko]-serializer/index.html
+$dokka.location:love.yinlin.data.compose/ItemKey.Serializer/descriptor/#/PointingToDeclaration/love.yinlin.core.compose/love.yinlin.data.compose/-item-key/[skiko]-serializer/descriptor.html
+$dokka.location:love.yinlin.data.compose/ItemKey.Serializer/deserialize/#kotlinx.serialization.encoding.Decoder/PointingToDeclaration/love.yinlin.core.compose/love.yinlin.data.compose/-item-key/[skiko]-serializer/deserialize.html
+$dokka.location:love.yinlin.data.compose/ItemKey.Serializer/serialize/#kotlinx.serialization.encoding.Encoder#love.yinlin.data.compose.ItemKey/PointingToDeclaration/love.yinlin.core.compose/love.yinlin.data.compose/-item-key/[skiko]-serializer/serialize.html
+$dokka.location:love.yinlin.data.compose/ItemKey/value/#/PointingToDeclaration/love.yinlin.core.compose/love.yinlin.data.compose/-item-key/[skiko]value.html
+module:love.yinlin.core.base
+love.yinlin.collection
+love.yinlin.compatible
+love.yinlin.data
+love.yinlin.extension
+love.yinlin.io
+love.yinlin.platform
+love.yinlin.uri
+module:love.yinlin.core.compose
+love.yinlin.collection
+love.yinlin.compose
+love.yinlin.compose.graphics
+love.yinlin.data.compose
+love.yinlin.fixup
+module:love.yinlin.core.cs
+love.yinlin.api
