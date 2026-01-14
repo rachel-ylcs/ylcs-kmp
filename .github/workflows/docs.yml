@@ -25,6 +25,16 @@ jobs:
       - name: Check Github Environment
         run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
 
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
       - name: Build Dokka
         run: |
           mkdir -p ylcs-docs/docs/overrides
