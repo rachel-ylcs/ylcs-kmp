@@ -12,20 +12,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Configure Git Credentials
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+
+      - name: Check Github Environment
+        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+
+      - name: Build Dokka
+        run: |
+          mkdir -p ylcs-docs/docs/overrides
+          ./gradlew :dokkaGenerateHtml
+
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
           path: ~/.cache
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-glightbox
-      - run: cd ylcs-docs && mkdocs gh-deploy --force
+          restore-keys: mkdocs-material-
+
+      - name: Pip Install Mkdocs Plugins
+        run: |
+          pip install mkdocs-material
+          pip install mkdocs-glightbox
+
+      - name: Deploy
+        run: |
+          cd ylcs-docs
+          mkdocs gh-deploy --force
