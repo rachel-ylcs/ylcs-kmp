@@ -5,7 +5,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
 
 @Stable
-expect class PAGSourceScope(layer: PAGSourceLayer) {
+expect class PAGSourceScope(layer: PAGSourceFile) {
     val width: Int
     val height: Int
     var matrix: Matrix

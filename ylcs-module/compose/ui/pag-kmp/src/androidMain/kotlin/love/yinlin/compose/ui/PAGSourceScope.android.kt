@@ -8,7 +8,7 @@ import love.yinlin.compose.graphics.asAndroidMatrix
 import love.yinlin.compose.graphics.asComposeMatrix
 
 @Stable
-actual class PAGSourceScope actual constructor(private val layer: PAGSourceLayer) {
+actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile) {
     actual val width: Int get() = layer.width()
     actual val height: Int get() = layer.height()
 

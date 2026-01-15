@@ -1,6 +1,7 @@
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinCocoapods,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
@@ -35,4 +36,8 @@ template(object : KotlinMultiplatformTemplate() {
 
         wasmJsMain.configure(webMain)
     }
+
+    override val cocoapodsList: List<Pod> = listOf(
+        Pod("libpag", version = libs.versions.pag)
+    )
 })
