@@ -2,6 +2,7 @@ import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import love.yinlin.task.GenerateCodeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.NamedDomainObjectCollectionDelegateProvider
 import org.gradle.kotlin.dsl.NamedDomainObjectContainerCreatingDelegateProvider
 import org.gradle.kotlin.dsl.configure
@@ -19,6 +20,9 @@ import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 // 在 ExportLib 后面的库将会被导出给其他模块可见
 data object ExportLib
+
+// Npm
+class NpmInfo internal constructor(val name: String, val version: String)
 
 class BackendInfo(namespace: String, selector: String, path: String) {
     val uniqueSelector: String = selector
@@ -96,14 +100,22 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
     open fun Project.build(extension: T) { extension.action() }
 
     // 引入依赖
+    fun npm(name: String, version: Provider<String>): NpmInfo = NpmInfo(name, version.get())
+
     fun HasKotlinDependencies.lib(vararg libs: Any) {
         dependencies {
             var isExport = false
             for (item in libs) {
                 when {
                     item is ExportLib -> isExport = true
-                    isExport -> api(item)
-                    else -> implementation(item)
+                    isExport -> {
+                        if (item is NpmInfo) api(npm(item.name, item.version))
+                        else api(item)
+                    }
+                    else -> {
+                        if (item is NpmInfo) implementation(npm(item.name, item.version))
+                        else implementation(item)
+                    }
                 }
             }
         }

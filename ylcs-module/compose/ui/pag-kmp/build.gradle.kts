@@ -30,7 +30,9 @@ template(object : KotlinMultiplatformTemplate() {
 
         desktopMain.configure(commonMain)
 
-        webMain.configure(commonMain)
+        webMain.configure(commonMain) {
+            lib(npm("libpag", libs.versions.pag))
+        }
 
         jsMain.configure(webMain)
 
