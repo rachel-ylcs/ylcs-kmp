@@ -17,8 +17,8 @@ import platform.WebKit.WKWebView
 import platform.darwin.NSObject
 
 @Stable
-actual class WebViewState actual constructor(initUrl: String) : PlatformView<WKWebView>() {
-    internal var stateUrl: String by mutableStateOf(initUrl)
+actual class WebViewState actual constructor(private val initUrl: String) : PlatformView<WKWebView>() {
+    internal var stateUrl: String by mutableStateOf("")
     actual var url: String get() = stateUrl
         set(value) { host?.loadRequest(NSMutableURLRequest(NSURL(string = value))) }
 
@@ -87,7 +87,7 @@ actual class WebViewState actual constructor(initUrl: String) : PlatformView<WKW
         webview.setUserInteractionEnabled(true)
         webview.allowsBackForwardNavigationGestures = true
         webview.navigationDelegate = protocol
-        if (stateUrl.isNotEmpty()) webview.loadRequest(NSMutableURLRequest(NSURL(string = stateUrl)))
+        if (initUrl.isNotEmpty()) webview.loadRequest(NSMutableURLRequest(NSURL(string = initUrl)))
         return webview
     }
 }

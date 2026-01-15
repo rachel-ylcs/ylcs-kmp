@@ -1,33 +1,38 @@
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
-actual fun PAGAnimation(state: PAGState, modifier: Modifier) {
-    state.Content(modifier)
+actual fun PAGAnimation(
+    state: PAGState,
+    modifier: Modifier,
+    repeatCount: Int,
+    scaleMode: PAGConfig.ScaleMode,
+    cachedEnabled: Boolean?,
+    cacheScale: Float?,
+    maxFrameRate: Float?,
+    isSync: Boolean?,
+    videoEnabled: Boolean?,
+    useDiskCache: Boolean?,
+) {
+    state.HostView(modifier = modifier)
 
-    LaunchedEffect(repeatCount, scaleMode) {
-        pagView.value?.let { view ->
-            view.setRepeatCount(repeatCount)
-            view.setScaleMode(when (scaleMode) {
-                PAGConfig.ScaleMode.None -> PAGScaleMode.None
-                PAGConfig.ScaleMode.Stretch -> PAGScaleMode.Stretch
-                PAGConfig.ScaleMode.LetterBox -> PAGScaleMode.LetterBox
-                PAGConfig.ScaleMode.Zoom -> PAGScaleMode.Zoom
-            })
-        }
+    state.Monitor(repeatCount, scaleMode, cachedEnabled, cacheScale, maxFrameRate, isSync, videoEnabled, useDiskCache) { view ->
+        if (view.repeatCount() != repeatCount) view.setRepeatCount(repeatCount)
+        scaleMode.asPAGScaleMode.let { if (view.scaleMode() != it) view.setScaleMode(it) }
+        cachedEnabled?.let { if (view.cacheEnabled() != it) view.setCacheEnabled(it) }
+        cacheScale?.let { if (view.cacheScale() != it) view.setCacheScale(it) }
+        maxFrameRate?.let { if (view.maxFrameRate() != it) view.setMaxFrameRate(it) }
+        isSync?.let { if (view.isSync != it) view.isSync = it }
+        videoEnabled?.let { if (view.videoEnabled() != it) view.setVideoEnabled(it) }
+        useDiskCache?.let { if (view.useDiskCache() != it) view.setUseDiskCache(it) }
     }
 
-    LaunchedEffect(listener) {
-        if (listener == pagViewListener.value.listener) {
-            return@LaunchedEffect
-        }
-        pagView.value?.let { view ->
-            view.removeListener(pagViewListener.value)
-            pagViewListener.value = PAGViewListenerImpl(listener)
-            view.addListener(pagViewListener.value)
-        }
+    val assetManager = LocalContext.current.assets
+
+    state.Monitor(state.stateComposition) {
+        state.updateComposition(assetManager, it)
     }
 }

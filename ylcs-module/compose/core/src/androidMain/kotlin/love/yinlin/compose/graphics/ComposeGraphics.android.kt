@@ -1,6 +1,7 @@
 package love.yinlin.compose.graphics
 
 import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Matrix
 
 typealias AndroidBlendMode = android.graphics.BlendMode
 
@@ -67,4 +68,33 @@ fun AndroidBlendMode.asComposeBlendMode(): BlendMode = when (this) {
     AndroidBlendMode.SATURATION -> BlendMode.Saturation
     AndroidBlendMode.COLOR -> BlendMode.Color
     AndroidBlendMode.LUMINOSITY -> BlendMode.Luminosity
+}
+
+typealias AndroidMatrix = android.graphics.Matrix
+
+fun Matrix.asAndroidMatrix(): AndroidMatrix {
+    // 4 x 4 降维到 3 x 3
+    val v = this.values
+    val androidMatrix = AndroidMatrix()
+    // ScaleX(0), SkewX(4), TransX(12)
+    // SkewY(1), ScaleY(5), TransY(13)
+    // Persp0(3), Persp1(7), Persp2(15)
+    androidMatrix.setValues(floatArrayOf(
+        v[Matrix.ScaleX], v[Matrix.SkewX], v[Matrix.TranslateX],
+        v[Matrix.SkewY], v[Matrix.ScaleY], v[Matrix.TranslateY],
+        v[Matrix.Perspective0], v[Matrix.Perspective1], v[Matrix.Perspective2]
+    ))
+    return androidMatrix
+}
+
+fun AndroidMatrix.asComposeMatrix(): Matrix {
+    val v = FloatArray(9)
+    this.getValues(v)
+    // 3 x 3 升维到 4 x 4
+    return Matrix(floatArrayOf(
+        v[AndroidMatrix.MSCALE_X], v[AndroidMatrix.MSKEW_Y], 0f, v[AndroidMatrix.MPERSP_0], // Column 0: ScaleX, SkewY, 0, Persp0
+        v[AndroidMatrix.MSKEW_X], v[AndroidMatrix.MSCALE_Y], 0f, v[AndroidMatrix.MPERSP_1], // Column 1: SkewX, ScaleY, 0, Persp1
+        0f, 0f, 1f, 0f,   // Column 2: 0, 0, ScaleZ, 0
+        v[AndroidMatrix.MTRANS_X], v[AndroidMatrix.MTRANS_Y], 0f, v[AndroidMatrix.MPERSP_2]  // Column 3: TransX, TransY, 0, Persp2
+    ))
 }

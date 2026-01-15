@@ -8,8 +8,8 @@ import platform.WebKit.javaScriptEnabled
 @Composable
 actual fun WebView(
     state: WebViewState,
+    modifier: Modifier,
     config: WebViewConfig,
-    modifier: Modifier
 ) {
     NavigationBack(enabled = state.canGoBack) { state.goBack() }
 

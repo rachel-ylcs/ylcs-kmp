@@ -3,11 +3,11 @@ package love.yinlin.compose.ui
 import androidx.compose.runtime.Stable
 
 @Stable
-sealed interface PAGSource {
+sealed class PAGSource(internal val block: PAGSourceScope.() -> Unit) {
     @Stable
-    data class File(val path: String) : PAGSource
+    class File(val path: String, block: PAGSourceScope.() -> Unit = {}) : PAGSource(block)
     @Stable
-    class Data(val data: ByteArray) : PAGSource
+    class Data(val data: ByteArray, block: PAGSourceScope.() -> Unit = {}) : PAGSource(block)
     @Stable
-    data class Asset(val path: String) : PAGSource
+    class Asset(val path: String, block: PAGSourceScope.() -> Unit = {}) : PAGSource(block)
 }

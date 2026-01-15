@@ -17,8 +17,8 @@ import love.yinlin.compose.extension.mutableRefStateOf
 internal typealias AndroidWebView = android.webkit.WebView
 
 @Stable
-actual class WebViewState actual constructor(initUrl: String) : PlatformView<AndroidWebView>(), Releasable<AndroidWebView> {
-    internal var stateUrl: String by mutableStateOf(initUrl)
+actual class WebViewState actual constructor(private val initUrl: String) : PlatformView<AndroidWebView>(), Releasable<AndroidWebView> {
+    internal var stateUrl: String by mutableStateOf("")
     actual var url: String get() = stateUrl
         set(value) { host?.loadUrl(value) }
 
@@ -121,7 +121,7 @@ actual class WebViewState actual constructor(initUrl: String) : PlatformView<And
         }
         webView.webViewClient = client
         webView.webChromeClient = chromeClient
-        if (stateUrl.isNotEmpty()) webView.loadUrl(stateUrl)
+        if (initUrl.isNotEmpty()) webView.loadUrl(initUrl)
         return webView
     }
 

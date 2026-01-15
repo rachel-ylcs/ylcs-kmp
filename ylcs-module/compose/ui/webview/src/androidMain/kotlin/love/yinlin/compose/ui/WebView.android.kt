@@ -7,8 +7,8 @@ import love.yinlin.compose.ui.layout.NavigationBack
 @Composable
 actual fun WebView(
     state: WebViewState,
+    modifier: Modifier,
     config: WebViewConfig,
-    modifier: Modifier
 ) {
     NavigationBack(enabled = state.canGoBack) { state.goBack() }
 

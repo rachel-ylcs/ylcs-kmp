@@ -9,8 +9,4 @@ interface PAGAnimationListener {
     fun onAnimationCancel() { }
     fun onAnimationRepeat() { }
     fun onAnimationUpdate(progress: Double) { }
-
-    companion object {
-        val Default = object : PAGAnimationListener {}
-    }
 }
