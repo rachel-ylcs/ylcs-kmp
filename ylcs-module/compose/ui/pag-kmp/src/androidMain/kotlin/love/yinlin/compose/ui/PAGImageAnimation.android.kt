@@ -44,9 +44,10 @@ actual fun PAGImageAnimation(
             is PAGSource.Data -> PAGFile.Load(source.data)
             is PAGSource.Asset -> PAGFile.Load(assetManager, source.path)
         }
-        if (source != null && layer != null) {
-            with(source) { PAGSourceScope(layer).block() }
-        }
+
+        val layerBlock = source?.block
+        if (source != null && layer != null && layerBlock != null) PAGSourceScope(layer).layerBlock()
+
         view.composition = layer
     }
 }

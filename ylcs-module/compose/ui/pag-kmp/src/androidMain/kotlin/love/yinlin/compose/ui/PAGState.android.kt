@@ -77,7 +77,10 @@ actual class PAGState actual constructor(
                 is PAGSource.Data -> PAGFile.Load(source.data)
                 is PAGSource.Asset -> PAGFile.Load(assetManager, source.path)
             }
-            with(source) { PAGSourceScope(layer).block() }
+
+            val layerBlock = source.block
+            if (layerBlock != null) PAGSourceScope(layer).layerBlock()
+
             if (width == null || height == null) {
                 width = layer.width()
                 height = layer.height()
