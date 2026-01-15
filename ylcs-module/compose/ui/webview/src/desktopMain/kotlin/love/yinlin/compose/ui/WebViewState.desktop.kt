@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.painter.BitmapPainter
 
 @Stable
-actual class WebViewState actual constructor(val settings: WebViewConfig, initUrl: String) {
+actual class WebViewState actual constructor(initUrl: String) {
     actual var url: String = initUrl
     actual val loadingState: WebViewLoadingState = WebViewLoadingState.Initializing
     actual val title: String = ""

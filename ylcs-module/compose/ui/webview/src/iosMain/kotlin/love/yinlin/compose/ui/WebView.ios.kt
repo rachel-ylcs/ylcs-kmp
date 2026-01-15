@@ -2,11 +2,24 @@ package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import love.yinlin.compose.ui.layout.NavigationBack
+import platform.WebKit.javaScriptEnabled
 
 @Composable
 actual fun WebView(
     state: WebViewState,
+    config: WebViewConfig,
     modifier: Modifier
 ) {
-    state.Content(modifier)
+    NavigationBack(enabled = state.canGoBack) { state.goBack() }
+
+    state.HostView(modifier = modifier)
+
+    state.Monitor(config) {
+        it.configuration.apply {
+            defaultWebpagePreferences.allowsContentJavaScript = config.enableJavaScript
+            preferences.javaScriptEnabled = config.enableJavaScript
+            preferences.javaScriptCanOpenWindowsAutomatically = config.enableJavaScriptOpenWindow
+        }
+    }
 }

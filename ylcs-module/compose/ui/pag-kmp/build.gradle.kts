@@ -15,7 +15,12 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 ExportLib,
+                projects.ylcsModule.compose.ui.platformView,
             )
+        }
+
+        androidMain.configure(commonMain) {
+            lib(libs.pag.android)
         }
 
         iosMain.configure(commonMain)

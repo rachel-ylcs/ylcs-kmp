@@ -27,7 +27,7 @@ import love.yinlin.compose.ui.layout.UnsupportedPlatformComponent
 @Stable
 class ScreenActivityLink(manager: ScreenManager) : Screen(manager) {
     val showstartInput = TextInputState()
-    val webPageState = WebViewState(WebViewConfig())
+    val webPageState = WebViewState()
 
     override val title: String = "链接提取"
 

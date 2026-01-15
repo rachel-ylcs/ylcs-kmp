@@ -6,7 +6,7 @@ import kotlinx.browser.document
 import org.w3c.dom.HTMLIFrameElement
 
 @Stable
-actual class WebViewState actual constructor(val settings: WebViewConfig, initUrl: String) : PlatformView<HTMLIFrameElement>() {
+actual class WebViewState actual constructor(initUrl: String) : PlatformView<HTMLIFrameElement>() {
     actual var url: String = initUrl
     actual val loadingState: WebViewLoadingState = WebViewLoadingState.Finished
     actual val title: String = ""

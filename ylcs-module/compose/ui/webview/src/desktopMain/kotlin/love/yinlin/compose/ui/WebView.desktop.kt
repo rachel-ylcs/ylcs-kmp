@@ -7,6 +7,7 @@ import love.yinlin.compose.ui.layout.UnsupportedPlatformComponent
 @Composable
 actual fun WebView(
     state: WebViewState,
+    config: WebViewConfig,
     modifier: Modifier
 ) {
     UnsupportedPlatformComponent(modifier = modifier)
