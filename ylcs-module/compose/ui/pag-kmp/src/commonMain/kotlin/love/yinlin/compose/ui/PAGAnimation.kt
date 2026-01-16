@@ -1,6 +1,7 @@
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 /**
@@ -12,13 +13,5 @@ expect fun PAGAnimation(
     state: PAGState,
     modifier: Modifier = Modifier,
     isPlaying: Boolean = false,
-    repeatCount: Int = PAGConfig.INFINITY,
-    scaleMode: PAGConfig.ScaleMode = PAGConfig.ScaleMode.LetterBox,
-    // 下面参数不确定初始值是什么, 后续看 native 源码再改, 请勿主动使用 null 以防后续不兼容
-    cachedEnabled: Boolean? = null,
-    cacheScale: Float? = null,
-    maxFrameRate: Float? = null,
-    isSync: Boolean? = null,
-    videoEnabled: Boolean? = null,
-    useDiskCache: Boolean? = null,
+    config: PAGConfig = remember { PAGConfig() }
 )

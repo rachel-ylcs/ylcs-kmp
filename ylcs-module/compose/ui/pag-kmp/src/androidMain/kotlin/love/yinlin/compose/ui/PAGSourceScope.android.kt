@@ -42,4 +42,19 @@ actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile)
 
     actual var alpha: Float get() = layer.alpha()
         set(value) { layer.setAlpha(value) }
+
+
+    actual val editableIndex: Int get() = layer.editableIndex()
+
+    actual val numChildren: Int get() = layer.numChildren()
+
+    actual val numTexts: Int get() = layer.numTexts()
+
+    actual val numImages: Int get() = layer.numImages()
+
+    actual val numVideos: Int get() = layer.numVideos()
+
+    actual val audioBytes: ByteArray? get() = layer.audioBytes()?.array()
+
+    actual val audioStartTime: Long get() = layer.audioStartTime()
 }

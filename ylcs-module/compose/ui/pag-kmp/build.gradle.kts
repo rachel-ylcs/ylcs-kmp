@@ -21,7 +21,10 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         androidMain.configure(commonMain) {
-            lib(libs.pag.android)
+            lib(
+                ExportLib,
+                libs.pag.android
+            )
         }
 
         iosMain.configure(commonMain)
@@ -31,7 +34,10 @@ template(object : KotlinMultiplatformTemplate() {
         desktopMain.configure(commonMain)
 
         webMain.configure(commonMain) {
-            lib(npm("libpag", libs.versions.pag))
+            lib(
+                ExportLib,
+                npm("libpag", "4.5.16")
+            )
         }
 
         jsMain.configure(webMain)
@@ -40,6 +46,6 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override val cocoapodsList: List<Pod> = listOf(
-        Pod("libpag", version = libs.versions.pag)
+        Pod("libpag", version = "4.5.12")
     )
 })

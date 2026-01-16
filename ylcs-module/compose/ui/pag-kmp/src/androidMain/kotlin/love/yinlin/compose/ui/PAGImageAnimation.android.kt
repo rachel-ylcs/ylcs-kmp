@@ -20,20 +20,17 @@ actual fun PAGImageAnimation(
     source: PAGSource?,
     modifier: Modifier,
     isPlaying: Boolean,
-    repeatCount: Int,
-    scaleMode: PAGConfig.ScaleMode,
-    renderScale: Float,
-    cacheAllFramesInMemory: Boolean,
+    config: PAGConfig,
 ) {
     val wrapper = rememberPlatformView { PAGImageAnimationWrapper() }
 
     wrapper.HostView(modifier = modifier)
 
-    wrapper.Monitor(repeatCount, scaleMode, renderScale, cacheAllFramesInMemory) { view ->
-        if (view.repeatCount() != repeatCount) view.setRepeatCount(repeatCount)
-        scaleMode.asPAGScaleMode.let { if (view.scaleMode() != it) view.setScaleMode(it) }
-        if (view.renderScale() != renderScale) view.setRenderScale(renderScale)
-        if (view.cacheAllFramesInMemory() != cacheAllFramesInMemory) view.setCacheAllFramesInMemory(cacheAllFramesInMemory)
+    wrapper.Monitor(config) { view ->
+        config.repeatCount.let { if (view.repeatCount() != it) view.setRepeatCount(it) }
+        config.scaleMode.ordinal.let { if (view.scaleMode() != it) view.setScaleMode(it) }
+        config.renderScale.let { if (view.renderScale() != it) view.setRenderScale(it) }
+        config.cacheAllFramesInMemory.let { if (view.cacheAllFramesInMemory() != it) view.setCacheAllFramesInMemory(it) }
     }
 
     val assetManager = LocalContext.current.assets

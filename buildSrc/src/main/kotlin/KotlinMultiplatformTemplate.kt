@@ -32,13 +32,26 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
 
-data class Pod(
+class Pod private constructor(
     val name: String,
     val moduleName: String? = null,
-    val version: Provider<String>? = null,
+    val version: String? = null,
     val extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
     val source: File? = null,
-)
+) {
+    constructor(
+        name: String,
+        moduleName: String? = null,
+        version: Any? = null,
+        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+        source: File? = null
+    ) : this(name, moduleName, version?.let {
+        when (it) {
+            is Provider<*> -> it.get() as String
+            else -> it.toString()
+        }
+    }, extraOpts, source)
+}
 
 class KotlinMultiplatformSourceSetsScope(
     p: Project,
@@ -235,7 +248,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         for (item in cocoapodsList) {
                             pod(item.name) {
                                 if (item.moduleName != null) moduleName = item.moduleName
-                                if (item.version != null) version = item.version.get()
+                                if (item.version != null) version = item.version
                                 extraOpts += item.extraOpts
                                 if (item.source != null) source = path(item.source)
                             }

@@ -1,32 +1,192 @@
+@file:JsModule("libpag")
 @file:OptIn(ExperimentalWasmJsInterop::class)
-@file:Suppress("FunctionName", "PropertyName")
+@file:Suppress("FunctionName", "PropertyName", "ConstPropertyName")
 package love.yinlin.compose.ui
 
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
+import org.khronos.webgl.WebGLFramebuffer
+import org.khronos.webgl.WebGLRenderingContext
+import org.khronos.webgl.WebGLTexture
 import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.ImageBitmap
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 import kotlin.js.JsBoolean
+import kotlin.js.JsModule
+import kotlin.js.JsName
 import kotlin.js.Promise
 import kotlin.js.definedExternally
 
-open external class PAGLayer : JsAny
+external interface PAGViewOptions : JsAny {
+    var useScale: Boolean?
+    var useCanvas2D: Boolean?
+    var firstFrame: Boolean?
+}
 
-open external class PAGComposition : PAGLayer
+external class PAG : JsAny {
+    val PAGPlayer: PAGPlayer.Companion
+    val PAGFile: PAGFile.Companion
+    val PAGView: PAGView.Companion
+    val PAGSurface: PAGSurface.Companion
+    val PAGComposition: PAGComposition.Companion
+}
+
+internal external fun PAGInit(moduleOption: JsAny? = definedExternally): Promise<PAG?>
+
+@JsName("Rect")
+external class PAGRect : JsAny {
+    val left: Double
+    val top: Double
+    val right: Double
+    val bottom: Double
+}
+
+@JsName("Matrix")
+external class PAGMatrix : JsAny {
+    companion object {
+        fun makeAll(scaleX: Double, skewX: Double, transX: Double, skewY: Double, scaleY: Double, transY: Double, pers0: Double = definedExternally, pers1: Double = definedExternally, pers2: Double = definedExternally): PAGMatrix
+        fun makeScale(scaleX: Double, scaleY: Double): PAGMatrix
+        fun makeTrans(dx: Double, dy: Double): PAGMatrix
+    }
+
+    // scaleX
+    var a: Double
+    // skewY
+    var b: Double
+    // skewX
+    var c: Double
+    // scaleY
+    var d: Double
+    // transX
+    var tx: Double
+    // transY
+    var ty: Double
+
+    fun get(index: Int): Double
+    fun set(index: Int, value: Double)
+    fun setAll(scaleX: Double, skewX: Double, transX: Double, skewY: Double, scaleY: Double, transY: Double)
+    fun setAffine(a: Double, b: Double, c: Double, d: Double, tx: Double, ty: Double)
+    fun reset()
+    fun setTranslate(dx: Double, dy: Double)
+    fun setScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun setRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun setSinCos(sinV: Double, cosV: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun setSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun setConcat(a: PAGMatrix, b: PAGMatrix)
+    fun preTranslate(dx: Double, dy: Double)
+    fun preScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun preRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun preSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun preConcat(other: PAGMatrix)
+    fun postTranslate(dx: Double, dy: Double)
+    fun postScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun postRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun postSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
+    fun postConcat(other: PAGMatrix)
+}
+
+external class PAGSurface : JsAny {
+    companion object {
+        fun fromCanvas(canvasID: String): PAGSurface
+        fun fromTexture(textureID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface
+        fun fromRenderTarget(frameBufferID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface
+    }
+
+    fun width(): Int
+    fun height(): Int
+    fun updateSize()
+    fun clearAll(): Boolean
+    fun freeCache()
+    fun readPixels(colorType: Int, alphaType: Int): Uint8Array?
+}
+
+open external class PAGLayer : JsAny {
+    fun uniqueID(): Int
+    fun layerType(): Int
+    fun layerName(): String
+    fun matrix(): PAGMatrix
+    fun setMatrix(matrix: PAGMatrix)
+    fun resetMatrix()
+    fun getTotalMatrix(): PAGMatrix
+    fun alpha(): Double
+    fun setAlpha(opacity: Double)
+    fun visible(): Boolean
+    fun setVisible(visible: Boolean)
+    fun editableIndex(): Int
+    fun parent(): PAGComposition
+    // fun markers()
+    fun localTimeToGlobal(localTime: Long): Long
+    fun globalToLocalTime(globalTime: Long): Long
+    fun duration(): Long
+    fun frameRate(): Float
+    fun startTime(): Long
+    fun setStartTime(time: Long)
+    fun currentTime(): Long
+    fun setCurrentTime(time: Long)
+    fun getProgress(): Double
+    fun setProgress(percent: Double)
+    fun preFrame()
+    fun nextFrame()
+    fun getBounds(): PAGRect
+    fun trackMatteLayer(): PAGLayer
+    fun excludedFromTimeline(): Boolean
+    fun setExcludedFromTimeline(value: Boolean)
+    fun isPAGFile(): Boolean
+    // fun asTypeLayer()
+}
+
+open external class PAGComposition : PAGLayer {
+    companion object {
+        fun make(width: Int, height: Int): PAGComposition
+    }
+
+    fun width(): Int
+    fun height(): Int
+    fun setContentSize(width: Int, height: Int)
+    fun numChildren(): Int
+    fun getLayerAt(index: Int): PAGLayer
+    fun getLayerIndex(pagLayer: PAGLayer): Int
+    fun setLayerIndex(pagLayer: PAGLayer, index: Int): Int
+    fun addLayer(pagLayer: PAGLayer): Boolean
+    fun addLayerAt(pagLayer: PAGLayer, index: Int): Boolean
+    fun contains(pagLayer: PAGLayer): Boolean
+    fun removeLayer(pagLayer: PAGLayer): PAGLayer
+    fun removeLayerAt(index: Int): PAGLayer
+    fun removeAllLayers()
+    fun swapLayer(pagLayer1: PAGLayer, pagLayer2: PAGLayer)
+    fun swapLayerAt(index1: Int, index2: Int)
+    fun audioBytes(): Uint8Array?
+    // fun audioMarkers()
+    fun audioStartTime(): Long
+    fun getLayersByName(layerName: String): PAGLayer
+    fun getLayersUnderPoint(localX: Double, localY: Double): PAGLayer
+}
 
 external class PAGFile : PAGComposition {
     companion object {
-        fun load(data: ArrayBuffer): Promise<PAGFile>
+        fun loadFromBuffer(data: ArrayBuffer): Promise<PAGFile>
+        fun maxSupportedTagLevel(): Int
+        fun tagLevel(): Int
+        fun numTexts(): Int
+        fun numImages(): Int
+        fun numVideos(): Int
+        // fun getTextData()
+        // fun replaceText()
+        // fun replaceImage()
+        // fun getLayersByEditableIndex()
+        // fun getEditableIndices()
+        // fun timeStretchMode()
+        // fun setTimeStretchMode()
+        fun setDuration(duration: Long)
+        fun copyOriginal(): PAGFile
     }
 }
 
-external class PAGPlayer {
+external class PAGPlayer : JsAny {
     companion object {
         fun create(): PAGPlayer
     }
-
-    val isDestroyed: Boolean
 
     fun setProgress(progress: Double)
     fun flush(): Promise<JsBoolean>
@@ -47,46 +207,52 @@ external class PAGPlayer {
     fun getComposition(): PAGComposition
     fun setComposition(pagComposition: PAGComposition?)
     fun getSurface(): PAGSurface
+    fun matrix(): PAGMatrix
+    fun setMatrix(matrix: PAGMatrix)
     fun nextFrame()
     fun preFrame()
     fun autoClear(): Boolean
     fun setAutoClear(value: Boolean)
+    fun getBounds(): PAGRect
+    // fun getLayersUnderPoint()
+    // fun hitTestPoint()
+    fun renderingTime(): Long
+    fun imageDecodingTime(): Long
+    fun presentingTime(): Long
+    fun graphicsMemory(): Double
     fun prepare(): Promise<JsAny?>
-    fun destroy()
+    // fun linkVideoReader()
+    // fun unlinkVideoReader()
 }
 
-external class PAGSurface {
+external class BackendContext(handle: Int, externallyOwned: Boolean = definedExternally) : JsAny {
     companion object {
-        fun fromCanvas(canvasID: String): PAGSurface;
-        fun fromTexture(textureID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface;
-        fun fromRenderTarget(frameBufferID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface;
+        fun from(gl: WebGLRenderingContext): BackendContext
+        fun from(gl: BackendContext): BackendContext
     }
 
-    val isDestroyed: Boolean
+    val handle: Int
 
-    fun width(): Int
-    fun height(): Int
-    fun updateSize()
-    fun clearAll(): Boolean
-    fun freeCache()
-    fun readPixels(colorType: Int, alphaType: Int): Uint8Array?
+    fun getContext(): WebGLRenderingContext?
+    fun makeCurrent(): Boolean
+    fun clearCurrent()
+    fun registerTexture(texture: WebGLTexture)
+    fun getTexture(handle: Int): WebGLTexture?
+    fun unregisterTexture(handle: Int)
+    fun registerRenderTarget(frameBuffer: WebGLFramebuffer)
+    fun getRenderTarget(handle: Int): WebGLFramebuffer?
+    fun unregisterRenderTarget(handle: Int)
     fun destroy()
 }
 
-external interface PAGViewOptions {
-    var useScale: Boolean?
-    var useCanvas2D: Boolean?
-    var firstFrame: Boolean?
-}
-
-external class PAGView : JsAny {
+external class PAGView(pagLayer: PAGLayer, canvasElement: HTMLCanvasElement) : JsAny {
     companion object {
-        fun init(file: PAGComposition, canvas: HTMLCanvasElement, initOptions: PAGViewOptions? = definedExternally): Promise<PAGView?>
+        fun init(composition: PAGComposition, canvas: HTMLCanvasElement, initOptions: PAGViewOptions? = definedExternally): Promise<PAGView?>
+        fun makePAGSurface(pagGlContext: BackendContext, width: Int, height: Int): PAGSurface
     }
 
     var repeatCount: Int
     var isPlaying: Boolean
-    val isDestroyed: Boolean
 
     fun duration(): Long
     fun addListener(eventName: String, listener: (event: JsAny) -> Unit)
@@ -98,6 +264,8 @@ external class PAGView : JsAny {
     fun getProgress(): Double
     fun currentFrame(): Int
     fun setProgress(progress: Double): Double
+    fun videoEnabled(): Boolean
+    fun setVideoEnabled(enable: Boolean)
     fun cacheEnabled(): Boolean
     fun setCacheEnabled(enable: Boolean)
     fun cacheScale(): Float
@@ -108,18 +276,13 @@ external class PAGView : JsAny {
     fun setScaleMode(value: Int)
     fun flush(): Promise<JsBoolean>
     fun freeCache()
-    fun getComposition(): PAGComposition
-    fun setComposition(pagComposition: PAGComposition)
+    fun getComposition(): PAGComposition?
+    fun setComposition(pagComposition: PAGComposition?)
+    fun matrix(): PAGMatrix
+    fun setMatrix(matrix: PAGMatrix)
+    // fun getLayersUnderPoint()
     fun updateSize()
     fun prepare(): Promise<JsAny?>
+    fun makeSnapshot(): Promise<ImageBitmap>
     fun destroy()
 }
-
-external class PAG : JsAny {
-    val PAGPlayer: PAGPlayer.Companion
-    val PAGFile: PAGFile.Companion
-    val PAGView: PAGView.Companion
-    val PAGSurface: PAGSurface.Companion
-}
-
-external fun PAGInit(moduleOption: JsAny? = definedExternally): Promise<PAG?>

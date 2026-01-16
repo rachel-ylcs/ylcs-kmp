@@ -9,26 +9,19 @@ actual fun PAGAnimation(
     state: PAGState,
     modifier: Modifier,
     isPlaying: Boolean,
-    repeatCount: Int,
-    scaleMode: PAGConfig.ScaleMode,
-    cachedEnabled: Boolean?,
-    cacheScale: Float?,
-    maxFrameRate: Float?,
-    isSync: Boolean?,
-    videoEnabled: Boolean?,
-    useDiskCache: Boolean?,
+    config: PAGConfig,
 ) {
     state.HostView(modifier = modifier)
 
-    state.Monitor(repeatCount, scaleMode, cachedEnabled, cacheScale, maxFrameRate, isSync, videoEnabled, useDiskCache) { view ->
-        if (view.repeatCount() != repeatCount) view.setRepeatCount(repeatCount)
-        scaleMode.asPAGScaleMode.let { if (view.scaleMode() != it) view.setScaleMode(it) }
-        cachedEnabled?.let { if (view.cacheEnabled() != it) view.setCacheEnabled(it) }
-        cacheScale?.let { if (view.cacheScale() != it) view.setCacheScale(it) }
-        maxFrameRate?.let { if (view.maxFrameRate() != it) view.setMaxFrameRate(it) }
-        isSync?.let { if (view.isSync != it) view.isSync = it }
-        videoEnabled?.let { if (view.videoEnabled() != it) view.setVideoEnabled(it) }
-        useDiskCache?.let { if (view.useDiskCache() != it) view.setUseDiskCache(it) }
+    state.Monitor(config) { view ->
+        config.repeatCount.let { if (view.repeatCount() != it) view.setRepeatCount(it) }
+        config.scaleMode.ordinal.let { if (view.scaleMode() != it) view.setScaleMode(it) }
+        config.cachedEnabled?.let { if (view.cacheEnabled() != it) view.setCacheEnabled(it) }
+        config.cacheScale?.let { if (view.cacheScale() != it) view.setCacheScale(it) }
+        config.maxFrameRate?.let { if (view.maxFrameRate() != it) view.setMaxFrameRate(it) }
+        config.isSync?.let { if (view.isSync != it) view.isSync = it }
+        config.videoEnabled?.let { if (view.videoEnabled() != it) view.setVideoEnabled(it) }
+        config.useDiskCache?.let { if (view.useDiskCache() != it) view.setUseDiskCache(it) }
     }
 
     val assetManager = LocalContext.current.assets

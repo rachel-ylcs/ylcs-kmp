@@ -59,14 +59,17 @@ actual class PAGState actual constructor(
                 is PAGSource.Asset -> PAGFile.Load(assetManager, source.path)
             }
 
-            val layerBlock = source.block
-            if (layerBlock != null) PAGSourceScope(layer).layerBlock()
+            if (layer != null) {
+                val layerBlock = source.block
+                if (layerBlock != null) PAGSourceScope(layer).layerBlock()
 
-            if (width == null || height == null) {
-                width = layer.width()
-                height = layer.height()
+                if (width == null || height == null) {
+                    width = layer.width()
+                    height = layer.height()
+                }
+
+                layers += layer
             }
-            layers += layer
         }
 
         view.composition = when (layers.size) {

@@ -101,6 +101,7 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
 
     // 引入依赖
     fun npm(name: String, version: Provider<String>): NpmInfo = NpmInfo(name, version.get())
+    fun npm(name: String, version: String): NpmInfo = NpmInfo(name, version)
 
     fun HasKotlinDependencies.lib(vararg libs: Any) {
         dependencies {

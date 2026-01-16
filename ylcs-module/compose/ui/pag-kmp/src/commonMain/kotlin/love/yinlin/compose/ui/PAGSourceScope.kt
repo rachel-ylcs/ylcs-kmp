@@ -20,4 +20,12 @@ expect class PAGSourceScope(layer: PAGSourceFile) {
     var progress: Double
     val bounds: Rect
     var alpha: Float
+
+    val editableIndex: Int
+    val numChildren: Int
+    val numTexts: Int
+    val numImages: Int
+    val numVideos: Int
+    val audioBytes: ByteArray?
+    val audioStartTime: Long
 }

@@ -1,6 +1,7 @@
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 /**
@@ -11,18 +12,12 @@ import androidx.compose.ui.Modifier
  * @param source PAG输入源
  * @param modifier
  * @param isPlaying 是否播放
- * @param repeatCount 重复次数
- * @param scaleMode 缩放模式
- * @param renderScale 缩放比例
- * @param cacheAllFramesInMemory 在内存中缓存所有帧 (会极大增加内存占用量, 仅在必要时开启)
+ * @param config PAG配置
  */
 @Composable
 expect fun PAGImageAnimation(
     source: PAGSource? = null,
     modifier: Modifier = Modifier,
     isPlaying: Boolean = false,
-    repeatCount: Int = PAGConfig.INFINITY,
-    scaleMode: PAGConfig.ScaleMode = PAGConfig.ScaleMode.LetterBox,
-    renderScale: Float = 1.0f,
-    cacheAllFramesInMemory: Boolean = false,
+    config: PAGConfig = remember { PAGConfig() }
 )
