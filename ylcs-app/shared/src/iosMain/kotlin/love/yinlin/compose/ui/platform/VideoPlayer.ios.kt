@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui.platform
 
 import androidx.compose.foundation.background
@@ -24,7 +25,6 @@ import platform.UIKit.UIView
 import platform.darwin.NSObject
 
 @Stable
-@OptIn(ExperimentalForeignApi::class)
 private class VideoPlayerWrapper : PlatformView<UIView>(), Releasable<UIView> {
     val player = VLCMediaPlayer()
     var isPlaying by mutableStateOf(false)
