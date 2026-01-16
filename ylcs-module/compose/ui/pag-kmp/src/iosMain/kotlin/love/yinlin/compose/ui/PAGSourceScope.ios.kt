@@ -6,6 +6,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
 import cocoapods.libpag.*
 import kotlinx.cinterop.ExperimentalForeignApi
+import love.yinlin.compose.graphics.asCGAffineTransform
+import love.yinlin.compose.graphics.asComposeMatrix
 import love.yinlin.compose.graphics.asComposeRect
 import love.yinlin.extension.toByteArray
 
@@ -14,8 +16,8 @@ actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile)
     actual val width: Int get() = layer.width().toInt()
     actual val height: Int get() = layer.height().toInt()
 
-    actual var matrix: Matrix get() = layer.matrix()
-        set(value) = { layer.setMatrix(value) }
+    actual var matrix: Matrix get() = layer.matrix().asComposeMatrix()
+        set(value) { layer.setMatrix(value.asCGAffineTransform()) }
 
     actual fun resetMatrix() { layer.resetMatrix() }
 
