@@ -4,3 +4,6 @@
 [submodule "ylcs-module/startup/mmkv-kmp/src/desktopMain/cpp/mmkv"]
 	path = ylcs-module/startup/mmkv-kmp/src/desktopMain/cpp/mmkv
 	url = https://github.com/Tencent/MMKV.git
+[submodule "ylcs-module/compose/ui/pag-kmp/src/desktopMain/cpp/libpag"]
+	path = ylcs-module/compose/ui/pag-kmp/src/desktopMain/cpp/libpag
+	url = https://github.com/Tencent/libpag.git
