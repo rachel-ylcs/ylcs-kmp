@@ -6,6 +6,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
 import cocoapods.libpag.*
 import kotlinx.cinterop.ExperimentalForeignApi
+import love.yinlin.extension.toByteArray
 
 @Stable
 actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile) {
