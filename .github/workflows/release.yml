@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -46,6 +48,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -80,6 +84,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -119,6 +125,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Install Dependencies
         run: |
@@ -156,6 +164,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -188,6 +198,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -219,6 +231,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup JDK
         uses: actions/setup-java@v4
