@@ -1,0 +1,3 @@
+[submodule "ylcs-module/startup/picker/src/desktopMain/cpp/nativefiledialog"]
+	path = ylcs-module/startup/picker/src/desktopMain/cpp/nativefiledialog
+	url = https://github.com/btzy/nativefiledialog-extended.git
