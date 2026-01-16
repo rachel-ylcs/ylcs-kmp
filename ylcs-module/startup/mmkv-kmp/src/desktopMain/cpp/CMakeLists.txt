@@ -28,7 +28,7 @@ if(NOT Java_FOUND)
 endif()
 find_package(JNI REQUIRED)
 
-add_subdirectory(mmkv)
+add_subdirectory(mmkv/Core)
 
 add_library(mmkv SHARED
     main.cpp
