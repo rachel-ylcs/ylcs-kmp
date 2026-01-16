@@ -1,9 +1,9 @@
 package love.yinlin.compose.graphics
 
+import android.graphics.BlendMode as AndroidBlendMode
+import android.graphics.Matrix as AndroidMatrix
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Matrix
-
-typealias AndroidBlendMode = android.graphics.BlendMode
 
 fun BlendMode.asAndroidBlendMode(): AndroidBlendMode = when (this) {
     BlendMode.Clear -> AndroidBlendMode.CLEAR
@@ -69,8 +69,6 @@ fun AndroidBlendMode.asComposeBlendMode(): BlendMode = when (this) {
     AndroidBlendMode.COLOR -> BlendMode.Color
     AndroidBlendMode.LUMINOSITY -> BlendMode.Luminosity
 }
-
-typealias AndroidMatrix = android.graphics.Matrix
 
 fun Matrix.asAndroidMatrix(): AndroidMatrix {
     // 4 x 4 降维到 3 x 3

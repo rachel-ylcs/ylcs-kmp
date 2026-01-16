@@ -2,10 +2,9 @@ package love.yinlin.compose.graphics
 
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Matrix
+import org.jetbrains.skia.BlendMode as SkiaBlendMode
 import org.jetbrains.skia.Matrix33
 import org.jetbrains.skia.Matrix44
-
-typealias SkiaBlendMode = org.jetbrains.skia.BlendMode
 
 fun BlendMode.asSkiaBlendMode(): SkiaBlendMode = when (this) {
     BlendMode.Clear -> SkiaBlendMode.CLEAR
