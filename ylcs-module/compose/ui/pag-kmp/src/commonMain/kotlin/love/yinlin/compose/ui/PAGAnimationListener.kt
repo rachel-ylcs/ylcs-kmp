@@ -8,5 +8,4 @@ interface PAGAnimationListener {
     fun onAnimationEnd() { }
     fun onAnimationCancel() { }
     fun onAnimationRepeat() { }
-    fun onAnimationUpdate(progress: Double) { }
 }

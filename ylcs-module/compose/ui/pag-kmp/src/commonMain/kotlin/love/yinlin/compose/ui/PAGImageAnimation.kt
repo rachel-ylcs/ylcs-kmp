@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
  *
  * @param source PAG输入源
  * @param modifier
+ * @param isPlaying 是否播放
  * @param repeatCount 重复次数
  * @param scaleMode 缩放模式
  * @param renderScale 缩放比例
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 expect fun PAGImageAnimation(
     source: PAGSource? = null,
     modifier: Modifier = Modifier,
+    isPlaying: Boolean = false,
     repeatCount: Int = PAGConfig.INFINITY,
     scaleMode: PAGConfig.ScaleMode = PAGConfig.ScaleMode.LetterBox,
     renderScale: Float = 1.0f,

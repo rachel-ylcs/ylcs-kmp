@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
+@file:Suppress("FunctionName", "PropertyName")
 package love.yinlin.compose.ui
 
 import org.khronos.webgl.ArrayBuffer

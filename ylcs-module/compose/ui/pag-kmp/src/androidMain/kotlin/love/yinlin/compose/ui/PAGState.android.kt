@@ -19,11 +19,9 @@ import org.libpag.PAGView
 @Stable
 actual class PAGState actual constructor(
     initComposition: PAGSourceComposition?,
-    initIsPlaying: Boolean,
     initProgress: Double,
     listener: PAGAnimationListener?,
 ) : PlatformView<PAGView>(), Releasable<PAGView> {
-    internal var stateComposition: PAGSourceComposition? by mutableRefStateOf(initComposition)
     internal var stateProgress: Double by mutableDoubleStateOf(initProgress)
 
     private val pagListener = listener?.let {
@@ -32,10 +30,7 @@ actual class PAGState actual constructor(
             override fun onAnimationEnd(view: PAGView) = it.onAnimationEnd()
             override fun onAnimationCancel(view: PAGView) = it.onAnimationCancel()
             override fun onAnimationRepeat(view: PAGView) = it.onAnimationRepeat()
-            override fun onAnimationUpdate(view: PAGView) {
-                stateProgress = view.progress
-                it.onAnimationUpdate(view.progress)
-            }
+            override fun onAnimationUpdate(view: PAGView) { stateProgress = view.progress }
         }
     }
 
@@ -49,26 +44,12 @@ actual class PAGState actual constructor(
         pagListener?.let { view.removeListener(it) }
     }
 
-    var progress: Double get() = stateProgress
-        set(value) {
-            host?.let {
-                it.progress = value
-                it.flush()
-            }
-        }
-
-    fun play() { host?.play() }
-    fun pause() { host?.pause() }
-    val isPlaying: Boolean get() = host?.isPlaying ?: false
-
-    fun freeCache() { host?.freeCache() }
-
-    fun makeSnapshot(): ImageBitmap? = host?.makeSnapshot()?.asImageBitmap()
+    actual var composition: PAGSourceComposition? by mutableRefStateOf(initComposition)
 
     internal fun updateComposition(assetManager: AssetManager, view: PAGView) {
-        val sources = stateComposition?.sources?.ifEmpty { null }
-        var width = stateComposition?.width
-        var height = stateComposition?.height
+        val sources = composition?.sources?.ifEmpty { null }
+        var width = composition?.width
+        var height = composition?.height
 
         val layers = mutableListOf<PAGFile>()
         sources?.fastForEach { source ->
@@ -102,4 +83,16 @@ actual class PAGState actual constructor(
             }
         }
     }
+
+    actual var progress: Double get() = stateProgress
+        set(value) {
+            host?.let {
+                it.progress = value
+                it.flush()
+            }
+        }
+
+    actual fun freeCache() { host?.freeCache() }
+
+    actual fun makeSnapshot(): ImageBitmap? = host?.makeSnapshot()?.asImageBitmap()
 }

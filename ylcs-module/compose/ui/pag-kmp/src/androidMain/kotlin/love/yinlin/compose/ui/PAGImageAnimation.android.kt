@@ -19,6 +19,7 @@ private class PAGImageAnimationWrapper : PlatformView<PAGImageView>() {
 actual fun PAGImageAnimation(
     source: PAGSource?,
     modifier: Modifier,
+    isPlaying: Boolean,
     repeatCount: Int,
     scaleMode: PAGConfig.ScaleMode,
     renderScale: Float,
@@ -49,5 +50,14 @@ actual fun PAGImageAnimation(
         if (source != null && layer != null && layerBlock != null) PAGSourceScope(layer).layerBlock()
 
         view.composition = layer
+    }
+
+    wrapper.Monitor(isPlaying) { view ->
+        if (isPlaying) {
+            if (!view.isPlaying) view.play()
+        }
+        else {
+            if (view.isPlaying) view.pause()
+        }
     }
 }

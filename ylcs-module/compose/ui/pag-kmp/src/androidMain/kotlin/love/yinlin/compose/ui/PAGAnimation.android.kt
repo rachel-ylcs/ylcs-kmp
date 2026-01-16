@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 actual fun PAGAnimation(
     state: PAGState,
     modifier: Modifier,
+    isPlaying: Boolean,
     repeatCount: Int,
     scaleMode: PAGConfig.ScaleMode,
     cachedEnabled: Boolean?,
@@ -32,7 +33,16 @@ actual fun PAGAnimation(
 
     val assetManager = LocalContext.current.assets
 
-    state.Monitor(state.stateComposition) {
-        state.updateComposition(assetManager, it)
+    state.Monitor(state.composition) { view ->
+        state.updateComposition(assetManager, view)
+    }
+
+    state.Monitor(isPlaying) { view ->
+        if (isPlaying) {
+            if (!view.isPlaying) view.play()
+        }
+        else {
+            if (view.isPlaying) view.pause()
+        }
     }
 }
