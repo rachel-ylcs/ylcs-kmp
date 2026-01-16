@@ -1,9 +1,11 @@
+@file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
 import cocoapods.libpag.*
+import kotlinx.cinterop.ExperimentalForeignApi
 
 @Stable
 actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile) {
@@ -52,7 +54,7 @@ actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile)
 
     actual val numVideos: Int get() = layer.numVideos()
 
-    actual val audioBytes: ByteArray? get() = layer.audioBytes()
+    actual val audioBytes: ByteArray? get() = layer.audioBytes()?.toByteArray()
 
     actual val audioStartTime: Long get() = layer.audioStartTime()
 }

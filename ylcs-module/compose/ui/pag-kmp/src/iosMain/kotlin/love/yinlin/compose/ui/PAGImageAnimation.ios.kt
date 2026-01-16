@@ -24,8 +24,7 @@ actual fun PAGImageAnimation(
     wrapper.HostView(modifier = modifier)
 
     wrapper.Monitor(config) { view ->
-        config.repeatCount.toUInt().let { if (view.repeatCount() != it) view.setRepeatCount(it) }
-        config.scaleMode.ordinal.let { if (view.scaleMode() != it) view.setScaleMode(it) }
+        config.repeatCount.let { if (view.repeatCount() != it) view.setRepeatCount(it) }
         config.renderScale.let { if (view.renderScale() != it) view.setRenderScale(it) }
         config.cacheAllFramesInMemory.let { if (view.cacheAllFramesInMemory() != it) view.setCacheAllFramesInMemory(it) }
     }
@@ -41,7 +40,7 @@ actual fun PAGImageAnimation(
         val layerBlock = source?.block
         if (source != null && layer != null && layerBlock != null) PAGSourceScope(layer).layerBlock()
 
-        view.composition = layer
+        view.setComposition(layer)
     }
 
     wrapper.Monitor(isPlaying) { view ->

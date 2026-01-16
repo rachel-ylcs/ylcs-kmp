@@ -3,6 +3,7 @@ package love.yinlin.compose.ui
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import cocoapods.libpag.*
 import kotlinx.cinterop.*
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageInfo

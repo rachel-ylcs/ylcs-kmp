@@ -16,8 +16,8 @@ actual fun PAGAnimation(
     state.HostView(modifier = modifier)
 
     state.Monitor(config) { view ->
-        config.repeatCount.toUInt().let { if (view.repeatCount() != it) view.setRepeatCount(it) }
-        config.scaleMode.ordinal.let { if (view.scaleMode() != it) view.setScaleMode(it) }
+        config.repeatCount.let { if (view.repeatCount() != it) view.setRepeatCount(it) }
+        config.scaleMode.ordinal.toUInt().let { if (view.scaleMode() != it) view.setScaleMode(it) }
         config.cachedEnabled?.let { if (view.cacheEnabled() != it) view.setCacheEnabled(it) }
         config.cacheScale?.let { if (view.cacheScale() != it) view.setCacheScale(it) }
         config.maxFrameRate?.let { if (view.maxFrameRate() != it) view.setMaxFrameRate(it) }
