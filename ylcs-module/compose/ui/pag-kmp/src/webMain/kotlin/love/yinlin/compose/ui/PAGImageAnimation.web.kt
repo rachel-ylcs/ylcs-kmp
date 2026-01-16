@@ -50,7 +50,7 @@ actual fun PAGImageAnimation(
     wrapper.Monitor(source) { view ->
         val pagInstance = pag() ?: return@Monitor
         println("ok1")
-        val layer = when (source) {
+        val layer: PAGFile? = when (source) {
             is PAGSource.Data -> {
                 val data = ByteArrayCompatible(source.data).toInt8Array()
                 println("ok2")

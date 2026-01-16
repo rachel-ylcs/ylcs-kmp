@@ -53,7 +53,7 @@ actual class PAGState actual constructor(
 
         val layers = mutableListOf<PAGFile>()
         sources?.fastForEach { source ->
-            val layer = when (source) {
+            val layer: PAGFile? = when (source) {
                 is PAGSource.File -> PAGFile.Load(source.path)
                 is PAGSource.Data -> PAGFile.Load(source.data)
                 is PAGSource.Asset -> PAGFile.Load(assetManager, source.path)

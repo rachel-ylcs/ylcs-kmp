@@ -47,7 +47,7 @@ actual class PAGState actual constructor(
         println("ok2")
         val layers = mutableListOf<PAGFile>()
         sources?.fastForEach { source ->
-            val layer = when (source) {
+            val layer: PAGFile? = when (source) {
                 is PAGSource.Data -> {
                     val data = ByteArrayCompatible(source.data).toInt8Array()
                     pagInstance.PAGFile.loadFromBuffer(data.buffer).await()

@@ -42,6 +42,6 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override val cocoapodsList: List<Pod> = listOf(
-        Pod("MMKV", version = libs.versions.mmkv)
+        pod("MMKV", libs.versions.mmkv)
     )
 })

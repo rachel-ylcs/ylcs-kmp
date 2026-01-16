@@ -46,6 +46,6 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override val cocoapodsList: List<Pod> = listOf(
-        Pod("libpag", version = "4.5.12")
+        pod("libpag", libs.versions.pag)
     )
 })

@@ -36,7 +36,7 @@ actual fun PAGImageAnimation(
     val assetManager = LocalContext.current.assets
 
     wrapper.Monitor(source) { view ->
-        val layer = when (source) {
+        val layer: PAGFile? = when (source) {
             null -> null
             is PAGSource.File -> PAGFile.Load(source.path)
             is PAGSource.Data -> PAGFile.Load(source.data)

@@ -32,26 +32,13 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
 
-class Pod private constructor(
+class Pod internal constructor(
     val name: String,
-    val moduleName: String? = null,
     val version: String? = null,
+    val moduleName: String? = null,
     val extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
     val source: File? = null,
-) {
-    constructor(
-        name: String,
-        moduleName: String? = null,
-        version: Any? = null,
-        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
-        source: File? = null
-    ) : this(name, moduleName, version?.let {
-        when (it) {
-            is Provider<*> -> it.get() as String
-            else -> it.toString()
-        }
-    }, extraOpts, source)
-}
+)
 
 class KotlinMultiplatformSourceSetsScope(
     p: Project,
@@ -113,6 +100,22 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinNativeTarget.ios() { }
     open val cocoapodsList: List<Pod> = emptyList()
     open fun CocoapodsExtension.cocoapods() { }
+
+    fun pod(
+        name: String,
+        version: String? = null,
+        moduleName: String? = null,
+        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+        source: File? = null,
+    ): Pod = Pod(name, version, moduleName, extraOpts, source)
+
+    fun pod(
+        name: String,
+        version: Provider<String>,
+        moduleName: String? = null,
+        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+        source: File? = null,
+    ): Pod = Pod(name, version.get(), moduleName, extraOpts, source)
 
     // Desktop
     open val desktopTarget: Boolean = true
