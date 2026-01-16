@@ -10,6 +10,7 @@ import androidx.compose.ui.util.fastForEach
 import cocoapods.libpag.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.compose.extension.mutableRefStateOf
+import platform.CoreGraphics.CGSizeMake
 import platform.darwin.NSObject
 
 @Stable
@@ -60,27 +61,27 @@ actual class PAGState actual constructor(
                 if (layerBlock != null) PAGSourceScope(layer).layerBlock()
 
                 if (width == null || height == null) {
-                    width = layer.width()
-                    height = layer.height()
+                    width = layer.width().toInt()
+                    height = layer.height().toInt()
                 }
 
                 layers += layer
             }
         }
 
-        view.composition = when (layers.size) {
+        view.setComposition(when (layers.size) {
             0 -> null
             1 -> layers.first()
             else -> {
                 val w = width
                 val h = height
                 if (w != null && h != null) {
-                    val multiComposition = PAGComposition.Make(w, h)
-                    for (layer in layers) multiComposition.addLayer(layer)
-                    multiComposition
+                    PAGComposition.Make(CGSizeMake(w.toDouble(), h.toDouble()))?.also { multiComposition ->
+                        for (layer in layers) multiComposition.addLayer(layer)
+                    }
                 } else null
             }
-        }
+        })
     }
 
     actual var progress: Double get() = stateProgress

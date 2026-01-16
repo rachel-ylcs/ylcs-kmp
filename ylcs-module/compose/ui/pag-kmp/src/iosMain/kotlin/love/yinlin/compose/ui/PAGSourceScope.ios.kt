@@ -3,11 +3,12 @@ package love.yinlin.compose.ui
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
+import cocoapods.libpag.*
 
 @Stable
 actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile) {
-    actual val width: Int get() = layer.width()
-    actual val height: Int get() = layer.height()
+    actual val width: Int get() = layer.width().toInt()
+    actual val height: Int get() = layer.height().toInt()
 
     actual var matrix: Matrix get() = TODO()
         set(value) = TODO()
@@ -32,7 +33,7 @@ actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile)
     actual var currentTime: Long get() = layer.currentTime()
         set(value) { layer.setCurrentTime(value) }
 
-    actual var progress: Double get() = layer.progress
+    actual var progress: Double get() = layer.getProgress()
         set(value) { layer.setProgress(value) }
 
     actual val bounds: Rect get() = TODO()
@@ -41,9 +42,9 @@ actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile)
         set(value) { layer.setAlpha(value) }
 
 
-    actual val editableIndex: Int get() = layer.editableIndex()
+    actual val editableIndex: Int get() = layer.editableIndex().toInt()
 
-    actual val numChildren: Int get() = layer.numChildren()
+    actual val numChildren: Int get() = layer.numChildren().toInt()
 
     actual val numTexts: Int get() = layer.numTexts()
 
@@ -51,7 +52,7 @@ actual class PAGSourceScope actual constructor(private val layer: PAGSourceFile)
 
     actual val numVideos: Int get() = layer.numVideos()
 
-    actual val audioBytes: ByteArray? get() = layer.audioBytes()?.array()
+    actual val audioBytes: ByteArray? get() = layer.audioBytes()
 
     actual val audioStartTime: Long get() = layer.audioStartTime()
 }

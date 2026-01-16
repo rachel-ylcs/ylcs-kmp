@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalForeignApi::class)
-
 package love.yinlin.compose.ui
 
 import androidx.compose.ui.graphics.ImageBitmap
@@ -9,6 +8,11 @@ import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageInfo
 import platform.CoreVideo.*
 import platform.posix.memcpy
+
+@Suppress("FunctionName")
+fun PAGFile.Companion.Load(data: ByteArray) = data.usePinned {
+    PAGFile.Load(it.addressOf(0), data.size.toULong())
+}
 
 fun createImageFromPixelBuffer(pixelBuffer: CVPixelBufferRef): ImageBitmap? {
     CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly)
