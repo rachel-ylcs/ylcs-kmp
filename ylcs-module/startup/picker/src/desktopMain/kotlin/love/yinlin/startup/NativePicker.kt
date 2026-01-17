@@ -1,5 +1,18 @@
 package love.yinlin.startup
 
-internal external fun openFileDialog(parent: Long, title: String, filterName: String, filter: String): String?
-internal external fun openMultipleFileDialog(parent: Long, maxNum: Int, title: String, filterName: String, filter: String): Array<String>
-internal external fun saveFileDialog(parent: Long, title: String, filename: String, ext: String, filterName: String): String?
+import love.yinlin.extension.NativeLib
+import love.yinlin.platform.NativeLibLoader
+
+@NativeLib
+internal object NativePicker {
+    init {
+        NativeLibLoader.resource("picker")
+    }
+
+    @JvmStatic
+    external fun openFileDialog(parent: Long, title: String, filterName: String, filter: String): String?
+    @JvmStatic
+    external fun openMultipleFileDialog(parent: Long, maxNum: Int, title: String, filterName: String, filter: String): Array<String>
+    @JvmStatic
+    external fun saveFileDialog(parent: Long, title: String, filename: String, ext: String, filterName: String): String?
+}

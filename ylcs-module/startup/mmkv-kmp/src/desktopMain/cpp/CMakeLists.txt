@@ -38,6 +38,7 @@ target_include_directories(mmkv PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${JNI_INCLUDE_DIRS}
     ${NATIVE_JNI_DIR}
+    mmkv/Core/include/MMKV
 )
 
 target_link_libraries(mmkv

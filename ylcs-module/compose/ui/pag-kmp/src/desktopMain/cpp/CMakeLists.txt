@@ -5,7 +5,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     message(FATAL_ERROR "不允许直接在源码树中构建, 请在build目录中构建, 或使用build.bat/build.sh脚本")
 endif()
 
-project(pag4j)
+project(pag_kotlin)
 
 if(MSVC)
     set(LINK_STATIC_MSVC_LIBS ON CACHE BOOL "")
@@ -34,26 +34,30 @@ set(PAG_BUILD_FRAMEWORK OFF)
 
 add_subdirectory(libpag)
 
-add_library(pag4j SHARED
+file(GLOB SRC_LIST "*.cpp")
+
+add_library(pag_kotlin SHARED
     main.cpp
+    ${SRC_LIST}
 )
 
-target_include_directories(pag4j PRIVATE
+target_include_directories(pag_kotlin PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${JNI_INCLUDE_DIRS}
     ${NATIVE_JNI_DIR}
+    libpag/include/pag
 )
 
-target_link_libraries(pag4j
+target_link_libraries(pag_kotlin
     ${JNI_LIBRARIES}
     pag
 )
 
 if(WIN32)
-    target_compile_definitions(pag4j PRIVATE UNICODE _UNICODE)
+    target_compile_definitions(pag_kotlin PRIVATE UNICODE _UNICODE)
 endif()
 
-set_target_properties(pag4j PROPERTIES
+set_target_properties(pag_kotlin PROPERTIES
     CXX_STANDARD 20
     CXX_EXTENSIONS OFF
     POSITION_INDEPENDENT_CODE ON

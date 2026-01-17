@@ -31,13 +31,12 @@ template(object : KotlinMultiplatformTemplate() {
 
         iosMainList.configure(iosMain)
 
-        desktopMain.configure(commonMain)
+        desktopMain.configure(commonMain) {
+            lib(projects.ylcsModule.platform.nativeLibLoader)
+        }
 
         webMain.configure(commonMain) {
-            lib(
-                ExportLib,
-                npm("libpag", "4.5.16")
-            )
+            lib(npm("libpag", "4.5.16"))
         }
 
         jsMain.configure(webMain)

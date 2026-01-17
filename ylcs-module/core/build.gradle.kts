@@ -39,7 +39,8 @@ template(object : KotlinMultiplatformTemplate() {
         androidMain.configure(jvmMain) {
             lib(
                 ExportLib,
-                libs.kotlinx.coroutines.android
+                libs.compose.annotation,
+                libs.kotlinx.coroutines.android,
             )
         }
 
