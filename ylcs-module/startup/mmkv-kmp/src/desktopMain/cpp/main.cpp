@@ -1,6 +1,6 @@
 #include <native_jni.h>
 #define FORCE_POSIX
-#include "mmkv/MMKV.h"
+#include "mmkv/Core/MMKV.h"
 
 using namespace mmkv;
 
