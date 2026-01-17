@@ -1,3 +1,6 @@
+#include <native_jni.h>
+#include <pag.h>
+
 class JPAGImage {
 public:
     explicit JPAGImage(std::shared_ptr<pag::PAGImage> pagImage) : pagImage(pagImage) {}
