@@ -87,7 +87,6 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
 
         // 准备 native 库编译目录
         val buildDir = nativeBuildDir.get()
-        buildDir.deleteRecursively()
         buildDir.mkdirs()
 
         // 设置 cmake 参数
