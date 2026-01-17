@@ -40,6 +40,8 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        appleMain.configure(commonMain)
+
         val skikoMain by create(commonMain) {
             lib(
                 ExportLib,
@@ -47,7 +49,7 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        iosMain.configure(skikoMain)
+        iosMain.configure(skikoMain, appleMain)
 
         iosMainList.configure(iosMain)
 

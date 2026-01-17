@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.painter.BitmapPainter
 
 @Stable
-expect class WebViewState(settings: WebViewConfig, initUrl: String = "") {
+expect class WebViewState(initUrl: String = "") {
     var url: String // URL
 
     val loadingState: WebViewLoadingState // 加载状态

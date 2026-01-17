@@ -29,9 +29,7 @@ template(object : KotlinMultiplatformTemplate() {
         iosMainList.configure(iosMain)
 
         desktopMain.configure(commonMain) {
-            lib(
-                projects.ylcsModule.platform.nativeLibLoader
-            )
+            lib(projects.ylcsModule.platform.nativeLibLoader)
         }
 
         webMain.configure(commonMain)
@@ -42,6 +40,6 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override val cocoapodsList: List<Pod> = listOf(
-        Pod("MMKV", version = libs.versions.mmkv)
+        pod("MMKV", libs.versions.mmkv)
     )
 })

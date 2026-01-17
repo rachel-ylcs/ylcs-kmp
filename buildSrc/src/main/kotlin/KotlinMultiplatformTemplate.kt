@@ -32,10 +32,10 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
 
-data class Pod(
+class Pod internal constructor(
     val name: String,
+    val version: String? = null,
     val moduleName: String? = null,
-    val version: Provider<String>? = null,
     val extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
     val source: File? = null,
 )
@@ -100,6 +100,22 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinNativeTarget.ios() { }
     open val cocoapodsList: List<Pod> = emptyList()
     open fun CocoapodsExtension.cocoapods() { }
+
+    fun pod(
+        name: String,
+        version: String? = null,
+        moduleName: String? = null,
+        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+        source: File? = null,
+    ): Pod = Pod(name, version, moduleName, extraOpts, source)
+
+    fun pod(
+        name: String,
+        version: Provider<String>,
+        moduleName: String? = null,
+        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+        source: File? = null,
+    ): Pod = Pod(name, version.get(), moduleName, extraOpts, source)
 
     // Desktop
     open val desktopTarget: Boolean = true
@@ -235,7 +251,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         for (item in cocoapodsList) {
                             pod(item.name) {
                                 if (item.moduleName != null) moduleName = item.moduleName
-                                if (item.version != null) version = item.version.get()
+                                if (item.version != null) version = item.version
                                 extraOpts += item.extraOpts
                                 if (item.source != null) source = path(item.source)
                             }
@@ -344,9 +360,9 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                         buildTypes.release.proguard {
                             version.set(C.proguard.version)
-                            isEnabled.set(false)
-                            optimize.set(false)
-                            obfuscate.set(false)
+                            isEnabled.set(true)
+                            optimize.set(true)
+                            obfuscate.set(true)
                             joinOutputJars.set(true)
                             configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
                         }
@@ -402,17 +418,16 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
         afterEvaluate {
             actions()
 
-            // 检查是否需要编译 Desktop Native
-            val sourceDir = layout.projectDirectory.asFile.resolve("src/desktopMain/cpp")
-            if (sourceDir.exists()) {
-                val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
-                    inputDir.set(sourceDir)
+            val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
+                // 检查是否需要编译 Desktop Native
+                val sourceDir = desktopNativeKMPSourceDir.asFile
+                onlyIf {
+                    sourceDir.exists() && !sourceDir.resolve("native.ignore").exists()
                 }
-
-                tasks.named("desktopJar") {
-                    dependsOn(buildNativeTask)
-                }
+                inputDir.set(sourceDir)
             }
+
+            tasks.findByName("desktopJar")?.dependsOn(buildNativeTask)
         }
     }
 }

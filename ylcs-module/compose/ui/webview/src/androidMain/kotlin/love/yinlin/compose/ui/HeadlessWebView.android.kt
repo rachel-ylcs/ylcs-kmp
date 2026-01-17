@@ -78,8 +78,10 @@ actual abstract class HeadlessWebView actual constructor(context: Context) {
         webChromeClient = object : WebChromeClient() {}
         addJavascriptInterface(object {
             @JavascriptInterface
+            @Suppress("unused")
             fun onUrlDetected(url: String?): Boolean = url?.let { onUrlIntercepted(it) } ?: false
 
+            @Suppress("unused")
             @JavascriptInterface
             fun onRequestDetected(url: String?, json: String?) {
                 if (url != null && json != null) {

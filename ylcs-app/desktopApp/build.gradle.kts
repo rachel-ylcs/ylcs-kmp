@@ -72,7 +72,10 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         // 复制桌面动态库
-        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class)
+        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class) {
+            dependsOn(findProject(projects.ylcsModule.buildTool)!!.tasks.named("buildDesktopNativePAG"))
+        }
+
         if ("desktopPublish" in currentTaskName) {
             tasks.named("prepareAppResources") {
                 dependsOn(desktopCopyNativeLib)

@@ -49,16 +49,16 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
         afterEvaluate {
             actions()
 
-            // 检查是否需要编译 Desktop Native
-            val sourceDir = layout.projectDirectory.asFile.resolve("src/main/cpp")
-            if (sourceDir.exists()) {
-                val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
-                    inputDir.set(sourceDir)
+            val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
+                // 检查是否需要编译 Desktop Native
+                val sourceDir = desktopNativeJVMSourceDir.asFile
+                onlyIf {
+                    sourceDir.exists() && !sourceDir.resolve("native.ignore").exists()
                 }
-                tasks.named("jar") {
-                    dependsOn(buildNativeTask)
-                }
+                inputDir.set(sourceDir)
             }
+
+            tasks.findByName("jar")?.dependsOn(buildNativeTask)
         }
     }
 }

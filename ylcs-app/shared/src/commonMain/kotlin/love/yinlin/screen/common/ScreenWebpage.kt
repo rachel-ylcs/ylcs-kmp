@@ -14,7 +14,6 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.WebView
-import love.yinlin.compose.ui.WebViewConfig
 import love.yinlin.compose.ui.WebViewState
 import love.yinlin.platform.Platform
 
@@ -30,7 +29,7 @@ class ScreenWebpage(manager: ScreenManager, url: String) : Screen(manager) {
 		}
 	}
 
-	private val state = WebViewState(WebViewConfig(), url)
+	private val state = WebViewState(url)
 
 	override val title: String by derivedStateOf { state.title }
 

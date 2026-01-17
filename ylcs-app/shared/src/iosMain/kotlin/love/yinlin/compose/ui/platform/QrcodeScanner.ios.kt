@@ -19,9 +19,11 @@ import love.yinlin.compose.*
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.PlatformView
+import love.yinlin.compose.ui.Releasable
 import love.yinlin.extension.toNSData
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
+import love.yinlin.compose.ui.rememberPlatformView
 import love.yinlin.coroutines.Coroutines
 import platform.AVFoundation.*
 import platform.darwin.NSObject
@@ -86,7 +88,9 @@ private class QrcodeView(private val onRectOfInterest: (CValue<CGRect>) -> Unit)
 }
 
 @Stable
-private class QrcodeScannerWrapper(private val onResult: (String) -> Unit) : PlatformView<QrcodeView>() {
+private class QrcodeScannerWrapper(onResultCallback: State<(String) -> Unit>) : PlatformView<QrcodeView>(), Releasable<QrcodeView> {
+    val onResult by onResultCallback
+
     val scanCode = SGScanCode().apply {
         delegate = object : SGScanCodeDelegateProtocol, NSObject() {
             override fun scanCode(scanCode: SGScanCode?, result: String?) {
@@ -127,12 +131,12 @@ actual fun QrcodeScanner(
     onAlbumPick: suspend () -> ByteArray?,
     onResult: (String) -> Unit
 ) {
-    val wrapper = remember { QrcodeScannerWrapper(onResult) }
-
     val scope = rememberCoroutineScope()
 
+    val wrapper = rememberPlatformView(onResult) { QrcodeScannerWrapper(it) }
+
     Box(modifier = modifier) {
-        wrapper.Content(Modifier.fillMaxSize().zIndex(1f))
+        wrapper.HostView(Modifier.fillMaxSize().zIndex(1f))
         Row(
             modifier = Modifier.fillMaxWidth()
                 .align(Alignment.BottomCenter)

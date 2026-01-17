@@ -28,20 +28,22 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.PlatformView
+import love.yinlin.compose.ui.Releasable
 import love.yinlin.compose.ui.image.ColorfulIcon
 import love.yinlin.compose.ui.image.colorfulImageVector
+import love.yinlin.compose.ui.rememberPlatformView
 import love.yinlin.coroutines.Coroutines
 import java.util.UUID
 
 @Stable
-private class QrCodeScannerWrapper(private val onResult: (String) -> Unit) : PlatformView<PreviewView>() {
-    private var cameraScan: BaseCameraScan<Result>? = null
+private class QrCodeScannerWrapper(onResultCallback: State<(String) -> Unit>) : PlatformView<PreviewView>(), Releasable<PreviewView> {
+    private val onResult by onResultCallback
+
+    var cameraScan: BaseCameraScan<Result>? = null
 
     val enableTorch: Boolean get() = cameraScan?.isTorchEnabled ?: false
 
-    fun toggle() {
-        cameraScan?.let { it.enableTorch(!it.isTorchEnabled) }
-    }
+    fun updateResult(result: String) { onResult(result) }
 
     override fun build(context: Context, lifecycleOwner: LifecycleOwner, activityResultRegistry: ActivityResultRegistry?): PreviewView {
         val previewView = PreviewView(context)
@@ -56,7 +58,7 @@ private class QrCodeScannerWrapper(private val onResult: (String) -> Unit) : Pla
             setPlayBeep(true)
             setOnScanResultCallback {
                 setAnalyzeImage(false)
-                onResult(it.result.text)
+                updateResult(it.result.text)
             }
             activityResultRegistry?.register(
                 key = UUID.randomUUID().toString(),
@@ -91,12 +93,12 @@ actual fun QrcodeScanner(
     onResult: (String) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val scannerWrapper = remember { QrCodeScannerWrapper(onResult) }
-    val finderWrapper = remember { QrCodeScannerFinderWrapper() }
+    val scannerWrapper = rememberPlatformView(onResult) { QrCodeScannerWrapper(it) }
+    val finderWrapper = rememberPlatformView { QrCodeScannerFinderWrapper() }
 
     Box(modifier = modifier) {
-        scannerWrapper.Content(Modifier.fillMaxSize().zIndex(1f))
-        finderWrapper.Content(Modifier.fillMaxSize().zIndex(2f))
+        scannerWrapper.HostView(Modifier.fillMaxSize().zIndex(1f))
+        finderWrapper.HostView(Modifier.fillMaxSize().zIndex(2f))
         Row(
             modifier = Modifier.fillMaxWidth()
                 .align(Alignment.BottomCenter)
@@ -119,7 +121,7 @@ actual fun QrcodeScanner(
                                 val bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.size)
                                 CodeUtils.parseQRCode(bitmap).also { bitmap.recycle() }
                             }
-                        }?.let(onResult)
+                        }?.let { scannerWrapper.updateResult(it) }
                     }
                 }
             )
@@ -133,7 +135,7 @@ actual fun QrcodeScanner(
                 ),
                 size = CustomTheme.size.mediumIcon,
                 onClick = {
-                    scannerWrapper.toggle()
+                    scannerWrapper.cameraScan?.let { it.enableTorch(!it.isTorchEnabled) }
                     flashEnabled = scannerWrapper.enableTorch
                 }
             )

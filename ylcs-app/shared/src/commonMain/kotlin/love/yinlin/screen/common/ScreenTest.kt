@@ -9,10 +9,6 @@ import love.yinlin.compose.screen.ScreenManager
 class ScreenTest(manager: ScreenManager) : Screen(manager) {
     override val title: String = "测试页"
 
-    override suspend fun initialize() {
-
-    }
-
     @Composable
     override fun Content(device: Device) {
 

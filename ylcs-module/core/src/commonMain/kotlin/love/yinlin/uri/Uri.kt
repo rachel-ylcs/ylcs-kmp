@@ -154,7 +154,7 @@ data class Uri(
                         }
                         '%' -> {
                             var hexValue: Byte = 0
-                            for (@Suppress("Unused") j in 0..1) {
+                            for (_ in 0..1) {
                                 if (i >= length) {
                                     flushDecodingByteAccumulator(builder)
                                     builder.append('\ufffd')

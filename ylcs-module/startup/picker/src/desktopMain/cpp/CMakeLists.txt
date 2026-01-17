@@ -38,6 +38,7 @@ target_include_directories(picker PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${JNI_INCLUDE_DIRS}
     ${NATIVE_JNI_DIR}
+    nativefiledialog/src/include
 )
 
 target_link_libraries(picker
