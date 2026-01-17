@@ -25,6 +25,11 @@ rootProject.name = "ylcs-kmp"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 include(
+    /* -----------------  工具模块  ----------------- */
+
+    "ylcs-module:build-tool",
+    "ylcs-module:dokka",
+
     /* -----------------  库模块  ----------------- */
 
     "ylcs-module:compose:app",
@@ -43,7 +48,6 @@ include(
     "ylcs-module:compose:ui:url-image",
     "ylcs-module:compose:ui:webview",
     "ylcs-module:core",
-    "ylcs-module:dokka",
     "ylcs-module:cs:core",
     "ylcs-module:cs:client-engine",
     "ylcs-module:cs:server-engine",

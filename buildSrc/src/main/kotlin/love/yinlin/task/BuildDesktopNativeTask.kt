@@ -6,6 +6,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -25,12 +26,20 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
     @get:Input
     abstract val nativeJniDir: Property<File>
 
+    @get:Input
+    abstract val cmakeOptions: ListProperty<Pair<String, String>>
+
+    @get:Input
+    abstract val preCommands: ListProperty<String>
+
     @get:Inject
     abstract val execOperations: ExecOperations
 
     init {
-        nativeJniDir.convention(project.C.root.artifacts.include.asFile)
         outputFile.convention(project.C.root.artifacts.desktopNative.file(System.mapLibraryName(project.name.replace('-', '_'))))
+        nativeJniDir.convention(project.C.root.artifacts.include.asFile)
+        cmakeOptions.convention(emptyList())
+        preCommands.convention(emptyList())
     }
 
     private fun buildArgs(vararg args: String) = args.joinToString(" && ")
@@ -67,6 +76,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
             if (currentPlatform == BuildPlatform.Windows) {
                 add("CMAKE_SHARED_LINKER_FLAGS" to "\"/NOEXP /NOIMPLIB\"")
             }
+            addAll(cmakeOptions.get())
         }
         val cmakeArgsText = cmakeArgs.joinToString(" ") { (key, value) -> "-D$key=$value" }
 
@@ -80,6 +90,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
             // Windows 调用 Ninja 使用 MSBuild 构建
             execOperations.exec(buildDir, "cmd", "/c", buildArgs(
                 "call \"$vcPath\"",
+                *preCommands.get().toTypedArray(),
                 "cmake \"${cmakelistsDir.absolutePath}\" -G Ninja $cmakeArgsText",
                 "cmake --build . --config Release"
             ))
@@ -87,6 +98,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
         else {
             // Linux / macOS 直接 build
             execOperations.exec(buildDir, "sh", "-c", buildArgs(
+                *preCommands.get().toTypedArray(),
                 "cmake \"${cmakelistsDir.absolutePath}\" $cmakeArgsText",
                 "make -j 4"
             ))

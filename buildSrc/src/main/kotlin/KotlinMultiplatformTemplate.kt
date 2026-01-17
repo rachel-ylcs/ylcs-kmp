@@ -422,7 +422,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             val sourceDir = layout.projectDirectory.asFile.resolve("src/desktopMain/cpp")
             if (sourceDir.exists()) {
                 // 检查是否忽略编译
-                if (!sourceDir.resolve("build.bat").exists() && !sourceDir.resolve("build.sh").exists()) {
+                if (!sourceDir.resolve("native.ignore").exists()) {
                     val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
                         inputDir.set(sourceDir)
                     }
