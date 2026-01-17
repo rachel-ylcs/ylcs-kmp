@@ -2,7 +2,7 @@
 
 using namespace pag;
 
-inline std::shared_ptr<PAGImage> obj_cast(jlong handle) {
+static inline std::shared_ptr<PAGImage> obj_cast(jlong handle) {
     auto jPagImage = reinterpret_cast<JPAGImage*>(handle);
     return jPagImage ? jPagImage->get() : nullptr;
 }
@@ -10,18 +10,18 @@ inline std::shared_ptr<PAGImage> obj_cast(jlong handle) {
 extern "C" {
     JNIEXPORT jlong JNICALL Java_org_libpag_PAGImage_nativeLoadFromPath(JNIEnv* env, jclass, jstring path) {
         auto pathStr = j2s(env, path);
-        if (pathStr.empty()) return 0L;
+        if (pathStr.empty()) return 0LL;
         auto pagImage = PAGImage::FromPath(pathStr);
-        return pagImage ? reinterpret_cast<jlong>(new JPAGImage(pagImage)) : 0L;
+        return pagImage ? reinterpret_cast<jlong>(new JPAGImage(pagImage)) : 0LL;
     }
 
     JNIEXPORT jlong JNICALL Java_org_libpag_PAGImage_nativeLoadFromBytes(JNIEnv* env, jclass, jbyteArray bytes) {
         auto length = env->GetArrayLength(bytes);
         auto data = env->GetPrimitiveArrayCritical(bytes, nullptr);
-        if (!data) return 0L;
+        if (!data) return 0LL;
         auto pagImage = PAGImage::FromBytes(data, length);
         env->ReleasePrimitiveArrayCritical(bytes, data, JNI_ABORT);
-        return pagImage ? reinterpret_cast<jlong>(new JPAGImage(pagImage)) : 0L;
+        return pagImage ? reinterpret_cast<jlong>(new JPAGImage(pagImage)) : 0LL;
     }
 
     JNIEXPORT void JNICALL Java_org_libpag_PAGImage_nativeClear(JNIEnv* env, jclass, jlong handle) {
