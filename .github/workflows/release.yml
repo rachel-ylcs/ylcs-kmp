@@ -103,6 +103,11 @@ jobs:
           arch: x64
           export-path-to-vs: VS_PATH
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
       - name: Build
         run: |
           ./gradlew ylcs-app:desktopApp:desktopPublish
@@ -143,6 +148,11 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
       - name: Build
         run: |
           ./gradlew ylcs-app:desktopApp:desktopPublish
@@ -176,6 +186,11 @@ jobs:
           cache-dependency-path: |
             ./*.gradle*
             ./**/gradle-wrapper.properties
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
 
       - name: Build
         run: |

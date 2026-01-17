@@ -360,9 +360,9 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                         buildTypes.release.proguard {
                             version.set(C.proguard.version)
-                            isEnabled.set(false)
-                            optimize.set(false)
-                            obfuscate.set(false)
+                            isEnabled.set(true)
+                            optimize.set(true)
+                            obfuscate.set(true)
                             joinOutputJars.set(true)
                             configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
                         }
@@ -420,7 +420,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
             val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
                 // 检查是否需要编译 Desktop Native
-                val sourceDir = layout.projectDirectory.asFile.resolve("src/desktopMain/cpp")
+                val sourceDir = desktopNativeKMPSourceDir.asFile
                 onlyIf {
                     sourceDir.exists() && !sourceDir.resolve("native.ignore").exists()
                 }
