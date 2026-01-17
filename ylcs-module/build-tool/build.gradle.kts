@@ -1,8 +1,8 @@
 import love.yinlin.task.BuildDesktopNativeTask
 
 afterEvaluate {
-    println(projects.ylcsModule.compose.ui.pagKmp.path)
     val buildDesktopNativePAG by tasks.registering(BuildDesktopNativeTask::class) {
-
+        val projectDir = projects.ylcsModule.compose.ui.pagKmp.projectDir(this@afterEvaluate).asFile
+        val sourceDir = projectDir.resolve("src/desktopMain/cpp")
     }
 }

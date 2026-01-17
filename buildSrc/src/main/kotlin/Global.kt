@@ -1,6 +1,7 @@
 import love.yinlin.project.Constants
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
+import org.gradle.api.internal.catalog.DelegatingProjectDependency
 
 enum class BuildEnvironment { Dev, Prod }
 
@@ -36,3 +37,10 @@ val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().d
 
 // 生成代码源目录
 val Project.generateSourceDir: Directory get() = layout.buildDirectory.get().dir("generated").dir("kotlin")
+
+fun DelegatingProjectDependency.projectDir(p: Project): Directory {
+    val names = this.path.removePrefix(":").split(":")
+    var target = p.rootProject.layout.projectDirectory
+    for (name in names) target = target.dir(name)
+    return target
+}

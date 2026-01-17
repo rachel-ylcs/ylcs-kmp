@@ -418,19 +418,16 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
         afterEvaluate {
             actions()
 
-            // 检查是否需要编译 Desktop Native
-            val sourceDir = layout.projectDirectory.asFile.resolve("src/desktopMain/cpp")
-            if (sourceDir.exists()) {
-                // 检查是否忽略编译
-                if (!sourceDir.resolve("native.ignore").exists()) {
-                    val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
-                        inputDir.set(sourceDir)
-                    }
-                    tasks.named("desktopJar") {
-                        dependsOn(buildNativeTask)
-                    }
+            val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
+                // 检查是否需要编译 Desktop Native
+                val sourceDir = layout.projectDirectory.asFile.resolve("src/desktopMain/cpp")
+                onlyIf {
+                    sourceDir.exists() && !sourceDir.resolve("native.ignore").exists()
                 }
+                inputDir.set(sourceDir)
             }
+
+            tasks.findByName("desktopJar")?.dependsOn(buildNativeTask)
         }
     }
 }
