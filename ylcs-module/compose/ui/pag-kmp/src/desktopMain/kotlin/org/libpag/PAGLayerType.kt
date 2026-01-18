@@ -10,5 +10,7 @@ enum class PAGLayerType(internal val value: Int) {
     PreCompose(6),
     Camera(7),
 
-    File(114514),
+    File(114514);
+
+    internal val internalNativeType: Int get() = if (this == File) PreCompose.ordinal else this.ordinal
 }
