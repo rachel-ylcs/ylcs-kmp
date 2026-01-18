@@ -58,7 +58,7 @@ actual class PAGImage(private val delegate: PlatformPAGImage) {
             finally {
                 CVPixelBufferUnlockBaseAddress(pixelBuffer, 0UL)
             }
-            return PAGImage(PlatformPAGImage.FromPixelBuffer(pixelBuffer))
+            return PAGImage(PlatformPAGImage.FromPixelBuffer(pixelBuffer)!!)
         }
     }
 }
