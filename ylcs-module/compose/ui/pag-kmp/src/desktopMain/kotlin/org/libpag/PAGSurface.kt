@@ -45,7 +45,8 @@ class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAI
 
     fun clearAll() = nativeClearAll(nativeHandle)
 
-    fun readPixels(colorType: PAGColorType, alphaType: PAGAlphaType, rowBytes: Long, container: ByteArray) = nativeReadPixels(nativeHandle, colorType.ordinal, alphaType.ordinal, rowBytes, container)
+    fun readPixels(colorType: PAGColorType, alphaType: PAGAlphaType, rowBytes: Long, container: ByteArray) =
+        nativeReadPixels(nativeHandle, colorType.ordinal, alphaType.ordinal, rowBytes, container)
 
     override fun close() {
         // Must call freeCache() here, otherwise, the cache may not be freed until the PAGPlayer is

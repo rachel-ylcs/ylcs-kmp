@@ -46,6 +46,8 @@ target_include_directories(pag_kotlin PRIVATE
     ${JNI_INCLUDE_DIRS}
     ${NATIVE_JNI_DIR}
     libpag/include/pag
+    libpag/src
+    libpag/third_party/tgfx/include
 )
 
 target_link_libraries(pag_kotlin
