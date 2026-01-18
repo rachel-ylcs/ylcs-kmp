@@ -8,7 +8,10 @@ import love.yinlin.platform.NativeLibLoader
 import org.jetbrains.skia.Matrix33
 
 @NativeLib
-class PAGLayer private constructor(constructor: () -> Long) : Destructible(RAII(constructor, ::nativeRelease)) {
+open class PAGLayer internal constructor(
+    constructor: () -> Long,
+    destructor: (Long) -> Unit = PAGLayer::nativeRelease,
+) : Destructible(RAII(constructor, destructor)) {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")

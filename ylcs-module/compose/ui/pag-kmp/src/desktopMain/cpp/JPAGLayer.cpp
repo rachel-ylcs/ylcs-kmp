@@ -145,7 +145,7 @@ extern "C" {
 
     JNIEXPORT jboolean JNICALL Java_org_libpag_PAGLayer_nativeExcludedFromTimeline(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
-        return pagLayer? static_cast<jboolean>(pagLayer->excludedFromTimeline()) : JNI_FALSE;
+        return pagLayer ? static_cast<jboolean>(pagLayer->excludedFromTimeline()) : JNI_FALSE;
     }
 
     JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetExcludedFromTimeline(JNIEnv* env, jclass, jlong handle, jboolean value) {
@@ -155,7 +155,7 @@ extern "C" {
 
     JNIEXPORT jfloat JNICALL Java_org_libpag_PAGLayer_nativeAlpha(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
-        return pagLayer? pagLayer->alpha() : 0.0f;
+        return pagLayer ? pagLayer->alpha() : 0.0f;
     }
 
     JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetAlpha(JNIEnv* env, jclass, jlong handle, jfloat alpha) {
