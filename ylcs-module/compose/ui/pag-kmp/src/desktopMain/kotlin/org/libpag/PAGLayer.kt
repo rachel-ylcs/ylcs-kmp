@@ -1,6 +1,7 @@
 package org.libpag
 
 import androidx.compose.ui.geometry.Rect
+import love.yinlin.compose.ui.PAGLayerType
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
@@ -72,13 +73,13 @@ open class PAGLayer internal constructor(
         private external fun nativeSetAlpha(handle: Long, alpha: Float)
 
         internal fun internalNativeMake(type: Int, handle: Long): PAGLayer? = when (type) {
-            PAGLayerType.Unknown.ordinal -> PAGLayer({ handle })
-            PAGLayerType.Solid.ordinal -> PAGSolidLayer { handle }
-            PAGLayerType.Text.ordinal -> PAGTextLayer { handle }
-            PAGLayerType.Shape.ordinal -> PAGShapeLayer { handle }
-            PAGLayerType.Image.ordinal -> PAGImageLayer { handle }
-            PAGLayerType.PreCompose.ordinal -> PAGComposition { handle }
-            PAGLayerType.File.ordinal -> PAGFile { handle }
+            PAGLayerType.Unknown.value -> PAGLayer({ handle })
+            PAGLayerType.Solid.value -> PAGSolidLayer { handle }
+            PAGLayerType.Text.value -> PAGTextLayer { handle }
+            PAGLayerType.Shape.value -> PAGShapeLayer { handle }
+            PAGLayerType.Image.value -> PAGImageLayer { handle }
+            PAGLayerType.PreCompose.value -> PAGComposition { handle }
+            PAGLayerType.File.value -> PAGFile { handle }
             else -> null
         }
     }
@@ -147,5 +148,5 @@ open class PAGLayer internal constructor(
         is PAGComposition -> PAGLayerType.PreCompose
         is PAGFile -> PAGLayerType.File
         else -> PAGLayerType.Unknown
-    }.ordinal
+    }.value
 }

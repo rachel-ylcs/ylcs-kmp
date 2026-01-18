@@ -1,5 +1,6 @@
 package org.libpag
 
+import love.yinlin.compose.ui.PAGLayerType
 import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
 
@@ -67,7 +68,7 @@ class PAGFile internal constructor(constructor: () -> Long) : PAGLayer(construct
 
     fun replaceImageByName(layerName: String, image: PAGImage) = nativeReplaceImageByName(nativeHandle, layerName, image.nativeHandle)
 
-    fun getEditableIndices(layerType: PAGLayerType): IntArray = nativeGetEditableIndices(nativeHandle, layerType.internalNativeType)
+    fun getEditableIndices(layerType: PAGLayerType): IntArray = nativeGetEditableIndices(nativeHandle, layerType.originType)
 
     var timeStretchMode: Int get() = nativeTimeStretchMode(nativeHandle)
         set(value) { nativeSetTimeStretchMode(nativeHandle, value) }

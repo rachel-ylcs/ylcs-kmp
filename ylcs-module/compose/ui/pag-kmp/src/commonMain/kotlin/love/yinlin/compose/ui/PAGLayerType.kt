@@ -1,4 +1,4 @@
-package org.libpag
+package love.yinlin.compose.ui
 
 enum class PAGLayerType(internal val value: Int) {
     Unknown(0),
@@ -12,5 +12,5 @@ enum class PAGLayerType(internal val value: Int) {
 
     File(114514);
 
-    internal val internalNativeType: Int get() = if (this == File) PreCompose.ordinal else this.ordinal
+    internal val originType: Int get() = if (this == File) PreCompose.ordinal else this.ordinal
 }
