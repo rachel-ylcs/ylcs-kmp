@@ -24,7 +24,7 @@ extern "C" {
         return pagImage ? reinterpret_cast<jlong>(new JPAGImage(pagImage)) : 0LL;
     }
 
-    JNIEXPORT jlong JNICALL Java_org_libpag_PAGImage_nativeLoadFromPixels(JNIEnv* env, jclass, jbyteArray pixels, jint width, jint height, jlong row_bytes, jint color_type, jint alpha_type) {
+    JNIEXPORT jlong JNICALL Java_org_libpag_PAGImage_nativeLoadFromPixels(JNIEnv* env, jclass, jintArray pixels, jint width, jint height, jlong row_bytes, jint color_type, jint alpha_type) {
         auto data = env->GetPrimitiveArrayCritical(pixels, nullptr);
         if (!data) return 0LL;
         auto pagImage = PAGImage::FromPixels(data, width, height, row_bytes, static_cast<ColorType>(color_type), static_cast<AlphaType>(alpha_type));

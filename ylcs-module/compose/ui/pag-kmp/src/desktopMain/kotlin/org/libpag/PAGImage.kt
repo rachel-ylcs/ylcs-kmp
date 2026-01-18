@@ -17,7 +17,7 @@ class PAGImage private constructor(constructor: () -> Long) : Destructible(RAII(
         @JvmStatic
         private external fun nativeLoadFromBytes(bytes: ByteArray): Long
         @JvmStatic
-        private external fun nativeLoadFromPixels(pixels: ByteArray, width: Int, height: Int, rowBytes: Long, colorType: Int, alphaType: Int): Long
+        private external fun nativeLoadFromPixels(pixels: IntArray, width: Int, height: Int, rowBytes: Long, colorType: Int, alphaType: Int): Long
         @JvmStatic
         private external fun nativeClear(handle: Long)
         @JvmStatic
@@ -37,7 +37,7 @@ class PAGImage private constructor(constructor: () -> Long) : Destructible(RAII(
 
         fun loadFromPath(path: String): PAGImage = PAGImage { nativeLoadFromPath(path) }
         fun loadFromBytes(bytes: ByteArray): PAGImage = PAGImage { nativeLoadFromBytes(bytes) }
-        fun loadFromPixels(pixels: ByteArray, width: Int, height: Int, rowBytes: Long, colorType: Int, alphaType: Int): PAGImage =
+        fun loadFromPixels(pixels: IntArray, width: Int, height: Int, rowBytes: Long, colorType: Int, alphaType: Int): PAGImage =
             PAGImage { nativeLoadFromPixels(pixels, width, height, rowBytes, colorType, alphaType) }
     }
 

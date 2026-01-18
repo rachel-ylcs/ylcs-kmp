@@ -4,12 +4,14 @@
 package org.libpag
 
 import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.TexImageSource
 import org.khronos.webgl.Uint8Array
 import org.khronos.webgl.WebGLFramebuffer
 import org.khronos.webgl.WebGLRenderingContext
 import org.khronos.webgl.WebGLTexture
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.ImageBitmap
+import org.w3c.files.File
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 import kotlin.js.JsBoolean
@@ -85,6 +87,24 @@ external class PAGMatrix : JsAny {
     fun postRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun postSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun postConcat(other: PAGMatrix)
+    fun destroy()
+}
+
+external class PAGImage : JsAny {
+    companion object {
+        fun fromFile(data: File): Promise<PAGImage>
+        fun fromSource(source: TexImageSource): PAGImage
+        fun fromPixels(pixels: Uint8Array, width: Int, height: Int, colorType: Int, alphaType: Int): PAGImage
+        fun fromTexture(textureID: Int, width: Int, height: Int, flipY: Boolean): PAGImage
+    }
+
+    fun width(): Int
+    fun height(): Int
+    fun scaleMode(): Int
+    fun setScaleMode(mode: Int)
+    fun matrix(): PAGMatrix
+    fun setMatrix(matrix: PAGMatrix)
+    fun destroy()
 }
 
 external class PAGSurface : JsAny {

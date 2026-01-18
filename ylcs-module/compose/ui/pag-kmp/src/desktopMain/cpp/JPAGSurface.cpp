@@ -43,7 +43,7 @@ extern "C" {
         if (pagSurface) pagSurface->freeCache();
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGSurface_nativeReadPixels(JNIEnv* env, jclass, jlong handle, jint color_type, jint alpha_type, jlong row_bytes, jbyteArray container) {
+    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGSurface_nativeReadPixels(JNIEnv* env, jclass, jlong handle, jint color_type, jint alpha_type, jlong row_bytes, jintArray container) {
         auto pagSurface = obj_cast(handle);
         if (pagSurface) {
             auto data = env->GetPrimitiveArrayCritical(container, nullptr);
