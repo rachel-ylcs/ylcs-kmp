@@ -12,7 +12,7 @@ class RAII(constructor: () -> Long, private val destructor: (Long) -> Unit) : Ru
 }
 
 abstract class Destructible(raii: RAII) {
-    protected val nativeHandle: Long = raii.handle
+    val nativeHandle: Long = raii.handle
     init {
         RAII.cleaner.register(this, raii)
     }
