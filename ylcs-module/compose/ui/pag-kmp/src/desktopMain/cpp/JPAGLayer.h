@@ -1,3 +1,5 @@
+#pragma once
+
 #include <native_jni.h>
 #include <pag.h>
 

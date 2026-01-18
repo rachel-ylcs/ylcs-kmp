@@ -27,7 +27,7 @@ class PAGImageLayer internal constructor(constructor: () -> Long) : PAGLayer(con
         @JvmStatic
         private external fun nativeContentTimeToLayer(handle: Long, time: Long): Long
         @JvmStatic
-        private external fun nativeImageBytes(handle: Long): ByteBuffer
+        private external fun nativeImageBytes(handle: Long): ByteBuffer?
 
         fun make(width: Int, height: Int, duration: Long): PAGImageLayer {
             return PAGImageLayer { nativeMake(width, height, duration) }
@@ -44,5 +44,5 @@ class PAGImageLayer internal constructor(constructor: () -> Long) : PAGLayer(con
 
     fun contentTimeToLayer(time: Long): Long = nativeContentTimeToLayer(nativeHandle, time)
 
-    val imageBytes: ByteBuffer get() = nativeImageBytes(nativeHandle)
+    val imageBytes: ByteBuffer? get() = nativeImageBytes(nativeHandle)
 }

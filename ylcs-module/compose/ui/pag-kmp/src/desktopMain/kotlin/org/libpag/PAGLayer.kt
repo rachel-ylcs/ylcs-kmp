@@ -70,6 +70,17 @@ open class PAGLayer internal constructor(
         private external fun nativeAlpha(handle: Long): Float
         @JvmStatic
         private external fun nativeSetAlpha(handle: Long, alpha: Float)
+
+        internal fun internalNativeMake(type: Int, handle: Long): PAGLayer? = when (type) {
+            PAGLayerType.Unknown.ordinal -> PAGLayer({ handle })
+            PAGLayerType.Solid.ordinal -> PAGSolidLayer { handle }
+            PAGLayerType.Text.ordinal -> PAGTextLayer { handle }
+            PAGLayerType.Shape.ordinal -> PAGShapeLayer { handle }
+            PAGLayerType.Image.ordinal -> PAGImageLayer { handle }
+            PAGLayerType.PreCompose.ordinal -> PAGComposition { handle }
+            PAGLayerType.File.ordinal -> PAGFile { handle }
+            else -> null
+        }
     }
 
     val layerType: Int get() = nativeLayerType(nativeHandle)
@@ -127,4 +138,14 @@ open class PAGLayer internal constructor(
 
     var alpha: Float get() = nativeAlpha(nativeHandle)
         set(value) { nativeSetAlpha(nativeHandle, value) }
+
+    internal val internalNativeType: Int get() = when (this) {
+        is PAGSolidLayer -> PAGLayerType.Solid
+        is PAGTextLayer -> PAGLayerType.Text
+        is PAGShapeLayer -> PAGLayerType.Shape
+        is PAGImageLayer -> PAGLayerType.Image
+        is PAGComposition -> PAGLayerType.PreCompose
+        is PAGFile -> PAGLayerType.File
+        else -> PAGLayerType.Unknown
+    }.ordinal
 }

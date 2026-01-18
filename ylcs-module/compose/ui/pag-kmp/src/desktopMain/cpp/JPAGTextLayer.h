@@ -1,4 +1,5 @@
-#include <native_jni.h>
+#pragma once
+
 #include "JPAGUtils.h"
 
 class JPAGTextLayer {
