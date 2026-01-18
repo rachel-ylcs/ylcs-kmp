@@ -31,7 +31,7 @@ data class Token(
             val timestampBytes = bytes.copyOfRange(12, 20)
             val uid = ByteBuffer.wrap(uidBytes).int
             val magic = ByteBuffer.wrap(magicBytes).int
-            val platform = Platform.fromInt(ByteBuffer.wrap(platformBytes).int)
+            val platform = Platform.entries.getOrNull(ByteBuffer.wrap(platformBytes).int)
             val timestamp = ByteBuffer.wrap(timestampBytes).long
             return if (uid > 0 && magic == MAGIC && timestamp in 1727755860000..1917058260000 && platform != null)
                 Token(uid = uid, platform = platform, timestamp = timestamp) else null

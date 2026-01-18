@@ -32,17 +32,22 @@ extern "C" {
         if (pagLayer) pagLayer->setFillColor(ToColor(color));
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGTextLayer_nativeFont(JNIEnv* env, jclass, jlong handle, jobjectArray outInfo) {
+    JNIEXPORT jobjectArray JNICALL Java_org_libpag_PAGTextLayer_nativeFont(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
             auto font = pagLayer->font();
             auto family = s2j(env, font.fontFamily);
             auto style = s2j(env, font.fontStyle);
-            env->SetObjectArrayElement(outInfo, 0, family);
-            env->SetObjectArrayElement(outInfo, 1, style);
+            auto clz = env->GetObjectClass(family);
+            auto result = env->NewObjectArray(2, clz, nullptr);
+            env->SetObjectArrayElement(result, 0, family);
+            env->SetObjectArrayElement(result, 1, style);
             env->DeleteLocalRef(family);
             env->DeleteLocalRef(style);
+            env->DeleteLocalRef(clz);
+            return result;
         }
+        return nullptr;
     }
 
     JNIEXPORT void JNICALL Java_org_libpag_PAGTextLayer_nativeSetFont(JNIEnv* env, jclass, jlong handle, jstring font_family, jstring font_style) {

@@ -26,21 +26,24 @@ extern "C" {
         PAGFont::SetFallbackFontPaths(fallbackList, ttcList);
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGFont_nativeRegisterFont(JNIEnv* env, jclass, jbyteArray bytes, jint ttcIndex, jstring font_family, jstring font_style, jobjectArray outInfo) {
+    JNIEXPORT jobjectArray JNICALL Java_org_libpag_PAGFont_nativeRegisterFont(JNIEnv* env, jclass, jbyteArray bytes, jint ttcIndex, jstring font_family, jstring font_style) {
         auto length = env->GetArrayLength(bytes);
         auto data = env->GetPrimitiveArrayCritical(bytes, nullptr);
         if (data) {
             auto font = PAGFont::RegisterFont(data, static_cast<size_t>(length), ttcIndex, j2s(env, font_family), j2s(env, font_style));
             env->ReleasePrimitiveArrayCritical(bytes, data, JNI_ABORT);
-            if (font.fontFamily.empty()) return JNI_FALSE;
+            if (font.fontFamily.empty()) return nullptr;
             auto family = s2j(env, font.fontFamily);
             auto style = s2j(env, font.fontStyle);
-            env->SetObjectArrayElement(outInfo, 0, family);
-            env->SetObjectArrayElement(outInfo, 1, style);
+            auto clz = env->GetObjectClass(family);
+            auto result = env->NewObjectArray(2, clz, nullptr);
+            env->SetObjectArrayElement(result, 0, family);
+            env->SetObjectArrayElement(result, 1, style);
             env->DeleteLocalRef(family);
             env->DeleteLocalRef(style);
-            return JNI_TRUE;
+            env->DeleteLocalRef(clz);
+            return result;
         }
-        return JNI_FALSE;
+        return nullptr;
     }
 }

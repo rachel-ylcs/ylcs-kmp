@@ -42,7 +42,7 @@ class MusicService : MediaSessionService() {
             return when (customCommand) {
                 CustomCommands.SetMode -> {
                     val playMode = if (args.isEmpty) mergePlayMode(player.repeatMode, player.shuffleModeEnabled).next
-                    else MusicPlayMode.fromInt(args.getInt(CustomCommands.Args.SET_MODE_ARG_MODE)) ?: MusicPlayMode.ORDER
+                    else MusicPlayMode.entries.getOrNull(args.getInt(CustomCommands.Args.SET_MODE_ARG_MODE)) ?: MusicPlayMode.ORDER
                     when (playMode) {
                         MusicPlayMode.ORDER -> {
                             player.repeatMode = Player.REPEAT_MODE_ALL

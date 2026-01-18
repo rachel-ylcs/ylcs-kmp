@@ -43,13 +43,13 @@ extern "C" {
         if (pagSurface) pagSurface->freeCache();
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGSurface_nativeReadPixels(JNIEnv* env, jclass, jlong handle, jint color_type, jint alpha_type, jbyteArray bytes) {
+    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGSurface_nativeReadPixels(JNIEnv* env, jclass, jlong handle, jint color_type, jint alpha_type, jlong row_bytes, jbyteArray container) {
         auto pagSurface = obj_cast(handle);
         if (pagSurface) {
-            auto data = env->GetPrimitiveArrayCritical(bytes, nullptr);
+            auto data = env->GetPrimitiveArrayCritical(container, nullptr);
             if (data) {
-                pagSurface->readPixels(static_cast<ColorType>(color_type), static_cast<AlphaType>(alpha_type), data, static_cast<size_t>(pagSurface->width()));
-                env->ReleasePrimitiveArrayCritical(bytes, data, 0);
+                pagSurface->readPixels(static_cast<ColorType>(color_type), static_cast<AlphaType>(alpha_type), data, row_bytes);
+                env->ReleasePrimitiveArrayCritical(container, data, 0);
                 return JNI_TRUE;
             }
         }

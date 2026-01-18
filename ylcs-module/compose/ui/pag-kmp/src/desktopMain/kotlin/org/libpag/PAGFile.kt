@@ -1,6 +1,7 @@
 package org.libpag
 
 import love.yinlin.compose.ui.PAGLayerType
+import love.yinlin.compose.ui.PAGTimeStretchMode
 import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
 
@@ -37,7 +38,7 @@ class PAGFile internal constructor(constructor: () -> Long) : PAGLayer(construct
         private external fun nativeReplaceImageByName(handle: Long, layerName: String, imageHandle: Long)
         // getLayersByEditableIndex()
         @JvmStatic
-        private external fun nativeGetEditableIndices(handle: Long, layerType: Int): IntArray
+        private external fun nativeGetEditableIndices(handle: Long, type: Int): IntArray
         @JvmStatic
         private external fun nativeTimeStretchMode(handle: Long): Int
         @JvmStatic
@@ -68,10 +69,10 @@ class PAGFile internal constructor(constructor: () -> Long) : PAGLayer(construct
 
     fun replaceImageByName(layerName: String, image: PAGImage) = nativeReplaceImageByName(nativeHandle, layerName, image.nativeHandle)
 
-    fun getEditableIndices(layerType: PAGLayerType): IntArray = nativeGetEditableIndices(nativeHandle, layerType.originType)
+    fun getEditableIndices(type: PAGLayerType): IntArray = nativeGetEditableIndices(nativeHandle, type.originType)
 
-    var timeStretchMode: Int get() = nativeTimeStretchMode(nativeHandle)
-        set(value) { nativeSetTimeStretchMode(nativeHandle, value) }
+    var timeStretchMode: PAGTimeStretchMode get() = PAGTimeStretchMode.entries[nativeTimeStretchMode(nativeHandle)]
+        set(value) { nativeSetTimeStretchMode(nativeHandle, value.ordinal) }
 
     fun setDuration(duration: Long) = nativeSetDuration(nativeHandle, duration)
 

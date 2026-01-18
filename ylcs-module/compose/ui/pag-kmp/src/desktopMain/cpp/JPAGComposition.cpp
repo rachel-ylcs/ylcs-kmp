@@ -38,14 +38,16 @@ extern "C" {
         return pagLayer ? pagLayer->numChildren() : 0;
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeGetLayerAt(JNIEnv* env, jclass, jlong handle, jint index, jlongArray outInfo) {
+    JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGComposition_nativeGetLayerAt(JNIEnv* env, jclass, jlong handle, jint index) {
         auto pagLayer = obj_cast(handle);
+        auto result = env->NewLongArray(2);
         if (pagLayer) {
             auto subLayer = pagLayer->getLayerAt(index);
             auto [layerHandle, type] = JPAGLayerInstance(subLayer);
             jlong values[2] = { layerHandle, static_cast<jlong>(type) };
-            env->SetLongArrayRegion(outInfo, 0, 2, values);
+            env->SetLongArrayRegion(result, 0, 2, values);
         }
+        return result;
     }
 
     JNIEXPORT jint JNICALL Java_org_libpag_PAGComposition_nativeGetLayerIndex(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type) {
@@ -90,27 +92,31 @@ extern "C" {
         return JNI_FALSE;
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeRemoveLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type, jlongArray outInfo) {
+    JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGComposition_nativeRemoveLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type) {
         auto pagLayer = obj_cast(handle);
+        auto result = env->NewLongArray(2);
         if (pagLayer) {
             auto subLayer = PAGLayerInstance(layerHandle, type);
             if (subLayer) {
                 auto removeLayer = pagLayer->removeLayer(subLayer);
                 auto [removeLayerHandle, removeType] = JPAGLayerInstance(removeLayer);
                 jlong values[2] = { removeLayerHandle, static_cast<jlong>(removeType) };
-                env->SetLongArrayRegion(outInfo, 0, 2, values);
+                env->SetLongArrayRegion(result, 0, 2, values);
             }
         }
+        return result;
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeRemoveLayerAt(JNIEnv* env, jclass, jlong handle, jint index, jlongArray outInfo) {
+    JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGComposition_nativeRemoveLayerAt(JNIEnv* env, jclass, jlong handle, jint index) {
         auto pagLayer = obj_cast(handle);
+        auto result = env->NewLongArray(2);
         if (pagLayer) {
             auto removeLayer = pagLayer->removeLayerAt(index);
             auto [removeLayerHandle, removeType] = JPAGLayerInstance(removeLayer);
             jlong values[2] = { removeLayerHandle, static_cast<jlong>(removeType) };
-            env->SetLongArrayRegion(outInfo, 0, 2, values);
+            env->SetLongArrayRegion(result, 0, 2, values);
         }
+        return result;
     }
 
     JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeRemoveAllLayers(JNIEnv* env, jclass, jlong handle) {
@@ -136,11 +142,16 @@ extern "C" {
         if (pagLayer) pagLayer->swapLayerAt(index1, index2);
     }
 
-    JNIEXPORT jobject JNICALL Java_org_libpag_PAGComposition_nativeAudioBytes(JNIEnv* env, jclass, jlong handle) {
+    JNIEXPORT jbyteArray JNICALL Java_org_libpag_PAGComposition_nativeAudioBytes(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
             auto audio = pagLayer->audioBytes();
-            if (audio) return env->NewDirectByteBuffer(audio->data(), audio->length());
+            auto length = static_cast<jsize>(audio->length());
+            if (audio) {
+                jbyteArray result = env->NewByteArray(length);
+                env->SetByteArrayRegion(result, 0, length, reinterpret_cast<const jbyte*>(audio->data()));
+                return result;
+            }
         }
         return nullptr;
     }

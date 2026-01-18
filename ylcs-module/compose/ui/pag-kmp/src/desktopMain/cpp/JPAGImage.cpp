@@ -62,9 +62,10 @@ extern "C" {
         if (pagImage) pagImage->setScaleMode(static_cast<PAGScaleMode>(value));
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGImage_nativeGetMatrix(JNIEnv* env, jclass, jlong handle, jfloatArray arr) {
+    JNIEXPORT jfloatArray JNICALL Java_org_libpag_PAGImage_nativeGetMatrix(JNIEnv* env, jclass, jlong handle) {
         auto pagImage = obj_cast(handle);
         float values[9];
+        jfloatArray result = env->NewFloatArray(9);
         if (pagImage) {
             auto matrix = pagImage->matrix();
             matrix.get9(values);
@@ -74,7 +75,8 @@ extern "C" {
             matrix.setIdentity();
             matrix.get9(values);
         }
-        env->SetFloatArrayRegion(arr, 0, 9, values);
+        env->SetFloatArrayRegion(result, 0, 9, values);
+        return result;
     }
 
     JNIEXPORT void JNICALL Java_org_libpag_PAGImage_nativeSetMatrix(JNIEnv* env, jclass, jlong handle, jfloatArray arr) {

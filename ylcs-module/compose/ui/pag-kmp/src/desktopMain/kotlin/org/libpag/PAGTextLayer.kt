@@ -1,5 +1,7 @@
 package org.libpag
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
 
@@ -19,7 +21,7 @@ class PAGTextLayer internal constructor(constructor: () -> Long) : PAGLayer(cons
         @JvmStatic
         private external fun nativeSetFillColor(handle: Long, color: Int)
         @JvmStatic
-        private external fun nativeFont(handle: Long, outInfo: Array<String>)
+        private external fun nativeFont(handle: Long): Array<String>?
         @JvmStatic
         private external fun nativeSetFont(handle: Long, fontFamily: String, fontStyle: String)
         @JvmStatic
@@ -42,14 +44,13 @@ class PAGTextLayer internal constructor(constructor: () -> Long) : PAGLayer(cons
         }
     }
 
-    var fillColor: Int get() = nativeFillColor(nativeHandle)
-        set(value) { nativeSetFillColor(nativeHandle, value) }
+    var fillColor: Color get() = Color(nativeFillColor(nativeHandle))
+        set(value) { nativeSetFillColor(nativeHandle, value.toArgb()) }
 
     var font: PAGFont
         get() {
-            val outInfo = arrayOf("", "")
-            nativeFont(nativeHandle, outInfo)
-            return PAGFont(outInfo[0], outInfo[1])
+            val result = nativeFont(nativeHandle)
+            return if (result != null) PAGFont(result[0], result[1]) else PAGFont()
         }
         set(value) {
             nativeSetFont(nativeHandle, value.fontFamily, value.fontStyle)
@@ -58,8 +59,8 @@ class PAGTextLayer internal constructor(constructor: () -> Long) : PAGLayer(cons
     var fontSize: Float get() = nativeFontSize(nativeHandle)
         set(value) { nativeSetFontSize(nativeHandle, value) }
 
-    var strokeColor: Int get() = nativeStrokeColor(nativeHandle)
-        set(value) { nativeSetStrokeColor(nativeHandle, value) }
+    var strokeColor: Color get() = Color(nativeStrokeColor(nativeHandle))
+        set(value) { nativeSetStrokeColor(nativeHandle, value.toArgb()) }
 
     var text: String get() = nativeText(nativeHandle)
         set(value) { nativeSetText(nativeHandle, value) }

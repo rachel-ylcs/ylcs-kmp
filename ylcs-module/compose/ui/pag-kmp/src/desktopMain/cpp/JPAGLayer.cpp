@@ -15,7 +15,12 @@ extern "C" {
 
     JNIEXPORT jint JNICALL Java_org_libpag_PAGLayer_nativeLayerType(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
-        return pagLayer ? static_cast<jint>(pagLayer->layerType()) : static_cast<jint>(LayerType::Unknown);
+        if (pagLayer) {
+            auto type = pagLayer->layerType();
+            if (type == LayerType::PreCompose && std::static_pointer_cast<PAGComposition>(pagLayer)->isPAGFile()) return 114514;
+            return static_cast<jint>(type);
+        }
+        return static_cast<jint>(LayerType::Unknown);
     }
 
     JNIEXPORT jstring JNICALL Java_org_libpag_PAGLayer_nativeLayerName(JNIEnv* env, jclass, jlong handle) {
@@ -23,9 +28,10 @@ extern "C" {
         return s2j(env, pagLayer ? pagLayer->layerName() : std::string{});
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeGetMatrix(JNIEnv* env, jclass, jlong handle, jfloatArray arr) {
+    JNIEXPORT jfloatArray JNICALL Java_org_libpag_PAGLayer_nativeGetMatrix(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
         float values[9];
+        auto result = env->NewFloatArray(9);
         if (pagLayer) {
             auto matrix = pagLayer->matrix();
             matrix.get9(values);
@@ -35,7 +41,8 @@ extern "C" {
             matrix.setIdentity();
             matrix.get9(values);
         }
-        env->SetFloatArrayRegion(arr, 0, 9, values);
+        env->SetFloatArrayRegion(result, 0, 9, values);
+        return result;
     }
 
     JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetMatrix(JNIEnv* env, jclass, jlong handle, jfloatArray arr) {
@@ -54,9 +61,10 @@ extern "C" {
         if (pagLayer) pagLayer->resetMatrix();
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeGetTotalMatrix(JNIEnv* env, jclass, jlong handle, jfloatArray arr) {
+    JNIEXPORT jfloatArray JNICALL Java_org_libpag_PAGLayer_nativeGetTotalMatrix(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
         float values[9];
+        auto result = env->NewFloatArray(9);
         if (pagLayer) {
             auto matrix = pagLayer->getTotalMatrix();
             matrix.get9(values);
@@ -66,7 +74,8 @@ extern "C" {
             matrix.setIdentity();
             matrix.get9(values);
         }
-        env->SetFloatArrayRegion(arr, 0, 9, values);
+        env->SetFloatArrayRegion(result, 0, 9, values);
+        return result;
     }
 
     JNIEXPORT jboolean JNICALL Java_org_libpag_PAGLayer_nativeVisible(JNIEnv* env, jclass, jlong handle) {
@@ -134,13 +143,15 @@ extern "C" {
         if (pagLayer) pagLayer->setProgress(progress);
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeGetBounds(JNIEnv* env, jclass, jlong handle, jfloatArray outInfo) {
+    JNIEXPORT jfloatArray JNICALL Java_org_libpag_PAGLayer_nativeGetBounds(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
+        auto result = env->NewFloatArray(4);
         if (pagLayer) {
             auto rect = pagLayer->getBounds();
             float values[4] = { rect.x(), rect.y(), rect.width(), rect.height() };
-            env->SetFloatArrayRegion(outInfo, 0, 4, values);
+            env->SetFloatArrayRegion(result, 0, 4, values);
         }
+        return result;
     }
 
     JNIEXPORT jboolean JNICALL Java_org_libpag_PAGLayer_nativeExcludedFromTimeline(JNIEnv* env, jclass, jlong handle) {

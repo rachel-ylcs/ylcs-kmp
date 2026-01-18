@@ -2,16 +2,6 @@ package love.yinlin.platform
 
 enum class WindowsNativePlaybackState {
     None, Opening, Buffering, Playing, Paused;
-
-    companion object {
-        fun fromInt(value: Int): WindowsNativePlaybackState = when (value) {
-            Opening.ordinal -> Opening
-            Buffering.ordinal -> Buffering
-            Playing.ordinal -> Playing
-            Paused.ordinal -> Paused
-            else -> None
-        }
-    }
 }
 
 class WindowsNativeAudioPlayer {
@@ -34,7 +24,7 @@ class WindowsNativeAudioPlayer {
 
     val isInit: Boolean get() = nativeHandle != 0L
 
-    val playbackState: WindowsNativePlaybackState get() = WindowsNativePlaybackState.fromInt(nativeGetPlaybackState(nativeHandle))
+    val playbackState: WindowsNativePlaybackState get() = WindowsNativePlaybackState.entries.getOrNull(nativeGetPlaybackState(nativeHandle)) ?: WindowsNativePlaybackState.None
 
     val position: Long get() = nativeGetPosition(nativeHandle)
     val duration: Long get() = nativeGetDuration(nativeHandle)
@@ -75,7 +65,9 @@ class WindowsNativeAudioPlayer {
     @Suppress("unused")
     private fun nativeDurationChange(duration: Long) { listener?.onDurationChange(duration) }
     @Suppress("unused")
-    private fun nativePlaybackStateChange(value: Int) { listener?.onPlaybackStateChange(WindowsNativePlaybackState.fromInt(value)) }
+    private fun nativePlaybackStateChange(value: Int) {
+        listener?.onPlaybackStateChange(WindowsNativePlaybackState.entries.getOrNull(value) ?: WindowsNativePlaybackState.None)
+    }
     @Suppress("unused")
     private fun nativeSourceChange() { listener?.onSourceChange() }
     @Suppress("unused")
@@ -116,7 +108,7 @@ class WindowsNativeVideoPlayer {
 
     val isInit: Boolean get() = nativeHandle != 0L
 
-    val playbackState: WindowsNativePlaybackState get() = WindowsNativePlaybackState.fromInt(nativeGetPlaybackState(nativeHandle))
+    val playbackState: WindowsNativePlaybackState get() = WindowsNativePlaybackState.entries.getOrNull(nativeGetPlaybackState(nativeHandle)) ?: WindowsNativePlaybackState.None
 
     val position: Long get() = nativeGetPosition(nativeHandle)
     val duration: Long get() = nativeGetDuration(nativeHandle)
@@ -157,7 +149,7 @@ class WindowsNativeVideoPlayer {
     @Suppress("unused")
     private fun nativeDurationChange(duration: Long) { listener?.onDurationChange(duration) }
     @Suppress("unused")
-    private fun nativePlaybackStateChange(value: Int) { listener?.onPlaybackStateChange(WindowsNativePlaybackState.fromInt(value)) }
+    private fun nativePlaybackStateChange(value: Int) { listener?.onPlaybackStateChange(WindowsNativePlaybackState.entries.getOrNull(value) ?: WindowsNativePlaybackState.None) }
     @Suppress("unused")
     private fun nativeSourceChange() { listener?.onSourceChange() }
     @Suppress("unused")

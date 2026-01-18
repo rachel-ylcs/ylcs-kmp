@@ -6,9 +6,10 @@ import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
 import love.yinlin.platform.NativeLibLoader
+import java.nio.ByteBuffer
 
 @NativeLib
-class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAII(constructor, ::nativeRelease)), AutoCloseable {
+class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAII(constructor, PAGSurface::nativeRelease)), AutoCloseable {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")
@@ -31,7 +32,7 @@ class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAI
         @JvmStatic
         private external fun nativeFreeCache(handle: Long)
         @JvmStatic
-        private external fun nativeReadPixels(colorType: Int, alphaType: Int, handle: Long, bytes: ByteArray): Boolean
+        private external fun nativeReadPixels(handle: Long, colorType: Int, alphaType: Int, rowBytes: Long, container: ByteArray): Boolean
 
         fun makeOffscreen(width: Int, height: Int): PAGSurface = PAGSurface { nativeMakeOffscreen(width, height) }
     }
@@ -44,7 +45,7 @@ class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAI
 
     fun clearAll() = nativeClearAll(nativeHandle)
 
-    fun readPixels(bytes: ByteArray, colorType: PAGColorType, alphaType: PAGAlphaType) = nativeReadPixels(colorType.ordinal, alphaType.ordinal, nativeHandle, bytes)
+    fun readPixels(colorType: PAGColorType, alphaType: PAGAlphaType, rowBytes: Long, container: ByteArray) = nativeReadPixels(nativeHandle, colorType.ordinal, alphaType.ordinal, rowBytes, container)
 
     override fun close() {
         // Must call freeCache() here, otherwise, the cache may not be freed until the PAGPlayer is

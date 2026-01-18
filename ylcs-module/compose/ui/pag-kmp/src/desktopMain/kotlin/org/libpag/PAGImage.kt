@@ -1,13 +1,15 @@
 package org.libpag
 
+import love.yinlin.compose.ui.PAGAlphaType
+import love.yinlin.compose.ui.PAGColorType
+import love.yinlin.compose.ui.PAGScaleMode
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
 import love.yinlin.platform.NativeLibLoader
-import org.jetbrains.skia.Matrix33
 
 @NativeLib
-class PAGImage private constructor(constructor: () -> Long) : Destructible(RAII(constructor, ::nativeRelease)), AutoCloseable {
+class PAGImage private constructor(constructor: () -> Long) : Destructible(RAII(constructor, PAGImage::nativeRelease)), AutoCloseable {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")
@@ -32,32 +34,25 @@ class PAGImage private constructor(constructor: () -> Long) : Destructible(RAII(
         @JvmStatic
         private external fun nativeSetScaleMode(handle: Long, value: Int)
         @JvmStatic
-        private external fun nativeGetMatrix(handle: Long, arr: FloatArray)
+        private external fun nativeGetMatrix(handle: Long): FloatArray
         @JvmStatic
         private external fun nativeSetMatrix(handle: Long, arr: FloatArray)
 
         fun loadFromPath(path: String): PAGImage = PAGImage { nativeLoadFromPath(path) }
         fun loadFromBytes(bytes: ByteArray): PAGImage = PAGImage { nativeLoadFromBytes(bytes) }
-        fun loadFromPixels(pixels: ByteArray, width: Int, height: Int, rowBytes: Long, colorType: Int, alphaType: Int): PAGImage =
-            PAGImage { nativeLoadFromPixels(pixels, width, height, rowBytes, colorType, alphaType) }
+        fun loadFromPixels(pixels: ByteArray, width: Int, height: Int, rowBytes: Long, colorType: PAGColorType, alphaType: PAGAlphaType): PAGImage =
+            PAGImage { nativeLoadFromPixels(pixels, width, height, rowBytes, colorType.ordinal, alphaType.ordinal) }
     }
 
     val width: Int get() = nativeWidth(nativeHandle)
 
     val height: Int get() = nativeHeight(nativeHandle)
 
-    var scaleMode: Int get() = nativeScaleMode(nativeHandle)
-        set(value) { nativeSetScaleMode(nativeHandle, value) }
+    var scaleMode: PAGScaleMode get() = PAGScaleMode.entries[nativeScaleMode(nativeHandle)]
+        set(value) { nativeSetScaleMode(nativeHandle, value.ordinal) }
 
-    var matrix: Matrix33
-        get() {
-            val values = FloatArray(9)
-            nativeGetMatrix(nativeHandle, values)
-            return Matrix33(*values)
-        }
-        set(value) {
-            nativeSetMatrix(nativeHandle, value.mat)
-        }
+    var matrix: PAGMatrix get() = PAGMatrix(*nativeGetMatrix(nativeHandle))
+        set(value) { nativeSetMatrix(nativeHandle, value.mat) }
 
     override fun close() = nativeClear(nativeHandle)
 }

@@ -6,7 +6,6 @@ import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
 import love.yinlin.platform.NativeLibLoader
-import org.jetbrains.skia.Matrix33
 
 @NativeLib
 open class PAGLayer internal constructor(
@@ -25,14 +24,14 @@ open class PAGLayer internal constructor(
         @JvmStatic
         private external fun nativeLayerName(handle: Long): String
         @JvmStatic
-        private external fun nativeGetMatrix(handle: Long, arr: FloatArray)
+        private external fun nativeGetMatrix(handle: Long): FloatArray
         @JvmStatic
         private external fun nativeSetMatrix(handle: Long, arr: FloatArray)
         // parent()
         @JvmStatic
         private external fun nativeResetMatrix(handle: Long)
         @JvmStatic
-        private external fun nativeGetTotalMatrix(handle: Long, arr: FloatArray)
+        private external fun nativeGetTotalMatrix(handle: Long): FloatArray
         @JvmStatic
         private external fun nativeVisible(handle: Long): Boolean
         @JvmStatic
@@ -62,7 +61,7 @@ open class PAGLayer internal constructor(
         private external fun nativeSetProgress(handle: Long, progress: Double)
         // trackMatteLayer()
         @JvmStatic
-        private external fun nativeGetBounds(handle: Long, outInfo: FloatArray)
+        private external fun nativeGetBounds(handle: Long): FloatArray
         @JvmStatic
         private external fun nativeExcludedFromTimeline(handle: Long): Boolean
         @JvmStatic
@@ -84,27 +83,19 @@ open class PAGLayer internal constructor(
         }
     }
 
-    val layerType: Int get() = nativeLayerType(nativeHandle)
+    val layerType: PAGLayerType get() {
+        val rawType = nativeLayerType(nativeHandle)
+        return if (rawType == PAGLayerType.File.value) PAGLayerType.File else PAGLayerType.entries[rawType]
+    }
 
     val layerName: String get() = nativeLayerName(nativeHandle)
 
-    var matrix: Matrix33
-        get() {
-            val values = FloatArray(9)
-            nativeGetMatrix(nativeHandle, values)
-            return Matrix33(*values)
-        }
-        set(value) {
-            nativeSetMatrix(nativeHandle, value.mat)
-        }
+    var matrix: PAGMatrix get() = PAGMatrix(*nativeGetMatrix(nativeHandle))
+        set(value) { nativeSetMatrix(nativeHandle, value.mat) }
 
     fun resetMatrix() { nativeResetMatrix(nativeHandle) }
 
-    val totalMatrix: Matrix33 get() {
-        val values = FloatArray(9)
-        nativeGetTotalMatrix(nativeHandle, values)
-        return Matrix33(*values)
-    }
+    val totalMatrix: PAGMatrix get() = PAGMatrix(*nativeGetTotalMatrix(nativeHandle))
 
     var visible: Boolean get() = nativeVisible(nativeHandle)
         set(value) { nativeSetVisible(nativeHandle, value) }
@@ -129,8 +120,7 @@ open class PAGLayer internal constructor(
         set(value) { nativeSetProgress(nativeHandle, value) }
 
     val bounds: Rect get() {
-        val outInfo = FloatArray(4)
-        nativeGetBounds(nativeHandle, outInfo)
+        val outInfo = nativeGetBounds(nativeHandle)
         return Rect(outInfo[0], outInfo[1], outInfo[2], outInfo[3])
     }
 

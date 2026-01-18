@@ -2,7 +2,6 @@ package org.libpag
 
 import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
-import java.nio.ByteBuffer
 
 @NativeLib
 class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(constructor, PAGComposition::nativeRelease) {
@@ -24,7 +23,7 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
         @JvmStatic
         private external fun nativeNumChildren(handle: Long): Int
         @JvmStatic
-        private external fun nativeGetLayerAt(handle: Long, index: Int, outInfo: LongArray)
+        private external fun nativeGetLayerAt(handle: Long, index: Int): LongArray
         @JvmStatic
         private external fun nativeGetLayerIndex(handle: Long, layerHandle: Long, type: Int): Int
         @JvmStatic
@@ -36,9 +35,9 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
         @JvmStatic
         private external fun nativeContains(handle: Long, layerHandle: Long, type: Int): Boolean
         @JvmStatic
-        private external fun nativeRemoveLayer(handle: Long, layerHandle: Long, type: Int, outInfo: LongArray)
+        private external fun nativeRemoveLayer(handle: Long, layerHandle: Long, type: Int): LongArray
         @JvmStatic
-        private external fun nativeRemoveLayerAt(handle: Long, index: Int, outInfo: LongArray)
+        private external fun nativeRemoveLayerAt(handle: Long, index: Int): LongArray
         @JvmStatic
         private external fun nativeRemoveAllLayers(handle: Long)
         @JvmStatic
@@ -46,7 +45,7 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
         @JvmStatic
         private external fun nativeSwapLayerAt(handle: Long, index1: Int, index2: Int)
         @JvmStatic
-        private external fun nativeAudioBytes(handle: Long): ByteBuffer?
+        private external fun nativeAudioBytes(handle: Long): ByteArray?
         @JvmStatic
         private external fun nativeAudioStartTime(handle: Long): Long
         // audioMarkers()
@@ -65,10 +64,9 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
     val numChildren: Int get() = nativeNumChildren(nativeHandle)
 
     fun getLayerAt(index: Int): PAGLayer? {
-        val outInfo = longArrayOf(0L, 0L)
-        nativeGetLayerAt(nativeHandle, index, outInfo)
-        val layerHandle = outInfo[0]
-        return if (layerHandle == 0L) null else internalNativeMake(outInfo[1].toInt(), layerHandle)
+        val result = nativeGetLayerAt(nativeHandle, index)
+        val layerHandle = result[0]
+        return if (layerHandle == 0L) null else internalNativeMake(result[1].toInt(), layerHandle)
     }
 
     fun getLayerIndex(layer: PAGLayer): Int = nativeGetLayerIndex(nativeHandle, layer.nativeHandle, layer.internalNativeType)
@@ -82,17 +80,15 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
     operator fun contains(layer: PAGLayer): Boolean = nativeContains(nativeHandle, layer.nativeHandle, layer.internalNativeType)
 
     fun removeLayer(layer: PAGLayer): PAGLayer? {
-        val outInfo = longArrayOf(0L, 0L)
-        nativeRemoveLayer(nativeHandle, layer.nativeHandle, layer.internalNativeType, outInfo)
-        val layerHandle = outInfo[0]
-        return if (layerHandle == 0L) null else internalNativeMake(outInfo[1].toInt(), layerHandle)
+        val result = nativeRemoveLayer(nativeHandle, layer.nativeHandle, layer.internalNativeType)
+        val layerHandle = result[0]
+        return if (layerHandle == 0L) null else internalNativeMake(result[1].toInt(), layerHandle)
     }
 
     fun removeLayerAt(index: Int): PAGLayer? {
-        val outInfo = longArrayOf(0L, 0L)
-        nativeGetLayerAt(nativeHandle, index, outInfo)
-        val layerHandle = outInfo[0]
-        return if (layerHandle == 0L) null else internalNativeMake(outInfo[1].toInt(), layerHandle)
+        val result = nativeRemoveLayerAt(nativeHandle, index)
+        val layerHandle = result[0]
+        return if (layerHandle == 0L) null else internalNativeMake(result[1].toInt(), layerHandle)
     }
 
     fun removeAllLayers() = nativeRemoveAllLayers(nativeHandle)
@@ -101,7 +97,7 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
 
     fun swapLayerAt(index1: Int, index2: Int) = nativeSwapLayerAt(nativeHandle, index1, index2)
 
-    val audioBytes: ByteBuffer? get() = nativeAudioBytes(nativeHandle)
+    val audioBytes: ByteArray? get() = nativeAudioBytes(nativeHandle)
 
     val audioStartTime: Long get() = nativeAudioStartTime(nativeHandle)
 }
