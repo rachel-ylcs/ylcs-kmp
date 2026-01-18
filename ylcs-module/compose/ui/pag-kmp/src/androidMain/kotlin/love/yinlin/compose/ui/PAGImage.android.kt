@@ -17,7 +17,9 @@ actual class PAGImage(private val delegate: PlatformPAGImage) {
 
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.FromPath(path))
+
         actual fun loadFromBytes(bytes: ByteArray): PAGImage = PAGImage(PlatformPAGImage.FromBytes(bytes))
+
         actual fun loadFromPixels(pixels: IntArray, width: Int, height: Int, rowBytes: Long, colorType: PAGColorType, alphaType: PAGAlphaType): PAGImage {
             val config = colorType.asAndroidBitmapConfig
             val bitmap = createBitmap(width, height, config)

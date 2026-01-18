@@ -17,7 +17,9 @@ actual class PAGImage(private val delegate: PlatformPAGImage) {
 
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.loadFromPath(path))
+
         actual fun loadFromBytes(bytes: ByteArray): PAGImage = PAGImage(PlatformPAGImage.loadFromBytes(bytes))
+
         actual fun loadFromPixels(pixels: IntArray, width: Int, height: Int, rowBytes: Long, colorType: PAGColorType, alphaType: PAGAlphaType): PAGImage =
             PAGImage(PlatformPAGImage.loadFromPixels(pixels, width, height, rowBytes, colorType.ordinal, alphaType.ordinal))
     }
