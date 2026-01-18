@@ -103,4 +103,63 @@ extern "C" {
         auto pagLayer = obj_cast(handle);
         return pagLayer ? pagLayer->frameRate() : 60.0F;
     }
+
+    JNIEXPORT jlong JNICALL Java_org_libpag_PAGLayer_nativeStartTime(JNIEnv* env, jclass, jlong handle) {
+        auto pagLayer = obj_cast(handle);
+        return pagLayer ? pagLayer->startTime() : 0LL;
+    }
+
+    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetStartTime(JNIEnv* env, jclass, jlong handle, jlong time) {
+        auto pagLayer = obj_cast(handle);
+        if (pagLayer) pagLayer->setStartTime(time);
+    }
+
+    JNIEXPORT jlong JNICALL Java_org_libpag_PAGLayer_nativeCurrentTime(JNIEnv* env, jclass, jlong handle) {
+        auto pagLayer = obj_cast(handle);
+        return pagLayer ? pagLayer->currentTime() : 0LL;
+    }
+
+    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetCurrentTime(JNIEnv* env, jclass, jlong handle, jlong time) {
+        auto pagLayer = obj_cast(handle);
+        if (pagLayer) pagLayer->setCurrentTime(time);
+    }
+
+    JNIEXPORT jdouble JNICALL Java_org_libpag_PAGLayer_nativeGetProgress(JNIEnv* env, jclass, jlong handle) {
+        auto pagLayer = obj_cast(handle);
+        return pagLayer ? pagLayer->getProgress() : 0.0;
+    }
+
+    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetProgress(JNIEnv* env, jclass, jlong handle, jdouble progress) {
+        auto pagLayer = obj_cast(handle);
+        if (pagLayer) pagLayer->setProgress(progress);
+    }
+
+    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeGetBounds(JNIEnv* env, jclass, jlong handle, jfloatArray outInfo) {
+        auto pagLayer = obj_cast(handle);
+        if (pagLayer) {
+            auto rect = pagLayer->getBounds();
+            float values[4] = { rect.x(), rect.y(), rect.width(), rect.height() };
+            env->SetFloatArrayRegion(outInfo, 0, 4, values);
+        }
+    }
+
+    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGLayer_nativeExcludedFromTimeline(JNIEnv* env, jclass, jlong handle) {
+        auto pagLayer = obj_cast(handle);
+        return pagLayer? static_cast<jboolean>(pagLayer->excludedFromTimeline()) : JNI_FALSE;
+    }
+
+    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetExcludedFromTimeline(JNIEnv* env, jclass, jlong handle, jboolean value) {
+        auto pagLayer = obj_cast(handle);
+        if (pagLayer) pagLayer->setExcludedFromTimeline(value);
+    }
+
+    JNIEXPORT jfloat JNICALL Java_org_libpag_PAGLayer_nativeAlpha(JNIEnv* env, jclass, jlong handle) {
+        auto pagLayer = obj_cast(handle);
+        return pagLayer? pagLayer->alpha() : 0.0f;
+    }
+
+    JNIEXPORT void JNICALL Java_org_libpag_PAGLayer_nativeSetAlpha(JNIEnv* env, jclass, jlong handle, jfloat alpha) {
+        auto pagLayer = obj_cast(handle);
+        if (pagLayer) pagLayer->setAlpha(alpha);
+    }
 }

@@ -1,5 +1,6 @@
 package org.libpag
 
+import androidx.compose.ui.geometry.Rect
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
@@ -43,6 +44,29 @@ class PAGLayer private constructor(constructor: () -> Long) : Destructible(RAII(
         private external fun nativeDuration(handle: Long): Long
         @JvmStatic
         private external fun nativeFrameRate(handle: Long): Float
+        @JvmStatic
+        private external fun nativeStartTime(handle: Long): Long
+        @JvmStatic
+        private external fun nativeSetStartTime(handle: Long, time: Long)
+        @JvmStatic
+        private external fun nativeCurrentTime(handle: Long): Long
+        @JvmStatic
+        private external fun nativeSetCurrentTime(handle: Long, time: Long)
+        @JvmStatic
+        private external fun nativeGetProgress(handle: Long): Double
+        @JvmStatic
+        private external fun nativeSetProgress(handle: Long, progress: Double)
+        // trackMatteLayer()
+        @JvmStatic
+        private external fun nativeGetBounds(handle: Long, outInfo: FloatArray)
+        @JvmStatic
+        private external fun nativeExcludedFromTimeline(handle: Long): Boolean
+        @JvmStatic
+        private external fun nativeSetExcludedFromTimeline(handle: Long, value: Boolean)
+        @JvmStatic
+        private external fun nativeAlpha(handle: Long): Float
+        @JvmStatic
+        private external fun nativeSetAlpha(handle: Long, alpha: Float)
     }
 
     val layerType: Int get() = nativeLayerType(nativeHandle)
@@ -79,4 +103,25 @@ class PAGLayer private constructor(constructor: () -> Long) : Destructible(RAII(
     val duration: Long get() = nativeDuration(nativeHandle)
 
     val frameRate: Float get() = nativeFrameRate(nativeHandle)
+
+    var startTime: Long get() = nativeStartTime(nativeHandle)
+        set(value) { nativeSetStartTime(nativeHandle, value) }
+
+    var currentTime: Long get() = nativeCurrentTime(nativeHandle)
+        set(value) { nativeSetCurrentTime(nativeHandle, value) }
+
+    var progress: Double get() = nativeGetProgress(nativeHandle)
+        set(value) { nativeSetProgress(nativeHandle, value) }
+
+    val bounds: Rect get() {
+        val outInfo = FloatArray(4)
+        nativeGetBounds(nativeHandle, outInfo)
+        return Rect(outInfo[0], outInfo[1], outInfo[2], outInfo[3])
+    }
+
+    var excludedFromTimeline: Boolean get() = nativeExcludedFromTimeline(nativeHandle)
+        set(value) { nativeSetExcludedFromTimeline(nativeHandle, value) }
+
+    var alpha: Float get() = nativeAlpha(nativeHandle)
+        set(value) { nativeSetAlpha(nativeHandle, value) }
 }
