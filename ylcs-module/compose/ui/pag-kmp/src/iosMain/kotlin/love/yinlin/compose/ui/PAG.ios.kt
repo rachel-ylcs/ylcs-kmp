@@ -1,7 +1,10 @@
 @file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
-import cocoapods.libpag.*
 import kotlinx.cinterop.ExperimentalForeignApi
 
-actual typealias PAGSourceFile = PAGFile
+actual object PAG {
+    actual val sdkVersion: String get() = PlatformPAG.SDKVersion()
+
+    actual suspend fun init() { }
+}

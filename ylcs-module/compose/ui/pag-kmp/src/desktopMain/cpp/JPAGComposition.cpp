@@ -41,68 +41,58 @@ extern "C" {
     JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGComposition_nativeGetLayerAt(JNIEnv* env, jclass, jlong handle, jint index) {
         auto pagLayer = obj_cast(handle);
         auto result = env->NewLongArray(2);
-        if (pagLayer) {
-            auto subLayer = pagLayer->getLayerAt(index);
-            auto [layerHandle, type] = JPAGLayerInstance(subLayer);
-            jlong values[2] = { layerHandle, static_cast<jlong>(type) };
-            env->SetLongArrayRegion(result, 0, 2, values);
-        }
+        if (pagLayer) env->SetLongArrayRegion(result, 0, 2, JPAGLayerInstance(pagLayer->getLayerAt(index)));
         return result;
     }
 
-    JNIEXPORT jint JNICALL Java_org_libpag_PAGComposition_nativeGetLayerIndex(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type) {
+    JNIEXPORT jint JNICALL Java_org_libpag_PAGComposition_nativeGetLayerIndex(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jlong type) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
-            auto subLayer = PAGLayerInstance(layerHandle, type);
+            auto subLayer = PAGLayerInstance(LayerInfo(layerHandle, type));
             if (subLayer) return pagLayer->getLayerIndex(subLayer);
         }
         return -1;
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeSetLayerIndex(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type, jint index) {
+    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeSetLayerIndex(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jlong type, jint index) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
-            auto subLayer = PAGLayerInstance(layerHandle, type);
+            auto subLayer = PAGLayerInstance(LayerInfo(layerHandle, type));
             if (subLayer) pagLayer->setLayerIndex(subLayer, index);
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeAddLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type) {
+    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeAddLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jlong type) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
-            auto subLayer = PAGLayerInstance(layerHandle, type);
+            auto subLayer = PAGLayerInstance(LayerInfo(layerHandle, type));
             if (subLayer) pagLayer->addLayer(subLayer);
         }
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeAddLayerAt(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type, jint index) {
+    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeAddLayerAt(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jlong type, jint index) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
-            auto subLayer = PAGLayerInstance(layerHandle, type);
+            auto subLayer = PAGLayerInstance(LayerInfo(layerHandle, type));
             if (subLayer) pagLayer->addLayerAt(subLayer, index);
         }
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGComposition_nativeContains(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type) {
+    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGComposition_nativeContains(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jlong type) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
-            auto subLayer = PAGLayerInstance(layerHandle, type);
+            auto subLayer = PAGLayerInstance(LayerInfo(layerHandle, type));
             if (subLayer) static_cast<jboolean>(pagLayer->contains(subLayer));
         }
         return JNI_FALSE;
     }
 
-    JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGComposition_nativeRemoveLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type) {
+    JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGComposition_nativeRemoveLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jlong type) {
         auto pagLayer = obj_cast(handle);
         auto result = env->NewLongArray(2);
         if (pagLayer) {
-            auto subLayer = PAGLayerInstance(layerHandle, type);
-            if (subLayer) {
-                auto removeLayer = pagLayer->removeLayer(subLayer);
-                auto [removeLayerHandle, removeType] = JPAGLayerInstance(removeLayer);
-                jlong values[2] = { removeLayerHandle, static_cast<jlong>(removeType) };
-                env->SetLongArrayRegion(result, 0, 2, values);
-            }
+            auto subLayer = PAGLayerInstance(LayerInfo(layerHandle, type));
+            if (subLayer) env->SetLongArrayRegion(result, 0, 2, JPAGLayerInstance(pagLayer->removeLayer(subLayer)));
         }
         return result;
     }
@@ -110,12 +100,7 @@ extern "C" {
     JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGComposition_nativeRemoveLayerAt(JNIEnv* env, jclass, jlong handle, jint index) {
         auto pagLayer = obj_cast(handle);
         auto result = env->NewLongArray(2);
-        if (pagLayer) {
-            auto removeLayer = pagLayer->removeLayerAt(index);
-            auto [removeLayerHandle, removeType] = JPAGLayerInstance(removeLayer);
-            jlong values[2] = { removeLayerHandle, static_cast<jlong>(removeType) };
-            env->SetLongArrayRegion(result, 0, 2, values);
-        }
+        if (pagLayer) env->SetLongArrayRegion(result, 0, 2, JPAGLayerInstance(pagLayer->removeLayerAt(index)));
         return result;
     }
 
@@ -124,12 +109,12 @@ extern "C" {
         if (pagLayer) pagLayer->removeAllLayers();
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeSwapLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle1, jint type1, jlong layerHandle2, jint type2) {
+    JNIEXPORT void JNICALL Java_org_libpag_PAGComposition_nativeSwapLayer(JNIEnv* env, jclass, jlong handle, jlong layerHandle1, jlong type1, jlong layerHandle2, jlong type2) {
         auto pagLayer = obj_cast(handle);
         if (pagLayer) {
-            auto subLayer1 = PAGLayerInstance(layerHandle1, type1);
+            auto subLayer1 = PAGLayerInstance(LayerInfo(layerHandle1, type1));
             if (subLayer1) {
-                auto subLayer2 = PAGLayerInstance(layerHandle2, type2);
+                auto subLayer2 = PAGLayerInstance(LayerInfo(layerHandle2, type2));
                 if (subLayer2) {
                     pagLayer->swapLayer(subLayer1, subLayer2);
                 }

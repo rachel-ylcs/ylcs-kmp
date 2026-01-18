@@ -5,7 +5,9 @@ import love.yinlin.platform.NativeLibLoader
 import java.nio.ByteBuffer
 
 @NativeLib
-class PAGImageLayer internal constructor(constructor: () -> Long) : PAGLayer(constructor, PAGImageLayer::nativeRelease) {
+class PAGImageLayer internal constructor(
+    constructor: () -> Long
+) : PAGLayer(PAGImageLayer::nativeRelease, constructor) {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")

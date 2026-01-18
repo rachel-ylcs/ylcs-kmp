@@ -1,12 +1,9 @@
 package org.libpag
 
-import love.yinlin.compose.ui.PAGAlphaType
-import love.yinlin.compose.ui.PAGColorType
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
 import love.yinlin.platform.NativeLibLoader
-import java.nio.ByteBuffer
 
 @NativeLib
 class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAII(constructor, PAGSurface::nativeRelease)), AutoCloseable {
@@ -45,8 +42,8 @@ class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAI
 
     fun clearAll() = nativeClearAll(nativeHandle)
 
-    fun readPixels(colorType: PAGColorType, alphaType: PAGAlphaType, rowBytes: Long, container: ByteArray) =
-        nativeReadPixels(nativeHandle, colorType.ordinal, alphaType.ordinal, rowBytes, container)
+    fun readPixels(colorType: Int, alphaType: Int, rowBytes: Long, container: ByteArray) =
+        nativeReadPixels(nativeHandle, colorType, alphaType, rowBytes, container)
 
     override fun close() {
         // Must call freeCache() here, otherwise, the cache may not be freed until the PAGPlayer is

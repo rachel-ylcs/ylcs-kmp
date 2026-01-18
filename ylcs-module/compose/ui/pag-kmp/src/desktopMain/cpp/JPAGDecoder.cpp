@@ -1,4 +1,5 @@
 #include "JPAGDecoder.h"
+#include "JPAGComposition.h"
 
 using namespace pag;
 
@@ -8,6 +9,15 @@ static inline std::shared_ptr<PAGDecoder> obj_cast(jlong handle) {
 }
 
 extern "C" {
+    JNIEXPORT jlong JNICALL Java_org_libpag_PAGDecoder_nativeMakeFrom(JNIEnv* env, jclass, jlong composition_handle, jfloat max_frame_rate, jfloat scale) {
+        auto composition = reinterpret_cast<JPAGComposition*>(composition_handle);
+        if (composition) {
+            auto jPagDecoder = PAGDecoder::MakeFrom(composition->get(), max_frame_rate, scale);
+            if (jPagDecoder) return reinterpret_cast<jlong>(new JPAGDecoder(jPagDecoder));
+        }
+        return 0LL;
+    }
+
     JNIEXPORT void JNICALL Java_org_libpag_PAGDecoder_nativeClear(JNIEnv* env, jclass, jlong handle) {
         auto jPagDecoder = reinterpret_cast<JPAGDecoder*>(handle);
         if (jPagDecoder) jPagDecoder->clear();

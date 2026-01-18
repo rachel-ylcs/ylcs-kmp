@@ -1,7 +1,5 @@
 package org.libpag
 
-import androidx.compose.ui.geometry.Rect
-import love.yinlin.compose.ui.PAGLayerType
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
@@ -9,8 +7,8 @@ import love.yinlin.platform.NativeLibLoader
 
 @NativeLib
 open class PAGLayer internal constructor(
-    constructor: () -> Long,
     destructor: (Long) -> Unit = PAGLayer::nativeRelease,
+    constructor: () -> Long,
 ) : Destructible(RAII(constructor, destructor)) {
     companion object {
         init {
@@ -70,32 +68,28 @@ open class PAGLayer internal constructor(
         private external fun nativeAlpha(handle: Long): Float
         @JvmStatic
         private external fun nativeSetAlpha(handle: Long, alpha: Float)
-
-        internal fun internalNativeMake(type: Int, handle: Long): PAGLayer? = when (type) {
-            PAGLayerType.Unknown.value -> PAGLayer({ handle })
-            PAGLayerType.Solid.value -> PAGSolidLayer { handle }
-            PAGLayerType.Text.value -> PAGTextLayer { handle }
-            PAGLayerType.Shape.value -> PAGShapeLayer { handle }
-            PAGLayerType.Image.value -> PAGImageLayer { handle }
-            PAGLayerType.PreCompose.value -> PAGComposition { handle }
-            PAGLayerType.File.value -> PAGFile { handle }
-            else -> null
-        }
     }
 
-    val layerType: PAGLayerType get() {
-        val rawType = nativeLayerType(nativeHandle)
-        return if (rawType == PAGLayerType.File.value) PAGLayerType.File else PAGLayerType.entries[rawType]
-    }
+    internal val internalLayerType: Long get() = when (this) {
+        is PAGFile -> PAGLayerType.File
+        is PAGComposition -> PAGLayerType.PreCompose
+        is PAGSolidLayer -> PAGLayerType.Solid
+        is PAGTextLayer -> PAGLayerType.Text
+        is PAGShapeLayer -> PAGLayerType.Shape
+        is PAGImageLayer -> PAGLayerType.Image
+        else -> PAGLayerType.Unknown
+    }.value
+
+    val layerType: Int get() = nativeLayerType(nativeHandle)
 
     val layerName: String get() = nativeLayerName(nativeHandle)
 
-    var matrix: PAGMatrix get() = PAGMatrix(*nativeGetMatrix(nativeHandle))
-        set(value) { nativeSetMatrix(nativeHandle, value.mat) }
+    var matrix: FloatArray get() = nativeGetMatrix(nativeHandle)
+        set(value) { nativeSetMatrix(nativeHandle, value) }
 
     fun resetMatrix() { nativeResetMatrix(nativeHandle) }
 
-    val totalMatrix: PAGMatrix get() = PAGMatrix(*nativeGetTotalMatrix(nativeHandle))
+    val totalMatrix: FloatArray get() = nativeGetTotalMatrix(nativeHandle)
 
     var visible: Boolean get() = nativeVisible(nativeHandle)
         set(value) { nativeSetVisible(nativeHandle, value) }
@@ -119,24 +113,11 @@ open class PAGLayer internal constructor(
     var progress: Double get() = nativeGetProgress(nativeHandle)
         set(value) { nativeSetProgress(nativeHandle, value) }
 
-    val bounds: Rect get() {
-        val outInfo = nativeGetBounds(nativeHandle)
-        return Rect(outInfo[0], outInfo[1], outInfo[2], outInfo[3])
-    }
+    val bounds: FloatArray get() = nativeGetBounds(nativeHandle)
 
     var excludedFromTimeline: Boolean get() = nativeExcludedFromTimeline(nativeHandle)
         set(value) { nativeSetExcludedFromTimeline(nativeHandle, value) }
 
     var alpha: Float get() = nativeAlpha(nativeHandle)
         set(value) { nativeSetAlpha(nativeHandle, value) }
-
-    internal val internalNativeType: Int get() = when (this) {
-        is PAGSolidLayer -> PAGLayerType.Solid
-        is PAGTextLayer -> PAGLayerType.Text
-        is PAGShapeLayer -> PAGLayerType.Shape
-        is PAGImageLayer -> PAGLayerType.Image
-        is PAGComposition -> PAGLayerType.PreCompose
-        is PAGFile -> PAGLayerType.File
-        else -> PAGLayerType.Unknown
-    }.value
 }

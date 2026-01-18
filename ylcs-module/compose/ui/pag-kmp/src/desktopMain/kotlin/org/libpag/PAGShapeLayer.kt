@@ -4,7 +4,9 @@ import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
 
 @NativeLib
-class PAGShapeLayer internal constructor(constructor: () -> Long) : PAGLayer(constructor, PAGShapeLayer::nativeRelease) {
+class PAGShapeLayer internal constructor(
+    constructor: () -> Long
+) : PAGLayer(PAGShapeLayer::nativeRelease, constructor) {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")

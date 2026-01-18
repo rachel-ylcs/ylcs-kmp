@@ -1,12 +1,12 @@
 package org.libpag
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
 
 @NativeLib
-class PAGSolidLayer internal constructor(constructor: () -> Long) : PAGLayer(constructor, PAGSolidLayer::nativeRelease) {
+class PAGSolidLayer internal constructor(
+    constructor: () -> Long
+) : PAGLayer(PAGSolidLayer::nativeRelease, constructor) {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")
@@ -26,6 +26,6 @@ class PAGSolidLayer internal constructor(constructor: () -> Long) : PAGLayer(con
         }
     }
 
-    var solidColor: Color get() = Color(nativeSolidColor(nativeHandle))
-        set(value) = nativeSetSolidColor(nativeHandle, value.toArgb())
+    var solidColor: Int get() = nativeSolidColor(nativeHandle)
+        set(value) = nativeSetSolidColor(nativeHandle, value)
 }

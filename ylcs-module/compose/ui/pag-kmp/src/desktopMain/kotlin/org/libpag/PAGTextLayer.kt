@@ -1,12 +1,12 @@
 package org.libpag
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
 
 @NativeLib
-class PAGTextLayer internal constructor(constructor: () -> Long) : PAGLayer(constructor, PAGTextLayer::nativeRelease) {
+class PAGTextLayer internal constructor(
+    constructor: () -> Long
+) : PAGLayer(PAGTextLayer::nativeRelease, constructor) {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")
@@ -44,8 +44,8 @@ class PAGTextLayer internal constructor(constructor: () -> Long) : PAGLayer(cons
         }
     }
 
-    var fillColor: Color get() = Color(nativeFillColor(nativeHandle))
-        set(value) { nativeSetFillColor(nativeHandle, value.toArgb()) }
+    var fillColor: Int get() = nativeFillColor(nativeHandle)
+        set(value) { nativeSetFillColor(nativeHandle, value) }
 
     var font: PAGFont
         get() {
@@ -59,8 +59,8 @@ class PAGTextLayer internal constructor(constructor: () -> Long) : PAGLayer(cons
     var fontSize: Float get() = nativeFontSize(nativeHandle)
         set(value) { nativeSetFontSize(nativeHandle, value) }
 
-    var strokeColor: Color get() = Color(nativeStrokeColor(nativeHandle))
-        set(value) { nativeSetStrokeColor(nativeHandle, value.toArgb()) }
+    var strokeColor: Int get() = nativeStrokeColor(nativeHandle)
+        set(value) { nativeSetStrokeColor(nativeHandle, value) }
 
     var text: String get() = nativeText(nativeHandle)
         set(value) { nativeSetText(nativeHandle, value) }

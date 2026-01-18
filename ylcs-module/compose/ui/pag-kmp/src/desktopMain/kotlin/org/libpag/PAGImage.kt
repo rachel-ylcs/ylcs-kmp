@@ -1,8 +1,5 @@
 package org.libpag
 
-import love.yinlin.compose.ui.PAGAlphaType
-import love.yinlin.compose.ui.PAGColorType
-import love.yinlin.compose.ui.PAGScaleMode
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
@@ -40,19 +37,19 @@ class PAGImage private constructor(constructor: () -> Long) : Destructible(RAII(
 
         fun loadFromPath(path: String): PAGImage = PAGImage { nativeLoadFromPath(path) }
         fun loadFromBytes(bytes: ByteArray): PAGImage = PAGImage { nativeLoadFromBytes(bytes) }
-        fun loadFromPixels(pixels: ByteArray, width: Int, height: Int, rowBytes: Long, colorType: PAGColorType, alphaType: PAGAlphaType): PAGImage =
-            PAGImage { nativeLoadFromPixels(pixels, width, height, rowBytes, colorType.ordinal, alphaType.ordinal) }
+        fun loadFromPixels(pixels: ByteArray, width: Int, height: Int, rowBytes: Long, colorType: Int, alphaType: Int): PAGImage =
+            PAGImage { nativeLoadFromPixels(pixels, width, height, rowBytes, colorType, alphaType) }
     }
 
     val width: Int get() = nativeWidth(nativeHandle)
 
     val height: Int get() = nativeHeight(nativeHandle)
 
-    var scaleMode: PAGScaleMode get() = PAGScaleMode.entries[nativeScaleMode(nativeHandle)]
-        set(value) { nativeSetScaleMode(nativeHandle, value.ordinal) }
+    var scaleMode: Int get() = nativeScaleMode(nativeHandle)
+        set(value) { nativeSetScaleMode(nativeHandle, value) }
 
-    var matrix: PAGMatrix get() = PAGMatrix(*nativeGetMatrix(nativeHandle))
-        set(value) { nativeSetMatrix(nativeHandle, value.mat) }
+    var matrix: FloatArray get() = nativeGetMatrix(nativeHandle)
+        set(value) { nativeSetMatrix(nativeHandle, value) }
 
     override fun close() = nativeClear(nativeHandle)
 }

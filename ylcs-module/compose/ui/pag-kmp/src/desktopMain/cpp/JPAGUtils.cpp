@@ -9,39 +9,30 @@
 
 using namespace pag;
 
-std::pair<jlong, int> JPAGLayerInstance(std::shared_ptr<PAGLayer> pagLayer) {
-    if (pagLayer == nullptr) return std::make_pair(0LL, static_cast<int>(LayerType::Null));
+LayerInfo JPAGLayerInstance(std::shared_ptr<PAGLayer> pagLayer) {
+    if (pagLayer == nullptr) return LayerInfo();
     switch (auto type = pagLayer->layerType()) {
-        case LayerType::Shape:
-            return std::make_pair(reinterpret_cast<jlong>(new JPAGShapeLayer(std::static_pointer_cast<PAGShapeLayer>(pagLayer))), static_cast<int>(type));
-        case LayerType::Solid:
-            return std::make_pair(reinterpret_cast<jlong>(new JPAGSolidLayer(std::static_pointer_cast<PAGSolidLayer>(pagLayer))), static_cast<int>(type));
+        case LayerType::Shape: return LayerInfo(new JPAGShapeLayer(std::static_pointer_cast<PAGShapeLayer>(pagLayer)), static_cast<jlong>(type));
+        case LayerType::Solid: return LayerInfo(new JPAGSolidLayer(std::static_pointer_cast<PAGSolidLayer>(pagLayer)), static_cast<jlong>(type));
         case LayerType::PreCompose: {
-            if (std::static_pointer_cast<PAGComposition>(pagLayer)->isPAGFile()) {
-                return std::make_pair(reinterpret_cast<jlong>(new JPAGFile(std::static_pointer_cast<PAGFile>(pagLayer))), 114514);
-            }
-            else {
-                return std::make_pair(reinterpret_cast<jlong>(new JPAGComposition(std::static_pointer_cast<PAGComposition>(pagLayer))), static_cast<int>(type));
-            }
+            if (std::static_pointer_cast<PAGComposition>(pagLayer)->isPAGFile()) return LayerInfo(new JPAGFile(std::static_pointer_cast<PAGFile>(pagLayer)), true);
+            else return LayerInfo(new JPAGComposition(std::static_pointer_cast<PAGComposition>(pagLayer)), static_cast<jlong>(type));
         }
-        case LayerType::Text:
-            return std::make_pair(reinterpret_cast<jlong>(new JPAGTextLayer(std::static_pointer_cast<PAGTextLayer>(pagLayer))), static_cast<int>(type));
-        case LayerType::Image:
-            return std::make_pair(reinterpret_cast<jlong>(new JPAGImageLayer(std::static_pointer_cast<PAGImageLayer>(pagLayer))), static_cast<int>(type));
-        default:
-            return std::make_pair(reinterpret_cast<jlong>(new JPAGLayer(pagLayer)), static_cast<int>(LayerType::Unknown));
+        case LayerType::Text: return LayerInfo(new JPAGTextLayer(std::static_pointer_cast<PAGTextLayer>(pagLayer)), static_cast<jlong>(type));
+        case LayerType::Image: return LayerInfo(new JPAGImageLayer(std::static_pointer_cast<PAGImageLayer>(pagLayer)), static_cast<jlong>(type));
+        default: return LayerInfo(new JPAGLayer(pagLayer), static_cast<jlong>(LayerType::Unknown));
     }
 }
 
-std::shared_ptr<pag::PAGLayer> PAGLayerInstance(jlong layerHandle, jint type) {
-    if (layerHandle == 0LL) return nullptr;
-    switch (static_cast<LayerType>(type)) {
-        case LayerType::Shape: return reinterpret_cast<JPAGShapeLayer*>(layerHandle)->get();
-        case LayerType::Solid: return reinterpret_cast<JPAGSolidLayer*>(layerHandle)->get();
-        case LayerType::PreCompose: return reinterpret_cast<JPAGComposition*>(layerHandle)->get();
-        case static_cast<LayerType>(114514): return reinterpret_cast<JPAGFile*>(layerHandle)->get();
-        case LayerType::Text: return reinterpret_cast<JPAGTextLayer*>(layerHandle)->get();
-        case LayerType::Image: return reinterpret_cast<JPAGImageLayer*>(layerHandle)->get();
-        default: return reinterpret_cast<JPAGLayer*>(layerHandle)->get();
+std::shared_ptr<pag::PAGLayer> PAGLayerInstance(LayerInfo info) {
+    if (info.empty()) return nullptr;
+    if (info.file()) return info.handle<JPAGFile>()->get();
+    switch (info.rawType()) {
+        case LayerType::Shape: return info.handle<JPAGShapeLayer>()->get();
+        case LayerType::Solid: return info.handle<JPAGSolidLayer>()->get();
+        case LayerType::PreCompose: return info.handle<JPAGComposition>()->get();
+        case LayerType::Text: return info.handle<JPAGTextLayer>()->get();
+        case LayerType::Image: return info.handle<JPAGImageLayer>()->get();
+        default: return info.handle<JPAGLayer>()->get();
     }
 }

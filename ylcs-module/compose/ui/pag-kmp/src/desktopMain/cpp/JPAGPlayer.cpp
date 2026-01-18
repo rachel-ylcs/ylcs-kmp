@@ -33,21 +33,14 @@ extern "C" {
     JNIEXPORT jlongArray JNICALL Java_org_libpag_PAGPlayer_nativeGetComposition(JNIEnv* env, jclass, jlong handle) {
         auto pagPlayer = obj_cast(handle);
         auto result = env->NewLongArray(2);
-        if (pagPlayer) {
-            auto composition = pagPlayer->getComposition();
-            if (composition) {
-                auto [layerHandle, type] = JPAGLayerInstance(composition);
-                jlong values[2] = { layerHandle, static_cast<jlong>(type) };
-                env->SetLongArrayRegion(result, 0, 2, values);
-            }
-        }
+        if (pagPlayer) env->SetLongArrayRegion(result, 0, 2, JPAGLayerInstance(pagPlayer->getComposition()));
         return result;
     }
 
-    JNIEXPORT void JNICALL Java_org_libpag_PAGPlayer_nativeSetComposition(JNIEnv* env, jclass, jlong handle, jlong compositionHandle, jint type) {
+    JNIEXPORT void JNICALL Java_org_libpag_PAGPlayer_nativeSetComposition(JNIEnv* env, jclass, jlong handle, jlong compositionHandle, jlong type) {
         auto pagPlayer = obj_cast(handle);
         if (pagPlayer) {
-            auto composition = PAGLayerInstance(compositionHandle, type);
+            auto composition = PAGLayerInstance(LayerInfo(compositionHandle, type));
             if (composition) pagPlayer->setComposition(std::static_pointer_cast<PAGComposition>(composition));
         }
     }
@@ -196,10 +189,10 @@ extern "C" {
         return JNI_FALSE;
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGPlayer_nativeHitTestPoint(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jint type, jfloat x, jfloat y, jboolean pixelHitTest) {
+    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGPlayer_nativeHitTestPoint(JNIEnv* env, jclass, jlong handle, jlong layerHandle, jlong type, jfloat x, jfloat y, jboolean pixelHitTest) {
         auto pagPlayer = obj_cast(handle);
         if (pagPlayer) {
-            auto layer = PAGLayerInstance(layerHandle, type);
+            auto layer = PAGLayerInstance(LayerInfo(layerHandle, type));
             return static_cast<jboolean>(pagPlayer->hitTestPoint(layer, x, y, pixelHitTest));
         }
         return JNI_FALSE;

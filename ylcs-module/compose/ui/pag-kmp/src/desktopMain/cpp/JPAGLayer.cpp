@@ -15,12 +15,7 @@ extern "C" {
 
     JNIEXPORT jint JNICALL Java_org_libpag_PAGLayer_nativeLayerType(JNIEnv* env, jclass, jlong handle) {
         auto pagLayer = obj_cast(handle);
-        if (pagLayer) {
-            auto type = pagLayer->layerType();
-            if (type == LayerType::PreCompose && std::static_pointer_cast<PAGComposition>(pagLayer)->isPAGFile()) return 114514;
-            return static_cast<jint>(type);
-        }
-        return static_cast<jint>(LayerType::Unknown);
+        return static_cast<jint>(pagLayer ? pagLayer->layerType() : LayerType::Unknown);
     }
 
     JNIEXPORT jstring JNICALL Java_org_libpag_PAGLayer_nativeLayerName(JNIEnv* env, jclass, jlong handle) {

@@ -1,7 +1,7 @@
 @file:JsModule("libpag")
 @file:OptIn(ExperimentalWasmJsInterop::class)
 @file:Suppress("FunctionName", "PropertyName", "ConstPropertyName")
-package love.yinlin.compose.ui
+package org.libpag
 
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Uint8Array
@@ -30,6 +30,7 @@ external class PAG : JsAny {
     val PAGView: PAGView.Companion
     val PAGSurface: PAGSurface.Companion
     val PAGComposition: PAGComposition.Companion
+    val SDKVersion: () -> String
 }
 
 internal external fun PAGInit(moduleOption: JsAny? = definedExternally): Promise<PAG?>

@@ -1,6 +1,5 @@
 package org.libpag
 
-import love.yinlin.compose.ui.PAGScaleMode
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
@@ -22,7 +21,7 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
         @JvmStatic
         private external fun nativeGetComposition(handle: Long): LongArray
         @JvmStatic
-        private external fun nativeSetComposition(handle: Long, compositionHandle: Long, type: Int)
+        private external fun nativeSetComposition(handle: Long, compositionHandle: Long, type: Long)
         @JvmStatic
         private external fun nativeVideoEnabled(handle: Long): Boolean
         @JvmStatic
@@ -70,7 +69,7 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
         // getBounds()
         // getLayersUnderPoint()
         @JvmStatic
-        private external fun nativeHitTestPoint(handle: Long, layerHandle: Long, type: Int, x: Float, y: Float, pixelHitTest: Boolean): Boolean
+        private external fun nativeHitTestPoint(handle: Long, layerHandle: Long, type: Long, x: Float, y: Float, pixelHitTest: Boolean): Boolean
         @JvmStatic
         private external fun nativeRenderingTime(handle: Long): Long
         @JvmStatic
@@ -88,14 +87,9 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
             else nativeSetSurface(nativeHandle, value.nativeHandle)
         }
 
-    var composition: PAGComposition?
-        get() {
-            val result = nativeGetComposition(nativeHandle)
-            val layerHandle = result[0]
-            return if (layerHandle == 0L) null else PAGLayer.internalNativeMake(result[1].toInt(), layerHandle) as? PAGComposition
-        }
+    var composition: PAGComposition? get() = unpackLayerInfo(nativeGetComposition(nativeHandle)) as? PAGComposition
         set(value) {
-            value?.let { nativeSetComposition(nativeHandle, it.nativeHandle, it.internalNativeType) }
+            value?.let { nativeSetComposition(nativeHandle, it.nativeHandle, it.internalLayerType) }
         }
 
     var videoEnabled: Boolean get() = nativeVideoEnabled(nativeHandle)
@@ -113,11 +107,11 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
     var maxFrameRate: Float get() = nativeMaxFrameRate(nativeHandle)
         set(value) { nativeSetMaxFrameRate(nativeHandle, value) }
 
-    var scaleMode: PAGScaleMode get() = PAGScaleMode.entries[nativeScaleMode(nativeHandle)]
-        set(value) { nativeSetScaleMode(nativeHandle, value.ordinal) }
+    var scaleMode: Int get() = nativeScaleMode(nativeHandle)
+        set(value) { nativeSetScaleMode(nativeHandle, value) }
 
-    var matrix: PAGMatrix get() = PAGMatrix(*nativeGetMatrix(nativeHandle))
-        set(value) { nativeSetMatrix(nativeHandle, value.mat) }
+    var matrix: FloatArray get() = nativeGetMatrix(nativeHandle)
+        set(value) { nativeSetMatrix(nativeHandle, value) }
 
     val duration: Long get() = nativeDuration(nativeHandle)
 
@@ -134,7 +128,7 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
 
     fun waitSync(sync: Long) = nativeWaitSync(nativeHandle, sync)
 
-    fun hitTestPoint(layer: PAGLayer, x: Float, y: Float, pixelHitTest: Boolean) = nativeHitTestPoint(nativeHandle, layer.nativeHandle, layer.internalNativeType, x, y, pixelHitTest)
+    fun hitTestPoint(layer: PAGLayer, x: Float, y: Float, pixelHitTest: Boolean) = nativeHitTestPoint(nativeHandle, layer.nativeHandle, layer.internalLayerType, x, y, pixelHitTest)
 
     val renderingTime: Long get() = nativeRenderingTime(nativeHandle)
 

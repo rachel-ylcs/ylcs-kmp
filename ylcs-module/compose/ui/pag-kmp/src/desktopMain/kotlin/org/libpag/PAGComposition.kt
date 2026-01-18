@@ -4,7 +4,10 @@ import love.yinlin.extension.NativeLib
 import love.yinlin.platform.NativeLibLoader
 
 @NativeLib
-class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(constructor, PAGComposition::nativeRelease) {
+open class PAGComposition internal constructor(
+    destructor: (Long) -> Unit = PAGComposition::nativeRelease,
+    constructor: () -> Long,
+) : PAGLayer(destructor, constructor) {
     companion object {
         init {
             NativeLibLoader.resource("pag_kmp")
@@ -25,23 +28,23 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
         @JvmStatic
         private external fun nativeGetLayerAt(handle: Long, index: Int): LongArray
         @JvmStatic
-        private external fun nativeGetLayerIndex(handle: Long, layerHandle: Long, type: Int): Int
+        private external fun nativeGetLayerIndex(handle: Long, layerHandle: Long, type: Long): Int
         @JvmStatic
-        private external fun nativeSetLayerIndex(handle: Long, layerHandle: Long, type: Int, index: Int): Int
+        private external fun nativeSetLayerIndex(handle: Long, layerHandle: Long, type: Long, index: Int): Int
         @JvmStatic
-        private external fun nativeAddLayer(handle: Long, layerHandle: Long, type: Int)
+        private external fun nativeAddLayer(handle: Long, layerHandle: Long, type: Long)
         @JvmStatic
-        private external fun nativeAddLayerAt(handle: Long, layerHandle: Long, type: Int, index: Int)
+        private external fun nativeAddLayerAt(handle: Long, layerHandle: Long, type: Long, index: Int)
         @JvmStatic
-        private external fun nativeContains(handle: Long, layerHandle: Long, type: Int): Boolean
+        private external fun nativeContains(handle: Long, layerHandle: Long, type: Long): Boolean
         @JvmStatic
-        private external fun nativeRemoveLayer(handle: Long, layerHandle: Long, type: Int): LongArray
+        private external fun nativeRemoveLayer(handle: Long, layerHandle: Long, type: Long): LongArray
         @JvmStatic
         private external fun nativeRemoveLayerAt(handle: Long, index: Int): LongArray
         @JvmStatic
         private external fun nativeRemoveAllLayers(handle: Long)
         @JvmStatic
-        private external fun nativeSwapLayer(handle: Long, layerHandle1: Long, type1: Int, layerHandle2: Long, type2: Int)
+        private external fun nativeSwapLayer(handle: Long, layerHandle1: Long, type1: Long, layerHandle2: Long, type2: Long)
         @JvmStatic
         private external fun nativeSwapLayerAt(handle: Long, index1: Int, index2: Int)
         @JvmStatic
@@ -63,37 +66,25 @@ class PAGComposition internal constructor(constructor: () -> Long) : PAGLayer(co
 
     val numChildren: Int get() = nativeNumChildren(nativeHandle)
 
-    fun getLayerAt(index: Int): PAGLayer? {
-        val result = nativeGetLayerAt(nativeHandle, index)
-        val layerHandle = result[0]
-        return if (layerHandle == 0L) null else internalNativeMake(result[1].toInt(), layerHandle)
-    }
+    fun getLayerAt(index: Int): PAGLayer? = unpackLayerInfo(nativeGetLayerAt(nativeHandle, index))
 
-    fun getLayerIndex(layer: PAGLayer): Int = nativeGetLayerIndex(nativeHandle, layer.nativeHandle, layer.internalNativeType)
+    fun getLayerIndex(layer: PAGLayer): Int = nativeGetLayerIndex(nativeHandle, layer.nativeHandle, layer.internalLayerType)
 
-    fun setLayerIndex(layer: PAGLayer, index: Int) = nativeSetLayerIndex(nativeHandle, layer.nativeHandle, layer.internalNativeType, index)
+    fun setLayerIndex(layer: PAGLayer, index: Int) = nativeSetLayerIndex(nativeHandle, layer.nativeHandle, layer.internalLayerType, index)
 
-    fun addLayer(layer: PAGLayer) = nativeAddLayer(nativeHandle, layer.nativeHandle, layer.internalNativeType)
+    fun addLayer(layer: PAGLayer) = nativeAddLayer(nativeHandle, layer.nativeHandle, layer.internalLayerType)
 
-    fun addLayerAt(layer: PAGLayer, index: Int) = nativeAddLayerAt(nativeHandle, layer.nativeHandle, layer.internalNativeType, index)
+    fun addLayerAt(layer: PAGLayer, index: Int) = nativeAddLayerAt(nativeHandle, layer.nativeHandle, layer.internalLayerType, index)
 
-    operator fun contains(layer: PAGLayer): Boolean = nativeContains(nativeHandle, layer.nativeHandle, layer.internalNativeType)
+    operator fun contains(layer: PAGLayer): Boolean = nativeContains(nativeHandle, layer.nativeHandle, layer.internalLayerType)
 
-    fun removeLayer(layer: PAGLayer): PAGLayer? {
-        val result = nativeRemoveLayer(nativeHandle, layer.nativeHandle, layer.internalNativeType)
-        val layerHandle = result[0]
-        return if (layerHandle == 0L) null else internalNativeMake(result[1].toInt(), layerHandle)
-    }
+    fun removeLayer(layer: PAGLayer): PAGLayer? = unpackLayerInfo(nativeRemoveLayer(nativeHandle, layer.nativeHandle, layer.internalLayerType))
 
-    fun removeLayerAt(index: Int): PAGLayer? {
-        val result = nativeRemoveLayerAt(nativeHandle, index)
-        val layerHandle = result[0]
-        return if (layerHandle == 0L) null else internalNativeMake(result[1].toInt(), layerHandle)
-    }
+    fun removeLayerAt(index: Int): PAGLayer? = unpackLayerInfo(nativeRemoveLayerAt(nativeHandle, index))
 
     fun removeAllLayers() = nativeRemoveAllLayers(nativeHandle)
 
-    fun swapLayer(layer1: PAGLayer, layer2: PAGLayer) = nativeSwapLayer(nativeHandle, layer1.nativeHandle, layer1.internalNativeType, layer2.nativeHandle, layer2.internalNativeType)
+    fun swapLayer(layer1: PAGLayer, layer2: PAGLayer) = nativeSwapLayer(nativeHandle, layer1.nativeHandle, layer1.internalLayerType, layer2.nativeHandle, layer2.internalLayerType)
 
     fun swapLayerAt(index1: Int, index2: Int) = nativeSwapLayerAt(nativeHandle, index1, index2)
 

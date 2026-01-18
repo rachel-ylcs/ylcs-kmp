@@ -294,7 +294,7 @@ class SubScreenMe(parent: BasicScreen) : SubScreen(parent) {
                     )
                     ClickText(
                         text = stringResource(Res.string.login),
-                        onClick = { navigate(::ScreenLogin) }
+                        onClick = { navigate(::ScreenTest) }
                     )
                 }
             }
