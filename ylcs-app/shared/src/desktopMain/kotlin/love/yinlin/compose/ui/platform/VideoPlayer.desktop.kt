@@ -13,11 +13,11 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.zIndex
 import kotlinx.atomicfu.locks.SynchronousMutex
 import kotlinx.atomicfu.locks.withLock
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.*
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.extension.NativeLib
 import love.yinlin.extension.catching
 import love.yinlin.platform.WindowsNativePlaybackState
 import love.yinlin.platform.WindowsNativeVideoPlayer
@@ -31,9 +31,9 @@ import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
 
 @Stable
-@NativeLib
+@NativeLibApi
 private class VideoPlayerState(val url: String) {
-    @NativeLib
+    @NativeLibApi
     private val controller = WindowsNativeVideoPlayer()
 
     var isPlaying by mutableStateOf(false)
@@ -116,7 +116,7 @@ private class VideoPlayerState(val url: String) {
 }
 
 @Composable
-@NativeLib
+@NativeLibApi
 actual fun VideoPlayer(
     url: String,
     modifier: Modifier,

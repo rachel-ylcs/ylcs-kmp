@@ -1,11 +1,11 @@
 package org.libpag
 
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.extension.Destructible
-import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
 import love.yinlin.platform.NativeLibLoader
 
-@NativeLib
+@NativeLibApi
 class PAGDecoder private constructor(constructor: () -> Long) : Destructible(RAII(constructor, PAGDecoder::nativeRelease)), AutoCloseable {
     companion object {
         init {

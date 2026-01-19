@@ -3,6 +3,7 @@ import kotlinx.browser.window
 import kotlinx.html.*
 import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
+import love.yinlin.reflect.metaSimpleClassName
 import love.yinlin.uri.Uri
 import org.w3c.dom.HTMLElement
 
@@ -10,8 +11,8 @@ var currentPage: Page? = null
 
 fun navigate(pageName: String) {
     val page = when (pageName) {
-        DocPage::class.simpleName -> DocPage
-        RecruitmentPage::class.simpleName -> RecruitmentPage
+        DocPage.metaSimpleClassName -> DocPage
+        RecruitmentPage.metaSimpleClassName -> RecruitmentPage
         else -> MainPage
     }
 
@@ -23,11 +24,11 @@ fun navigate(pageName: String) {
         root.append {
             with(page) { render() }
         }
-        window.history.pushState(null, "", "?page=${page::class.simpleName!!}")
+        window.history.pushState(null, "", "?page=${page.metaSimpleClassName}")
     }
 }
 
-fun navigate(page: Page) = navigate(page::class.simpleName!!)
+fun navigate(page: Page) = navigate(page.metaSimpleClassName)
 
 private fun setupTailwindcss() = js("""
 {
@@ -148,7 +149,7 @@ fun TagConsumer<HTMLElement>.renderFooter() {
                 }
                 div("flex items-center gap-x-1") {
                     +"Developed with"
-                    a(href = DEVELEOPMENT_URL, target = ATarget.blank, classes = "font-bold hover:text-black dark:hover:text-white tracking-tighter transition-colors") { +"Kotlin" }
+                    a(href = DEVELOPMENT_URL, target = ATarget.blank, classes = "font-bold hover:text-black dark:hover:text-white tracking-tighter transition-colors") { +"Kotlin" }
                 }
             }
         }

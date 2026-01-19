@@ -1,9 +1,9 @@
 package org.libpag
 
-import love.yinlin.extension.NativeLib
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.platform.NativeLibLoader
 
-@NativeLib
+@NativeLibApi
 data class PAGFont(val fontFamily: String = "", val fontStyle: String = "") {
     companion object {
         init {

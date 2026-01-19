@@ -1,9 +1,9 @@
 package org.libpag
 
-import love.yinlin.extension.NativeLib
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.platform.NativeLibLoader
 
-@NativeLib
+@NativeLibApi
 open class PAGComposition internal constructor(
     destructor: (Long) -> Unit = PAGComposition::nativeRelease,
     constructor: () -> Long,

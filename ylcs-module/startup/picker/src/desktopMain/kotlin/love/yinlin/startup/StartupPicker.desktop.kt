@@ -3,6 +3,7 @@ package love.yinlin.startup
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.files.Path
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingNull
 import love.yinlin.io.Sources
@@ -10,7 +11,6 @@ import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupNative
 import love.yinlin.foundation.SyncStartup
-import love.yinlin.extension.NativeLib
 import love.yinlin.extension.bufferedSink
 import love.yinlin.extension.bufferedSource
 import love.yinlin.extension.delete
@@ -19,7 +19,7 @@ import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 
 @StartupNative
-@NativeLib
+@NativeLibApi
 actual class StartupPicker : SyncStartup() {
     private lateinit var context: Context
     private val handle: Long get() = context.handle

@@ -13,9 +13,9 @@ val Long.float1: Float get() =  Float.fromBits((this shr 32).toInt())
 val Long.float2: Float get() =  Float.fromBits((this and 0xFFFFFFFF).toInt())
 
 val Long.fileSizeString: String get() = if (this < 1024) "${this}B"
-else if (this < 1024 * 1024) "${this / 1024}KB"
-else if (this < 1024 * 1024 * 1024) "${this / (1024 * 1024)}MB"
-else "${this / (1024 * 1024 * 1024)}GB"
+    else if (this < 1024 * 1024) "${this / 1024}KB"
+    else if (this < 1024 * 1024 * 1024) "${this / (1024 * 1024)}MB"
+    else "${this / (1024 * 1024 * 1024)}GB"
 
 val Long.timeString: String get() {
     val hours = (this / (1000 * 60 * 60)).toInt()

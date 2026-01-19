@@ -133,4 +133,5 @@ suspend fun Path.writeTo(other: Path): Boolean = catchingDefault(false) {
 }
 
 fun List<Path>.safeRawSources(): Sources<RawSource>? = this.safeToSources { SystemFileSystem.source(it) }
+
 fun List<Path>.safeSources(): Sources<Source>? = this.safeToSources { SystemFileSystem.source(it).buffered() }

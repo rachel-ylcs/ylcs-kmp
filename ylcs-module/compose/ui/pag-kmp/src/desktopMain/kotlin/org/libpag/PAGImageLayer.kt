@@ -1,10 +1,10 @@
 package org.libpag
 
-import love.yinlin.extension.NativeLib
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.platform.NativeLibLoader
 import java.nio.ByteBuffer
 
-@NativeLib
+@NativeLibApi
 class PAGImageLayer internal constructor(
     constructor: () -> Long
 ) : PAGLayer(PAGImageLayer::nativeRelease, constructor) {

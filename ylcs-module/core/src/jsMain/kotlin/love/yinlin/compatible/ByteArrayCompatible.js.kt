@@ -1,13 +1,13 @@
 package love.yinlin.compatible
 
-import org.khronos.webgl.Int8Array
+import love.yinlin.annotation.CompatibleRachelApi
 import org.khronos.webgl.toInt8Array
 
-actual class ByteArrayCompatible actual constructor(private val raw: ByteArray) {
+@CompatibleRachelApi
+actual class ByteArrayCompatible actual constructor(actual val raw: ByteArray) {
     actual val size: Int get() = raw.size
     actual operator fun get(index: Int): Byte = raw[index]
     actual operator fun set(index: Int, value: Byte) = raw.set(index, value)
     actual operator fun iterator(): ByteIterator = raw.iterator()
-
-    actual fun toInt8Array(): Int8Array = raw.toInt8Array()
+    actual val asWebByteArray: WebByteArray get() = raw.toInt8Array()
 }

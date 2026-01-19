@@ -2,12 +2,12 @@ package love.yinlin.platform
 
 import androidx.compose.runtime.Stable
 import kotlinx.io.files.Path
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.extension.NativeLib
 import love.yinlin.foundation.Context
 
 @Stable
-@NativeLib
+@NativeLibApi
 actual class AudioPlayer actual constructor(context: Context, private val onEndListener: () -> Unit) {
     private val nativeAudioPlayer = WindowsNativeAudioPlayer()
 

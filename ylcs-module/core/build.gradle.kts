@@ -26,15 +26,13 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val skikoMain by create(commonMain)
-
         val clientMain by create(commonMain)
 
-        val kotlinMain by create(commonMain)
+        nativeMain.configure(clientMain)
 
         val jvmMain by create(clientMain)
 
-        appleMain.configure(skikoMain, clientMain)
+        appleMain.configure(nativeMain)
 
         androidMain.configure(jvmMain) {
             lib(
@@ -44,19 +42,19 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        iosMain.configure(appleMain, kotlinMain)
+        iosMain.configure(appleMain)
 
         iosMainList.configure(iosMain)
 
         // appleMain是原生objc，desktopMain是基于jvm的，不许在这加appleMain了:(
-        desktopMain.configure(skikoMain, jvmMain) {
+        desktopMain.configure(jvmMain) {
             lib(
                 ExportLib,
                 libs.kotlinx.coroutines.swing
             )
         }
 
-        webMain.configure(skikoMain, kotlinMain) {
+        webMain.configure(commonMain) {
             lib(
                 ExportLib,
                 libs.kotlinx.broswer
@@ -65,14 +63,28 @@ template(object : KotlinMultiplatformTemplate() {
 
         jsMain.configure(webMain)
 
+        jsTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test
+            )
+        }
+
         wasmJsMain.configure(webMain)
 
-        androidNativeMain.configure(kotlinMain)
+        wasmJsTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test
+            )
+        }
 
-        windowsMain.configure(kotlinMain)
+        androidNativeMain.configure(nativeMain)
 
-        linuxMain.configure(kotlinMain)
+        windowsMain.configure(nativeMain)
 
-        macosMain.configure(kotlinMain)
+        linuxMain.configure(nativeMain)
+
+        macosMain.configure(appleMain)
     }
 })

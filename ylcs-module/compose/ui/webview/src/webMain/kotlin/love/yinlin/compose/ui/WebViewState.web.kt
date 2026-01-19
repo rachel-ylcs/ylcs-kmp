@@ -2,7 +2,7 @@ package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import kotlinx.browser.document
+import love.yinlin.extension.createElement
 import org.w3c.dom.HTMLIFrameElement
 
 @Stable
@@ -18,11 +18,9 @@ actual class WebViewState actual constructor(private val initUrl: String) : Plat
     actual fun goForward() {}
     actual fun evaluateJavaScript(script: String) {}
 
-    override fun build(): HTMLIFrameElement {
-        val iframe = document.createElement("iframe") as HTMLIFrameElement
-        iframe.frameBorder = "0"
-        iframe.referrerPolicy = "no-referrer"
-        iframe.src = initUrl
-        return iframe
+    override fun build(): HTMLIFrameElement = createElement {
+        frameBorder = "0"
+        referrerPolicy = "no-referrer"
+        src = initUrl
     }
 }

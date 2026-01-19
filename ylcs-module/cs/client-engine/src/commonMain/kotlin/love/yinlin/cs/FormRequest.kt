@@ -13,6 +13,7 @@ import kotlinx.io.RawSource
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.serialization.json.JsonArray
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.data.Data
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
@@ -22,6 +23,7 @@ import love.yinlin.extension.safeRawSources
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
 import love.yinlin.io.Sources
+import love.yinlin.reflect.metaClassName
 
 class ClientAPIFile internal constructor(val value: Any) : APIFile {
     override val files: List<String> = emptyList()
@@ -45,6 +47,7 @@ class APIFormScope {
 
     fun internalAddRawSource(key: String, value: RawSource) { formParts += FormPart(key = key, value = InputProvider { value.buffered() }, headers = headers) }
 
+    @OptIn(CompatibleRachelApi::class)
     inline fun <reified I> add(i: I) {
         if (i is ClientAPIFile?) {
             if (i != null) {
@@ -52,7 +55,7 @@ class APIFormScope {
                     is ByteArray -> internalAddByteArray("${index++}", value)
                     is RawSource -> internalAddRawSource("${index++}", value)
                     is Sources<out RawSource> -> value.forEachIndexed { i, source -> internalAddRawSource("${index}:$i", source) }
-                    else -> error("unsupported file type ${value::class.qualifiedName}")
+                    else -> error("unsupported file type ${value.metaClassName}")
                 }
             }
             else formParts += FormPart(key = "#${index++}", value = "")

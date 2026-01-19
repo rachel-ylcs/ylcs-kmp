@@ -48,9 +48,13 @@ class KotlinMultiplatformSourceSetsScope(
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
     val commonTest: KotlinSourceSet by lazy { with(extension) { set.commonTest.get() } }
     val nativeMain: KotlinSourceSet by lazy { with(extension) { set.nativeMain.get() } }
+    val nativeTest: KotlinSourceSet by lazy { with(extension) { set.nativeTest.get() } }
     val androidMain: KotlinSourceSet by lazy { with(extension) { set.androidMain.get() } }
+    val androidTest: KotlinSourceSet by lazy { with(extension) { set.androidUnitTest.get() } }
     val appleMain: KotlinSourceSet by lazy { with(extension) { set.appleMain.get() } }
+    val appleTest: KotlinSourceSet by lazy { with(extension) { set.appleTest.get() } }
     val iosMain: KotlinSourceSet by lazy { with(extension) { set.iosMain.get() } }
+    val iosTest: KotlinSourceSet by lazy { with(extension) { set.iosTest.get() } }
     val iosMainList: List<KotlinSourceSet> by lazy {
         buildList {
             with(extension) {
@@ -66,9 +70,13 @@ class KotlinMultiplatformSourceSetsScope(
         }
     }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
+    val desktopTest: KotlinSourceSet by lazy { set.getByName("desktopTest") }
     val webMain: KotlinSourceSet by lazy { with(extension) { set.webMain.get() } }
+    val webTest: KotlinSourceSet by lazy { with(extension) { set.webTest.get() } }
     val jsMain: KotlinSourceSet by lazy { with(extension) { set.jsMain.get() } }
+    val jsTest: KotlinSourceSet by lazy { with(extension) { set.jsTest.get()} }
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
+    val wasmJsTest: KotlinSourceSet by lazy { with(extension) { set.wasmJsTest.get() } }
 
     val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
     val androidNativeTest: KotlinSourceSet by lazy { set.getByName("androidNativeTest") }
@@ -283,6 +291,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
 
                     browser {
+                        testTask {
+                            useKarma {
+                                useChromeHeadless()
+                            }
+                        }
+
                         commonWebpackConfig {
                             cssSupport {
                                 enabled.set(true)
@@ -306,6 +320,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
 
                     browser {
+                        testTask {
+                            useKarma {
+                                useChromeHeadless()
+                            }
+                        }
+
                         commonWebpackConfig {
                             cssSupport {
                                 enabled.set(true)

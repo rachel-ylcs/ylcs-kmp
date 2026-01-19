@@ -1,11 +1,11 @@
 package org.libpag
 
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.extension.Destructible
-import love.yinlin.extension.NativeLib
 import love.yinlin.extension.RAII
 import love.yinlin.platform.NativeLibLoader
 
-@NativeLib
+@NativeLibApi
 class PAGImage private constructor(constructor: () -> Long) : Destructible(RAII(constructor, PAGImage::nativeRelease)), AutoCloseable {
     companion object {
         init {

@@ -1,15 +1,15 @@
 package love.yinlin.collection
 
-actual class PriorityQueue<E : Any> actual constructor(private val comparator: Comparator<E>) {
+class KotlinPriorityQueue<E : Any>(private val comparator: Comparator<E>) {
     private val heap = mutableListOf<E>()
 
-    actual val size: Int get() = heap.size
-    actual val isEmpty: Boolean get() = heap.isEmpty()
-    actual val isNotEmpty: Boolean get() = heap.isNotEmpty()
-    actual val front: E get() = heap.first()
-    actual val frontOrNull: E? get() = heap.firstOrNull()
+    val size: Int get() = heap.size
+    val isEmpty: Boolean get() = heap.isEmpty()
+    val isNotEmpty: Boolean get() = heap.isNotEmpty()
+    val front: E get() = heap.first()
+    val frontOrNull: E? get() = heap.firstOrNull()
 
-    actual fun push(element: E) {
+    fun push(element: E) {
         heap.add(element)
         var child = heap.size - 1
         var parent = (child - 1) / 2
@@ -22,11 +22,11 @@ actual class PriorityQueue<E : Any> actual constructor(private val comparator: C
         }
     }
 
-    actual fun push(elements: Collection<E>) {
+    fun push(elements: Collection<E>) {
         for (element in elements) push(element)
     }
 
-    actual fun pop(): E? {
+    fun pop(): E? {
         if (heap.isEmpty()) return null
         val result = heap[0]
         heap[0] = heap.last()
@@ -47,9 +47,9 @@ actual class PriorityQueue<E : Any> actual constructor(private val comparator: C
         return result
     }
 
-    actual fun clear() { heap.clear() }
+    fun clear() { heap.clear() }
 
-    actual operator fun iterator(): Iterator<E> = heap.iterator()
+    operator fun iterator(): Iterator<E> = heap.iterator()
 
-    actual fun reverse(): Iterator<E> = heap.reversed().iterator()
+    fun reverse(): Iterator<E> = heap.reversed().iterator()
 }

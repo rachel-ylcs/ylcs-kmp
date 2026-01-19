@@ -1,9 +1,12 @@
 package love.yinlin.foundation
 
 import kotlinx.coroutines.CoroutineScope
+import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.reflect.metaClassName
 
 abstract class SyncStartup : Startup() {
-    override fun toString(): String = "(Sync|${this::class.qualifiedName})"
+    @OptIn(CompatibleRachelApi::class)
+    override fun toString(): String = "(Sync|${this.metaClassName})"
 
     override fun initLater(context: Context, args: StartupArgs) {}
 

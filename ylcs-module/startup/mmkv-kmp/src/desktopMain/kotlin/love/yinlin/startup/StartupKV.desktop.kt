@@ -2,16 +2,16 @@ package love.yinlin.startup
 
 import com.tencent.mmkv.MMKV
 import kotlinx.io.files.Path
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupFetcher
 import love.yinlin.foundation.StartupNative
 import love.yinlin.foundation.SyncStartup
-import love.yinlin.extension.NativeLib
 
 @StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
 @StartupNative
-@NativeLib
+@NativeLibApi
 actual class StartupKV : SyncStartup() {
     lateinit var kv: MMKV
 

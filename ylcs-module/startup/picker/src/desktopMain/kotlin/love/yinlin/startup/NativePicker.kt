@@ -1,9 +1,9 @@
 package love.yinlin.startup
 
-import love.yinlin.extension.NativeLib
+import love.yinlin.annotation.NativeLibApi
 import love.yinlin.platform.NativeLibLoader
 
-@NativeLib
+@NativeLibApi
 internal object NativePicker {
     init {
         NativeLibLoader.resource("picker")

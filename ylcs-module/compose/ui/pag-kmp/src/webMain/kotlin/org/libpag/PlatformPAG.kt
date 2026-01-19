@@ -14,43 +14,25 @@ import org.w3c.dom.ImageBitmap
 import org.w3c.files.File
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
+import kotlin.js.JsArray
 import kotlin.js.JsBoolean
 import kotlin.js.JsModule
-import kotlin.js.JsName
+import kotlin.js.JsString
 import kotlin.js.Promise
 import kotlin.js.definedExternally
 
-external interface PAGViewOptions : JsAny {
-    var useScale: Boolean?
-    var useCanvas2D: Boolean?
-    var firstFrame: Boolean?
+external interface Rect : JsAny {
+    var left: Double
+    var top: Double
+    var right: Double
+    var bottom: Double
 }
 
-external class PAG : JsAny {
-    val PAGPlayer: PAGPlayer.Companion
-    val PAGFile: PAGFile.Companion
-    val PAGView: PAGView.Companion
-    val PAGSurface: PAGSurface.Companion
-    val PAGComposition: PAGComposition.Companion
-    val SDKVersion: () -> String
-}
-
-internal external fun PAGInit(moduleOption: JsAny? = definedExternally): Promise<PAG?>
-
-@JsName("Rect")
-external class PAGRect : JsAny {
-    val left: Double
-    val top: Double
-    val right: Double
-    val bottom: Double
-}
-
-@JsName("Matrix")
-external class PAGMatrix : JsAny {
+external class Matrix : JsAny {
     companion object {
-        fun makeAll(scaleX: Double, skewX: Double, transX: Double, skewY: Double, scaleY: Double, transY: Double, pers0: Double = definedExternally, pers1: Double = definedExternally, pers2: Double = definedExternally): PAGMatrix
-        fun makeScale(scaleX: Double, scaleY: Double): PAGMatrix
-        fun makeTrans(dx: Double, dy: Double): PAGMatrix
+        fun makeAll(scaleX: Double, skewX: Double, transX: Double, skewY: Double, scaleY: Double, transY: Double, pers0: Double = definedExternally, pers1: Double = definedExternally, pers2: Double = definedExternally): Matrix
+        fun makeScale(scaleX: Double, scaleY: Double): Matrix
+        fun makeTrans(dx: Double, dy: Double): Matrix
     }
 
     // scaleX
@@ -76,18 +58,44 @@ external class PAGMatrix : JsAny {
     fun setRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun setSinCos(sinV: Double, cosV: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun setSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun setConcat(a: PAGMatrix, b: PAGMatrix)
+    fun setConcat(a: Matrix, b: Matrix)
     fun preTranslate(dx: Double, dy: Double)
     fun preScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun preRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun preSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun preConcat(other: PAGMatrix)
+    fun preConcat(other: Matrix)
     fun postTranslate(dx: Double, dy: Double)
     fun postScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun postRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
     fun postSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun postConcat(other: PAGMatrix)
+    fun postConcat(other: Matrix)
     fun destroy()
+}
+
+external interface PAGViewOptions : JsAny {
+    var useScale: Boolean?
+    var useCanvas2D: Boolean?
+    var firstFrame: Boolean?
+}
+
+external class PAG : JsAny {
+    val PAGPlayer: PAGPlayer.Companion
+    val PAGFile: PAGFile.Companion
+    val PAGView: PAGView.Companion
+    val PAGSurface: PAGSurface.Companion
+    val PAGComposition: PAGComposition.Companion
+    val SDKVersion: () -> String
+}
+
+internal external fun PAGInit(moduleOption: JsAny? = definedExternally): Promise<PAG?>
+
+external class PAGFont : JsAny {
+    companion object {
+        fun create(fontFamily: String, fontStyle: String): PAGFont
+        fun registerFont(): Promise<JsAny?>
+        fun registerFallbackFontNames(fontNames: JsArray<JsString> = definedExternally)
+
+    }
 }
 
 external class PAGImage : JsAny {
@@ -102,8 +110,8 @@ external class PAGImage : JsAny {
     fun height(): Int
     fun scaleMode(): Int
     fun setScaleMode(mode: Int)
-    fun matrix(): PAGMatrix
-    fun setMatrix(matrix: PAGMatrix)
+    fun matrix(): Matrix
+    fun setMatrix(matrix: Matrix)
     fun destroy()
 }
 
@@ -126,10 +134,10 @@ open external class PAGLayer : JsAny {
     fun uniqueID(): Int
     fun layerType(): Int
     fun layerName(): String
-    fun matrix(): PAGMatrix
-    fun setMatrix(matrix: PAGMatrix)
+    fun matrix(): Matrix
+    fun setMatrix(matrix: Matrix)
     fun resetMatrix()
-    fun getTotalMatrix(): PAGMatrix
+    fun getTotalMatrix(): Matrix
     fun alpha(): Double
     fun setAlpha(opacity: Double)
     fun visible(): Boolean
@@ -149,7 +157,7 @@ open external class PAGLayer : JsAny {
     fun setProgress(percent: Double)
     fun preFrame()
     fun nextFrame()
-    fun getBounds(): PAGRect
+    fun getBounds(): Rect
     fun trackMatteLayer(): PAGLayer
     fun excludedFromTimeline(): Boolean
     fun setExcludedFromTimeline(value: Boolean)
@@ -228,13 +236,13 @@ external class PAGPlayer : JsAny {
     fun getComposition(): PAGComposition
     fun setComposition(pagComposition: PAGComposition?)
     fun getSurface(): PAGSurface
-    fun matrix(): PAGMatrix
-    fun setMatrix(matrix: PAGMatrix)
+    fun matrix(): Matrix
+    fun setMatrix(matrix: Matrix)
     fun nextFrame()
     fun preFrame()
     fun autoClear(): Boolean
     fun setAutoClear(value: Boolean)
-    fun getBounds(): PAGRect
+    fun getBounds(): Rect
     // fun getLayersUnderPoint()
     // fun hitTestPoint()
     fun renderingTime(): Long
@@ -299,8 +307,8 @@ external class PAGView(pagLayer: PAGLayer, canvasElement: HTMLCanvasElement) : J
     fun freeCache()
     fun getComposition(): PAGComposition?
     fun setComposition(pagComposition: PAGComposition?)
-    fun matrix(): PAGMatrix
-    fun setMatrix(matrix: PAGMatrix)
+    fun matrix(): Matrix
+    fun setMatrix(matrix: Matrix)
     // fun getLayersUnderPoint()
     fun updateSize()
     fun prepare(): Promise<JsAny?>

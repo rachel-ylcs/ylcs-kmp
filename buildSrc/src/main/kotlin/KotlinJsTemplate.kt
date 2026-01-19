@@ -25,6 +25,12 @@ abstract class KotlinJsTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
             js {
                 outputModuleName.set(uniqueModuleName)
                 browser {
+                    testTask {
+                        useKarma {
+                            useChromeHeadless()
+                        }
+                    }
+
                     commonWebpackConfig {
                         cssSupport {
                             enabled.set(true)

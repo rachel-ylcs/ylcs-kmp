@@ -1,8 +1,9 @@
-@file:OptIn(ExperimentalWasmJsInterop::class)
+@file:OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
 package love.yinlin.compose.ui
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.await
 import org.libpag.PAGInit
 import kotlin.js.ExperimentalWasmJsInterop

@@ -1,5 +1,7 @@
 package love.yinlin.cs
 
+import love.yinlin.reflect.metaSimpleClassName
+
 open class APIRes private constructor(name: String?, parent: APIRes?) : APIFile {
     constructor(root: String) : this(root, null)
     constructor(parent: APIRes) : this(null, parent)
@@ -8,7 +10,7 @@ open class APIRes private constructor(name: String?, parent: APIRes?) : APIFile 
     val path: String = when {
         parent == null -> name!!
         name != null -> "$parent/$name"
-        else -> "$parent/${this::class.simpleName!!.lowercase()}"
+        else -> "$parent/${this.metaSimpleClassName.lowercase()}"
     }
 
     override val files: List<String> = listOf(path)

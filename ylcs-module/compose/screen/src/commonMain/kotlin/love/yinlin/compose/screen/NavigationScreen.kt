@@ -44,7 +44,7 @@ abstract class NavigationScreen(manager: ScreenManager) : BasicScreen(manager) {
         Wrapper(LocalDevice.current, pagerState.currentPage) { device ->
             HorizontalPager(
                 state = pagerState,
-                key = { subs[it].clz.qualifiedName!! },
+                key = { it },
                 beyondViewportPageCount = 0,
                 userScrollEnabled = false,
                 modifier = Modifier.fillMaxSize()

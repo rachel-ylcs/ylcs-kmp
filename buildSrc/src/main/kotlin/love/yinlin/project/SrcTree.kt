@@ -70,8 +70,10 @@ class DesktopAppNode(root: RootProjectNode, c: Constants) : Directory by root.di
 class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("webApp") {
     private val build: Directory = dir("build")
 
-    val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
-    val output: Directory = root.outputs.dir("web")
+    val originJsOutput: Directory = build.dir("dist").dir("js").dir("productionExecutable")
+    val originWasmOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
+    val jsOutput: Directory = root.outputs.dir("webJs")
+    val wasmOutput: Directory = root.outputs.dir("webWasm")
 }
 
 class LandpageNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("landpage") {

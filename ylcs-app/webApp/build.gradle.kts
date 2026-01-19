@@ -40,6 +40,11 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
+        // 运行 Web Js 应用程序
+        val webJsRun by tasks.registering {
+            dependsOn(tasks.named("jsBrowserDevelopmentRun"))
+        }
+
         // 运行 Web 应用程序
         val webRun by tasks.registering {
             dependsOn(tasks.named("wasmJsBrowserDevelopmentRun"))
@@ -47,16 +52,24 @@ template(object : KotlinMultiplatformTemplate() {
 
         // 发布 Web 应用程序
         val webPublish by tasks.registering {
+            dependsOn(tasks.named("jsBrowserDistribution"))
             dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
             doLast {
                 copy {
-                    from(C.root.webApp.originOutput)
-                    into(C.root.webApp.output)
+                    from(C.root.webApp.originJsOutput)
+                    into(C.root.webApp.jsOutput)
                 }
-                delete(*C.root.webApp.output.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                zip(C.root.webApp.output, C.root.outputs.file("[Web]${C.app.displayName}${C.app.versionName}.zip"))
-                delete(C.root.webApp.output)
+                delete(*C.root.webApp.jsOutput.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                copy {
+                    from(C.root.webApp.originWasmOutput)
+                    into(C.root.webApp.wasmOutput)
+                }
+                delete(*C.root.webApp.wasmOutput.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(C.root.webApp.jsOutput, C.root.outputs.file("[WebJs]${C.app.displayName}${C.app.versionName}.zip"))
+                delete(C.root.webApp.jsOutput)
+                zip(C.root.webApp.wasmOutput, C.root.outputs.file("[WebWasm]${C.app.displayName}${C.app.versionName}.zip"))
+                delete(C.root.webApp.wasmOutput)
             }
         }
     }
