@@ -10,15 +10,19 @@ import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.js
 
 internal typealias PlatformPAG = org.libpag.PAG
+internal typealias PlatformPAGComposition = org.libpag.PAGComposition
+internal typealias PlatformPAGFile = org.libpag.PAGFile
 internal typealias PlatformPAGFont = org.libpag.PAGFont
 internal typealias PlatformPAGImage = org.libpag.PAGImage
 internal typealias PlatformPAGColor = org.libpag.Color
 internal typealias PlatformPAGRect = org.libpag.Rect
 internal typealias PlatformPAGLayer = org.libpag.PAGLayer
 internal typealias PlatformPAGMarker = org.libpag.Marker
+internal typealias PlatformPAGPlayer = org.libpag.PAGPlayer
 internal typealias PlatformPAGMatrix = org.libpag.Matrix
 internal typealias PlatformPAGImageLayer = org.libpag.PAGImageLayer
 internal typealias PlatformPAGSolidLayer = org.libpag.PAGSolidLayer
+internal typealias PlatformPAGSurface = org.libpag.PAGSurface
 internal typealias PlatformPAGTextLayer = org.libpag.PAGTextLayer
 internal typealias PlatformPAGVideoRange = org.libpag.PAGVideoRange
 

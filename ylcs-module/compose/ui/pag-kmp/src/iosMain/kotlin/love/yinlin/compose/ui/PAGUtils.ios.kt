@@ -3,23 +3,23 @@ package love.yinlin.compose.ui
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreVideo.*
-import cocoapods.libpag.PAGLayerTypeNull
-import cocoapods.libpag.PAGLayerTypeSolid
-import cocoapods.libpag.PAGLayerTypeText
-import cocoapods.libpag.PAGLayerTypeShape
-import cocoapods.libpag.PAGLayerTypeImage
-import cocoapods.libpag.PAGLayerTypePreCompose
 
 internal typealias PlatformPAG = cocoapods.libpag.PAG
+internal typealias PlatformPAGComposition = cocoapods.libpag.PAGComposition
 internal typealias PlatformPAGDiskCache = cocoapods.libpag.PAGDiskCache
+internal typealias PlatformPAGDecoder = cocoapods.libpag.PAGDecoder
+internal typealias PlatformPAGFile = cocoapods.libpag.PAGFile
 internal typealias PlatformPAGFont = cocoapods.libpag.PAGFont
 internal typealias PlatformPAGImage = cocoapods.libpag.PAGImage
+internal typealias PlatformPAGImageLayer = cocoapods.libpag.PAGImageLayer
 internal typealias PlatformPAGLayer = cocoapods.libpag.PAGLayer
 internal typealias PlatformPAGMarker = cocoapods.libpag.PAGMarker
-internal typealias PlatformPAGImageLayer = cocoapods.libpag.PAGImageLayer
+internal typealias PlatformPAGPlayer = cocoapods.libpag.PAGPlayer
 internal typealias PlatformPAGShapeLayer = cocoapods.libpag.PAGShapeLayer
 internal typealias PlatformPAGSolidLayer = cocoapods.libpag.PAGSolidLayer
+internal typealias PlatformPAGSurface = cocoapods.libpag.PAGSurface
 internal typealias PlatformPAGTextLayer = cocoapods.libpag.PAGTextLayer
+internal typealias PlatformPAGVideoDecoder = cocoapods.libpag.VideoDecoder
 internal typealias PlatformPAGVideoRange = cocoapods.libpag.PAGVideoRange
 
 internal fun makePlatformPAGFont(fontFamily: String, fontStyle: String): PlatformPAGFont {
@@ -42,18 +42,23 @@ internal fun makePlatformPAGVideoRange(startTime: Long, endTime: Long, playDurat
     range.startTime = startTime
     range.endTime = endTime
     range.playDuration = playDuration
-    range.reversed = reversed.toString()
+    range.reversed = reversed.toLong()
     return range
 }
 
-internal val cocoapods.libpag.PAGLayerType.ordinal: Int get() = when (this) {
-    PAGLayerTypeNull -> 1
-    PAGLayerTypeSolid -> 2
-    PAGLayerTypeText -> 3
-    PAGLayerTypeShape -> 4
-    PAGLayerTypeImage -> 5
-    PAGLayerTypePreCompose -> 6
-    else -> 0
+internal val cocoapods.libpag.PAGLayerType.ordinal: Int get() {
+    println(cocoapods.libpag.PAGLayerType.PAGLayerTypeNull)
+    println(cocoapods.libpag.PAGLayerType.Null)
+    println(PAGLayerTypeNull)
+    return when (this) {
+        PAGLayerTypeNull -> 1
+        PAGLayerTypeSolid -> 2
+        PAGLayerTypeText -> 3
+        PAGLayerTypeShape -> 4
+        PAGLayerTypeImage -> 5
+        PAGLayerTypePreCompose -> 6
+        else -> 0
+    }
 }
 
 internal val PAGColorType.asCVPixelFormat: UInt get() = when (this) {

@@ -8,7 +8,7 @@ import platform.CoreGraphics.CGSizeMake
 actual class PAGImageLayer(private val delegate: PlatformPAGImageLayer) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(width: Int, height: Int, duration: Long): PAGImageLayer =
-            PAGImageLayer(PlatformPAGImageLayer.Make(CGSizeMake(width.toDouble(), height.toDouble()), duration))
+            PAGImageLayer(PlatformPAGImageLayer.Make(CGSizeMake(width.toDouble(), height.toDouble()), duration)!!)
     }
 
     actual val contentDuration: Long get() = delegate.contentDuration()
