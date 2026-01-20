@@ -15,12 +15,12 @@ internal typealias PlatformPAGSolidLayer = cocoapods.libpag.PAGSolidLayer
 internal typealias PlatformPAGVideoRange = cocoapods.libpag.PAGVideoRange
 
 internal val cocoapods.libpag.PAGLayerType.ordinal: Int get() = when (this) {
-    cocoapods.libpag.PAGLayerTypeNull -> 1
-    cocoapods.libpag.PAGLayerTypeSolid -> 2
-    cocoapods.libpag.PAGLayerTypeText -> 3
-    cocoapods.libpag.PAGLayerTypeShape -> 4
-    cocoapods.libpag.PAGLayerTypeImage -> 5
-    cocoapods.libpag.PAGLayerTypePreCompose -> 6
+    PAGLayerTypeNull -> 1
+    PAGLayerTypeSolid -> 2
+    PAGLayerTypeText -> 3
+    PAGLayerTypeShape -> 4
+    PAGLayerTypeImage -> 5
+    PAGLayerTypePreCompose -> 6
     else -> 0
 }
 

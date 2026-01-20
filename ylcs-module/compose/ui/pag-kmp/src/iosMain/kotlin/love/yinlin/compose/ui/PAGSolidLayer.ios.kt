@@ -11,6 +11,6 @@ actual class PAGSolidLayer(private val delegate: PlatformPAGSolidLayer) : PAGLay
         actual fun make(duration: Long, width: Int, height: Int, solidColor: Color, opacity: Int): PAGSolidLayer = unsupportedPlatform()
     }
 
-    actual var solidColor: Color get() = delegate.solidColor().asComposeColor()
+    actual var solidColor: Color get() = delegate.solidColor()!!.asComposeColor()
         set(value) { delegate.setSolidColor(value.asUIColor()) }
 }
