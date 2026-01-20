@@ -1,6 +1,7 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
-actual data class PAGFont(private val delegate: PlatformPAGFont) {
+actual class PAGFont(private val delegate: PlatformPAGFont) {
     actual constructor(fontFamily: String, fontStyle: String) : this(PlatformPAGFont(fontFamily, fontStyle))
 
     actual companion object {
@@ -10,6 +11,6 @@ actual data class PAGFont(private val delegate: PlatformPAGFont) {
         actual fun unregisterFont(font: PAGFont) { PlatformPAGFont.UnregisterFont(font.delegate) }
     }
 
-    actual val fontFamily: String by delegate::fontFamily
-    actual val fontStyle: String by delegate::fontStyle
+    actual val fontFamily: String get() = delegate.fontFamily!!
+    actual val fontStyle: String get() = delegate.fontStyle!!
 }

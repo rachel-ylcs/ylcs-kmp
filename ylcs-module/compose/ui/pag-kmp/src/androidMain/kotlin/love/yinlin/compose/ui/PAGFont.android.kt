@@ -1,6 +1,6 @@
 package love.yinlin.compose.ui
 
-actual data class PAGFont(private val delegate: PlatformPAGFont) {
+actual class PAGFont(private val delegate: PlatformPAGFont) {
     actual constructor(fontFamily: String, fontStyle: String) : this(PlatformPAGFont(fontFamily, fontStyle))
 
     actual companion object {

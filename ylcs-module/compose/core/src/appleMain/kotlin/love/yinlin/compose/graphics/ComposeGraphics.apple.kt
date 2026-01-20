@@ -4,15 +4,27 @@ package love.yinlin.compose.graphics
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
-import kotlinx.cinterop.CValue
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
 import platform.CoreGraphics.CGAffineTransform
 import platform.CoreGraphics.CGAffineTransformMake
+import platform.CoreGraphics.CGFloatVar
 import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
+import platform.UIKit.UIColor
 import platform.darwin.Rect as DarwinRect
+
+fun UIColor.asComposeColor(): Color = memScoped {
+    val red = alloc<CGFloatVar>()
+    val green = alloc<CGFloatVar>()
+    val blue = alloc<CGFloatVar>()
+    val alpha = alloc<CGFloatVar>()
+    this@asComposeColor.getRed(red.ptr, green.ptr, blue.ptr, alpha.ptr)
+    Color(red = red.value.toFloat(), green = green.value.toFloat(), blue = blue.value.toFloat(), alpha = alpha.value.toFloat())
+}
+
+fun Color.asUIColor(): UIColor = UIColor(red = red.toDouble(), green = green.toDouble(), blue = blue.toDouble(), alpha = alpha.toDouble())
 
 fun DarwinRect.asComposeRect(): Rect = Rect(this.left.toFloat(), this.top.toFloat(), this.right.toFloat(), this.bottom.toFloat())
 

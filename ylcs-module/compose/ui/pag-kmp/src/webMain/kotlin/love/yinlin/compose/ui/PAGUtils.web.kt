@@ -2,19 +2,29 @@
 package love.yinlin.compose.ui
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.FloatArrayCompatible
 import kotlin.js.ExperimentalWasmJsInterop
+import kotlin.js.js
 
 internal typealias PlatformPAG = org.libpag.PAG
 internal typealias PlatformPAGFont = org.libpag.PAGFont
 internal typealias PlatformPAGImage = org.libpag.PAGImage
+internal typealias PlatformPAGColor = org.libpag.Color
 internal typealias PlatformPAGRect = org.libpag.Rect
 internal typealias PlatformPAGLayer = org.libpag.PAGLayer
 internal typealias PlatformPAGMarker = org.libpag.Marker
 internal typealias PlatformPAGMatrix = org.libpag.Matrix
+internal typealias PlatformPAGSolidLayer = org.libpag.PAGSolidLayer
 internal typealias PlatformPAGVideoRange = org.libpag.PAGVideoRange
+
+internal fun PlatformPAGColor.asComposeColor(): Color = Color(red.toFloat(), green.toFloat(), blue.toFloat())
+
+private fun makePAGColor(red: Float, green: Float, blue: Float): PlatformPAGColor = js("({ red: red, green: green, blue: blue })")
+
+internal fun Color.asPAGColor(): PlatformPAGColor = makePAGColor(red, green, blue)
 
 internal fun PlatformPAGRect.asComposeRect(): Rect = Rect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
 

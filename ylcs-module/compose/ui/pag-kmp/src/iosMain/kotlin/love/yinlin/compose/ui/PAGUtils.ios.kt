@@ -10,7 +10,19 @@ internal typealias PlatformPAGFont = cocoapods.libpag.PAGFont
 internal typealias PlatformPAGImage = cocoapods.libpag.PAGImage
 internal typealias PlatformPAGLayer = cocoapods.libpag.PAGLayer
 internal typealias PlatformPAGMarker = cocoapods.libpag.PAGMarker
+internal typealias PlatformPAGShapeLayer = cocoapods.libpag.PAGShapeLayer
+internal typealias PlatformPAGSolidLayer = cocoapods.libpag.PAGSolidLayer
 internal typealias PlatformPAGVideoRange = cocoapods.libpag.PAGVideoRange
+
+internal val cocoapods.libpag.PAGLayerType.ordinal: Int get() = when (this) {
+    cocoapods.libpag.PAGLayerTypeNull -> 1
+    cocoapods.libpag.PAGLayerTypeSolid -> 2
+    cocoapods.libpag.PAGLayerTypeText -> 3
+    cocoapods.libpag.PAGLayerTypeShape -> 4
+    cocoapods.libpag.PAGLayerTypeImage -> 5
+    cocoapods.libpag.PAGLayerTypePreCompose -> 6
+    else -> 0
+}
 
 internal val PAGColorType.asCVPixelFormat: UInt get() = when (this) {
     PAGColorType.ALPHA_8 -> kCVPixelFormatType_OneComponent8

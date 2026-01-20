@@ -1,3 +1,4 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
 import androidx.compose.ui.geometry.Rect
@@ -7,15 +8,15 @@ import love.yinlin.compose.graphics.asComposeMatrix
 import love.yinlin.compose.graphics.asComposeRect
 
 actual open class PAGLayer(private val delegate: PlatformPAGLayer) {
-    actual val layerType: PAGLayerType get() = PAGLayerType.entries[delegate.layerType()]
-    actual val layerName: String get() = delegate.layerName()
+    actual val layerType: PAGLayerType get() = PAGLayerType.entries[delegate.layerType().ordinal]
+    actual val layerName: String get() = delegate.layerName()!!
     actual var matrix: Matrix get() = delegate.matrix().asComposeMatrix()
         set(value) { delegate.setMatrix(value.asCGAffineTransform()) }
     actual fun resetMatrix() { delegate.resetMatrix() }
     actual val totalMatrix: Matrix get() = delegate.getTotalMatrix().asComposeMatrix()
     actual var visible: Boolean get() = delegate.visible()
         set(value) { delegate.setVisible(value) }
-    actual val editableIndex: Int get() = delegate.editableIndex()
+    actual val editableIndex: Int get() = delegate.editableIndex().toInt()
     actual fun localTimeToGlobal(time: Long): Long = delegate.localTimeToGlobal(time)
     actual fun globalToLocalTime(time: Long): Long = delegate.globalToLocalTime(time)
     actual val duration: Long get() = delegate.duration()

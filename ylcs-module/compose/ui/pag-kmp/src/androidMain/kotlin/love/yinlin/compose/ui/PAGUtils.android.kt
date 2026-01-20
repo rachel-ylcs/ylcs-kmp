@@ -9,6 +9,8 @@ internal typealias PlatformPAGFont = org.libpag.PAGFont
 internal typealias PlatformPAGImage = org.libpag.PAGImage
 internal typealias PlatformPAGLayer = org.libpag.PAGLayer
 internal typealias PlatformPAGMarker = org.libpag.PAGMarker
+internal typealias PlatformPAGShapeLayer = org.libpag.PAGShapeLayer
+internal typealias PlatformPAGSolidLayer = org.libpag.PAGSolidLayer
 internal typealias PlatformPAGVideoRange = org.libpag.PAGVideoRange
 
 internal val PAGColorType.asAndroidBitmapConfig: Bitmap.Config get() = when (this) {
