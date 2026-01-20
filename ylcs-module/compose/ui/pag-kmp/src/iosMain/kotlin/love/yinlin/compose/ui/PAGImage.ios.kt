@@ -9,7 +9,7 @@ import platform.CoreVideo.*
 import platform.darwin.ByteVar
 import platform.posix.memcpy
 
-actual class PAGImage(private val delegate: PlatformPAGImage) {
+actual class PAGImage(internal val delegate: PlatformPAGImage) {
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.FromPath(path)!!)
 

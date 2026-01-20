@@ -17,7 +17,9 @@ internal typealias PlatformPAGRect = org.libpag.Rect
 internal typealias PlatformPAGLayer = org.libpag.PAGLayer
 internal typealias PlatformPAGMarker = org.libpag.Marker
 internal typealias PlatformPAGMatrix = org.libpag.Matrix
+internal typealias PlatformPAGImageLayer = org.libpag.PAGImageLayer
 internal typealias PlatformPAGSolidLayer = org.libpag.PAGSolidLayer
+internal typealias PlatformPAGTextLayer = org.libpag.PAGTextLayer
 internal typealias PlatformPAGVideoRange = org.libpag.PAGVideoRange
 
 internal fun PlatformPAGColor.asComposeColor(): Color = Color(red.toFloat(), green.toFloat(), blue.toFloat())

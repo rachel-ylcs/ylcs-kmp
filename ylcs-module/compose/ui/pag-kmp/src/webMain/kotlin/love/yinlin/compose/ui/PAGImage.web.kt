@@ -5,7 +5,7 @@ import androidx.compose.ui.graphics.Matrix
 import love.yinlin.platform.unsupportedPlatform
 import kotlin.js.ExperimentalWasmJsInterop
 
-actual class PAGImage(private val delegate: PlatformPAGImage) {
+actual class PAGImage(internal val delegate: PlatformPAGImage) {
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = unsupportedPlatform()
 

@@ -5,7 +5,7 @@ import love.yinlin.compose.graphics.asComposeMatrix
 import love.yinlin.compose.graphics.asSkiaMatrix33
 import org.jetbrains.skia.Matrix33
 
-actual class PAGImage(private val delegate: PlatformPAGImage) {
+actual class PAGImage(internal val delegate: PlatformPAGImage) {
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.loadFromPath(path))
 
