@@ -1,6 +1,7 @@
 package love.yinlin.compatible
 
 import love.yinlin.annotation.CompatibleRachelApi
+import org.khronos.webgl.Int32Array
 
 @CompatibleRachelApi
 expect class IntArrayCompatible(raw: IntArray) {
@@ -9,5 +10,5 @@ expect class IntArrayCompatible(raw: IntArray) {
     operator fun get(index: Int): Int
     operator fun set(index: Int, value: Int)
     operator fun iterator(): IntIterator
-    val asWebIntArray: WebIntArray
+    val asInt32Array: Int32Array
 }

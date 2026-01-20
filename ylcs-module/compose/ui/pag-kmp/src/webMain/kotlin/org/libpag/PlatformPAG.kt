@@ -3,29 +3,46 @@
 @file:Suppress("FunctionName", "PropertyName", "ConstPropertyName")
 package org.libpag
 
-import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.TexImageSource
-import org.khronos.webgl.Uint8Array
-import org.khronos.webgl.WebGLFramebuffer
-import org.khronos.webgl.WebGLRenderingContext
-import org.khronos.webgl.WebGLTexture
+import org.khronos.webgl.*
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.ImageBitmap
 import org.w3c.files.File
-import kotlin.js.ExperimentalWasmJsInterop
-import kotlin.js.JsAny
-import kotlin.js.JsArray
-import kotlin.js.JsBoolean
-import kotlin.js.JsModule
-import kotlin.js.JsString
-import kotlin.js.Promise
-import kotlin.js.definedExternally
+import kotlin.js.*
+
+external interface Marker : JsAny {
+    var startTime: Double
+    var duration: Double
+    var comment: String
+}
+
+external interface Color : JsAny {
+    var red: Double
+    var green: Double
+    var blue: Double
+}
+
+external interface YUVBuffer : JsAny {
+    var data: JsArray<JsNumber>
+    var lineSize: JsArray<JsNumber>
+}
+
+external interface DebugData : JsAny {
+    var FPS: Double?
+    var flushTime: Double?
+}
 
 external interface Rect : JsAny {
     var left: Double
     var top: Double
     var right: Double
     var bottom: Double
+}
+
+external interface PAGVideoRange : JsAny {
+    var startTime: Double
+    var endTime: Double
+    var playDuration: Double
+    var reversed: Boolean
 }
 
 external class Matrix : JsAny {
@@ -35,67 +52,62 @@ external class Matrix : JsAny {
         fun makeTrans(dx: Double, dy: Double): Matrix
     }
 
-    // scaleX
-    var a: Double
-    // skewY
-    var b: Double
-    // skewX
-    var c: Double
-    // scaleY
-    var d: Double
-    // transX
-    var tx: Double
-    // transY
-    var ty: Double
+    var a: Double // scaleX
+    var b: Double // skewY
+    var c: Double // skewX
+    var d: Double // scaleY
+    var tx: Double // transX
+    var ty: Double // transY
 
-    fun get(index: Int): Double
     fun set(index: Int, value: Double)
-    fun setAll(scaleX: Double, skewX: Double, transX: Double, skewY: Double, scaleY: Double, transY: Double)
     fun setAffine(a: Double, b: Double, c: Double, d: Double, tx: Double, ty: Double)
-    fun reset()
-    fun setTranslate(dx: Double, dy: Double)
-    fun setScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun setRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun setSinCos(sinV: Double, cosV: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun setSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun setConcat(a: Matrix, b: Matrix)
-    fun preTranslate(dx: Double, dy: Double)
-    fun preScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun preRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun preSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun preConcat(other: Matrix)
-    fun postTranslate(dx: Double, dy: Double)
-    fun postScale(sx: Double, sy: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun postRotate(degrees: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun postSkew(kx: Double, ky: Double, px: Double = definedExternally, py: Double = definedExternally)
-    fun postConcat(other: Matrix)
-    fun destroy()
 }
 
-external interface PAGViewOptions : JsAny {
-    var useScale: Boolean?
-    var useCanvas2D: Boolean?
-    var firstFrame: Boolean?
+external class TextDocument : JsAny {
+    var applyFill: Boolean
+    var applyStroke: Boolean
+    var baselineShift: Double
+    var boxText: Boolean
+    var firstBaseLine: Double
+    var fauxBold: Boolean
+    var fauxItalic: Boolean
+    var fillColor: Color
+    var fontFamily: String
+    var fontStyle: String
+    var fontSize: Double
+    var strokeColor: Color
+    var strokeOverFill: Boolean
+    var strokeWidth: Double
+    var text: String
+    var leading: Double
+    var tracking: Double
+    var backgroundColor: Color
+    var backgroundAlpha: Double
 }
 
-external class PAG : JsAny {
-    val PAGPlayer: PAGPlayer.Companion
-    val PAGFile: PAGFile.Companion
-    val PAGView: PAGView.Companion
-    val PAGSurface: PAGSurface.Companion
-    val PAGComposition: PAGComposition.Companion
-    val SDKVersion: () -> String
+external class SoftwareDecoder : JsAny {
+    fun onConfigure(headers: JsArray<Uint8Array>, mimeType: String, width: Int, height: Int): Boolean
+    fun onSendBytes(bytes: Uint8Array, timestamp: Double): Double // 0:Success -1:TryAgainLater -2:Error
+    fun onDecodeFrame(): Double // 0:Success -1:TryAgainLater -2:Error
+    fun onEndOfStream(): Double // 0:Success -1:TryAgainLater -2:Error
+    fun onFlush()
+    fun onRenderFrame(): YUVBuffer?
+    fun onRelease()
 }
 
-internal external fun PAGInit(moduleOption: JsAny? = definedExternally): Promise<PAG?>
+external class SoftwareDecoderFactory : JsAny {
+    fun createSoftwareDecoder(pag: PAG): SoftwareDecoder?
+}
 
 external class PAGFont : JsAny {
     companion object {
         fun create(fontFamily: String, fontStyle: String): PAGFont
-        fun registerFont(): Promise<JsAny?>
+        fun registerFont(): Promise<PAGFont>
         fun registerFallbackFontNames(fontNames: JsArray<JsString> = definedExternally)
-
     }
+
+    val fontFamily: String
+    val fontStyle: String
 }
 
 external class PAGImage : JsAny {
@@ -115,22 +127,11 @@ external class PAGImage : JsAny {
     fun destroy()
 }
 
-external class PAGSurface : JsAny {
+open external class PAGLayer : JsAny {
     companion object {
-        fun fromCanvas(canvasID: String): PAGSurface
-        fun fromTexture(textureID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface
-        fun fromRenderTarget(frameBufferID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface
+
     }
 
-    fun width(): Int
-    fun height(): Int
-    fun updateSize()
-    fun clearAll(): Boolean
-    fun freeCache()
-    fun readPixels(colorType: Int, alphaType: Int): Uint8Array?
-}
-
-open external class PAGLayer : JsAny {
     fun uniqueID(): Int
     fun layerType(): Int
     fun layerName(): String
@@ -145,14 +146,14 @@ open external class PAGLayer : JsAny {
     fun editableIndex(): Int
     fun parent(): PAGComposition
     // fun markers()
-    fun localTimeToGlobal(localTime: Long): Long
-    fun globalToLocalTime(globalTime: Long): Long
-    fun duration(): Long
+    fun localTimeToGlobal(localTime: Double): Double
+    fun globalToLocalTime(globalTime: Double): Double
+    fun duration(): Double
     fun frameRate(): Float
-    fun startTime(): Long
-    fun setStartTime(time: Long)
-    fun currentTime(): Long
-    fun setCurrentTime(time: Long)
+    fun startTime(): Double
+    fun setStartTime(time: Double)
+    fun currentTime(): Double
+    fun setCurrentTime(time: Double)
     fun getProgress(): Double
     fun setProgress(percent: Double)
     fun preFrame()
@@ -163,6 +164,48 @@ open external class PAGLayer : JsAny {
     fun setExcludedFromTimeline(value: Boolean)
     fun isPAGFile(): Boolean
     // fun asTypeLayer()
+}
+
+external class PAGSolidLayer : PAGLayer {
+    companion object {
+        fun make(duration: Double, width: Int, height: Int, solidColor: Color, opacity: Double): PAGSolidLayer
+    }
+
+    fun solidColor(): Color
+    fun setSolidColor(color: Color)
+}
+
+external class PAGImageLayer : PAGLayer {
+    companion object {
+        fun make(width: Int, height: Int, duration: Double): PAGImageLayer
+    }
+
+    fun contentDuration(): Double
+    fun getVideoRanges(): JsArray<PAGVideoRange>
+    fun replaceImage(image: PAGImage)
+    fun setImage(image: PAGImage)
+    fun layerTimeToContent(layerTime: Double): Double
+    fun contentTimeToLayer(contentTime: Double): Double
+    fun imageBytes(): Uint8Array?
+}
+
+external class PAGTextLayer : PAGLayer {
+    companion object {
+        fun make(duration: Double, text: String, fontSize: Double, fontFamily: String, fontStyle: String): PAGTextLayer
+        fun make(duration: Double, textDocument: TextDocument): PAGTextLayer
+    }
+
+    fun fillColor(): Color
+    fun setFillColor(color: Color)
+    fun font(): PAGFont
+    fun setFont(font: PAGFont)
+    fun fontSize(): Double
+    fun setFontSize(size: Double)
+    fun strokeColor(): Color
+    fun setStrokeColor(color: Color)
+    fun text(): String
+    fun setText(text: String)
+    fun reset()
 }
 
 open external class PAGComposition : PAGLayer {
@@ -187,7 +230,7 @@ open external class PAGComposition : PAGLayer {
     fun swapLayerAt(index1: Int, index2: Int)
     fun audioBytes(): Uint8Array?
     // fun audioMarkers()
-    fun audioStartTime(): Long
+    fun audioStartTime(): Double
     fun getLayersByName(layerName: String): PAGLayer
     fun getLayersUnderPoint(localX: Double, localY: Double): PAGLayer
 }
@@ -196,20 +239,36 @@ external class PAGFile : PAGComposition {
     companion object {
         fun loadFromBuffer(data: ArrayBuffer): Promise<PAGFile>
         fun maxSupportedTagLevel(): Int
-        fun tagLevel(): Int
-        fun numTexts(): Int
-        fun numImages(): Int
-        fun numVideos(): Int
-        // fun getTextData()
-        // fun replaceText()
-        // fun replaceImage()
-        // fun getLayersByEditableIndex()
-        // fun getEditableIndices()
-        // fun timeStretchMode()
-        // fun setTimeStretchMode()
-        fun setDuration(duration: Long)
-        fun copyOriginal(): PAGFile
     }
+
+    fun tagLevel(): Int
+    fun numTexts(): Int
+    fun numImages(): Int
+    fun numVideos(): Int
+    fun getTextData(): TextDocument
+    fun replaceText(editableTextIndex: Int, textData: TextDocument)
+    fun replaceImage(editableImageIndex: Int, pagImage: PAGImage)
+    // fun getLayersByEditableIndex()
+    fun getEditableIndices(layerType: Int): JsArray<JsNumber>
+    fun timeStretchMode(): Int
+    fun setTimeStretchMode(mode: Int)
+    fun setDuration(duration: Double)
+    fun copyOriginal(): PAGFile
+}
+
+external class PAGSurface : JsAny {
+    companion object {
+        fun fromCanvas(canvasID: String): PAGSurface
+        fun fromTexture(textureID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface
+        fun fromRenderTarget(frameBufferID: Int, width: Int, height: Int, flipY: Boolean): PAGSurface
+    }
+
+    fun width(): Int
+    fun height(): Int
+    fun updateSize()
+    fun clearAll(): Boolean
+    fun freeCache()
+    fun readPixels(colorType: Int, alphaType: Int): Uint8Array?
 }
 
 external class PAGPlayer : JsAny {
@@ -219,7 +278,7 @@ external class PAGPlayer : JsAny {
 
     fun setProgress(progress: Double)
     fun flush(): Promise<JsBoolean>
-    fun duration(): Long
+    fun duration(): Double
     fun getProgress(): Double
     fun currentFrame(): Int
     fun videoEnabled(): Boolean
@@ -244,51 +303,55 @@ external class PAGPlayer : JsAny {
     fun setAutoClear(value: Boolean)
     fun getBounds(): Rect
     // fun getLayersUnderPoint()
-    // fun hitTestPoint()
-    fun renderingTime(): Long
-    fun imageDecodingTime(): Long
-    fun presentingTime(): Long
+    fun hitTestPoint(layer: PAGLayer, x: Double, y: Double, pixelHitTest: Boolean = definedExternally): Boolean
+    fun renderingTime(): Double
+    fun imageDecodingTime(): Double
+    fun presentingTime(): Double
     fun graphicsMemory(): Double
     fun prepare(): Promise<JsAny?>
     // fun linkVideoReader()
     // fun unlinkVideoReader()
 }
 
-external class BackendContext(handle: Int, externallyOwned: Boolean = definedExternally) : JsAny {
-    companion object {
-        fun from(gl: WebGLRenderingContext): BackendContext
-        fun from(gl: BackendContext): BackendContext
-    }
+external class PAG : JsAny {
+    var PAGPlayer: PAGPlayer.Companion
+    var PAGFile: PAGFile.Companion
+    var PAGView: PAGView.Companion
+    var PAGFont: PAGFont.Companion
+    var PAGImage: PAGImage.Companion
+    var PAGLayer: PAGLayer.Companion
+    var PAGComposition: PAGComposition.Companion
+    var PAGSurface: PAGSurface.Companion
+    var PAGTextLayer: PAGTextLayer.Companion
+    var PAGImageLayer: PAGImage.Companion
+    var PAGSolidLayer: PAGSolidLayer.Companion
+    var Matrix: Matrix.Companion
+    var SDKVersion: () -> String
+    var currentPlayer: PAGPlayer?
+}
 
-    val handle: Int
+internal external fun PAGInit(moduleOption: JsAny? = definedExternally): Promise<PAG?>
 
-    fun getContext(): WebGLRenderingContext?
-    fun makeCurrent(): Boolean
-    fun clearCurrent()
-    fun registerTexture(texture: WebGLTexture)
-    fun getTexture(handle: Int): WebGLTexture?
-    fun unregisterTexture(handle: Int)
-    fun registerRenderTarget(frameBuffer: WebGLFramebuffer)
-    fun getRenderTarget(handle: Int): WebGLFramebuffer?
-    fun unregisterRenderTarget(handle: Int)
-    fun destroy()
+external interface PAGViewOptions : JsAny {
+    var useScale: Boolean?
+    var useCanvas2D: Boolean?
+    var firstFrame: Boolean?
 }
 
 external class PAGView(pagLayer: PAGLayer, canvasElement: HTMLCanvasElement) : JsAny {
     companion object {
         fun init(composition: PAGComposition, canvas: HTMLCanvasElement, initOptions: PAGViewOptions? = definedExternally): Promise<PAGView?>
-        fun makePAGSurface(pagGlContext: BackendContext, width: Int, height: Int): PAGSurface
     }
 
     var repeatCount: Int
     var isPlaying: Boolean
 
-    fun duration(): Long
+    fun duration(): Double
     fun addListener(eventName: String, listener: (event: JsAny) -> Unit)
     fun removeListener(eventName: String, listener: ((event: JsAny) -> Unit)?): Boolean
     fun play(): Promise<JsAny?>
     fun pause()
-    fun stop(notification: Boolean?): Promise<JsAny?>
+    fun stop(notification: Boolean = definedExternally): Promise<JsAny?>
     fun setRepeatCount(repeatCount: Int)
     fun getProgress(): Double
     fun currentFrame(): Int
@@ -314,4 +377,6 @@ external class PAGView(pagLayer: PAGLayer, canvasElement: HTMLCanvasElement) : J
     fun prepare(): Promise<JsAny?>
     fun makeSnapshot(): Promise<ImageBitmap>
     fun destroy()
+    fun getDebugData(): DebugData
+    fun setDebugData(debugData: DebugData)
 }

@@ -1,14 +1,7 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.compatible
 
-import love.yinlin.extension.Array
-import love.yinlin.extension.Boolean
-import love.yinlin.extension.Double
-import love.yinlin.extension.Float
-import love.yinlin.extension.Int
-import love.yinlin.extension.Long
-import love.yinlin.extension.String
-import org.khronos.webgl.*
+import love.yinlin.extension.*
 import kotlin.js.ExperimentalWasmJsInterop
 
 /**
@@ -42,11 +35,5 @@ import kotlin.js.ExperimentalWasmJsInterop
  * 1. [Array] 系列
  * 2. [Enum]
  */
-@Suppress("")
-object WebInteropHelper
-
-typealias WebByteArray = Int8Array
-typealias WebShortArray = Int16Array
-typealias WebIntArray = Int32Array
-typealias WebFloatArray = Float32Array
-typealias WebDoubleArray = Float64Array
+@Suppress("unused")
+object TypeCompatible

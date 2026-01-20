@@ -1,8 +1,8 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.extension
 
-import love.yinlin.compatible.WebByteArray
 import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Int8Array
 import org.khronos.webgl.toByteArray
 import kotlin.js.*
 
@@ -28,4 +28,4 @@ expect inline fun <T, R : JsAny> jsArrayOf(vararg value: T, block: (T) -> R): Js
 fun jsArrayOf(vararg value: Number): JsArray<JsAny> = jsArrayOf<Number, JsAny>(*value) { it.toDouble().raw }
 fun jsArrayOf(vararg value: String): JsArray<JsAny> = jsArrayOf<String, JsAny>(*value) { it.raw }
 
-val ArrayBuffer.asByteArray: ByteArray get() = WebByteArray(this).toByteArray()
+val ArrayBuffer.asByteArray: ByteArray get() = Int8Array(this).toByteArray()

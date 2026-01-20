@@ -32,7 +32,7 @@ actual class SoundPlayer {
         catching {
             caches = Coroutines.io {
                 data.fastMap { bytes ->
-                    decodeAudioData(context, ByteArrayCompatible(bytes).asWebByteArray.buffer)
+                    decodeAudioData(context, ByteArrayCompatible(bytes).asInt8Array.buffer)
                 }
             }
         }

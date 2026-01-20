@@ -109,7 +109,7 @@ if (data && data instanceof FileList && data.length > 0) {
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
         val blob = Coroutines.io {
             val bytes = ByteArrayCompatible((sink as Buffer).readByteArray())
-            Blob(jsArrayOf(bytes.asWebByteArray).cast(), BlobPropertyBag(type = MimeType.ANY))
+            Blob(jsArrayOf(bytes.asInt8Array).cast(), BlobPropertyBag(type = MimeType.ANY))
         }
         val url = URL.createObjectURL(blob)
         createElement<HTMLAnchorElement> {
