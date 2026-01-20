@@ -6,18 +6,18 @@ import platform.CoreGraphics.CGSizeMake
 actual open class PAGComposition(override val delegate: PlatformPAGComposition) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(width: Int, height: Int): PAGComposition =
-            PAGComposition(PlatformPAGComposition.Make(CGSizeMake(width.toDouble(), height.toDouble())))
+            PAGComposition(PlatformPAGComposition.Make(CGSizeMake(width.toDouble(), height.toDouble()))!!)
     }
 
-    actual val width: Int get() = delegate.width()
-    actual val height: Int get() = delegate.height()
-    actual fun setContentSize(width: Int, height: Int) { delegate.setContentSize(width, height) }
-    actual val numChildren: Int get() = delegate.numChildren()
+    actual val width: Int get() = delegate.width().toInt()
+    actual val height: Int get() = delegate.height().toInt()
+    actual fun setContentSize(width: Int, height: Int) { delegate.setContentSize(CGSizeMake(width.toDouble(), height.toDouble())) }
+    actual val numChildren: Int get() = delegate.numChildren().toInt()
     actual fun getLayerAt(index: Int): PAGLayer? = delegate.getLayerAt(index)?.let(::PAGLayer)
-    actual fun getLayerIndex(layer: PAGLayer): Int = delegate.getLayerIndex(layer.delegate)
-    actual fun setLayerIndex(layer: PAGLayer, index: Int) { delegate.setLayerIndex(layer.delegate, index) }
+    actual fun getLayerIndex(layer: PAGLayer): Int = delegate.getLayerIndex(layer.delegate).toInt()
+    actual fun setLayerIndex(layer: PAGLayer, index: Int) { delegate.setLayerIndex(index, layer.delegate) }
     actual fun addLayer(layer: PAGLayer) { delegate.addLayer(layer.delegate) }
-    actual fun addLayerAt(layer: PAGLayer, index: Int) { delegate.addLayerAt(layer.delegate, index) }
+    actual fun addLayerAt(layer: PAGLayer, index: Int) { delegate.addLayer(layer.delegate, index) }
     actual operator fun contains(layer: PAGLayer): Boolean = delegate.contains(layer.delegate)
     actual fun removeLayer(layer: PAGLayer): PAGLayer? = delegate.removeLayer(layer.delegate)?.let(::PAGLayer)
     actual fun removeLayerAt(index: Int): PAGLayer? = delegate.removeLayerAt(index)?.let(::PAGLayer)

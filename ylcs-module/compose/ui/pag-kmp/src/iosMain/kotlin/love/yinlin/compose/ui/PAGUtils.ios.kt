@@ -42,7 +42,7 @@ internal fun makePlatformPAGVideoRange(startTime: Long, endTime: Long, playDurat
     range.startTime = startTime
     range.endTime = endTime
     range.playDuration = playDuration
-    range.reversed = false
+    range.reversed = 0L
     return range
 }
 
@@ -54,6 +54,16 @@ internal val cocoapods.libpag.PAGLayerType.ordinal: Int get() = when (this) {
     cocoapods.libpag.PAGLayerType.PAGLayerTypeImage -> 5
     cocoapods.libpag.PAGLayerType.PAGLayerTypePreCompose -> 6
     else -> 0
+}
+
+internal val Int.asPAGLayerType: cocoapods.libpag.PAGLayerType get() = when (this) {
+    1 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeNull
+    2 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeSolid
+    3 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeText
+    4 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeShape
+    5 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeImage
+    6 -> cocoapods.libpag.PAGLayerType.PAGLayerTypePreCompose
+    else -> cocoapods.libpag.PAGLayerType.PAGLayerTypeUnknown
 }
 
 internal val PAGColorType.asCVPixelFormat: UInt get() = when (this) {
