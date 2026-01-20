@@ -5,7 +5,8 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
-inline fun <T, R> T.internalCloseable(block: (T) -> R, clean: T.() -> Unit): R {
+@PublishedApi
+internal inline fun <T, R> T.internalCloseable(block: (T) -> R, clean: T.() -> Unit): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

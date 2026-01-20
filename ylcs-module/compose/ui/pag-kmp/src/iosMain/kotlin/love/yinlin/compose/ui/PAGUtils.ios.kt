@@ -4,10 +4,15 @@ package love.yinlin.compose.ui
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreVideo.*
 
-typealias PlatformPAG = cocoapods.libpag.PAG
-typealias PlatformPAGImage = cocoapods.libpag.PAGImage
+internal typealias PlatformPAG = cocoapods.libpag.PAG
+internal typealias PlatformPAGDiskCache = cocoapods.libpag.PAGDiskCache
+internal typealias PlatformPAGFont = cocoapods.libpag.PAGFont
+internal typealias PlatformPAGImage = cocoapods.libpag.PAGImage
+internal typealias PlatformPAGLayer = cocoapods.libpag.PAGLayer
+internal typealias PlatformPAGMarker = cocoapods.libpag.PAGMarker
+internal typealias PlatformPAGVideoRange = cocoapods.libpag.PAGVideoRange
 
-val PAGColorType.asCVPixelFormat: UInt get() = when (this) {
+internal val PAGColorType.asCVPixelFormat: UInt get() = when (this) {
     PAGColorType.ALPHA_8 -> kCVPixelFormatType_OneComponent8
     PAGColorType.RGBA_8888 -> kCVPixelFormatType_32RGBA
     PAGColorType.BGRA_8888 -> kCVPixelFormatType_32BGRA

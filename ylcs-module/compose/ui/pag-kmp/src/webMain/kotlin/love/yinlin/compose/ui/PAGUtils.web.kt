@@ -7,16 +7,20 @@ import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.FloatArrayCompatible
 import kotlin.js.ExperimentalWasmJsInterop
 
-typealias PlatformPAG = org.libpag.PAG
-typealias PlatformPAGImage = org.libpag.PAGImage
-typealias PlatformRect = org.libpag.Rect
-typealias PlatformMatrix = org.libpag.Matrix
+internal typealias PlatformPAG = org.libpag.PAG
+internal typealias PlatformPAGFont = org.libpag.PAGFont
+internal typealias PlatformPAGImage = org.libpag.PAGImage
+internal typealias PlatformPAGRect = org.libpag.Rect
+internal typealias PlatformPAGLayer = org.libpag.PAGLayer
+internal typealias PlatformPAGMarker = org.libpag.Marker
+internal typealias PlatformPAGMatrix = org.libpag.Matrix
+internal typealias PlatformPAGVideoRange = org.libpag.PAGVideoRange
 
-internal fun PlatformRect.asComposeRect(): Rect = Rect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
+internal fun PlatformPAGRect.asComposeRect(): Rect = Rect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat())
 
-internal fun Matrix.asPAGMatrix(): PlatformMatrix {
+internal fun Matrix.asPAGMatrix(): PlatformPAGMatrix {
     val v = FloatArrayCompatible(this.values)
-    return PlatformMatrix.makeAll(
+    return PlatformPAGMatrix.makeAll(
         v[Matrix.ScaleX].toDouble(),
         v[Matrix.SkewX].toDouble(),
         v[Matrix.TranslateX].toDouble(),
@@ -26,7 +30,7 @@ internal fun Matrix.asPAGMatrix(): PlatformMatrix {
     )
 }
 
-internal fun PlatformMatrix.asComposeMatrix(): Matrix = Matrix(floatArrayOf(
+internal fun PlatformPAGMatrix.asComposeMatrix(): Matrix = Matrix(floatArrayOf(
     this.a.toFloat(), this.b.toFloat(), 0f, 0f, // Column 0: ScaleX, SkewY, 0, Persp0
     this.c.toFloat(), this.d.toFloat(), 0f, 0f, // Column 1: SkewX, ScaleY, 0, Persp1
     0f, 0f, 1f, 0f,   // Column 2: 0, 0, ScaleZ, 0

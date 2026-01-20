@@ -102,7 +102,7 @@ external class SoftwareDecoderFactory : JsAny {
 external class PAGFont : JsAny {
     companion object {
         fun create(fontFamily: String, fontStyle: String): PAGFont
-        fun registerFont(): Promise<PAGFont>
+        fun registerFont(family: String, data: File): Promise<PAGFont>
         fun registerFallbackFontNames(fontNames: JsArray<JsString> = definedExternally)
     }
 

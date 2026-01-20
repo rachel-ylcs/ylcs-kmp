@@ -10,15 +10,6 @@ import platform.darwin.ByteVar
 import platform.posix.memcpy
 
 actual class PAGImage(private val delegate: PlatformPAGImage) {
-    actual val width: Int get() = delegate.width().toInt()
-    actual val height: Int get() = delegate.height().toInt()
-    actual var scaleMode: PAGScaleMode get() = PAGScaleMode.entries[delegate.scaleMode().toInt()]
-        set(value) { delegate.setScaleMode(value.ordinal.toUInt()) }
-    actual var matrix: Matrix get() = delegate.matrix().asComposeMatrix()
-        set(value) { delegate.setMatrix(value.asCGAffineTransform()) }
-
-    actual fun close() { }
-
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.FromPath(path)!!)
 
@@ -61,4 +52,13 @@ actual class PAGImage(private val delegate: PlatformPAGImage) {
             return PAGImage(PlatformPAGImage.FromPixelBuffer(pixelBuffer)!!)
         }
     }
+
+    actual val width: Int get() = delegate.width().toInt()
+    actual val height: Int get() = delegate.height().toInt()
+    actual var scaleMode: PAGScaleMode get() = PAGScaleMode.entries[delegate.scaleMode().toInt()]
+        set(value) { delegate.setScaleMode(value.ordinal.toUInt()) }
+    actual var matrix: Matrix get() = delegate.matrix().asComposeMatrix()
+        set(value) { delegate.setMatrix(value.asCGAffineTransform()) }
+
+    actual fun close() { }
 }

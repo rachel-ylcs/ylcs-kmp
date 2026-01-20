@@ -6,15 +6,6 @@ import love.yinlin.compose.graphics.asComposeMatrix
 import androidx.core.graphics.createBitmap
 
 actual class PAGImage(private val delegate: PlatformPAGImage) {
-    actual val width: Int get() = delegate.width()
-    actual val height: Int get() = delegate.height()
-    actual var scaleMode: PAGScaleMode get() = PAGScaleMode.entries[delegate.scaleMode()]
-        set(value) { delegate.setScaleMode(value.ordinal) }
-    actual var matrix: Matrix get() = delegate.matrix().asComposeMatrix()
-        set(value) { delegate.setMatrix(value.asAndroidMatrix()) }
-
-    actual fun close() = delegate.release()
-
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.FromPath(path))
 
@@ -36,4 +27,13 @@ actual class PAGImage(private val delegate: PlatformPAGImage) {
             return PAGImage(image)
         }
     }
+
+    actual val width: Int get() = delegate.width()
+    actual val height: Int get() = delegate.height()
+    actual var scaleMode: PAGScaleMode get() = PAGScaleMode.entries[delegate.scaleMode()]
+        set(value) { delegate.setScaleMode(value.ordinal) }
+    actual var matrix: Matrix get() = delegate.matrix().asComposeMatrix()
+        set(value) { delegate.setMatrix(value.asAndroidMatrix()) }
+
+    actual fun close() = delegate.release()
 }
