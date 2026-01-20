@@ -217,14 +217,14 @@ open external class PAGComposition : PAGLayer {
     fun height(): Int
     fun setContentSize(width: Int, height: Int)
     fun numChildren(): Int
-    fun getLayerAt(index: Int): PAGLayer
+    fun getLayerAt(index: Int): PAGLayer?
     fun getLayerIndex(pagLayer: PAGLayer): Int
     fun setLayerIndex(pagLayer: PAGLayer, index: Int): Int
     fun addLayer(pagLayer: PAGLayer): Boolean
     fun addLayerAt(pagLayer: PAGLayer, index: Int): Boolean
     fun contains(pagLayer: PAGLayer): Boolean
-    fun removeLayer(pagLayer: PAGLayer): PAGLayer
-    fun removeLayerAt(index: Int): PAGLayer
+    fun removeLayer(pagLayer: PAGLayer): PAGLayer?
+    fun removeLayerAt(index: Int): PAGLayer?
     fun removeAllLayers()
     fun swapLayer(pagLayer1: PAGLayer, pagLayer2: PAGLayer)
     fun swapLayerAt(index1: Int, index2: Int)

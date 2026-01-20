@@ -3,7 +3,7 @@ package love.yinlin.compose.ui
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
-actual class PAGTextLayer(private val delegate: PlatformPAGTextLayer) : PAGLayer(delegate) {
+actual class PAGTextLayer(override val delegate: PlatformPAGTextLayer) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(duration: Long, text: String, fontSize: Float, font: PAGFont): PAGTextLayer =
             PAGTextLayer(PlatformPAGTextLayer.make(duration, text, fontSize, PlatformPAGFont(font.fontFamily, font.fontStyle)))

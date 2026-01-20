@@ -30,7 +30,7 @@ open class PAGComposition internal constructor(
         @JvmStatic
         private external fun nativeGetLayerIndex(handle: Long, layerHandle: Long, type: Long): Int
         @JvmStatic
-        private external fun nativeSetLayerIndex(handle: Long, layerHandle: Long, type: Long, index: Int): Int
+        private external fun nativeSetLayerIndex(handle: Long, layerHandle: Long, type: Long, index: Int)
         @JvmStatic
         private external fun nativeAddLayer(handle: Long, layerHandle: Long, type: Long)
         @JvmStatic

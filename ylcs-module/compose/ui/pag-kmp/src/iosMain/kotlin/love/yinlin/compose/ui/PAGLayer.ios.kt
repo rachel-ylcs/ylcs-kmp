@@ -7,7 +7,7 @@ import love.yinlin.compose.graphics.asCGAffineTransform
 import love.yinlin.compose.graphics.asComposeMatrix
 import love.yinlin.compose.graphics.asComposeRect
 
-actual open class PAGLayer(private val delegate: PlatformPAGLayer) {
+actual open class PAGLayer(internal open val delegate: PlatformPAGLayer) {
     actual val layerType: PAGLayerType get() = PAGLayerType.entries[delegate.layerType().ordinal]
     actual val layerName: String get() = delegate.layerName()!!
     actual var matrix: Matrix get() = delegate.matrix().asComposeMatrix()

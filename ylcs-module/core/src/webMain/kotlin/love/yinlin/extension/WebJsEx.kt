@@ -19,7 +19,11 @@ expect val JsBigInt.cast: Long
 expect val JsString.cast: String
 
 expect inline fun <reified T : JsAny, reified R> JsArray<out JsAny>.asArray(block: (T) -> R): Array<R>
-expect val JsArray<JsNumber>.asArray: Array<Double>
+expect val JsArray<JsNumber>.asShortArray: ShortArray
+expect val JsArray<JsNumber>.asIntArray: IntArray
+expect val JsArray<JsNumber>.asFloatArray: FloatArray
+expect val JsArray<JsNumber>.asLongArray: LongArray
+expect val JsArray<JsNumber>.asDoubleArray: DoubleArray
 expect val JsArray<JsString>.asArray: Array<String>
 
 expect fun jsArrayOf(vararg value: JsAny): JsArray<JsAny>

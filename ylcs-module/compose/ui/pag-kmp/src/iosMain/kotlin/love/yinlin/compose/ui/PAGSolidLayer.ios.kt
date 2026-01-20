@@ -6,7 +6,7 @@ import love.yinlin.compose.graphics.asComposeColor
 import love.yinlin.compose.graphics.asUIColor
 import love.yinlin.platform.unsupportedPlatform
 
-actual class PAGSolidLayer(private val delegate: PlatformPAGSolidLayer) : PAGLayer(delegate) {
+actual class PAGSolidLayer(override val delegate: PlatformPAGSolidLayer) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(duration: Long, width: Int, height: Int, solidColor: Color, opacity: Int): PAGSolidLayer = unsupportedPlatform()
     }

@@ -6,7 +6,7 @@ import love.yinlin.compose.graphics.asComposeMatrix
 import love.yinlin.compose.graphics.asSkiaMatrix33
 import org.jetbrains.skia.Matrix33
 
-actual open class PAGLayer(private val delegate: PlatformPAGLayer) {
+actual open class PAGLayer(internal open val delegate: PlatformPAGLayer) {
     actual val layerType: PAGLayerType get() = PAGLayerType.entries[delegate.layerType]
     actual val layerName: String get() = delegate.layerName
     actual var matrix: Matrix get() = Matrix33(*delegate.matrix).asComposeMatrix()

@@ -2,7 +2,7 @@ package love.yinlin.compose.ui
 
 import love.yinlin.platform.unsupportedPlatform
 
-actual class PAGImageLayer(private val delegate: PlatformPAGImageLayer) : PAGLayer(delegate) {
+actual class PAGImageLayer(override val delegate: PlatformPAGImageLayer) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(width: Int, height: Int, duration: Long): PAGImageLayer =
             PAGImageLayer(PlatformPAGImageLayer.Make(width, height, duration))
