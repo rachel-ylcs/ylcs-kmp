@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebView as AndroidWebView
 import android.webkit.WebViewClient
 import androidx.activity.result.ActivityResultRegistry
 import androidx.compose.runtime.*
@@ -13,8 +14,6 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.lifecycle.LifecycleOwner
 import love.yinlin.compose.extension.mutableRefStateOf
-
-internal typealias AndroidWebView = android.webkit.WebView
 
 @Stable
 actual class WebViewState actual constructor(private val initUrl: String) : PlatformView<AndroidWebView>(), Releasable<AndroidWebView> {
