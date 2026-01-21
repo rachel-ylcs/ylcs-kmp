@@ -25,10 +25,10 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override val cocoapodsList: List<Pod> = listOf(
-        Pod("YLCSCore", moduleName = "YLCSCore", source = C.root.iosApp.core.asFile),
-        Pod("MMKV", version = libs.versions.mmkv),
-        Pod("MobileVLCKit", version = libs.versions.vlcKit),
-        Pod("SGQRCode", version = libs.versions.sgQrcode),
+        pod("YLCSCore", moduleName = "YLCSCore", source = C.root.iosApp.core.asFile),
+        pod("MMKV", libs.versions.mmkv),
+        pod("MobileVLCKit", libs.versions.vlcKit),
+        pod("SGQRCode", libs.versions.sgQrcode),
     )
 
     override fun CocoapodsExtension.cocoapods() {

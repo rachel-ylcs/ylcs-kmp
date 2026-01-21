@@ -39,14 +39,6 @@ import love.yinlin.cs.*
 @Stable
 enum class FollowTabItem(val title: String) {
     FOLLOWS("关注"), FOLLOWERS("粉丝"), BLOCK_USERS("黑名单");
-
-    companion object {
-        fun fromInt(value: Int): FollowTabItem = when (value) {
-            FOLLOWERS.ordinal -> FOLLOWERS
-            BLOCK_USERS.ordinal -> BLOCK_USERS
-            else -> FOLLOWS
-        }
-    }
 }
 
 @Stable
@@ -83,7 +75,7 @@ private fun FollowItemLayout(
 
 @Stable
 class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
-    private var tab by mutableRefStateOf(FollowTabItem.fromInt(currentTab))
+    private var tab by mutableRefStateOf(FollowTabItem.entries[currentTab])
     private val gridState = LazyGridState()
 
     private val pageFollows = object : PaginationArgs<FollowInfo, Long, Int, Long>(
@@ -186,7 +178,7 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
                 TabBar(
                     currentPage = tab.ordinal,
                     onNavigate = {
-                        tab = FollowTabItem.fromInt(it)
+                        tab = FollowTabItem.entries[it]
                         launch { if (items.isEmpty()) requestNewData() }
                     },
                     items = remember { FollowTabItem.entries.fastMap { it.title }.toStableList() },

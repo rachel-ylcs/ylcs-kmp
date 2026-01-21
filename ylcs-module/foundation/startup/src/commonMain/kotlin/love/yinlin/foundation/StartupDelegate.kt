@@ -1,6 +1,8 @@
 package love.yinlin.foundation
 
 import kotlinx.coroutines.CoroutineScope
+import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.reflect.metaIsAnonymousClass
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -46,9 +48,10 @@ class StartupDelegate<S : Startup>(
     val isSync: Boolean = type == StartupType.Sync
     val isAsync: Boolean = type == StartupType.Async
 
+    @OptIn(CompatibleRachelApi::class)
     override fun toString(): String = when {
         !::startup.isInitialized -> "uninitialized"
-        startup::class.qualifiedName != null -> startup.toString()
+        !startup.metaIsAnonymousClass -> startup.toString()
         serviceName != null -> startup.toString().replace("null", serviceName!!)
         else -> startup.toString().replace("null", "unnamed")
     }

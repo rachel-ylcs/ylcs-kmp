@@ -2,8 +2,10 @@ package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavBackStackEntry
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.uri.Uri
 import love.yinlin.extension.toJsonString
+import love.yinlin.reflect.metaClassName
 
 @Stable
 class Route(name: String) {
@@ -20,8 +22,9 @@ class Route(name: String) {
     companion object {
         fun argName(index: Int) = "arg$index"
 
+        @OptIn(CompatibleRachelApi::class)
         inline fun <reified S : BasicScreen> build(num: Int): String = buildString {
-            append(S::class.qualifiedName!!)
+            append(metaClassName<S>())
             repeat(num) { index ->
                 append("|{${argName(index)}}")
             }
@@ -34,4 +37,5 @@ class Route(name: String) {
     }
 }
 
-inline fun <reified S : BasicScreen> route(): Route = Route(S::class.qualifiedName!!)
+@OptIn(CompatibleRachelApi::class)
+inline fun <reified S : BasicScreen> route(): Route = Route(metaClassName<S>())

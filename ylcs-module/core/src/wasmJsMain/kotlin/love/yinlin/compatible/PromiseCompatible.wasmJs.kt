@@ -1,0 +1,29 @@
+@file:OptIn(ExperimentalWasmJsInterop::class)
+package love.yinlin.compatible
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import love.yinlin.annotation.CompatibleRachelApi
+import kotlinx.coroutines.asDeferred as coroutinesAsDeferred
+import kotlinx.coroutines.asPromise as coroutinesAsPromise
+import kotlinx.coroutines.promise as coroutinesPromise
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.await as coroutinesAwait
+import kotlin.js.Promise
+
+@CompatibleRachelApi
+actual fun <T> CoroutineScope.promise(
+    context: CoroutineContext,
+    start: CoroutineStart,
+    block: suspend CoroutineScope.() -> T
+): Promise<JsAny?> = this.coroutinesPromise(context, start, block)
+
+@CompatibleRachelApi
+actual fun <T> Deferred<T>.asPromise(): Promise<JsAny?> = this.coroutinesAsPromise()
+
+@CompatibleRachelApi
+actual fun <T> Promise<JsAny?>.asDeferred(): Deferred<T> = this.coroutinesAsDeferred()
+
+@CompatibleRachelApi
+actual suspend fun <T : JsAny?> Promise<T>.await(): T = this.coroutinesAwait()

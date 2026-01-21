@@ -3,6 +3,7 @@ package love.yinlin.platform
 
 import androidx.compose.ui.util.fastMap
 import kotlinx.io.files.Path
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ByteArrayCompatible
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
@@ -26,11 +27,12 @@ actual class SoundPlayer {
     private var caches = emptyList<JsAny>()
     private val context = newAudioContext()
 
+    @OptIn(CompatibleRachelApi::class)
     actual suspend fun loadFromByteArray(data: List<ByteArray>) {
         catching {
             caches = Coroutines.io {
                 data.fastMap { bytes ->
-                    decodeAudioData(context, ByteArrayCompatible(bytes).toInt8Array().buffer)
+                    decodeAudioData(context, ByteArrayCompatible(bytes).asInt8Array.buffer)
                 }
             }
         }

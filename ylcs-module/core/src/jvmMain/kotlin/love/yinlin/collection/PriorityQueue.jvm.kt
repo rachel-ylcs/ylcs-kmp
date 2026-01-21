@@ -1,7 +1,10 @@
 package love.yinlin.collection
 
+import java.util.Comparator as JvmComparator
+import java.util.PriorityQueue as JvmPriorityQueue
+
 actual class PriorityQueue<E : Any> actual constructor(private val comparator: Comparator<E>) {
-    private val queue = java.util.PriorityQueue<E>(java.util.Comparator<E> { a, b -> comparator.compare(a, b) })
+    private val queue = JvmPriorityQueue<E>(JvmComparator<E> { a, b -> comparator.compare(a, b) })
 
     actual val size: Int get() = queue.size
     actual val isEmpty: Boolean get() = queue.isEmpty()

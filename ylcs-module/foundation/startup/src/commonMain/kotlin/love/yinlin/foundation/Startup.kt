@@ -1,9 +1,12 @@
 package love.yinlin.foundation
 
 import kotlinx.coroutines.CoroutineScope
+import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.reflect.metaClassName
 
 abstract class Startup {
-    override fun toString(): String = "(${this::class.qualifiedName})"
+    @OptIn(CompatibleRachelApi::class)
+    override fun toString(): String = "(${this.metaClassName})"
 
     abstract fun init(context: Context, args: StartupArgs)
     abstract fun initLater(context: Context, args: StartupArgs)

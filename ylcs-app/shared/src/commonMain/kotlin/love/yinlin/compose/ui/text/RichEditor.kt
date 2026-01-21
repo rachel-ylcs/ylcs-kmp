@@ -139,7 +139,7 @@ open class RichEditorState {
         Column(modifier = modifier) {
             TabBar(
                 currentPage = emojiClassify.ordinal,
-                onNavigate = { emojiClassify = EmojiType.fromInt(it) },
+                onNavigate = { emojiClassify = EmojiType.entries[it] },
                 items = remember { EmojiType.entries.map { it.title }.toStableList() },
                 modifier = Modifier.fillMaxWidth()
             )

@@ -2,6 +2,8 @@ package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
+import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.reflect.metaClassName
 
 @Stable
 class ScreenManager(val navController: NavHostController) {
@@ -14,8 +16,9 @@ class ScreenManager(val navController: NavHostController) {
     val infoMap = mutableMapOf<String, MutableList<ScreenInfo>>()
     val idMap = mutableMapOf<String, BasicScreen>()
 
+    @OptIn(CompatibleRachelApi::class)
     fun registerScreen(screen: BasicScreen, id: String) {
-        val key = screen::class.qualifiedName!!
+        val key = screen.metaClassName
         val value = infoMap[key]
         val info = ScreenInfo(screen, id)
         if (value != null) value += info
@@ -23,8 +26,9 @@ class ScreenManager(val navController: NavHostController) {
         idMap[id] = screen
     }
 
+    @OptIn(CompatibleRachelApi::class)
     fun unregisterScreen(screen: BasicScreen) {
-        val key = screen::class.qualifiedName!!
+        val key = screen.metaClassName
         val value = infoMap[key]
         if (value != null) {
             val index = value.indexOfFirst { it.screen == screen }
@@ -39,10 +43,12 @@ class ScreenManager(val navController: NavHostController) {
 
     val top: BasicScreen get() = idMap[navController.currentBackStackEntry!!.id]!!
 
-    inline fun <reified S : BasicScreen> get(): S = infoMap[S::class.qualifiedName!!]!!.first().screen as S
+    @OptIn(CompatibleRachelApi::class)
+    inline fun <reified S : BasicScreen> get(): S = infoMap[metaClassName<S>()]!!.first().screen as S
 
+    @OptIn(CompatibleRachelApi::class)
     inline fun <reified S : BasicScreen> forEach(block: S.() -> Unit) {
-        val key = S::class.qualifiedName!!
+        val key = metaClassName<S>()
         val value = infoMap[key]
         if (value != null) {
             for ((screen, _) in value) {

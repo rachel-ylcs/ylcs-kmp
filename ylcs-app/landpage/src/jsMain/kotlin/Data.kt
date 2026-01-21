@@ -1,7 +1,7 @@
 const val DOWNLOAD_URL = "https://pan.baidu.com/s/1Ujv4UeRMXUSbXas-Qy6UKw?pwd=1211"
 const val WEBAPP_URL = "https://web.yinlin.love"
 const val GITHUB_URL = "https://github.com/rachel-ylcs/ylcs-kmp"
-const val DEVELEOPMENT_URL = "https://kotlinlang.org"
+const val DEVELOPMENT_URL = "https://kotlinlang.org"
 const val BEIAN_URL = "https://beian.miit.gov.cn"
 
 enum class ContactInfo(

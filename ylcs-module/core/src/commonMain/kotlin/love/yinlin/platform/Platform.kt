@@ -9,8 +9,8 @@ enum class Platform {
     Windows,
     Linux,
     MacOS,
-    WebJs,
     WebWasm,
+    WebJs,
     AndroidNative,
     WindowsNative,
     LinuxNative,
@@ -22,21 +22,6 @@ enum class Platform {
         val DesktopNative = arrayOf(WindowsNative, LinuxNative, MacOSNative)
         val Web = arrayOf(WebJs, WebWasm)
         val Native = arrayOf(AndroidNative, *DesktopNative)
-
-        fun fromInt(value: Int): Platform? = when (value) {
-            Android.ordinal -> Android
-            IOS.ordinal -> IOS
-            Windows.ordinal -> Windows
-            Linux.ordinal -> Linux
-            MacOS.ordinal -> MacOS
-            WebJs.ordinal -> WebJs
-            WebWasm.ordinal -> WebWasm
-            AndroidNative.ordinal -> AndroidNative
-            WindowsNative.ordinal -> WindowsNative
-            LinuxNative.ordinal -> LinuxNative
-            MacOSNative.ordinal -> MacOSNative
-            else -> null
-        }
 
         fun contains(vararg filter: Platform): Boolean = platform in filter
         inline fun use(vararg filter: Platform, block: () -> Unit) = if (platform in filter) block() else Unit

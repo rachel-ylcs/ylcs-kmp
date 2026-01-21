@@ -7,12 +7,14 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.json
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJson
+import love.yinlin.reflect.metaClassName
 import java.math.BigDecimal
 import java.sql.Connection
 import java.sql.Date
@@ -171,6 +173,7 @@ data object SQLConverter {
     private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
     private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
+    @OptIn(CompatibleRachelApi::class)
     fun convert(type: String, value: Any?): JsonElement {
         if (value == null) return JsonNull
         return when (type) {
@@ -187,7 +190,7 @@ data object SQLConverter {
             "JSON" -> (value as String).parseJson
             "TIME" -> catchingDefault(JsonNull) { (value as Time).toLocalTime().format(timeFormatter).json }
             "TIMESTAMP" -> catchingDefault(JsonNull) { (value as Timestamp).toLocalDateTime().format(dateTimeFormatter).json }
-            else -> "$type ${value::class.qualifiedName} $value".json
+            else -> "$type ${value.metaClassName} $value".json
         }
     }
 

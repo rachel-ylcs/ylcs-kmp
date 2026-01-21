@@ -1,0 +1,27 @@
+@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+package love.yinlin.compose.ui
+
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Color
+import love.yinlin.compose.graphics.asComposeColor
+import love.yinlin.compose.graphics.asUIColor
+import love.yinlin.platform.unsupportedPlatform
+
+@Stable
+actual class PAGTextLayer(override val delegate: PlatformPAGTextLayer) : PAGLayer(delegate) {
+    actual companion object {
+        actual fun make(duration: Long, text: String, fontSize: Float, font: PAGFont): PAGTextLayer = unsupportedPlatform()
+    }
+
+    actual var fillColor: Color get() = delegate.fillColor()!!.asComposeColor()
+        set(value) { delegate.setFillColor(value.asUIColor()) }
+    actual var font: PAGFont get() = delegate.font()!!.let { PAGFont(it.fontFamily!!, it.fontStyle!!) }
+        set(value) { delegate.setFont(makePlatformPAGFont(value.fontFamily, value.fontStyle)) }
+    actual var fontSize: Float get() = delegate.fontSize().toFloat()
+        set(value) { delegate.setFontSize(value.toDouble()) }
+    actual var strokeColor: Color get() = delegate.strokeColor()!!.asComposeColor()
+        set(value) { delegate.setStrokeColor(value.asUIColor()) }
+    actual var text: String get() = delegate.text()!!
+        set(value) { delegate.setText(value) }
+    actual fun reset() { delegate.reset() }
+}

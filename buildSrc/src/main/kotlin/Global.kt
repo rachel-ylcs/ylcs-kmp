@@ -1,6 +1,7 @@
 import love.yinlin.project.Constants
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
+import org.gradle.api.internal.catalog.DelegatingProjectDependency
 
 enum class BuildEnvironment { Dev, Prod }
 
@@ -29,10 +30,20 @@ val projectMap = mutableMapOf<Project, Constants>()
 val Project.C: Constants get() = projectMap.getOrPut(this) { Constants(this) }
 
 // 当前任务名
-val Project.currentTaskName: String get() = this.gradle.startParameter.taskNames.firstOrNull() ?: "sync"
+val Project.currentTaskName: String get() = gradle.startParameter.taskNames.firstOrNull() ?: "sync"
+
+// 查找项目
+fun Project.findProject(dependency: DelegatingProjectDependency): Project? = rootProject.findProject(dependency.path)
 
 // KMP 项目资源目录
 val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().dir("packageResources")
 
 // 生成代码源目录
 val Project.generateSourceDir: Directory get() = layout.buildDirectory.get().dir("generated").dir("kotlin")
+
+// Desktop Native 编译目录
+val Project.desktopNativeBuildDir: Directory get() = layout.buildDirectory.get().dir("desktopNative")
+
+// Desktop Native 源代码
+val Project.desktopNativeKMPSourceDir: Directory get() = layout.projectDirectory.dir("src").dir("desktopMain").dir("cpp")
+val Project.desktopNativeJVMSourceDir: Directory get() = layout.projectDirectory.dir("src").dir("main").dir("cpp")

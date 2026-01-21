@@ -1,42 +1,27 @@
 package love.yinlin.compose.ui.platform
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import kotlinx.browser.document
 import love.yinlin.compose.OffScreenEffect
 import love.yinlin.compose.ui.PlatformView
+import love.yinlin.compose.ui.rememberPlatformView
 import love.yinlin.data.MimeType
+import love.yinlin.extension.createElement
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
 import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
 private class VideoPlayerWrapper : PlatformView<HTMLVideoElement>() {
-    override fun build(): HTMLVideoElement {
-        val video = document.createElement("video") as HTMLVideoElement
-        val source = document.createElement("source") as HTMLSourceElement
-        video.autoplay = true
-        video.controls = true
-        video.loop = true
-        video.muted = false
-        source.type = MimeType.MP4
-        video.appendChild(source)
-        return video
-    }
-
-    fun load(url: String) {
-        (view?.firstElementChild as? HTMLSourceElement)?.src = url
-    }
-
-    @OptIn(ExperimentalWasmJsInterop::class)
-    fun playOrPause(isForeground: Boolean) {
-        view?.let {
-            if (isForeground) it.play()
-            else it.pause()
-        }
+    override fun build(): HTMLVideoElement = createElement {
+        autoplay = true
+        controls = true
+        loop = true
+        muted = false
+        appendChild(createElement<HTMLSourceElement> {
+            type = MimeType.MP4
+        })
     }
 }
 
@@ -46,11 +31,16 @@ actual fun VideoPlayer(
     modifier: Modifier,
     onBack: () -> Unit
 ) {
-    val wrapper = remember { VideoPlayerWrapper() }
+    val wrapper = rememberPlatformView { VideoPlayerWrapper() }
 
-    wrapper.Content(modifier)
+    wrapper.HostView(modifier)
 
-    LaunchedEffect(url) { wrapper.load(url) }
+    wrapper.Monitor(url) {
+        (it.firstElementChild as? HTMLSourceElement)?.src = url
+    }
 
-    OffScreenEffect { wrapper.playOrPause(it) }
+    @OptIn(ExperimentalWasmJsInterop::class)
+    OffScreenEffect { isForeground ->
+        wrapper.host { if (isForeground) it.play() else it.pause() }
+    }
 }

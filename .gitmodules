@@ -1,0 +1,9 @@
+[submodule "ylcs-module/startup/picker/src/desktopMain/cpp/nativefiledialog"]
+	path = ylcs-module/startup/picker/src/desktopMain/cpp/nativefiledialog
+	url = https://github.com/btzy/nativefiledialog-extended.git
+[submodule "ylcs-module/startup/mmkv-kmp/src/desktopMain/cpp/mmkv"]
+	path = ylcs-module/startup/mmkv-kmp/src/desktopMain/cpp/mmkv
+	url = https://github.com/Tencent/MMKV.git
+[submodule "ylcs-module/compose/ui/pag-kmp/src/desktopMain/cpp/libpag"]
+	path = ylcs-module/compose/ui/pag-kmp/src/desktopMain/cpp/libpag
+	url = https://github.com/Tencent/libpag.git

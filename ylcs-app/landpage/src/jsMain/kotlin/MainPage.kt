@@ -3,13 +3,14 @@ import kotlinx.browser.window
 import kotlinx.html.*
 import kotlinx.html.js.onClickFunction
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.getElementById
 import org.w3c.dom.HTMLElement
 
 object MainPage : Page {
     override fun onCreate() {
         val section2Manager = ScrollAnimationManager("section-2-container") { progress ->
-            val monitor = document.getElementById("monitor-frame") as? HTMLElement ?: return@ScrollAnimationManager
-            val phone = document.getElementById("layer-phone-2") as? HTMLElement ?: return@ScrollAnimationManager
+            val monitor = getElementById<HTMLElement>("monitor-frame") ?: return@ScrollAnimationManager
+            val phone = getElementById<HTMLElement>("layer-phone-2") ?: return@ScrollAnimationManager
             val smoothProgress = (progress * 1.5).coerceIn(0.0, 1.0)
             val currentScale = 1.1 - (smoothProgress * 0.2)
             monitor.style.transform = "scale($currentScale)"
@@ -19,12 +20,12 @@ object MainPage : Page {
         }
 
         val section3Manager = ScrollAnimationManager("section-3-container") { progress ->
-            val container = document.getElementById("section-3-container") as HTMLElement
-            val l1 = document.getElementById("img-layer-1") as HTMLElement
-            val l2 = document.getElementById("img-layer-2") as HTMLElement
-            val l3 = document.getElementById("img-layer-3") as HTMLElement
-            val l4 = document.getElementById("img-layer-4") as HTMLElement
-            val l5 = document.getElementById("img-layer-5") as HTMLElement
+            val container = getElementById<HTMLElement>("section-3-container")!!
+            val l1 = getElementById<HTMLElement>("img-layer-1")!!
+            val l2 = getElementById<HTMLElement>("img-layer-2")!!
+            val l3 = getElementById<HTMLElement>("img-layer-3")!!
+            val l4 = getElementById<HTMLElement>("img-layer-4")!!
+            val l5 = getElementById<HTMLElement>("img-layer-5")!!
 
             val opacity = (progress * 2).coerceIn(0.0, 1.0)
             container.style.opacity = opacity.toString()
@@ -39,11 +40,11 @@ object MainPage : Page {
         }
 
         val section4Manager = ScrollAnimationManager("section-4-container") { progress ->
-            val grid = document.getElementById("section-4-grid") as? HTMLElement ?: return@ScrollAnimationManager
+            val grid = getElementById<HTMLElement>("section-4-grid") ?: return@ScrollAnimationManager
             val containerY = (0.5 - progress) * 100
             grid.style.transform = "rotateX(20deg) rotateZ(-8deg) skewY(2deg) translateX(0%) translateY(${containerY}px)"
             (1..6).forEach { i ->
-                val phone = document.getElementById("s4-phone-$i") as? HTMLElement ?: return@forEach
+                val phone = getElementById<HTMLElement>("s4-phone-$i") ?: return@forEach
                 val wave = kotlin.math.sin(progress * 4.0 + i * 0.8) * 20
                 val lift = (1.0 - progress) * 100
                 phone.style.transform = "translateY(${wave - lift}px)"
@@ -51,8 +52,8 @@ object MainPage : Page {
         }
 
         val section5Manager = ScrollAnimationManager("section-5-container") { progress ->
-            val card1 = document.getElementById("s5-card-1") as? HTMLElement ?: return@ScrollAnimationManager
-            val card2 = document.getElementById("s5-card-2") as? HTMLElement ?: return@ScrollAnimationManager
+            val card1 = getElementById<HTMLElement>("s5-card-1") ?: return@ScrollAnimationManager
+            val card2 = getElementById<HTMLElement>("s5-card-2") ?: return@ScrollAnimationManager
             val offset = (progress - 0.5) * 120
 
             card1.style.transform = "translateY(${-offset}px) translateX(${offset * 0.5}px)"
@@ -60,11 +61,11 @@ object MainPage : Page {
         }
 
         val section6Manager = ScrollAnimationManager("section-6-container") { progress ->
-            val mainCard = document.getElementById("s6-main-card") as? HTMLElement ?: return@ScrollAnimationManager
-            val phone1 = document.getElementById("s6-phone-1") as? HTMLElement ?: return@ScrollAnimationManager
-            val phone2 = document.getElementById("s6-phone-2") as? HTMLElement ?: return@ScrollAnimationManager
-            val textContent = document.getElementById("s6-text-content") as? HTMLElement ?: return@ScrollAnimationManager
-            val decorBg = document.getElementById("s6-decor-bg") as? HTMLElement ?: return@ScrollAnimationManager
+            val mainCard = getElementById<HTMLElement>("s6-main-card") ?: return@ScrollAnimationManager
+            val phone1 = getElementById<HTMLElement>("s6-phone-1") ?: return@ScrollAnimationManager
+            val phone2 = getElementById<HTMLElement>("s6-phone-2") ?: return@ScrollAnimationManager
+            val textContent = getElementById<HTMLElement>("s6-text-content") ?: return@ScrollAnimationManager
+            val decorBg = getElementById<HTMLElement>("s6-decor-bg") ?: return@ScrollAnimationManager
 
             val mainScale = 0.9 + (progress * 0.1).coerceAtMost(0.1)
             val mainTranslate = (1.0 - progress) * 60

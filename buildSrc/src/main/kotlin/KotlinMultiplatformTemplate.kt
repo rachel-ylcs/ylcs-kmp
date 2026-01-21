@@ -32,10 +32,10 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
 
-data class Pod(
+class Pod internal constructor(
     val name: String,
+    val version: String? = null,
     val moduleName: String? = null,
-    val version: Provider<String>? = null,
     val extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
     val source: File? = null,
 )
@@ -48,9 +48,13 @@ class KotlinMultiplatformSourceSetsScope(
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
     val commonTest: KotlinSourceSet by lazy { with(extension) { set.commonTest.get() } }
     val nativeMain: KotlinSourceSet by lazy { with(extension) { set.nativeMain.get() } }
+    val nativeTest: KotlinSourceSet by lazy { with(extension) { set.nativeTest.get() } }
     val androidMain: KotlinSourceSet by lazy { with(extension) { set.androidMain.get() } }
+    val androidTest: KotlinSourceSet by lazy { with(extension) { set.androidUnitTest.get() } }
     val appleMain: KotlinSourceSet by lazy { with(extension) { set.appleMain.get() } }
+    val appleTest: KotlinSourceSet by lazy { with(extension) { set.appleTest.get() } }
     val iosMain: KotlinSourceSet by lazy { with(extension) { set.iosMain.get() } }
+    val iosTest: KotlinSourceSet by lazy { with(extension) { set.iosTest.get() } }
     val iosMainList: List<KotlinSourceSet> by lazy {
         buildList {
             with(extension) {
@@ -66,9 +70,13 @@ class KotlinMultiplatformSourceSetsScope(
         }
     }
     val desktopMain: KotlinSourceSet by lazy { set.getByName("desktopMain") }
+    val desktopTest: KotlinSourceSet by lazy { set.getByName("desktopTest") }
     val webMain: KotlinSourceSet by lazy { with(extension) { set.webMain.get() } }
+    val webTest: KotlinSourceSet by lazy { with(extension) { set.webTest.get() } }
     val jsMain: KotlinSourceSet by lazy { with(extension) { set.jsMain.get() } }
+    val jsTest: KotlinSourceSet by lazy { with(extension) { set.jsTest.get()} }
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
+    val wasmJsTest: KotlinSourceSet by lazy { with(extension) { set.wasmJsTest.get() } }
 
     val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
     val androidNativeTest: KotlinSourceSet by lazy { set.getByName("androidNativeTest") }
@@ -100,6 +108,22 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinNativeTarget.ios() { }
     open val cocoapodsList: List<Pod> = emptyList()
     open fun CocoapodsExtension.cocoapods() { }
+
+    fun pod(
+        name: String,
+        version: String? = null,
+        moduleName: String? = null,
+        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+        source: File? = null,
+    ): Pod = Pod(name, version, moduleName, extraOpts, source)
+
+    fun pod(
+        name: String,
+        version: Provider<String>,
+        moduleName: String? = null,
+        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
+        source: File? = null,
+    ): Pod = Pod(name, version.get(), moduleName, extraOpts, source)
 
     // Desktop
     open val desktopTarget: Boolean = true
@@ -235,7 +259,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         for (item in cocoapodsList) {
                             pod(item.name) {
                                 if (item.moduleName != null) moduleName = item.moduleName
-                                if (item.version != null) version = item.version.get()
+                                if (item.version != null) version = item.version
                                 extraOpts += item.extraOpts
                                 if (item.source != null) source = path(item.source)
                             }
@@ -267,6 +291,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
 
                     browser {
+                        testTask {
+                            useKarma {
+                                useChromeHeadless()
+                            }
+                        }
+
                         commonWebpackConfig {
                             cssSupport {
                                 enabled.set(true)
@@ -290,6 +320,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
 
                     browser {
+                        testTask {
+                            useKarma {
+                                useChromeHeadless()
+                            }
+                        }
+
                         commonWebpackConfig {
                             cssSupport {
                                 enabled.set(true)
@@ -344,9 +380,9 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                         buildTypes.release.proguard {
                             version.set(C.proguard.version)
-                            isEnabled.set(false)
-                            optimize.set(false)
-                            obfuscate.set(false)
+                            isEnabled.set(true)
+                            optimize.set(true)
+                            obfuscate.set(true)
                             joinOutputJars.set(true)
                             configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
                         }
@@ -402,17 +438,16 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
         afterEvaluate {
             actions()
 
-            // 检查是否需要编译 Desktop Native
-            val sourceDir = layout.projectDirectory.asFile.resolve("src/desktopMain/cpp")
-            if (sourceDir.exists()) {
-                val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
-                    inputDir.set(sourceDir)
+            val buildNativeTask = tasks.register("buildDesktopNative", BuildDesktopNativeTask::class) {
+                // 检查是否需要编译 Desktop Native
+                val sourceDir = desktopNativeKMPSourceDir.asFile
+                onlyIf {
+                    sourceDir.exists() && !sourceDir.resolve("native.ignore").exists()
                 }
-
-                tasks.named("desktopJar") {
-                    dependsOn(buildNativeTask)
-                }
+                inputDir.set(sourceDir)
             }
+
+            tasks.findByName("desktopJar")?.dependsOn(buildNativeTask)
         }
     }
 }
