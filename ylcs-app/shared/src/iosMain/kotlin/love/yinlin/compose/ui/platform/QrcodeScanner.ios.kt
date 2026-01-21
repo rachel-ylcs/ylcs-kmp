@@ -14,9 +14,9 @@ import cocoapods.SGQRCode.*
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.launch
-import love.yinlin.extension.colorWithHex
 import love.yinlin.compose.*
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.graphics.colorWithHex
 import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.PlatformView
 import love.yinlin.compose.ui.Releasable

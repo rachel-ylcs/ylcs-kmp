@@ -22,11 +22,13 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        appleMain.configure(commonMain)
+
         val jvmMain by create(commonMain)
 
         androidMain.configure(jvmMain)
 
-        iosMain.configure(commonMain)
+        iosMain.configure(appleMain)
 
         iosMainList.configure(iosMain)
 
@@ -46,6 +48,6 @@ template(object : KotlinMultiplatformTemplate() {
 
         linuxMain.configure(nativeMain)
 
-        macosMain.configure(nativeMain)
+        macosMain.configure(appleMain)
     }
 })
