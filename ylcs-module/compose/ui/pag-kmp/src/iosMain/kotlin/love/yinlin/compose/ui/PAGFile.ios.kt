@@ -22,9 +22,9 @@ actual class PAGFile(override val delegate: PlatformPAGFile) : PAGComposition(de
     actual val path: String get() = delegate.path()!!
     actual fun replaceImage(index: Int, image: PAGImage) { delegate.replaceImage(index, image.delegate) }
     actual fun replaceImageByName(layerName: String, image: PAGImage) { delegate.replaceImageByName(layerName, image.delegate) }
-    actual fun getEditableIndices(layerType: PAGLayerType): IntArray = delegate.getEditableIndices(layerType.ordinal.asPAGLayerType).map { it.toInt() }.toIntArray()
+    actual fun getEditableIndices(layerType: PAGLayerType): IntArray = delegate.getEditableIndices(layerType.ordinal.asPAGLayerType)!!.map { it.toInt() }.toIntArray()
     actual var timeStretchMode: PAGTimeStretchMode get() = PAGTimeStretchMode.entries[delegate.timeStretchMode().toInt()]
-        set(value) { delegate.seTimeStretchMode(value.ordinal) } // 逆天笔误
+        set(value) { delegate.seTimeStretchMode(value.ordinal.toUInt()) } // 逆天笔误
     actual fun setDuration(duration: Long) { delegate.setDuration(duration) }
     actual fun copyOriginal(): PAGFile = PAGFile(delegate.copyOriginal()!!)
 }

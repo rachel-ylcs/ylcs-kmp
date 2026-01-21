@@ -15,7 +15,7 @@ actual open class PAGComposition(override val delegate: PlatformPAGComposition) 
     actual val numChildren: Int get() = delegate.numChildren().toInt()
     actual fun getLayerAt(index: Int): PAGLayer? = delegate.getLayerAt(index)?.let(::PAGLayer)
     actual fun getLayerIndex(layer: PAGLayer): Int = delegate.getLayerIndex(layer.delegate).toInt()
-    actual fun setLayerIndex(layer: PAGLayer, index: Int) { delegate.setLayerIndex(index, layer.delegate) }
+    actual fun setLayerIndex(layer: PAGLayer, index: Int) { delegate.setLayerIndex(index.toLong(), layer.delegate) }
     actual fun addLayer(layer: PAGLayer) { delegate.addLayer(layer.delegate) }
     actual fun addLayerAt(layer: PAGLayer, index: Int) { delegate.addLayer(layer.delegate, index) }
     actual operator fun contains(layer: PAGLayer): Boolean = delegate.contains(layer.delegate)
