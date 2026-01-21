@@ -24,7 +24,6 @@ import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.compose.ui.layout.Pagination
@@ -81,8 +80,6 @@ class ScreenGameHall(manager: ScreenManager, private val type: Game) : Screen(ma
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
             val canDelete by rememberDerivedState { app.config.userProfile?.hasPrivilegeVIPTopic == true }
-
-            PauseLoading(gridState)
 
             PaginationStaggeredGrid(
                 items = page.items,

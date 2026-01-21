@@ -5,7 +5,7 @@ kotlin = "2.3.20-Beta1"
 cmp = "1.11.0-alpha01"
 agp = "8.12.3"
 mavenPublish = "0.35.0"
-dokka = "2.1.0"
+dokka = "2.2.0-Beta"
 
 # Libs #
 
@@ -16,14 +16,14 @@ material3 = "1.11.0-alpha01"
 material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
 ktor = "3.3.3"
-sketch = "4.4.0-alpha01"
+sketch = "4.4.0-alpha02"
 mmkv = "2.3.0"
 lottie = "2.0.2"
 cryptography = "0.5.0"
 pag = "4.5.12"
 
 # Android
-cmp-android = "1.10.0"
+cmp-android = "1.10.1"
 media3 = "1.9.0"
 
 # iOS
@@ -65,7 +65,7 @@ test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
-compose-collection = { module = "androidx.collection:collection", version = "1.6.0-alpha01" }
+compose-collection = { module = "androidx.collection:collection", version = "1.6.0-beta01" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
@@ -75,7 +75,7 @@ compose-material3-icons = { module = "org.jetbrains.compose.material:material-ic
 compose-material3-iconsExtended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "material3-icon-old" }
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
 compose-navigation = { module = "org.jetbrains.androidx.navigation:navigation-compose", version = "2.9.1" }
-compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.0-rc02" }
+compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.0" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
@@ -85,7 +85,7 @@ kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.2" }
-kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.10.0-RC" }
+kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.10.0" }
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
 kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html", version = "0.12.0" }
 
@@ -155,7 +155,7 @@ ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref =
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.24" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.25" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-redis = { module = "redis.clients:jedis", version = "7.2.0" }
+redis = { module = "redis.clients:jedis", version = "7.2.1" }

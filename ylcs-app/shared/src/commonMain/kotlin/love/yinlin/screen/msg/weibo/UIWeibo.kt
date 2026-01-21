@@ -32,7 +32,6 @@ import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.compose.ui.image.ClickIcon
 import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.RichText
@@ -255,7 +254,6 @@ fun WeiboGrid(
     onPicturesDownload: ((List<Picture>) -> Unit)?,
     onVideoDownload: ((String) -> Unit)?
 ) {
-    PauseLoading(state)
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Adaptive(CustomTheme.size.cardWidth),
         modifier = modifier,

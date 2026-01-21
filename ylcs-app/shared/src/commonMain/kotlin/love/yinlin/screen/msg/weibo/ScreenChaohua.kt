@@ -20,7 +20,6 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.CustomTheme
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.StatefulBox
 import love.yinlin.data.weibo.Weibo
@@ -90,8 +89,6 @@ class ScreenChaohua(manager: ScreenManager) : Screen(manager) {
                 state = state,
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
-                PauseLoading(gridState)
-
                 PaginationStaggeredGrid(
                     items = items,
                     key = { it.id },

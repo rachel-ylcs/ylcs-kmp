@@ -11,7 +11,6 @@ import com.github.panpf.sketch.decode.GifDecoder
 import com.github.panpf.sketch.fetch.ComposeResourceUriFetcher
 import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
 import com.github.panpf.sketch.request.ImageOptions
-import com.github.panpf.sketch.request.PauseLoadWhenScrollingDecodeInterceptor
 import com.github.panpf.sketch.util.Logger
 import kotlinx.io.files.Path
 import love.yinlin.compose.data.ImageQuality
@@ -36,8 +35,6 @@ class StartupUrlImage : SyncStartup() {
 
         addDecoder(GifDecoder.Factory())
         addDecoder(AnimatedWebpDecoder.Factory())
-
-        addDecodeInterceptor(PauseLoadWhenScrollingDecodeInterceptor())
     }
 
     override fun init(context: Context, args: StartupArgs) {

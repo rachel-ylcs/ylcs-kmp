@@ -29,7 +29,6 @@ import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.floating.FABAction
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.BoxState
@@ -222,8 +221,6 @@ class SubScreenDiscovery(parent: BasicScreen) : SubScreen(parent) {
                 state = state,
                 modifier = Modifier.fillMaxWidth().weight(1f).padding(immersivePadding.withoutTop)
             ) {
-                PauseLoading(gridState)
-
                 PaginationStaggeredGrid(
                     items = page.items,
                     key = { it.tid },

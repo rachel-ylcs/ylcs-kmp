@@ -32,7 +32,6 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.filenameOrRandom
 import love.yinlin.extension.parseJson
 import love.yinlin.compose.ui.image.ClickIcon
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.BoxState
@@ -191,8 +190,6 @@ class ScreenDouyin(manager: ScreenManager) : Screen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            PauseLoading(gridState)
-
             PaginationStaggeredGrid(
                 items = items,
                 key = { it.id },

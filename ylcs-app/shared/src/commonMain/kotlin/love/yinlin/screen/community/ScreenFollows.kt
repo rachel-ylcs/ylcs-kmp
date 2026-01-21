@@ -22,7 +22,6 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.CustomTheme
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowerInfo
@@ -188,8 +187,6 @@ class ScreenFollows(manager: ScreenManager, currentTab: Int) : Screen(manager) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 if (items.isEmpty()) EmptyBox()
                 else {
-                    PauseLoading(gridState)
-
                     PaginationGrid(
                         items = items,
                         key = { it.fid },

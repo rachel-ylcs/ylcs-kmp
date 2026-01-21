@@ -44,7 +44,6 @@ import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
 import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
@@ -564,8 +563,6 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
 
     @Composable
     private fun Portrait(details: TopicDetails) {
-        PauseLoading(listState)
-
         PaginationColumn(
             items = pageComments.items,
             key = { it.cid },
@@ -612,8 +609,6 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
                 )
             }
             VerticalDivider()
-
-            PauseLoading(listState)
 
             PaginationColumn(
                 items = pageComments.items,
@@ -732,7 +727,6 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
         @Composable
         override fun Content(args: Comment) {
             val state = rememberLazyListState()
-            PauseLoading(state)
 
             PaginationColumn(
                 items = page.items,

@@ -46,7 +46,6 @@ import love.yinlin.compose.ui.floating.FloatingDialogInput
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.LoadingClickText
 import love.yinlin.compose.ui.input.NormalText
@@ -616,8 +615,6 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
 
     @Composable
     private fun Portrait() {
-        PauseLoading(listState)
-
         PaginationColumn(
             items = pageComments.items,
             key = { it.cid },

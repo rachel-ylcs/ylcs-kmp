@@ -39,7 +39,6 @@ import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.replaceAll
 import love.yinlin.mod.ModFactory
 import love.yinlin.compose.ui.image.LocalFileImage
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.SplitLayout
@@ -369,8 +368,6 @@ class ScreenMusicLibrary(manager: ScreenManager) : Screen(manager) {
     override fun Content(device: Device) {
         if (library.isEmpty()) EmptyBox()
         else {
-            PauseLoading(gridState)
-
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(CustomTheme.size.cellWidth),
                 state = gridState,

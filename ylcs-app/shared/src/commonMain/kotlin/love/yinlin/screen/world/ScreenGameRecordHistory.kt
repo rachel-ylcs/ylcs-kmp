@@ -37,7 +37,6 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.layout.StatefulBox
@@ -132,8 +131,6 @@ class ScreenGameRecordHistory(manager: ScreenManager) : Screen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            PauseLoading(gridState)
-
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.rid },

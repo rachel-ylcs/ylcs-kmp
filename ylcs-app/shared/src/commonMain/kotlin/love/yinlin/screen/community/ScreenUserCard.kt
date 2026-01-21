@@ -27,7 +27,6 @@ import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.NormalText
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -186,8 +185,6 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
     @Composable
     private fun Portrait(profile: UserPublicProfile) {
         if (profile.status.canShowTopics) {
-            PauseLoading(listState)
-
             PaginationStaggeredGrid(
                 items = page.items,
                 key = { it.tid },
@@ -231,8 +228,6 @@ class ScreenUserCard(manager: ScreenManager, private val uid: Int) : Screen(mana
                     .padding(CustomTheme.padding.equalExtraValue)
             )
             if (profile.status.canShowTopics) {
-                PauseLoading(listState)
-
                 PaginationStaggeredGrid(
                     items = page.items,
                     key = { it.tid },

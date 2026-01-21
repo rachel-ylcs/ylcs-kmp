@@ -24,7 +24,6 @@ import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.rachel.game.GameDetailsWithName
 import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.layout.BoxState
@@ -83,8 +82,6 @@ class ScreenGameHistory(manager: ScreenManager) : Screen(manager) {
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
             val name = remember { app.config.userProfile?.name ?: "" }
-
-            PauseLoading(gridState)
 
             PaginationStaggeredGrid(
                 items = page.items,

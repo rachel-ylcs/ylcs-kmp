@@ -29,7 +29,6 @@ import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.*
 import love.yinlin.compose.ui.floating.FloatingDialogInput
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.BoxState
 import love.yinlin.compose.ui.layout.SplitLayout
@@ -171,8 +170,6 @@ class ScreenPictures(manager: ScreenManager) : Screen(manager) {
             state = state,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            PauseLoading(listState)
-
             PaginationColumn(
                 items = page.items,
                 key = { it.aid },

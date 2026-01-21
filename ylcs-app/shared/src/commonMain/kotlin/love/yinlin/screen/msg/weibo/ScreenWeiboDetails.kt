@@ -19,7 +19,6 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.CustomTheme
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.LoadingBox
 import love.yinlin.compose.ui.layout.Space
@@ -88,7 +87,6 @@ class ScreenWeiboDetails(manager: ScreenManager) : Screen(manager) {
     @Composable
     private fun Portrait(weibo: Weibo) {
         val listState = rememberLazyListState()
-        PauseLoading(listState)
 
         LazyColumn(
             modifier = Modifier
@@ -143,7 +141,6 @@ class ScreenWeiboDetails(manager: ScreenManager) : Screen(manager) {
                 else if (weiboComments.isEmpty()) EmptyBox()
                 else {
                     val listState = rememberLazyListState()
-                    PauseLoading(listState)
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),

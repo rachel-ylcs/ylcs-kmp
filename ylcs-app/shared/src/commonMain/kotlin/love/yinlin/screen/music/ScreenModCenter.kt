@@ -29,7 +29,6 @@ import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.compose.ui.floating.FloatingDialogInput
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.EmptyBox
@@ -146,8 +145,6 @@ class ScreenModCenter(manager: ScreenManager) : Screen(manager) {
     override fun Content(device: Device) {
         if (pageSongs.items.isEmpty()) EmptyBox()
         else {
-            PauseLoading(gridState)
-
             PaginationGrid(
                 items = pageSongs.items,
                 key = { it.sid },

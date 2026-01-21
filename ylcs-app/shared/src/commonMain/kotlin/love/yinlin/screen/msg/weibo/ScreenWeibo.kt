@@ -26,7 +26,6 @@ import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.screen.common.ScreenMain
 import love.yinlin.screen.msg.SubScreenMsg
 import love.yinlin.compose.ui.floating.FloatingDownloadDialog
-import love.yinlin.compose.ui.image.PauseLoading
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.NetClient
 
@@ -85,8 +84,6 @@ class ScreenWeibo(manager: ScreenManager) : Screen(manager) {
                 state = state,
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
             ) {
-                PauseLoading(gridState)
-
                 WeiboGrid(
                     state = gridState,
                     items = remember(items) { items.toStableList() },
