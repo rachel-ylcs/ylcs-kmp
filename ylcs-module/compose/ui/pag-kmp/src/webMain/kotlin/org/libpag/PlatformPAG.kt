@@ -269,6 +269,7 @@ external class PAGSurface : JsAny {
     fun clearAll(): Boolean
     fun freeCache()
     fun readPixels(colorType: Int, alphaType: Int): Uint8Array?
+    fun destroy()
 }
 
 external class PAGPlayer : JsAny {
@@ -292,9 +293,9 @@ external class PAGPlayer : JsAny {
     fun scaleMode(): Int
     fun setScaleMode(value: Int)
     fun setSurface(pagSurface: PAGSurface?)
-    fun getComposition(): PAGComposition
+    fun getComposition(): PAGComposition?
     fun setComposition(pagComposition: PAGComposition?)
-    fun getSurface(): PAGSurface
+    fun getSurface(): PAGSurface?
     fun matrix(): Matrix
     fun setMatrix(matrix: Matrix)
     fun nextFrame()
@@ -309,6 +310,7 @@ external class PAGPlayer : JsAny {
     fun presentingTime(): Double
     fun graphicsMemory(): Double
     fun prepare(): Promise<JsAny?>
+    fun destroy()
     // fun linkVideoReader()
     // fun unlinkVideoReader()
 }

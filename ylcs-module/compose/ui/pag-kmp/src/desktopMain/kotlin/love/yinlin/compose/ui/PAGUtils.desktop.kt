@@ -13,5 +13,4 @@ internal typealias PlatformPAGShapeLayer = org.libpag.PAGShapeLayer
 internal typealias PlatformPAGSolidLayer = org.libpag.PAGSolidLayer
 internal typealias PlatformPAGSurface = org.libpag.PAGSurface
 internal typealias PlatformPAGTextLayer = org.libpag.PAGTextLayer
-internal typealias PlatformPAGVideoDecoder = org.libpag.PAGVideoDecoder
 internal typealias PlatformPAGVideoRange = org.libpag.PAGVideoRange
