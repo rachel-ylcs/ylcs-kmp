@@ -1,8 +1,10 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
 
+@Stable
 expect open class PAGLayer {
     val layerType: PAGLayerType
     val layerName: String

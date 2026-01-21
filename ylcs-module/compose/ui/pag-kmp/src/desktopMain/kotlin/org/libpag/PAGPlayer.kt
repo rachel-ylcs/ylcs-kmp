@@ -13,6 +13,8 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
         }
 
         @JvmStatic
+        private external fun nativeCreate(): Long
+        @JvmStatic
         private external fun nativeClear(handle: Long)
         @JvmStatic
         private external fun nativeRelease(handle: Long)
@@ -79,6 +81,8 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
         @JvmStatic
         private external fun nativeGraphicsMemory(handle: Long): Long
     }
+
+    constructor() : this(::nativeCreate)
 
     var surface: PAGSurface? = null
         set(value) {

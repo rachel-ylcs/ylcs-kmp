@@ -1,11 +1,15 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 import love.yinlin.platform.unsupportedPlatform
 import kotlin.js.ExperimentalWasmJsInterop
 
 @OptIn(ExperimentalWasmJsInterop::class)
+@Stable
 actual class PAGPlayer(private val delegate: PlatformPAGPlayer) {
+    actual constructor() : this(PlatformPAGPlayer.create())
+
     actual var surface: PAGSurface? get() = delegate.getSurface()?.let(::PAGSurface)
         set(value) { value?.delegate?.let { delegate.setSurface(it) } }
     actual var composition: PAGComposition? get() = delegate.getComposition()?.let(::PAGComposition)

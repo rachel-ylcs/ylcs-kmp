@@ -1,8 +1,10 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 
-expect class PAGPlayer {
+@Stable
+expect class PAGPlayer() {
     var surface: PAGSurface?
     var composition: PAGComposition?
     var videoEnabled: Boolean

@@ -1,7 +1,9 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import kotlin.String
 
+@Stable
 expect class PAGFont(fontFamily: String = "", fontStyle: String = "") {
     companion object {
         fun registerFont(path: String, ttcIndex: Int = 0, font: PAGFont = PAGFont()): PAGFont?

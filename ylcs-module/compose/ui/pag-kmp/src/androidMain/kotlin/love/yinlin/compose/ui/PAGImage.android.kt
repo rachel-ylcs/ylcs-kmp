@@ -1,10 +1,12 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 import love.yinlin.compose.graphics.asAndroidMatrix
 import love.yinlin.compose.graphics.asComposeMatrix
 import androidx.core.graphics.createBitmap
 
+@Stable
 actual class PAGImage(internal val delegate: PlatformPAGImage) {
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.FromPath(path))

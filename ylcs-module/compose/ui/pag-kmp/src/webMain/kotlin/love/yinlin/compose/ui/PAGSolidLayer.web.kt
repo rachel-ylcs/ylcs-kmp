@@ -1,7 +1,9 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
+@Stable
 actual class PAGSolidLayer(override val delegate: PlatformPAGSolidLayer) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(duration: Long, width: Int, height: Int, solidColor: Color, opacity: Int): PAGSolidLayer {

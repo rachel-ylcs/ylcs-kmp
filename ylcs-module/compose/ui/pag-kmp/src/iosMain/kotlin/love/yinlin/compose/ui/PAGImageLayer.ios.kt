@@ -1,10 +1,12 @@
 @file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.platform.unsupportedPlatform
 import platform.CoreGraphics.CGSizeMake
 
+@Stable
 actual class PAGImageLayer(override val delegate: PlatformPAGImageLayer) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(width: Int, height: Int, duration: Long): PAGImageLayer =

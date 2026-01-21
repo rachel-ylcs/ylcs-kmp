@@ -1,8 +1,10 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import platform.CoreGraphics.CGSizeMake
 
+@Stable
 actual open class PAGComposition(override val delegate: PlatformPAGComposition) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(width: Int, height: Int): PAGComposition =

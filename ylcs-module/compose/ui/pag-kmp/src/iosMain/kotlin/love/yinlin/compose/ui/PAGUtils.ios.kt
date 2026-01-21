@@ -1,8 +1,14 @@
 @file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.refTo
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageInfo
 import platform.CoreVideo.*
+import platform.posix.memcpy
 
 internal typealias PlatformPAG = cocoapods.libpag.PAG
 internal typealias PlatformPAGComposition = cocoapods.libpag.PAGComposition
@@ -12,6 +18,7 @@ internal typealias PlatformPAGFile = cocoapods.libpag.PAGFile
 internal typealias PlatformPAGFont = cocoapods.libpag.PAGFont
 internal typealias PlatformPAGImage = cocoapods.libpag.PAGImage
 internal typealias PlatformPAGImageLayer = cocoapods.libpag.PAGImageLayer
+internal typealias PlatformPAGImageView = cocoapods.libpag.PAGImageView
 internal typealias PlatformPAGLayer = cocoapods.libpag.PAGLayer
 internal typealias PlatformPAGMarker = cocoapods.libpag.PAGMarker
 internal typealias PlatformPAGPlayer = cocoapods.libpag.PAGPlayer
@@ -21,6 +28,8 @@ internal typealias PlatformPAGSurface = cocoapods.libpag.PAGSurface
 internal typealias PlatformPAGTextLayer = cocoapods.libpag.PAGTextLayer
 internal typealias PlatformPAGVideoDecoder = cocoapods.libpag.PAGVideoDecoder
 internal typealias PlatformPAGVideoRange = cocoapods.libpag.PAGVideoRange
+internal typealias PlatformPAGView = cocoapods.libpag.PAGView
+internal typealias PlatformPAGListener = cocoapods.libpag.PAGViewListenerProtocol
 
 internal fun makePlatformPAGFont(fontFamily: String, fontStyle: String): PlatformPAGFont {
     val font = PlatformPAGFont()
@@ -46,16 +55,6 @@ internal fun makePlatformPAGVideoRange(startTime: Long, endTime: Long, playDurat
     return range
 }
 
-internal val cocoapods.libpag.PAGLayerType.ordinal: Int get() = when (this) {
-    cocoapods.libpag.PAGLayerType.PAGLayerTypeNull -> 1
-    cocoapods.libpag.PAGLayerType.PAGLayerTypeSolid -> 2
-    cocoapods.libpag.PAGLayerType.PAGLayerTypeText -> 3
-    cocoapods.libpag.PAGLayerType.PAGLayerTypeShape -> 4
-    cocoapods.libpag.PAGLayerType.PAGLayerTypeImage -> 5
-    cocoapods.libpag.PAGLayerType.PAGLayerTypePreCompose -> 6
-    else -> 0
-}
-
 internal val Int.asPAGLayerType: cocoapods.libpag.PAGLayerType get() = when (this) {
     1 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeNull
     2 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeSolid
@@ -75,4 +74,29 @@ internal val PAGColorType.asCVPixelFormat: UInt get() = when (this) {
     PAGColorType.RGBA_F16 -> kCVPixelFormatType_64RGBAHalf
     PAGColorType.RGBA_1010102 -> kCVPixelFormatType_32RGBA
     PAGColorType.UNKNOWN -> kCVPixelFormatType_32ARGB
+}
+
+internal fun createImageFromPixelBuffer(pixelBuffer: CVPixelBufferRef): ImageBitmap? {
+    CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly)
+
+    val width = CVPixelBufferGetWidth(pixelBuffer).toInt()
+    val height = CVPixelBufferGetHeight(pixelBuffer).toInt()
+    val bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer).toInt()
+    val baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
+
+    if (baseAddress == null) {
+        CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly)
+        return null
+    }
+
+    val pixels = ByteArray(height * bytesPerRow)
+    memcpy(pixels.refTo(0), baseAddress, (height * bytesPerRow).toULong())
+
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly)
+
+    return Image.makeRaster(
+        imageInfo = ImageInfo.makeN32Premul(width, height),
+        bytes = pixels,
+        rowBytes = bytesPerRow
+    ).toComposeImageBitmap()
 }

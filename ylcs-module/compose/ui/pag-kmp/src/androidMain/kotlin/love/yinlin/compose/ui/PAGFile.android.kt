@@ -1,5 +1,8 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 actual class PAGFile(override val delegate: PlatformPAGFile) : PAGComposition(delegate) {
     actual companion object {
         actual val MaxSupportedTagLevel: Int get() = PlatformPAGFile.MaxSupportedTagLevel()

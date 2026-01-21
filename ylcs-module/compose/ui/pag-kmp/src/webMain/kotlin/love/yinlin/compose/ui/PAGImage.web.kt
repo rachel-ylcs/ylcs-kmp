@@ -1,10 +1,12 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 import love.yinlin.platform.unsupportedPlatform
 import kotlin.js.ExperimentalWasmJsInterop
 
+@Stable
 actual class PAGImage(internal val delegate: PlatformPAGImage) {
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = unsupportedPlatform()

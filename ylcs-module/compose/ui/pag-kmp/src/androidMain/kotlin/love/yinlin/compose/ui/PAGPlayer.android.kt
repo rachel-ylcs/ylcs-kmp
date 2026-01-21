@@ -1,10 +1,14 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 import love.yinlin.compose.graphics.asAndroidMatrix
 import love.yinlin.compose.graphics.asComposeMatrix
 
+@Stable
 actual class PAGPlayer(private val delegate: PlatformPAGPlayer) {
+    actual constructor() : this(PlatformPAGPlayer())
+
     actual var surface: PAGSurface? get() = delegate.surface?.let(::PAGSurface)
         set(value) { delegate.surface = value?.delegate }
     actual var composition: PAGComposition? get() = delegate.composition?.let(::PAGComposition)
@@ -24,7 +28,8 @@ actual class PAGPlayer(private val delegate: PlatformPAGPlayer) {
     actual var matrix: Matrix get() = delegate.matrix().asComposeMatrix()
         set(value) { delegate.setMatrix(value.asAndroidMatrix()) }
     actual val duration: Long get() = delegate.duration()
-    actual var progress: Double by delegate::progress
+    actual var progress: Double get() = delegate.progress
+        set(value) { delegate.progress = value }
     actual val currentFrame: Long get() = delegate.currentFrame()
     actual fun prepare() { delegate.prepare() }
     actual fun flush() { delegate.flush() }

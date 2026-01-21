@@ -1,15 +1,18 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 actual open class PAGComposition(override val delegate: PlatformPAGComposition) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(width: Int, height: Int): PAGComposition =
             PAGComposition(PlatformPAGComposition.make(width, height))
     }
 
-    actual val width: Int by delegate::width
-    actual val height: Int by delegate::height
+    actual val width: Int get() = delegate.width
+    actual val height: Int get() = delegate.height
     actual fun setContentSize(width: Int, height: Int) = delegate.setContentSize(width, height)
-    actual val numChildren: Int by delegate::numChildren
+    actual val numChildren: Int get() = delegate.numChildren
     actual fun getLayerAt(index: Int): PAGLayer? = delegate.getLayerAt(index)?.let(::PAGLayer)
     actual fun getLayerIndex(layer: PAGLayer): Int = delegate.getLayerIndex(layer.delegate)
     actual fun setLayerIndex(layer: PAGLayer, index: Int) = delegate.setLayerIndex(layer.delegate, index)
@@ -21,5 +24,5 @@ actual open class PAGComposition(override val delegate: PlatformPAGComposition) 
     actual fun removeAllLayers() = delegate.removeAllLayers()
     actual fun swapLayer(layer1: PAGLayer, layer2: PAGLayer) = delegate.swapLayer(layer1.delegate, layer2.delegate)
     actual fun swapLayerAt(index1: Int, index2: Int) = delegate.swapLayerAt(index1, index2)
-    actual val audioStartTime: Long by delegate::audioStartTime
+    actual val audioStartTime: Long get() = delegate.audioStartTime
 }

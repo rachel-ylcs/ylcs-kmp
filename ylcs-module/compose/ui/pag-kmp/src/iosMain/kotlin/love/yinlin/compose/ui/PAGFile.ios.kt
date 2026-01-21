@@ -1,9 +1,11 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 
+@Stable
 actual class PAGFile(override val delegate: PlatformPAGFile) : PAGComposition(delegate) {
     actual companion object {
         actual val MaxSupportedTagLevel: Int get() = PlatformPAGFile.MaxSupportedTagLevel().toInt()

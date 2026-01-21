@@ -8,6 +8,11 @@ static inline std::shared_ptr<PAGSurface> obj_cast(jlong handle) {
 }
 
 extern "C" {
+    JNIEXPORT jlong JNICALL Java_org_libpag_PAGSurface_nativeMakeOffscreen(JNIEnv* env, jclass, jlong handle, jint width, jint height) {
+        auto pagSurface = PAGSurface::MakeOffscreen(width, height);
+        return pagSurface ? reinterpret_cast<jlong>(new JPAGSurface(pagSurface)) : 0LL;
+    }
+
     JNIEXPORT void JNICALL Java_org_libpag_PAGSurface_nativeClear(JNIEnv* env, jclass, jlong handle) {
         auto jPagSurface = reinterpret_cast<JPAGSurface*>(handle);
         if (jPagSurface) jPagSurface->clear();
@@ -43,7 +48,7 @@ extern "C" {
         if (pagSurface) pagSurface->freeCache();
     }
 
-    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGSurface_nativeReadPixels(JNIEnv* env, jclass, jlong handle, jint color_type, jint alpha_type, jlong row_bytes, jintArray container) {
+    JNIEXPORT jboolean JNICALL Java_org_libpag_PAGSurface_nativeReadPixels(JNIEnv* env, jclass, jlong handle, jint color_type, jint alpha_type, jlong row_bytes, jbyteArray container) {
         auto pagSurface = obj_cast(handle);
         if (pagSurface) {
             auto data = env->GetPrimitiveArrayCritical(container, nullptr);

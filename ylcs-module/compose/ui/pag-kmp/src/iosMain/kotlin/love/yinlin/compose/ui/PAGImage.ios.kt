@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 import kotlinx.cinterop.*
 import love.yinlin.compose.graphics.asCGAffineTransform
@@ -9,6 +10,7 @@ import platform.CoreVideo.*
 import platform.darwin.ByteVar
 import platform.posix.memcpy
 
+@Stable
 actual class PAGImage(internal val delegate: PlatformPAGImage) {
     actual companion object {
         actual fun loadFromPath(path: String): PAGImage = PAGImage(PlatformPAGImage.FromPath(path)!!)

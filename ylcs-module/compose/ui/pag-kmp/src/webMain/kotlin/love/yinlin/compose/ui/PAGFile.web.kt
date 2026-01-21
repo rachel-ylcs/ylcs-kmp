@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ByteArrayCompatible
 import love.yinlin.compatible.await
@@ -7,6 +8,7 @@ import love.yinlin.extension.asIntArray
 import love.yinlin.platform.unsupportedPlatform
 import kotlin.js.ExperimentalWasmJsInterop
 
+@Stable
 actual class PAGFile(override val delegate: PlatformPAGFile) : PAGComposition(delegate) {
     actual companion object {
         actual val MaxSupportedTagLevel: Int get() = PlatformPAGFile.maxSupportedTagLevel()

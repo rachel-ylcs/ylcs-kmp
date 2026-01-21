@@ -1,5 +1,8 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 expect class PAGImageLayer : PAGLayer {
     companion object {
         fun make(width: Int, height: Int, duration: Long): PAGImageLayer

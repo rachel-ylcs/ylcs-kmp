@@ -11,6 +11,10 @@ static inline std::shared_ptr<PAGPlayer> obj_cast(jlong handle) {
 }
 
 extern "C" {
+    JNIEXPORT jlong JNICALL Java_org_libpag_PAGPlayer_nativeCreate(JNIEnv* env, jclass) {
+        return reinterpret_cast<jlong>(new JPAGPlayer(std::make_shared<PAGPlayer>()));
+    }
+
     JNIEXPORT void JNICALL Java_org_libpag_PAGPlayer_nativeClear(JNIEnv* env, jclass, jlong handle) {
         auto jPagPlayer = reinterpret_cast<JPAGPlayer*>(handle);
         if (jPagPlayer) jPagPlayer->clear();

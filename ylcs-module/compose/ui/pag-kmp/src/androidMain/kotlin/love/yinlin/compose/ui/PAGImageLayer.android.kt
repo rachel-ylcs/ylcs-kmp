@@ -1,7 +1,9 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import love.yinlin.platform.unsupportedPlatform
 
+@Stable
 actual class PAGImageLayer(override val delegate: PlatformPAGImageLayer) : PAGLayer(delegate) {
     actual companion object {
         actual fun make(width: Int, height: Int, duration: Long): PAGImageLayer =

@@ -1,5 +1,8 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 expect class PAGFile : PAGComposition {
     companion object {
         val MaxSupportedTagLevel: Int

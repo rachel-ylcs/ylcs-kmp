@@ -1,13 +1,17 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 import love.yinlin.compose.graphics.asCGAffineTransform
 import love.yinlin.compose.graphics.asComposeMatrix
 import love.yinlin.platform.unsupportedPlatform
 import platform.CoreGraphics.CGPointMake
 
+@Stable
 actual class PAGPlayer(private val delegate: PlatformPAGPlayer) {
+    actual constructor() : this(PlatformPAGPlayer())
+
     actual var surface: PAGSurface? get() = delegate.getSurface()?.let(::PAGSurface)
         set(value) { value?.delegate?.let { delegate.setSurface(it) } }
     actual var composition: PAGComposition? get() = delegate.getComposition()?.let(::PAGComposition)

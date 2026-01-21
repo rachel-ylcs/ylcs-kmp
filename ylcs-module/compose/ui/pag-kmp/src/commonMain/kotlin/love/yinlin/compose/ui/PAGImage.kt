@@ -1,7 +1,9 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
 
+@Stable
 expect class PAGImage {
     companion object {
         fun loadFromPath(path: String): PAGImage

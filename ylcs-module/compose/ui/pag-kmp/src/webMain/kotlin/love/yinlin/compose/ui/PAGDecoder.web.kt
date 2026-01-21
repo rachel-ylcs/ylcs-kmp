@@ -1,7 +1,9 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import love.yinlin.platform.unsupportedPlatform
 
+@Stable
 actual class PAGDecoder {
     actual companion object {
         actual fun makeFrom(composition: PAGComposition, maxFrameRate: Float, scale: Float): PAGDecoder = unsupportedPlatform()

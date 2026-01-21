@@ -71,7 +71,6 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.ui.rachel,
                 projects.ylcsModule.startup.os,
                 projects.ylcsModule.startup.picker,
-                projects.ylcsModule.compose.ui.pagKmp,
             )
         }
 

@@ -1,5 +1,8 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 actual class PAGFont(private val delegate: PlatformPAGFont) {
     actual constructor(fontFamily: String, fontStyle: String) : this(PlatformPAGFont(fontFamily, fontStyle))
 
@@ -11,6 +14,6 @@ actual class PAGFont(private val delegate: PlatformPAGFont) {
         actual fun unregisterFont(font: PAGFont) = PlatformPAGFont.unregisterFont(font.delegate)
     }
 
-    actual val fontFamily: String by delegate::fontFamily
-    actual val fontStyle: String by delegate::fontStyle
+    actual val fontFamily: String get() = delegate.fontFamily
+    actual val fontStyle: String get() = delegate.fontStyle
 }

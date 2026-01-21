@@ -1,5 +1,8 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 expect open class PAGComposition : PAGLayer {
     companion object {
         fun make(width: Int, height: Int): PAGComposition

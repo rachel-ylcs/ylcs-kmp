@@ -1,6 +1,9 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 actual class PAGFont(private val delegate: PlatformPAGFont) {
     actual constructor(fontFamily: String, fontStyle: String) : this(makePlatformPAGFont(fontFamily, fontStyle))
 

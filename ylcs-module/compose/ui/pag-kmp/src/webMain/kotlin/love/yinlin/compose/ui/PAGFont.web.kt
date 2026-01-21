@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ByteArrayCompatible
 import org.khronos.webgl.Uint8Array
@@ -18,6 +19,7 @@ private fun hackDomLoadFont(family: String, data: Uint8Array): Promise<JsAny?> =
 }
 """)
 
+@Stable
 actual class PAGFont(private val delegate: PlatformPAGFont) {
     actual constructor(fontFamily: String, fontStyle: String) : this(PlatformPAGFont.create(fontFamily, fontStyle))
 
@@ -34,6 +36,6 @@ actual class PAGFont(private val delegate: PlatformPAGFont) {
         actual fun unregisterFont(font: PAGFont) { }
     }
 
-    actual val fontFamily: String by delegate::fontFamily
-    actual val fontStyle: String by delegate::fontStyle
+    actual val fontFamily: String get() = delegate.fontFamily
+    actual val fontStyle: String get() = delegate.fontStyle
 }

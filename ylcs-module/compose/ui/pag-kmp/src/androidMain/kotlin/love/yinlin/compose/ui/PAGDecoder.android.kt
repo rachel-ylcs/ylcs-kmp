@@ -1,5 +1,8 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
+
+@Stable
 actual class PAGDecoder(private val delegate: PlatformPAGDecoder) {
     actual companion object {
         actual fun makeFrom(composition: PAGComposition, maxFrameRate: Float, scale: Float): PAGDecoder =

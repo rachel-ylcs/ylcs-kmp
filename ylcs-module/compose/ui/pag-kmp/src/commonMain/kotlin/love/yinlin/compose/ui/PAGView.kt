@@ -1,0 +1,18 @@
+package love.yinlin.compose.ui
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+
+/**
+ * 原生 PAGView 控件封装, 每个 PAGAnimation 都会创建一个 GPU 渲染上下文。
+ * 适用于只渲染单个 pag 动画的场景。
+ */
+@Composable
+expect fun PAGView(
+    state: PAGState,
+    modifier: Modifier = Modifier,
+    composition: PAGComposition? = null,
+    isPlaying: Boolean = false,
+    config: PAGConfig = remember { PAGConfig() }
+)

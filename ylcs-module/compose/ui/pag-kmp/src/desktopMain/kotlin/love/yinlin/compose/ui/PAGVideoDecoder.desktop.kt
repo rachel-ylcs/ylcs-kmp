@@ -1,3 +1,8 @@
 package love.yinlin.compose.ui
 
-actual typealias PAGVideoDecoder = org.libpag.PAGVideoDecoder
+import androidx.compose.runtime.Stable
+
+@Stable
+actual object PAGVideoDecoder {
+    actual fun setMaxHardwareDecoderCount(maxDecoderCount: Int) = PlatformPAGVideoDecoder.setMaxHardwareDecoderCount(maxDecoderCount)
+}

@@ -1,8 +1,10 @@
 @file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import kotlinx.cinterop.ExperimentalForeignApi
 
+@Stable
 actual class PAGDecoder(private val delegate: PlatformPAGDecoder) {
     actual companion object {
         actual fun makeFrom(composition: PAGComposition, maxFrameRate: Float, scale: Float): PAGDecoder =

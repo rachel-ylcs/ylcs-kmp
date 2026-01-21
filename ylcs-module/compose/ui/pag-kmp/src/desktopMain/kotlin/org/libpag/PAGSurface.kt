@@ -29,7 +29,7 @@ class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAI
         @JvmStatic
         private external fun nativeFreeCache(handle: Long)
         @JvmStatic
-        private external fun nativeReadPixels(handle: Long, colorType: Int, alphaType: Int, rowBytes: Long, container: IntArray): Boolean
+        private external fun nativeReadPixels(handle: Long, colorType: Int, alphaType: Int, rowBytes: Long, container: ByteArray): Boolean
 
         fun makeOffscreen(width: Int, height: Int): PAGSurface = PAGSurface { nativeMakeOffscreen(width, height) }
     }
@@ -40,9 +40,11 @@ class PAGSurface private constructor(constructor: () -> Long) : Destructible(RAI
 
     fun updateSize() = nativeUpdateSize(nativeHandle)
 
+    fun freeCache() = nativeFreeCache(nativeHandle)
+
     fun clearAll() = nativeClearAll(nativeHandle)
 
-    fun readPixels(colorType: Int, alphaType: Int, rowBytes: Long, container: IntArray) =
+    fun readPixels(colorType: Int, alphaType: Int, rowBytes: Long, container: ByteArray) =
         nativeReadPixels(nativeHandle, colorType, alphaType, rowBytes, container)
 
     override fun close() {

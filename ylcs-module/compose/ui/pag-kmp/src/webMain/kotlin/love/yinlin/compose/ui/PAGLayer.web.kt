@@ -1,8 +1,10 @@
 package love.yinlin.compose.ui
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Matrix
 
+@Stable
 actual open class PAGLayer(internal open val delegate: PlatformPAGLayer) {
     actual val layerType: PAGLayerType get() = PAGLayerType.entries[delegate.layerType()]
     actual val layerName: String get() = delegate.layerName()
