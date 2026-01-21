@@ -29,14 +29,28 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        iosMain.configure(commonMain)
+        val nonAndroidMain by create(commonMain)
+
+        iosMain.configure(nonAndroidMain)
 
         iosMainList.configure(iosMain)
 
-        webMain.configure(commonMain)
+        desktopMain.configure(nonAndroidMain)
+
+        webMain.configure(nonAndroidMain)
 
         jsMain.configure(webMain)
 
         wasmJsMain.configure(webMain)
+
+        nativeMain.configure(nonAndroidMain)
+
+        androidNativeMain.configure(nativeMain)
+
+        windowsMain.configure(nativeMain)
+
+        linuxMain.configure(nativeMain)
+
+        macosMain.configure(nativeMain)
     }
 })
