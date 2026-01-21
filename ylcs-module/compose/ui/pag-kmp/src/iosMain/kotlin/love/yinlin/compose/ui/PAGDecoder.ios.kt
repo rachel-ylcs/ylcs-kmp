@@ -9,9 +9,9 @@ actual class PAGDecoder(private val delegate: PlatformPAGDecoder) {
             PAGDecoder(PlatformPAGDecoder.Make(composition.delegate, maxFrameRate, scale)!!)
     }
 
-    actual val width: Int get() = delegate.width()
-    actual val height: Int get() = delegate.height()
-    actual val numFrames: Int get() = delegate.numFrames()
+    actual val width: Int get() = delegate.width().toInt()
+    actual val height: Int get() = delegate.height().toInt()
+    actual val numFrames: Int get() = delegate.numFrames().toInt()
     actual val frameRate: Float get() = delegate.frameRate()
     actual fun checkFrameRate(index: Int): Boolean = delegate.checkFrameChanged(index)
     actual fun close() { }

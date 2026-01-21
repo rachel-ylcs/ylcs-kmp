@@ -4,6 +4,8 @@ package love.yinlin.compose.ui
 import androidx.compose.ui.graphics.Matrix
 import love.yinlin.compose.graphics.asCGAffineTransform
 import love.yinlin.compose.graphics.asComposeMatrix
+import love.yinlin.platform.unsupportedPlatform
+import platform.CoreGraphics.CGPointMake
 
 actual class PAGPlayer(private val delegate: PlatformPAGPlayer) {
     actual var surface: PAGSurface? get() = delegate.getSurface()?.let(::PAGSurface)
@@ -30,10 +32,10 @@ actual class PAGPlayer(private val delegate: PlatformPAGPlayer) {
     actual val currentFrame: Long get() = delegate.currentFrame()
     actual fun prepare() { delegate.prepare() }
     actual fun flush() { delegate.flush() }
-    actual fun flushAndFenceSync(syncArray: LongArray) { delegate.flushAndFenceSync(syncArray) }
-    actual fun waitSync(sync: Long) { delegate.waitSync(sync) }
+    actual fun flushAndFenceSync(syncArray: LongArray) { unsupportedPlatform() }
+    actual fun waitSync(sync: Long) { unsupportedPlatform() }
     actual fun hitTestPoint(layer: PAGLayer, x: Float, y: Float, pixelHitTest: Boolean): Boolean =
-        delegate.hitTestPoint(layer.delegate, x, y, pixelHitTest)
+        delegate.hitTestPoint(layer.delegate, CGPointMake(x.toDouble(), y.toDouble()), pixelHitTest)
     actual val renderingTime: Long = 0L
     actual val imageDecodingTime: Long = 0L
     actual val presentingTime: Long = 0L
