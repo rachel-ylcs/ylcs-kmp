@@ -9,7 +9,7 @@ permissions:
   contents: write
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -37,6 +37,9 @@ jobs:
           cache-dependency-path: |
             ./*.gradle*
             ./**/gradle-wrapper.properties
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Build Dokka
         run: |
