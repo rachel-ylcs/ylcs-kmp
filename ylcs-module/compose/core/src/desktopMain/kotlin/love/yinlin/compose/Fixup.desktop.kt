@@ -14,7 +14,7 @@ import java.awt.Dimension
 import java.awt.Rectangle
 
 @Stable
-actual data object Fixup {
+actual object Fixup {
     // See https://youtrack.jetbrains.com/issue/CMP-2285/Min-Max-size-window
     @Composable
     fun swingWindowMinimize(scope: FrameWindowScope, minSize: DpSize) {

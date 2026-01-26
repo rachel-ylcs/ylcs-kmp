@@ -20,7 +20,7 @@ import love.yinlin.startup.StartupMacOSDeepLink
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.getString
 
-fun main() = object : RachelApplication(PlatformContextDelegate) {
+fun main() = object : RachelApplication(PlatformContextDelegate()) {
     override val title: String = runBlocking { getString(Res.string.app_name) }
     override val icon: DrawableResource = Res.drawable.img_logo
     override val actionAlwaysOnTop: Boolean = true

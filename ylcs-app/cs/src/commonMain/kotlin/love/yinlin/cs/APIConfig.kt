@@ -1,6 +1,6 @@
 package love.yinlin.cs
 
-data object APIConfig {
+object APIConfig {
     const val PROXY_NAME = "proxy"
     const val MIN_PAGE_NUM = 20
     const val MAX_PAGE_NUM = 30

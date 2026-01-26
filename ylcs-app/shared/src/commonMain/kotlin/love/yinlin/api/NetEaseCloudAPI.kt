@@ -11,7 +11,7 @@ import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 
 @Stable
-data object NetEaseCloudAPI {
+object NetEaseCloudAPI {
     private const val NETEASECLOUD_HOST: String = "music.163.com"
     private object Container {
         fun detail(id: String) = "api/song/detail?id=${id}&ids=[${id}]"

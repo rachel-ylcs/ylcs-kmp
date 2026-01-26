@@ -7,7 +7,7 @@ import love.yinlin.foundation.PlatformContextDelegate
 import love.yinlin.uri.toUri
 import platform.Foundation.NSURL
 
-fun MainViewController() = object : RachelApplication(PlatformContextDelegate) {
+fun MainViewController() = object : RachelApplication(PlatformContextDelegate()) {
     override fun buildDelegate(): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {
         override fun viewDidAppear(animated: Boolean) {
             Coroutines.startMain {

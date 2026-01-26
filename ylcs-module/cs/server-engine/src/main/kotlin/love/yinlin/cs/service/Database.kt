@@ -168,7 +168,7 @@ fun Connection.throwInsertSQLGeneratedKey(sql: String, vararg args: Any?): Long 
     return keys.getLong(1)
 }
 
-data object SQLConverter {
+object SQLConverter {
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     private val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
     private val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")

@@ -5,6 +5,6 @@ import kotlinx.io.files.Path
 import love.yinlin.app
 
 @Stable
-data object Paths {
+object Paths {
     val modPath: Path by lazy { Path(app.os.storage.dataPath, "mod") }
 }

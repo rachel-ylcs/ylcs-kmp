@@ -6,7 +6,7 @@ import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.*
 
 @Stable
-data object DouyinAPI {
+object DouyinAPI {
     private fun getDouyinVideo(json: JsonObject): DouyinVideo {
         val time = (json["create_time"].Long * 1000).toLocalDateTime!!
         val video = json.obj("video")

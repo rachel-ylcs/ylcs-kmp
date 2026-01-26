@@ -10,7 +10,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.collection.stableListOf
 
 @Stable
-data object About {
+object About {
     internal val updateInfo = UpdateInfo(
         platform = "Android/Windows/Web 先行发布",
         title = "音游内测上线, 动态歌词引擎支持, 抽奖活动即将上线",

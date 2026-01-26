@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 
 @Stable
-data object Colors {
+object Colors {
     val Unspecified = Color.Unspecified
     val Transparent = Color(0x00000000L)
     val White = Color(0xffffffff)

@@ -13,7 +13,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import java.io.File
 
 @Stable
-actual data object Fixup {
+actual object Fixup {
     // See https://github.com/androidx/media/issues/327
     // See https://github.com/PaulWoitaschek/Voice/blob/9b04e27feb27a32b3e660e7091e877bc2be93ece/playback/src/main/kotlin/voice/playback/session/MediaItemProvider.kt
     fun updateLocalFileProviderPermission(context: Context, authority: String, file: File): Uri {

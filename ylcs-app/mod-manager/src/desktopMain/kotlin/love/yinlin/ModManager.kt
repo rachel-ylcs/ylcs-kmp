@@ -13,7 +13,7 @@ import love.yinlin.mod.ModFactory
 import love.yinlin.screen.ScreenMain
 import love.yinlin.screen.ScreenRhyme
 
-class MainApplication : PlatformApplication<MainApplication>(appReference, PlatformContextDelegate) {
+class MainApplication : PlatformApplication<MainApplication>(appReference, PlatformContextDelegate()) {
     override val title: String = "MOD管理器 第${ModFactory.VERSION}版"
     override val initSize: DpSize = DpSize(1200.dp, 800.dp)
     override val actionMinimize: Boolean = false

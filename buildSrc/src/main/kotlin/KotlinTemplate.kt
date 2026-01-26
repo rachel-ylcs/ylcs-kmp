@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 // 在 ExportLib 后面的库将会被导出给其他模块可见
-data object ExportLib
+object ExportLib
 
 // Npm
 class NpmInfo internal constructor(val name: String, val version: String)

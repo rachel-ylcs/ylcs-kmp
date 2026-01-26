@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import love.yinlin.compose.Colors
 
 @Stable
-data object ExtraIcons {
+object ExtraIcons {
     val IOS: ImageVector by lazy {
         ImageVector.Builder(
             name = "IOS",

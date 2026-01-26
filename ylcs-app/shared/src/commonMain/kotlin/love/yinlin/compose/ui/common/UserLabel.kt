@@ -27,7 +27,7 @@ import love.yinlin.shared.resources.*
 import love.yinlin.compose.ui.image.MiniImage
 
 @Stable
-private data object UserLabelMeta {
+private object UserLabelMeta {
     private val labelNameFromLevel = arrayOf("BUG",
         "风露婆娑", "剑心琴魄", "梦外篝火", "日暮入旧",
         "烈火胜情爱", "青山撞入怀", "雨久苔如海", "曾吻过秋槐",

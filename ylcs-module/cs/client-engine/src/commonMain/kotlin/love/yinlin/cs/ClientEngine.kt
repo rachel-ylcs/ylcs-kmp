@@ -12,7 +12,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.uri.Uri
 import kotlin.jvm.JvmName
 
-data object ClientEngine {
+object ClientEngine {
     var baseUrl = ""
 
     fun init(baseUrl: String) {

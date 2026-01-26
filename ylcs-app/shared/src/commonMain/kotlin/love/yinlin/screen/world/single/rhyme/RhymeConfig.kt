@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 
 // 游戏配置
 @Stable
-internal data object RhymeConfig {
+internal object RhymeConfig {
     const val WIDTH = 1920f // 屏幕宽度
     const val HEIGHT = 1080f // 屏幕高度
     const val FPS = 60 // 帧率

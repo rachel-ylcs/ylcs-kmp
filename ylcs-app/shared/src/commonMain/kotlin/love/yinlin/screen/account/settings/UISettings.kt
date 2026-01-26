@@ -27,7 +27,7 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.Space
 
 @Stable
-data object SettingsScope {
+object SettingsScope {
 	@Composable
 	private fun ItemDivider(x: Dp = CustomTheme.padding.zeroSpace) {
 		HorizontalDivider(modifier = Modifier.padding(horizontal = x))

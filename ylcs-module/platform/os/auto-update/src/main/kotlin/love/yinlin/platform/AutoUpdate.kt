@@ -11,7 +11,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.system.exitProcess
 
-data object AutoUpdate {
+object AutoUpdate {
     private fun handleEntry(zipFile: ZipFile, entry: ZipEntry, targetDir: Path) {
         var entryName = entry.getName()
         entryName = entryName.replace('\\', '/')

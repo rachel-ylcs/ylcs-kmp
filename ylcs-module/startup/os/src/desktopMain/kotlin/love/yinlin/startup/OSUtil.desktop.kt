@@ -4,7 +4,7 @@ import love.yinlin.uri.Uri
 import love.yinlin.uri.toJvmUri
 import java.awt.Desktop
 
-internal data object OSUtil {
+internal object OSUtil {
     fun openUri(uri: Uri) {
         val desktop = Desktop.getDesktop()
         if (desktop.isSupported(Desktop.Action.BROWSE)) {

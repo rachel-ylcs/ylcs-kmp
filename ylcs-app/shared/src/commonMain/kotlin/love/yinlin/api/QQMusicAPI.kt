@@ -12,7 +12,7 @@ import love.yinlin.extension.*
 import kotlin.io.encoding.Base64
 
 @Stable
-data object QQMusicAPI {
+object QQMusicAPI {
     private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
     private fun decodeData(num: Int, json: JsonObject): List<JsonObject> {
