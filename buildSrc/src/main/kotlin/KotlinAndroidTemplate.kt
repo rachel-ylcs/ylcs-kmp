@@ -72,7 +72,7 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
                     isDebuggable = false
                     proguardFiles(
                         getDefaultProguardFile(C.proguard.defaultRule),
-                        C.root.shared.commonR8Rule, C.root.shared.androidR8Rule
+                        //C.root.shared.commonR8Rule, C.root.shared.androidR8Rule
                     )
                     signingConfig = androidSigningConfig
                 }

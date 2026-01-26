@@ -18,8 +18,8 @@ import love.yinlin.extension.toJson
 import love.yinlin.extension.makeObject
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.util.Base64
 import java.math.BigInteger
+import kotlin.io.encoding.Base64
 
 fun APIScope.prizeAPI() {
     ApiPrizeGetPrize.response { pid, num ->
@@ -79,10 +79,10 @@ fun APIScope.prizeAPI() {
         // 创建 32-byte的随机数种子和 SHA256 的公开承诺
         val seed = ByteArray(32)
         SecureRandom().nextBytes(seed)
-        val seedBase64 = Base64.getEncoder().encodeToString(seed)
+        val seedBase64 = Base64.encode(seed)
         
         val commitment = MessageDigest.getInstance("SHA-256").digest(seed)
-        val commitmentBase64 = Base64.getEncoder().encodeToString(commitment)
+        val commitmentBase64 = Base64.encode(commitment)
         
         // 创建并发布抽奖，存储种子（私密）和承诺（公开）
         // 种子将在抽签时揭晓，揭晓前的种子值保持为空（实际存储在seed字段中，但revealed_seed为空）
@@ -449,7 +449,7 @@ fun APIScope.prizeAPI() {
 
         // 使用承诺揭示机制打乱参与者顺序
         val sortedUids = participants.map { it.Object["uid"].Int }
-        val seedBytes = Base64.getDecoder().decode(seed)
+        val seedBytes = Base64.decode(seed)
 
         // 生成初始随机源：种子+排序uid列表
         val uidString = sortedUids.joinToString(",")

@@ -26,7 +26,6 @@ import io.ktor.server.response.respondBytes
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.route
 import io.ktor.util.appendAll
-import io.ktor.util.decodeBase64String
 import io.ktor.util.flattenForEach
 import io.ktor.util.toMap
 import love.yinlin.extension.Json
@@ -36,6 +35,7 @@ import love.yinlin.extension.toJsonString
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.uri.Uri
 import java.net.Proxy
+import kotlin.io.encoding.Base64
 
 class Proxy(
     private val name: String,
@@ -88,7 +88,7 @@ class Proxy(
                                         key.equals(HttpHeaders.Origin, ignoreCase = true) -> { }
                                         key.equals(HttpHeaders.Referrer, ignoreCase = true) -> { }
                                         key.equals(HttpHeaders.AcceptEncoding, ignoreCase = true) -> { }
-                                        key.equals("VHeaders", ignoreCase = true) -> vHeaders = value.decodeBase64String().parseJsonValue<Map<String, String>>()
+                                        key.equals("VHeaders", ignoreCase = true) -> vHeaders = Base64.decode(value).decodeToString().parseJsonValue<Map<String, String>>()
                                         else -> headersMap[key] = value
                                     }
                                 }

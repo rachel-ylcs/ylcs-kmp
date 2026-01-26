@@ -378,13 +378,17 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         jvmArgs += desktopJvmArgs
                         jvmArgs += "--enable-native-access=ALL-UNNAMED"
 
-                        buildTypes.release.proguard {
-                            version.set(C.proguard.version)
-                            isEnabled.set(true)
-                            optimize.set(true)
-                            obfuscate.set(true)
-                            joinOutputJars.set(true)
-                            configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
+                        buildTypes {
+                            release {
+                                proguard {
+                                    version.set(C.proguard.version)
+                                    isEnabled.set(true)
+                                    optimize.set(true)
+                                    obfuscate.set(true)
+                                    joinOutputJars.set(true)
+                                    //configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
+                                }
+                            }
                         }
 
                         nativeDistributions {

@@ -8,10 +8,10 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.nio.ByteBuffer
-import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import kotlin.io.encoding.Base64
 
 /* ------------------ 鉴权 --------------------- */
 
@@ -63,7 +63,7 @@ object AN {
         this.redis = redis
         val keyString = redis[TOKEN_SECRET_KEY]
         AES_KEY = if (keyString != null) {
-            val bis = ByteArrayInputStream(Base64.getDecoder().decode(keyString))
+            val bis = ByteArrayInputStream(Base64.decode(keyString))
             val ois = ObjectInputStream(bis)
             val secretKey = ois.readObject() as SecretKey
             ois.close()
@@ -78,7 +78,7 @@ object AN {
             oos.writeObject(secretKey)
             oos.flush()
             oos.close()
-            redis[TOKEN_SECRET_KEY] = Base64.getEncoder().encodeToString(bos.toByteArray())
+            redis[TOKEN_SECRET_KEY] = Base64.encode(bos.toByteArray())
             secretKey
         }
     }
@@ -88,14 +88,14 @@ object AN {
         val cipher = Cipher.getInstance(KEY_ALGORITHM)
         cipher.init(Cipher.ENCRYPT_MODE, AES_KEY)
         val encryptedBytes = cipher.doFinal(token.bytes)
-        val tokenString = Base64.getEncoder().encodeToString(encryptedBytes)
+        val tokenString = Base64.encode(encryptedBytes)
         redis.setex(token.key, tokenString, 30 * 24 * 60 * 60L)
         return tokenString
     }
 
     @Suppress("GetInstance")
     private fun parseToken(tokenString: String): Token {
-        val encryptedBytes = Base64.getDecoder().decode(tokenString)
+        val encryptedBytes = Base64.decode(tokenString)
         val cipher = Cipher.getInstance(KEY_ALGORITHM)
         cipher.init(Cipher.DECRYPT_MODE, AES_KEY)
         val bytes = cipher.doFinal(encryptedBytes)

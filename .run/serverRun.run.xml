@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":ylcs-app:server:serverRun" />
+          <option value="ylcs-app:server:serverRun" />
         </list>
       </option>
       <option name="vmOptions" />

@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="composeApp:desktopCheckModules" />
+          <option value="ylcs-app:desktopApp:desktopCheckModules" />
         </list>
       </option>
       <option name="vmOptions" />

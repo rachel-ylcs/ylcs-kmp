@@ -18,7 +18,6 @@ import dev.whyoleg.cryptography.serialization.asn1.modules.RsaPublicKey
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.util.appendAll
-import io.ktor.util.encodeBase64
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -33,6 +32,7 @@ import love.yinlin.compose.ui.text.buildRichString
 import love.yinlin.cs.APIConfig
 import love.yinlin.cs.ClientEngine
 import love.yinlin.cs.NetClient
+import kotlin.io.encoding.Base64
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -394,7 +394,7 @@ object WeiboAPI {
 		return NetClient.request(url, {
 			headers {
 				Platform.use(*Platform.Web,
-					ifTrue = { append("VHeaders", extraHeaders.toJsonString().encodeBase64()) },
+					ifTrue = { append("VHeaders", Base64.encode(extraHeaders.toJsonString().encodeToByteArray())) },
 					ifFalse = { appendAll(extraHeaders) }
 				)
 			}
