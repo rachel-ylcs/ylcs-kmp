@@ -15,12 +15,12 @@ lifecycle = "2.10.0-alpha07"
 material3 = "1.11.0-alpha01"
 material3-icon-old = "1.7.3"
 coroutines = "1.10.2"
-ktor = "3.3.3"
+ktor = "3.4.0"
 sketch = "4.4.0-alpha02"
 mmkv = "2.3.0"
 lottie = "2.0.2"
 cryptography = "0.5.0"
-pag = "4.5.12"
+pag = "4.5.23"
 
 # Android
 cmp-android = "1.10.1"
@@ -80,7 +80,7 @@ compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", 
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
-kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.30.0-beta" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.31.0" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
@@ -155,7 +155,7 @@ ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref =
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.25" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.26" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 redis = { module = "redis.clients:jedis", version = "7.2.1" }
