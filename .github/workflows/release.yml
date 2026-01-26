@@ -31,11 +31,6 @@ jobs:
       - name: Build
         run: ./gradlew ylcs-app:androidApp:androidPublish
 
-      - name: Rename
-        run: |
-          cd outputs
-          mv ylcs.apk "[Android]银临茶舍${{ github.ref_name }}.apk"
-
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -112,11 +107,6 @@ jobs:
         run: |
           ./gradlew ylcs-app:desktopApp:desktopPublish
 
-      - name: Compress
-        run: |
-          cd outputs
-          7z a "[Windows]银临茶舍${{ github.ref_name }}.zip" ylcs
-
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -157,16 +147,11 @@ jobs:
         run: |
           ./gradlew ylcs-app:desktopApp:desktopPublish
 
-      - name: Compress
-        run: |
-          cd outputs
-          tar -czf "[Linux]银临茶舍${{ github.ref_name }}.tar.gz" ylcs
-
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: linux
-          path: outputs/*.tar.gz
+          path: outputs/*.zip
 
   package-macos:
     name: Package macOS
@@ -196,11 +181,6 @@ jobs:
         run: |
           ./gradlew ylcs-app:desktopApp:desktopPublish
 
-      - name: Compress
-        run: |
-          cd outputs
-          zip -r "[macOS]银临茶舍${{ github.ref_name }}.zip" ylcs.app
-
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
@@ -228,11 +208,6 @@ jobs:
 
       - name: Build
         run: ./gradlew ylcs-app:webApp:webPublish
-
-      - name: Compress
-        run: |
-          cd outputs
-          zip -r "[Web]银临茶舍${{ github.ref_name }}.zip" web
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -265,18 +240,81 @@ jobs:
       - name: Compress
         run: |
           cd outputs
-          zip -r "[Server]银临茶舍${{ github.ref_name }}.zip" ylcs.jar
+          mv ylcs.jar "[Server]银临茶舍${{ github.ref_name }}.jar"
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: server
+          path: outputs/*.jar
+
+  package-modManager:
+    name: Package Mod Manager
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Setup MSVC
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+          export-path-to-vs: VS_PATH
+
+      - name: Build
+        run: |
+          ./gradlew ylcs-app:mod-manager:modManagerPublish
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: outputs/*.zip
+
+  package-landpage:
+    name: Package Landpage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:landpage:landpagePublish
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: web
           path: outputs/*.zip
 
   publish-release:
     name: Publish Release
     if: ${{ always() }}
-    needs: [package-android, package-ios, package-windows, package-linux, package-macos, package-web, package-server]
+    needs: [package-android, package-ios, package-windows, package-linux, package-macos, package-web, package-server, package-modManager, package-landpage]
     runs-on: ubuntu-latest
     permissions:
       contents: write # 发布 Release 需要写权限

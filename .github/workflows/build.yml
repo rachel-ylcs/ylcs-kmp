@@ -26,6 +26,8 @@ jobs:
       desktop: ${{ steps.filter.outputs.desktop }}
       web: ${{ steps.filter.outputs.web }}
       server: ${{ steps.filter.outputs.server }}
+      modManager: ${{ steps.filter.outputs.modManager }}
+      landpage: ${{ steps.filter.outputs.landpage }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -81,6 +83,12 @@ jobs:
             server:
               - *common
               - 'ylcs-app/server/**'
+            modManager:
+              - *common
+              - 'ylcs-app/modManager/**'
+            landpage:
+              - *common
+              - 'ylcs-app/landpage/**'
 
   build-android:
     name: Build Android
@@ -106,7 +114,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build Android
+      - name: Build
         run: ./gradlew ylcs-app:androidApp:androidPackage
 
   build-ios:
@@ -130,7 +138,7 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Build iOS
+      - name: Build
         run: ./gradlew ylcs-app:shared:linkPodDebugFrameworkIosArm64
 
   build-desktop:
@@ -170,7 +178,7 @@ jobs:
           arch: x64
           export-path-to-vs: VS_PATH
 
-      - name: Build Desktop
+      - name: Build
         run: ./gradlew ylcs-app:desktopApp:desktopJar
 
   build-web:
@@ -194,7 +202,7 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Build Web
+      - name: Build
         run: ./gradlew ylcs-app:webApp:wasmJsJar
 
   build-server:
@@ -218,5 +226,61 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Build Server
+      - name: Build
         run: ./gradlew ylcs-app:server:serverPublish
+
+  build-modManager:
+    name: Build Mod Manager
+    needs: changes
+    if: ${{ needs.changes.outputs.modManager == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Setup MSVC
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+          export-path-to-vs: VS_PATH
+
+      - name: Build
+        run: |
+          ./gradlew ylcs-app:mod-manager:desktopJar
+
+  build-landpage:
+    name: Build Landpage
+    needs: changes
+    if: ${{ needs.changes.outputs.landpage == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build
+        run: |
+          ./gradlew ylcs-app:landpage:jsJar
