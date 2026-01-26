@@ -1,0 +1,595 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>BaseCustomSize</title>
+<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.4.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:ui:core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:ui:core/commonMain" data-filter=":ylcs-module:compose:ui:core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.ui.core::love.yinlin.compose.ui/BaseCustomSize///PointingToDeclaration//-363941102">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.ui.core</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose.ui</a><span class="delimiter">/</span><span class="current">BaseCustomSize</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Base</span><wbr><span>Custom</span><wbr><span><span>Size</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">BaseCustomSize</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1997657550%2FConstructors%2F-363941102" anchor-label="BaseCustomSize" id="1997657550%2FConstructors%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-base-custom-size.html"><span>Base</span><wbr><span>Custom</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1997657550%2FConstructors%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1795696083%2FProperties%2F-363941102" anchor-label="cardWidth" id="1795696083%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="card-width.html"><span>card</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1795696083%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="card-width.html">cardWidth</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-661923675%2FProperties%2F-363941102" anchor-label="cellWidth" id="-661923675%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cell-width.html"><span>cell</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-661923675%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="cell-width.html">cellWidth</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="752429835%2FProperties%2F-363941102" anchor-label="dialogWidth" id="752429835%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dialog-width.html"><span>dialog</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="752429835%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="dialog-width.html">dialogWidth</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1826201639%2FProperties%2F-363941102" anchor-label="dotHeight" id="-1826201639%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="dot-height.html"><span>dot</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1826201639%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="dot-height.html">dotHeight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1094238496%2FProperties%2F-363941102" anchor-label="extraIcon" id="1094238496%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="extra-icon.html"><span>extra</span><wbr><span><span>Icon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1094238496%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="extra-icon.html">extraIcon</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="164695686%2FProperties%2F-363941102" anchor-label="extraImage" id="164695686%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="extra-image.html"><span>extra</span><wbr><span><span>Image</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="164695686%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="extra-image.html">extraImage</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1920259337%2FProperties%2F-363941102" anchor-label="extraInput" id="-1920259337%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="extra-input.html"><span>extra</span><wbr><span><span>Input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1920259337%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="extra-input.html">extraInput</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-711583358%2FProperties%2F-363941102" anchor-label="fab" id="-711583358%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fab.html"><span><span>fab</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-711583358%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="fab.html">fab</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2012820472%2FProperties%2F-363941102" anchor-label="icon" id="2012820472%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="icon.html"><span><span>icon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2012820472%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="icon.html">icon</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1424034130%2FProperties%2F-363941102" anchor-label="image" id="-1424034130%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="image.html"><span><span>image</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1424034130%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="image.html">image</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1425617451%2FProperties%2F-363941102" anchor-label="largeIcon" id="-1425617451%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="large-icon.html"><span>large</span><wbr><span><span>Icon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1425617451%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="large-icon.html">largeIcon</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-641427343%2FProperties%2F-363941102" anchor-label="largeImage" id="-641427343%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="large-image.html"><span>large</span><wbr><span><span>Image</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-641427343%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="large-image.html">largeImage</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1568584930%2FProperties%2F-363941102" anchor-label="largeInput" id="1568584930%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="large-input.html"><span>large</span><wbr><span><span>Input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1568584930%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="large-input.html">largeInput</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="352513819%2FProperties%2F-363941102" anchor-label="little" id="352513819%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="little.html"><span><span>little</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="352513819%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="little.html">little</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="28147005%2FProperties%2F-363941102" anchor-label="maxDialogContentHeight" id="28147005%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-dialog-content-height.html"><span>max</span><wbr><span>Dialog</span><wbr><span>Content</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="28147005%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="max-dialog-content-height.html">maxDialogContentHeight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1206409853%2FProperties%2F-363941102" anchor-label="mediumIcon" id="-1206409853%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="medium-icon.html"><span>medium</span><wbr><span><span>Icon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1206409853%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="medium-icon.html">mediumIcon</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1859040899%2FProperties%2F-363941102" anchor-label="mediumImage" id="1859040899%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="medium-image.html"><span>medium</span><wbr><span><span>Image</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1859040899%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="medium-image.html">mediumImage</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-225914124%2FProperties%2F-363941102" anchor-label="mediumInput" id="-225914124%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="medium-input.html"><span>medium</span><wbr><span><span>Input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-225914124%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="medium-input.html">mediumInput</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1004256719%2FProperties%2F-363941102" anchor-label="microCellWidth" id="-1004256719%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="micro-cell-width.html"><span>micro</span><wbr><span>Cell</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1004256719%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="micro-cell-width.html">microCellWidth</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-925891860%2FProperties%2F-363941102" anchor-label="microIcon" id="-925891860%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="micro-icon.html"><span>micro</span><wbr><span><span>Icon</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-925891860%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="micro-icon.html">microIcon</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1965164090%2FProperties%2F-363941102" anchor-label="microImage" id="1965164090%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="micro-image.html"><span>micro</span><wbr><span><span>Image</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1965164090%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="micro-image.html">microImage</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1021161173%2FProperties%2F-363941102" anchor-label="minDialogContentHeight" id="-1021161173%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="min-dialog-content-height.html"><span>min</span><wbr><span>Dialog</span><wbr><span>Content</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1021161173%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="min-dialog-content-height.html">minDialogContentHeight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="622091119%2FProperties%2F-363941102" anchor-label="panelWidth" id="622091119%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="panel-width.html"><span>panel</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="622091119%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="panel-width.html">panelWidth</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1214192099%2FProperties%2F-363941102" anchor-label="progressHeight" id="-1214192099%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="progress-height.html"><span>progress</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1214192099%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="progress-height.html">progressHeight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1874552876%2FProperties%2F-363941102" anchor-label="refreshFooterHeight" id="1874552876%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="refresh-footer-height.html"><span>refresh</span><wbr><span>Footer</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1874552876%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="refresh-footer-height.html">refreshFooterHeight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1698947846%2FProperties%2F-363941102" anchor-label="refreshHeaderHeight" id="-1698947846%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="refresh-header-height.html"><span>refresh</span><wbr><span>Header</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1698947846%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="refresh-header-height.html">refreshHeaderHeight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1076731274%2FProperties%2F-363941102" anchor-label="sheetWidth" id="1076731274%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="sheet-width.html"><span>sheet</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1076731274%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="sheet-width.html">sheetWidth</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-434328087%2FProperties%2F-363941102" anchor-label="sliderHeight" id="-434328087%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="slider-height.html"><span>slider</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-434328087%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="slider-height.html">sliderHeight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1082780444%2FProperties%2F-363941102" anchor-label="sliderWidth" id="-1082780444%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="slider-width.html"><span>slider</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1082780444%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="slider-width.html">sliderWidth</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-354131538%2FProperties%2F-363941102" anchor-label="smallInput" id="-354131538%2FProperties%2F-363941102" data-filterable-set=":ylcs-module:compose:ui:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui:core/commonMain" data-filterable-set=":ylcs-module:compose:ui:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="small-input.html"><span>small</span><wbr><span><span>Input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-354131538%2FProperties%2F-363941102"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime/ReadOnlyComposable///PointingToDeclaration/"><span class="token annotation builtin">ReadOnlyComposable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">val </span><a href="small-input.html">smallInput</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

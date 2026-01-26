@@ -1,0 +1,318 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ScreenManager</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.4.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:screen/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:screen/commonMain" data-filter=":ylcs-module:compose:screen/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.screen::love.yinlin.compose.screen/ScreenManager///PointingToDeclaration//245679779">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.screen</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose.screen</a><span class="delimiter">/</span><span class="current">ScreenManager</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Screen</span><wbr><span><span>Manager</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">class </span><a href="index.html">ScreenManager</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>navController<span class="token operator">: </span><span data-unresolved-link="androidx.navigation/NavHostController///PointingToDeclaration/">NavHostController</span></span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="783329182%2FConstructors%2F245679779" anchor-label="ScreenManager" id="783329182%2FConstructors%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-screen-manager.html"><span>Screen</span><wbr><span><span>Manager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="783329182%2FConstructors%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">navController<span class="token operator">: </span><span data-unresolved-link="androidx.navigation/NavHostController///PointingToDeclaration/">NavHostController</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="1986528706%2FClasslikes%2F245679779" anchor-label="ScreenInfo" id="1986528706%2FClasslikes%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-screen-info/index.html"><span>Screen</span><wbr><span><span>Info</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1986528706%2FClasslikes%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-screen-info/index.html">ScreenInfo</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>screen<span class="token operator">: </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>id<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="380300370%2FProperties%2F245679779" anchor-label="idMap" id="380300370%2FProperties%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="id-map.html"><span>id</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="380300370%2FProperties%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="id-map.html">idMap</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-309992475%2FProperties%2F245679779" anchor-label="infoMap" id="-309992475%2FProperties%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="info-map.html"><span>info</span><wbr><span><span>Map</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-309992475%2FProperties%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="info-map.html">infoMap</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-map/index.html">MutableMap</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><a href="-screen-info/index.html">ScreenManager.ScreenInfo</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-155952844%2FProperties%2F245679779" anchor-label="navController" id="-155952844%2FProperties%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nav-controller.html"><span>nav</span><wbr><span><span>Controller</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-155952844%2FProperties%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="nav-controller.html">navController</a><span class="token operator">: </span><span data-unresolved-link="androidx.navigation/NavHostController///PointingToDeclaration/">NavHostController</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-405813954%2FProperties%2F245679779" anchor-label="top" id="-405813954%2FProperties%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="top.html"><span><span>top</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-405813954%2FProperties%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="top.html">top</a><span class="token operator">: </span><a href="../-basic-screen/index.html">BasicScreen</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1074540665%2FFunctions%2F245679779" anchor-label="forEach" id="-1074540665%2FFunctions%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="for-each.html"><span>for</span><wbr><span><span>Each</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1074540665%2FFunctions%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="for-each.html">S</a><span class="token operator"> : </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token operator">&gt; </span><a href="for-each.html"><span class="token function">forEach</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><a href="for-each.html">S</a><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2003634781%2FFunctions%2F245679779" anchor-label="get" id="2003634781%2FFunctions%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get.html"><span><span>get</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2003634781%2FFunctions%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="get.html">S</a><span class="token operator"> : </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token operator">&gt; </span><a href="get.html"><span class="token function">get</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="get.html">S</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1864245540%2FFunctions%2F245679779" anchor-label="navigate" id="-1864245540%2FFunctions%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="navigate.html"><span><span>navigate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1864245540%2FFunctions%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="navigate.html">S</a><span class="token operator"> : </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token operator">&gt; </span><a href="navigate.html"><span class="token function">navigate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">s<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html">ScreenManager</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="navigate.html">S</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="navigate.html">S</a><span class="token operator"> : </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token punctuation">, </span><a href="navigate.html">A1</a><span class="token operator">&gt; </span><a href="navigate.html"><span class="token function">navigate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">s<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html">ScreenManager</a><span class="token punctuation">, </span><a href="navigate.html">A1</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="navigate.html">S</a><span class="token punctuation">, </span></span><span class="parameter ">arg1<span class="token operator">: </span><a href="navigate.html">A1</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="navigate.html">S</a><span class="token operator"> : </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token punctuation">, </span><a href="navigate.html">A1</a><span class="token punctuation">, </span><a href="navigate.html">A2</a><span class="token operator">&gt; </span><a href="navigate.html"><span class="token function">navigate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">s<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html">ScreenManager</a><span class="token punctuation">, </span><a href="navigate.html">A1</a><span class="token punctuation">, </span><a href="navigate.html">A2</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="navigate.html">S</a><span class="token punctuation">, </span></span><span class="parameter ">arg1<span class="token operator">: </span><a href="navigate.html">A1</a><span class="token punctuation">, </span></span><span class="parameter ">arg2<span class="token operator">: </span><a href="navigate.html">A2</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="navigate.html">S</a><span class="token operator"> : </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token punctuation">, </span><a href="navigate.html">A1</a><span class="token punctuation">, </span><a href="navigate.html">A2</a><span class="token punctuation">, </span><a href="navigate.html">A3</a><span class="token operator">&gt; </span><a href="navigate.html"><span class="token function">navigate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">s<span class="token operator">: </span><span class="token punctuation">(</span><a href="index.html">ScreenManager</a><span class="token punctuation">, </span><a href="navigate.html">A1</a><span class="token punctuation">, </span><a href="navigate.html">A2</a><span class="token punctuation">, </span><a href="navigate.html">A3</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="navigate.html">S</a><span class="token punctuation">, </span></span><span class="parameter ">arg1<span class="token operator">: </span><a href="navigate.html">A1</a><span class="token punctuation">, </span></span><span class="parameter ">arg2<span class="token operator">: </span><a href="navigate.html">A2</a><span class="token punctuation">, </span></span><span class="parameter ">arg3<span class="token operator">: </span><a href="navigate.html">A3</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="613132226%2FFunctions%2F245679779" anchor-label="pop" id="613132226%2FFunctions%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pop.html"><span><span>pop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="613132226%2FFunctions%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="pop.html"><span class="token function">pop</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1711952406%2FFunctions%2F245679779" anchor-label="registerScreen" id="-1711952406%2FFunctions%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="register-screen.html"><span>register</span><wbr><span><span>Screen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1711952406%2FFunctions%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="register-screen.html"><span class="token function">registerScreen</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">screen<span class="token operator">: </span><a href="../-basic-screen/index.html">BasicScreen</a><span class="token punctuation">, </span></span><span class="parameter ">id<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="167872844%2FFunctions%2F245679779" anchor-label="unregisterScreen" id="167872844%2FFunctions%2F245679779" data-filterable-set=":ylcs-module:compose:screen/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:screen/commonMain" data-filterable-set=":ylcs-module:compose:screen/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="unregister-screen.html"><span>unregister</span><wbr><span><span>Screen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="167872844%2FFunctions%2F245679779"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:screen/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="unregister-screen.html"><span class="token function">unregisterScreen</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">screen<span class="token operator">: </span><a href="../-basic-screen/index.html">BasicScreen</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

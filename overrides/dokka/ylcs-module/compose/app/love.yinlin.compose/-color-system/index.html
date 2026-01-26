@@ -1,0 +1,464 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>ColorSystem</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.4.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:app/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:app/commonMain" data-filter=":ylcs-module:compose:app/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.app::love.yinlin.compose/ColorSystem///PointingToDeclaration//-1342937106">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.app</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose</a><span class="delimiter">/</span><span class="current">ColorSystem</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Color</span><wbr><span><span>System</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">ColorSystem</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>primary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onPrimary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>primaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onPrimaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>secondary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSecondary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>secondaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSecondaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>tertiary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onTertiary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>tertiaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onTertiaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>background<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onBackground<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>surface<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSurface<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSurfaceVariant<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>error<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onError<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>scrim<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="730649331%2FConstructors%2F-1342937106" anchor-label="ColorSystem" id="730649331%2FConstructors%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-color-system.html"><span>Color</span><wbr><span><span>System</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="730649331%2FConstructors%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">primary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onPrimary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">primaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onPrimaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">secondary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onSecondary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">secondaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onSecondaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">tertiary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onTertiary<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">tertiaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onTertiaryContainer<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">background<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onBackground<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">surface<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onSurface<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onSurfaceVariant<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">error<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">onError<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a><span class="token punctuation">, </span></span><span class="parameter ">scrim<span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="248169238%2FProperties%2F-1342937106" anchor-label="background" id="248169238%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="background.html"><span><span>background</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="248169238%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="background.html">background</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-843012722%2FProperties%2F-1342937106" anchor-label="error" id="-843012722%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="error.html"><span><span>error</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-843012722%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="error.html">error</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="117154551%2FProperties%2F-1342937106" anchor-label="onBackground" id="117154551%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-background.html"><span>on</span><wbr><span><span>Background</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="117154551%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-background.html">onBackground</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2142659315%2FProperties%2F-1342937106" anchor-label="onError" id="-2142659315%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-error.html"><span>on</span><wbr><span><span>Error</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2142659315%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-error.html">onError</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1795049389%2FProperties%2F-1342937106" anchor-label="onPrimary" id="-1795049389%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-primary.html"><span>on</span><wbr><span><span>Primary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1795049389%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-primary.html">onPrimary</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1465718106%2FProperties%2F-1342937106" anchor-label="onPrimaryContainer" id="-1465718106%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-primary-container.html"><span>on</span><wbr><span>Primary</span><wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1465718106%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-primary-container.html">onPrimaryContainer</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1468597025%2FProperties%2F-1342937106" anchor-label="onSecondary" id="1468597025%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-secondary.html"><span>on</span><wbr><span><span>Secondary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1468597025%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-secondary.html">onSecondary</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1681397864%2FProperties%2F-1342937106" anchor-label="onSecondaryContainer" id="-1681397864%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-secondary-container.html"><span>on</span><wbr><span>Secondary</span><wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1681397864%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-secondary-container.html">onSecondaryContainer</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-797630456%2FProperties%2F-1342937106" anchor-label="onSurface" id="-797630456%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-surface.html"><span>on</span><wbr><span><span>Surface</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-797630456%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-surface.html">onSurface</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-622596019%2FProperties%2F-1342937106" anchor-label="onSurfaceVariant" id="-622596019%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-surface-variant.html"><span>on</span><wbr><span>Surface</span><wbr><span><span>Variant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-622596019%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-surface-variant.html">onSurfaceVariant</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-52295085%2FProperties%2F-1342937106" anchor-label="onTertiary" id="-52295085%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-tertiary.html"><span>on</span><wbr><span><span>Tertiary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-52295085%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-tertiary.html">onTertiary</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1560356698%2FProperties%2F-1342937106" anchor-label="onTertiaryContainer" id="-1560356698%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-tertiary-container.html"><span>on</span><wbr><span>Tertiary</span><wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1560356698%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="on-tertiary-container.html">onTertiaryContainer</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1624810644%2FProperties%2F-1342937106" anchor-label="primary" id="1624810644%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="primary.html"><span><span>primary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1624810644%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="primary.html">primary</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2005190779%2FProperties%2F-1342937106" anchor-label="primaryContainer" id="-2005190779%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="primary-container.html"><span>primary</span><wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2005190779%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="primary-container.html">primaryContainer</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="173973648%2FProperties%2F-1342937106" anchor-label="scrim" id="173973648%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="scrim.html"><span><span>scrim</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="173973648%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="scrim.html">scrim</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1990859998%2FProperties%2F-1342937106" anchor-label="secondary" id="-1990859998%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="secondary.html"><span><span>secondary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1990859998%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="secondary.html">secondary</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-423593801%2FProperties%2F-1342937106" anchor-label="secondaryContainer" id="-423593801%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="secondary-container.html"><span>secondary</span><wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-423593801%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="secondary-container.html">secondaryContainer</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1672737719%2FProperties%2F-1342937106" anchor-label="surface" id="-1672737719%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="surface.html"><span><span>surface</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1672737719%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="surface.html">surface</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1410816462%2FProperties%2F-1342937106" anchor-label="tertiary" id="-1410816462%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tertiary.html"><span><span>tertiary</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1410816462%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="tertiary.html">tertiary</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1104140377%2FProperties%2F-1342937106" anchor-label="tertiaryContainer" id="-1104140377%2FProperties%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="tertiary-container.html"><span>tertiary</span><wbr><span><span>Container</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1104140377%2FProperties%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="tertiary-container.html">tertiaryContainer</a><span class="token operator">: </span><a href="../-mode-color/index.html">ModeColor</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="2077705294%2FFunctions%2F-1342937106" anchor-label="toColorScheme" id="2077705294%2FFunctions%2F-1342937106" data-filterable-set=":ylcs-module:compose:app/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:app/commonMain" data-filterable-set=":ylcs-module:compose:app/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-color-scheme.html"><span>to</span><wbr><span>Color</span><wbr><span><span>Scheme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2077705294%2FFunctions%2F-1342937106"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:app/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="to-color-scheme.html"><span class="token function">toColorScheme</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">isDarkMode<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.material3/ColorScheme///PointingToDeclaration/">ColorScheme</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
