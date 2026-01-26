@@ -304,4 +304,4 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Test
-        run: ./gradlew check --stacktrace
+        run: ./gradlew allTests --parallel --continue
