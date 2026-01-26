@@ -257,8 +257,7 @@ jobs:
           export-path-to-vs: VS_PATH
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:mod-manager:desktopJar
+        run: ./gradlew ylcs-app:mod-manager:desktopJar
 
   build-landpage:
     name: Build Landpage
@@ -282,5 +281,27 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:landpage:jsJar
+        run: ./gradlew ylcs-app:landpage:jsJar
+
+  test-check:
+    name: Run All Tests
+    needs: changes
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Test
+        run: ./gradlew check --stacktrace
