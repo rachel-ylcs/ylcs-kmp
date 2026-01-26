@@ -24,7 +24,7 @@ pag = "4.5.23"
 
 # Android
 cmp-android = "1.10.1"
-media3 = "1.9.0"
+media3 = "1.9.1"
 
 # iOS
 vlcKit = "3.6.1b1"
