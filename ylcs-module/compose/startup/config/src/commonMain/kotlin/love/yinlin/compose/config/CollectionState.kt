@@ -17,7 +17,7 @@ abstract class CollectionState<C, RC : C>(
 ) : ConfigState {
     protected val storageKey = "$name$version"
     protected val state: RC = stateFactory(kv.getJson(serializer, storageKey, defaultFactory))
-    @PublishedApi internal val items: C = state
+    val items: C = state
 
     protected fun save() { kv.setJson(serializer, storageKey, state) }
 
