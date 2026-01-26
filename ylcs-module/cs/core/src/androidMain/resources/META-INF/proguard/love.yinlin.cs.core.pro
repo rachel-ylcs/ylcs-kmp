@@ -1,0 +1,1 @@
+-keep class * extends love.yinlin.cs.APIRes

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="modManagerPublish" type="GradleRunConfiguration" factoryName="Gradle" folderName="ModManager">
+  <configuration default="false" name="modManagerPublish" type="GradleRunConfiguration" factoryName="Gradle" folderName="Desktop">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />

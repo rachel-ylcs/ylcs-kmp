@@ -70,10 +70,12 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
                     isMinifyEnabled = true
                     isShrinkResources = true
                     isDebuggable = false
-                    proguardFiles(
-                        getDefaultProguardFile(C.proguard.defaultRule),
-                        //C.root.shared.commonR8Rule, C.root.shared.androidR8Rule
-                    )
+
+                    val proguardDir = androidProguardAndroidDir.asFile
+                    val proguardConfigs = mutableListOf<Any>(getDefaultProguardFile(C.proguard.defaultRule))
+                    if (proguardDir.isDirectory) proguardConfigs.addAll(proguardDir.listFiles { it.extension == "pro" })
+                    proguardFiles(*proguardConfigs.toTypedArray())
+
                     signingConfig = androidSigningConfig
                 }
             }

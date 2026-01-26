@@ -175,6 +175,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         minSdk = C.android.minSdk
                         lint.targetSdk = C.android.targetSdk
 
+                        val proguardDir = androidProguardKMPDir.asFile
+                        if (proguardDir.isDirectory) {
+                            val proguardFiles = proguardDir.listFiles { it.extension == "pro" }
+                            consumerProguardFiles.addAll(proguardFiles)
+                        }
+
                         ndk {
                             for (abi in C.android.ndkAbi) abiFilters += abi
                         }
@@ -203,6 +209,18 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         compileTaskProvider.configure {
                             compilerOptions {
                                 jvmTarget.set(C.jvm.androidTarget)
+                            }
+                        }
+                    }
+
+                    @Suppress("UnstableApiUsage")
+                    optimization {
+                        val proguardDir = androidProguardKMPDir.asFile
+                        if (proguardDir.isDirectory) {
+                            val proguardFiles = proguardDir.listFiles { it.extension == "pro" }
+                            consumerKeepRules.apply {
+                                publish = true
+                                files(*proguardFiles)
                             }
                         }
                     }
@@ -369,9 +387,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             }
         }
 
-        if (windowsDistributions != null || linuxDistributions != null || macOSDistributions != null) {
-            extensions.configure<ComposeExtension> {
-                this.configure<DesktopExtension> {
+        extensions.findByType<ComposeExtension>()?.apply {
+            this.extensions.findByType<DesktopExtension>()?.apply {
+                val packageDistributions = windowsDistributions != null || linuxDistributions != null || macOSDistributions != null
+                if (packageDistributions) {
                     application {
                         mainClass = desktopMainClass
 
@@ -386,7 +405,13 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                     optimize.set(true)
                                     obfuscate.set(true)
                                     joinOutputJars.set(true)
-                                    //configurationFiles.from(C.root.shared.commonR8Rule, C.root.shared.desktopR8Rule)
+
+                                    // Compose Desktop 似乎还不支持内嵌 Proguard 规则
+                                    val proguardDir = desktopProguardKMPDir.asFile
+                                    if (proguardDir.isDirectory) {
+                                        val proguardFiles = proguardDir.listFiles { it.extension == "pro" }
+                                        configurationFiles.from(*proguardFiles)
+                                    }
                                 }
                             }
                         }

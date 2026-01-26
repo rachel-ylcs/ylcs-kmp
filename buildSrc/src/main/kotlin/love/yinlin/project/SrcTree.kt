@@ -39,11 +39,6 @@ class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
 }
 
 class SharedNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("shared") {
-    private val proguard: Directory = dir("proguard")
-    val commonR8Rule: RegularFile = proguard.file("R8Common.pro")
-    val androidR8Rule: RegularFile = proguard.file("R8Android.pro")
-    val desktopR8Rule: RegularFile = proguard.file("R8Desktop.pro")
-
     private val build: Directory = dir("build")
     val composeCompilerReport: Directory = build.dir("composeCompiler")
 }

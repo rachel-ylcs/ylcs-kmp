@@ -41,6 +41,13 @@ val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().d
 // 生成代码源目录
 val Project.generateSourceDir: Directory get() = layout.buildDirectory.get().dir("generated").dir("kotlin")
 
+// Android Proguard 目录
+val Project.androidProguardKMPDir: Directory get() = layout.projectDirectory.dir("src").dir("androidMain").dir("resources").dir("META-INF").dir("proguard")
+val Project.androidProguardAndroidDir: Directory get() = layout.projectDirectory.dir("src").dir("main").dir("resources").dir("META-INF").dir("proguard")
+
+// Desktop Proguard 目录
+val Project.desktopProguardKMPDir: Directory get() = layout.projectDirectory.dir("src").dir("desktopMain").dir("resources").dir("META-INF").dir("proguard")
+
 // Desktop Native 编译目录
 val Project.desktopNativeBuildDir: Directory get() = layout.buildDirectory.get().dir("desktopNative")
 

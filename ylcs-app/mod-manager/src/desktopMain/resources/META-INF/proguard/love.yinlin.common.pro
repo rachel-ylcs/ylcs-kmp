@@ -42,15 +42,6 @@
 
 -dontwarn org.slf4j.**
 
--assumenosideeffects class * extends org.slf4j.Logger {
-      public void trace(...);
-      public void debug(...);
-      public void info(...);
-      public void warn(...);
-      public void error(...);
-}
-
-
 # ----------------------------------------- OkHttp ---------------------------------------------- #
 
 -dontwarn okhttp3.internal.platform.**
@@ -109,12 +100,3 @@
     boolean getDEBUG();
     boolean getRECOVER_STACK_TRACES();
 }
-
-# ----------------------------------------- ktor ---------------------------------------------- #
-
--keep class io.ktor.** { *; }
--keepclassmembers class io.ktor.** { volatile <fields>; }
-
-# ----------------------------------------- App ----------------------------------------------- #
-
--keep class * extends love.yinlin.cs.APIRes
