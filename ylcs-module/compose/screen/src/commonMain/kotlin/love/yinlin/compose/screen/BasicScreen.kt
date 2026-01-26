@@ -25,7 +25,7 @@ import love.yinlin.compose.ui.floating.FloatingArgsSheet
 import love.yinlin.compose.ui.floating.FloatingDialog
 
 @Stable
-abstract class BasicScreen(val manager: ScreenManager) : ViewModel() {
+abstract class BasicScreen(@PublishedApi internal val manager: ScreenManager) : ViewModel() {
     open suspend fun initialize() {}
 
     open fun finalize() {}

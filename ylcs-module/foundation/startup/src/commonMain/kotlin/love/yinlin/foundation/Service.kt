@@ -5,7 +5,7 @@ import love.yinlin.coroutines.Coroutines
 import kotlin.jvm.JvmName
 
 open class Service {
-    protected val startups = mutableListOf<StartupDelegate<out Startup>>()
+    @PublishedApi internal val startups = mutableListOf<StartupDelegate<out Startup>>()
 
     @JvmName("serviceSync")
     protected inline fun <reified S : SyncStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {

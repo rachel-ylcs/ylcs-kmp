@@ -9,7 +9,8 @@ import love.yinlin.reflect.metaClassName
 
 @Stable
 class Route(name: String) {
-    val mBuilder = StringBuilder().append(name)
+    @PublishedApi
+    internal val mBuilder = StringBuilder().append(name)
 
     inline fun <reified A> arg(v: A): Route {
         mBuilder.append('|')

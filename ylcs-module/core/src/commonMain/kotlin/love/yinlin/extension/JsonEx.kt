@@ -94,7 +94,7 @@ object JsonConverter {
 
 // Json DSL
 
-data class JsonArrayScope(val builder: JsonArrayBuilder) {
+data class JsonArrayScope(@PublishedApi internal val builder: JsonArrayBuilder) {
     fun add(value: Nothing?) = builder.add(JsonNull)
     fun add(value: Boolean) = builder.add(value.json)
     fun add(value: Number) = builder.add(value.json)
@@ -109,7 +109,7 @@ data class JsonArrayScope(val builder: JsonArrayBuilder) {
     }
 }
 
-data class JsonObjectScope(val builder: JsonObjectBuilder) {
+data class JsonObjectScope(@PublishedApi internal val builder: JsonObjectBuilder) {
     infix fun String.with(value: Nothing?) = builder.put(this, JsonNull)
     infix fun String.with(value: Boolean) = builder.put(this, value.json)
     infix fun String.with(value: Number) = builder.put(this, value.json)

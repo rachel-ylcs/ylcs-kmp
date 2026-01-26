@@ -19,7 +19,8 @@ onmessage = function(event) {
 };
     """.trimIndent()
 
-    val url = URL.createObjectURL(
+    @PublishedApi
+    internal val url = URL.createObjectURL(
         Blob(
             blobParts = jsArrayOf(text).cast(),
             options = BlobPropertyBag(type = "application/javascript")

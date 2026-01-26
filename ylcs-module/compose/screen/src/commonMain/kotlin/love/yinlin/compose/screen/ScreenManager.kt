@@ -8,13 +8,14 @@ import love.yinlin.reflect.metaClassName
 @Stable
 class ScreenManager(val navController: NavHostController) {
     @Stable
-    data class ScreenInfo(
+    @PublishedApi
+    internal data class ScreenInfo(
         val screen: BasicScreen,
         val id: String
     )
 
-    val infoMap = mutableMapOf<String, MutableList<ScreenInfo>>()
-    val idMap = mutableMapOf<String, BasicScreen>()
+    @PublishedApi internal val infoMap = mutableMapOf<String, MutableList<ScreenInfo>>()
+    @PublishedApi internal val idMap = mutableMapOf<String, BasicScreen>()
 
     @OptIn(CompatibleRachelApi::class)
     fun registerScreen(screen: BasicScreen, id: String) {

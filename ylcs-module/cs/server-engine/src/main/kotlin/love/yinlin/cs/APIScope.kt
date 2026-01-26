@@ -489,10 +489,10 @@ abstract class APIScope internal constructor(
 
     class FormResult(private val multipartData: MultiPartData) {
         private val tempDir = System.getProperty("java.io.tmpdir")
-        var dataIndex = 0
-        var fileIndex = 0
-        var dataList = emptyList<String>()
-        var fileList = emptyList<APIFile?>()
+        @PublishedApi internal var dataIndex = 0
+        @PublishedApi internal var fileIndex = 0
+        @PublishedApi internal var dataList = emptyList<String>()
+        @PublishedApi internal var fileList = emptyList<APIFile?>()
 
         suspend fun parse() {
             val dataItems = mutableListOf<Pair<Int, String>>()
