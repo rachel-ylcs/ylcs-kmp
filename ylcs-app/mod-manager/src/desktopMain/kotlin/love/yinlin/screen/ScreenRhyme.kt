@@ -67,10 +67,10 @@ import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLine
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.*
+import love.yinlin.mod_manager.resources.Res
+import love.yinlin.mod_manager.resources.music
 import love.yinlin.util.QrcDecrypter
 import org.jetbrains.compose.resources.Font
-import love.yinlin.mod_manager.generated.resources.Res
-import love.yinlin.mod_manager.generated.resources.music
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection

@@ -14,8 +14,6 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val exportResource: Boolean = true
-
     override fun KotlinNativeTarget.ios() {
         if (C.platform == BuildPlatform.Mac) {
             compilations.getByName("main") {

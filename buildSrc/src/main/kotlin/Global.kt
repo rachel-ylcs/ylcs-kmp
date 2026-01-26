@@ -54,3 +54,8 @@ val Project.desktopNativeBuildDir: Directory get() = layout.buildDirectory.get()
 // Desktop Native 源代码
 val Project.desktopNativeKMPSourceDir: Directory get() = layout.projectDirectory.dir("src").dir("desktopMain").dir("cpp")
 val Project.desktopNativeJVMSourceDir: Directory get() = layout.projectDirectory.dir("src").dir("main").dir("cpp")
+
+// KMP 资源
+val Project.hasKMPResources: Boolean get() = layout.projectDirectory.dir("src").asFile.listFiles {
+    it.isDirectory && it.resolve("composeResources").isDirectory
+}.isNotEmpty()

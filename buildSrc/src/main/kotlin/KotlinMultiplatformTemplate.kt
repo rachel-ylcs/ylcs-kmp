@@ -95,7 +95,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinMultiplatformSourceSetsScope.source() { }
 
     // Compose
-    open val exportResource: Boolean = false
     open fun ComposeCompilerGradlePluginExtension.composeCompiler() { }
 
     // Android
@@ -151,6 +150,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinNativeTarget.native() { }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
+        val exportResources = hasKMPResources
+
         with(extension) {
             compilerOptions {
                 useLanguageFeature()
@@ -225,7 +226,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         }
                     }
 
-                    if (exportResource) {
+                    if (exportResources) {
                         @Suppress("UnstableApiUsage")
                         androidResources.enable = true
                     }
@@ -378,16 +379,14 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             composeCompiler()
         }
 
-        if (exportResource) {
-            extensions.configure<ComposeExtension> {
-                this.configure<ResourcesExtension> {
+        extensions.findByType<ComposeExtension>()?.apply {
+            if (exportResources) {
+                this.extensions.findByType<ResourcesExtension>()?.apply {
                     publicResClass = true
                     packageOfResClass = "$uniqueSafeModuleName.resources"
                 }
             }
-        }
 
-        extensions.findByType<ComposeExtension>()?.apply {
             this.extensions.findByType<DesktopExtension>()?.apply {
                 val packageDistributions = windowsDistributions != null || linuxDistributions != null || macOSDistributions != null
                 if (packageDistributions) {

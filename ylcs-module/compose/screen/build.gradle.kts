@@ -11,7 +11,6 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val exportResource: Boolean = true
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
