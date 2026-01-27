@@ -40,6 +40,7 @@ include(
     "ylcs-module:compose:screen",
     "ylcs-module:compose:startup:config",
     "ylcs-module:compose:theme",
+    "ylcs-module:compose:ui",
     "ylcs-module:compose:ui:core",
     "ylcs-module:compose:ui:pag-kmp",
     "ylcs-module:compose:ui:pagination-layout",
