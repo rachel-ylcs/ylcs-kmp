@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import kotlinx.cinterop.ExperimentalForeignApi
 
 private class PAGImageViewWrapper : PlatformView<PlatformPAGImageView>() {
-    override fun build(): PlatformPAGImageView = PlatformPAGImageView(context)
+    override fun build(): PlatformPAGImageView = PlatformPAGImageView()
 }
 
 @Composable
@@ -22,7 +22,7 @@ actual fun PAGImageView(
 
     wrapper.Monitor(config) { view ->
         config.repeatCount.let { if (view.repeatCount() != it) view.setRepeatCount(it) }
-        config.scaleMode.ordinal.toUInt().let { if (view.scaleMode() != it) view.setScaleMode(it) }
+        config.renderScale.let { if (view.renderScale() != it) view.setRenderScale(it) }
     }
 
     wrapper.Monitor(composition) { view ->
