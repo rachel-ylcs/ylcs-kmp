@@ -7,3 +7,4 @@
 [submodule "ylcs-module/compose/components/pag-kmp/src/desktopMain/cpp/libpag"]
 	path = ylcs-module/compose/components/pag-kmp/src/desktopMain/cpp/libpag
 	url = https://github.com/Tencent/libpag.git
+    ignore = all

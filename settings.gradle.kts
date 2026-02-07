@@ -34,7 +34,6 @@ include(
     /* -----------------  库模块  ----------------- */
 
     "ylcs-module:compose:app",
-    "ylcs-module:compose:components:pag-kmp",
     "ylcs-module:compose:components:pagination-layout",
     "ylcs-module:compose:components:url-image",
     "ylcs-module:compose:components:webview",
@@ -42,6 +41,7 @@ include(
     "ylcs-module:compose:platform-view",
     "ylcs-module:compose:plugin:animated-webp-decoder",
     "ylcs-module:compose:plugin:game",
+    "ylcs-module:compose:components:pag-kmp",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:startup:config",
     "ylcs-module:compose:theme",
