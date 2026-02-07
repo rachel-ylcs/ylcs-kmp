@@ -14,7 +14,7 @@ inline val <reified T> T.metaSimpleClassName: String get() = T::class.simpleName
 expect inline fun <reified T> metaClassName(): String
 
 @CompatibleRachelApi
-expect val <T : Any> T.metaClassName: String
+expect inline val <T : Any> T.metaClassName: String
 
 @CompatibleRachelApi
 @get:JvmName("metaClassNameByType")
@@ -24,7 +24,7 @@ inline val <reified T> T.metaClassName: String get() = metaClassName<T>()
 expect inline fun <reified T> metaIsAnonymousClass(): Boolean
 
 @CompatibleRachelApi
-expect val <T : Any> T.metaIsAnonymousClass: Boolean
+expect inline val <T : Any> T.metaIsAnonymousClass: Boolean
 
 @CompatibleRachelApi
 @get:JvmName("metaIsAnonymousClassByType")

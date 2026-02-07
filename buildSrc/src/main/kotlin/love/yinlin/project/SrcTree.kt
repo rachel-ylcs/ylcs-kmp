@@ -21,6 +21,7 @@ class DocsNode(root: RootProjectNode) : Directory by root.dir("ylcs-docs") {
     val docs: Directory = dir("docs")
     val overrides: Directory = docs.dir("overrides")
     val dokka: Directory = overrides.dir("dokka")
+    val gallery: Directory = overrides.dir("gallery")
 }
 
 class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
@@ -71,11 +72,18 @@ class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
     val wasmOutput: Directory = root.outputs.dir("webWasm")
 }
 
-class LandpageNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("landpage") {
+class LandpageNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("landpage") {
     private val build: Directory = dir("build")
 
     val originOutput: Directory = build.dir("dist").dir("js").dir("productionExecutable")
     val output: Directory = root.outputs.dir("landpage")
+}
+
+class GalleryNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("gallery") {
+    private val build: Directory = dir("build")
+
+    val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
+    val output: Directory = root.docs.gallery
 }
 
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
@@ -100,7 +108,8 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val iosApp = IosAppNode(this, c)
     val desktopApp = DesktopAppNode(this, c)
     val webApp = WebAppNode(this, c)
-    val landpage = LandpageNode(this, c)
+    val landpage = LandpageNode(this)
+    val gallery = GalleryNode(this)
     val server = ServerNode(this, c)
     val modManager = ModManagerNode(this, c)
     val libsVersion: RegularFile = file("libs.version.toml")

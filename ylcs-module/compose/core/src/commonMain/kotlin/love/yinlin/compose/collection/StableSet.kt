@@ -20,6 +20,11 @@ class StableSet<T>(private val instance: Set<T>) : Set<T> by instance {
 
     override fun equals(other: Any?): Boolean = instance == other
     override fun hashCode(): Int = instance.hashCode()
+
+    fun cloneAdd(value: T): StableSet<T> = StableSet(instance.toMutableSet().also { it += value })
+    fun cloneAdd(vararg value: T): StableSet<T> = StableSet(instance.toMutableSet().also { it += value })
+    fun cloneRemove(value: T): StableSet<T> = StableSet(instance.toMutableSet().also { it -= value })
+    fun cloneRemove(predicate: (T) -> Boolean): StableSet<T> = StableSet(instance.toMutableSet().also { it.removeAll(predicate) })
 }
 
 inline fun <reified T> Set<T>.toStableSet(): StableSet<T> = StableSet(this)

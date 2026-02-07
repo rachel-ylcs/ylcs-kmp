@@ -57,7 +57,7 @@ private fun UserItem(
     Box(modifier = modifier) {
         Column(
             modifier = Modifier.fillMaxWidth()
-                .condition(onClick != null) { clickable { onClick?.invoke() } }
+                .condition(onClick != null) { clickable { onClick() } }
                 .padding(CustomTheme.padding.equalExtraValue),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)

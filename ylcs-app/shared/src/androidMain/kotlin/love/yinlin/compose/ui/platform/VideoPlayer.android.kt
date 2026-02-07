@@ -19,8 +19,6 @@ import androidx.media3.ui.compose.PlayerSurface
 import androidx.media3.ui.compose.SURFACE_TYPE_SURFACE_VIEW
 import androidx.media3.ui.compose.modifiers.resizeWithContentScale
 import androidx.media3.ui.compose.state.rememberPresentationState
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import love.yinlin.app
@@ -29,6 +27,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.concurrent.Lock
 import love.yinlin.coroutines.Coroutines
 
 @Stable
@@ -40,21 +39,22 @@ private class VideoPlayerState {
     var duration by mutableLongStateOf(0L)
 
     var updateProgressJob: Job? = null
-    val updateProgressJobLock = SynchronizedObject()
+    val updateProgressJobLock = Lock()
 
     val listener = object : Player.Listener {
         override fun onIsPlayingChanged(value: Boolean) {
             withPlayer { player ->
                 isPlaying = value
-                synchronized(updateProgressJobLock) {
+                updateProgressJobLock.synchronized {
                     updateProgressJob?.cancel()
-                    updateProgressJob = if (value) Coroutines.startMain {
-                        while (true) {
-                            if (!Coroutines.isActive()) break
-                            position = player.currentPosition
-                            delay(100L)
-                        }
-                    } else null
+                    // TODO: work on main dispatcher
+//                    updateProgressJob = if (value) Coroutines.startMain {
+//                        while (true) {
+//                            if (!Coroutines.isActive()) break
+//                            position = player.currentPosition
+//                            delay(100L)
+//                        }
+//                    } else null
                 }
             }
         }
@@ -104,7 +104,7 @@ actual fun VideoPlayer(
             play()
         }
         onDispose {
-            synchronized(state.updateProgressJobLock) {
+            state.updateProgressJobLock.synchronized {
                 state.updateProgressJob?.cancel()
             }
             state.controller?.removeListener(state.listener)

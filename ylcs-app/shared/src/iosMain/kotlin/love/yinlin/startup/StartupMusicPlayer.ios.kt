@@ -202,12 +202,11 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
             override fun mediaPlayerStateChanged(aNotification: NSNotification) {
                 mediaPlayer?.let { player ->
                     if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
-                        Coroutines.startMain {
-                            when (playMode) {
-                                MusicPlayMode.LOOP -> setCurrentPlaying(currentIndex, true)
-                                else -> gotoNext()
-                            }
-                        }
+                        // TODO: work on dispatcher main
+//                        when (playMode) {
+//                            MusicPlayMode.LOOP -> setCurrentPlaying(currentIndex, true)
+//                            else -> gotoNext()
+//                        }
                     } else {
                         isPlaying = player.playing
                         if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateOpening) {
@@ -275,42 +274,35 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
     }
 
     private fun setupNowPlayingInfoCenter() {
-        Coroutines.startMain {
-            // 加上下面这行才能后台播放，否则后台切歌的时候会被suspend
-            UIApplication.sharedApplication.beginReceivingRemoteControlEvents()
-        }
+        // 加上下面这行才能后台播放，否则后台切歌的时候会被suspend
+        UIApplication.sharedApplication.beginReceivingRemoteControlEvents()
         val commandCenter = MPRemoteCommandCenter.sharedCommandCenter()
         commandCenter.playCommand.addTargetWithHandler { event ->
-            Coroutines.startMain {
-                play()
-            }
+            // TODO: work on dispatcher main
+            // play()
             MPRemoteCommandHandlerStatusSuccess
         }
         commandCenter.pauseCommand.addTargetWithHandler { event ->
-            Coroutines.startMain {
-                pause()
-            }
+            // TODO: work on dispatcher main
+            // pause()
             MPRemoteCommandHandlerStatusSuccess
         }
         commandCenter.previousTrackCommand.addTargetWithHandler { event ->
-            Coroutines.startMain {
-                gotoPrevious()
-            }
+            // TODO: work on dispatcher main
+            // gotoPrevious()
             MPRemoteCommandHandlerStatusSuccess
         }
         commandCenter.nextTrackCommand.addTargetWithHandler { event ->
-            Coroutines.startMain {
-                gotoNext()
-            }
+            // TODO: work on dispatcher main
+            // gotoNext()
             MPRemoteCommandHandlerStatusSuccess
         }
         commandCenter.changePlaybackPositionCommand.addTargetWithHandler { event ->
             val event = event as? MPChangePlaybackPositionCommandEvent
-            Coroutines.startMain {
-                event?.let {
-                    seekTo((it.positionTime * 1000).roundToLong())
-                }
-            }
+            // TODO: work on dispatcher main
+//            event?.let {
+//                seekTo((it.positionTime * 1000).roundToLong())
+//            }
             MPRemoteCommandHandlerStatusSuccess
         }
     }

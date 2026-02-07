@@ -36,18 +36,4 @@ actual object Fixup {
             )
         }
     }
-
-    // ignoresMouseEvents on macOS is buggy
-    // See https://stackoverflow.com/questions/29441015
-    inline fun macOSClickEventDelay(value: Boolean, crossinline setValue: (Boolean) -> Unit) {
-        Platform.use(Platform.MacOS) {
-            if (value) {
-                setValue(false)
-                Coroutines.startMain {
-                    delay(100)
-                    setValue(true)
-                }
-            }
-        }
-    }
 }

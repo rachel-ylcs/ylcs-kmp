@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
 import androidx.compose.ui.window.ComposeUIViewController
+import kotlinx.coroutines.MainScope
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.foundation.PlatformContextDelegate
 import platform.UIKit.UIViewController
@@ -19,14 +20,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun buildDelegate(): ComposeUIViewControllerDelegate = object : ComposeUIViewControllerDelegate {}
 
     fun run(): UIViewController {
-        openService(later = false, immediate = true)
+        openService(scope = MainScope(), later = false, immediate = true)
 
         val uiViewController = ComposeUIViewController(
             configure = {
                 delegate = buildDelegate()
             }
         ) {
-            Layout {
+            ComposedLayout {
                 BeginContent()
                 Content()
             }

@@ -1,6 +1,6 @@
 package love.yinlin.platform
 
-val UnsupportedPlatformText = "不支持的平台 $platform"
+val UnsupportedPlatformText = "unsupported platform [$platform]"
 
 open class UnsupportedPlatformException : Exception(UnsupportedPlatformText)
 

@@ -1,41 +1,32 @@
 package love.yinlin.compose.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.zIndex
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.rememberImmersivePadding
-import love.yinlin.compose.ui.CustomTheme
+import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.Floating
-import love.yinlin.compose.ui.icon.M3Icons
-import love.yinlin.compose.ui.image.ClickIcon
-import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.compose.ui.layout.NavigationBack
-import love.yinlin.compose.ui.layout.SplitActionLayout
+import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.text.SimpleEllipsisText
 
 @Stable
-abstract class Screen(manager: ScreenManager) : BasicScreen(manager) {
-    @Composable
-    protected abstract fun Content(device: Device)
-
+abstract class Screen : BasicScreen() {
     protected open val title: String? = null
 
-    protected open fun onBack() = pop()
+    @Composable
+    protected open fun RowScope.LeftActions() { }
 
     @Composable
-    protected open fun ActionScope.LeftActions() { }
-
-    @Composable
-    protected open fun ActionScope.RightActions() { }
+    protected open fun RowScope.RightActions() { }
 
     @Composable
     protected open fun ColumnScope.SecondTitleBar() { }
@@ -43,50 +34,45 @@ abstract class Screen(manager: ScreenManager) : BasicScreen(manager) {
     @Composable
     protected open fun BottomBar() { }
 
-    @OptIn(ExperimentalComposeUiApi::class)
+    @Composable
+    protected abstract fun Content()
+
     @Composable
     final override fun BasicContent() {
-        NavigationBack(onBack = ::onBack)
-
         val immersivePadding = rememberImmersivePadding()
+
         Column(modifier = Modifier.fillMaxSize()) {
             title?.let { titleString ->
                 Surface(
                     modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-                    tonalElevation = CustomTheme.shadow.tonal,
-                    shadowElevation = CustomTheme.shadow.surface
+                    contentPadding = immersivePadding.withoutBottom,
+                    tonalLevel = 5,
+                    shadowElevation = Theme.shadow.v2
                 ) {
-                    Column(modifier = Modifier.padding(immersivePadding.withoutBottom).fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         Box(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace),
+                            modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
                             contentAlignment = Alignment.Center
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxWidth().zIndex(2f),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = titleString,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
+                                SimpleEllipsisText(text = titleString, style = Theme.typography.v6.bold)
                             }
-                            SplitActionLayout(
+                            Row(
                                 modifier = Modifier.fillMaxWidth().zIndex(1f),
-                                left = {
-                                    ClickIcon(
-                                        modifier = Modifier.padding(start = CustomTheme.padding.horizontalSpace),
-                                        icon = M3Icons.ArrowBack,
-                                        tip = "返回",
-                                        onClick = ::onBack
-                                    )
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                ActionScope.Left.Container {
+                                    Icon(icon = Icons.ArrowBack, tip = Theme.value.backText, onClick = ::onBack)
                                     LeftActions()
-                                },
-                                right = {
+                                }
+                                ActionScope.Right.Container {
                                     RightActions()
                                 }
-                            )
+                            }
                         }
                         SecondTitleBar()
                     }
@@ -94,21 +80,19 @@ abstract class Screen(manager: ScreenManager) : BasicScreen(manager) {
             }
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 CompositionLocalProvider(
-                    LocalImmersivePadding provides (if (title == null) immersivePadding else immersivePadding.withoutTop)
-                ) {
-                    Content(LocalDevice.current)
-                }
+                    LocalImmersivePadding provides (if (title == null) immersivePadding else immersivePadding.withoutTop),
+                    content = ::Content
+                )
             }
             Surface(
                 modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
-                tonalElevation = CustomTheme.shadow.tonal,
-                shadowElevation = CustomTheme.shadow.surface
+                tonalLevel = 5,
+                shadowElevation = Theme.shadow.v2
             ) {
                 CompositionLocalProvider(
-                    LocalImmersivePadding provides (if (title == null) immersivePadding else immersivePadding.withoutTop)
-                ) {
-                    BottomBar()
-                }
+                    LocalImmersivePadding provides (if (title == null) immersivePadding else immersivePadding.withoutTop),
+                    content = ::BottomBar
+                )
             }
         }
     }

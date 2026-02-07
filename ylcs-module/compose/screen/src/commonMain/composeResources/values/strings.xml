@@ -1,6 +1,0 @@
-<resources>
-    <string name="dialog_ok">确定</string>
-    <string name="dialog_cancel">取消</string>
-    <string name="dialog_yes">是</string>
-    <string name="dialog_no">否</string>
-</resources>

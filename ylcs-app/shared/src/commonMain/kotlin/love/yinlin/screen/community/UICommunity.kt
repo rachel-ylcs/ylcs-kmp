@@ -97,7 +97,7 @@ internal fun BoxText(
     Box(
         modifier = Modifier.padding(CustomTheme.padding.verticalSpace / 2)
             .border(CustomTheme.border.small, color = color)
-            .condition(onClick != null) { clickable { onClick?.invoke() } },
+            .condition(onClick != null) { clickable { onClick() } },
         contentAlignment = Alignment.Center
     ) {
         Text(

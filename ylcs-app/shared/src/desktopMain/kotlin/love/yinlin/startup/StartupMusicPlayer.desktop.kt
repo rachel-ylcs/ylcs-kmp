@@ -1,12 +1,11 @@
 package love.yinlin.startup
 
 import androidx.compose.runtime.*
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.concurrent.Lock
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.foundation.StartupFetcher
 import love.yinlin.data.mod.ModResourceType
@@ -174,7 +173,7 @@ private class WindowsMusicPlayer : PlatformMusicPlayer() {
     private var shouldImmediatePlay: Boolean = false
 
     private var updateProgressJob: Job? = null
-    private val updateProgressJobLock = SynchronizedObject()
+    private val updateProgressJobLock = Lock()
 
     override var isInit: Boolean by mutableStateOf(false)
         private set
@@ -188,20 +187,21 @@ private class WindowsMusicPlayer : PlatformMusicPlayer() {
             when (state) {
                 WindowsNativePlaybackState.Playing -> {
                     isPlaying = true
-                    synchronized(updateProgressJobLock) {
+                    updateProgressJobLock.synchronized {
                         updateProgressJob?.cancel()
-                        updateProgressJob = Coroutines.startCPU {
-                            while (true) {
-                                if (!Coroutines.isActive()) break
-                                currentPosition = controller.position
-                                delay(engine.interval)
-                            }
-                        }
+                        // work on dispatcher cpu
+//                        updateProgressJob = Coroutines.startCPU {
+//                            while (true) {
+//                                if (!Coroutines.isActive()) break
+//                                currentPosition = controller.position
+//                                delay(engine.interval)
+//                            }
+//                        }
                     }
                 }
                 WindowsNativePlaybackState.Paused, WindowsNativePlaybackState.None -> {
                     isPlaying = false
-                    synchronized(updateProgressJobLock) {
+                    updateProgressJobLock.synchronized {
                         updateProgressJob?.cancel()
                         updateProgressJob = null
                     }

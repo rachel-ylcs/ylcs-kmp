@@ -1,42 +1,43 @@
 package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Stable
-import androidx.navigation.NavBackStackEntry
 import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.uri.Uri
 import love.yinlin.extension.toJsonString
 import love.yinlin.reflect.metaClassName
 
 @Stable
-class Route(name: String) {
-    @PublishedApi
-    internal val mBuilder = StringBuilder().append(name)
-
-    inline fun <reified A> arg(v: A): Route {
-        mBuilder.append('|')
-        mBuilder.append(Uri.encodeUri(v.toJsonString()))
-        return this
-    }
-
-    override fun toString(): String = mBuilder.toString()
-
+@PublishedApi
+internal class Route(private val screenKey: String) {
     companion object {
-        fun argName(index: Int) = "arg$index"
+        const val SCREEN_404 = "404"
 
         @OptIn(CompatibleRachelApi::class)
-        inline fun <reified S : BasicScreen> build(num: Int): String = buildString {
-            append(metaClassName<S>())
-            repeat(num) { index ->
-                append("|{${argName(index)}}")
-            }
-        }
+        inline fun <reified S : BasicScreen> key(): String = metaClassName<S>()
 
-        fun fetch(num: Int, backStackEntry: NavBackStackEntry): List<String> {
-            val handle = backStackEntry.savedStateHandle
-            return List(num) { index -> Uri.decodeUri(handle.get<String>(argName(index))!!) }
+        inline operator fun <reified S : BasicScreen> invoke(): Route = Route(key<S>())
+
+        fun parse(route: String): Triple<String, String, String> {
+            val index1 = route.indexOf('|')
+            val index2 = route.indexOf('?', index1 + 1)
+            val screenName = route.substring(0, index1)
+            val uniqueId = route.substring(index1 + 1, index2)
+            val args = route.substring(index2 + 1)
+            return Triple(screenName, uniqueId, args)
         }
     }
-}
 
-@OptIn(CompatibleRachelApi::class)
-inline fun <reified S : BasicScreen> route(): Route = Route(metaClassName<S>())
+    val items = mutableListOf<String>()
+
+    fun build(): String = buildString {
+        append(screenKey)
+        append('|')
+        append(ScreenGlobal.ScreenUniqueId++)
+        append('?')
+        items.joinTo(this, separator = ",", prefix = "[", postfix = "]")
+    }
+
+    inline fun <reified A> arg(value: A): Route {
+        items += value.toJsonString()
+        return this
+    }
+}

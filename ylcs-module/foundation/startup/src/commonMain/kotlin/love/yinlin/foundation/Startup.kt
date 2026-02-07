@@ -10,8 +10,8 @@ abstract class Startup {
 
     abstract fun init(context: Context, args: StartupArgs)
     abstract fun initLater(context: Context, args: StartupArgs)
-    abstract suspend fun CoroutineScope.init(context: Context, args: StartupArgs)
-    abstract suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs)
+    abstract suspend fun init(scope: CoroutineScope, context: Context, args: StartupArgs)
+    abstract suspend fun initLater(scope: CoroutineScope, context: Context, args: StartupArgs)
     open fun destroy(context: Context, args: StartupArgs) { }
     open fun destroyBefore(context: Context, args: StartupArgs) { }
 

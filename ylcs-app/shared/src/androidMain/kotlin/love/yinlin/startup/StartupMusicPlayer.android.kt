@@ -16,13 +16,12 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import androidx.media3.session.SessionToken
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.io.files.Path
 import love.yinlin.compose.Fixup
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.concurrent.Lock
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.foundation.StartupFetcher
 import love.yinlin.data.mod.ModResourceType
@@ -52,7 +51,7 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
     override var currentMusic: MusicInfo? by mutableRefStateOf(null)
 
     private var updateProgressJob: Job? = null
-    private val updateProgressJobLock = SynchronizedObject()
+    private val updateProgressJobLock = Lock()
 
     override suspend fun initController(context: Context) {
         Coroutines.main {
@@ -142,15 +141,16 @@ actual fun buildMusicPlayer(): StartupMusicPlayer = object : StartupMusicPlayer(
             withPlayer { player ->
                 isPlaying = value
                 // 更新进度
-                synchronized(updateProgressJobLock) {
+                updateProgressJobLock.synchronized {
                     updateProgressJob?.cancel()
-                    updateProgressJob = if (value) Coroutines.startMain {
-                        while (true) {
-                            if (!Coroutines.isActive()) break
-                            currentPosition = player.currentPosition
-                            delay(engine.interval)
-                        }
-                    } else null
+                    // TODO: work on main dispatcher
+//                    updateProgressJob = if (value) Coroutines.startMain {
+//                        while (true) {
+//                            if (!Coroutines.isActive()) break
+//                            currentPosition = player.currentPosition
+//                            delay(engine.interval)
+//                        }
+//                    } else null
                 }
             }
         }

@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.collection.StableList
 import love.yinlin.compose.collection.toStableList
 import love.yinlin.compose.data.Picture
-import love.yinlin.compose.extension.localComposition
+import love.yinlin.compose.extension.staticLocalComposition
 import love.yinlin.compose.ui.CustomTheme
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -47,7 +47,7 @@ interface WeiboProcessor {
     fun onWeiboVideoClick(pic: Picture)
 }
 
-val LocalWeiboProcessor = localComposition<WeiboProcessor>()
+val LocalWeiboProcessor = staticLocalComposition<WeiboProcessor>()
 
 @Composable
 private fun WeiboIconValue(

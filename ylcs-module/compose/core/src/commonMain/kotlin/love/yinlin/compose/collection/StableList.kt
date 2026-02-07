@@ -20,6 +20,12 @@ class StableList<T>(private val instance: List<T>) : List<T> by instance {
 
     override fun equals(other: Any?): Boolean = instance == other
     override fun hashCode(): Int = instance.hashCode()
+
+    fun cloneSet(index: Int, value: T): StableList<T> = StableList(instance.toMutableList().also { it[index] = value })
+    fun cloneAdd(value: T): StableList<T> = StableList(instance.toMutableList().also { it += value })
+    fun cloneAdd(vararg value: T): StableList<T> = StableList(instance.toMutableList().also { it += value })
+    fun cloneRemove(index: Int): StableList<T> = StableList(instance.toMutableList().also { it.removeAt(index) })
+    fun cloneRemove(predicate: (T) -> Boolean): StableList<T> = StableList(instance.toMutableList().also { it.removeAll(predicate) })
 }
 
 inline fun <reified T> List<T>.toStableList(): StableList<T> = StableList(this)

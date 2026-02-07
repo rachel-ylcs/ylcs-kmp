@@ -19,7 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
-            lib(libs.compose.components.resources)
+            lib(libs.compose.resources)
         }
 
         desktopMain.configure(commonMain) {

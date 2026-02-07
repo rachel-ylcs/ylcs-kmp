@@ -23,7 +23,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -55,6 +54,7 @@ import love.yinlin.compose.ui.layout.LoadingBox
 import love.yinlin.compose.ui.layout.SplitLayout
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.text.StrokeText
+import love.yinlin.concurrent.atomic
 import love.yinlin.coroutines.ioContext
 import love.yinlin.cs.NetClient
 import love.yinlin.cs.ServerRes

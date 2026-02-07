@@ -16,7 +16,7 @@ template(object : KotlinMultiplatformTemplate() {
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
-            lib(libs.compose.components.resources)
+            lib(libs.compose.resources)
         }
 
         desktopMain.configure(commonMain) {
@@ -24,8 +24,7 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsApp.mod,
                 projects.ylcsModule.compose.app,
                 projects.ylcsModule.compose.screen,
-                projects.ylcsModule.compose.ui.rachel,
-                projects.ylcsModule.compose.ui.urlImage,
+                //projects.ylcsModule.compose.ui.urlImage,
             )
         }
     }

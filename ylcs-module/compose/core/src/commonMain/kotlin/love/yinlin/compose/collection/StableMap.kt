@@ -20,6 +20,9 @@ class StableMap<K, V>(private val instance: Map<K, V>) : Map<K, V> by instance {
 
     override fun equals(other: Any?): Boolean = instance == other
     override fun hashCode(): Int = instance.hashCode()
+
+    fun cloneSet(key: K, value: V): StableMap<K, V> = StableMap(instance.toMutableMap().also { it[key] = value })
+    fun cloneRemove(key: K): StableMap<K, V> = StableMap(instance.toMutableMap().also { it.remove(key) })
 }
 
 inline fun <reified K, reified V> Map<K, V>.toStableMap(): StableMap<K, V> = StableMap(this)

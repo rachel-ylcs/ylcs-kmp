@@ -110,6 +110,7 @@ object Colors {
     operator fun invoke(value: Long) = Color(value)
     operator fun invoke(value: ULong) = Color(value)
     operator fun invoke(red: Float, green: Float, blue: Float, alpha: Float = 1f) = Color(red, green, blue, alpha)
+    operator fun invoke(red: Int, green: Int, blue: Int, alpha: Int = 255) = Color(red, green, blue, alpha)
 }
 
 fun Color.blend(other: Color): Color {

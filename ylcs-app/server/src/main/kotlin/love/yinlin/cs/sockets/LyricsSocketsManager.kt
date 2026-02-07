@@ -1,12 +1,13 @@
 package love.yinlin.cs.sockets
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.cpuContext
 import love.yinlin.cs.service.Database
 import love.yinlin.cs.service.values
 import love.yinlin.cs.user.AN
@@ -28,7 +29,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
         }
 
         private val players = ConcurrentHashMap<Int, Player>()
-        private val scope = CoroutineScope(Dispatchers.Default)
+        private val scope = CoroutineScope(SupervisorJob() + cpuContext)
 
         private val availablePlayers: List<LyricsSockets.PlayerInfo> get() = players.values.filter { it.room == null }.map { it.info }
     }

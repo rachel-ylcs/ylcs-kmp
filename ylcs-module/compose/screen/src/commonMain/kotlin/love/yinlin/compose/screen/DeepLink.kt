@@ -11,7 +11,7 @@ fun interface DeepLink {
 
     @Stable
     companion object {
-        val DEFAULT = DeepLink { manager, uri -> }
+        val Default = DeepLink { manager, uri -> }
 
         private var cached: Uri? = null
         private var listener: ((uri: Uri) -> Unit)? = null

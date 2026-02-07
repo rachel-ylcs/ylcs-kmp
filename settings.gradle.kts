@@ -29,25 +29,23 @@ include(
 
     "ylcs-module:build-tool",
     "ylcs-module:dokka",
+    "ylcs-module:compose:test",
 
     /* -----------------  库模块  ----------------- */
 
     "ylcs-module:compose:app",
+    "ylcs-module:compose:components:pag-kmp",
+    "ylcs-module:compose:components:pagination-layout",
+    "ylcs-module:compose:components:url-image",
+    "ylcs-module:compose:components:webview",
     "ylcs-module:compose:core",
-    "ylcs-module:compose:device",
+    "ylcs-module:compose:platform-view",
     "ylcs-module:compose:plugin:animated-webp-decoder",
     "ylcs-module:compose:plugin:game",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:startup:config",
     "ylcs-module:compose:theme",
     "ylcs-module:compose:ui",
-    "ylcs-module:compose:ui:core",
-    "ylcs-module:compose:ui:pag-kmp",
-    "ylcs-module:compose:ui:pagination-layout",
-    "ylcs-module:compose:ui:platform-view",
-    "ylcs-module:compose:ui:rachel",
-    "ylcs-module:compose:ui:url-image",
-    "ylcs-module:compose:ui:webview",
     "ylcs-module:core",
     "ylcs-module:cs:core",
     "ylcs-module:cs:client-engine",
@@ -70,13 +68,14 @@ include(
 
     /* -----------------  应用模块  ----------------- */
 
+    "ylcs-app:androidApp",
+    "ylcs-app:cs",
+    "ylcs-app:desktopApp",
+    "ylcs-app:gallery",
     "ylcs-app:landpage",
     "ylcs-app:mod",
-    "ylcs-app:cs",
-    "ylcs-app:shared",
-    "ylcs-app:androidApp",
-    "ylcs-app:desktopApp",
-    "ylcs-app:webApp",
-    "ylcs-app:server",
     "ylcs-app:mod-manager",
+    "ylcs-app:server",
+    "ylcs-app:shared",
+    "ylcs-app:webApp",
 )

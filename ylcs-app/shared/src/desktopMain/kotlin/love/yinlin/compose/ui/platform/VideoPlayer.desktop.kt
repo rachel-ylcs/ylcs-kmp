@@ -11,12 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.zIndex
-import kotlinx.atomicfu.locks.SynchronousMutex
-import kotlinx.atomicfu.locks.withLock
+import kotlinx.coroutines.runBlocking
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.*
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
 import love.yinlin.platform.WindowsNativePlaybackState
@@ -46,7 +46,7 @@ private class VideoPlayerState(val url: String) {
     // https://github.com/coil-kt/coil/pull/2594
     var bitmap: Bitmap? = null
 
-    var mutex = SynchronousMutex()
+    var mutex = Mutex()
     var isRelease: Boolean = false
 
     fun init() {
@@ -69,20 +69,21 @@ private class VideoPlayerState(val url: String) {
             }
 
             override fun onFrame(width: Int, height: Int, data: ByteArray) {
-                if (mutex.tryLock() && !isRelease) {
-                    Coroutines.startMain {
-                        catching {
-                            val currentBitmap = bitmap ?: Bitmap().apply {
-                                allocPixels(ImageInfo(width, height, ColorType.BGRA_8888, ColorAlphaType.PREMUL))
-                                setImmutable()
-                                bitmap = this
-                            }
-                            currentBitmap.installPixels(data)
-                            currentBitmap.notifyPixelsChanged()
-                            position = controller.position
-                        }
-                    }
-                    mutex.unlock()
+                if (mutex.lock() && !isRelease) {
+                    // work on dispatcher main
+//                    Coroutines.startMain {
+//                        catching {
+//                            val currentBitmap = bitmap ?: Bitmap().apply {
+//                                allocPixels(ImageInfo(width, height, ColorType.BGRA_8888, ColorAlphaType.PREMUL))
+//                                setImmutable()
+//                                bitmap = this
+//                            }
+//                            currentBitmap.installPixels(data)
+//                            currentBitmap.notifyPixelsChanged()
+//                            position = controller.position
+//                        }
+//                        mutex.unlock()
+//                    }
                 }
             }
         })
@@ -90,12 +91,14 @@ private class VideoPlayerState(val url: String) {
     }
 
     fun release() {
-        mutex.withLock {
-            isRelease = true
-            controller.release()
-            val tmp = bitmap
-            bitmap = null
-            tmp?.close()
+        runBlocking {
+            mutex.with {
+                isRelease = true
+                controller.release()
+                val tmp = bitmap
+                bitmap = null
+                tmp?.close()
+            }
         }
     }
 

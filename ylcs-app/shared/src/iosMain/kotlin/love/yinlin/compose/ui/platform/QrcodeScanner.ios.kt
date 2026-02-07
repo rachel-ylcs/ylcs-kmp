@@ -104,7 +104,8 @@ private class QrcodeScannerWrapper(onResultCallback: State<(String) -> Unit>) : 
     override fun build(): QrcodeView {
         val qrcodeView = QrcodeView { scanCode.setRectOfInterest(it) }
         scanCode.preview = qrcodeView
-        Coroutines.startIO { scanCode.startRunning() }
+        // TODO: work on dispatcher io
+        scanCode.startRunning()
         qrcodeView.scanView.startScanning()
         return qrcodeView
     }
@@ -119,7 +120,8 @@ private class QrcodeScannerWrapper(onResultCallback: State<(String) -> Unit>) : 
         scanCode.readQRCode(image) { text ->
             if (text != null) {
                 scanCode.playSoundEffect("SGQRCode.bundle/scan_end_sound.caf")
-                Coroutines.startMain { onResult(text) }
+                // work on dispatcher main
+                onResult(text)
             }
         }
     }

@@ -41,10 +41,9 @@ private class VideoPlayerWrapper : PlatformView<UIView>(), Releasable<UIView> {
         player.delegate = object : NSObject(), VLCMediaPlayerDelegateProtocol {
             override fun mediaPlayerStateChanged(aNotification: NSNotification) {
                 if (player.state == VLCMediaPlayerState.VLCMediaPlayerStateEnded) {
-                    Coroutines.startMain {
-                        player.media = player.media?.url?.let { VLCMedia.mediaWithURL(it) }
-                        player.play()
-                    }
+                    // work on dispatcher main
+                    player.media = player.media?.url?.let { VLCMedia.mediaWithURL(it) }
+                    player.play()
                 } else {
                     isPlaying = player.playing
                     if (player.state == VLCMediaPlayerState.VLCMediaPlayerStatePlaying) {

@@ -41,6 +41,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Build Gallery
+        run: |
+          mkdir -p ylcs-docs/docs/overrides
+          ./gradlew ylcs-app:gallery:galleryPublish
+
       - name: Build Dokka
         run: |
           mkdir -p ylcs-docs/docs/overrides

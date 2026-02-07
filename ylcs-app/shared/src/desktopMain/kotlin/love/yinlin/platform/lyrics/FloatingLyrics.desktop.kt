@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.onEach
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.foundation.Context
 import love.yinlin.platform.NativeWindow
 
@@ -83,7 +82,7 @@ actual class FloatingLyrics {
             }
 
             if (app.mp.isPlaying) {
-                DragArea(enabled = canMove) {
+                WindowDraggableArea(enabled = canMove) {
                     app.Layout(modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.3f)) }) {
                         Box(
                             modifier = Modifier.fillMaxSize(),

@@ -4,77 +4,78 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.Device
 import love.yinlin.compose.LaunchFlag
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.ui.floating.FABLayout
-import kotlin.reflect.KClass
 
 @Stable
-abstract class NavigationScreen(manager: ScreenManager) : BasicScreen(manager) {
+abstract class NavigationScreen : BasicScreen() {
+    /**
+     * 装饰器
+     *
+     * 使用装饰器包裹导航切换组件并调用实际内容 content
+     */
+    @Composable
+    protected abstract fun DecorateContent(index: Int, content: @Composable () -> Unit)
+
     @Stable
-    data class SubScreenInfo(
-        val screen: SubScreen,
-        val clz: KClass<out SubScreen>,
-        val flag: LaunchFlag = LaunchFlag()
-    )
+    internal class SubScreenInfo(val screen: SubScreen, val flag: LaunchFlag = LaunchFlag())
 
-    abstract val subs: List<SubScreenInfo>
+    private val subScreenList = mutableStateListOf<SubScreenInfo>()
 
-    inline fun <reified S : SubScreen> sub(factory: (BasicScreen) -> S): SubScreenInfo = SubScreenInfo(factory(this), S::class)
+    /**
+     * 创建子页面
+     */
+    fun <S : SubScreen> create(factory: (BasicScreen) -> S) { subScreenList += SubScreenInfo(screen = factory(this)) }
 
-    inline fun <reified S : SubScreen> get(): S = subs.first { it.clz == S::class }.screen as S
+    private val pagerState = PagerState { subScreenList.size }
 
-    private val pagerState = PagerState { subs.size }
-
-    var pageIndex: Int get() = pagerState.settledPage
+    /**
+     * 当前页索引
+     */
+    var pageIndex: Int get() = pagerState.currentPage
         set(value) {
             launch { pagerState.scrollToPage(value) }
         }
 
-    private val currentScreen: SubScreen get() = subs[pageIndex].screen
-
     @Composable
-    protected abstract fun Wrapper(device: Device, index: Int, content: @Composable (Device) -> Unit)
-
-    @Composable
-    override fun BasicContent() {
-        Wrapper(LocalDevice.current, pagerState.currentPage) { device ->
+    final override fun BasicContent() {
+        DecorateContent(pagerState.currentPage) {
             HorizontalPager(
                 state = pagerState,
-                key = { it },
                 beyondViewportPageCount = 0,
                 userScrollEnabled = false,
                 modifier = Modifier.fillMaxSize()
             ) { index ->
                 Box(modifier = Modifier.fillMaxSize()) {
-                    val screen = subs[index].screen
-                    screen.Content(device)
+                    subScreenList.getOrNull(index)?.screen?.let { subScreen ->
+                        subScreen.Content()
 
-                    screen.fabIcon?.let { icon ->
-                        FABLayout(
-                            icon = icon,
-                            canExpand = screen.fabCanExpand,
-                            onClick = screen::onFabClick,
-                            menus = screen.fabMenus
-                        )
+                        subScreen.fab.Land()
                     }
                 }
             }
 
             LaunchedEffect(pageIndex) {
-                val info = subs[pageIndex]
-                info.flag({
-                    launch { info.screen.update() }
-                }) {
-                    launch { info.screen.initialize() }
+                subScreenList.getOrNull(pageIndex)?.let { info ->
+                    info.flag(
+                        update = {
+                            launch { info.screen.update() }
+                        },
+                        init = {
+                            launch { info.screen.initialize() }
+                        }
+                    )
                 }
             }
         }
     }
 
     @Composable
-    override fun Floating() = currentScreen.ComposedFloating()
+    final override fun Floating() {
+        subScreenList.getOrNull(pagerState.currentPage)?.screen?.SubComposedFloating()
+    }
 }

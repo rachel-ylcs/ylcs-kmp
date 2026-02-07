@@ -12,9 +12,8 @@ inline fun catching(block: () -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    try {
-        block()
-    } catch (_: Throwable) { }
+    try { block() }
+    catch (_: Throwable) { }
 }
 
 /**
@@ -38,9 +37,7 @@ inline fun <R> catchingNull(block: () -> R): R? {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return try {
-        block()
-    }
+    return try { block() }
     catch (_: Throwable) { null }
 }
 
@@ -51,12 +48,8 @@ inline fun <R> catchingDefault(default: R, block: () -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return try {
-        block()
-    }
-    catch (_: Throwable) {
-        default
-    }
+    return try { block() }
+    catch (_: Throwable) { default }
 }
 
 /**
@@ -66,10 +59,6 @@ inline fun <R> catchingDefault(default: (Throwable) -> R, block: () -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return try {
-        block()
-    }
-    catch (e: Throwable) {
-        default(e)
-    }
+    return try { block() }
+    catch (e: Throwable) { default(e) }
 }

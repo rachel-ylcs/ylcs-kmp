@@ -26,7 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import io.github.alexzhirkevich.qrose.options.*
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
-import kotlinx.atomicfu.atomic
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.minus
 import kotlinx.datetime.number
@@ -73,6 +72,7 @@ import love.yinlin.screen.community.UserProfileInfo
 import love.yinlin.screen.msg.activity.ScreenActivityLink
 import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.platform.QrcodeScanner
+import love.yinlin.concurrent.atomic
 import love.yinlin.cs.*
 import love.yinlin.data.Data
 import love.yinlin.extension.catchingError

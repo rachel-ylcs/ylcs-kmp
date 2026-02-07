@@ -8,15 +8,15 @@ abstract class AsyncStartup : Startup() {
     @OptIn(CompatibleRachelApi::class)
     override fun toString(): String = "(Async|${this.metaClassName})"
 
-    override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) { }
+    override suspend fun initLater(scope: CoroutineScope, context: Context, args: StartupArgs) { }
 
     final override fun init(context: Context, args: StartupArgs) = errorScope
     final override fun initLater(context: Context, args: StartupArgs) = errorScope
 
     companion object {
-        inline fun build(crossinline factory: suspend (StartupArgs) -> Unit): AsyncStartup = object : AsyncStartup() {
-            override suspend fun CoroutineScope.init(context: Context, args: StartupArgs) {
-                factory(args)
+        internal inline fun build(crossinline factory: suspend CoroutineScope.(StartupArgs) -> Unit): AsyncStartup = object : AsyncStartup() {
+            override suspend fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
+                scope.factory(args)
             }
         }
     }

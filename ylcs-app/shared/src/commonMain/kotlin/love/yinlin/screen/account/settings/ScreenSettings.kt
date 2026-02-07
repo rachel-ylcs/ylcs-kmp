@@ -297,7 +297,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                     verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.littleSpace)
                 ) {
                     for (themeMode in ThemeMode.entries) {
-                        this.Item(themeMode, themeMode.toString())
+                        this.Item(themeMode, themeMode.to111String())
                     }
                 }
             }

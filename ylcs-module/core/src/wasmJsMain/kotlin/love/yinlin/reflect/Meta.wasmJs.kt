@@ -6,10 +6,10 @@ import love.yinlin.annotation.CompatibleRachelApi
 actual inline fun <reified T> metaClassName(): String = T::class.qualifiedName!!
 
 @CompatibleRachelApi
-actual val <T : Any> T.metaClassName: String get() = this::class.qualifiedName!!
+actual inline val <T : Any> T.metaClassName: String get() = this::class.qualifiedName!!
 
 @CompatibleRachelApi
 actual inline fun <reified T> metaIsAnonymousClass(): Boolean = T::class.qualifiedName == null
 
 @CompatibleRachelApi
-actual val <T : Any> T.metaIsAnonymousClass: Boolean get() = this::class.qualifiedName == null
+actual inline val <T : Any> T.metaIsAnonymousClass: Boolean get() = this::class.qualifiedName == null
