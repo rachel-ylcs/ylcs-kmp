@@ -15,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -23,6 +22,7 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.localComposition
+import love.yinlin.compose.ui.node.condition
 import kotlin.math.ln
 
 private val LocalSurfaceTonalLevel = localComposition { 0 }
@@ -53,11 +53,10 @@ fun Surface(
         }
         Box(
             modifier = modifier
-                .then(if (shadowPx > 0f) Modifier.graphicsLayer(shadowElevation = shadowPx, shape = shape, clip = false) else Modifier)
-                .then(if (border != null) Modifier.border(border, shape) else Modifier)
-                .background(color = backgroundColor, shape = shape)
+                .condition(shadowPx > 0f) { graphicsLayer(shadowElevation = shadowPx, shape = shape) }
+                .condition(border != null) { border(border, shape) }
                 .clip(shape)
-                .pointerInput(Unit) {}
+                .background(color = backgroundColor)
                 .padding(contentPadding),
             contentAlignment = contentAlignment
         ) {

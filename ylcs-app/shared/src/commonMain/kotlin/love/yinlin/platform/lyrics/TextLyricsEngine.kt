@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.compose.Colors
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.ui.CustomTheme
-import love.yinlin.compose.ui.node.fadingEdges
+import love.yinlin.compose.ui.node.fadingEdge
 import kotlin.math.abs
 
 @Stable
@@ -95,14 +96,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
         BoxWithConstraints(modifier = modifier) {
             LazyColumn(
                 state = listState,
-                modifier = Modifier.fillMaxSize().fadingEdges(
-                    edges = DpRect(
-                        left = CustomTheme.padding.zeroSpace,
-                        top = maxHeight * 3 / 7,
-                        right = CustomTheme.padding.zeroSpace,
-                        bottom = maxHeight * 3 / 7
-                    )
-                )
+                modifier = Modifier.fillMaxSize().fadingEdge { PaddingValues(top = it.height * 3 / 7, bottom = it.height * 3 / 7) }
             ) {
                 lines?.let { lines ->
                     itemsIndexed(

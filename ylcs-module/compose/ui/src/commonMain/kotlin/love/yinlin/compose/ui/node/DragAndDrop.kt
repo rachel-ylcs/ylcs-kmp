@@ -1,6 +1,5 @@
 package love.yinlin.compose.ui.node
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import kotlinx.io.files.Path
@@ -27,7 +26,6 @@ sealed interface DropResult {
     data class Text(val text: String) : DropResult
 }
 
-@Composable
 expect fun Modifier.dragAndDrop(
     enabled: Boolean,
     flag: DragFlag,

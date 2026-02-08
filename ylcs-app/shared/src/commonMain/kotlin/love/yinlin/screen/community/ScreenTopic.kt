@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -57,6 +56,7 @@ import love.yinlin.compose.ui.text.RichEditor
 import love.yinlin.compose.ui.text.RichEditorState
 import love.yinlin.compose.ui.text.RichString
 import love.yinlin.compose.ui.text.RichText
+import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.cs.*
 
 @Composable
@@ -361,7 +361,7 @@ class ScreenTopic(manager: ScreenManager, currentTopic: Topic) : Screen(manager)
                 level = details.level,
                 onAvatarClick = { onAvatarClick(topic.uid) }
             )
-            SelectionContainer {
+            SelectionBox {
                 Text(
                     text = topic.title,
                     style = MaterialTheme.typography.titleMedium,

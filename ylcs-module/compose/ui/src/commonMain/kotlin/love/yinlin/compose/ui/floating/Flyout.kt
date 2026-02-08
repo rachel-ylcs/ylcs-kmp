@@ -10,7 +10,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
@@ -22,7 +21,6 @@ import love.yinlin.compose.Theme
 fun Flyout(
     visible: Boolean,
     onClickOutside: () -> Unit ,
-    modifier: Modifier = Modifier,
     position: FlyoutPosition = FlyoutPosition.Top,
     space: Dp = Theme.padding.v,
     flyout: @Composable () -> Unit,
@@ -55,6 +53,6 @@ fun Flyout(
             }
         }
 
-        Box(modifier = modifier) { content() }
+        content()
     }
 }

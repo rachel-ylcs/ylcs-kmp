@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -426,14 +425,7 @@ inline fun buildRichString(content: RichContainer.() -> Unit): RichString {
 	return richString
 }
 
-@Composable
-private fun SelectableContainer(
-	enabled: Boolean,
-	content: @Composable () -> Unit
-) {
-	if (enabled) SelectionContainer(content = content)
-	else content()
-}
+
 
 @Composable
 fun RichText(

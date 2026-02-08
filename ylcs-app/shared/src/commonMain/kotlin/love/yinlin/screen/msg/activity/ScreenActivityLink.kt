@@ -2,7 +2,6 @@ package love.yinlin.screen.msg.activity
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +22,7 @@ import love.yinlin.compose.ui.text.TextInputState
 import love.yinlin.platform.Platform
 import love.yinlin.compose.ui.input.ClickText
 import love.yinlin.compose.ui.layout.UnsupportedPlatformComponent
+import love.yinlin.compose.ui.text.SelectionBox
 
 @Stable
 class ScreenActivityLink(manager: ScreenManager) : Screen(manager) {
@@ -75,7 +75,7 @@ class ScreenActivityLink(manager: ScreenManager) : Screen(manager) {
                             }
                         )
                     }
-                    SelectionContainer {
+                    SelectionBox {
                         Text(text = webPageState.url)
                     }
                 }

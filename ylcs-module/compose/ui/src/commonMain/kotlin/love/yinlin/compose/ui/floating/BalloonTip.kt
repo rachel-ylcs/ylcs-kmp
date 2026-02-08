@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui.floating
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.getValue
@@ -23,7 +24,17 @@ private fun BalloonTip(text: String, content: @Composable () -> Unit) {
     Flyout(
         visible = visible,
         onClickOutside = { visible = false },
-        modifier = Modifier.pointerInput(Unit) {
+        flyout = {
+            Surface(
+                contentPadding = Theme.padding.value,
+                shape = Theme.shape.v5,
+                shadowElevation = Theme.shadow.v4,
+            ) {
+                Text(text = text)
+            }
+        }
+    ) {
+        Box(modifier = Modifier.pointerInput(Unit) {
             coroutineScope {
                 awaitPointerEventScope {
                     while (true) {
@@ -37,18 +48,10 @@ private fun BalloonTip(text: String, content: @Composable () -> Unit) {
                     }
                 }
             }
-        },
-        flyout = {
-            Surface(
-                contentPadding = Theme.padding.value,
-                shape = Theme.shape.v5,
-                shadowElevation = Theme.shadow.v4,
-            ) {
-                Text(text = text)
-            }
-        },
-        content = content
-    )
+        }) {
+            content()
+        }
+    }
 }
 
 @Composable

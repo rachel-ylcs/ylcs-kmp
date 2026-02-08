@@ -1,64 +1,52 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.ContextMenuDataProvider
-import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.AlignHorizontalLeft
-import androidx.compose.material.icons.automirrored.outlined.AlignHorizontalRight
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draganddrop.DragAndDropEvent
-import androidx.compose.ui.draganddrop.DragAndDropTarget
-import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntRect
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import kotlinx.serialization.json.Json
 import love.yinlin.compose.Colors
-import love.yinlin.compose.Device
+import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.rememberFontFamily
 import love.yinlin.compose.screen.Screen
-import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.compose.ui.CustomTheme
-import love.yinlin.compose.ui.floating.FloatingDialogInput
-import love.yinlin.compose.ui.image.ClickIcon
+import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.floating.DialogInput
+import love.yinlin.compose.ui.floating.Flyout
+import love.yinlin.compose.ui.floating.FlyoutPosition
+import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.ZoomWebImage
-import love.yinlin.compose.ui.input.LoadingClickText
-import love.yinlin.compose.ui.input.SingleSelector
+import love.yinlin.compose.ui.input.Filter
+import love.yinlin.compose.ui.input.LoadingTextButton
 import love.yinlin.compose.ui.input.Switch
-import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.compose.ui.layout.EmptyBox
+import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.Space
+import love.yinlin.compose.ui.node.DragFlag
+import love.yinlin.compose.ui.node.DropResult
+import love.yinlin.compose.ui.node.dashBorder
+import love.yinlin.compose.ui.node.dragAndDrop
+import love.yinlin.compose.ui.text.SelectionBox
+import love.yinlin.compose.ui.text.Text
+import love.yinlin.compose.ui.window.ContextMenuProvider
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.Chorus
@@ -70,14 +58,11 @@ import love.yinlin.extension.*
 import love.yinlin.mod_manager.resources.Res
 import love.yinlin.mod_manager.resources.music
 import love.yinlin.util.QrcDecrypter
-import org.jetbrains.compose.resources.Font
 import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
-import java.io.File
 
 @Stable
-class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(manager) {
+class ScreenRhyme(private val path: String?) : Screen() {
     private val prettyJson = Json { prettyPrint = true }
     private val defaultConfig = RhymeLyricsConfig(id = "", duration = 0L, chorus = emptyList(), lyrics = emptyList(), offset = 0)
 
@@ -86,7 +71,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
     private var rhymeConfig by mutableRefStateOf(defaultConfig)
     private val rhymeConfigText by derivedStateOf { prettyJson.encodeToString(rhymeConfig) }
 
-    private var selectedTab by mutableStateOf("歌词")
+    private var selectedTab by mutableIntStateOf(0)
 
     private var notationImage by mutableRefStateOf<String?>(null)
 
@@ -121,11 +106,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                     scale = 1
                 )
             }
-            rhymeLines += RhymeLine(
-                text = lineText.toString(),
-                start = lineStart,
-                theme = theme
-            )
+            if (theme.isNotEmpty()) rhymeLines += RhymeLine(text = lineText.toString(), start = lineStart, theme = theme)
         }
 
         rhymeConfig = rhymeConfig.copy(lyrics = rhymeLines)
@@ -136,7 +117,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
 
     private suspend fun saveConfig() {
         path?.let {
-            if (!slot.confirm.openSuspend(content = "替换音游配置到库")) return
+            if (!slot.confirm.open(content = "替换音游配置到库")) return
             val rhymePath = Path(it, ModResourceType.Rhyme.filename)
             rhymePath.writeText(prettyJson.encodeToString(rhymeConfig))
             slot.tip.success("保存成功")
@@ -145,7 +126,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
 
     private suspend fun deleteConfig() {
         path?.let {
-            if (!slot.confirm.openSuspend(content = "删除音游配置")) return
+            if (!slot.confirm.open(content = "删除音游配置")) return
             val rhymePath = Path(it, ModResourceType.Rhyme.filename)
             rhymePath.delete()
             pop()
@@ -177,9 +158,9 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
     }
 
     @Composable
-    override fun ActionScope.RightActions() {
-        ActionSuspend(Icons.Outlined.Done, enabled = useFile, onClick = ::saveConfig)
-        ActionSuspend(Icons.Outlined.Delete, enabled = useFile, onClick = ::deleteConfig)
+    override fun RowScope.RightActions() {
+        LoadingIcon(Icons.Check, enabled = useFile, onClick = ::saveConfig)
+        LoadingIcon(Icons.Delete, enabled = useFile, onClick = ::deleteConfig)
     }
 
     private val scaleTable = arrayOf(
@@ -196,34 +177,23 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
         lineIndex: Int,
         line: RhymeLine
     ) {
-        val positioner = remember {
-            object : PopupPositionProvider {
-                override fun calculatePosition(anchorBounds: IntRect, windowSize: IntSize, layoutDirection: LayoutDirection, popupContentSize: IntSize): IntOffset {
-                    return IntOffset(anchorBounds.right, anchorBounds.bottom)
-                }
-            }
-        }
-
         Column(modifier) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LoadingClickText(text = line.text, color = MaterialTheme.colorScheme.secondary, onClick = {
-                    inputDialog.openSuspend()?.let { text ->
+            ActionScope.Left.Container(modifier = Modifier.fillMaxWidth()) {
+                LoadingTextButton(text = line.text, color = Theme.color.secondary, onClick = {
+                    inputDialog.open()?.let { text ->
                         val newLyrics = config.lyrics.toMutableList()
                         newLyrics[lineIndex] = line.copy(text = text)
                         rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
                     }
                 })
-                LoadingClickText(text = line.start.toString(), icon = Icons.Outlined.Timer, onClick = {
-                    inputDialog.openSuspend()?.let { text ->
+                LoadingTextButton(text = line.start.toString(), icon = Icons.Timer, onClick = {
+                    inputDialog.open()?.let { text ->
                         val newLyrics = config.lyrics.toMutableList()
                         newLyrics[lineIndex] = line.copy(start = text.toLongOrNull() ?: 0L)
                         rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
                     }
                 })
-                ClickIcon(tip = "添加副歌开始", icon = Icons.AutoMirrored.Outlined.AlignHorizontalLeft, color = MaterialTheme.colorScheme.primary, onClick = {
+                Icon(tip = "添加副歌开始", icon = Icons.AlignHorizontalLeft, color = Theme.color.primary, onClick = {
                     val lineStart = line.start
                     val chorus = config.chorus
                     var findIndex = chorus.indexOfFirst { lineStart <= it.start }
@@ -232,7 +202,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                     newChorus.add(findIndex, Chorus(lineStart, lineStart))
                     rhymeConfig = config.copy(chorus = newChorus)
                 })
-                ClickIcon(tip = "标记副歌结尾", icon = Icons.AutoMirrored.Outlined.AlignHorizontalRight, color = MaterialTheme.colorScheme.primary, onClick = {
+                Icon(tip = "标记副歌结尾", icon = Icons.AlignHorizontalRight, color = Theme.color.primary, onClick = {
                     val lineEnd = line.theme.last().end + line.start
                     val chorus = config.chorus
                     var findIndex = chorus.lastIndex
@@ -248,16 +218,16 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                         rhymeConfig = config.copy(chorus = newChorus)
                     }
                 })
-                ClickIcon(tip = "删除", icon = Icons.Outlined.Delete, color = MaterialTheme.colorScheme.primary, onClick = {
+                Icon(tip = "删除", icon = Icons.Delete, color = Theme.color.primary, onClick = {
                     val newLyrics = config.lyrics.toMutableList()
                     newLyrics.removeAt(lineIndex)
                     rhymeConfig = config.copy(lyrics = newLyrics)
                 })
-                ClickIcon(tip = "复制", icon = Icons.Outlined.ContentCopy, color = MaterialTheme.colorScheme.primary, onClick = {
+                Icon(tip = "复制", icon = Icons.ContentCopy, color = Theme.color.primary, onClick = {
                     copyData = line.theme
                 })
                 copyData?.let { data ->
-                    ClickIcon(tip = "粘贴", icon = Icons.Outlined.ContentPaste, color = MaterialTheme.colorScheme.primary, onClick = {
+                    Icon(tip = "粘贴", icon = Icons.ContentPaste, color = Theme.color.primary, onClick = {
                         if (line.theme.size != data.size) slot.tip.warning("粘贴目标与源长度不同")
                         else {
                             val newLyrics = config.lyrics.toMutableList()
@@ -276,17 +246,13 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
             FlowRow(modifier = Modifier.fillMaxWidth()) {
                 for ((actionIndex, action) in line.theme.withIndex()) {
                     Column(
-                        modifier = Modifier.border(width = 1.dp, color = MaterialTheme.colorScheme.tertiary),
+                        modifier = Modifier.border(width = Theme.border.v7, color = Theme.color.tertiary),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = action.ch,
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(top = CustomTheme.padding.verticalSpace)
-                        )
+                        Text(text = action.ch, style = Theme.typography.v6.bold)
 
-                        LoadingClickText(text = action.end.toString(), onClick = {
-                            inputDialog.openSuspend()?.let { text ->
+                        LoadingTextButton(text = action.end.toString(), onClick = {
+                            inputDialog.open()?.let { text ->
                                 val newTheme = line.theme.toMutableList()
                                 when (action) {
                                     is RhymeAction.Note -> newTheme[actionIndex] = action.copy(end = text.toIntOrNull() ?: 0)
@@ -298,85 +264,65 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                             }
                         })
 
-                        val currentScale = remember(action) {
-                            when (action) {
-                                is RhymeAction.Note -> listOf(action.scale)
-                                is RhymeAction.Slur -> action.scale
-                            }
+                        val fontFamily = rememberFontFamily(Res.font.music)
+                        var isOpen by rememberFalse()
+
+                        val currentScale = when (action) {
+                            is RhymeAction.Note -> listOf(action.scale)
+                            is RhymeAction.Slur -> action.scale
                         }
-                        val scaleText = remember(action) { currentScale.joinToString("9") { scaleTable[it.toInt()] } }
 
-                        Box {
-                            val font = Font(Res.font.music)
-                            val fontFamily = remember(font) { FontFamily(font) }
-                            var isOpen by rememberFalse()
-                            Text(
-                                text = scaleText,
-                                color = MaterialTheme.colorScheme.tertiary,
-                                style = MaterialTheme.typography.displayLarge,
-                                fontFamily = fontFamily,
-                                modifier = Modifier.clickable { isOpen = true }.padding(CustomTheme.padding.value)
-                            )
-
-                            if (isOpen) {
-                                Popup(
-                                    popupPositionProvider = positioner,
-                                    onDismissRequest = { isOpen = false }
+                        Flyout(
+                            visible = isOpen,
+                            onClickOutside = { isOpen = false },
+                            position = FlyoutPosition.Bottom,
+                            flyout = {
+                                Surface(
+                                    contentPadding = Theme.padding.eValue,
+                                    shape = Theme.shape.v1,
+                                    shadowElevation = Theme.shadow.v3
                                 ) {
-                                    Surface(
-                                        modifier = Modifier.size(200.dp, 150.dp),
-                                        shape = MaterialTheme.shapes.extraLarge,
-                                        shadowElevation = CustomTheme.shadow.surface
-                                    ) {
-                                        Column(
-                                            modifier = Modifier.fillMaxSize().padding(CustomTheme.padding.equalValue),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
+                                    Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
+                                        var isAddMode by rememberFalse()
+
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                                            verticalAlignment = Alignment.CenterVertically,
                                         ) {
-                                            var isAddMode by rememberFalse()
+                                            Switch(checked = isAddMode, onCheckedChange = { isAddMode = it })
+                                            Text(text = "添加模式")
+                                        }
 
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
-                                                verticalAlignment = Alignment.CenterVertically,
-                                            ) {
-                                                Text(text = "添加模式")
-                                                Switch(
-                                                    checked = isAddMode,
-                                                    onCheckedChange = { isAddMode = it },
-                                                )
-                                            }
-
-                                            FlowRow(
-                                                modifier = Modifier.fillMaxWidth().weight(1f),
-                                                maxItemsInEachRow = 7,
-                                            ) {
-                                                repeat(3) { i ->
-                                                    repeat(7) { j ->
-                                                        val newScaleValue = (i * 7 + j + 1).toByte()
-                                                        Text(
-                                                            text = scaleTable[newScaleValue.toInt()],
-                                                            color = MaterialTheme.colorScheme.onSurface,
-                                                            style = MaterialTheme.typography.displayMedium,
-                                                            textAlign = TextAlign.Center,
-                                                            fontFamily = fontFamily,
-                                                            modifier = Modifier.weight(1f).clickable {
-                                                                val newTheme = line.theme.toMutableList()
-                                                                newTheme[actionIndex] = if (isAddMode) RhymeAction.Slur(action.ch, action.end, currentScale.toMutableList().also { it += newScaleValue })
-                                                                else RhymeAction.Note(action.ch, action.end, newScaleValue)
-                                                                val newLyrics = config.lyrics.toMutableList()
-                                                                newLyrics[lineIndex] = line.copy(theme = newTheme)
-                                                                rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
-                                                                isOpen = false
-                                                            }
-                                                        )
+                                        FlowRow(maxItemsInEachRow = 7, maxLines = 3) {
+                                            repeat(21) { index ->
+                                                val newScaleValue = (index / 7 * 7 + index % 7 + 1).toByte()
+                                                Text(
+                                                    text = scaleTable[newScaleValue.toInt()],
+                                                    style = Theme.typography.v3.bold,
+                                                    fontFamily = fontFamily,
+                                                    modifier = Modifier.clickable {
+                                                        val newTheme = line.theme.toMutableList()
+                                                        newTheme[actionIndex] = if (isAddMode) RhymeAction.Slur(action.ch, action.end, currentScale.toMutableList().also { it += newScaleValue })
+                                                        else RhymeAction.Note(action.ch, action.end, newScaleValue)
+                                                        val newLyrics = config.lyrics.toMutableList()
+                                                        newLyrics[lineIndex] = line.copy(theme = newTheme)
+                                                        rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
+                                                        isOpen = false
                                                     }
-                                                }
+                                                )
                                             }
                                         }
                                     }
                                 }
                             }
+                        ) {
+                            Text(
+                                text = currentScale.joinToString("9") { scaleTable[it.toInt()] },
+                                color = Theme.color.tertiary,
+                                style = Theme.typography.v3.bold,
+                                fontFamily = fontFamily,
+                                modifier = Modifier.clickable { isOpen = true }.padding(Theme.padding.value)
+                            )
                         }
                     }
                 }
@@ -389,7 +335,7 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
         LazyColumn(modifier) {
             itemsIndexed(config.lyrics, key = { _, line -> line.start }) { index, line ->
                 LyricsLineEditor(
-                    modifier = Modifier.fillMaxWidth().border(CustomTheme.border.small, Colors.Black),
+                    modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Colors.Black),
                     config = config,
                     lineIndex = index,
                     line = line,
@@ -402,106 +348,88 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
     private fun ConfigEditor(modifier: Modifier = Modifier, config: RhymeLyricsConfig) {
         Row(modifier = modifier) {
             Column(
-                modifier = Modifier.fillMaxHeight().padding(CustomTheme.padding.equalValue),
+                modifier = Modifier.fillMaxHeight().padding(Theme.padding.eValue),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
             ) {
-                Text(text = "基础信息", style = MaterialTheme.typography.titleMedium)
-                LoadingClickText(text = "ID: ${config.id}", onClick = {
-                    inputDialog.openSuspend()?.let { text -> rhymeConfig = config.copy(id = text) }
+                Text(text = "基础信息", style = Theme.typography.v7.bold)
+                LoadingTextButton(text = "ID: ${config.id}", onClick = {
+                    inputDialog.open()?.let { text -> rhymeConfig = config.copy(id = text) }
                 })
-                LoadingClickText(text = "时长: ${config.duration}", onClick = {
-                    inputDialog.openSuspend()?.let { text -> rhymeConfig = config.copy(duration = text.toLongOrNull() ?: 0L) }
+                LoadingTextButton(text = "时长: ${config.duration}", onClick = {
+                    inputDialog.open()?.let { text -> rhymeConfig = config.copy(duration = text.toLongOrNull() ?: 0L) }
                 })
-                LoadingClickText(text = "偏移: ${config.offset}", onClick = {
-                    inputDialog.openSuspend()?.let { text -> rhymeConfig = config.copy(offset = text.toIntOrNull() ?: 0) }
+                LoadingTextButton(text = "偏移: ${config.offset}", onClick = {
+                    inputDialog.open()?.let { text -> rhymeConfig = config.copy(offset = text.toIntOrNull() ?: 0) }
                 })
 
-                Text(text = "副歌段", style = MaterialTheme.typography.titleMedium)
+                Text(text = "副歌段", style = Theme.typography.v7.bold)
                 Space()
                 config.chorus.fastForEachIndexed { index, chorus ->
                     Text(
                         text = "[${index + 1}] ${chorus.start} -> ${chorus.end}",
-                        color = MaterialTheme.colorScheme.primary,
+                        color = Theme.color.primary,
                         modifier = Modifier.clickable {
                             launch {
-                                if (slot.confirm.openSuspend(content = "删除此条目")) {
+                                if (slot.confirm.open(content = "删除此条目")) {
                                     val newChorus = config.chorus.toMutableList()
                                     newChorus.removeAt(index)
                                     rhymeConfig = config.copy(chorus = newChorus)
                                 }
                             }
-                        }.padding(CustomTheme.padding.value)
+                        }.padding(Theme.padding.value)
                     )
                     Space()
                 }
             }
-            VerticalDivider(modifier = Modifier.fillMaxHeight())
+            Divider()
             Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
                 Text(
                     text = "歌词",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = Theme.typography.v7.bold,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(CustomTheme.padding.equalValue)
+                    modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue)
                 )
                 LyricsEditor(modifier = Modifier.fillMaxWidth().weight(1f), config = config)
             }
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
-    override fun Content(device: Device) {
+    override fun Content() {
         Row(modifier = Modifier.fillMaxSize()) {
             val scrollState = rememberScrollState()
 
-            Column(
-                modifier = Modifier.weight(1f).fillMaxHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace)
-            ) {
-                SingleSelector(
-                    current = selectedTab,
-                    onSelected = { selectedTab = it },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Item("歌词", "歌词")
-                    Item("简谱", "简谱")
-                }
+            Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                val tabs = remember { listOf("歌词", "简谱") }
+
+                Filter(
+                    size = tabs.size,
+                    selectedProvider = { it == selectedTab },
+                    titleProvider = { tabs[it] },
+                    modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                    onClick = { index, checked -> if (checked) selectedTab = index }
+                )
                 Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                     when (selectedTab) {
-                        "歌词" -> {
-                            Box(modifier = Modifier.fillMaxSize().dragAndDropTarget(
-                                shouldStartDragAndDrop = { event ->
-                                    val transferable = event.awtTransferable
-                                    transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-                                },
-                                target = remember { object : DragAndDropTarget {
-                                    override fun onDrop(event: DragAndDropEvent): Boolean {
-                                        val transferable = event.awtTransferable
-                                        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                                            catchingError {
-                                                val files = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-                                                parseQrc(QrcDecrypter.decrypt((files.first() as File).readBytes())!!)
-                                            }?.let { slot.tip.error("解析失败") }
-                                            return true
-                                        }
-                                        return false
+                        0 -> {
+                            Box(modifier = Modifier.fillMaxSize().dragAndDrop(true, DragFlag.File) { dropResult ->
+                                catchingError {
+                                    launch {
+                                        parseQrc(QrcDecrypter.decrypt((dropResult as DropResult.File).path.first().readByteArray()!!)!!)
                                     }
-                                } }
-                            )) {
-                                ContextMenuDataProvider({
-                                    listOf(
-                                        ContextMenuItem("全选自动复制") {
-                                            Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(rhymeConfigText), null)
-                                            slot.tip.success("复制成功")
-                                        }
-                                    )
+                                }?.let { slot.tip.error("解析失败") }
+                            }) {
+                                ContextMenuProvider({
+                                    item("全选自动复制") {
+                                        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(rhymeConfigText), null)
+                                        slot.tip.success("复制成功")
+                                    }
                                 }) {
-                                    SelectionContainer(modifier = Modifier.fillMaxSize().zIndex(1f).verticalScroll(scrollState)) {
+                                    SelectionBox {
                                         Text(
                                             text = rhymeConfigText,
-                                            modifier = Modifier.fillMaxSize()
+                                            modifier = Modifier.fillMaxSize().verticalScroll(scrollState)
                                         )
                                     }
                                 }
@@ -511,43 +439,36 @@ class ScreenRhyme(manager: ScreenManager, private val path: String?) : Screen(ma
                                 )
                             }
                         }
-                        "简谱" -> {
-                            Box(modifier = Modifier.fillMaxSize().dragAndDropTarget(
-                                shouldStartDragAndDrop = { event ->
-                                    val transferable = event.awtTransferable
-                                    transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-                                },
-                                target = remember { object : DragAndDropTarget {
-                                    override fun onDrop(event: DragAndDropEvent): Boolean {
-                                        val transferable = event.awtTransferable
-                                        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                                            catching {
-                                                val files = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
-                                                notationImage = (files.first() as File).absolutePath
-                                            }
-                                            return true
-                                        }
-                                        return false
-                                    }
-                                } }
-                            )) {
-                                notationImage?.let {
+                        1 -> {
+                            Box(modifier = Modifier.fillMaxSize().dragAndDrop(true, DragFlag.File) { dropResult ->
+                                catching { notationImage = (dropResult as DropResult.File).path.first().toString() }
+                            }) {
+                                val showImage = notationImage
+                                if (showImage != null) {
                                     ZoomWebImage(
-                                        uri = it,
+                                        uri = showImage,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.FillWidth,
                                         quality = ImageQuality.Full
                                     )
-                                } ?: EmptyBox(text = "拖动简谱图片到这")
+                                }
+                                else {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().aspectRatio(2f).padding(Theme.padding.value).dashBorder(Theme.border.v6, Theme.color.primary),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(text = "拖动简谱图片到这")
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-            VerticalDivider(modifier = Modifier.fillMaxHeight())
+            Divider()
             ConfigEditor(Modifier.weight(2f).fillMaxHeight(), rhymeConfig)
         }
     }
 
-    private val inputDialog = this land FloatingDialogInput()
+    private val inputDialog = this land DialogInput()
 }

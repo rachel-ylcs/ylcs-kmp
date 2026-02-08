@@ -28,6 +28,7 @@ jobs:
       server: ${{ steps.filter.outputs.server }}
       modManager: ${{ steps.filter.outputs.modManager }}
       landpage: ${{ steps.filter.outputs.landpage }}
+      gallery: ${{ steps.filter.outputs.gallery }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -89,6 +90,9 @@ jobs:
             landpage:
               - *common
               - 'ylcs-app/landpage/**'
+            gallery:
+              - *common
+              - 'ylcs-app/gallery/**'
 
   build-android:
     name: Build Android
@@ -213,8 +217,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -237,8 +239,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -267,8 +267,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -282,3 +280,25 @@ jobs:
 
       - name: Build
         run: ./gradlew ylcs-app:landpage:jsJar
+
+  build-gallery:
+    name: Build Rachel UI Gallery
+    needs: changes
+    if: ${{ needs.changes.outputs.gallery == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:gallery:desktopJar

@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Comment
@@ -54,6 +53,7 @@ import love.yinlin.compose.ui.layout.OffsetLayout
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
 import love.yinlin.compose.ui.layout.SimpleEmptyBox
+import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
@@ -388,7 +388,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                             }
                         }
 
-                        SelectionContainer {
+                        SelectionBox {
                             Text(
                                 text = lyrics,
                                 modifier = Modifier.fillMaxWidth().aspectRatio(2f).verticalScroll(rememberScrollState())
@@ -587,7 +587,7 @@ class ScreenMusicDetails(manager: ScreenManager, private val sid: String) : Scre
                 level = comment.level,
                 onAvatarClick = { navigate(::ScreenUserCard, comment.uid) }
             )
-            SelectionContainer {
+            SelectionBox {
                 Text(
                     text = comment.content,
                     modifier = Modifier.fillMaxWidth()

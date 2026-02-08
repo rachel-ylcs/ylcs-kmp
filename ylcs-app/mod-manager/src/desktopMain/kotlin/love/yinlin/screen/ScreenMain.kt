@@ -7,12 +7,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,45 +14,50 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.compose.Colors
+import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.compose.screen.resources.Res
-import love.yinlin.compose.screen.resources.dialog_ok
-import love.yinlin.compose.ui.CustomTheme
-import love.yinlin.compose.ui.floating.FloatingArgsSheet
-import love.yinlin.compose.ui.floating.FloatingDialogInput
-import love.yinlin.compose.ui.floating.FloatingSheet
+import love.yinlin.compose.ui.animation.CircleLoading
+import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.DefaultStatefulProvider
+import love.yinlin.compose.ui.container.StatefulBox
+import love.yinlin.compose.ui.container.StatefulStatus
+import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.floating.DialogInput
+import love.yinlin.compose.ui.floating.Sheet
+import love.yinlin.compose.ui.floating.SheetContent
+import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
-import love.yinlin.compose.ui.input.ClickText
+import love.yinlin.compose.ui.input.SecondaryTextButton
 import love.yinlin.compose.ui.input.Switch
-import love.yinlin.compose.ui.layout.BoxState
-import love.yinlin.compose.ui.layout.EmptyBox
-import love.yinlin.compose.ui.layout.LoadingBox
-import love.yinlin.compose.ui.layout.SplitActionLayout
-import love.yinlin.compose.ui.layout.StatefulBox
+import love.yinlin.compose.ui.layout.VerticalDivider
 import love.yinlin.compose.ui.mod.ModPreviewLayout
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
+import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.node.dragAndDrop
+import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.ui.text.Text
+import love.yinlin.compose.ui.window.ContextMenu
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModItem
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
 import love.yinlin.mod.ModFactory
-import org.jetbrains.compose.resources.stringResource
 import java.awt.Desktop
 import java.io.File
 
 @Stable
-class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
-    private var state by mutableStateOf(BoxState.EMPTY)
+class ScreenMain : BasicScreen() {
+    private val boxStatus = DefaultStatefulProvider()
     private val library = mutableStateListOf<ModItem>()
     private val searchLibrary by derivedStateOf { library.filter { it.shown } }
     private val selectedLibrary by derivedStateOf { searchLibrary.filter { it.selected } }
@@ -74,7 +73,7 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
 
     private suspend fun loadLibrary() {
         onSearching = false
-        state = BoxState.LOADING
+        boxStatus.status = StatefulStatus.Loading
         val result = Coroutines.io {
             app.libraryPath.list().filter { it.isDirectory }.map { folder ->
                 var id = ""
@@ -97,7 +96,7 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
             }.distinctBy { it.id }
         }
         library.replaceAll(result)
-        state = if (result.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+        boxStatus.status = if (result.isEmpty()) StatefulStatus.Empty else StatefulStatus.Content
     }
 
     private fun startSearch(input: String) {
@@ -112,7 +111,7 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
                 if (item.shown) library[index] = item.copy(shown = false)
             }
         }
-        state = if (count == 0) BoxState.EMPTY else BoxState.CONTENT
+        boxStatus.status = if (count == 0) StatefulStatus.Empty else StatefulStatus.Content
     }
 
     private fun closeSearch() {
@@ -120,7 +119,7 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
         library.forEachIndexed { index, item ->
             if (!item.shown) library[index] = item.copy(shown = true)
         }
-        state = if (library.isEmpty()) BoxState.EMPTY else BoxState.CONTENT
+        boxStatus.status = if (library.isEmpty()) StatefulStatus.Empty else StatefulStatus.Content
     }
 
     private suspend fun mergeSingleMod(
@@ -195,141 +194,135 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
 
     @Composable
     private fun ModCard(modifier: Modifier = Modifier.Companion, item: ModItem) {
-        val needRename = remember(item) { item.path.name != item.name }
+        val needRename = item.path.name != item.name
 
-        ContextMenuArea(items = {
-            buildList {
-                add(ContextMenuItem("预览") {
-                    modDetailsSheet.open(item)
-                })
-                add(ContextMenuItem("删除") {
-                    launch {
-                        if (slot.confirm.openSuspend(content = "真的要删除 ${item.name} 吗")) {
-                            item.path.deleteRecursively()
-                            library.removeAll { it == item }
-                        }
+        ContextMenu(menus = {
+            item("预览") { modDetailsSheet.open(item) }
+            item("删除") {
+                launch {
+                    if (slot.confirm.open(content = "真的要删除 ${item.name} 吗")) {
+                        item.path.deleteRecursively()
+                        library.removeAll { it == item }
                     }
-                })
-                if (needRename) {
-                    add(ContextMenuItem("重命名") {
-                        launch {
-                            item.path.rename(item.name)?.let { loadLibrary() }
-                        }
-                    })
                 }
-                add(ContextMenuItem("打开所在目录") {
-                    Desktop.getDesktop().open(File(item.path.toString()))
-                })
-                add(ContextMenuItem("音游编辑") {
+            }
+            if (needRename) {
+                item("重命名") {
                     launch {
-                        navigate(::ScreenRhyme, item.path.toString())
+                        item.path.rename(item.name)?.let { loadLibrary() }
                     }
-                })
+                }
+            }
+            item("打开所在目录") { Desktop.getDesktop().open(File(item.path.toString())) }
+            item("音游编辑") {
+                launch { navigate(::ScreenRhyme, item.path.toString()) }
             }
         }) {
-            Box(modifier = modifier) {
-                Column(modifier = Modifier.fillMaxWidth().clickable {
-                    val index = library.indexOf(item)
-                    library[index] = item.copy(selected = !item.selected)
-                }.padding(CustomTheme.padding.equalValue)) {
-                    LocalFileImage(
-                        path = { Path(item.path, ModResourceType.Record.filename) },
-                        item.id,
-                        modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                        contentScale = ContentScale.Crop
-                    )
+            Column(modifier = modifier.clickable {
+                val index = library.indexOf(item)
+                library[index] = item.copy(selected = !item.selected)
+            }.padding(Theme.padding.eValue)) {
+                LocalFileImage(
+                    path = { Path(item.path, ModResourceType.Record.filename) },
+                    item.id,
+                    modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                    contentScale = ContentScale.Crop
+                )
 
-                    Text(
-                        text = item.name,
-                        color = when {
-                            !item.enabled -> MaterialTheme.colorScheme.onError
-                            item.selected -> MaterialTheme.colorScheme.onPrimaryContainer
-                            else -> MaterialTheme.colorScheme.onSurface
-                        },
-                        style = if (needRename) MaterialTheme.typography.labelMedium else MaterialTheme.typography.bodyMedium,
-                        textDecoration = if (needRename) TextDecoration.LineThrough else null,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth().background(
-                            when {
-                                !item.enabled -> MaterialTheme.colorScheme.error
-                                item.selected -> MaterialTheme.colorScheme.primaryContainer
-                                else -> Colors.Transparent
-                            }
-                        ).padding(CustomTheme.padding.value)
-                    )
-                }
+                Text(
+                    text = item.name,
+                    color = when {
+                        !item.enabled -> Theme.color.onError
+                        item.selected -> Theme.color.onContainer
+                        else -> Theme.color.onSurface
+                    },
+                    style = if (needRename) Theme.typography.v7.bold else Theme.typography.v7,
+                    textDecoration = if (needRename) TextDecoration.LineThrough else null,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth().background(
+                        when {
+                            !item.enabled -> Theme.color.error
+                            item.selected -> Theme.color.primaryContainer
+                            else -> Colors.Transparent
+                        }
+                    ).padding(Theme.padding.value)
+                )
             }
+        }
+    }
+
+    @Composable
+    private fun ActionBar(modifier: Modifier = Modifier) {
+        Surface(
+            modifier = modifier,
+            shadowElevation = Theme.shadow.v3
+        ) {
+            ActionScope.SplitContainer(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
+                left = {
+                    LoadingIcon(Icons.Refresh, tip = "刷新", onClick = ::loadLibrary)
+                    if (onSearching) Icon(Icons.Clear, tip = "关闭搜索", onClick = ::closeSearch)
+                    else LoadingIcon(Icons.Search, tip = "搜索", onClick = {
+                        inputDialog.open()?.let { startSearch(it) }
+                    })
+                    Icon(Icons.SelectAll, tip = if (isSelectAll) "取消全选" else "全选", onClick = {
+                        val v = isSelectAll
+                        library.fastForEachIndexed { index, item ->
+                            if (item.selected == v) library[index] = item.copy(selected = !v)
+                        }
+                    })
+                },
+                right = {
+                    Icon(Icons.MusicNote, tip = "音游配置", onClick = { navigate(::ScreenRhyme, null)} )
+                    Icon(Icons.Preview, tip = "预览", onClick = { previewSheet.open() })
+                    Icon(Icons.Download, tip = "导入", onClick = { importSheet.open() })
+                    if (selectedLibrary.isNotEmpty()) {
+                        Icon(Icons.Token, tip = "打包", onClick = { packageSheet.open() })
+                        LoadingIcon(Icons.LocalAirport, tip = "部署", onClick = {
+                            if (slot.confirm.open(content = "部署所选MOD到mod目录吗?")) {
+                                deploy(selectedLibrary)
+                            }
+                        })
+                    }
+                }
+            )
+        }
+    }
+
+    @Composable
+    private fun StatusBar(modifier: Modifier = Modifier) {
+        Surface(
+            modifier = modifier,
+            contentPadding = Theme.padding.value,
+            contentAlignment = Alignment.CenterStart,
+            shadowElevation = Theme.shadow.v3
+        ) {
+            SimpleEllipsisText(status)
         }
     }
 
     @Composable
     override fun BasicContent() {
         Column(modifier = Modifier.fillMaxSize()) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shadowElevation = CustomTheme.shadow.surface
-            ) {
-                SplitActionLayout(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = CustomTheme.padding.verticalSpace),
-                    left = {
-                        ActionSuspend(Icons.Outlined.Refresh, "刷新", onClick = ::loadLibrary)
-                        if (onSearching) {
-                            Action(Icons.Outlined.Close, "关闭搜索", onClick = ::closeSearch)
-                        } else {
-                            ActionSuspend(Icons.Outlined.Search, "搜索") {
-                                inputDialog.openSuspend()?.let { input ->
-                                    startSearch(input)
-                                }
-                            }
-                        }
-                        Action(Icons.Outlined.SelectAll, if (isSelectAll) "取消全选" else "全选") {
-                            val v = isSelectAll
-                            library.fastForEachIndexed { index, item ->
-                                if (item.selected == v) library[index] = item.copy(selected = !v)
-                            }
-                        }
-                    },
-                    right = {
-                        Action(Icons.Outlined.MusicNote, "音游配置") {
-                            navigate(::ScreenRhyme, null)
-                        }
-                        ActionSuspend(Icons.Outlined.Preview, "预览") {
-                            previewSheet.open()
-                        }
-                        ActionSuspend(Icons.Outlined.Download, "导入") {
-                            importSheet.open()
-                        }
-                        if (selectedLibrary.isNotEmpty()) {
-                            Action(Icons.Outlined.Token, "打包") {
-                                packageSheet.open()
-                            }
-                            ActionSuspend(Icons.Outlined.LocalAirport, "部署") {
-                                if (slot.confirm.openSuspend(content = "部署所选MOD到mod目录吗?")) {
-                                    deploy(selectedLibrary)
-                                }
-                            }
-                        }
-                    }
-                )
-            }
+            ActionBar(modifier = Modifier.fillMaxWidth())
             Row(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 StatefulBox(
-                    state = state,
+                    provider = boxStatus,
                     modifier = Modifier.weight(2f).fillMaxHeight()
                 ) {
                     Box(modifier = Modifier.fillMaxSize()) {
                         if (unSelectedLibrary.isEmpty()) {
                             Text(
                                 text = "待选择区域",
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.titleLarge,
+                                color = Theme.color.onSurface,
+                                style = Theme.typography.v6.bold,
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         } else {
                             LazyVerticalGrid(
-                                columns = GridCells.Adaptive(120.dp),
+                                columns = GridCells.Adaptive(Theme.size.cell5),
                                 modifier = Modifier.fillMaxSize(),
                                 state = leftState
                             ) {
@@ -343,7 +336,7 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
                 Box(modifier = Modifier.fillMaxHeight()) {
                     VerticalDivider(
                         modifier = Modifier.fillMaxHeight().zIndex(1f),
-                        thickness = 10.dp,
+                        thickness = Theme.border.v1,
                         color = Colors.White
                     )
                     VerticalScrollbar(
@@ -355,13 +348,13 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
                     if (selectedLibrary.isEmpty()) {
                         Text(
                             text = "已选择区域",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.titleLarge,
+                            color = Theme.color.onSurface,
+                            style = Theme.typography.v6.bold,
                             modifier = Modifier.align(Alignment.Center)
                         )
                     } else {
                         LazyVerticalGrid(
-                            columns = GridCells.Adaptive(120.dp),
+                            columns = GridCells.Adaptive(Theme.size.cell5),
                             modifier = Modifier.fillMaxSize(),
                             state = rightState
                         ) {
@@ -372,148 +365,15 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
                     }
                 }
             }
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shadowElevation = CustomTheme.shadow.surface
-            ) {
-                Box(Modifier.fillMaxWidth().padding(CustomTheme.padding.value)) {
-                    Text(
-                        text = status,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
+            StatusBar(modifier = Modifier.fillMaxWidth())
         }
     }
 
-    private val packageSheet = this land object : FloatingSheet() {
-        override val initFullScreen: Boolean = true
-        override val dismissOnBackPress: Boolean by derivedStateOf { !isRunning }
-        override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
+    private val inputDialog = this land DialogInput(hint = "查找关键字", maxLength = 64)
 
-        private var isRunning by mutableStateOf(false)
-        private val filters = mutableStateListOf<ModResourceType>()
-        private var mergeMode by mutableStateOf(true)
-        private val canSubmit by derivedStateOf { ModResourceType.BASE.all { it in filters } }
-
-        private var statusText by mutableStateOf("正在打包中...")
-
-        @Composable
-        private fun SwitchText(type: ModResourceType) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Switch(
-                    checked = type in filters,
-                    onCheckedChange = {
-                        if (it) filters += type
-                        else filters -= type
-                    }
-                )
-                Text(
-                    text = type.description,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-
-        override suspend fun initialize() {
-            isRunning = false
-            filters.replaceAll(ModResourceType.BASE)
-            mergeMode = true
-        }
-
-        @Composable
-        override fun Content() {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(end = CustomTheme.padding.horizontalSpace),
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(vertical = CustomTheme.padding.verticalExtraSpace),
-                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "导出",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-                    ClickText(
-                        text = stringResource(Res.string.dialog_ok),
-                        enabled = canSubmit && !isRunning,
-                        onClick = {
-                            launch {
-                                isRunning = true
-                                catchingError {
-                                    Coroutines.io {
-                                        runMergeTask(filters, mergeMode) { index, total, name ->
-                                            statusText = "[$index/$total] -> $name"
-                                        }
-                                    }
-                                }?.let { statusText = it.message ?: "未知错误" }
-                                isRunning = false
-                                close()
-                            }
-                        }
-                    )
-                }
-                if (isRunning) {
-                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
-                        LoadingBox(text = statusText)
-                    }
-                } else {
-                    Text(
-                        text = "过滤器",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(vertical = CustomTheme.padding.verticalExtraSpace),
-                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
-                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
-                    ) {
-                        for (type in ModResourceType.entries) SwitchText(type)
-                    }
-                    Text(
-                        text = "打包模式",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(vertical = CustomTheme.padding.verticalExtraSpace),
-                        horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalSpace),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Switch(
-                            checked = mergeMode,
-                            onCheckedChange = { mergeMode = it }
-                        )
-                        Text(
-                            text = "合并打包",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private val inputDialog = this land FloatingDialogInput(hint = "查找关键字", maxLength = 64)
-
-    private val previewSheet = this land object : FloatingSheet() {
-        override val initFullScreen: Boolean = true
-        override val dismissOnBackPress: Boolean by derivedStateOf { !isRunning }
-        override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
+    private val previewSheet = this land object : Sheet() {
+        override val dismissOnBackPress: Boolean get() = !isRunning
+        override val dismissOnClickOutside: Boolean get() = !isRunning
 
         private var isRunning by mutableStateOf(false)
         private var result: ModFactory.Preview.PreviewResult? by mutableStateOf(null)
@@ -532,49 +392,49 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
 
         @Composable
         override fun Content() {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(end = CustomTheme.padding.horizontalSpace)
-                    .dragAndDrop(!isRunning, DragFlag.File) { dropResult ->
-                        if (dropResult is DropResult.File) {
-                            val paths = dropResult.path
-                            if (paths.size == 1) {
-                                launch {
-                                    reset()
-                                    isRunning = true
-                                    catchingError {
-                                        result = Coroutines.io {
-                                            paths[0].read { source -> ModFactory.Preview(source).process() }
-                                        }
-                                        statusText = ""
-                                    }?.let { statusText = it.message ?: "未知错误" }
-                                    isRunning = false
+            Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragAndDrop(!isRunning, DragFlag.File) { dropResult ->
+                if (dropResult is DropResult.File) {
+                    val paths = dropResult.path
+                    if (paths.size == 1) {
+                        launch {
+                            reset()
+                            isRunning = true
+                            catchingError {
+                                result = Coroutines.io {
+                                    paths[0].read { source -> ModFactory.Preview(source).process() }
                                 }
-                            }
+                                statusText = ""
+                            }?.let { statusText = it.message ?: "未知错误" }
+                            isRunning = false
                         }
-                    },
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalSpace),
-            ) {
+                    }
+                }
+            }) {
                 if (isRunning) {
-                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
-                        LoadingBox(text = "正在解析中...")
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                    ) {
+                        CircleLoading.Content()
+                        Text("正在解析中...")
                     }
                 } else {
                     val previewResult = result
                     if (previewResult == null) {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxWidth().aspectRatio(2f).dashBorder(Theme.border.v6, Theme.color.primary),
                             contentAlignment = Alignment.Center
                         ) {
-                            Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
-                                EmptyBox(
-                                    text = "拖拽最多一个MOD文件预览${if (statusText.isEmpty()) "" else "\nError: $statusText"}"
-                                )
-                            }
+                            Text(
+                                text = "拖拽最多一个MOD文件预览${if (statusText.isEmpty()) "" else "\nError: $statusText"}",
+                                color = Theme.color.primary,
+                                style = Theme.typography.v6.bold
+                            )
                         }
                     } else {
                         ModPreviewLayout(
-                            modifier = Modifier.fillMaxSize()
-                                .padding(vertical = CustomTheme.padding.verticalSpace),
+                            modifier = Modifier.fillMaxWidth(),
                             result = previewResult
                         )
                     }
@@ -583,8 +443,7 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
         }
     }
 
-    private val importSheet = this land object : FloatingSheet() {
-        override val initFullScreen: Boolean = true
+    private val importSheet = this land object : Sheet() {
         override val dismissOnBackPress: Boolean by derivedStateOf { !isRunning }
         override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
 
@@ -608,49 +467,54 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
 
         @Composable
         override fun Content() {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(end = CustomTheme.padding.horizontalSpace)
-                    .dragAndDrop(!isRunning, DragFlag.File) { dropResult ->
-                        if (dropResult is DropResult.File) {
-                            val paths = dropResult.path
-                            if (paths.isNotEmpty()) {
-                                launch {
-                                    isRunning = true
-                                    catchingError {
-                                        Coroutines.io {
-                                            for (path in paths) {
-                                                runReleaseTask(path) { index, total, id ->
-                                                    statusText = "[$index/$total] -> $id"
-                                                }
-                                            }
+            Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragAndDrop(!isRunning, DragFlag.File) { dropResult ->
+                if (dropResult is DropResult.File) {
+                    val paths = dropResult.path
+                    if (paths.isNotEmpty()) {
+                        launch {
+                            isRunning = true
+                            catchingError {
+                                Coroutines.io {
+                                    for (path in paths) {
+                                        runReleaseTask(path) { index, total, id ->
+                                            statusText = "[$index/$total] -> $id"
                                         }
-                                    }?.let { statusText = it.message ?: "未知错误" }
-                                    isRunning = false
-                                    close()
-                                    loadLibrary()
+                                    }
                                 }
-                            }
+                            }?.let { statusText = it.message ?: "未知错误" }
+                            isRunning = false
+                            close()
+                            loadLibrary()
                         }
-                    },
-                verticalArrangement = Arrangement.spacedBy(
-                    CustomTheme.padding.verticalSpace,
-                    Alignment.CenterVertically
-                ),
-            ) {
+                    }
+                }
+            }) {
                 if (isRunning) {
-                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
-                        LoadingBox(text = statusText)
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                    ) {
+                        CircleLoading.Content()
+                        Text(statusText)
                     }
                 } else {
-                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
-                        EmptyBox(text = "拖拽一个或多个MOD文件导入")
+                    Box(
+                        modifier = Modifier.fillMaxWidth().aspectRatio(2f).dashBorder(Theme.border.v6, Theme.color.primary),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "拖拽一个或多个MOD文件导入",
+                            color = Theme.color.primary,
+                            style = Theme.typography.v6.bold
+                        )
                     }
                 }
             }
         }
     }
 
-    private val modDetailsSheet = this land object : FloatingArgsSheet<ModItem>() {
+    private val modDetailsSheet = this land object : SheetContent<ModItem>() {
         private var configText: String? by mutableStateOf(null)
 
         override suspend fun initialize(args: ModItem) {
@@ -660,16 +524,13 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
         @Composable
         override fun Content(args: ModItem) {
             Column(
-                modifier = Modifier.fillMaxSize().padding(
-                    top = CustomTheme.padding.verticalExtraSpace,
-                    end = CustomTheme.padding.horizontalExtraSpace
-                ),
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.verticalExtraSpace)
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(CustomTheme.padding.horizontalExtraSpace),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     LocalFileImage(
@@ -683,17 +544,116 @@ class ScreenMain(manager: ScreenManager) : BasicScreen(manager) {
                         modifier = Modifier.weight(1f).aspectRatio(0.5625f)
                     )
                 }
-                Text(
-                    text = args.name,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                SimpleEllipsisText(args.name, style = Theme.typography.v6.bold, color = Theme.color.primary)
                 Text(
                     text = configText ?: "",
                     modifier = Modifier.align(Alignment.Start)
                 )
+            }
+        }
+    }
+
+    private val packageSheet = this land object : Sheet() {
+        override val dismissOnBackPress: Boolean by derivedStateOf { !isRunning }
+        override val dismissOnClickOutside: Boolean by derivedStateOf { !isRunning }
+
+        private var isRunning by mutableStateOf(false)
+        private val filters = mutableStateListOf<ModResourceType>()
+        private var mergeMode by mutableStateOf(true)
+        private val canSubmit by derivedStateOf { ModResourceType.BASE.all { it in filters } }
+
+        private var statusText by mutableStateOf("正在打包中...")
+
+        @Composable
+        private fun SwitchText(type: ModResourceType) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Switch(
+                    checked = type in filters,
+                    onCheckedChange = {
+                        if (it) filters += type
+                        else filters -= type
+                    }
+                )
+                SimpleEllipsisText(type.description, color = Theme.color.onSurface)
+            }
+        }
+
+        override suspend fun initialize() {
+            isRunning = false
+            filters.replaceAll(ModResourceType.BASE)
+            mergeMode = true
+        }
+
+        @Composable
+        override fun Content() {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v9),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "导出",
+                        style = Theme.typography.v6.bold,
+                        color = Theme.color.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    SecondaryTextButton(
+                        text = "确认",
+                        enabled = canSubmit && !isRunning,
+                        onClick = {
+                            launch {
+                                isRunning = true
+                                catchingError {
+                                    Coroutines.io {
+                                        runMergeTask(filters, mergeMode) { index, total, name ->
+                                            statusText = "[$index/$total] -> $name"
+                                        }
+                                    }
+                                }?.let { statusText = it.message ?: "未知错误" }
+                                isRunning = false
+                                close()
+                            }
+                        }
+                    )
+                }
+                if (isRunning) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                    ) {
+                        CircleLoading.Content()
+                        Text(statusText)
+                    }
+                } else {
+                    SimpleEllipsisText("过滤器", color = Theme.color.onSurface)
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v9),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                    ) {
+                        for (type in ModResourceType.entries) SwitchText(type)
+                    }
+                    SimpleEllipsisText("打包模式", color = Theme.color.onSurface)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v9),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Switch(
+                            checked = mergeMode,
+                            onCheckedChange = { mergeMode = it }
+                        )
+                        SimpleEllipsisText("合并打包", color = Theme.color.onSurface)
+                    }
+                }
             }
         }
     }

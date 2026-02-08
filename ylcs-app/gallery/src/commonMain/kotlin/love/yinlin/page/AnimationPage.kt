@@ -39,6 +39,7 @@ object AnimationPage : Page() {
                     }
                 }
             }
+
             Component("Progress") {
                 ExampleRow {
                     val transition = rememberInfiniteTransition()
@@ -48,11 +49,12 @@ object AnimationPage : Page() {
                     Example("Linear") {
                         LinearProgress(progress)
                     }
-                    Example("Wave") {
+                    Example("Circle") {
                         CircleProgress(progress)
                     }
                 }
             }
+
             Component("ExpandableContent") {
                 var isExpanded by rememberFalse()
 

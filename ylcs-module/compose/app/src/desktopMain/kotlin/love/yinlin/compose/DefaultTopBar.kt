@@ -49,7 +49,7 @@ fun DefaultTopBar(controller: WindowController, onExit: () -> Unit) {
                     Icon(
                         icon = Icons.Remove,
                         tip = Theme.value.windowMinimizeText,
-                        onClick = { controller.visible = false }
+                        onClick = { controller.minimize = true }
                     )
                 }
 

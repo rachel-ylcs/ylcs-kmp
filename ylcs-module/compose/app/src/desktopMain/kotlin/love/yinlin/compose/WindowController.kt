@@ -35,9 +35,19 @@ class WindowController(
     private var maximizeState: MaximizeState by mutableRefStateOf(MaximizeState.Normal)
 
     /**
+     * 托盘图标
+     */
+    val tray: Tray = Tray()
+
+    /**
      * 窗口是否最大化
      */
     val maximize: Boolean get() = maximizeState !is MaximizeState.Normal
+
+    /**
+     * 设置窗口最小化状态
+     */
+    var minimize: Boolean by rawState::isMinimized
 
     /**
      * 切换窗口最大化状态
@@ -91,5 +101,8 @@ class WindowController(
      */
     var actionClose by mutableStateOf(initActionClose)
 
+    /**
+     * 图标绘制
+     */
     val iconPainter: Painter @Composable get() = icon?.let { painterResource(it) } ?: rememberVectorPainter(Icons.ComposeMultiplatform)
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
@@ -46,11 +47,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
 
-    // Tray State 并入 Controller, 修复最小化
-    protected open val tray: Boolean = false
-    protected open val trayHideNotification: String? = null
-    protected open fun onTrayClick(show: () -> Unit) { show() }
-
     @Composable
     protected open fun ApplicationScope.MultipleWindow() {}
 
@@ -72,8 +68,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     private val windowStarter = LaunchFlag()
 
+    private val mainScope = MainScope()
+
     fun run() {
-        openService(scope = MainScope(), later = false, immediate = false)
+        openService(scope = mainScope, later = false, immediate = false)
 
         application(exitProcessOnExit = false) {
             val onMainWindowClose = {
@@ -81,6 +79,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 exitApplication()
             }
 
+            // 主窗口
             Window(
                 onCloseRequest = onMainWindowClose,
                 title = controller.title,
@@ -124,36 +123,24 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 }
             }
 
-            if (tray) {
-                val trayState = rememberTrayState()
-
+            // 托盘
+            val tray = controller.tray
+            if (tray.visible) {
                 Tray(
-                    icon = controller.iconPainter,
-                    state = trayState,
-                    onAction = {
-                        onTrayClick { controller.visible = true }
-                    }
+                    icon = tray.painter ?: controller.iconPainter,
+                    state = tray.state,
+                    tooltip = controller.title,
+                    onAction = { tray.onDoubleClick?.invoke() }
                 )
-
-                trayHideNotification?.let { notificationText ->
-                    val notification = rememberNotification(
-                        title = controller.title,
-                        message = notificationText,
-                        type = Notification.Type.Info
-                    )
-
-                    val enabledTip = Theme.tool.enableBallonTip
-
-                    LaunchedEffect(controller.visible, enabledTip) {
-                        if (!controller.visible && enabledTip) trayState.sendNotification(notification)
-                    }
-                }
             }
 
+            // 多窗口
             MultipleWindow()
         }
 
         closeService(before = false, immediate = false)
+
+        mainScope.cancel()
 
         exitProcess(0)
     }

@@ -25,14 +25,16 @@ fun <S> AnimationContent(
 ) {
     val animationTheme = Theme.animation
     val animationDuration = duration ?: animationTheme.duration.default
-    val enterAnimation = enter ?: animationTheme.enter
-    val exitAnimation = exit ?: animationTheme.exit
 
     AnimatedContent(
         targetState = state,
         modifier = modifier,
         contentAlignment = alignment,
-        transitionSpec = { enterAnimation(animationDuration) togetherWith exitAnimation(animationDuration) },
+        transitionSpec = {
+            val enterAnimation = enter ?: animationTheme.enter
+            val exitAnimation = exit ?: animationTheme.exit
+            enterAnimation(animationDuration) togetherWith exitAnimation(animationDuration)
+        },
         contentKey = contentKey,
         content = content,
     )

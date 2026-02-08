@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.*
 import androidx.compose.material.icons.outlined.*
@@ -500,7 +499,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                 .padding(CustomTheme.padding.sheetValue)
                 .verticalScroll(rememberScrollState())
             ) {
-                SelectionContainer {
+                SelectionBox {
                     Text(
                         text = text,
                         modifier = Modifier.fillMaxWidth()
@@ -544,7 +543,7 @@ class ScreenSettings(manager: ScreenManager) : Screen(manager) {
                 .padding(CustomTheme.padding.sheetValue)
                 .verticalScroll(rememberScrollState())
             ) {
-                SelectionContainer {
+                SelectionBox {
                     Text(
                         text = stringResource(Res.string.app_privacy_policy),
                         modifier = Modifier.fillMaxWidth()

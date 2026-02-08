@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,6 +37,7 @@ import love.yinlin.compose.ui.layout.EqualRow
 import love.yinlin.compose.ui.layout.EqualRowScope
 import love.yinlin.compose.ui.node.clickableNoRipple
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.cs.url
 import kotlin.math.max
 
@@ -204,7 +204,7 @@ internal fun UserProfileCard(
                     onLevelClick = onLevelClick,
                     content = content
                 )
-                SelectionContainer {
+                SelectionBox {
                     Text(
                         text = profile.signature,
                         style = MaterialTheme.typography.bodySmall,
@@ -276,7 +276,7 @@ internal fun UserPublicProfileCard(
                     modifier = Modifier.fillMaxWidth(),
                     content = content
                 )
-                SelectionContainer {
+                SelectionBox {
                     Text(
                         text = profile.signature,
                         style = MaterialTheme.typography.bodySmall,

@@ -29,7 +29,6 @@ include(
 
     "ylcs-module:build-tool",
     "ylcs-module:dokka",
-    "ylcs-module:compose:test",
 
     /* -----------------  库模块  ----------------- */
 

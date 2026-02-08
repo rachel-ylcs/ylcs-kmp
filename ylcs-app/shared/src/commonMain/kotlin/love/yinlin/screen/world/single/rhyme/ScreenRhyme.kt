@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -438,7 +437,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
 
     @Composable
     private fun GameOverlayPlaying() {
-        val rhymeFont = Font(Res.font.rhyme)
+        val rhymeFont = rememberFontFamily(Res.font.rhyme)
 
         LocalFileImage(
             path = { prologueBackground ?: Path("") },
@@ -449,10 +448,7 @@ class ScreenRhyme(manager: ScreenManager) : Screen(manager) {
 
         rhymeManager.SceneContent(
             modifier = Modifier.fillMaxSize().zIndex(2f),
-            fonts = arrayOf(
-                mainFont(),
-                remember(rhymeFont) { FontFamily(rhymeFont) }
-            )
+            fonts = arrayOf(mainFont(), rhymeFont)
         )
     }
 

@@ -5,7 +5,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import kotlinx.io.files.Path
 import love.yinlin.compose.PlatformApplication
-import love.yinlin.compose.screen.AppScreen
+import love.yinlin.compose.ToolingTheme
+import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.extension.LazyReference
 import love.yinlin.extension.mkdir
 import love.yinlin.foundation.PlatformContextDelegate
@@ -16,7 +17,7 @@ import love.yinlin.screen.ScreenRhyme
 class MainApplication : PlatformApplication<MainApplication>(appReference, PlatformContextDelegate()) {
     override val title: String = "MOD管理器 第${ModFactory.VERSION}版"
     override val initSize: DpSize = DpSize(1200.dp, 800.dp)
-    override val actionMinimize: Boolean = false
+    override val toolingTheme: ToolingTheme = ToolingTheme(enableBallonTip = true)
 
     val rootPath = Path(System.getProperty("user.dir"))
     val libraryPath = Path(rootPath, "library")
@@ -30,7 +31,7 @@ class MainApplication : PlatformApplication<MainApplication>(appReference, Platf
 
     @Composable
     override fun Content() {
-        AppScreen<ScreenMain> {
+        ScreenManager.Navigation<ScreenMain> {
             screen(::ScreenMain)
             screen(::ScreenRhyme)
         }

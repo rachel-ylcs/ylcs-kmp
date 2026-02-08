@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -33,6 +34,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import love.yinlin.compose.Device
@@ -77,11 +79,11 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
 
     override val zIndex: Float = Z_INDEX_SHEET
 
-    // 尺寸比例 (纵向Sheet是高度, 横向Sheet是宽度)
+    // 竖屏尺寸比例
     protected open val minPortraitRatio: Float = 0.3f
     protected open val maxPortraitRatio: Float = 0.7f
-    protected open val minLandscapeRatio: Float = 0.3f
-    protected open val maxLandscapeRatio: Float = 0.7f
+    // 横屏固定宽度
+    protected open val landscapeWidth: Dp? = null
 
     /**
      * 圆角形式(只有两个角)
@@ -156,6 +158,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
                     onDragStopped = { controller.stop() },
                 ).nestedScroll(controller),
             shadowElevation = Theme.shadow.v1,
+            tonalLevel = 5,
             contentPadding = LocalImmersivePadding.current,
             shape = shape
         ) {
@@ -204,9 +207,10 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
         val controller = remember { SheetController(false, ::close) }
         val animatedOffset by animateIntAsState(targetValue = controller.offset)
         val shape = if (useLandscapeRoundedCorner) Theme.shape.v1.copy(topEnd = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
+        val sheetWidth = landscapeWidth ?: Theme.size.cell1
 
         Surface(
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier.width(sheetWidth).fillMaxHeight()
                 .offset { IntOffset(x = animatedOffset, y = 0) }
                 .onSizeChanged { controller.dimension = it.width }
                 .draggable(
@@ -215,33 +219,12 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
                     onDragStopped = { controller.stop() },
                 ).nestedScroll(controller),
             shadowElevation = Theme.shadow.v1,
+            tonalLevel = 5,
+            contentAlignment = Alignment.TopStart,
             contentPadding = LocalImmersivePadding.current,
             shape = shape
         ) {
-            val landscapeMinWidth = Theme.size.cell1
-
-            Layout(content = {
-                Box { Content(args) }
-            }) { measurables, constraints ->
-                val parentWidth = constraints.maxWidth
-                val safeMaxRatio = maxLandscapeRatio.coerceIn(0.1f, 1f)
-                val safeMinRatio = minLandscapeRatio.coerceIn(0.1f, maxLandscapeRatio)
-                val landscapeMinWidthPx = landscapeMinWidth.toPx()
-                val minWidth = (parentWidth * safeMinRatio).coerceAtLeast(landscapeMinWidthPx).toInt()
-                val maxWidth = (parentWidth * safeMaxRatio).coerceAtLeast(landscapeMinWidthPx).toInt()
-                val maxHeight = constraints.maxHeight
-
-                val contentPlaceable = measurables.first().measure(Constraints(
-                    minWidth = minWidth,
-                    maxWidth = maxWidth,
-                    minHeight = 0,
-                    maxHeight = maxHeight
-                ))
-
-                layout(contentPlaceable.width, maxHeight) {
-                    contentPlaceable.placeRelative(x = 0, y = 0)
-                }
-            }
+            Content(args)
         }
     }
 

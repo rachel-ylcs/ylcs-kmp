@@ -17,6 +17,7 @@ internal class SwipeState {
     val isRunning: Boolean get() = !isAnimateOver || refreshStatus == PaginationStatus.RUNNING || loadingStatus == PaginationStatus.RUNNING
 
     private val mutatorMutex = MutatorMutex()
+    // TODO: 等 kotlin 2.3 稳定后用 backend field替换
     private val _indicatorOffset = Animatable(0f)
     val indicatorOffset: Float get() = _indicatorOffset.value
 

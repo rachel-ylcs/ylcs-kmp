@@ -1,7 +1,8 @@
 package love.yinlin.compose.ui.container
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ValueTheme
+import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -99,15 +101,15 @@ fun StatefulBox(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    Crossfade(
-        targetState = provider.status,
-        animationSpec = tween(durationMillis = Theme.animation.duration.default),
-    ) {
-        Box(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
-        ) {
-            when (it) {
+    AnimationContent(
+        state = provider.status,
+        modifier = modifier,
+        alignment = Alignment.Center,
+        enter = { fadeIn(tween(it)) },
+        exit = { fadeOut(tween(it)) }
+    ) { status ->
+        Box(contentAlignment = Alignment.Center) {
+            when (status) {
                 StatefulStatus.Content -> content()
                 StatefulStatus.Empty -> provider.EmptyLayout()
                 StatefulStatus.NetworkError -> provider.NetworkErrorLayout()

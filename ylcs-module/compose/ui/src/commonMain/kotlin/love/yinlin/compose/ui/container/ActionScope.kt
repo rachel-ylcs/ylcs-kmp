@@ -29,4 +29,22 @@ sealed class ActionScope(private val ltr: Boolean) {
             content()
         }
     }
+
+    companion object {
+        @Composable
+        fun SplitContainer(
+            modifier: Modifier = Modifier,
+            left: @Composable RowScope.() -> Unit,
+            right: @Composable RowScope.() -> Unit,
+        ) {
+            Row(
+                modifier = modifier,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Left.Container(content = left)
+                Right.Container(content = right)
+            }
+        }
+    }
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -44,6 +43,7 @@ import love.yinlin.compose.ui.layout.EmptyBox
 import love.yinlin.compose.ui.layout.ActionScope
 import love.yinlin.compose.ui.layout.SimpleEmptyBox
 import love.yinlin.compose.ui.layout.Space
+import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.cs.*
 import love.yinlin.platform.Platform
 import love.yinlin.screen.common.ScreenImagePreview
@@ -283,7 +283,7 @@ class ScreenActivityDetails(manager: ScreenManager, private val aid: Int) : Scre
 					style = MaterialTheme.typography.labelMedium,
 					modifier = Modifier.padding(CustomTheme.padding.value)
 				)
-				SelectionContainer {
+                SelectionBox {
 					Text(
 						text = content,
 						modifier = Modifier.padding(CustomTheme.padding.value)

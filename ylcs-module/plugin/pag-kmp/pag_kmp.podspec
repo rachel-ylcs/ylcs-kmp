@@ -13,14 +13,14 @@ Pod::Spec.new do |spec|
         raise "
         Kotlin framework 'pag_kmp' doesn't exist yet, so a proper Xcode project can't be generated.
         'pod install' should be executed after running ':generateDummyFramework' Gradle task:
-            ./gradlew :ylcs-module:compose:plugin:pag-kmp:generateDummyFramework
+            ./gradlew :ylcs-module:plugin:pag-kmp:generateDummyFramework
         Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
     end
     spec.xcconfig = {
         'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
     }
     spec.pod_target_xcconfig = {
-        'KOTLIN_PROJECT_PATH' => ':ylcs-module:compose:plugin:pag-kmp',
+        'KOTLIN_PROJECT_PATH' => ':ylcs-module:plugin:pag-kmp',
         'PRODUCT_MODULE_NAME' => 'pag_kmp',
     }
     spec.script_phases = [
@@ -35,7 +35,7 @@ Pod::Spec.new do |spec|
                 fi
                 set -ev
                 REPO_ROOT="$PODS_TARGET_SRCROOT"
-                "$REPO_ROOT/../../../../gradlew" -p "$REPO_ROOT" $KOTLIN_PROJECT_PATH:syncFramework \
+                "$REPO_ROOT/../../../gradlew" -p "$REPO_ROOT" $KOTLIN_PROJECT_PATH:syncFramework \
                     -Pkotlin.native.cocoapods.platform=$PLATFORM_NAME \
                     -Pkotlin.native.cocoapods.archs="$ARCHS" \
                     -Pkotlin.native.cocoapods.configuration="$CONFIGURATION"
