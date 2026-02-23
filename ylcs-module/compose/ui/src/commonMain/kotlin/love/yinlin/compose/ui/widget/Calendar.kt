@@ -9,9 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import kotlinx.datetime.DateTimeUnit
@@ -24,15 +22,15 @@ import kotlinx.datetime.plus
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
-import love.yinlin.compose.collection.StableMap
-import love.yinlin.compose.collection.emptyStableMap
 import love.yinlin.compose.extension.localComposition
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.scaleSize
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.node.keepSize
 import love.yinlin.compose.ui.resources.Res
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.ui.text.measureTextHeight
 import love.yinlin.concurrent.Mutex
 import love.yinlin.extension.DateEx
 
@@ -157,7 +155,7 @@ private fun CalendarHeader(
     val currentDate = remember(state.settledPage) { CalendarState.indexShadowDate(state.settledPage) }
 
     val dayTextStyle = LocalCalendarDayTextStyle.current
-    val headerStyle = dayTextStyle.scaleSize(1.8f, true)
+    val headerStyle = dayTextStyle.scaleSize(1.6f, true)
 
     val (_, _, totalWidth) = rememberCalendarSize()
 
@@ -168,7 +166,7 @@ private fun CalendarHeader(
     ) {
         SimpleEllipsisText(
             text = "${currentDate.year}年${currentDate.month.number}月",
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).padding(start = Theme.padding.h / 2),
             style = headerStyle,
         )
         ActionScope.Right.Container(content = actions)
@@ -197,14 +195,14 @@ private fun CalendarWeekGrid() {
 @Composable
 private fun CalendarDayGrid(
     state: CalendarState,
-    events: StableMap<Long, String>,
+    events: Map<Long, String>,
     onEventClick: (LocalDate) -> Unit,
 ) {
     val (cellSize, cellPadding, totalWidth) = rememberCalendarSize()
     val today = remember { DateEx.Today }
 
     HorizontalPager(
-        modifier = Modifier.size(totalWidth, cellSize * 6 + cellPadding * 12),
+        modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12),
         state = state,
         beyondViewportPageCount = 2,
         key = { it },
@@ -246,10 +244,17 @@ private fun CalendarDayGrid(
                                 if (isToday) drawCircle(todayBackgroundColor)
                                 drawContent()
                             },
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
+                            val fontSize = Theme.typography.v8.fontSize / when (text.length) {
+                                in 0 .. 2 -> 1f
+                                in 3 .. 4 -> 1.25f
+                                else -> 1.5f
+                            }
+
                             SimpleClipText(text = date.day.toString(), color = color, style = LocalCalendarDayNumberStyle.current)
-                            SimpleClipText(text = text, color = color, style = LocalCalendarDayTextStyle.current)
+                            SimpleClipText(text = text, color = color, style = LocalCalendarDayTextStyle.current.copy(fontSize = fontSize))
                         }
                     }
                 }
@@ -262,7 +267,7 @@ private fun CalendarDayGrid(
 fun Calendar(
     state: CalendarState = rememberCalendarState(),
     modifier: Modifier = Modifier,
-    events: StableMap<Long, String> = remember { emptyStableMap() },
+    events: Map<Long, String> = emptyMap(),
     actions: @Composable RowScope.() -> Unit = {},
     onEventClick: (LocalDate) -> Unit = {},
     style: TextStyle = Theme.typography.v8,
@@ -271,13 +276,8 @@ fun Calendar(
     LunarLoader.Load()
 
     val dayNumberStyle = style.scaleSize(1.6f, true)
-    val textMeasurer = rememberTextMeasurer()
-    val density = LocalDensity.current
-    val cellSize = remember(textMeasurer, style, density, dayNumberStyle) {
-        val dayNumberResult = textMeasurer.measure(text = "31", style = dayNumberStyle, maxLines = 1)
-        val dayTextResult = textMeasurer.measure(text = solarTermTable[0], style, maxLines = 1)
-        with(density) { (dayNumberResult.size.height + dayTextResult.size.height).toDp() }
-    }
+
+    val cellSize = measureTextHeight("31", dayNumberStyle, solarTermTable[0], style) { v1, v2 -> v1 + v2 }
 
     CompositionLocalProvider(
         LocalCalendarDayTextStyle provides style,
@@ -289,16 +289,9 @@ fun Calendar(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(cellSize * 0.3f),
         ) {
-            CalendarHeader(
-                state = state,
-                actions = actions
-            )
+            CalendarHeader(state = state, actions = actions)
             CalendarWeekGrid()
-            CalendarDayGrid(
-                state = state,
-                events = events,
-                onEventClick = onEventClick
-            )
+            CalendarDayGrid(state = state, events = events, onEventClick = onEventClick)
         }
     }
 }

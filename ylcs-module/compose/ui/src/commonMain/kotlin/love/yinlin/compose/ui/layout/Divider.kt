@@ -20,10 +20,10 @@ import love.yinlin.compose.Theme
 @NonRestartableComposable
 fun VerticalDivider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline,
+    color: Color = Theme.color.outline.copy(alpha = 0.5f),
     modifier: Modifier = Modifier,
 ) {
-    Layout(modifier = Modifier.fillMaxHeight().width(thickness).then(modifier).drawBehind {
+    Layout(modifier = modifier.fillMaxHeight().width(thickness).drawBehind {
         val thicknessPx = thickness.toPx()
         drawLine(
             color = color,
@@ -39,7 +39,7 @@ fun VerticalDivider(
 @NonRestartableComposable
 fun RowScope.Divider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline,
+    color: Color = Theme.color.outline.copy(alpha = 0.5f),
     modifier: Modifier = Modifier,
 ) {
     VerticalDivider(thickness, color, modifier)
@@ -49,10 +49,10 @@ fun RowScope.Divider(
 @NonRestartableComposable
 fun HorizontalDivider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline,
+    color: Color = Theme.color.outline.copy(alpha = 0.5f),
     modifier: Modifier = Modifier,
 ) {
-    Layout(modifier = Modifier.fillMaxWidth().height(thickness).then(modifier).drawBehind {
+    Layout(modifier = modifier.fillMaxWidth().height(thickness).drawBehind {
         val thicknessPx = thickness.toPx()
         drawLine(
             color = color,
@@ -68,7 +68,7 @@ fun HorizontalDivider(
 @NonRestartableComposable
 fun ColumnScope.Divider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline,
+    color: Color = Theme.color.outline.copy(alpha = 0.5f),
     modifier: Modifier = Modifier,
 ) {
     HorizontalDivider(thickness, color, modifier)

@@ -1,0 +1,15 @@
+package love.yinlin.data.compose
+
+import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
+
+@Stable
+@Serializable
+data class Picture(
+	val image: String,
+	val source: String = image,
+	val video: String = ""
+) {
+	val isImage: Boolean = video.isEmpty()
+	val isVideo: Boolean = video.isNotEmpty()
+}

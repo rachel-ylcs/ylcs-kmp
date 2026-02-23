@@ -1,7 +1,7 @@
 package love.yinlin.compose.graphics
 
 import androidx.compose.ui.graphics.ImageBitmap
-import love.yinlin.compose.data.ImageCropResult
+import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.data.ImageFormat
 import love.yinlin.compose.data.ImageQuality
 import kotlin.math.max
@@ -28,7 +28,7 @@ expect fun PlatformImage.detachImageBitmap(): ImageBitmap
 expect fun PlatformImage.copy(): PlatformImage?
 
 
-expect fun PlatformImage.crop(rect: ImageCropResult)
+expect fun PlatformImage.crop(rect: CropRegion)
 
 internal fun calculateThumbnailScale(width: Int, height: Int, longImageThreshold: Float, maxSizeNormal: Int, minSizeLong: Int): Triple<Int, Int, Boolean> {
     val aspectRatio = width / height.toFloat()

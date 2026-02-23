@@ -18,7 +18,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -39,6 +38,7 @@ import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.node.keepSize
 import love.yinlin.extension.catching
 
 @Composable
@@ -49,7 +49,7 @@ private fun BannerArrow(
     onClick: () -> Unit
 ) {
     AnimationVisibility(visible = visible, modifier = modifier) {
-        CompositionLocalProvider(LocalColor provides Theme.color.onSurface) {
+        SurfaceContainer {
             val shape = Theme.shape.circle
 
             Box(
@@ -132,7 +132,7 @@ fun Banner(
             HorizontalPager(
                 state = state,
                 beyondViewportPageCount = 1,
-                modifier = Modifier.matchParentSize().zIndex(1f)
+                modifier = Modifier.keepSize().matchParentSize().zIndex(1f)
             ) { virtualIndex ->
                 content(virtualIndex % size)
             }

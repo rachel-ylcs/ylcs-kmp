@@ -18,14 +18,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
-import love.yinlin.compose.collection.StableMap
-import love.yinlin.compose.collection.emptyStableMap
 
 @Stable
-data class AutoSize(private val min: TextUnit, private val max: TextUnit, private val step: TextUnit) {
+data class AutoSizer(private val min: TextUnit, private val max: TextUnit, private val step: TextUnit = 0.25.sp) {
     internal val delegate: TextAutoSize = TextAutoSize.StepBased(min, max, step)
+
+    companion object {
+        val Default = AutoSizer(10.sp, 100.sp)
+    }
 }
 
 @Composable
@@ -33,7 +36,7 @@ fun Text(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
-    autoSize: AutoSize? = null,
+    autoSizer: AutoSizer? = null,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
@@ -68,7 +71,7 @@ fun Text(
         softWrap = softWrap,
         maxLines = maxLines,
         minLines = minLines,
-        autoSize = autoSize?.delegate,
+        autoSize = autoSizer?.delegate,
     )
 }
 
@@ -77,7 +80,7 @@ fun Text(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
-    autoSize: AutoSize? = null,
+    autoSizer: AutoSizer? = null,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,
@@ -90,7 +93,7 @@ fun Text(
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
     minLines: Int = 1,
-    inlineContent: StableMap<String, InlineTextContent> = emptyStableMap(),
+    inlineContent: Map<String, InlineTextContent> = emptyMap(),
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalStyle.current,
 ) {
@@ -114,7 +117,7 @@ fun Text(
         maxLines = maxLines,
         minLines = minLines,
         inlineContent = inlineContent,
-        autoSize = autoSize?.delegate,
+        autoSize = autoSizer?.delegate,
     )
 }
 
@@ -157,7 +160,8 @@ fun SimpleEllipsisText(
     color: Color = Color.Unspecified,
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,
-    style: TextStyle = LocalStyle.current
+    style: TextStyle = LocalStyle.current,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
     BasicText(
         text = text,
@@ -174,7 +178,7 @@ fun SimpleEllipsisText(
             letterSpacing = TextUnit.Unspecified,
         ),
         onTextLayout = null,
-        overflow = TextOverflow.Ellipsis,
+        overflow = overflow,
         softWrap = true,
         maxLines = 1,
         minLines = 1,

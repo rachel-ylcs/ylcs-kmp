@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -19,7 +20,6 @@ import kotlinx.coroutines.delay
 import love.yinlin.Page
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
-import love.yinlin.compose.collection.stableListOf
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
@@ -92,6 +92,7 @@ object InputPage : Page() {
                     }
                 }
             }
+
             Component("Switch") {
                 ExampleRow {
                     var checked by rememberFalse()
@@ -109,6 +110,7 @@ object InputPage : Page() {
                     }
                 }
             }
+
             Component("Radio / CheckBox") {
                 ExampleRow {
                     Example("RadioGroup") {
@@ -132,6 +134,7 @@ object InputPage : Page() {
                     }
                 }
             }
+
             Component("Slider") {
                 ExampleRow {
                     var value by rememberValueState(0f)
@@ -212,12 +215,49 @@ object InputPage : Page() {
                 }
             }
 
+            Component("ComboBox") {
+                ExampleRow {
+                    val items = remember { (1 .. 20).map { "Item $it" } }
+                    var current by rememberValueState(-1)
+
+                    Example("Normal") {
+                        ComboBox(
+                            items = items,
+                            hint = "Select Name",
+                            onSelect = { current = it },
+                            index = current,
+                        )
+                    }
+
+                    Example("Width", modifier = Modifier.weight(1f)) {
+                        ComboBox(
+                            items = items,
+                            hint = "Select Name",
+                            onSelect = { current = it },
+                            index = current,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    Example("Disabled") {
+                        ComboBox(
+                            items = items,
+                            hint = "Select Name",
+                            onSelect = { current = it },
+                            index = current,
+                            enabled = false
+                        )
+                    }
+                }
+            }
+
             Component("Filter") {
                 ExampleRow {
                     Example("SingleFilter", modifier = Modifier.weight(1f)) {
                         var currentIndex by rememberValueState(1)
 
                         Filter(
+                            modifier = Modifier.fillMaxWidth(),
                             size = 4,
                             selectedProvider = { currentIndex == it },
                             titleProvider = { "Item $it" },
@@ -228,15 +268,16 @@ object InputPage : Page() {
                     }
 
                     Example("MultiFilter", modifier = Modifier.weight(1f)) {
-                        var selectedList by rememberState { stableListOf(true, false, false, true) }
+                        val selectedList = remember { mutableStateListOf(true, false, false, true) }
 
                         Filter(
+                            modifier = Modifier.fillMaxWidth(),
                             size = selectedList.size,
                             selectedProvider = { selectedList.getOrNull(it) ?: false },
                             titleProvider = { "Item $it" },
                             iconProvider = { if (it == 2) Icons.Home else null },
                             enabledProvider = { it != 3 },
-                            onClick = { index, selected -> selectedList = selectedList.cloneSet(index, selected) }
+                            onClick = { index, selected -> selectedList[index] = selected }
                         )
                     }
                 }

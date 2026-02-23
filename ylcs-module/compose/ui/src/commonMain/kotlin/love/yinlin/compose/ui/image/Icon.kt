@@ -18,12 +18,14 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.Role
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.floating.BalloonTip
 import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.node.pointerIcon
+import love.yinlin.compose.ui.node.semantics
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -61,6 +63,7 @@ fun Icon(
     BalloonTip(enabled = Theme.tool.enableBallonTip, text = tip) {
         Layout(
             modifier = Modifier.defaultMinSize(minSize, minSize)
+                .semantics(role = Role.Image, description = tip.ifEmpty { null })
                 .then(modifier)
                 .paint(painter = painter, colorFilter = colorFilter, contentScale = ContentScale.Fit)
                 .then(clickableModifier)

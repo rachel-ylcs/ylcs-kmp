@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,12 +30,12 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.animation.AnimationVisibility
+import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.shadow
@@ -43,7 +43,7 @@ import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.tool.NavigationBack
 
 @Stable
-open class FAB(private val scope: CoroutineScope? = null) {
+open class FAB {
     companion object {
         val Empty = FAB()
     }
@@ -77,8 +77,8 @@ open class FAB(private val scope: CoroutineScope? = null) {
     protected open val size: Dp? = null
 
     @Composable
-    private fun ActionButton(action: FABAction, overrideClick: (() -> Boolean)? = null) {
-        val buttonSize = size ?: Theme.size.input7
+    private fun ActionButton(scope: CoroutineScope, action: FABAction, overrideClick: (() -> Boolean)? = null) {
+        val buttonSize = size ?: Theme.size.input8
         val enabled by rememberDerivedState(action.enabledProvider)
         val backgroundColor = if (enabled) {
             action.backgroundColorProvider?.invoke() ?: Theme.color.primaryContainer
@@ -88,7 +88,7 @@ open class FAB(private val scope: CoroutineScope? = null) {
         } else Theme.color.disabledContent
         val shape = Theme.shape.circle
 
-        CompositionLocalProvider(LocalColor provides contentColor) {
+        ThemeContainer(contentColor) {
             Box(
                 modifier = Modifier.padding(horizontal = buttonSize / 4, vertical = buttonSize / 8)
                     .size(buttonSize)
@@ -96,19 +96,19 @@ open class FAB(private val scope: CoroutineScope? = null) {
                     .clip(shape)
                     .background(backgroundColor.copy(alpha = 0.75f))
                     .clickable(enabled = enabled) {
-                        if (scope != null && overrideClick?.invoke() == false && action.onClick != null) {
+                        if (overrideClick?.invoke() != true && action.onClick != null) {
                             scope.launch { action.onClick() }
                         }
                     }.padding(buttonSize / 5),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon = action.icon, tip = action.tip, modifier = Modifier.fillMaxSize())
+                Icon(icon = action.iconProvider(), tip = action.tipProvider(), modifier = Modifier.fillMaxSize())
             }
         }
     }
 
     @Composable
-    private fun ActionMenus(mainAction: FABAction) {
+    private fun ActionMenus(scope: CoroutineScope, mainAction: FABAction) {
         var expanded by rememberFalse()
 
         val duration = Theme.animation.duration.default
@@ -131,12 +131,13 @@ open class FAB(private val scope: CoroutineScope? = null) {
         Box(
             modifier = Modifier.fillMaxSize()
                 .background(Theme.color.scrim.copy(alpha = alpha))
-                .condition(expanded) { silentClick { expanded = false } },
+                .condition(expanded) { silentClick { expanded = false } }
+                .padding(Theme.padding.eValue),
             contentAlignment = Alignment.BottomEnd
         ) {
             Column(
-                modifier = Modifier.padding(Theme.padding.eValue8).verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 menus.fastForEachIndexed { index, action ->
                     val delay = (menus.size - 1 - index) * duration / menus.size
@@ -146,14 +147,14 @@ open class FAB(private val scope: CoroutineScope? = null) {
                         enter = { fadeIn(tween(delayMillis = delay)) + slideInVertically(tween(delayMillis = delay, durationMillis = duration - delay)) { it } },
                         exit = { fadeOut(tween(duration)) + slideOutHorizontally(tween(durationMillis = duration)) }
                     ) {
-                        ActionButton(action) {
+                        ActionButton(scope, action) {
                             expanded = false
                             false
                         }
                     }
                 }
 
-                ActionButton(mainAction) {
+                ActionButton(scope, mainAction) {
                     if (expandable) {
                         expanded = !expanded
                         true
@@ -163,20 +164,27 @@ open class FAB(private val scope: CoroutineScope? = null) {
         }
     }
 
-    val visible: Boolean get() = scope != null && action != null
+    val visible: Boolean get() = action != null
 
     @Composable
     fun Land() {
-        val mainAction = action
-        if (scope != null && mainAction != null) {
-            Box(
-                modifier = Modifier.padding(LocalImmersivePadding.current)
-                    .fillMaxSize()
-                    .zIndex(Floating.Z_INDEX_FAB),
-                contentAlignment = Alignment.BottomEnd
+        val scope = rememberCoroutineScope()
+
+        action?.let { mainAction ->
+            Box(modifier = Modifier
+                .padding(LocalImmersivePadding.current)
+                .fillMaxSize()
+                .zIndex(Floating.Z_INDEX_FAB)
             ) {
-                if (menus.isEmpty()) ActionButton(mainAction)
-                else ActionMenus(mainAction)
+                if (menus.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(Theme.padding.eValue),
+                        contentAlignment = Alignment.BottomEnd
+                    ) {
+                        ActionButton(scope, mainAction)
+                    }
+                }
+                else ActionMenus(scope, mainAction)
             }
         }
     }

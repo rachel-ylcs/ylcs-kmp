@@ -35,7 +35,7 @@ class DialogProgress<R : Any> : DialogTemplate<R>() {
     var total by mutableStateOf("0")
     var progress by mutableFloatStateOf(0f)
 
-    override val actions: @Composable (RowScope.() -> Unit)? = {
+    override val actions: @Composable (RowScope.() -> Unit) = {
         TextButton(text = Theme.value.dialogCancelText, enabled = isOpen, onClick = { close() })
     }
 

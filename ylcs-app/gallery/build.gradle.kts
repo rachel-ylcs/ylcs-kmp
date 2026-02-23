@@ -17,7 +17,10 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 libs.compose.resources,
-                projects.ylcsModule.compose.ui
+                projects.ylcsModule.compose.ui,
+                projects.ylcsModule.compose.components.richText,
+                libs.sketch,
+                libs.sketch.http,
             )
         }
 

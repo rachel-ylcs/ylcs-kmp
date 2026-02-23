@@ -22,6 +22,8 @@ fun Flyout(
     visible: Boolean,
     onClickOutside: () -> Unit ,
     position: FlyoutPosition = FlyoutPosition.Top,
+    focusable: Boolean = true,
+    clip: Boolean = false,
     space: Dp = Theme.padding.v,
     flyout: @Composable () -> Unit,
     content: @Composable () -> Unit
@@ -38,7 +40,7 @@ fun Flyout(
             Popup(
                 popupPositionProvider = positionProvider,
                 onDismissRequest = onClickOutside,
-                properties = PopupProperties(focusable = false, clippingEnabled = false)
+                properties = PopupProperties(focusable = focusable, clippingEnabled = clip)
             ) {
                 val duration = Theme.animation.duration.v8
                 val spec = tween<Float>(duration)

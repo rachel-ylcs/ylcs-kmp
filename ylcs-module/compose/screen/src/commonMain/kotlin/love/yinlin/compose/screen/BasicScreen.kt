@@ -19,6 +19,8 @@ import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.tool.NavigationBack
 import love.yinlin.extension.Array
 import love.yinlin.extension.parseJson
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmName
 
 @Stable
@@ -32,13 +34,16 @@ abstract class BasicScreen : ViewModel() {
     @PublishedApi
     internal var lastResumeArgs: String? = null
 
-    final override fun addCloseable(closeable: AutoCloseable) {
-        super.addCloseable(closeable)
-    }
+    final override fun addCloseable(closeable: AutoCloseable) = super.addCloseable(closeable)
 
     final override fun onCleared() {
+        // 1. 清理回调
         finalize()
+        // 2. 释放数据源
+        (this as? DataSource)?.onDataSourceClean()
+        // 3. 注销屏幕
         uniqueId.let { manager.unregisterScreen(it) }
+        // 4. ViewModel 回收
         super.onCleared()
     }
 
@@ -144,7 +149,7 @@ abstract class BasicScreen : ViewModel() {
     /**
      * 启动协程
      */
-    fun launch(block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(block = block)
+    fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(context = context, block = block)
 
     /**
      * 弹出导航栈顶层页面

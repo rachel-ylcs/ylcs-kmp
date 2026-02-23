@@ -7,9 +7,11 @@ import kotlinx.coroutines.Job
 import love.yinlin.compose.ui.floating.BasicSheet
 import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.floating.FAB
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @Stable
-abstract class SubScreen(val parent: BasicScreen) {
+abstract class SubScreen(val parent: NavigationScreen) {
     /**
      * 首次进入子页面的初始化事件
      */
@@ -82,7 +84,7 @@ abstract class SubScreen(val parent: BasicScreen) {
     /**
      * 启动协程
      */
-    fun launch(block: suspend CoroutineScope.() -> Unit): Job = parent.launch(block = block)
+    fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = parent.launch(context = context, block = block)
 
     /**
      * 弹出导航栈顶层页面

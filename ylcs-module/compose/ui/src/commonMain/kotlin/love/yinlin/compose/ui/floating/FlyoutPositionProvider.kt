@@ -54,9 +54,7 @@ internal class FlyoutPositionProvider(
             x = (anchorBounds.right - popupContentSize.width).coerceAtLeast(0)
         }
         var y = anchorBounds.bottom + space
-        if (y + popupContentSize.height > containerSize.height) {
-            y = anchorBounds.top - popupContentSize.height - space
-        }
+        if (y + popupContentSize.height > containerSize.height) y = anchorBounds.top - popupContentSize.height - space
         return IntOffset(x, y)
     }
 

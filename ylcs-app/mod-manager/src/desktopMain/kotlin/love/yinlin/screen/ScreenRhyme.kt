@@ -276,6 +276,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                             visible = isOpen,
                             onClickOutside = { isOpen = false },
                             position = FlyoutPosition.Bottom,
+                            clip = true,
                             flyout = {
                                 Surface(
                                     contentPadding = Theme.padding.eValue,

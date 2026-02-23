@@ -52,7 +52,7 @@ abstract class DialogChoice : DialogTemplate<Int>() {
     }
 
     @Stable
-    abstract class ByList internal constructor() : DialogChoice() {
+    abstract class ByList : DialogChoice() {
         abstract fun nameFactory(index: Int): String
         abstract fun iconFactory(index: Int): ImageVector
 

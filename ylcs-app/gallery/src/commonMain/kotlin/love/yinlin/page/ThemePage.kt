@@ -16,6 +16,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.zIndex
 import love.yinlin.Page
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -146,15 +147,11 @@ object ThemePage : Page() {
                         Text(text = "onWarning", color = Theme.color.onWarning, style = Theme.typography.v4.bold)
                     }
                     Box(
-                        modifier = Modifier.weight(1f).background(Theme.color.primaryContainer).padding(Theme.padding.v),
+                        modifier = Modifier.weight(1f).padding(Theme.padding.v),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().background(Theme.color.scrim.copy(alpha = 0.5f)),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(text = "scrim", color = Theme.color.onContainer, style = Theme.typography.v4.bold)
-                        }
+                        Box(modifier = Modifier.matchParentSize().background(Theme.color.scrim.copy(alpha = 0.5f)).zIndex(2f))
+                        Text(text = "scrim", style = Theme.typography.v4, modifier = Modifier.zIndex(1f))
                     }
                 }
             }

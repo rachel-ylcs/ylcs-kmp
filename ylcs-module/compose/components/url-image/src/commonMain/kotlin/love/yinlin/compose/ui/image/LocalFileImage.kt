@@ -32,14 +32,16 @@ fun LocalFileImage(
     val state = rememberWebImageState(ImageQuality.Full, background = null, animated = animated)
     Box(modifier = modifier) {
         AsyncImage(
-            uri = rememberWebImageKeyUrl(baseUri, baseKey),
+            uri = buildWebImageKeyUrl(baseUri, baseKey),
             contentDescription = null,
             state = state,
             alignment = alignment,
             contentScale = contentScale,
             filterQuality = ImageQuality.Full.filterQuality,
             alpha = alpha,
-            modifier = Modifier.matchParentSize().condition(circle) { clip(CircleShape) }
+            modifier = Modifier
+                .matchParentSize()
+                .condition(circle) { clip(CircleShape) }
                 .condition(onClick != null) { clickable(onClick = onClick) }
         )
     }

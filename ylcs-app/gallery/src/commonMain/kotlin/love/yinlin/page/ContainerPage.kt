@@ -2,6 +2,7 @@ package love.yinlin.page
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,9 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -23,12 +24,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import love.yinlin.Page
-import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
-import love.yinlin.compose.collection.emptyStableList
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.AdaptiveTwoBox
 import love.yinlin.compose.ui.container.AdderBox
 import love.yinlin.compose.ui.container.Banner
 import love.yinlin.compose.ui.container.DefaultStatefulProvider
@@ -37,6 +37,7 @@ import love.yinlin.compose.ui.container.ReplaceableBox
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
@@ -126,7 +127,7 @@ object ContainerPage : Page() {
                     onClick = { index, selected -> if (selected) provider.status = StatefulStatus.entries[index] }
                 )
 
-                CompositionLocalProvider(LocalColor provides Theme.color.onContainer) {
+                ThemeContainer {
                     StatefulBox(provider = provider, modifier = Modifier.size(Theme.size.cell3).background(Theme.color.primaryContainer)) {
                         Text("Hello world")
                     }
@@ -162,27 +163,27 @@ object ContainerPage : Page() {
                     Theme.color.tertiaryContainer,
                     Theme.color.surface
                 )
-                var items by rememberState { emptyStableList<Color>() }
+                val items = remember { mutableStateListOf<Color>() }
 
                 AdderBox(
                     maxNum = 9,
                     items = items,
                     modifier = Modifier.width(Theme.size.cell1),
-                    onAdd = { items = items.cloneAdd(colorList.random()) },
-                    onReplace = { index, _ -> items = items.cloneSet(index, colorList.random()) },
-                    onDelete = { index, _ -> items = items.cloneRemove(index) }
+                    onAdd = { items += colorList.random() },
+                    onReplace = { index, _ -> items[index] = colorList.random() },
+                    onDelete = { index, _ -> items.removeAt(index) }
                 ) { _, color ->
                     Box(modifier = Modifier.fillMaxSize().background(color))
                 }
             }
 
             Component("Banner") {
-                val imgRes = remember { listOf(
+                val imgRes = listOf(
                     Res.drawable.img0,
                     Res.drawable.img1,
                     Res.drawable.img2,
                     Res.drawable.img3
-                ) }
+                )
 
                 Banner(
                     size = imgRes.size,
@@ -203,6 +204,17 @@ object ContainerPage : Page() {
                     Icon(icon = Icons.Upload, onClick = {})
                     Icon(icon = Icons.CloudDownload, onClick = {})
                     Icon(icon = Icons.CloudUpload, onClick = {})
+                }
+            }
+
+            Component("AdaptiveTwoBox") {
+                AdaptiveTwoBox(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Box(modifier = Modifier.size(Theme.size.cell1, Theme.size.cell2).background(Theme.color.primaryContainer))
+                    Box(modifier = Modifier.size(Theme.size.cell2, Theme.size.cell3).background(Theme.color.secondaryContainer))
                 }
             }
         }

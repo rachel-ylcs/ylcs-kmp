@@ -24,6 +24,7 @@ private fun BalloonTip(text: String, content: @Composable () -> Unit) {
     Flyout(
         visible = visible,
         onClickOutside = { visible = false },
+        focusable = false,
         flyout = {
             Surface(
                 contentPadding = Theme.padding.value,

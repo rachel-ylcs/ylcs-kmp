@@ -22,9 +22,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.github.panpf.sketch.size
-import kotlinx.serialization.Serializable
 import love.yinlin.compose.Colors
-import love.yinlin.compose.data.ImageCropResult
+import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberRefState
@@ -163,7 +162,7 @@ class CropState {
     var frameRect by mutableStateOf(Rect.Zero)
     var imageRect by mutableStateOf(Rect.Zero)
 
-    val result: ImageCropResult get() = ImageCropResult(
+    val result: CropRegion get() = CropRegion(
         xPercent = (frameRect.left - imageRect.left) / imageRect.width,
         yPercent = (frameRect.top - imageRect.top) / imageRect.height,
         widthPercent = frameRect.width / imageRect.width,
@@ -192,14 +191,16 @@ fun CropImage(
         modifier = modifier.pointerInput(aspectRatio, imageSize) {
             if (imageSize != null) detectDragGestures(
                 onDragStart = { position ->
-                    touchRegion = state.frameRect.run { when {
-                        Rect(topLeft, tolerance).contains(position) -> TouchRegion.Vertex.TOP_LEFT
-                        Rect(topRight, tolerance).contains(position) -> TouchRegion.Vertex.TOP_RIGHT
-                        Rect(bottomLeft, tolerance).contains(position) -> TouchRegion.Vertex.BOTTOM_LEFT
-                        Rect(bottomRight, tolerance).contains(position) -> TouchRegion.Vertex.BOTTOM_RIGHT
-                        contains(position) -> TouchRegion.Inside
-                        else -> null
-                    } }
+                    touchRegion = state.frameRect.run {
+                        when {
+                            Rect(topLeft, tolerance).contains(position) -> TouchRegion.Vertex.TOP_LEFT
+                            Rect(topRight, tolerance).contains(position) -> TouchRegion.Vertex.TOP_RIGHT
+                            Rect(bottomLeft, tolerance).contains(position) -> TouchRegion.Vertex.BOTTOM_LEFT
+                            Rect(bottomRight, tolerance).contains(position) -> TouchRegion.Vertex.BOTTOM_RIGHT
+                            contains(position) -> TouchRegion.Inside
+                            else -> null
+                        }
+                    }
                 },
                 onDragEnd = { touchRegion = null }
             ) { change, dragAmount ->

@@ -69,9 +69,10 @@ object TreeViewScope {
             val textPlaceable = textMeasurable.measure(looseConstraints)
 
             val heightPx = textPlaceable.height
+            val iconSize = if (heightPx >= Short.MAX_VALUE) 0 else heightPx
             val gap = (heightPx * 0.5f).toInt()
 
-            val iconConstraints = Constraints.fixed(heightPx, heightPx)
+            val iconConstraints = Constraints.fixed(iconSize, iconSize)
 
             val expandIconPlaceable = expandIconMeasurable?.measure(iconConstraints)
             val iconPlaceable = iconMeasurable?.measure(iconConstraints)

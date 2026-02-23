@@ -39,10 +39,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open val initSize: DpSize = DpSize(1200.dp, 700.dp)
     protected open val minSize: DpSize = DpSize(360.dp, 640.dp)
     protected open val roundedCorner: Boolean = true
-    protected open val actionAlwaysOnTop: Boolean = false
-    protected open val actionMinimize: Boolean = true
-    protected open val actionMaximize: Boolean = true
-    protected open val actionClose: Boolean = true
 
     @Composable
     protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
@@ -58,17 +54,13 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             initSize = initSize,
             initTitle = title,
             initIcon = icon,
-            initRoundedCorner = roundedCorner,
-            initActionAlwaysOnTop = actionAlwaysOnTop,
-            initActionMinimize = actionMinimize,
-            initActionMaximize = actionMaximize,
-            initActionClose = actionClose,
+            initRoundedCorner = roundedCorner
         )
     }
 
     private val windowStarter = LaunchFlag()
 
-    private val mainScope = MainScope()
+    val mainScope = MainScope()
 
     fun run() {
         openService(scope = mainScope, later = false, immediate = false)

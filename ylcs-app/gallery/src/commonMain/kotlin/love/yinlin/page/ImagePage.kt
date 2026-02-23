@@ -3,6 +3,7 @@ package love.yinlin.page
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -14,8 +15,6 @@ import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.delay
 import love.yinlin.Page
 import love.yinlin.compose.Theme
-import love.yinlin.compose.collection.stableListOf
-import love.yinlin.compose.data.Picture
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.ColorIcon
@@ -23,6 +22,8 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.NineGrid
+import love.yinlin.compose.ui.node.condition
+import love.yinlin.data.compose.Picture
 import love.yinlin.gallery.resources.*
 
 @Stable
@@ -81,29 +82,29 @@ object ImagePage : Page() {
             }
 
             Component("NineGrid") {
-                val imgRes = remember { listOf(
+                val imgRes = listOf(
                     Res.drawable.img0,
                     Res.drawable.img1,
                     Res.drawable.img2,
                     Res.drawable.img3
-                ) }
+                )
 
-                val imageBlock = @Composable { modifier: Modifier, pic: Picture, contentScale: ContentScale, onClick: () -> Unit ->
+                val imageBlock = @Composable { isSingle: Boolean, pic: Picture, onClick: () -> Unit ->
                     Image(
                         res = imgRes[pic.image.toInt()],
-                        modifier = modifier.clickable(onClick = onClick),
-                        contentScale = contentScale,
+                        modifier = Modifier.condition(!isSingle) { fillMaxSize() }.clickable(onClick = onClick),
+                        contentScale = if (isSingle) ContentScale.Inside else ContentScale.Crop,
                     )
                 }
 
                 ExampleRow {
                     Example("Single DefaultSize") {
-                        NineGrid(pics = remember { stableListOf(Picture("0")) }, content = imageBlock)
+                        NineGrid(pics = remember { listOf(Picture("0")) }, content = imageBlock)
                     }
 
                     Example("Single fillMaxWidth", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { stableListOf(Picture("2")) },
+                            pics = remember { listOf(Picture("2")) },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
@@ -112,12 +113,12 @@ object ImagePage : Page() {
 
                 ExampleRow {
                     Example("Single Portrait") {
-                        NineGrid(pics = remember { stableListOf(Picture("1")) }, content = imageBlock)
+                        NineGrid(pics = remember { listOf(Picture("1")) }, content = imageBlock)
                     }
 
                     Example("Video", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { stableListOf(Picture("0", video = "0")) },
+                            pics = remember { listOf(Picture("0", video = "0")) },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
@@ -127,14 +128,14 @@ object ImagePage : Page() {
                 ExampleRow {
                     Example("2 Picture", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { stableListOf(Picture("0"), Picture("1")) },
+                            pics = remember { listOf(Picture("0"), Picture("1")) },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
                     }
                     Example("3 Picture", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { stableListOf(Picture("0"), Picture("1"), Picture("3")) },
+                            pics = remember { listOf(Picture("0"), Picture("1"), Picture("3")) },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
@@ -144,14 +145,14 @@ object ImagePage : Page() {
                 ExampleRow {
                     Example("5 Picture, Fixed Width") {
                         NineGrid(
-                            pics = remember { stableListOf(Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")) },
+                            pics = remember { listOf(Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")) },
                             modifier = Modifier.width(Theme.size.cell1),
                             content = imageBlock
                         )
                     }
                     Example("9 Picture", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { stableListOf(Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")) },
+                            pics = remember { listOf(Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")) },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )

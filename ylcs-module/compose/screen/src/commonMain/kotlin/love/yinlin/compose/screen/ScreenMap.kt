@@ -10,7 +10,7 @@ class ScreenMap @PublishedApi internal constructor() {
     @PublishedApi
     internal val screens = mutableMapOf<String, (JsonArray) -> BasicScreen>()
 
-    var screen404: (@Composable () -> Unit)? = null
+    var screen404: @Composable (ScreenManager) -> Unit = ::DefaultScreen404
 
     @PublishedApi
     internal inline fun <reified S : BasicScreen> screen(noinline handler: (JsonArray) -> BasicScreen) { screens[Route.key<S>()] = handler }

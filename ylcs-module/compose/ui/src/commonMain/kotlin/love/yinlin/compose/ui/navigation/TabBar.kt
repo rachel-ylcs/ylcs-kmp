@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import love.yinlin.compose.LocalColor
@@ -22,6 +23,7 @@ import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.TextIconAdapter
@@ -36,7 +38,7 @@ fun TabBar(
     iconProvider: ((Int) -> ImageVector?)? = null,
     enabledProvider: ((Int) -> Boolean)? = null,
     key: ((Int) -> Any)? = null,
-    padding: PaddingValues = Theme.padding.value,
+    padding: PaddingValues = Theme.padding.value9,
     style: TextStyle = LocalStyle.current.bold,
     activeColor: Color = Theme.color.primary,
     onLongClick: ((Int) -> Unit)? = null,
@@ -76,7 +78,7 @@ fun TabBar(
                         topLeft = Offset(startRatio * boxWidth, boxHeight - indicatorHeight),
                         size = Size(indicatorRatio * boxWidth, indicatorHeight)
                     )
-                }.padding(padding)
+                }.pointerIcon(PointerIcon.Hand).padding(padding)
             ) { iconId, textId ->
                 icon?.let { Icon(icon = it, color = contentColor, modifier = Modifier.iconId()) }
                 SimpleClipText(text = title, modifier = Modifier.textId(), color = contentColor, style = style)

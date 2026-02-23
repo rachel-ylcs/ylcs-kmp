@@ -1,6 +1,5 @@
 package love.yinlin
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,7 +50,7 @@ abstract class Page {
     @Composable
     protected fun ExampleRow(content: @Composable FlowRowScope.() -> Unit) {
         FlowRow(
-            modifier = Modifier.fillMaxWidth().animateContentSize(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
             content = content,

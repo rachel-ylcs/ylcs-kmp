@@ -3,7 +3,6 @@ package love.yinlin.compose.ui.layout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -27,7 +26,7 @@ internal fun <T> SwipePaginationColumn(
     verticalArrangement: Arrangement.Vertical,
     horizontalAlignment: Alignment.Horizontal,
     header: (@Composable LazyItemScope.() -> Unit)?,
-    itemDivider: PaddingValues?,
+    itemDivider: (@Composable () -> Unit)? = null,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
     SwipePaginationLayout(
@@ -51,8 +50,8 @@ internal fun <T> SwipePaginationColumn(
             }
 
             itemsIndexed(items = items, key = key?.let { { _, item -> it(item) } }) {index, item->
-                if (itemDivider != null && index != 0) HorizontalDivider(modifier = Modifier.padding(itemDivider))
                 itemContent(item)
+                if (itemDivider != null && index != items.lastIndex) itemDivider()
             }
         }
     }

@@ -59,7 +59,7 @@ internal fun <T> ClickPaginationStaggeredGrid(
 
         if (canLoading) {
             item(
-                key = Unit,
+                key = ItemKey("Loading"),
                 span = StaggeredGridItemSpan.FullLine
             ) {
                 indicator(status) {

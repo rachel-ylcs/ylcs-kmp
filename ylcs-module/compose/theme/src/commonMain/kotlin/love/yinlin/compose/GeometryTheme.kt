@@ -42,6 +42,7 @@ data class SizeTheme(
     val cell8: Dp,
     val cell9: Dp,
     val cell10: Dp,
+    val sheet: Dp,
 )
 
 /**
@@ -198,6 +199,7 @@ data class GeometryTheme(
                 cell8 = 75.dp,
                 cell9 = 64.dp,
                 cell10 = 48.dp,
+                sheet = 360.dp,
             ),
             padding = PaddingTheme(
                 h = 10.dp,

@@ -33,10 +33,14 @@ include(
     /* -----------------  库模块  ----------------- */
 
     "ylcs-module:compose:app",
+    "ylcs-module:compose:components:media",
     "ylcs-module:compose:components:pagination-layout",
+    "ylcs-module:compose:components:qrcode",
+    "ylcs-module:compose:components:rich-text",
     "ylcs-module:compose:components:url-image",
     "ylcs-module:compose:components:webview",
     "ylcs-module:compose:core",
+    "ylcs-module:compose:icons",
     "ylcs-module:compose:platform-view",
     "ylcs-module:compose:plugin:animated-webp-decoder",
     "ylcs-module:compose:plugin:game",
@@ -49,6 +53,7 @@ include(
     "ylcs-module:cs:client-engine",
     "ylcs-module:cs:server-engine",
     "ylcs-module:foundation:context",
+    "ylcs-module:foundation:orientation",
     "ylcs-module:foundation:startup",
     "ylcs-module:native:win32:core",
     "ylcs-module:platform:ffi:core",
@@ -56,7 +61,6 @@ include(
     "ylcs-module:platform:ffi:win32",
     "ylcs-module:platform:native-lib-loader",
     "ylcs-module:platform:os:auto-update",
-    "ylcs-module:platform:os:desktop-player",
     "ylcs-module:platform:os:single-instance",
     "ylcs-module:platform:os:window",
     "ylcs-module:plugin:pag-kmp",
@@ -67,6 +71,18 @@ include(
 
     /* -----------------  应用模块  ----------------- */
 
+    "ylcs-app:app:account",
+    "ylcs-app:app:community",
+    "ylcs-app:app:game",
+    "ylcs-app:app:game-guess-lyrics",
+    "ylcs-app:app:game-rhyme",
+    "ylcs-app:app:global",
+    "ylcs-app:app:information",
+    "ylcs-app:app:music",
+    "ylcs-app:app:portal",
+    "ylcs-app:app:third-party",
+    "ylcs-app:app:viewer",
+
     "ylcs-app:androidApp",
     "ylcs-app:cs",
     "ylcs-app:desktopApp",
@@ -75,6 +91,5 @@ include(
     "ylcs-app:mod",
     "ylcs-app:mod-manager",
     "ylcs-app:server",
-    "ylcs-app:shared",
     "ylcs-app:webApp",
 )

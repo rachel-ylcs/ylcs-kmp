@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -30,14 +29,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.animation.AnimationContent
+import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catching
 
 @Stable
@@ -77,7 +77,7 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
 
     fun open(text: String?, type: Type, duration: Long = DEFAULT_DURATION) {
         job?.cancel()
-        job = scope.launch {
+        job = scope.launch(mainContext) {
             val self = coroutineContext[Job]
             openFloating(Data(type, text ?: ""))
             catching { delay(duration) }
@@ -121,7 +121,7 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
 
                 val duration = Theme.animation.duration.v7
 
-                CompositionLocalProvider(LocalColor provides contentColor) {
+                ThemeContainer(contentColor) {
                     AnimationContent(
                         state = data,
                         enter = { fadeIn(tween(duration, delayMillis = (duration * 0.3f).toInt())) + slideInVertically { it / 2 } },

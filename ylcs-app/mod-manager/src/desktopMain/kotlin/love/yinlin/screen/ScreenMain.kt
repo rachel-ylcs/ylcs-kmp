@@ -257,10 +257,11 @@ class ScreenMain : BasicScreen() {
     private fun ActionBar(modifier: Modifier = Modifier) {
         Surface(
             modifier = modifier,
+            contentPadding = Theme.padding.value,
             shadowElevation = Theme.shadow.v3
         ) {
             ActionScope.SplitContainer(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
+                modifier = Modifier.fillMaxWidth(),
                 left = {
                     LoadingIcon(Icons.Refresh, tip = "刷新", onClick = ::loadLibrary)
                     if (onSearching) Icon(Icons.Clear, tip = "关闭搜索", onClick = ::closeSearch)
@@ -374,6 +375,7 @@ class ScreenMain : BasicScreen() {
     private val previewSheet = this land object : Sheet() {
         override val dismissOnBackPress: Boolean get() = !isRunning
         override val dismissOnClickOutside: Boolean get() = !isRunning
+        override val scrollable: Boolean = false
 
         private var isRunning by mutableStateOf(false)
         private var result: ModFactory.Preview.PreviewResult? by mutableStateOf(null)

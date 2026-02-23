@@ -1,66 +1,68 @@
 package love.yinlin
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CleaningServices
-import androidx.compose.material.icons.outlined.RocketLaunch
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.ApplicationScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import love.yinlin.app.global.resources.Res
+import love.yinlin.app.global.resources.img_logo
+import love.yinlin.compose.DefaultTopBar
+import love.yinlin.compose.DefaultTopBarActions
+import love.yinlin.compose.Theme
+import love.yinlin.compose.WindowController
 import love.yinlin.compose.screen.DeepLink
-import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.coroutines.Coroutines
+import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
+import love.yinlin.coroutines.ioContext
 import love.yinlin.data.MimeType
 import love.yinlin.foundation.PlatformContextDelegate
 import love.yinlin.foundation.StartupDelegate
-import love.yinlin.platform.*
-import love.yinlin.shared.resources.*
+import love.yinlin.platform.AutoUpdate
+import love.yinlin.platform.SingleInstance
 import love.yinlin.startup.StartupComposeSwingRender
 import love.yinlin.startup.StartupMacOSDeepLink
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.getString
 
 fun main() = object : RachelApplication(PlatformContextDelegate()) {
-    override val title: String = runBlocking { getString(Res.string.app_name) }
+    override val title: String = "银临茶舍"
     override val icon: DrawableResource = Res.drawable.img_logo
-    override val actionAlwaysOnTop: Boolean = true
-    override val tray: Boolean = true
-    override val trayHideNotification: String = "已隐藏到任务栏托盘中"
 
     @Composable
-    override fun TopBar(actions: @Composable (ActionScope.() -> Unit)) {
-        super.TopBar {
-            if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
-                Action(
-                    icon = Icons.Outlined.CleaningServices,
-                    tip = "GC",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                ) {
-                    System.gc()
-                }
-            }
+    override fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit) {
+        if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+            Icon(
+                icon = Icons.CleaningServices,
+                tip = "GC",
+                onClick = { System.gc() }
+            )
+        }
 
-            ActionSuspend(
-                icon = Icons.Outlined.RocketLaunch,
-                tip = "加载更新包",
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            ) {
-                picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
-                    Coroutines.io {
+        Icon(
+            icon = Icons.RocketLaunch,
+            tip = "加载更新包",
+            onClick = {
+                mainScope.launch(ioContext) {
+                    picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
                         AutoUpdate.start(path.path)
                     }
                 }
             }
+        )
 
-            actions()
-        }
+        Icon(
+            icon = if (controller.alwaysOnTop) Icons.MobiledataOff else Icons.VerticalAlignTop,
+            tip = if (controller.alwaysOnTop) Theme.value.windowAlwaysTopDisableText else Theme.value.windowAlwaysTopEnableText,
+            onClick = { controller.alwaysOnTop = !controller.alwaysOnTop }
+        )
+
+        DefaultTopBarActions(controller, onExit)
     }
 
     @Composable
     override fun ApplicationScope.MultipleWindow() {
-        mp.floatingLyrics.let {
-            if (it.isAttached) it.Content()
-        }
+        // TODO:
+//        mp.floatingLyrics.let {
+//            if (it.isAttached) it.Content()
+//        }
     }
 
     private val setupSingleInstance by sync(priority = StartupDelegate.HIGH7) { SingleInstance.run("${Local.info.appName}.lock") }
@@ -68,9 +70,7 @@ fun main() = object : RachelApplication(PlatformContextDelegate()) {
     private val setComposeRender by service(factory = ::StartupComposeSwingRender)
 
     private val setupMacOSDeepLink by service(
-        StartupMacOSDeepLink.Handler { uri ->
-            DeepLink.openUri(uri)
-        },
+        StartupMacOSDeepLink.Handler { DeepLink.openUri(it) },
         factory = ::StartupMacOSDeepLink
     )
 }.run()

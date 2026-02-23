@@ -60,6 +60,7 @@ private class SliderMeasurePolicy(val percent: Float, val trackHeight: Dp, val m
             Constraints.fixed(layoutWidth, trackHeightPx)
         )
         val activeTrackWidth = (layoutWidth * percent).roundToInt()
+
         val activeTrackPlaceable = measurables.require(SliderMeasureId.ActiveTrack).measure(
             Constraints.fixed(activeTrackWidth, trackHeightPx)
         )
@@ -241,7 +242,7 @@ fun <T> Slider(
     content: (@Composable BoxScope.() -> Unit)? = null
 ) {
     Slider(
-        value = remember(converter, value) { converter.from(value) },
+        value = converter.from(value),
         onValueChangeFinished = { onValueChangeFinished(converter.to(it)) },
         modifier = modifier,
         onValueChange = { onValueChange?.invoke(converter.to(it)) },

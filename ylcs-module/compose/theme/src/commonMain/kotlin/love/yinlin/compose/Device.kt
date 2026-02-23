@@ -41,8 +41,8 @@ data class Device(val size: Size, val type: Type) {
             else -> Size.LARGE
         },
         type = when {
-            height >= width * 1.3f -> Type.PORTRAIT
-            width >= height * 1.3f -> Type.LANDSCAPE
+            height >= width * 1.5f -> Type.PORTRAIT
+            width >= height * 1.3333f -> Type.LANDSCAPE
             else -> Type.SQUARE
         }
     )

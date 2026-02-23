@@ -6,7 +6,6 @@ import org.gradle.api.file.RegularFile
 class BuildSrcNode(root: RootProjectNode) : Directory by root.dir("buildSrc")
 
 class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("config") {
-    val stability: RegularFile = file("stability.conf")
     val icon: RegularFile = file(when (c.platform) {
         BuildPlatform.Windows -> "icon.ico"
         BuildPlatform.Linux -> "icon.png"
@@ -37,11 +36,6 @@ class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
     val desktop: Directory = dir("desktop")
     val server: Directory = dir("server")
     val modManager: Directory = dir("modManager")
-}
-
-class SharedNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("shared") {
-    private val build: Directory = dir("build")
-    val composeCompilerReport: Directory = build.dir("composeCompiler")
 }
 
 class AndroidAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("androidApp") {
@@ -103,7 +97,6 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val script = ScriptNode(this)
     val artifacts = ArtifactsNode(this)
     val work = WorkNode(this)
-    val shared = SharedNode(this, c)
     val androidApp = AndroidAppNode(this, c)
     val iosApp = IosAppNode(this, c)
     val desktopApp = DesktopAppNode(this, c)

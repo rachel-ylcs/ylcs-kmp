@@ -4,7 +4,6 @@ import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
@@ -93,9 +92,6 @@ class KotlinMultiplatformSourceSetsScope(
 abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
     // SourceSets
     open fun KotlinMultiplatformSourceSetsScope.source() { }
-
-    // Compose
-    open fun ComposeCompilerGradlePluginExtension.composeCompiler() { }
 
     // Android
     open fun KotlinMultiplatformAndroidLibraryTarget.android() { }
@@ -376,7 +372,14 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
         }
 
         extensions.findByType<ComposeCompilerGradlePluginExtension>()?.apply {
-            composeCompiler()
+            val composeCompilerOutput = layout.buildDirectory.dir("composeStability")
+            reportsDestination.set(composeCompilerOutput)
+            metricsDestination.set(composeCompilerOutput)
+            val stabilityFileDir = layout.projectDirectory.dir("config")
+            val stabilityFiles = (stabilityFileDir.asFile.listFiles { it.extension == "conf" } ?: emptyArray<File>()).map {
+                stabilityFileDir.file(it.name)
+            }
+            if (stabilityFiles.isNotEmpty()) stabilityConfigurationFiles.addAll(stabilityFiles)
         }
 
         extensions.findByType<ComposeExtension>()?.apply {

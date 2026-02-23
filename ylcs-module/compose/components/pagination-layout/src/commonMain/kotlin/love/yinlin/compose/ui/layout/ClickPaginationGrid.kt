@@ -58,7 +58,7 @@ internal fun <T> ClickPaginationGrid(
 
         if (canLoading) {
             item(
-                key = Unit,
+                key = ItemKey("Loading"),
                 span = { GridItemSpan(maxLineSpan) }
             ) {
                 indicator(status) {

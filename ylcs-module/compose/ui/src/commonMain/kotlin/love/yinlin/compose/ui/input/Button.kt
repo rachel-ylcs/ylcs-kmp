@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,11 +16,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
-import love.yinlin.compose.LocalColor
-import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
@@ -38,14 +36,7 @@ internal fun Button(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val contentColor = if (enabled) Theme.color.onContainer else Theme.color.disabledContent
-    val contentColorVariant = if (enabled) Theme.color.onContainerVariant else Theme.color.disabledContent
-    val backgroundColor = if (enabled) color else Theme.color.disabledContainer
-
-    CompositionLocalProvider(
-        LocalColor provides contentColor,
-        LocalColorVariant provides contentColorVariant,
-    ) {
+    ThemeContainer(enabled) {
         val shape = Theme.shape.circle
         val minWidth = Theme.size.input5
         Box(
@@ -53,7 +44,7 @@ internal fun Button(
                 .defaultMinSize(minWidth = minWidth, minHeight = minWidth / 3)
                 .shadow(shape, Theme.shadow.v6)
                 .clip(shape)
-                .background(color = backgroundColor)
+                .background(color = if (enabled) color else Theme.color.disabledContainer)
                 .pointerIcon(PointerIcon.Hand, enabled = enabled)
                 .semantics(Role.Button)
                 .clickable(enabled = enabled, onClick = onClick)
@@ -77,7 +68,7 @@ private fun Button(
     modifier: Modifier = Modifier
 ) {
     Button(onClick = onClick, color = color, enabled = enabled, modifier = modifier) {
-        TextIconAdapter{ iconId, textId ->
+        TextIconAdapter { iconId, textId ->
             if (icon != null) Icon(icon = icon, modifier = Modifier.iconId())
             Text(text = text, style = style, modifier = Modifier.textId())
         }

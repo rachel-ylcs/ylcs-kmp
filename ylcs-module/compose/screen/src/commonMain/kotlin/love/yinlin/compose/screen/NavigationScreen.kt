@@ -29,7 +29,11 @@ abstract class NavigationScreen : BasicScreen() {
     /**
      * 创建子页面
      */
-    fun <S : SubScreen> create(factory: (BasicScreen) -> S) { subScreenList += SubScreenInfo(screen = factory(this)) }
+    fun <S : SubScreen> create(factory: (NavigationScreen) -> S): S {
+        val subScreen = factory(this)
+        subScreenList += SubScreenInfo(screen = subScreen)
+        return subScreen
+    }
 
     private val pagerState = PagerState { subScreenList.size }
 
@@ -37,9 +41,7 @@ abstract class NavigationScreen : BasicScreen() {
      * 当前页索引
      */
     var pageIndex: Int get() = pagerState.currentPage
-        set(value) {
-            launch { pagerState.scrollToPage(value) }
-        }
+        set(value) { pagerState.requestScrollToPage(value) }
 
     @Composable
     final override fun BasicContent() {

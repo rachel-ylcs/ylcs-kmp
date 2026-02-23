@@ -25,13 +25,6 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        commonTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
-        }
-
         androidMain.configure(commonMain) {
             lib(
                 ExportLib,

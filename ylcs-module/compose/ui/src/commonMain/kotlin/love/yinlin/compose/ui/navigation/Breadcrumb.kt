@@ -2,6 +2,7 @@ package love.yinlin.compose.ui.navigation
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.semantics.Role
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
@@ -23,8 +25,8 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
-import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.TextIconAdapter
 
@@ -65,11 +67,12 @@ fun Breadcrumb(
                 )
 
                 TextIconAdapter(
-                    modifier = Modifier.silentClick(
+                    modifier = Modifier.clickable(
                         enabled = !isLast,
+                        indication = null,
                         interactionSource = interactionSource,
                         onClick = { onNavigate(index) }
-                    ).padding(padding)
+                    ).pointerIcon(PointerIcon.Hand).padding(padding)
                 ) { iconId, textId ->
                     icon?.let { Icon(icon = it, color = contentColor, modifier = Modifier.iconId()) }
                     SimpleClipText(text = title, modifier = Modifier.textId(), color = contentColor, style = LocalStyle.current.bold)

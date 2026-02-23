@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.MainScope
 import love.yinlin.compose.Theme
@@ -25,6 +26,7 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.layout.Divider
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.gallery.resources.*
 import love.yinlin.page.*
@@ -79,8 +81,10 @@ fun App() {
                     Row(
                         modifier = Modifier.fillMaxWidth()
                             .clickable { if (item.page != null) currentPage = item.page }
-                            .drawBehind {
-                                if (currentPage == item.page) drawLine(primaryColor, Offset(4f, 8f), Offset(4f, size.height - 8f), 4f)
+                            .condition(currentPage == item.page) {
+                                drawBehind {
+                                    drawLine(primaryColor, Offset(4f, 8f), Offset(4f, size.height - 8f), 4f, cap = StrokeCap.Round)
+                                }
                             }.padding(Theme.padding.value),
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                         verticalAlignment = Alignment.CenterVertically

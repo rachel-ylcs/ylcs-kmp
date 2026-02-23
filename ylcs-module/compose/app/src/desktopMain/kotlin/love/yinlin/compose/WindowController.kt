@@ -25,10 +25,6 @@ class WindowController(
     initTitle: String,
     initIcon: DrawableResource?,
     initRoundedCorner: Boolean,
-    initActionAlwaysOnTop: Boolean,
-    initActionMinimize: Boolean,
-    initActionMaximize: Boolean,
-    initActionClose: Boolean,
 ) {
     internal val rawState = WindowState(placement, isMinimized, position, initSize)
 
@@ -80,26 +76,6 @@ class WindowController(
      * 窗口圆角
      */
     var roundedCorner by mutableStateOf(initRoundedCorner)
-
-    /**
-     * 窗口置顶按钮
-     */
-    var actionAlwaysOnTop by mutableStateOf(initActionAlwaysOnTop)
-
-    /**
-     * 最小化按钮
-     */
-    var actionMinimize by mutableStateOf(initActionMinimize)
-
-    /**
-     * 最大化按钮
-     */
-    var actionMaximize by mutableStateOf(initActionMaximize)
-
-    /**
-     * 关闭按钮
-     */
-    var actionClose by mutableStateOf(initActionClose)
 
     /**
      * 图标绘制

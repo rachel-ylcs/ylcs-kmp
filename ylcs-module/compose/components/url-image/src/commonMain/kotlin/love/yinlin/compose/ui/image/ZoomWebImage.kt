@@ -26,7 +26,7 @@ fun ZoomWebImage(
         val zoomState = rememberSketchZoomState()
 
         SketchZoomAsyncImage(
-            uri = rememberWebImageKeyUrl(uri, key),
+            uri = buildWebImageKeyUrl(uri, key),
             contentDescription = null,
             state = state,
             zoomState = zoomState,

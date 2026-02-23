@@ -37,6 +37,19 @@ data class DurationTheme(
     }
 
     val default = v6
+
+    fun clone(ratio: Float): DurationTheme = DurationTheme(
+        v1 = (v1 * ratio).toInt(),
+        v2 = (v2 * ratio).toInt(),
+        v3 = (v3 * ratio).toInt(),
+        v4 = (v4 * ratio).toInt(),
+        v5 = (v5 * ratio).toInt(),
+        v6 = (v6 * ratio).toInt(),
+        v7 = (v7 * ratio).toInt(),
+        v8 = (v8 * ratio).toInt(),
+        v9 = (v9 * ratio).toInt(),
+        v10 = (v10 * ratio).toInt(),
+    )
 }
 
 @Stable

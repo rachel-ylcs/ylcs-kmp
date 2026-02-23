@@ -12,20 +12,20 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.zIndex
 import love.yinlin.compose.Theme
-import love.yinlin.compose.collection.StableList
-import love.yinlin.compose.data.Picture
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.data.compose.Picture
 import kotlin.math.min
 
 @Composable
 fun NineGrid(
-    pics: StableList<Picture>,
+    pics: List<Picture>,
     modifier: Modifier = Modifier,
     space: Dp = Theme.padding.g3,
     onImageClick: (Int, Picture) -> Unit = { _, _ -> },
     onVideoClick: (Picture) -> Unit = {},
-    content: @Composable (Modifier, Picture, ContentScale, () -> Unit) -> Unit
+    content: @Composable (Boolean, Picture, () -> Unit) -> Unit
 ) {
     // 无图跳过
     val picSize = pics.size.coerceAtMost(9)
@@ -40,21 +40,19 @@ fun NineGrid(
         modifier = modifier.clipToBounds(),
         content = {
             val isSingle = picSize == 1
-            val childModifier = if (isSingle) Modifier else Modifier.fillMaxSize()
-            val childContentScale = if (isSingle) ContentScale.FillWidth else ContentScale.Crop
             for (index in 0 ..< picSize) {
                 val pic = pics[index]
                 val isVideo = pic.isVideo
 
                 Box(contentAlignment = Alignment.Center) {
-                    content(childModifier, pic, childContentScale) {
+                    content(isSingle, pic) {
                         if (isVideo) onVideoClick(pic) else onImageClick(index, pic)
                     }
                     if (isVideo) {
                         Icon(
                             icon = Icons.SmartDisplay,
                             color = Theme.color.onContainer,
-                            modifier = Modifier.size(Theme.size.image8)
+                            modifier = Modifier.size(Theme.size.image8).zIndex(2f)
                         )
                     }
                 }
@@ -92,7 +90,7 @@ fun NineGrid(
             // 确定总宽度
             val totalWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else minPicWidthPx
             // 计算方格尺寸
-            val itemSize = (totalWidth - (columns - 1) * paddingPx) / columns
+            val itemSize = ((totalWidth - (columns - 1) * paddingPx) / columns).coerceAtLeast(0)
 
             // 测量
             val itemConstraints = Constraints.fixed(itemSize, itemSize)

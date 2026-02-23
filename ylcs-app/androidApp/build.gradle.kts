@@ -18,7 +18,7 @@ template(object : KotlinAndroidTemplate() {
 
     override fun KotlinAndroidSourceSetsScope.source() {
         main.configure {
-            lib(projects.ylcsApp.shared)
+            lib(projects.ylcsApp.app.portal)
         }
     }
 

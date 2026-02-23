@@ -1,7 +1,6 @@
 package love.yinlin.compose.ui.image
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -15,6 +14,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.layout.MeasurePolicies
@@ -28,19 +28,19 @@ import love.yinlin.compose.ui.layout.MeasurePolicies
 @Composable
 fun ColorIcon(
     icon: ImageVector,
+    size: Dp = Theme.size.icon,
     color: Color = Theme.color.onContainer,
     background: Color = Theme.color.primaryContainer,
     modifier: Modifier = Modifier,
 ) {
-    val minSize = Theme.size.icon
     val colorFilter = remember(color) { if (color == Colors.Unspecified) null else ColorFilter.tint(color) }
 
     Layout(
         modifier = Modifier
-            .defaultMinSize(minSize, minSize)
+            .size(size)
             .clip(Theme.shape.circle)
             .background(background)
-            .padding(Theme.padding.g)
+            .padding(Theme.padding.g5)
             .then(modifier)
             .paint(
                 painter = rememberVectorPainter(icon),

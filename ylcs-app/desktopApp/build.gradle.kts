@@ -24,7 +24,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         desktopMain.configure(commonMain) {
             lib(
-                projects.ylcsApp.shared,
+                projects.ylcsApp.app.portal,
                 projects.ylcsModule.platform.nativeLibLoader,
                 projects.ylcsModule.platform.os.autoUpdate,
                 projects.ylcsModule.platform.os.singleInstance,

@@ -10,33 +10,31 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.util.fastForEachIndexed
-import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
-import love.yinlin.compose.collection.StableList
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import kotlin.math.min
 
 @Composable
 private inline fun LookaheadScope.AdderBoxCell(
     size: Dp,
+    shape: Shape,
     clickModifier: Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
     Box(
         modifier = Modifier
+            .animateBounds(this)
             .size(size)
-            .clip(Theme.shape.v7)
+            .clip(shape)
             .background(Theme.color.backgroundVariant)
-            .then(clickModifier)
-            .animateBounds(this),
+            .then(clickModifier),
         contentAlignment = Alignment.Center,
         content = content
     )
@@ -45,9 +43,10 @@ private inline fun LookaheadScope.AdderBoxCell(
 @Composable
 fun <T> AdderBox(
     maxNum: Int,
-    items: StableList<T>,
+    items: List<T>,
     modifier: Modifier = Modifier,
     size: Dp = Theme.size.cell9,
+    shape: Shape = Theme.shape.v7,
     onAdd: () -> Unit = {},
     onReplace: (Int, T) -> Unit = { _, _ -> },
     onDelete: (Int, T) -> Unit = { _, _ -> },
@@ -61,12 +60,14 @@ fun <T> AdderBox(
             horizontalArrangement = Arrangement.spacedBy(space),
             verticalArrangement = Arrangement.spacedBy(space)
         ) {
-            val actualItems = remember(maxNum, items) { items.take(maxNum) }
+            BackgroundContainer {
+                val itemNum = items.size
 
-            CompositionLocalProvider(LocalColor provides Theme.color.onBackground) {
-                actualItems.fastForEachIndexed { index, item ->
+                for (index in 0 ..< min(itemNum, maxNum))  {
+                    val item = items[index]
                     AdderBoxCell(
                         size = size,
+                        shape = shape,
                         clickModifier = Modifier.combinedClickable(
                             onClick = { onReplace(index, item) },
                             onLongClick = { onDelete(index, item) }
@@ -76,9 +77,10 @@ fun <T> AdderBox(
                     }
                 }
 
-                if (actualItems.size < maxNum) {
+                if (itemNum < maxNum) {
                     AdderBoxCell(
                         size = size,
+                        shape = shape,
                         clickModifier = Modifier.clickable(onClick = onAdd)
                     ) {
                         Icon(icon = Icons.Add)

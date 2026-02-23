@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
@@ -53,6 +54,7 @@ interface InputDecoration {
     @Stable
     class Icon(
         private val icon: (InputState) -> ImageVector,
+        private val color: (InputState) -> Color? = { null },
         private val visible: (InputState) -> Boolean = { true },
         private val enabled: (InputState) -> Boolean = { true },
         private val onClick: ((InputState) -> Unit)? = null
@@ -64,6 +66,7 @@ interface InputDecoration {
             if (visible(state)) {
                 love.yinlin.compose.ui.image.Icon(
                     icon = icon(state),
+                    color = color(state) ?: LocalColor.current,
                     enabled = enabled(state),
                     onClick = onClick?.let { { it(state) } }
                 )

@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 @Stable
 data class FABAction(
-    val icon: ImageVector,
-    val tip: String = "",
+    val iconProvider: () -> ImageVector,
+    val tipProvider: () -> String = { "" },
     val onClick: (suspend () -> Unit)? = null,
     val backgroundColorProvider: (@Composable () -> Color)? = null,
     val contentColorProvider: (@Composable () -> Color)? = null,

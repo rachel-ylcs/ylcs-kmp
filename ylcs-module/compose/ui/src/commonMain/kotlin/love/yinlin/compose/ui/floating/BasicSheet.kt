@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.ZeroCornerSize
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -47,6 +49,7 @@ import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.layout.find
 import love.yinlin.compose.ui.layout.measureId
 import love.yinlin.compose.ui.layout.require
+import love.yinlin.compose.ui.node.condition
 import kotlin.math.roundToInt
 
 @Stable
@@ -78,6 +81,11 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
     }
 
     override val zIndex: Float = Z_INDEX_SHEET
+
+    /**
+     * 支持内容滚动
+     */
+    protected open val scrollable: Boolean = true
 
     // 竖屏尺寸比例
     protected open val minPortraitRatio: Float = 0.3f
@@ -171,7 +179,11 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
                         measurePolicy = MeasurePolicies.Empty
                     )
                 }
-                Box(modifier = Modifier.measureId(SheetMeasureId.CONTENT)) { Content(args) }
+                Box(modifier = Modifier.measureId(SheetMeasureId.CONTENT).condition(scrollable) {
+                    verticalScroll(state = rememberScrollState())
+                }) {
+                    Content(args)
+                }
             }) { measurables, constraints ->
                 val parentHeight = constraints.maxHeight
                 val safeMaxRatio = maxPortraitRatio.coerceIn(0.1f, 1f)
@@ -207,7 +219,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
         val controller = remember { SheetController(false, ::close) }
         val animatedOffset by animateIntAsState(targetValue = controller.offset)
         val shape = if (useLandscapeRoundedCorner) Theme.shape.v1.copy(topEnd = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
-        val sheetWidth = landscapeWidth ?: Theme.size.cell1
+        val sheetWidth = landscapeWidth ?: Theme.size.sheet
 
         Surface(
             modifier = Modifier.width(sheetWidth).fillMaxHeight()
@@ -224,7 +236,11 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
             contentPadding = LocalImmersivePadding.current,
             shape = shape
         ) {
-            Content(args)
+            Box(modifier = Modifier.condition(scrollable) {
+                verticalScroll(state = rememberScrollState())
+            }) {
+                Content(args)
+            }
         }
     }
 

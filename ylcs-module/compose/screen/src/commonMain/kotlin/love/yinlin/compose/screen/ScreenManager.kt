@@ -12,16 +12,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
-import love.yinlin.compose.ui.text.Text
 import love.yinlin.extension.Array
 import love.yinlin.extension.parseJson
 
@@ -98,7 +94,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
                     }
                     screen.ComposedUI()
                 }
-                else map.screen404?.invoke() ?: Text(text = "404", style = Theme.typography.v1.bold, modifier = Modifier.align(Alignment.Center))
+                else map.screen404(this@ScreenManager)
             }
         }
     }

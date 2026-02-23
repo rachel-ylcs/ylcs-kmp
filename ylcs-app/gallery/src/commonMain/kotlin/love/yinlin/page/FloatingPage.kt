@@ -54,7 +54,11 @@ object FloatingPage : Page() {
     val sheetFillSize = object : Sheet() {
         @Composable
         override fun Content() {
-            Text(text = "hello world", modifier = Modifier.fillMaxSize())
+            Column(modifier = Modifier.fillMaxSize()) {
+                repeat(100) {
+                    Text(text = "hello world $it")
+                }
+            }
         }
     }
 
@@ -66,6 +70,8 @@ object FloatingPage : Page() {
     }
 
     val sheetLazyColumn = object : Sheet() {
+        override val scrollable: Boolean = false
+
         @Composable
         override fun Content() {
             LazyColumn {
@@ -78,11 +84,11 @@ object FloatingPage : Page() {
 
     var showFab by mutableStateOf(true)
     var canFabExpand by mutableStateOf(true)
-    val fab = object : FAB(mainScope) {
+    val fab = object : FAB() {
         override val action: FABAction? by derivedStateOf {
             if (showFab) {
                 FABAction(
-                    icon = if (canFabExpand) Icons.Add else Icons.Refresh,
+                    iconProvider = { if (canFabExpand) Icons.Add else Icons.Refresh },
                     onClick = { tip.info("Refresh") }
                 )
             } else null
@@ -91,15 +97,15 @@ object FloatingPage : Page() {
         override val expandable: Boolean by derivedStateOf { canFabExpand }
         override val menus: List<FABAction> = listOf(
             FABAction(
-                icon = Icons.Check,
+                iconProvider = { Icons.Check },
                 onClick = { tip.success("Success") }
             ),
             FABAction(
-                icon = Icons.Warning,
+                iconProvider = { Icons.Warning },
                 onClick = { tip.warning("Warning") }
             ),
             FABAction(
-                icon = Icons.Error,
+                iconProvider = { Icons.Error },
                 onClick = { tip.error("Error") }
             )
         )
@@ -156,6 +162,7 @@ object FloatingPage : Page() {
                     }
                 }
             }
+
             Component("Sheet") {
                 ExampleRow {
                     Example("Normal") {
@@ -183,6 +190,7 @@ object FloatingPage : Page() {
                     }
                 }
             }
+
             Component("Flyout") {
                 ExampleRow {
                     Example("BalloonTip") {
@@ -196,6 +204,7 @@ object FloatingPage : Page() {
                         Flyout(
                             visible = visible,
                             onClickOutside = { visible = false },
+                            clip = true,
                             flyout = {
                                 Surface(
                                     modifier = Modifier.size(Theme.size.cell1, Theme.size.cell3),
@@ -213,8 +222,26 @@ object FloatingPage : Page() {
                             PrimaryButton("open", onClick = { visible = true })
                         }
                     }
+
+                    Example("Menus") {
+                        var visible by rememberFalse()
+
+                        Menus(
+                            visible = visible,
+                            onClose = { visible = false },
+                            menus = {
+                                Menu("Home", icon = Icons.Home)
+                                Menu("Edit", icon = Icons.Edit, enabled = false)
+                                Menu(icon = Icons.Delete)
+                                Menu("Exit")
+                            }
+                        ) {
+                            PrimaryButton("Open", onClick = { visible = true })
+                        }
+                    }
                 }
             }
+
             Component("Tip") {
                 ExampleRow {
                     Example("Info") {
@@ -242,6 +269,7 @@ object FloatingPage : Page() {
                     }
                 }
             }
+
             Component("FAB") {
                 ExampleRow {
                     Example("enabled: ${fab.visible}") {

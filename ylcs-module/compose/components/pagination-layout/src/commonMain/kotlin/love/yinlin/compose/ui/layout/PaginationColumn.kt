@@ -24,7 +24,7 @@ fun <T> PaginationColumn(
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     header: (@Composable LazyItemScope.() -> Unit)? = null,
-    itemDivider: PaddingValues? = null,
+    itemDivider: (@Composable () -> Unit)? = null,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
     if (Platform.contains(*Platform.Phone)) {
