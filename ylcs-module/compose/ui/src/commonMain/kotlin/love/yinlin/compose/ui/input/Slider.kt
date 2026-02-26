@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.zIndex
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.extension.rememberValueState
@@ -41,6 +42,7 @@ import love.yinlin.compose.ui.layout.require
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.shadow
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 @Stable
 private enum class SliderMeasureId : MeasureId {
@@ -138,9 +140,9 @@ fun Slider(
     Layout(
         content = {
             // 1. Track
-            Box(modifier = Modifier.measureId(SliderMeasureId.Track).shadow(trackShape, Theme.shadow.v9).background(actualTrackColor, trackShape))
+            Box(modifier = Modifier.measureId(SliderMeasureId.Track).shadow(trackShape, Theme.shadow.v9).background(actualTrackColor, trackShape).zIndex(1f))
             // 2. ActiveTrack
-            Box(modifier = Modifier.measureId(SliderMeasureId.ActiveTrack).background(actualActiveColor, trackShape))
+            Box(modifier = Modifier.measureId(SliderMeasureId.ActiveTrack).background(actualActiveColor, trackShape).zIndex(2f))
             // 3. Thumb
             if (showThumb) {
                 val dotRatio by animateFloatAsState(if (isDragging) 0.6f else 0.33333f)
@@ -149,14 +151,10 @@ fun Slider(
                     val radius = this.size.width / 2
                     drawCircle(actualThumbColor, radius)
                     drawCircle(actualActiveColor, radius * dotRatio)
-                }, measurePolicy = MeasurePolicies.Empty)
+                }.zIndex(3f), measurePolicy = MeasurePolicies.Empty)
             }
             // 4. Content
-            if (content != null) {
-                Box(modifier = Modifier.measureId(SliderMeasureId.Content)) {
-                    content()
-                }
-            }
+            if (content != null) Box(modifier = Modifier.measureId(SliderMeasureId.Content).zIndex(4f), content = content)
         },
         modifier = modifier.pointerIcon(PointerIcon.Hand, enabled).pointerInput(enabled) {
             if (!enabled) return@pointerInput
@@ -211,6 +209,12 @@ interface SliderConverter<T> {
 data class SliderIntConverter(val min: Int, val max: Int) : SliderConverter<Int> {
     override fun from(value: Int): Float = if (min == max) 0f else (value - min).toFloat() / (max - min)
     override fun to(value: Float): Int = (min + (max - min) * value).roundToInt()
+}
+
+@Stable
+data class SliderLongConverter(val min: Long, val max: Long) : SliderConverter<Long> {
+    override fun from(value: Long): Float = if (min == max) 0f else (value - min).toFloat() / (max - min)
+    override fun to(value: Float): Long = (min + (max - min) * value).roundToLong()
 }
 
 @Stable

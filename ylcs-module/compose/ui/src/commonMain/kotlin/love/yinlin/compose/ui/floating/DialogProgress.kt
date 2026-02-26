@@ -36,7 +36,7 @@ class DialogProgress<R : Any> : DialogTemplate<R>() {
     var progress by mutableFloatStateOf(0f)
 
     override val actions: @Composable (RowScope.() -> Unit) = {
-        TextButton(text = Theme.value.dialogCancelText, enabled = isOpen, onClick = { close() })
+        TextButton(text = Theme.value.dialogCancelText, enabled = isOpen, onClick = ::close)
     }
 
     suspend fun open(title: String? = ValueTheme.runtime(), block: suspend DialogProgress<R>.() -> R): R? {

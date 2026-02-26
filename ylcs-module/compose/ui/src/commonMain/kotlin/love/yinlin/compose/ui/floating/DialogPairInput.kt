@@ -55,7 +55,7 @@ class DialogPairInput(
             color = Theme.color.primary,
             onClick = { future?.send(textInputState1.text to textInputState2.text) }
         )
-        TextButton(text = Theme.value.dialogCancelText, onClick = { close() })
+        TextButton(text = Theme.value.dialogCancelText, onClick = ::close)
     }
 
     suspend fun open(initText1: String = "", initText2: String, title: String? = ValueTheme.runtime()): Pair<String, String>? {

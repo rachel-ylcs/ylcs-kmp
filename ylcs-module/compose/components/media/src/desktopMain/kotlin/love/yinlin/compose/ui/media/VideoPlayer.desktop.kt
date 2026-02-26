@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.CoroutineScope
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.Colors
 import love.yinlin.foundation.Context
@@ -58,8 +57,6 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
 
 actual fun buildVideoController(
     context: Context,
-    scope: CoroutineScope,
-    audioFocus: Boolean,
     topBar: VideoActionBar?,
     bottomBar: VideoActionBar?
 ): VideoController = VideoController.build(context, topBar, bottomBar)

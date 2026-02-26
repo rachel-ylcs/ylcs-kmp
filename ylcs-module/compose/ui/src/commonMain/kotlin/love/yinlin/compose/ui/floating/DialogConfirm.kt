@@ -21,7 +21,7 @@ class DialogConfirm : DialogTemplate<Unit>() {
 
     override val actions: @Composable (RowScope.() -> Unit) = {
         TextButton(text = Theme.value.dialogYesText, color = Theme.color.primary, onClick = { future?.send(Unit) })
-        TextButton(text = Theme.value.dialogNoText, onClick = { close() })
+        TextButton(text = Theme.value.dialogNoText, onClick = ::close)
     }
 
     suspend fun open(content: String, title: String? = ValueTheme.runtime()): Boolean {

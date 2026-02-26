@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewModelScope
 import love.yinlin.app
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.Screen
@@ -17,7 +16,7 @@ import love.yinlin.compose.ui.media.buildVideoController
 class ScreenVideo(val url: String) : Screen() {
     override val title: String? = null
 
-    val controller = buildVideoController(app.context, viewModelScope, app.config.audioFocus, VideoActionBar.topDefault(::onBack))
+    private val controller = buildVideoController(app.context, VideoActionBar.topDefault(::onBack))
 
     override suspend fun initialize() {
         controller.load(url)

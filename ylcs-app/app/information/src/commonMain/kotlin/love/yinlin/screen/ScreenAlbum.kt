@@ -158,7 +158,7 @@ class ScreenAlbum : Screen() {
                 state = listState,
                 canRefresh = false,
                 canLoading = page.canLoading,
-                onLoading = { requestMorePhotos() },
+                onLoading = ::requestMorePhotos,
                 itemDivider = { HorizontalDivider(Theme.border.v3, Theme.color.secondary) },
                 modifier = Modifier.fillMaxSize()
             ) {

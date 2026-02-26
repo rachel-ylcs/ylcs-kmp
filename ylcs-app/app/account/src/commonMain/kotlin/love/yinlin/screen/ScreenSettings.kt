@@ -238,7 +238,7 @@ class ScreenSettings : Screen() {
                 ItemExpander(
                     title = "修改密码",
                     icon = Icons.Password,
-                    onClick = { passwordModifySheet.open() }
+                    onClick = passwordModifySheet::open
                 )
                 ItemExpanderSuspend(
                     title = "重置默认图片",
@@ -377,7 +377,7 @@ class ScreenSettings : Screen() {
             ItemExpander(
                 title = "崩溃日志",
                 icon = Icons.Description,
-                onClick = { crashLogSheet.open() }
+                onClick = crashLogSheet::open
             )
 
             ItemExpanderSuspend(
@@ -390,26 +390,26 @@ class ScreenSettings : Screen() {
             ItemExpander(
                 title = "反馈与建议",
                 icon = Icons.Draw,
-                onClick = { feedbackSheet.open() }
+                onClick = feedbackSheet::open
             )
 
             ItemExpander(
                 title = "隐私政策",
                 icon = Icons.VerifiedUser,
-                onClick = { privacyPolicySheet.open() }
+                onClick = privacyPolicySheet::open
             )
 
             ItemExpander(
                 title = "更新日志",
                 icon = Icons.History,
-                onClick = { updateLogSheet.open() }
+                onClick = updateLogSheet::open
             )
 
             ItemExpander(
                 title = "关于茶舍",
                 icon = Icons.Face,
                 hasDivider = false,
-                onClick = { aboutSheet.open() }
+                onClick = aboutSheet::open
             )
         }
     }
@@ -542,10 +542,7 @@ class ScreenSettings : Screen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v5)
             ) {
-                Image(
-                    res = Res.drawable.img_logo,
-                    modifier = Modifier.size(Theme.size.image7).clip(Theme.shape.circle)
-                )
+                Image(res = Res.drawable.img_logo, modifier = Modifier.size(Theme.size.image7).clip(Theme.shape.circle))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,

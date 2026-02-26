@@ -163,7 +163,7 @@ class ScreenLogin : Screen() {
                 modifier = Modifier.fillMaxWidth(),
                 text = "登录",
                 enabled = canLogin,
-                onClick = { login() }
+                onClick = ::login
             )
         }
     }
@@ -217,7 +217,7 @@ class ScreenLogin : Screen() {
                 modifier = Modifier.fillMaxWidth(),
                 text = "注册",
                 enabled = canRegister,
-                onClick = { register() }
+                onClick = ::register
             )
         }
     }
@@ -260,7 +260,7 @@ class ScreenLogin : Screen() {
                 modifier = Modifier.fillMaxWidth(),
                 text = "提交申请",
                 enabled = canForgotPassword,
-                onClick = { forgotPassword() }
+                onClick = ::forgotPassword
             )
         }
     }

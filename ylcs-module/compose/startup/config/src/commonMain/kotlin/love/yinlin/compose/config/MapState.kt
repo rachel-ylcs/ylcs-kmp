@@ -23,8 +23,14 @@ open class MapState<K, V>(
     serializer = MapSerializer(keySerializer, valueSerializer),
     stateFactory = { it.toMutableStateMap() },
     defaultFactory = defaultFactory
-){
-    override val size: Int by derivedStateOf { state.size }
+) {
+    override val size: Int get() = state.size
+
+    override val isEmpty: Boolean get() = state.isEmpty()
+
+    override val isNotEmpty: Boolean get() = state.isNotEmpty()
+
+    val keys: List<K> get() = state.map { it.key }
 
     operator fun set(key: K, value: V) {
         state[key] = value

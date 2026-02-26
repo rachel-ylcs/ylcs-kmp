@@ -38,7 +38,7 @@ class DialogInput(
 
     override val actions: @Composable (RowScope.() -> Unit) = {
         TextButton(text = Theme.value.dialogOkText, enabled = textInputState.isSafe, color = Theme.color.primary, onClick = { future?.send(textInputState.text) })
-        TextButton(text = Theme.value.dialogCancelText, onClick = { close() })
+        TextButton(text = Theme.value.dialogCancelText, onClick = ::close)
     }
 
     suspend fun open(initText: String = "", title: String? = ValueTheme.runtime()): String? {

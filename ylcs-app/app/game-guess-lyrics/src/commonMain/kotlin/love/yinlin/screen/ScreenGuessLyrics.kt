@@ -45,6 +45,7 @@ import love.yinlin.cs.sockets.LyricsSockets
 import love.yinlin.cs.url
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.timeString
@@ -74,7 +75,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
         }
 
         override suspend fun onMessage(msg: String) {
-            when (val data = msg.parseJsonValue<LyricsSockets.SM?>()) {
+            when (val data = catchingNull { msg.parseJsonValue<LyricsSockets.SM>() }) {
                 is LyricsSockets.SM.Error -> slot.tip.warning(data.message)
                 is LyricsSockets.SM.PlayerList -> players.replaceAll(data.players)
                 is LyricsSockets.SM.InviteReceived -> handleInvitation(data.player)

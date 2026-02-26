@@ -27,7 +27,7 @@ interface VideoActionBar {
             override fun RowScope.Content(controller: VideoController) {
                 Icon(icon = Icons.ArrowBack, onClick = onBack)
                 Box(modifier = Modifier.weight(1f))
-                Icon(icon = Icons.FullScreen, onClick = { controller.orientationController.rotate() })
+                Icon(icon = Icons.FullScreen, onClick = controller.orientationController::rotate)
             }
         }
 

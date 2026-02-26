@@ -148,7 +148,7 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
 
     @Composable
     override fun RowScope.RightActions() {
-        LoadingIcon(icon = Icons.Refresh, tip = "刷新", onClick = { requestNewData() })
+        LoadingIcon(icon = Icons.Refresh, tip = "刷新", onClick = ::requestNewData)
     }
 
     @Composable
@@ -180,8 +180,8 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
                         state = gridState,
                         canRefresh = true,
                         canLoading = page.canLoading,
-                        onRefresh = { requestNewData() },
-                        onLoading = { requestMoreData() },
+                        onRefresh = ::requestNewData,
+                        onLoading = ::requestMoreData,
                         modifier = Modifier.fillMaxSize()
                     ) {
                         FollowItemLayout(

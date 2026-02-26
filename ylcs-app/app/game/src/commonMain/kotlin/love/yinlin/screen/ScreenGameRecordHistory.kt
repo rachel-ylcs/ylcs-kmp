@@ -138,7 +138,7 @@ class ScreenGameRecordHistory : Screen() {
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewGameRecords(false) },
-                onLoading = { requestMoreGameRecords() },
+                onLoading = ::requestMoreGameRecords,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = Theme.padding.eValue,
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),

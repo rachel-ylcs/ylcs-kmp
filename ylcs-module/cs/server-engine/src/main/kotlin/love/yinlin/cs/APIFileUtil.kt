@@ -30,6 +30,6 @@ val APIFile.num: Int get() = files.size
 
 fun APIFile.copy(other: APIFile): File = first.copyTo(other.first, true)
 
-fun APIFile.delete() = files.map { Path(it) }.forEach { it.deleteRecursively() }
+fun APIFile.delete() = files.map(::Path).forEach { it.deleteRecursively() }
 
 fun APIFile.mkdir() = first.mkdirs()

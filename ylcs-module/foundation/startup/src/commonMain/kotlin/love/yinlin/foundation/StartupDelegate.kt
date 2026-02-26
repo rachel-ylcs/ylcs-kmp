@@ -45,6 +45,9 @@ class StartupDelegate<S : Startup>(
         return startup
     }
 
+    @PublishedApi
+    internal val unsafeStartup: S? get() = if (::startup.isInitialized) startup else null
+
     val isSync: Boolean = type == StartupType.Sync
     val isAsync: Boolean = type == StartupType.Async
 

@@ -2,7 +2,6 @@ package love.yinlin.compose.ui.image
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -11,13 +10,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.github.panpf.sketch.AsyncImage
 import kotlinx.io.files.Path
+import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.extension.size
+import love.yinlin.extension.fileSize
 
 @Composable
 fun LocalFileImage(
-    path: () -> Path,
+    uri: String,
     vararg key: Any,
     modifier: Modifier = Modifier,
     circle: Boolean = false,
@@ -27,21 +27,18 @@ fun LocalFileImage(
     animated: Boolean = true,
     onClick: (() -> Unit)? = null
 ) {
-    val baseUri = remember(*key) { path().toString() }
-    val baseKey = remember(*key) { path().size }
-    val state = rememberWebImageState(ImageQuality.Full, background = null, animated = animated)
     Box(modifier = modifier) {
         AsyncImage(
-            uri = buildWebImageKeyUrl(baseUri, baseKey),
+            uri = remember(uri, *key) { buildWebImageKeyUrl(uri, Path(uri).fileSize) },
             contentDescription = null,
-            state = state,
+            state = rememberWebImageState(ImageQuality.Full, background = null, animated = animated),
             alignment = alignment,
             contentScale = contentScale,
             filterQuality = ImageQuality.Full.filterQuality,
             alpha = alpha,
             modifier = Modifier
                 .matchParentSize()
-                .condition(circle) { clip(CircleShape) }
+                .condition(circle) { clip(Theme.shape.circle) }
                 .condition(onClick != null) { clickable(onClick = onClick) }
         )
     }

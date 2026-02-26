@@ -39,7 +39,7 @@ private fun ValueSlider(
     Layout(modifier = Modifier.pointerInput(Unit) {
         detectDragGestures(
             onDrag = { change, _ -> onValueChange(1 - (change.position.y / size.height).coerceIn(0f, 1f)) },
-            onDragEnd = { onFinished() }
+            onDragEnd = onFinished
         )
     }.pointerInput(Unit) {
         detectTapGestures { offset ->
@@ -79,7 +79,7 @@ private fun SpectrumArea(
             onDrag = { change, _ ->
                 onHsvChange((change.position.x / size.width).coerceIn(0f, 1f) * 360, 1 - (change.position.y / size.height).coerceIn(0f, 1f))
             },
-            onDragEnd = { onFinished() }
+            onDragEnd = onFinished
         )
     }.pointerInput(Unit) {
         detectTapGestures { offset ->
@@ -120,7 +120,7 @@ private fun AlphaSlider(
         if (enabled) {
             detectDragGestures(
                 onDrag = { change, _ -> onAlphaChange(1 - (change.position.y / size.height).coerceIn(0f, 1f)) },
-                onDragEnd = { onFinished() }
+                onDragEnd = onFinished
             )
         }
     }.pointerInput(enabled) {

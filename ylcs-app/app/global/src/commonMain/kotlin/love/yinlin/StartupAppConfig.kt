@@ -3,15 +3,17 @@ package love.yinlin
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.ThemeMode
 import love.yinlin.compose.config.Patches
+import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.data.config.AnimationSpeedConfig
 import love.yinlin.data.config.FontScaleConfig
-import love.yinlin.data.music.MusicPlayMode
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupFetcher
+import love.yinlin.media.lyrics.LyricsEngineConfig
+import love.yinlin.media.lyrics.LyricsEngineType
 import love.yinlin.startup.StartupConfig
 import love.yinlin.startup.StartupKV
 
@@ -48,13 +50,13 @@ class StartupAppConfig : StartupConfig() {
     // 上次播放歌曲
     var lastMusic by stringState("")
     // 播放模式
-    var musicPlayMode by enumState(MusicPlayMode.ORDER)
+    var musicPlayMode by enumState(MediaPlayMode.Default, version = "20260224")
     // 开启悬浮歌词
     var enabledFloatingLyrics by booleanState(false)
     // 歌词引擎配置
-    // TODO: var lyricsEngineConfig by jsonState { LyricsEngineConfig() }
+    var lyricsEngineConfig by jsonState { LyricsEngineConfig() }
     // 歌词引擎类型
-    // var lyricsEngineOrder by jsonState { LyricsEngineType.DefaultOrder }
+    var lyricsEngineOrder by jsonState { LyricsEngineType.DefaultOrder }
 
     /* ------------------  社区  ------------------ */
 

@@ -47,7 +47,7 @@ class ScreenImagePreview(private val images: List<Picture>, initIndex: Int) : Sc
             text = "原图",
             onChecked = { downloadSource = it }
         )
-        Icon(icon = Icons.Download, tip = "下载", onClick = { downloadPicture() })
+        Icon(icon = Icons.Download, tip = "下载", onClick = ::downloadPicture)
     }
 
     @Composable

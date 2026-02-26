@@ -104,6 +104,7 @@ lottie = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "lo
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
 
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
+tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.1" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 tool-cryptography = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }

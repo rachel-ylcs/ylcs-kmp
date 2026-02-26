@@ -150,7 +150,7 @@ abstract class Floating<A : Any> {
         }
 
         DisposableEffect(Unit) {
-            onDispose { close() }
+            onDispose(::close)
         }
     }
 }

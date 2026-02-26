@@ -223,7 +223,7 @@ class ScreenMain : BasicScreen() {
                 library[index] = item.copy(selected = !item.selected)
             }.padding(Theme.padding.eValue)) {
                 LocalFileImage(
-                    path = { Path(item.path, ModResourceType.Record.filename) },
+                    uri = Path(item.path, ModResourceType.Record.filename).toString(),
                     item.id,
                     modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                     contentScale = ContentScale.Crop
@@ -277,10 +277,10 @@ class ScreenMain : BasicScreen() {
                 },
                 right = {
                     Icon(Icons.MusicNote, tip = "音游配置", onClick = { navigate(::ScreenRhyme, null)} )
-                    Icon(Icons.Preview, tip = "预览", onClick = { previewSheet.open() })
-                    Icon(Icons.Download, tip = "导入", onClick = { importSheet.open() })
+                    Icon(Icons.Preview, tip = "预览", onClick = previewSheet::open)
+                    Icon(Icons.Download, tip = "导入", onClick = importSheet::open)
                     if (selectedLibrary.isNotEmpty()) {
-                        Icon(Icons.Token, tip = "打包", onClick = { packageSheet.open() })
+                        Icon(Icons.Token, tip = "打包", onClick = packageSheet::open)
                         LoadingIcon(Icons.LocalAirport, tip = "部署", onClick = {
                             if (slot.confirm.open(content = "部署所选MOD到mod目录吗?")) {
                                 deploy(selectedLibrary)
@@ -536,12 +536,12 @@ class ScreenMain : BasicScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     LocalFileImage(
-                        path = { Path(args.path, ModResourceType.Record.filename) },
+                        uri = Path(args.path, ModResourceType.Record.filename).toString(),
                         args.id,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     LocalFileImage(
-                        path = { Path(args.path, ModResourceType.Background.filename) },
+                        uri = Path(args.path, ModResourceType.Background.filename).toString(),
                         args.id,
                         modifier = Modifier.weight(1f).aspectRatio(0.5625f)
                     )

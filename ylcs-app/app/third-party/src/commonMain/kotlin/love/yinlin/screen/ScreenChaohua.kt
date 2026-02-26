@@ -84,7 +84,7 @@ class ScreenChaohua : Screen() {
                 canRefresh = true,
                 canLoading = canLoading,
                 onRefresh = { requestNewData(false) },
-                onLoading = { requestMoreData() },
+                onLoading = ::requestMoreData,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = Theme.padding.eValue,
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),

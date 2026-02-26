@@ -157,7 +157,7 @@ class ScreenMail : Screen() {
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewMails(false) },
-                onLoading = { requestMoreMails() },
+                onLoading = ::requestMoreMails,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = Theme.padding.eValue,
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),

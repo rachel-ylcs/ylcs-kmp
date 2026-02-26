@@ -118,7 +118,7 @@ object ModFactory {
             require(version == VERSION) { "不兼容的MOD版本 APP: $VERSION, MOD: $version" }
             val mediaNum = readInt() // 读媒体数
             require(mediaNum >= 0) { "MOD文件已破坏" }
-            val info = readLengthString().parseJsonValue<ModInfo?>()
+            val info = catchingNull { readLengthString().parseJsonValue<ModInfo>() }
             require(info != null) { "MOD文件已破坏" }
             ModMetadata(version, mediaNum, info)
         }

@@ -31,13 +31,7 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                projects.ylcsModule.compose.plugin.game,
-                projects.ylcsModule.compose.platformView,
-
                 libs.compose.resources,
-
-                libs.tool.reorder,
-
                 ExportLib,
                 projects.ylcsApp.app.account,
                 projects.ylcsApp.app.community,

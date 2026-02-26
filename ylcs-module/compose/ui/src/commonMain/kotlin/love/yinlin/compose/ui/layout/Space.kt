@@ -24,3 +24,11 @@ fun RowScope.Space(size: Dp = Theme.padding.h) {
 fun ColumnScope.Space(size: Dp = Theme.padding.v) {
     Layout(modifier = Modifier.height(size), measurePolicy = MeasurePolicies.Space)
 }
+
+@Composable
+@NonRestartableComposable
+fun Space(width: Int?, height: Int?) {
+    Layout { _, constraints ->
+        layout(width ?: if (constraints.hasFixedWidth) constraints.maxWidth else 0, height ?: if (constraints.hasFixedHeight) constraints.maxHeight else 0) { }
+    }
+}

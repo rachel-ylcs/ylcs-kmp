@@ -72,7 +72,7 @@ class ScreenGameHall(private val game: Game) : Screen() {
                 canRefresh = true,
                 canLoading = page.canLoading,
                 onRefresh = { requestNewGames(false) },
-                onLoading = { requestMoreGames() },
+                onLoading = ::requestMoreGames,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = Theme.padding.eValue,
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),

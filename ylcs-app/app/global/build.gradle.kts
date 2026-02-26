@@ -19,6 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
                 ExportLib,
 
                 projects.ylcsApp.cs,
+                projects.ylcsApp.mod,
 
                 projects.ylcsModule.cs.clientEngine,
 

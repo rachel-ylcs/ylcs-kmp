@@ -521,7 +521,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
             state = listState,
             canRefresh = false,
             canLoading = pageComments.canLoading,
-            onLoading = { requestMoreComments() },
+            onLoading = ::requestMoreComments,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
             header = { TopicLayout(details = details, modifier = Modifier.fillMaxWidth()) }
@@ -551,7 +551,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                 state = listState,
                 canRefresh = false,
                 canLoading = pageComments.canLoading,
-                onLoading = { requestMoreComments() },
+                onLoading = ::requestMoreComments,
                 modifier = Modifier
                     .padding(LocalImmersivePadding.current.withoutStart)
                     .weight(1f)

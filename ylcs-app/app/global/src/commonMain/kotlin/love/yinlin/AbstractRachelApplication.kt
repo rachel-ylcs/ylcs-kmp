@@ -84,12 +84,6 @@ abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : Pl
         factory = ::StartupExceptionHandler
     )
 
-    // TODO:
-//    val mp by service(
-//        useNotPlatformStartupLazyFetcher(*Platform.Web) { Paths.modPath },
-//        factory = ::buildMusicPlayer
-//    )
-
     override val themeMode: ThemeMode get() = config.themeMode
     override val fontScale: Float get() = config.fontScale.value
     override val mainFontResource: FontResource = Res.font.xwwk

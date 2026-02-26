@@ -209,7 +209,7 @@ class ScreenUserCard(private val uid: Int) : Screen() {
                 state = listState,
                 canRefresh = false,
                 canLoading = page.canLoading,
-                onLoading = { requestMoreTopics() },
+                onLoading = ::requestMoreTopics,
                 modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
                 verticalItemSpacing = Theme.padding.e,
                 header = { UserProfileCard(profile = profile, modifier = Modifier.fillMaxWidth()) }
@@ -233,7 +233,7 @@ class ScreenUserCard(private val uid: Int) : Screen() {
                     state = listState,
                     canRefresh = false,
                     canLoading = page.canLoading,
-                    onLoading = { requestMoreTopics() },
+                    onLoading = ::requestMoreTopics,
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                     contentPadding = Theme.padding.eValue,
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),

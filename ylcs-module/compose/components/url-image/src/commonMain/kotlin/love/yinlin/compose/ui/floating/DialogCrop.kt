@@ -38,7 +38,7 @@ class DialogCrop : Dialog<CropRegion>() {
                         text = "取消",
                         icon = Icons.ArrowBack,
                         color = Theme.color.secondary,
-                        onClick = { close() }
+                        onClick = ::close
                     )
                     TextButton(
                         text = "裁剪",

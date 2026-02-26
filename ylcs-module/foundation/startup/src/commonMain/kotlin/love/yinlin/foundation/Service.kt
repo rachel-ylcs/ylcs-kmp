@@ -6,26 +6,34 @@ import love.yinlin.coroutines.mainContext
 import kotlin.jvm.JvmName
 
 open class Service {
-    @PublishedApi internal val startups = mutableListOf<StartupDelegate<out Startup>>()
+    @PublishedApi internal val startupList = mutableListOf<StartupDelegate<out Startup>>()
+
+    inline fun <reified T : Startup> startup(): T? {
+        for (delegate in startupList) {
+            val unsafeStartup = delegate.unsafeStartup
+            if (unsafeStartup is T) return unsafeStartup
+        }
+        return null
+    }
 
     @JvmName("serviceSync")
     protected inline fun <reified S : SyncStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(type = StartupType.Sync, priority = priority, factory = factory, arrayOf(*args))
-        startups += delegate
+        startupList += delegate
         return delegate
     }
 
     @JvmName("serviceASync")
     protected inline fun <reified S : AsyncStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(type = StartupType.Async, priority = priority, factory = factory, arrayOf(*args))
-        startups += delegate
+        startupList += delegate
         return delegate
     }
 
     @JvmName("serviceFree")
     protected inline fun <reified S : FreeStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
         val delegate = StartupDelegate(type = StartupType.Free, priority = priority, factory = factory, arrayOf(*args))
-        startups += delegate
+        startupList += delegate
         return delegate
     }
 
@@ -39,7 +47,7 @@ open class Service {
         service<FreeStartup>(*args, priority = priority) { FreeStartup.build(factory) }
 
     private val split: Array<List<StartupDelegate<out Startup>>> get() {
-        val (sync, other) = startups.partition { it.isSync }
+        val (sync, other) = startupList.partition { it.isSync }
         val (async, free) = other.partition { it.isAsync }
         return arrayOf(sync, async, free)
     }
@@ -71,5 +79,6 @@ open class Service {
         // 这里必须先倒序排列再反向才能提供正确的析构顺序, 因为 sortedByDescending 排序是稳定的
         for (delegate in async.sortedByDescending { it.priority }.asReversed()) delegate.destroyStartup(context, before)
         for (delegate in sync.sortedByDescending { it.priority }.asReversed()) delegate.destroyStartup(context, before)
+        startupList.clear()
     }
 }

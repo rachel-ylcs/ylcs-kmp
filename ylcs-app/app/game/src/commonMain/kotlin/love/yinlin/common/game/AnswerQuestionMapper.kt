@@ -467,7 +467,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
                         Icon(icon = Icons.RadioButtonChecked, tip = "单选题", onClick = { addQuestion(QuestionType.Choice) })
                         Icon(icon = Icons.CheckBox, tip = "多选题", onClick = { addQuestion(QuestionType.MultiChoice) })
                         Icon(icon = Icons.Translate, tip = "填空题", onClick = { addQuestion(QuestionType.Blank) })
-                        Icon(icon = Icons.Delete, tip = "删除", onClick = { deleteQuestion() })
+                        Icon(icon = Icons.Delete, tip = "删除", onClick = ::deleteQuestion)
                     }
                 )
             }

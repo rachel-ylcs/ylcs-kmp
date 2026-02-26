@@ -32,7 +32,7 @@ fun main() = object : RachelApplication(PlatformContextDelegate()) {
             Icon(
                 icon = Icons.CleaningServices,
                 tip = "GC",
-                onClick = { System.gc() }
+                onClick = System::gc
             )
         }
 

@@ -59,6 +59,22 @@ struct NativePlayer {
     void seek(jlong position) { player.PlaybackSession().Position(ms_cast(position)); }
 };
 
+struct NativeMusicPlayer : NativePlayer {
+    winrt::event_token token_duration, token_state, token_source, token_ended, token_failed;
+
+    void release(JNIEnv* env) {
+        auto session = player.PlaybackSession();
+
+        session.NaturalDurationChanged(token_duration);
+        player.CurrentStateChanged(token_state);
+        player.SourceChanged(token_source);
+        player.MediaEnded(token_ended);
+        player.MediaFailed(token_failed);
+
+        NativePlayer::release(env);
+    }
+};
+
 struct NativeVideoPlayer : NativePlayer {
     UINT surfaceWidth = 0U;
     UINT surfaceHeight = 0U;
@@ -114,6 +130,7 @@ struct NativeVideoPlayer : NativePlayer {
         player.VideoFrameAvailable(token_frame);
 
         NativePlayer::release(env);
+
         d3dDevice = nullptr;
         d3dContext = nullptr;
         renderTargetTexture = nullptr;
@@ -127,16 +144,16 @@ struct NativeVideoPlayer : NativePlayer {
     }
 };
 
-inline NativePlayer* mp_cast(jlong handle) { return reinterpret_cast<NativePlayer*>(handle); }
+inline NativeMusicPlayer* ap_cast(jlong handle) { return reinterpret_cast<NativeMusicPlayer*>(handle); }
 inline NativeVideoPlayer* vp_cast(jlong handle) { return reinterpret_cast<NativeVideoPlayer*>(handle); }
 
 extern "C" {
-    // Audio Player
-    static jmethodID g_method_nativeAudioDurationChange = nullptr;
-    static jmethodID g_method_nativeAudioPlaybackStateChange = nullptr;
-    static jmethodID g_method_nativeAudioSourceChange = nullptr;
-    static jmethodID g_method_nativeAudioMediaEnded = nullptr;
-    static jmethodID g_method_nativeAudioOnError = nullptr;
+    // Music Player
+    static jmethodID g_method_nativeMusicDurationChange = nullptr;
+    static jmethodID g_method_nativeMusicPlaybackStateChange = nullptr;
+    static jmethodID g_method_nativeMusicSourceChange = nullptr;
+    static jmethodID g_method_nativeMusicMediaEnded = nullptr;
+    static jmethodID g_method_nativeMusicOnError = nullptr;
 
     // Video Player
     static jmethodID g_method_nativeVideoDurationChange = nullptr;
@@ -151,14 +168,14 @@ extern "C" {
         JVM::JniEnvGuard guard;
         JNIEnv* env = guard.env;
 
-        // Init Audio Player
-//        jclass clz1 = env->FindClass("love/yinlin/media/WindowsAudioController");
-//        g_method_nativeAudioDurationChange = env->GetMethodID(clz1, "nativeDurationChange", "(J)V");
-//        g_method_nativeAudioPlaybackStateChange = env->GetMethodID(clz1, "nativePlaybackStateChange", "(I)V");
-//        g_method_nativeAudioSourceChange = env->GetMethodID(clz1, "nativeSourceChange", "()V");
-//        g_method_nativeAudioMediaEnded = env->GetMethodID(clz1, "nativeMediaEnded", "()V");
-//        g_method_nativeAudioOnError = env->GetMethodID(clz1, "nativeOnError", "(Ljava/lang/String;)V");
-//        env->DeleteLocalRef(clz1);
+        // Init Music Player
+        jclass clz1 = env->FindClass("love/yinlin/media/WindowsMusicController");
+        g_method_nativeMusicDurationChange = env->GetMethodID(clz1, "nativeDurationChange", "(J)V");
+        g_method_nativeMusicPlaybackStateChange = env->GetMethodID(clz1, "nativePlaybackStateChange", "(I)V");
+        g_method_nativeMusicSourceChange = env->GetMethodID(clz1, "nativeSourceChange", "()V");
+        g_method_nativeMusicMediaEnded = env->GetMethodID(clz1, "nativeMediaEnded", "()V");
+        g_method_nativeMusicOnError = env->GetMethodID(clz1, "nativeOnError", "(Ljava/lang/String;)V");
+        env->DeleteLocalRef(clz1);
 
         // Init Video Player
         jclass clz2 = env->FindClass("love/yinlin/media/WindowsVideoController");
@@ -173,9 +190,9 @@ extern "C" {
         return JNI_VERSION_1_6;
     }
 
-    JNIEXPORT jlong JNICALL Java_love_yinlin_media_WindowsAudioController_nativeCreate(JNIEnv* env, jobject obj) {
+    JNIEXPORT jlong JNICALL Java_love_yinlin_media_WindowsMusicController_nativeCreate(JNIEnv* env, jobject obj) {
         auto instance = env->NewGlobalRef(obj);
-        auto nativePlayer = new NativePlayer(instance);
+        auto nativePlayer = new NativeMusicPlayer(instance);
         auto& player = nativePlayer->player;
 
         player.AutoPlay(false);
@@ -183,36 +200,36 @@ extern "C" {
 
         auto session = player.PlaybackSession();
 
-        session.NaturalDurationChanged([instance](Playback::MediaPlaybackSession const& sender, auto&& args) {
+        nativePlayer->token_duration = session.NaturalDurationChanged([instance](Playback::MediaPlaybackSession const& sender, auto&& args) {
             JVM::JniEnvGuard guard;
             auto duration = ms_cast(sender.NaturalDuration());
-            guard->CallVoidMethod(instance, g_method_nativeAudioDurationChange, duration);
+            guard->CallVoidMethod(instance, g_method_nativeMusicDurationChange, duration);
             guard.checkException();
         });
 
-        player.CurrentStateChanged([instance](Playback::MediaPlayer const& sender, auto&& args) {
+        nativePlayer->token_state = player.CurrentStateChanged([instance](Playback::MediaPlayer const& sender, auto&& args) {
             JVM::JniEnvGuard guard;
             auto state = static_cast<jint>(sender.PlaybackSession().PlaybackState());
-            guard->CallVoidMethod(instance, g_method_nativeAudioPlaybackStateChange, state);
+            guard->CallVoidMethod(instance, g_method_nativeMusicPlaybackStateChange, state);
             guard.checkException();
         });
 
-        player.SourceChanged([instance](Playback::MediaPlayer const& sender, auto&& args) {
+        nativePlayer->token_source = player.SourceChanged([instance](Playback::MediaPlayer const& sender, auto&& args) {
             JVM::JniEnvGuard guard;
-            guard->CallVoidMethod(instance, g_method_nativeAudioSourceChange);
+            guard->CallVoidMethod(instance, g_method_nativeMusicSourceChange);
             guard.checkException();
         });
 
-        player.MediaEnded([instance](Playback::MediaPlayer const& sender, auto&& args) {
+        nativePlayer->token_ended = player.MediaEnded([instance](Playback::MediaPlayer const& sender, auto&& args) {
             JVM::JniEnvGuard guard;
-            guard->CallVoidMethod(instance, g_method_nativeAudioMediaEnded);
+            guard->CallVoidMethod(instance, g_method_nativeMusicMediaEnded);
             guard.checkException();
         });
 
-        player.MediaFailed([instance](Playback::MediaPlayer const& sender, Playback::MediaPlayerFailedEventArgs const& args) {
+        nativePlayer->token_failed = player.MediaFailed([instance](Playback::MediaPlayer const& sender, Playback::MediaPlayerFailedEventArgs const& args) {
             JVM::JniEnvGuard guard;
             auto message = s2j(guard.env, winrt::to_string(args.ErrorMessage()));
-            guard->CallVoidMethod(instance, g_method_nativeAudioOnError, message);
+            guard->CallVoidMethod(instance, g_method_nativeMusicOnError, message);
             guard.checkException();
             guard->DeleteLocalRef(message);
         });
@@ -220,46 +237,41 @@ extern "C" {
         return reinterpret_cast<jlong>(nativePlayer);
     }
 
-    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsAudioController_nativeRelease(JNIEnv* env, jobject, jlong handle) {
+    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsMusicController_nativeRelease(JNIEnv* env, jobject, jlong handle) {
         if (handle == 0LL) return;
-        auto nativePlayer = mp_cast(handle);
+        auto nativePlayer = ap_cast(handle);
         nativePlayer->release(env);
         delete nativePlayer;
     }
 
-    JNIEXPORT jint JNICALL Java_love_yinlin_media_WindowsAudioController_nativeGetPlaybackState(JNIEnv* env, jobject, jlong handle) {
+    JNIEXPORT jint JNICALL Java_love_yinlin_media_WindowsMusicController_nativeGetPlaybackState(JNIEnv* env, jobject, jlong handle) {
         if (handle == 0LL) return JNI_FALSE;
-        return mp_cast(handle)->getPlaybackState();
+        return ap_cast(handle)->getPlaybackState();
     }
 
-    JNIEXPORT jlong JNICALL Java_love_yinlin_media_WindowsAudioController_nativeGetPosition(JNIEnv* env, jobject, jlong handle) {
+    JNIEXPORT jlong JNICALL Java_love_yinlin_media_WindowsMusicController_nativeGetPosition(JNIEnv* env, jobject, jlong handle) {
         if (handle == 0LL) return 0LL;
-        return mp_cast(handle)->getPosition();
+        return ap_cast(handle)->getPosition();
     }
 
-    JNIEXPORT jlong JNICALL Java_love_yinlin_media_WindowsAudioController_nativeGetDuration(JNIEnv* env, jobject, jlong handle) {
-        if (handle == 0LL) return 0LL;
-        return mp_cast(handle)->getDuration();
-    }
-
-    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsAudioController_nativeSetSource(JNIEnv* env, jobject, jlong handle, jstring path) {
+    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsMusicController_nativeSetSource(JNIEnv* env, jobject, jlong handle, jstring path) {
         if (handle == 0LL) return;
-        mp_cast(handle)->loadFile(env, path);
+        ap_cast(handle)->loadFile(env, path);
     }
 
-    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsAudioController_nativePlay(JNIEnv* env, jobject, jlong handle) {
+    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsMusicController_nativePlay(JNIEnv* env, jobject, jlong handle) {
         if (handle == 0LL) return;
-        mp_cast(handle)->play();
+        ap_cast(handle)->play();
     }
 
-    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsAudioController_nativePause(JNIEnv* env, jobject, jlong handle) {
+    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsMusicController_nativePause(JNIEnv* env, jobject, jlong handle) {
         if (handle == 0LL) return;
-        mp_cast(handle)->pause();
+        ap_cast(handle)->pause();
     }
 
-    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsAudioController_nativeSeek(JNIEnv* env, jobject, jlong handle, jlong position) {
+    JNIEXPORT void JNICALL Java_love_yinlin_media_WindowsMusicController_nativeSeek(JNIEnv* env, jobject, jlong handle, jlong position) {
         if (handle == 0LL) return;
-        mp_cast(handle)->seek(position);
+        ap_cast(handle)->seek(position);
     }
 
     JNIEXPORT jlong JNICALL Java_love_yinlin_media_WindowsVideoController_nativeCreate(JNIEnv* env, jobject obj) {
