@@ -45,13 +45,14 @@ abstract class Application<out A : Application<A>>(
     @Composable
     fun ComposedLayout(
         modifier: Modifier = Modifier.fillMaxSize(),
+        bgColor: Color? = null,
         content: @Composable () -> Unit = { Content() }
     ) {
         Theme(
             themeMode = themeMode,
             fontScale = fontScale,
             mainFontResource = mainFontResource,
-            background = background,
+            background = bgColor ?: background,
             colorSystem = colorSystem,
             typographyTheme = typographyTheme,
             shapeTheme = shapeTheme,

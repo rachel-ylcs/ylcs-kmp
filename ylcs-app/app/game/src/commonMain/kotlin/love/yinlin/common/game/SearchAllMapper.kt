@@ -30,7 +30,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.collection.TagView
-import love.yinlin.compose.ui.common.GameSlider
+import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
 import love.yinlin.compose.ui.common.value
 import love.yinlin.compose.ui.icon.Icons
@@ -137,13 +137,13 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
 
         @Composable
         override fun ColumnScope.ConfigContent() {
-            GameSlider(
+            ArgsSlider(
                 title = "准确率",
                 args = threshold,
                 onValueChange = { threshold = threshold.copy(tmpValue = it) },
                 modifier = Modifier.fillMaxWidth()
             )
-            GameSlider(
+            ArgsSlider(
                 title = "时间限制(秒)",
                 args = timeLimit,
                 onValueChange = { timeLimit = timeLimit.copy(tmpValue = it) },

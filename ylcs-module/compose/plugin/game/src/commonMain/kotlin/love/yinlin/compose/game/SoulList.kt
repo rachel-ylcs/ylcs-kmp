@@ -31,16 +31,15 @@ class SoulList(list: List<Soul>) {
 
     private var soulAddIndex: Long = 0L
 
-    private fun push(item: Soul) {
-        if (items.isEmpty()) return
-        val entry = SoulEntry(item, soulAddIndex++)
-        var index = items.binarySearch(entry, comparator)
-        index = -index - 1
-        items.add(index, entry)
-    }
-
     init {
-        for (v in list) push(v)
+        for (item in list) {
+            // push
+            val entry = SoulEntry(item, soulAddIndex++)
+            // 优先队列 -> 二分查找
+            var index = items.binarySearch(entry, comparator)
+            index = -index - 1
+            items.add(index, entry)
+        }
     }
 
     inline fun forEachForward(block: (Soul) -> Unit) {

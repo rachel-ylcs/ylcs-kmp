@@ -17,7 +17,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
-import love.yinlin.compose.ui.common.GameSlider
+import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.LoadingIcon
@@ -75,19 +75,19 @@ class ScreenCreateGame(private val game: Game) : Screen() {
 
     @Composable
     private fun BasicConfigLayout() {
-        GameSlider(
+        ArgsSlider(
             title = "奖励银币(手续+20%)",
             args = args.rewardArgs,
             onValueChange = { args = args.copy(tmpReward = it) },
             modifier = Modifier.fillMaxWidth()
         )
-        GameSlider(
+        ArgsSlider(
             title = "限定名额",
             args = args.numArgs,
             onValueChange = { args = args.copy(tmpNum = it) },
             modifier = Modifier.fillMaxWidth()
         )
-        GameSlider(
+        ArgsSlider(
             title = "入场银币",
             args = args.costArgs,
             onValueChange = { args = args.copy(tmpCost = it) },

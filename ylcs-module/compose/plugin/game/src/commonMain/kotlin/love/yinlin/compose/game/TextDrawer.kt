@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.TextUnitType
 
 @Stable
 class TextDrawer(
-    userFonts: Array<FontFamily>,
+    userFonts: List<FontFamily>,
     private val fontFamilyResolver: FontFamily.Resolver
 ) {
     @Stable

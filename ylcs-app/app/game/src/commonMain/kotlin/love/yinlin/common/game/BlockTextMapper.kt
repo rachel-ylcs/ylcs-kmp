@@ -24,7 +24,7 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.common.GameSlider
+import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
 import love.yinlin.compose.ui.common.value
 import love.yinlin.compose.ui.container.ActionScope
@@ -288,7 +288,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
 
         @Composable
         override fun ColumnScope.ConfigContent() {
-            GameSlider(
+            ArgsSlider(
                 title = "网格大小",
                 args = blockSize,
                 onValueChange = { blockSize = blockSize.copy(tmpValue = it) },

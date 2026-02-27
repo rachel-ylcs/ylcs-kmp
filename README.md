@@ -41,16 +41,41 @@
 - **模块化**：全框架模块化，模块间依赖清晰，应用程序按需引入模块。
 - **高协作**：框架支持前后端协作开发，共享数据组织结构。
 
-## 文档
+# 文档
 因为Rachel框架模块较多，功能丰富，一个最简单的应用程序可以仅导入app模块（注意版本号）：
 ```kotlin
 implementation("love.yinlin.compose:app:x.x.x")
 ```
 
-### 入门指引文档: [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
+## 入门指引文档: [Rachel框架开发向导](https://rachel-ylcs.github.io/ylcs-kmp)
 
-### API文档: [模块API合集](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)
+## API文档: [模块API合集](https://rachel-ylcs.github.io/ylcs-kmp/overrides/dokka)
 
+# Rachel Compose UI 界面库
+
+界面库涵盖主题、文本、输入、图片、动画、容器、集合、导航、浮窗等多种组件，支持暗色模式，界面库独立，无 `compose.material` 依赖。
+
+## UI 在线预览: [Rachel UI Gallery](https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery)
+
+|                       Theme                        |                     Dark Mode                      |
+|:--------------------------------------------------:|:--------------------------------------------------:|
+|   ![rachel](ylcs-docs/docs/assets/ui/theme.png)    |    ![rachel](ylcs-docs/docs/assets/ui/dark.png)    |
+|                        Text                        |                      RichText                      |
+|   ![rachel](ylcs-docs/docs/assets/ui/text1.png)    |   ![rachel](ylcs-docs/docs/assets/ui/text2.png)    |
+|                       Button                       |                       Input                        |
+|   ![rachel](ylcs-docs/docs/assets/ui/input1.png)   |   ![rachel](ylcs-docs/docs/assets/ui/input2.png)   |
+|                        Icon                        |                       Image                        |
+|   ![rachel](ylcs-docs/docs/assets/ui/image1.png)   |   ![rachel](ylcs-docs/docs/assets/ui/image2.png)   |
+|                     Container                      |                   Data Container                   |
+| ![rachel](ylcs-docs/docs/assets/ui/container1.png) | ![rachel](ylcs-docs/docs/assets/ui/container2.png) |
+|                     Collection                     |                      Calendar                      |
+| ![rachel](ylcs-docs/docs/assets/ui/collection.png) |  ![rachel](ylcs-docs/docs/assets/ui/calendar.png)  |
+|                     Animation                      |                     Navigation                     |
+| ![rachel](ylcs-docs/docs/assets/ui/animation.png)  | ![rachel](ylcs-docs/docs/assets/ui/navigation.png) |
+|                       Dialog                       |                       Sheet                        |
+|   ![rachel](ylcs-docs/docs/assets/ui/dialog.png)   |   ![rachel](ylcs-docs/docs/assets/ui/sheet.png)    |
+|                       Flyout                       |                        Tip                         |
+|   ![rachel](ylcs-docs/docs/assets/ui/flyout.png)   |    ![rachel](ylcs-docs/docs/assets/ui/tip.png)     |
 
 # 案例：银临茶舍跨平台 App
 
@@ -66,6 +91,14 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 ![art](ylcs-docs/docs/assets/art.png)
 
+基于本案例，你可以学习到除了 `Rachel` 框架、`Rachel` 界面库外，更多 `KMP` 在架构设计、跨平台兼容等方面上有趣的实现，包括但不限于如下：
+
+- 多模块、多APP的数据共享、结构共享
+- 基于 Screen 的单一数据源的开发模式
+- 多窗口、悬浮窗口的黑盒接口
+- 音视频、多媒体、WebView 的跨平台实现
+- 基于 Canvas 自绘的简单游戏引擎
+
 ## 贡献者
 
 [![Contributors](https://contrib.rocks/image?repo=rachel-ylcs/ylcs-kmp)](https://github.com/rachel-ylcs/ylcs-kmp/graphs/contributors)
@@ -78,24 +111,19 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 按首字母排序。
 
-|  Type   |     Author      |                                    Name                                     |
-|:-------:|:---------------:|:---------------------------------------------------------------------------:|
-| Library | alexzhirkevich  |          [compottie](https://github.com/alexzhirkevich/compottie)           |
-| Library | alexzhirkevich  |              [qrose](https://github.com/alexzhirkevich/qrose)               |
-| Library | brettwooldridge |           [HikariCP](https://github.com/brettwooldridge/HikariCP)           |
-| Library |    Calvin-LL    |           [reorderable](https://github.com/Calvin-LL/Reorderable)           |
-| Library |   chrisbanes    |                 [haze](https://github.com/chrisbanes/haze)                  |
-| Library |    fleeksoft    |                 [ksoup](https://github.com/fleeksoft/ksoup)                 |
-| Library |     Google      |                 [media3](https://github.com/androidx/media)                 |
-| Library |    jenly1314    |            [zxing-lite](https://github.com/jenly1314/ZXingLite)             |
-| Library |    jenly1314    |           [camera-scan](https://github.com/jenly1314/CameraScan)            |
-| Library |    Jetbrains    |                [kotlin](https://github.com/JetBrains/kotlin)                |
-| Library |    Jetbrains    | [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform) |
-| Library |    Jetbrains    |                   [ktor](https://github.com/ktorio/ktor)                    |
-| Library |     mlabbe      |       [nativefiledialog](https://github.com/mlabbe/nativefiledialog)        |
-| Library |      mysql      |                       [mysql](https://dev.mysql.com)                        |
-| Library |      panpf      |                  [sketch](https://github.com/panpf/sketch)                  |
-| Library |     qos-ch      |                [logback](https://github.com/qos-ch/logback)                 |
-| Library |      redis      |                   [jedis](https://github.com/redis/jedis)                   |
-| Library |     Tencent     |                   [MMKV](https://github.com/Tencent/MMKV)                   |
-| Library |     Tencent     |                 [libpag](https://github.com/Tencent/libpag)                 |
+|  Type   |     Author      |                                                                                Name                                                                                |
+|:-------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Library | alexzhirkevich  |                             [compottie](https://github.com/alexzhirkevich/compottie), [qrose](https://github.com/alexzhirkevich/qrose)                             |
+| Library | brettwooldridge |                                                      [HikariCP](https://github.com/brettwooldridge/HikariCP)                                                       |
+| Library |    Calvin-LL    |                                                      [reorderable](https://github.com/Calvin-LL/Reorderable)                                                       |
+| Library |   chrisbanes    |                                                             [haze](https://github.com/chrisbanes/haze)                                                             |
+| Library |    fleeksoft    |                                                            [ksoup](https://github.com/fleeksoft/ksoup)                                                             |
+| Library |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
+| Library |    jenly1314    |                            [zxing-lite](https://github.com/jenly1314/ZXingLite), [camera-scan](https://github.com/jenly1314/CameraScan)                            |
+| Library |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
+| Library |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
+| Library |      mysql      |                                                                   [mysql](https://dev.mysql.com)                                                                   |
+| Library |      panpf      |                                                             [sketch](https://github.com/panpf/sketch)                                                              |
+| Library |     qos-ch      |                                                            [logback](https://github.com/qos-ch/logback)                                                            |
+| Library |      redis      |                                                              [jedis](https://github.com/redis/jedis)                                                               |
+| Library |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |

@@ -2,11 +2,13 @@ package love.yinlin.compose.game
 
 import androidx.collection.mutableLongObjectMapOf
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
@@ -16,7 +18,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.changedToDown
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.game.asset.Assets
 import love.yinlin.compose.game.traits.Event
 import love.yinlin.compose.game.traits.PointerDownEvent
@@ -39,7 +41,7 @@ abstract class Manager {
     abstract val currentTick: Long
     abstract val assets: Assets
 
-    protected var scene: Spirit? = null // 主场景
+    protected var scene: Spirit? by mutableRefStateOf(null) // 主场景
 
     private val pointers = mutableLongObjectMapOf<Offset>() // 指针集
 
@@ -102,46 +104,42 @@ abstract class Manager {
     @Composable
     fun SceneContent(
         modifier: Modifier = Modifier,
-        fonts: Array<FontFamily>,
+        fonts: List<FontFamily>,
     ) {
-        BoxWithConstraints(modifier = modifier) {
-            val canvasScale = with(LocalDensity.current) { maxWidth.toPx() } / size.width
+        Box(modifier = modifier) {
             val fontFamilyResolver = LocalFontFamilyResolver.current
             val textDrawer = remember(fonts, fontFamilyResolver) { TextDrawer(fonts, fontFamilyResolver) }
 
             Canvas(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clipToBounds()
-                    .pointerInput(canvasScale) {
-                        awaitPointerEventScope {
-                            while (true) {
-                                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-                                for (change in event.changes) {
-                                    val id = change.id.value
-                                    val position = change.position / canvasScale
-                                    when {
-                                        change.changedToDown() -> { // 按下
-                                            pointers[id] = position
-                                            eventChannel.trySend(PointerDownEvent(id = id, position = position))
+                modifier = Modifier.fillMaxSize().clipToBounds().pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                            for (change in event.changes) {
+                                val id = change.id.value
+                                val position = change.position / (this@pointerInput.size.width / this@Manager.size.width)
+                                when {
+                                    change.changedToDown() -> { // 按下
+                                        pointers[id] = position
+                                        eventChannel.trySend(PointerDownEvent(id = id, position = position))
+                                    }
+                                    change.changedToUp() -> { // 抬起
+                                        pointers.remove(id)?.let { rawPosition ->
+                                            eventChannel.trySend(PointerUpEvent(id = id, position = position, rawPosition = rawPosition))
                                         }
-                                        change.changedToUp() -> { // 抬起
-                                            pointers.remove(id)?.let { rawPosition ->
-                                                eventChannel.trySend(PointerUpEvent(id = id, position = position, rawPosition = rawPosition))
-                                            }
-                                        }
-                                        else -> { // 移动
-                                            pointers[id]?.let { rawPosition ->
-                                                eventChannel.trySend(PointerMoveEvent(id = id, position = position, rawPosition = rawPosition))
-                                            }
+                                    }
+                                    else -> { // 移动
+                                        pointers[id]?.let { rawPosition ->
+                                            eventChannel.trySend(PointerMoveEvent(id = id, position = position, rawPosition = rawPosition))
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                }
             ) {
-                scale(scale = canvasScale, pivot = Offset.Zero) {
+                scale(scale = size.width / this@Manager.size.width, pivot = Offset.Zero) {
                     scene?.apply { Drawer(this@scale, textDrawer).onDraw() }
                 }
             }

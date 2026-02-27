@@ -2,8 +2,6 @@ package love.yinlin.compose.ui.common
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,86 +20,11 @@ import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.input.Slider
-import love.yinlin.compose.ui.input.SliderFloatConverter
-import love.yinlin.compose.ui.input.SliderIntConverter
-import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.cs.url
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
-import kotlin.jvm.JvmName
-
-@Stable
-data class SliderArgs<T : Number>(internal val tmpValue: T, val minValue: T, val maxValue: T)
-
-@get:JvmName("SliderArgsIntValue")
-val SliderArgs<Int>.value: Int get() = this.tmpValue.coerceIn(this.minValue, this.maxValue)
-@get:JvmName("SliderArgsFloatValue")
-val SliderArgs<Float>.value: Float get() = this.tmpValue.coerceIn(this.minValue, this.maxValue)
-
-@Composable
-private fun <T : Number> GameSliderContainer(
-    title: String,
-    args: SliderArgs<T>,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Box(modifier = modifier) {
-        Column(
-            modifier = Modifier.fillMaxWidth().dashBorder(Theme.border.v7, Theme.color.primary, Theme.shape.v7).padding(Theme.padding.value),
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
-        ) {
-            SimpleEllipsisText(text = title, style = Theme.typography.v7.bold)
-            content()
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SimpleEllipsisText(text = "当前: ${args.tmpValue}")
-                SimpleEllipsisText(text = "范围: ${args.minValue} ~ ${args.maxValue}")
-            }
-        }
-    }
-}
-
-@Composable
-@JvmName("GameSliderInt")
-internal fun GameSlider(
-    title: String,
-    args: SliderArgs<Int>,
-    onValueChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    GameSliderContainer(title = title, args = args, modifier = modifier) {
-        Slider(
-            value = args.value,
-            onValueChangeFinished = onValueChange,
-            converter = remember(args) { SliderIntConverter(args.minValue, args.maxValue) },
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
-}
-
-@Composable
-@JvmName("GameSliderFloat")
-internal fun GameSlider(
-    title: String,
-    args: SliderArgs<Float>,
-    onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    GameSliderContainer(title = title, args = args, modifier = modifier) {
-        Slider(
-            value = args.value,
-            onValueChangeFinished = onValueChange,
-            converter = remember(args) { SliderFloatConverter(args.minValue, args.maxValue) },
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
-}
 
 @Composable
 internal fun TopPager(

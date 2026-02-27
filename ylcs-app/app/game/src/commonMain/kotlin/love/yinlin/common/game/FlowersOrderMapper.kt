@@ -35,7 +35,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.common.GameSlider
+import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
 import love.yinlin.compose.ui.common.value
 import love.yinlin.compose.ui.icon.Icons
@@ -152,7 +152,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
 
         @Composable
         override fun ColumnScope.ConfigContent() {
-            GameSlider(
+            ArgsSlider(
                 title = "尝试次数",
                 args = tryCount,
                 onValueChange = { tryCount = tryCount.copy(tmpValue = it) },

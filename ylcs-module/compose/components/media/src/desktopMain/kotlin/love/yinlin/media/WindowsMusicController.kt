@@ -49,8 +49,8 @@ internal class WindowsMusicController<Info : MediaInfo>(fetcher: MediaMetadataFe
 
     override fun release() {
         if (!isRelease) {
-            scope.cancel()
             isRelease = true
+            scope.cancel()
             nativeRelease(nativeHandle)
             nativeHandle = 0L
         }

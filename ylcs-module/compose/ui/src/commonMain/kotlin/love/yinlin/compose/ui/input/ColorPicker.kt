@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui.input
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.defaultMinSize
@@ -167,7 +168,7 @@ fun ColorPicker(
     var currentAlpha by rememberState { initColor.alpha }
 
     Layout(
-        modifier = modifier.defaultMinSize(minWidth = 200.dp, minHeight = 150.dp),
+        modifier = modifier.defaultMinSize(minWidth = 200.dp, minHeight = 150.dp).border(Theme.border.v10, Theme.color.outline),
         content = {
             ValueSlider(
                 hsv = currentHsv,

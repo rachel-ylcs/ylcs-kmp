@@ -9,7 +9,7 @@ import love.yinlin.platform.platform
 
 @Stable
 @NativeLibApi
-internal object DesktopAudioController {
+internal object DesktopMusicController {
     init {
         NativeLibLoader.resource("media")
     }
@@ -21,4 +21,4 @@ internal object DesktopAudioController {
     }
 }
 
-actual fun <Info : MediaInfo> buildMusicPlayer(fetcher: MediaMetadataFetcher<Info>): MusicPlayer<Info> = DesktopAudioController.build(fetcher)
+actual fun <Info : MediaInfo> buildMusicPlayer(fetcher: MediaMetadataFetcher<Info>): MusicPlayer<Info> = DesktopMusicController.build(fetcher)

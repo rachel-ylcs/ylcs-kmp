@@ -25,7 +25,7 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.collection.TagView
-import love.yinlin.compose.ui.common.GameSlider
+import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
 import love.yinlin.compose.ui.common.TopPager
 import love.yinlin.compose.ui.common.value
@@ -342,7 +342,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
 
         @Composable
         override fun ColumnScope.ConfigContent() {
-            GameSlider(
+            ArgsSlider(
                 title = "准确率",
                 args = threshold,
                 onValueChange = { threshold = threshold.copy(tmpValue = it) },

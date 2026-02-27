@@ -30,6 +30,10 @@ template(object : KotlinMultiplatformTemplate() {
 
         iosMainList.configure(iosMain)
 
+        desktopMain.configure(commonMain) {
+            lib(projects.ylcsModule.platform.os.window)
+        }
+
         webMain.configure(commonMain)
 
         jsMain.configure(webMain)

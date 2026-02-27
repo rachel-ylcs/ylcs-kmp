@@ -3,11 +3,10 @@ package love.yinlin.media.lyrics
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.semantics.hideFromAccessibility
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.zIndex
@@ -15,6 +14,8 @@ import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.catchingDefault
@@ -100,7 +101,7 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
                 text = item.text,
                 color = Colors.Green5,
                 style = Theme.typography.v5.bold,
-                modifier = Modifier.semantics { hideFromAccessibility() }.zIndex(2f).graphicsLayer {
+                modifier = Modifier.semantics().zIndex(2f).graphicsLayer {
                     clip = true
                     shape = GenericShape { size, _ ->
                         addRect(Rect(0f, 0f, size.width * progress, size.height))
@@ -112,27 +113,31 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
 
     @Composable
     override fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle) {
-//        Text(
-//            text = currentText,
-//            color = Colors.White,
-//            style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize),
-//            textAlign = TextAlign.Center,
-//            maxLines = 1,
-//            overflow = TextOverflow.Ellipsis,
-//            modifier = Modifier.zIndex(1f)
-//        )
-//        Text(
-//            text = currentText,
-//            color = Colors(config.textColor),
-//            style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize),
-//            textAlign = TextAlign.Center,
-//            maxLines = 1,
-//            overflow = TextOverflow.Ellipsis,
-//            modifier = Modifier.zIndex(2f).drawWithContent {
-//                clipRect(0f, 0f, size.width * progress, size.height) {
-//                    this@drawWithContent.drawContent()
-//                }
-//            }
-//        )
+        val currentText by rememberDerivedState { lines?.getOrNull(currentIndex)?.text ?: "" }
+        val style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize)
+
+        SimpleEllipsisText(
+            text = currentText,
+            color = Colors.White,
+            style = style,
+            modifier = Modifier.zIndex(1f).graphicsLayer {
+                clip = true
+                shape = GenericShape { size, _ ->
+                    addRect(Rect(size.width * progress, 0f, size.width, size.height))
+                }
+            }
+        )
+
+        SimpleEllipsisText(
+            text = currentText,
+            color = Colors(config.textColor),
+            style = style,
+            modifier = Modifier.semantics().zIndex(2f).graphicsLayer {
+                clip = true
+                shape = GenericShape { size, _ ->
+                    addRect(Rect(0f, 0f, size.width * progress, size.height))
+                }
+            }
+        )
     }
 }

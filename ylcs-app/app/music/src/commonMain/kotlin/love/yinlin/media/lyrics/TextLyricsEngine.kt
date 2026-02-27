@@ -142,7 +142,10 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     @Composable
     final override fun FloatingLyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle) {
         CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
-            Box(modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(Theme.padding.value)) {
+            Box(
+                modifier = Modifier.fillMaxSize().background(color = Colors(config.backgroundColor)).padding(Theme.padding.value),
+                contentAlignment = Alignment.BottomCenter
+            ) {
                 FloatingLine(config, textStyle)
             }
         }
