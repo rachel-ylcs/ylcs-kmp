@@ -1,16 +1,14 @@
 package love.yinlin.compose.ui.common
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
@@ -22,10 +20,13 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.image.Image
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
+import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.extension.DateEx
 import org.jetbrains.compose.resources.DrawableResource
 
 @Stable
@@ -83,5 +84,46 @@ fun UserLabel(
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+@Composable
+fun UserBar(
+    avatar: String,
+    name: String,
+    time: String,
+    label: String,
+    level: Int,
+    onAvatarClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+    ) {
+        WebImage(
+            uri = avatar,
+            key = remember { DateEx.TodayString },
+            contentScale = ContentScale.Crop,
+            circle = true,
+            onClick = onAvatarClick,
+            modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+        ) {
+            SimpleEllipsisText(
+                text = name,
+                style = Theme.typography.v7.bold,
+                modifier = Modifier.fillMaxWidth()
+            )
+            SimpleEllipsisText(
+                text = time,
+                color = Theme.color.onSurfaceVariant,
+                style = Theme.typography.v8,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        UserLabel(label = label, level = level)
     }
 }

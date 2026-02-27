@@ -453,8 +453,20 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             }
                         }
 
-                        MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(PaddingValues(start = Theme.padding.h9, end = Theme.padding.h9, top = Theme.padding.v9)))
-                        MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
+                        if (device == Device.Type.LANDSCAPE) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                MusicControlLayout(modifier = Modifier.weight(1f))
+                                MusicProgressLayout(modifier = Modifier.weight(3f))
+                            }
+                        }
+                        else {
+                            MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(PaddingValues(start = Theme.padding.h9, end = Theme.padding.h9, top = Theme.padding.v9)))
+                            MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
+                        }
                     }
                 }
             }

@@ -1,12 +1,16 @@
 package love.yinlin.tpl
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.NetClient
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.tpl.lyrics.LrcParser
+import love.yinlin.uri.Uri
 
-object NetEaseCloudAPI {
+@Stable
+object NetEaseCloudAPI : PlatformMusicParser {
     private const val NETEASECLOUD_HOST: String = "music.163.com"
     private object Container {
         fun detail(id: String) = "api/song/detail?id=${id}&ids=[${id}]"
@@ -50,5 +54,24 @@ object NetEaseCloudAPI {
         }
         musicInfos.removeAll { it.lyrics.isEmpty() }
         musicInfos.ifEmpty { null }
+    }
+
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = when {
+        // 歌曲 http://163cn.tv/EElG0jr
+        link.contains("163cn.tv") -> Coroutines.io {
+            requestMusicId(link)?.let { requestMusic(it) }
+        }?.let { listOf(it) }
+        // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
+        link.contains("music.163.com") && link.contains("playlist") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) requestPlaylist(id) else null
+        }
+        // 歌曲 https://music.163.com/#/song?textid=1064008&id=504686858
+        link.contains("music.163.com") && link.contains("song") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) requestMusic(id) else null
+        }?.let { listOf(it) }
+        // 歌曲 504686858
+        else -> Coroutines.io { requestMusic(link) }?.let { listOf(it) }
     }
 }

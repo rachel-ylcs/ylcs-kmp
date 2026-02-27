@@ -26,47 +26,6 @@ import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
 
 @Composable
-internal fun UserBar(
-    avatar: String,
-    name: String,
-    time: String,
-    label: String,
-    level: Int,
-    onAvatarClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-    ) {
-        WebImage(
-            uri = avatar,
-            key = remember { DateEx.TodayString },
-            contentScale = ContentScale.Crop,
-            circle = true,
-            onClick = onAvatarClick,
-            modifier = Modifier.fillMaxHeight().aspectRatio(1f)
-        )
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
-        ) {
-            SimpleEllipsisText(
-                text = name,
-                style = Theme.typography.v7.bold,
-                modifier = Modifier.fillMaxWidth()
-            )
-            SimpleEllipsisText(
-                text = time,
-                color = Theme.color.onSurfaceVariant,
-                style = Theme.typography.v8,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        UserLabel(label = label, level = level)
-    }
-}
-
-@Composable
 fun BoxText(text: String, color: Color) {
     SimpleEllipsisText(
         text = text,

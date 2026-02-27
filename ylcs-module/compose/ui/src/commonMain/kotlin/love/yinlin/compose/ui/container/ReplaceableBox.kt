@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.icon.Icons
@@ -23,6 +24,7 @@ fun <T> ReplaceableBox(
     value: T? = null,
     onReplace: () -> Unit,
     onDelete: () -> Unit,
+    shape: Shape = Theme.shape.v7,
     content: @Composable (T) -> Unit
 ) {
     val minSize = Theme.size.input6
@@ -40,20 +42,17 @@ fun <T> ReplaceableBox(
             if (targetValue == null) {
                 Box(
                     modifier = Modifier
-                        .clip(Theme.shape.v7)
+                        .clip(shape)
                         .background(Theme.color.backgroundVariant)
                         .clickable(onClick = onReplace),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        icon = Icons.Add,
-                        color = Theme.color.onBackground
-                    )
+                    Icon(icon = Icons.Add, color = Theme.color.onBackground)
                 }
             }
             else {
                 Box(
-                    modifier = Modifier.combinedClickable(onClick = onReplace, onLongClick = onDelete),
+                    modifier = Modifier.clip(shape).combinedClickable(onClick = onReplace, onLongClick = onDelete),
                     propagateMinConstraints = true
                 ) {
                     content(targetValue)

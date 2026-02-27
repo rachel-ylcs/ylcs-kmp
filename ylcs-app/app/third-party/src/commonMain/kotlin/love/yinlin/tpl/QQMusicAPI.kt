@@ -1,6 +1,8 @@
 package love.yinlin.tpl
 
+import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.NetClient
 import love.yinlin.uri.Uri
 import love.yinlin.data.music.PlatformMusicInfo
@@ -8,7 +10,8 @@ import love.yinlin.extension.*
 import love.yinlin.tpl.lyrics.LrcParser
 import kotlin.io.encoding.Base64
 
-object QQMusicAPI {
+@Stable
+object QQMusicAPI : PlatformMusicParser {
     private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
     private fun decodeData(num: Int, json: JsonObject): List<JsonObject> {
@@ -78,5 +81,32 @@ object QQMusicAPI {
         val items = mutableListOf<PlatformMusicInfo>()
         for (mid in list) requestMusic(mid)?.let { items += it }
         items.ifEmpty { null }
+    }
+
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = when {
+        // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
+        link.contains("c6.y.qq.com") -> Coroutines.io {
+            requestMusicId(link)?.let { requestMusic(it) }
+        }?.let { listOf(it) }
+        // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
+        link.contains("y.qq.com") && link.contains("songDetail") -> Coroutines.io {
+            requestMusic(link.substringAfterLast("/"))
+        }?.let { listOf(it) }
+        // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
+        link.contains("i2.y.qq.com") && link.contains("playlist") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) requestPlaylist(id) else null
+        }
+        // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
+        link.contains("i.y.qq.com") && link.contains("taoge") -> Coroutines.io {
+            val id = Uri.parse(link)?.params["id"]
+            if (id != null) requestPlaylist(id) else null
+        }
+        // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
+        link.contains("y.qq.com") && link.contains("playlist") -> Coroutines.io {
+            requestPlaylist(link.substringAfterLast("/"))
+        }
+        // 歌曲 003yJ3Ba1bDVJc
+        else -> Coroutines.io { requestMusic(link) }?.let { listOf(it) }
     }
 }

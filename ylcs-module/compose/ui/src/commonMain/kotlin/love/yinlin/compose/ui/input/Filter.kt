@@ -15,12 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.container.ThemeContainer
@@ -48,6 +50,7 @@ fun Filter(
     shape: Shape = Theme.shape.v7,
     border: Dp = Theme.border.v7,
     activeIcon: ImageVector? = Icons.Check,
+    iconColor: Color? = null,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(Theme.padding.h),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(Theme.padding.v),
     maxItemsInEachRow: Int = Int.MAX_VALUE,
@@ -92,7 +95,9 @@ fun Filter(
                         .clickable(enabled = enabled) { onClick(index, !selected) }
                         .padding(padding),
                     ) { iconId, textId ->
-                        if (contentIcon != null) Icon(icon = contentIcon, modifier = Modifier.iconId())
+                        if (contentIcon != null) {
+                            Icon(icon = contentIcon, color = iconColor ?: LocalColor.current, modifier = Modifier.iconId())
+                        }
                         SimpleClipText(text = title, modifier = Modifier.textId(), style = style)
                     }
                 }

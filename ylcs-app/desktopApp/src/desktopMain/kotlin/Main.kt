@@ -59,10 +59,9 @@ fun main() = object : RachelApplication(PlatformContextDelegate()) {
 
     @Composable
     override fun ApplicationScope.MultipleWindow() {
-        // TODO:
-//        mp.floatingLyrics.let {
-//            if (it.isAttached) it.Content()
-//        }
+        mp.floatingLyrics.let {
+            if (it.isAttached) it.Content()
+        }
     }
 
     private val setupSingleInstance by sync(priority = StartupDelegate.HIGH7) { SingleInstance.run("${Local.info.appName}.lock") }

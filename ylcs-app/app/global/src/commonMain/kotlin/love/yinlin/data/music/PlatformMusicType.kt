@@ -1,7 +1,9 @@
 package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
+import love.yinlin.compose.ui.icon.Icons2
 
 @Stable
 @Serializable
@@ -18,5 +20,11 @@ enum class PlatformMusicType {
         QQMusic -> "QM"
         NetEaseCloud -> "NEC"
         Kugou -> "KG"
+    }
+
+    val icon: ImageVector get() = when (this) {
+        QQMusic -> Icons2.QQMusic
+        NetEaseCloud -> Icons2.NetEaseCloudMusic
+        Kugou -> Icons2.KugouMusic
     }
 }

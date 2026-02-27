@@ -17,6 +17,7 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.tool.reorder,
 
                 projects.ylcsApp.app.global,
+                projects.ylcsApp.app.community,
                 projects.ylcsApp.app.thirdParty,
                 projects.ylcsApp.app.viewer,
 

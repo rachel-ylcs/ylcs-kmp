@@ -3,7 +3,6 @@ package love.yinlin.media.lyrics
 import androidx.compose.runtime.*
 import love.yinlin.foundation.Context
 
-// TODO:
 @Stable
 actual class FloatingLyrics {
     actual var isAttached: Boolean by mutableStateOf(false)
