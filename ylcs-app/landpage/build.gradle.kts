@@ -11,8 +11,9 @@ template(object : KotlinJsTemplate() {
     override fun KotlinJsSourceSetsScope.source() {
         jsMain.configure(commonMain) {
             lib(
-                projects.ylcsModule.core,
                 libs.kotlinx.html,
+                projects.ylcsModule.core,
+                projects.ylcsApp.cs,
             )
         }
     }

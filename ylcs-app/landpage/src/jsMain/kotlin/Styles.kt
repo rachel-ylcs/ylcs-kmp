@@ -7,6 +7,5 @@ object Styles {
     const val h2 = "text-2xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4 leading-tight"
     const val pLarge = "text-lg md:text-xl text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl"
     const val link = "hover:text-[#22c55e] cursor-pointer transition-colors"
-    const val btnPrimary = "bg-[#22c55e] text-black font-bold py-3 px-5 lg:px-10 rounded-full hover:bg-green-400 active:scale-95 active:bg-green-600 transition-all transform hover:scale-105"
-    const val btnOutline = "border border-gray-300 dark:border-gray-600 hover:border-[#22c55e] hover:text-[#22c55e] active:scale-95 active:bg-[#22c55e]/10 font-medium py-3 px-5 lg:px-10 rounded-full transition-all backdrop-blur-sm"
+    const val btnPrimary = "bg-[#22c55e] text-black font-bold py-2 px-5 rounded-full hover:bg-green-400 active:scale-95 active:bg-green-600 transition-all transform hover:scale-105"
 }

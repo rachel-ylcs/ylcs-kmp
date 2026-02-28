@@ -51,20 +51,6 @@ fun TagConsumer<HTMLElement>.renderHeaderMenu() {
     }
 
     div(classes = Styles.link) {
-        +"客户端下载"
-        onClickFunction = {
-            window.open(DOWNLOAD_URL, ATarget.blank)
-            hideMenu()
-        }
-    }
-    div(classes = Styles.link) {
-        +"网页版"
-        onClickFunction = {
-            window.open(WEBAPP_URL, ATarget.blank)
-            hideMenu()
-        }
-    }
-    div(classes = Styles.link) {
         +"使用教程"
         onClickFunction = {
             navigate(DocPage)

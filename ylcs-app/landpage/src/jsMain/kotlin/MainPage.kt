@@ -1,9 +1,11 @@
-import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.html.*
 import kotlinx.html.js.onClickFunction
+import love.yinlin.Local
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.createElement
 import love.yinlin.extension.getElementById
+import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLElement
 
 object MainPage : Page {
@@ -110,18 +112,8 @@ object MainPage : Page {
                             span(Styles.primaryGradient) { +"APP跨端版本 上线!" }
                         }
                         p("${Styles.pLarge} my-6") { +"集资讯、听歌、美图、社交于一体的小银子聚集地。" }
-                        div("flex flex-wrap gap-4") {
-                            button(classes = Styles.btnPrimary) {
-                                +"客户端下载"
-                                onClickFunction = { window.open(DOWNLOAD_URL) }
-                            }
-                            button(classes = Styles.btnOutline) {
-                                +"网页版"
-                                onClickFunction = { window.location.href = WEBAPP_URL }
-                            }
-                        }
                         p("pt-6 text-sm font-medium space-x-4") {
-                            span(Styles.primaryGreen) { +"最新版本 v3.4.1" }
+                            span(Styles.primaryGreen) { +"最新版本 v${Local.info.versionName}" }
                             span("text-gray-500") { +DateEx.TodayString }
                         }
                     }
@@ -154,7 +146,13 @@ object MainPage : Page {
                             div("w-10 h-10 lg:w-16 lg:h-16 mb-6 bg-gradient-to-br ${appPlatform.iconColor} rounded-xl flex items-center justify-center text-white text-2xl shadow-xl shadow-inherit/30 group-hover:scale-110 transition-transform") {
                                 i(appPlatform.icon)
                             }
-                            h3("text-xl font-bold mb-2 group-hover:${Styles.primaryGreen} transition-colors") { +appPlatform.title }
+                            div("flex flex-row justify-between items-center mb-2") {
+                                h3("text-xl font-bold group-hover:${Styles.primaryGreen} transition-colors") { +appPlatform.title }
+                                button(classes = Styles.btnPrimary) {
+                                    +appPlatform.clickText
+                                    onClickFunction = { appPlatform.onClick() }
+                                }
+                            }
                             p("text-gray-500 leading-relaxed text-sm") { +appPlatform.content }
                         }
                     }

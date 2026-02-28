@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'pag_kmp'
-    spec.version                  = '3.4.1'
+    spec.version                  = '3.5.0'
     spec.homepage                 = ''
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
