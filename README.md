@@ -29,7 +29,7 @@
 
 涵盖跨平台入口、共享UI、依赖服务启动、客户端和服务端交互引擎、自由屏幕导航、平台原生组件、自定义主题、响应式布局、MDI配置一致性、分页加载、服务端路由等领域。
 
-支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)`等客户端, `Server`服务端。
+支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(Wasm)`等客户端, `Server`服务端。
 
 ## 特性
 

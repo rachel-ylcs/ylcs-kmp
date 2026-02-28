@@ -29,7 +29,7 @@
 
 Covering cross-platform entry, shared UI, dependent service startup, client and server interaction engines, free screen navigation, platform native components, custom themes, responsive layout, MDI configuration consistency, page loading, server routing, and other fields.
 
-It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(wasm)` and other client and server platforms.
+It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(Wasm)` and other client and server platforms.
 
 ## Feature
 
