@@ -147,7 +147,7 @@ object ModFactory {
             Path(mediaPath, type.filename).write { sink ->
                 repeat(times) {
                     readTo(sink, INTERVAL.toLong())
-                    readByte()
+                    val _ = readByte()
                 }
                 if (remain > 0) readTo(sink, remain.toLong())
             }

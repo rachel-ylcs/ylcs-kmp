@@ -14,15 +14,19 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.coroutines.ioContext
 import love.yinlin.data.MimeType
+import love.yinlin.extension.lazyProvider
 import love.yinlin.foundation.PlatformContextDelegate
 import love.yinlin.foundation.StartupDelegate
 import love.yinlin.platform.AutoUpdate
 import love.yinlin.platform.SingleInstance
 import love.yinlin.startup.StartupComposeSwingRender
 import love.yinlin.startup.StartupMacOSDeepLink
+import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.compose.resources.DrawableResource
 
 fun main() = object : RachelApplication(PlatformContextDelegate()) {
+    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+
     override val title: String = "银临茶舍"
     override val icon: DrawableResource = Res.drawable.img_logo
 
@@ -59,7 +63,7 @@ fun main() = object : RachelApplication(PlatformContextDelegate()) {
 
     @Composable
     override fun ApplicationScope.MultipleWindow() {
-        mp.floatingLyrics.let {
+        mp?.floatingLyrics?.let {
             if (it.isAttached) it.Content()
         }
     }

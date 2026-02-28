@@ -34,23 +34,6 @@
     java.lang.Object readResolve();
 }
 
-# ----------------------------------------- compose ----------------------------------------------- #
-
--keep class androidx.compose.runtime.** { *; }
-
-# ----------------------------------------- Logger ----------------------------------------------- #
-
--dontwarn org.slf4j.**
-
-# ----------------------------------------- OkHttp ---------------------------------------------- #
-
--dontwarn okhttp3.internal.platform.**
--dontwarn org.conscrypt.**
--dontwarn org.bouncycastle.**
--dontwarn org.openjsse.**
--dontwarn com.oracle.svm.**
--dontwarn org.graalvm.nativeimage.**
-
 # --------------------------------- kotlinx.serialization --------------------------------------- #
 
 -if @kotlinx.serialization.Serializable class **
@@ -100,3 +83,7 @@
     boolean getDEBUG();
     boolean getRECOVER_STACK_TRACES();
 }
+
+# ----------------------------------------- Logger ----------------------------------------------- #
+
+-dontwarn org.slf4j.**

@@ -1,5 +1,6 @@
 import love.yinlin.task.CopyDesktopNativeTask
 import love.yinlin.task.spec.zip
+import org.gradle.api.internal.catalog.DelegatingProjectDependency
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
@@ -45,6 +46,16 @@ template(object : KotlinMultiplatformTemplate() {
         }
     }
     override val desktopModules: List<String> = C.desktop.modules.toList()
+    override val desktopProguard: List<DelegatingProjectDependency> = listOf(
+        projects.ylcsModule.core,
+        projects.ylcsModule.cs.core,
+        projects.ylcsModule.cs.clientEngine,
+        projects.ylcsModule.platform.ffi.core,
+        projects.ylcsModule.platform.os.singleInstance,
+        projects.ylcsModule.compose.core,
+        projects.ylcsModule.compose.components.urlImage,
+        projects.ylcsModule.compose.components.media,
+    )
     override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = {
         iconFile.set(C.root.config.icon)
     }

@@ -15,7 +15,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 abstract class RachelApplication(delegate: PlatformContextDelegate) : AbstractRachelApplication(delegate) {
-    val mp by service(
+    private val mp by service(
         useNotPlatformStartupLazyFetcher(*Platform.Web) { PathMod },
         factory = ::StartupMusicPlayer
     )

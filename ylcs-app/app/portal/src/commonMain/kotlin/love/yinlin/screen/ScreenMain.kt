@@ -3,14 +3,7 @@ package love.yinlin.screen
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -157,7 +150,7 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                 tonalLevel = 5
             ) {
                 CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutEnd) {
-                    Column(modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState())) {
+                    Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxHeight().verticalScroll(rememberScrollState())) {
                         TabItem.entries.fastForEachIndexed { i, item ->
                             val isCurrent = i == index
                             val primaryColor = Theme.color.primary

@@ -47,6 +47,7 @@ val Project.androidProguardAndroidDir: Directory get() = layout.projectDirectory
 
 // Desktop Proguard 目录
 val Project.desktopProguardKMPDir: Directory get() = layout.projectDirectory.dir("src").dir("desktopMain").dir("resources").dir("META-INF").dir("proguard")
+val Project.desktopProguardJVMDir: Directory get() = layout.projectDirectory.dir("src").dir("main").dir("resources").dir("META-INF").dir("proguard")
 
 // Desktop Native 编译目录
 val Project.desktopNativeBuildDir: Directory get() = layout.buildDirectory.get().dir("desktopNative")

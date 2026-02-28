@@ -3,6 +3,8 @@ import com.android.build.api.dsl.LibraryExtension
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.internal.catalog.DelegatingProjectDependency
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
@@ -127,6 +129,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open val desktopMainClass: String? = null
     open val desktopJvmArgs: List<String> = emptyList()
     open val desktopModules: List<String> = emptyList()
+    open val desktopProguard: List<DelegatingProjectDependency> = emptyList()
     open val windowsDistributions: (WindowsPlatformSettings.() -> Unit)? = null
     open val linuxDistributions: (LinuxPlatformSettings.() -> Unit)? = null
     open val macOSDistributions: (JvmMacOSPlatformSettings.() -> Unit)? = null
@@ -408,12 +411,31 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                     obfuscate.set(true)
                                     joinOutputJars.set(true)
 
-                                    // Compose Desktop 似乎还不支持内嵌 Proguard 规则
-                                    val proguardDir = desktopProguardKMPDir.asFile
-                                    if (proguardDir.isDirectory) {
-                                        val proguardFiles = proguardDir.listFiles { it.extension == "pro" }
-                                        configurationFiles.from(*proguardFiles)
+                                    /*
+                                     * Compose Desktop 似乎还不支持内嵌 Proguard 规则
+                                     * 手动解析依赖
+                                     */
+                                    val proguardFiles = mutableListOf<File>()
+                                    for (dependency in desktopProguard) {
+                                        findProject(dependency)?.let { submoduleProject ->
+                                            submoduleProject.desktopProguardKMPDir.asFile.let { subDir ->
+                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                            }
+                                            submoduleProject.desktopProguardJVMDir.asFile.let { subDir ->
+                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                            }
+                                        }
                                     }
+                                    // 再添加自身
+                                    desktopProguardKMPDir.asFile.let { subDir ->
+                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                    }
+                                    desktopProguardJVMDir.asFile.let { subDir ->
+                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                    }
+
+                                    // 合并所有混淆规则
+                                    configurationFiles.from(*proguardFiles.toTypedArray())
                                 }
                             }
                         }
