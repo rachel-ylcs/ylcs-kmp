@@ -130,7 +130,7 @@ actual fun QrcodeScanner(
     wrapper.Monitor(wrapper.isStart) {
         if (wrapper.isStart) {
             it.scanView.startScanning()
-            Coroutines.io { it.scanCode.startRunning() }
+            Coroutines.io { wrapper.scanCode.startRunning() }
         }
     }
 

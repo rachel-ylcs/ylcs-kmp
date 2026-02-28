@@ -50,6 +50,8 @@ if(WIN32)
     target_compile_definitions(picker PRIVATE UNICODE _UNICODE)
 endif()
 
+set_target_properties(nfd PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 set_target_properties(picker PROPERTIES
     CXX_STANDARD 20
     CXX_EXTENSIONS OFF
