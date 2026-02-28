@@ -18,7 +18,7 @@ sketch = "4.4.0-beta01"
 mmkv = "2.3.0"
 lottie = "2.0.3"
 cryptography = "0.5.0"
-pag = "4.5.23"
+pag = "4.5.27"
 
 # Android
 cmp-android = "1.10.1"
@@ -59,7 +59,7 @@ test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
-compose-collection = { module = "androidx.collection:collection", version = "1.6.0-beta01" }
+compose-collection = { module = "androidx.collection:collection", version = "1.6.0-rc01" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
@@ -100,7 +100,7 @@ lottie-network = { module = "io.github.alexzhirkevich:compottie-network", versio
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.6" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.2" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
-tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
+tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.1.2" }
 tool-cryptography = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }
 tool-cryptography-provider = { module = "dev.whyoleg.cryptography:cryptography-provider-optimal", version.ref = "cryptography" }
 tool-cryptography-asn1 = { module = "dev.whyoleg.cryptography:cryptography-serialization-asn1-modules", version.ref = "cryptography" }
@@ -110,7 +110,7 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 compose-annotation = { module = "androidx.annotation:annotation-jvm", version = "1.9.1" }
-compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.2" }
+compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.4" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 
@@ -119,8 +119,8 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 media3-player = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
-scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.3.0" }
-scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "1.3.1" }
+scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.4.0" }
+scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "1.4.0" }
 
 pag-android = { module = "com.tencent.tav:libpag", version.ref = "pag" }
 
