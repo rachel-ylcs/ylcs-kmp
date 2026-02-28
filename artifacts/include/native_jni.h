@@ -14,14 +14,16 @@ namespace JVM {
 
     struct JniEnvGuard {
         JNIEnv* env = nullptr;
+        bool attached = false;
+
         JniEnvGuard() {
             if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) == JNI_EDETACHED) {
-                vm->AttachCurrentThread((void**)&env, nullptr);
+                if (vm->AttachCurrentThread((void**)&env, nullptr) == JNI_OK) attached = true;
             }
         }
 
         ~JniEnvGuard() {
-            if (env) vm->DetachCurrentThread();
+            if (attached && env) vm->DetachCurrentThread();
         }
 
         JNIEnv* operator -> () {

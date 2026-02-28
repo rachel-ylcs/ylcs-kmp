@@ -42,3 +42,4 @@ config/secret/
 
 # 文档
 ylcs-docs/docs/overrides/dokka
+ylcs-docs/docs/overrides/gallery

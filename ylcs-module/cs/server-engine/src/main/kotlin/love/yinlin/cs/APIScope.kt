@@ -22,6 +22,7 @@ import io.ktor.websocket.readText
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.cs.sockets.SocketsManager
+import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJsonValue
@@ -52,10 +53,10 @@ abstract class APIScope internal constructor(
                         call.respond(status = HttpStatusCode.OK, message = block(call))
                     }
                 }?.let { err ->
-                    logger.error("CallDie - {}", err.stackTraceToString())
+                    logger.error("CallError - {}", err.stackTraceToString())
                     when (err) {
                         is UnauthorizedException -> call.respond(status = HttpStatusCode.Unauthorized, message = makeArray { })
-                        is FailureException -> call.respondText(status = HttpStatusCode.Accepted, text = err.message ?: "未知错误")
+                        is FailureException -> call.respondText(status = HttpStatusCode.Accepted, text = err.message ?: "Unknown Error")
                         else -> call.respond(status = HttpStatusCode.Forbidden, message = makeArray { })
                     }
                 }
@@ -498,8 +499,8 @@ abstract class APIScope internal constructor(
             val dataItems = mutableListOf<Pair<Int, String>>()
             val fileItems = mutableMapOf<Int, MutableList<Pair<Int, String>>>()
             multipartData.forEachPart { part ->
-                catchingError {
-                    val name: String = part.name ?: return@catchingError
+                catching {
+                    val name: String = part.name ?: return@catching
                     when (part) {
                         is PartData.FormItem -> {
                             if (name.startsWith('#')) fileItems[name.removePrefix("#").toInt()] = mutableListOf() // APIFile?
@@ -521,6 +522,7 @@ abstract class APIScope internal constructor(
                     }
                 }
                 part.dispose()
+                Coroutines.requireActive()
             }
             dataList = dataItems.sortedBy { it.first }.map { it.second }
             fileList = fileItems.toList().sortedBy { it.first }.map { (_, items) ->

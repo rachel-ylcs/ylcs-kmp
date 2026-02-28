@@ -16,7 +16,7 @@ template(object : KotlinMultiplatformTemplate() {
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         webMain.configure(commonMain) {
-            lib(projects.ylcsApp.shared)
+            lib(projects.ylcsApp.app.portal)
         }
 
         jsMain.configure(webMain)

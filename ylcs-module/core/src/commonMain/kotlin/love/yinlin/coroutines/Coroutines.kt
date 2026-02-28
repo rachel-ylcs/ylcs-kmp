@@ -1,33 +1,26 @@
 package love.yinlin.coroutines
 
-import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import love.yinlin.extension.catchingError
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-
-class SyncFuture<T>(private val continuation: CancellableContinuation<T?>) {
-    fun send() = continuation.resumeWith(Result.success(null))
-    fun send(result: T?) = continuation.resumeWith(Result.success(result))
-    inline fun send(block: () -> T) { catchingError { send(block()) }?.let { send() } }
-    fun cancel() { continuation.cancel(CancellationException("SyncFuture cancelled")) }
-    inline fun catching(block: () -> Unit) { catchingError(block = block)?.let { send() } }
-}
 
 @OptIn(ExperimentalContracts::class)
 object Coroutines {
-    suspend inline fun <T> with(context: CoroutineContext, noinline block: suspend CoroutineScope.() -> T): T = withContext(context, block)
+    suspend inline fun <T> with(context: CoroutineContext, noinline block: suspend CoroutineScope.() -> T): T {
+        contract {
+            callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+        }
+        return withContext(context, block)
+    }
 
     suspend inline fun <T> main(noinline block: suspend CoroutineScope.() -> T): T {
         contract {
@@ -58,22 +51,57 @@ object Coroutines {
     }
 
     suspend fun isActive(): Boolean = currentCoroutineContext().isActive
-    suspend fun startCurrent(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job =
-        CoroutineScope(currentCoroutineContext()).launch(context = context, block = block)
-    fun startMain(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(mainContext).launch(block = block)
-    fun startCPU(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(cpuContext).launch(block = block)
-    fun startIO(block: suspend CoroutineScope.() -> Unit): Job = CoroutineScope(ioContext).launch(block = block)
+    suspend fun requireActive() = currentCoroutineContext().ensureActive()
 
-    suspend inline fun <T> sync(
-        crossinline onCancel: () -> Unit = {},
-        crossinline block: (SyncFuture<T>) -> Unit
-    ): T? = suspendCancellableCoroutine { continuation ->
-        continuation.invokeOnCancellation { onCancel() }
+    suspend inline fun <T> sync(crossinline block: (SyncFuture<T>) -> Unit): T? = suspendCancellableCoroutine { continuation ->
         block(SyncFuture(continuation))
     }
-}
 
-expect val mainContext: CoroutineContext
-expect val cpuContext: CoroutineContext
-expect val ioContext: CoroutineContext
-expect val waitContext: CoroutineContext
+    suspend inline fun catching(block: suspend () -> Unit) {
+        contract {
+            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        }
+        try { block() }
+        catch (e: CancellationException) { throw e }
+        catch (_: Throwable) { }
+    }
+
+    suspend inline fun catchingError(block: suspend () -> Unit): Throwable? {
+        contract {
+            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        }
+        return try {
+            block()
+            null
+        }
+        catch (e: CancellationException) { throw e }
+        catch (e: Throwable) { e }
+    }
+
+    suspend inline fun <R> catchingNull(block: suspend () -> R): R? {
+        contract {
+            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        }
+        return try { block() }
+        catch (e: CancellationException) { throw e }
+        catch (_: Throwable) { null }
+    }
+
+    suspend inline fun <R> catchingDefault(default: R, block: suspend () -> R): R {
+        contract {
+            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        }
+        return try { block() }
+        catch (e: CancellationException) { throw e }
+        catch (_: Throwable) { default }
+    }
+
+    suspend inline fun <R> catchingDefault(default: (Throwable) -> R, block: suspend () -> R): R {
+        contract {
+            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        }
+        return try { block() }
+        catch (e: CancellationException) { throw e }
+        catch (e: Throwable) { default(e) }
+    }
+}

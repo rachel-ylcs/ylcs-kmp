@@ -18,7 +18,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     return JNI_VERSION_1_6;
 }
 
-JNIEXPORT jlong JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpCreate(JNIEnv* env, jclass, jbyteArray data) {
+JNIEXPORT jlong JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpCreate(JNIEnv* env, jclass clz, jbyteArray data) {
     WebPAnimDecoderOptions options;
     WebPAnimDecoderOptionsInit(&options);
     options.color_mode = MODE_rgbA;
@@ -47,7 +47,7 @@ JNIEXPORT jlong JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_n
     return 0L;
 }
 
-JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpRelease(JNIEnv* env, jclass, jlong handle) {
+JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpRelease(JNIEnv* env, jclass clz, jlong handle) {
     AnimatedWebpDecoder* instance = (AnimatedWebpDecoder*)handle;
     if (instance) {
         if (instance->data) free(instance->data);
@@ -56,27 +56,27 @@ JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_na
     }
 }
 
-JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetWidth(JNIEnv* env, jclass, jlong handle) {
+JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetWidth(JNIEnv* env, jclass clz, jlong handle) {
     AnimatedWebpDecoder* instance = (AnimatedWebpDecoder*)handle;
     return instance ? instance->width : 0;
 }
 
-JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetHeight(JNIEnv* env, jclass, jlong handle) {
+JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetHeight(JNIEnv* env, jclass clz, jlong handle) {
     AnimatedWebpDecoder* instance = (AnimatedWebpDecoder*)handle;
     return instance ? instance->height : 0;
 }
 
-JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetFrameCount(JNIEnv* env, jclass, jlong handle) {
+JNIEXPORT jint JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetFrameCount(JNIEnv* env, jclass clz, jlong handle) {
     AnimatedWebpDecoder* instance = (AnimatedWebpDecoder*)handle;
     return instance ? instance->frameCount : 0;
 }
 
-JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpHasMoreFrames(JNIEnv* env, jclass, jlong handle) {
+JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpHasMoreFrames(JNIEnv* env, jclass clz, jlong handle) {
     AnimatedWebpDecoder* instance = (AnimatedWebpDecoder*)handle;
     return (jboolean)(instance ? WebPAnimDecoderHasMoreFrames(instance->decoder) : 0);
 }
 
-JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetNext(JNIEnv* env, jclass, jlong handle, jobject directBuffer) {
+JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpGetNext(JNIEnv* env, jclass clz, jlong handle, jobject directBuffer) {
     AnimatedWebpDecoder* instance = (AnimatedWebpDecoder*)handle;
     if (instance) {
         uint8_t* buf = NULL;
@@ -92,7 +92,7 @@ JNIEXPORT jboolean JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpK
     return 0;
 }
 
-JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpReset(JNIEnv* env, jclass, jlong handle) {
+JNIEXPORT void JNICALL Java_love_yinlin_compose_graphics_NativeAnimatedWebpKt_nativeAnimatedWebpReset(JNIEnv* env, jclass clz, jlong handle) {
     AnimatedWebpDecoder* instance = (AnimatedWebpDecoder*)handle;
     if (instance) WebPAnimDecoderReset(instance->decoder);
 }

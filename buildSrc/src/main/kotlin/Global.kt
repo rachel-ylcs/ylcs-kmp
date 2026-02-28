@@ -57,5 +57,5 @@ val Project.desktopNativeJVMSourceDir: Directory get() = layout.projectDirectory
 
 // KMP 资源
 val Project.hasKMPResources: Boolean get() = layout.projectDirectory.dir("src").asFile.listFiles {
-    it.isDirectory && it.resolve("composeResources").isDirectory
+    it.isDirectory && (it.resolve("composeResources").isDirectory || it.resolve("res").isDirectory)
 }.isNotEmpty()

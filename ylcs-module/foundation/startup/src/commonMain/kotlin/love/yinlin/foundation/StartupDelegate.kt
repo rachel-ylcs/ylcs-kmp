@@ -45,6 +45,9 @@ class StartupDelegate<S : Startup>(
         return startup
     }
 
+    @PublishedApi
+    internal val unsafeStartup: S? get() = if (::startup.isInitialized) startup else null
+
     val isSync: Boolean = type == StartupType.Sync
     val isAsync: Boolean = type == StartupType.Async
 
@@ -64,11 +67,11 @@ class StartupDelegate<S : Startup>(
         }
     }
 
-    suspend fun CoroutineScope.initStartup(context: Context, later: Boolean) {
-        if (later) with(startup) { this@initStartup.initLater(context, startupArgs) }
+    suspend fun initStartup(scope: CoroutineScope, context: Context, later: Boolean) {
+        if (later) startup.initLater(scope, context, startupArgs)
         else {
             startup = factory()
-            with(startup) { this@initStartup.init(context, startupArgs) }
+            startup.init(scope, context, startupArgs)
         }
     }
 

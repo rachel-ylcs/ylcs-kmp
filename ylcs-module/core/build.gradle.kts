@@ -17,8 +17,8 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                ExportLib,
                 libs.kotlinx.atomicfu,
+                ExportLib,
                 libs.kotlinx.coroutines,
                 libs.kotlinx.datetime,
                 libs.kotlinx.io,

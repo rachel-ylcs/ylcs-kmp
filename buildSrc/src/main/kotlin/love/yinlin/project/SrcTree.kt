@@ -6,7 +6,6 @@ import org.gradle.api.file.RegularFile
 class BuildSrcNode(root: RootProjectNode) : Directory by root.dir("buildSrc")
 
 class ConfigNode(root: RootProjectNode, c: Constants) : Directory by root.dir("config") {
-    val stability: RegularFile = file("stability.conf")
     val icon: RegularFile = file(when (c.platform) {
         BuildPlatform.Windows -> "icon.ico"
         BuildPlatform.Linux -> "icon.png"
@@ -21,6 +20,7 @@ class DocsNode(root: RootProjectNode) : Directory by root.dir("ylcs-docs") {
     val docs: Directory = dir("docs")
     val overrides: Directory = docs.dir("overrides")
     val dokka: Directory = overrides.dir("dokka")
+    val gallery: Directory = overrides.dir("gallery")
 }
 
 class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
@@ -36,11 +36,6 @@ class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
     val desktop: Directory = dir("desktop")
     val server: Directory = dir("server")
     val modManager: Directory = dir("modManager")
-}
-
-class SharedNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("shared") {
-    private val build: Directory = dir("build")
-    val composeCompilerReport: Directory = build.dir("composeCompiler")
 }
 
 class AndroidAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("androidApp") {
@@ -71,11 +66,18 @@ class WebAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("y
     val wasmOutput: Directory = root.outputs.dir("webWasm")
 }
 
-class LandpageNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("landpage") {
+class LandpageNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("landpage") {
     private val build: Directory = dir("build")
 
     val originOutput: Directory = build.dir("dist").dir("js").dir("productionExecutable")
     val output: Directory = root.outputs.dir("landpage")
+}
+
+class GalleryNode(root: RootProjectNode) : Directory by root.dir("ylcs-app").dir("gallery") {
+    private val build: Directory = dir("build")
+
+    val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
+    val output: Directory = root.docs.gallery
 }
 
 class ServerNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("server") {
@@ -95,12 +97,12 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val script = ScriptNode(this)
     val artifacts = ArtifactsNode(this)
     val work = WorkNode(this)
-    val shared = SharedNode(this, c)
     val androidApp = AndroidAppNode(this, c)
     val iosApp = IosAppNode(this, c)
     val desktopApp = DesktopAppNode(this, c)
     val webApp = WebAppNode(this, c)
-    val landpage = LandpageNode(this, c)
+    val landpage = LandpageNode(this)
+    val gallery = GalleryNode(this)
     val server = ServerNode(this, c)
     val modManager = ModManagerNode(this, c)
     val libsVersion: RegularFile = file("libs.version.toml")

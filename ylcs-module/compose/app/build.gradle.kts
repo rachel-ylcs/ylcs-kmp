@@ -15,10 +15,10 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 projects.ylcsModule.platform.nativeLibLoader,
-                libs.compose.components.resources,
+                libs.compose.resources,
                 ExportLib,
                 projects.ylcsModule.foundation.startup,
-                projects.ylcsModule.compose.ui.core,
+                projects.ylcsModule.compose.ui,
             )
         }
 
@@ -26,11 +26,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         iosMainList.configure(iosMain)
 
-        desktopMain.configure(commonMain) {
-            lib(
-                composeOSLib
-            )
-        }
+        desktopMain.configure(commonMain)
 
         webMain.configure(commonMain)
 

@@ -16,7 +16,7 @@ object QrcDecrypter {
     private val KEY3 = "!@#)(*$%^&abcDEF".toByteArray(StandardCharsets.UTF_8)
     private const val ENCRYPT_MODE = 1
     private const val DECRYPT_MODE = 0
-    private val SBOXES = arrayOf(
+    private val sboxes = arrayOf(
         intArrayOf(
             14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7,
             0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8,
@@ -283,14 +283,14 @@ object QrcDecrypter {
         sboxInputs[6] = ((expanded[4] and 0x0F) shl 2) or (expanded[5] shr 6)
         sboxInputs[7] = expanded[5] and 0x3F
         var sboxOutput = 0
-        sboxOutput = sboxOutput or (SBOXES[0][prepareSboxIndex(sboxInputs[0])] shl 28)
-        sboxOutput = sboxOutput or (SBOXES[1][prepareSboxIndex(sboxInputs[1])] shl 24)
-        sboxOutput = sboxOutput or (SBOXES[2][prepareSboxIndex(sboxInputs[2])] shl 20)
-        sboxOutput = sboxOutput or (SBOXES[3][prepareSboxIndex(sboxInputs[3])] shl 16)
-        sboxOutput = sboxOutput or (SBOXES[4][prepareSboxIndex(sboxInputs[4])] shl 12)
-        sboxOutput = sboxOutput or (SBOXES[5][prepareSboxIndex(sboxInputs[5])] shl 8)
-        sboxOutput = sboxOutput or (SBOXES[6][prepareSboxIndex(sboxInputs[6])] shl 4)
-        sboxOutput = sboxOutput or SBOXES[7][prepareSboxIndex(sboxInputs[7])]
+        sboxOutput = sboxOutput or (sboxes[0][prepareSboxIndex(sboxInputs[0])] shl 28)
+        sboxOutput = sboxOutput or (sboxes[1][prepareSboxIndex(sboxInputs[1])] shl 24)
+        sboxOutput = sboxOutput or (sboxes[2][prepareSboxIndex(sboxInputs[2])] shl 20)
+        sboxOutput = sboxOutput or (sboxes[3][prepareSboxIndex(sboxInputs[3])] shl 16)
+        sboxOutput = sboxOutput or (sboxes[4][prepareSboxIndex(sboxInputs[4])] shl 12)
+        sboxOutput = sboxOutput or (sboxes[5][prepareSboxIndex(sboxInputs[5])] shl 8)
+        sboxOutput = sboxOutput or (sboxes[6][prepareSboxIndex(sboxInputs[6])] shl 4)
+        sboxOutput = sboxOutput or sboxes[7][prepareSboxIndex(sboxInputs[7])]
         return (extractBitLeftShift(sboxOutput, 15, 0) or
                 extractBitLeftShift(sboxOutput, 6, 1) or
                 extractBitLeftShift(sboxOutput, 19, 2) or
@@ -451,8 +451,7 @@ object QrcDecrypter {
 
     private fun decryptByQrcHexContent(hexContent: String): String {
         val processedHex = if (hexContent.startsWith("9825B0ACE3028368E8FC6C")) hexContent.substring(22) else hexContent
-        val xoredHex: String = xorHexStrings(processedHex)
-        var decryptQrc = decryptQrc(xoredHex)
+        var decryptQrc = decryptQrc(xorHexStrings(processedHex))
         if (decryptQrc.contains("<QrcInfos>") && !decryptQrc.contains("</QrcInfos>")) {
             decryptQrc += "\n\"/>\n</LyricInfo>\n</QrcInfos>"
         }

@@ -19,12 +19,12 @@ template(object : KotlinMultiplatformTemplate() {
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
-            lib(libs.compose.components.resources)
+            lib(libs.compose.resources)
         }
 
         desktopMain.configure(commonMain) {
             lib(
-                projects.ylcsApp.shared,
+                projects.ylcsApp.app.portal,
                 projects.ylcsModule.platform.nativeLibLoader,
                 projects.ylcsModule.platform.os.autoUpdate,
                 projects.ylcsModule.platform.os.singleInstance,

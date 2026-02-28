@@ -24,7 +24,11 @@ open class ListState<T>(
     stateFactory = { it.toMutableStateList() },
     defaultFactory = defaultFactory
 ) {
-    override val size: Int by derivedStateOf { state.size }
+    override val size: Int get() = state.size
+
+    override val isEmpty: Boolean get() = state.isEmpty()
+
+    override val isNotEmpty: Boolean get() = state.isNotEmpty()
 
     operator fun set(index: Int, item: T) {
         state[index] = item

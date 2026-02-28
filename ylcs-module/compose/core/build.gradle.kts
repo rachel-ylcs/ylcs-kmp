@@ -25,18 +25,10 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        commonTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
-        }
-
         androidMain.configure(commonMain) {
             lib(
                 ExportLib,
                 libs.compose.activity,
-                libs.compose.ui.graphics.android
             )
         }
 
@@ -53,7 +45,9 @@ template(object : KotlinMultiplatformTemplate() {
 
         iosMainList.configure(iosMain)
 
-        desktopMain.configure(skikoMain)
+        desktopMain.configure(skikoMain) {
+            lib(composeOSLib)
+        }
 
         webMain.configure(skikoMain)
 

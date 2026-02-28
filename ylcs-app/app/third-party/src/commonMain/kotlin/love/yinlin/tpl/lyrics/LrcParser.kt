@@ -1,0 +1,51 @@
+package love.yinlin.tpl.lyrics
+
+import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
+import love.yinlin.extension.catching
+import love.yinlin.extension.timeString
+
+@Stable
+@Serializable
+data class LrcLine(val position: Long, val text: String) : Comparable<LrcLine> {
+    override fun compareTo(other: LrcLine) = position.compareTo(other.position)
+}
+
+class LrcParser(source: String) {
+    val lines: List<LrcLine>?
+
+    init {
+        val newLines = mutableListOf<LrcLine>()
+        val pattern = "\\[(\\d{2}):(\\d{2})\\.(\\d{2,3})](.*)".toRegex()
+        val items = source.split("\\r?\\n".toRegex())
+        for (item in items) {
+            val line = item.trim()
+            if (line.isEmpty()) continue
+            catching {
+                val result = pattern.find(line)!!.groups
+                val minutes = result[1]!!.value.toLong()
+                val seconds = result[2]!!.value.toLong()
+                val millisecondsString = result[3]!!.value
+                var milliseconds = millisecondsString.toLong()
+                if (millisecondsString.length == 2) milliseconds *= 10L
+                val position = (minutes * 60 + seconds) * 1000 + milliseconds
+                val text = result[4]!!.value.trim()
+                if (text.isNotEmpty()) newLines += LrcLine(position, text)
+            }
+        }
+        lines = newLines.asSequence().filter { it.position > 100L }.distinctBy { it.position }.sorted().toList().ifEmpty { null }
+    }
+
+    val ok: Boolean get() = lines != null
+
+    val plainText: String get() = lines?.let { items ->
+        items.joinToString("\n") { it.text }
+    } ?: ""
+
+    override fun toString(): String = lines?.let { items ->
+        items.joinToString("\n") {
+            val milliseconds = (it.position % 1000) / 10
+            "[${it.position.timeString}.${if (milliseconds < 10) "0" else ""}$milliseconds]${it.text}"
+        }
+    } ?: ""
+}

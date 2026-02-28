@@ -11,7 +11,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="ylcs-app:shared:dependencies" />
+          <option value="ylcs-app:androidApp:androidDependencies" />
         </list>
       </option>
       <option name="vmOptions" />

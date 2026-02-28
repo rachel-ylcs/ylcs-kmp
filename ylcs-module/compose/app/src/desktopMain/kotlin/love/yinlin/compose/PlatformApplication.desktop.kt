@@ -1,30 +1,27 @@
 package love.yinlin.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.compose.ui.CustomTheme
-import love.yinlin.compose.ui.floating.localBalloonTipEnabled
-import love.yinlin.compose.ui.icon.M3Icons
-import love.yinlin.compose.ui.image.MiniIcon
-import love.yinlin.compose.ui.image.MiniImage
-import love.yinlin.compose.ui.layout.ActionScope
-import love.yinlin.compose.ui.layout.Space
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.foundation.PlatformContextDelegate
-import org.jetbrains.compose.resources.*
+import org.jetbrains.compose.resources.DrawableResource
 import kotlin.system.exitProcess
 
 @Stable
@@ -35,180 +32,79 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun BeginContent() {}
 
+    // 这些配置都是非状态变量作为初始值表达, 需要监听变化请使用 controller
+
     protected open val title: String = ""
     protected open val icon: DrawableResource? = null
     protected open val initSize: DpSize = DpSize(1200.dp, 700.dp)
     protected open val minSize: DpSize = DpSize(360.dp, 640.dp)
-    protected open val actionAlwaysOnTop: Boolean = false
-    protected open val actionMinimize: Boolean = true
-    protected open val actionMaximize: Boolean = true
-    protected open val actionClose: Boolean = true
+    protected open val roundedCorner: Boolean = true
 
     @Composable
-    protected open fun TopBar(actions: @Composable ActionScope.() -> Unit) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(
-                    top = CustomTheme.padding.verticalExtraSpace,
-                    bottom = CustomTheme.padding.verticalExtraSpace,
-                    start = CustomTheme.padding.horizontalExtraSpace
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val topBarIcon = icon
-            if (topBarIcon != null) {
-                MiniIcon(topBarIcon)
-            }
-            else {
-                MiniImage(
-                    painter = rememberVectorPainter(DefaultIcon),
-                    modifier = Modifier.size(CustomTheme.size.icon)
-                )
-            }
-            Space()
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Space()
-            Row(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.End
-            ) {
-                ActionScope.Right.actions()
-            }
-        }
-    }
-
-    protected open val tray: Boolean = false
-    protected open val trayHideNotification: String? = null
-    protected open fun onTrayClick(show: () -> Unit) { show() }
+    protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
 
     @Composable
     protected open fun ApplicationScope.MultipleWindow() {}
 
-    @Stable
-    private sealed interface MaximizeState {
-        val showText: String
-        fun toggle(windowState: WindowState): MaximizeState
-
-        @Stable
-        data object Normal : MaximizeState {
-            override val showText: String = "最大化"
-
-            override fun toggle(windowState: WindowState): MaximizeState {
-                val newState = Maximized(windowState.size, windowState.position)
-                windowState.placement = WindowPlacement.Maximized
-                return newState
-            }
-        }
-
-        @Stable
-        data class Maximized(val lastSize: DpSize, val lastPosition: WindowPosition) : MaximizeState {
-            override val showText: String = "还原"
-
-            override fun toggle(windowState: WindowState): MaximizeState {
-                windowState.placement = WindowPlacement.Floating
-                windowState.size = lastSize
-                windowState.position = lastPosition
-                return Normal
-            }
-        }
-    }
-
-    private var maximizeState: MaximizeState by mutableRefStateOf(MaximizeState.Normal)
-
-    private var windowVisible by mutableStateOf(true)
-    private var alwaysOnTop by mutableStateOf(false)
-
-    private val windowState by derivedStateOf {
-        WindowState(
+    val controller by lazy {
+        WindowController(
             placement = WindowPlacement.Floating,
             isMinimized = false,
             position = WindowPosition.Aligned(Alignment.Center),
-            size = initSize
+            initSize = initSize,
+            initTitle = title,
+            initIcon = icon,
+            initRoundedCorner = roundedCorner
         )
     }
 
     private val windowStarter = LaunchFlag()
 
+    val mainScope = MainScope()
+
     fun run() {
-        openService(later = false, immediate = false)
+        openService(scope = mainScope, later = false, immediate = false)
 
         application(exitProcessOnExit = false) {
+            val onMainWindowClose = {
+                closeService(before = true, immediate = false)
+                exitApplication()
+            }
+
+            // 主窗口
             Window(
-                onCloseRequest = {
-                    closeService(before = true, immediate = false)
-                    exitApplication()
-                },
-                title = title,
-                icon = icon?.let { painterResource(it) } ?: rememberVectorPainter(DefaultIcon),
-                visible = windowVisible,
+                onCloseRequest = onMainWindowClose,
+                title = controller.title,
+                icon = controller.iconPainter,
+                visible = controller.visible,
                 undecorated = true,
-                resizable = maximizeState is MaximizeState.Normal,
+                resizable = !controller.maximize,
                 transparent = true,
-                alwaysOnTop = alwaysOnTop,
-                state = windowState
+                alwaysOnTop = controller.alwaysOnTop,
+                state = controller.rawState,
             ) {
                 LaunchedEffect(Unit) {
                     Fixup.swingWindowMaximizeBounds(window)
                     context.bindWindow(window.windowHandle)
 
                     windowStarter {
-                        openService(later = true, immediate = false)
+                        openService(scope = this, later = true, immediate = false)
                     }
                 }
 
                 Fixup.swingWindowMinimize(this, minSize)
 
-                Layout {
-                    Column(modifier = Modifier.fillMaxSize().clip(MaterialTheme.shapes.extraLarge)) {
-                        DragArea(maximizeState is MaximizeState.Normal) {
-                            TopBar {
-                                if (actionAlwaysOnTop) {
-                                    Action(
-                                        icon = if (alwaysOnTop) M3Icons.MobiledataOff else M3Icons.VerticalAlignTop,
-                                        tip = "窗口置顶",
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ) {
-                                        alwaysOnTop = !alwaysOnTop
-                                    }
-                                }
+                val useRoundedCorner by rememberDerivedState {
+                    if (controller.maximize) false else controller.roundedCorner
+                }
 
-                                if (actionMinimize) {
-                                    Action(
-                                        icon = M3Icons.Remove,
-                                        tip = "最小化到托盘",
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ) {
-                                        windowVisible = false
-                                    }
-                                }
-
-                                if (actionMaximize) {
-                                    Action(
-                                        icon = M3Icons.CropSquare,
-                                        tip = maximizeState.showText,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ) {
-                                        maximizeState = maximizeState.toggle(windowState)
-                                    }
-                                }
-
-                                if (actionClose) {
-                                    Action(
-                                        icon = M3Icons.Clear,
-                                        tip = "关闭",
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                                    ) {
-                                        exitApplication()
-                                    }
-                                }
-                            }
+                ComposedLayout(modifier = Modifier.fillMaxSize().condition(useRoundedCorner) { clip(Theme.shape.v1) }) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        DragArea(
+                            enabled = !controller.maximize,
+                            onDoubleClick = { controller.toggleMaximize() },
+                        ) {
+                            TopBar(controller, onMainWindowClose)
                         }
 
                         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
@@ -219,36 +115,24 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 }
             }
 
-            if (tray) {
-                val trayState = rememberTrayState()
-
+            // 托盘
+            val tray = controller.tray
+            if (tray.visible) {
                 Tray(
-                    icon = icon?.let { painterResource(it) } ?: rememberVectorPainter(DefaultIcon),
-                    state = trayState,
-                    onAction = {
-                        onTrayClick { windowVisible = true }
-                    }
+                    icon = tray.painter ?: controller.iconPainter,
+                    state = tray.state,
+                    tooltip = controller.title,
+                    onAction = { tray.onDoubleClick?.invoke() }
                 )
-
-                trayHideNotification?.let { notificationText ->
-                    val notification = rememberNotification(
-                        title = title,
-                        message = notificationText,
-                        type = Notification.Type.Info
-                    )
-
-                    val enabledTip = localBalloonTipEnabled.current
-
-                    LaunchedEffect(windowVisible, enabledTip) {
-                        if (!windowVisible && enabledTip) trayState.sendNotification(notification)
-                    }
-                }
             }
 
+            // 多窗口
             MultipleWindow()
         }
 
         closeService(before = false, immediate = false)
+
+        mainScope.cancel()
 
         exitProcess(0)
     }

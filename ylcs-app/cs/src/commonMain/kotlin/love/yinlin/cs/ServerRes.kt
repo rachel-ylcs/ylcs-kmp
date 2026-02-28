@@ -8,7 +8,6 @@ object ServerRes : APIRes("public") {
     object Assets : APIRes(this) {
         val DefaultAvatar = APIRes(this, "default_avatar.webp")
         val DefaultWall = APIRes(this, "default_wall.webp")
-        val Poster = APIRes(this, "poster.webp")
     }
 
     object Emoji : APIRes(this) {
@@ -17,10 +16,7 @@ object ServerRes : APIRes("public") {
     }
 
     object Game : APIRes(this) {
-        fun x(id: Int) = APIRes(this, "game${id}x.webp")
-        fun y(id: Int) = APIRes(this, "game${id}y.webp")
-        fun xy(id: Int, isX: Boolean) = if (isX) x(id) else y(id)
-        fun res(id: Int, key: String) = APIRes(this, "game$id$key.webp")
+        fun res(id: Int, key: String = "") = APIRes(this, "game$id$key.webp")
         object Rhyme : APIRes(this) {
             fun res(filename: String) = APIRes(this, filename)
         }

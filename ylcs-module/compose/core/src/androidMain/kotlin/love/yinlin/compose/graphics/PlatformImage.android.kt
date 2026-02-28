@@ -6,7 +6,7 @@ import android.os.Build
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import love.yinlin.compose.data.ImageCropResult
+import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.data.ImageFormat
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.catching
@@ -59,7 +59,7 @@ actual fun PlatformImage.copy(): PlatformImage? {
     return PlatformImage(bitmap.copy(bitmap.config ?: Bitmap.Config.ARGB_8888, false))
 }
 
-actual fun PlatformImage.crop(rect: ImageCropResult) = catching {
+actual fun PlatformImage.crop(rect: CropRegion) = catching {
     val cropBitmap = Bitmap.createBitmap(
         bitmap,
         (rect.xPercent * bitmap.width).toInt(),

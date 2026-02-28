@@ -38,9 +38,13 @@ import java.net.Proxy
 import kotlin.io.encoding.Base64
 
 class Proxy(
-    private val name: String,
-    private val whitelist: List<Regex>
+    private val name: String = DEFAULT_NAME,
+    private val whitelist: List<Regex> = emptyList()
 ) {
+    companion object {
+        const val DEFAULT_NAME = "proxy"
+    }
+
     private val client = HttpClient(OkHttp) {
         engine {
             proxy = Proxy.NO_PROXY

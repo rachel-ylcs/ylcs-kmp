@@ -33,6 +33,7 @@ nav:
         - 7. 回调: rachel/4_server/callback.md
         - 8. 服务: rachel/4_server/service.md
         - 9. 插件: rachel/4_server/plugin.md
+    - UI组件库: overrides/gallery/index.html
     - 模块API合集: overrides/dokka/index.html
 
 

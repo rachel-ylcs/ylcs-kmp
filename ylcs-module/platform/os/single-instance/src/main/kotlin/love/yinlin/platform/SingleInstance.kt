@@ -16,6 +16,6 @@ object SingleInstance : SingleInstanceImpl by when (platform) {
 } {
     fun run(key: String) {
         if (!lock(key)) exitProcess(0)
-        Runtime.getRuntime().addShutdownHook(thread(start = false) { unlock() })
+        Runtime.getRuntime().addShutdownHook(thread(start = false, block = ::unlock))
     }
 }

@@ -2,7 +2,7 @@ import love.yinlin.task.BuildDesktopNativeTask
 
 afterEvaluate {
     val buildDesktopNativePAG by tasks.registering(BuildDesktopNativeTask::class) {
-        val targetProject = findProject(projects.ylcsModule.compose.ui.pagKmp)!!
+        val targetProject = findProject(projects.ylcsModule.plugin.pagKmp)!!
         val sourceDir = targetProject.desktopNativeKMPSourceDir.asFile
         onlyIf {
             sourceDir.exists() && sourceDir.resolve("native.ignore").exists()

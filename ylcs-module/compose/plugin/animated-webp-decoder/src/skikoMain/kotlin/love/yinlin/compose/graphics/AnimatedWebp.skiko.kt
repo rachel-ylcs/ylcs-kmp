@@ -55,7 +55,7 @@ actual class AnimatedWebp internal constructor(
                 dst = dst.toSkiaRect(),
                 paint = paint,
                 samplingMode = SamplingMode.MITCHELL,
-                strict = true
+                strict = false
             )
 
             paint.alpha = oldAlpha
@@ -119,7 +119,7 @@ actual class AnimatedWebp internal constructor(
                                             ),
                                             samplingMode = SamplingMode.MITCHELL,
                                             paint = paint,
-                                            strict = true
+                                            strict = false
                                         )
                                     }
                                 }

@@ -22,4 +22,6 @@ abstract class CollectionState<C, RC : C>(
     protected fun save() { kv.setJson(serializer, storageKey, state) }
 
     abstract val size: Int
+    abstract val isEmpty: Boolean
+    abstract val isNotEmpty: Boolean
 }

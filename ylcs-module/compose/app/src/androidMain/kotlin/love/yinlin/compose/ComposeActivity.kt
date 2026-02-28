@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.lifecycleScope
 import love.yinlin.extension.catching
 
 abstract class ComposeActivity : ComponentActivity() {
@@ -16,7 +17,7 @@ abstract class ComposeActivity : ComponentActivity() {
 
         instance.context.bindActivity(this)
 
-        instance.openService(later = true, immediate = false)
+        instance.openService(scope = lifecycleScope, later = true, immediate = false)
 
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
@@ -26,8 +27,8 @@ abstract class ComposeActivity : ComponentActivity() {
         }
 
         setContent {
-            instance.Layout {
-                Fixup.StatusBarAutoTheme(window, LocalDarkMode.current)
+            instance.ComposedLayout {
+                Fixup.StatusBarAutoTheme(window, Theme.darkMode)
 
                 instance.BeginContent(this)
                 instance.Content()

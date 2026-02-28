@@ -3,7 +3,7 @@ package love.yinlin.compose.graphics
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
-import love.yinlin.compose.data.ImageCropResult
+import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.data.ImageFormat
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.catching
@@ -68,7 +68,7 @@ actual fun PlatformImage.copy(): PlatformImage? = catchingNull {
     PlatformImage(Image.makeFromBitmap(bitmap))
 }
 
-actual fun PlatformImage.crop(rect: ImageCropResult) = catching {
+actual fun PlatformImage.crop(rect: CropRegion) = catching {
     val actualX = rect.xPercent * image.width
     val actualY = rect.yPercent * image.height
     val actualWidth = rect.widthPercent * image.width
@@ -82,7 +82,7 @@ actual fun PlatformImage.crop(rect: ImageCropResult) = catching {
             dst = Rect.makeWH(actualWidth, actualHeight),
             samplingMode = SamplingMode.MITCHELL,
             paint = Paint().apply { isAntiAlias = true },
-            strict = true
+            strict = false
         )
     }
     image.close()
@@ -102,7 +102,7 @@ actual fun PlatformImage.thumbnail(longImageThreshold: Float, maxSizeNormal: Int
                 dst = Rect.makeWH(thumbWidth.toFloat(), thumbHeight.toFloat()),
                 samplingMode = SamplingMode.LINEAR,
                 paint = Paint().apply { isAntiAlias = true },
-                strict = true
+                strict = false
             )
         }
         image.close()

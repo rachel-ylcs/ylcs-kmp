@@ -19,9 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         androidMain.configure(commonMain) {
-            lib(
-                libs.mmkv.android
-            )
+            lib(libs.mmkv.android)
         }
 
         iosMain.configure(commonMain)

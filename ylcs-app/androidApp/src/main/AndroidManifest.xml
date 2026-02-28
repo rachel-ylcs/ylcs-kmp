@@ -57,7 +57,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".MusicService"
+            android:name=".RachelMusicService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback|mediaProcessing"
@@ -67,14 +67,5 @@
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
-        <provider
-            android:authorities="@string/mod_file_provider"
-            android:name="androidx.core.content.FileProvider"
-            android:exported="false"
-            android:grantUriPermissions="true" >
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/paths" />
-        </provider>
     </application>
 </manifest>

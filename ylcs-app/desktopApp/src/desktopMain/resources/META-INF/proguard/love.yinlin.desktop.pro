@@ -10,11 +10,6 @@
 -keep class java.lang.foreign.** { *; }
 -dontwarn java.lang.invoke.MethodHandle
 
-# ----------------------------------- NativeMusicPlayer ----------------------------------------- #
-
--keep class love.yinlin.platform.WindowsNativeAudioPlayer** { *; }
--keep class love.yinlin.platform.WindowsNativeVideoPlayer** { *; }
-
 # ----------------------------------------- Sketch ----------------------------------------------- #
 
 -keep class com.github.panpf.sketch.**

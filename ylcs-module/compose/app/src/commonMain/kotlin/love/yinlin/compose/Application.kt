@@ -1,22 +1,13 @@
 package love.yinlin.compose
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import love.yinlin.compose.ui.BaseCustomTheme
-import love.yinlin.compose.ui.LocalCustomTheme
+import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.CoroutineScope
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.PlatformContextDelegate
@@ -31,10 +22,14 @@ abstract class Application<out A : Application<A>>(
     protected open val themeMode: ThemeMode = ThemeMode.SYSTEM
     protected open val fontScale: Float = 1f
     protected open val mainFontResource: FontResource? = null
-    protected open val colorSystem: ColorSystem = DefaultColorSystem
-    protected open val shapeSystem: ShapeSystem = DefaultShapeSystem
-    protected open val textSystem: TextSystem = DefaultTextSystem
-    protected open val customTheme: BaseCustomTheme? = null
+    protected open val background: Color? = null
+    protected open val colorSystem: ColorSystem = ColorSystem.Default
+    protected open val typographyTheme: TypographyTheme = TypographyTheme.Default
+    protected open val shapeTheme: ShapeTheme = ShapeTheme.Default
+    protected open val geometryTheme: GeometryTheme = GeometryTheme.Default
+    protected open val animationTheme: AnimationTheme = AnimationTheme.Default
+    protected open val toolingTheme: ToolingTheme = ToolingTheme.Default
+    protected open val valueTheme: ValueTheme = ValueTheme.Default
     protected open val localProvider: Array<ProvidedValue<*>> = emptyArray()
 
     protected open fun onCreate() { }
@@ -48,67 +43,38 @@ abstract class Application<out A : Application<A>>(
     val context: Context = Context(delegate)
 
     @Composable
-    fun Layout(modifier: Modifier = Modifier.fillMaxSize(), content: @Composable () -> Unit = { Content() }) {
-        BoxWithConstraints(
-            modifier = modifier,
-            contentAlignment = Alignment.Center
+    fun ComposedLayout(
+        modifier: Modifier = Modifier.fillMaxSize(),
+        bgColor: Color? = null,
+        content: @Composable () -> Unit = { Content() }
+    ) {
+        Theme(
+            themeMode = themeMode,
+            fontScale = fontScale,
+            mainFontResource = mainFontResource,
+            background = bgColor ?: background,
+            colorSystem = colorSystem,
+            typographyTheme = typographyTheme,
+            shapeTheme = shapeTheme,
+            geometryTheme = geometryTheme,
+            animationTheme = animationTheme,
+            toolingTheme = toolingTheme,
+            valueTheme = valueTheme,
+            modifier = modifier
         ) {
-            val device = remember(maxWidth, maxHeight) { Device(maxWidth, maxHeight) }
-
-            val isDarkMode = when (themeMode) {
-                ThemeMode.SYSTEM -> isSystemInDarkTheme()
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-            }
-
-            val providers = buildList {
-                add(LocalDevice provides device)
-                add(LocalDarkMode provides isDarkMode)
-                add(LocalMainFontResource provides mainFontResource)
-                customTheme?.let { add(LocalCustomTheme provides it) }
-            }
-            CompositionLocalProvider(*providers.toTypedArray()) {
-                val colorScheme = remember(isDarkMode, colorSystem) {
-                    colorSystem.toColorScheme(isDarkMode)
-                }
-
-                val shapes = remember(device, shapeSystem) {
-                    shapeSystem.toShapes(device.size)
-                }
-
-                val font = mainFont()
-
-                val typography = remember(device, font, textSystem) {
-                    textSystem.toTypography(font, device.size)
-                }
-
-                MaterialTheme(
-                    colorScheme = colorScheme,
-                    shapes = shapes,
-                    typography = typography
-                ) {
-                    CompositionLocalProvider(
-                        LocalContentColor provides MaterialTheme.colorScheme.onBackground,
-                        LocalTextStyle provides MaterialTheme.typography.bodyMedium,
-                        LocalDensity provides Density(LocalDensity.current.density, fontScale),
-                        *localProvider
-                    ) {
-                        content()
-                    }
-                }
-            }
+            CompositionLocalProvider(*localProvider, content = content)
         }
     }
 
-    internal fun openService(later: Boolean, immediate: Boolean) {
+    internal fun openService(scope: CoroutineScope, later: Boolean, immediate: Boolean) {
         if (later) {
-            initService(context, later = later, immediate = false)
+            initService(scope, context, later = later, immediate = false)
             onCreateLater()
         }
         else {
             @Suppress("UNCHECKED_CAST")
             self.init(this as A)
-            initService(context, later = later, immediate = immediate)
+            initService(scope, context, later = later, immediate = immediate)
             onCreate()
         }
     }

@@ -27,7 +27,7 @@ suspend inline fun <reified R : Any> API<out APIType>.internalRequest(
     uploadFile: Boolean,
     crossinline block: suspend (HttpResponse) -> R
 ): R {
-    val result = catchingDefault(Data.Failure(IllegalStateException("出现错误了呀"))) {
+    val result = catchingDefault(Data.Failure(IllegalStateException("Unknown Error: 未知错误"))) {
         val context = currentCoroutineContext()
         val url = "${ClientEngine.baseUrl}$route"
         Coroutines.io {
@@ -35,9 +35,9 @@ suspend inline fun <reified R : Any> API<out APIType>.internalRequest(
                 when (response.status) {
                     HttpStatusCode.OK -> Coroutines.with(context) { Data.Success(block(response)) }
                     HttpStatusCode.Accepted -> Data.Failure(FailureException(response.bodyAsText()))
-                    HttpStatusCode.Unauthorized -> Data.Failure(UnauthorizedException("登录验证已过期"))
+                    HttpStatusCode.Unauthorized -> Data.Failure(UnauthorizedException("Unauthorized: 登录验证已过期"))
                     HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> Data.Failure(RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp))
-                    else -> Data.Failure(IllegalArgumentException("出现错误了呀"))
+                    else -> Data.Failure(IllegalArgumentException("Unknown Error: 未知错误"))
                 }
             }
         }

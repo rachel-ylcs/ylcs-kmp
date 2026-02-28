@@ -24,22 +24,8 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.Foundation.temporaryDirectory
 import platform.Photos.PHPhotoLibrary
-import platform.PhotosUI.PHPickerConfiguration
-import platform.PhotosUI.PHPickerConfigurationSelectionOrdered
-import platform.PhotosUI.PHPickerFilter
-import platform.PhotosUI.PHPickerResult
-import platform.PhotosUI.PHPickerViewController
-import platform.PhotosUI.PHPickerViewControllerDelegateProtocol
-import platform.UIKit.UIAdaptivePresentationControllerDelegateProtocol
-import platform.UIKit.UIApplication
-import platform.UIKit.UIDocumentPickerDelegateProtocol
-import platform.UIKit.UIDocumentPickerViewController
-import platform.UIKit.UIImage
-import platform.UIKit.UIImageWriteToSavedPhotosAlbum
-import platform.UIKit.UIPresentationController
-import platform.UIKit.UISaveVideoAtPathToSavedPhotosAlbum
-import platform.UIKit.UIVideoAtPathIsCompatibleWithSavedPhotosAlbum
-import platform.UIKit.presentationController
+import platform.PhotosUI.*
+import platform.UIKit.*
 import platform.UniformTypeIdentifiers.UTType
 import platform.UniformTypeIdentifiers.UTTypeContent
 import platform.UniformTypeIdentifiers.UTTypeFolder
@@ -67,8 +53,8 @@ actual class StartupPicker : SyncStartup() {
 
     actual suspend fun pickPicture(): Source? = pickPicture(1)?.getOrNull(0)
 
-    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.sync { future ->
-        Coroutines.startMain {
+    actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.main {
+        Coroutines.sync { future ->
             future.catching {
                 val configuration = PHPickerConfiguration(PHPhotoLibrary.sharedPhotoLibrary()).apply {
                     selectionLimit = maxNum.toLong()
@@ -111,54 +97,56 @@ actual class StartupPicker : SyncStartup() {
         }
     }
 
-    private inline fun openPicker(mimeType: List<String>, filter: List<String>, crossinline callback: (NSURL?) -> Unit) {
-        Coroutines.startMain {
-            val picker = UIDocumentPickerViewController(
-                forOpeningContentTypes = filter
-                    .map { it.substringAfterLast(".") }
-                    .mapNotNull { UTType.typeWithFilenameExtension(it) }
-                    .ifEmpty {
-                        mimeType.mapNotNull {
-                            UTType.typeWithMIMEType(it)
-                        }
+    private fun openPicker(mimeType: List<String>, filter: List<String>, callback: (NSURL?) -> Unit) {
+        val picker = UIDocumentPickerViewController(
+            forOpeningContentTypes = filter
+                .map { it.substringAfterLast(".") }
+                .mapNotNull { UTType.typeWithFilenameExtension(it) }
+                .ifEmpty {
+                    mimeType.mapNotNull {
+                        UTType.typeWithMIMEType(it)
                     }
-                    .ifEmpty { listOf(UTTypeContent) }
-            ).apply {
-                allowsMultipleSelection = false
-            }
-            documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
-                override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
-                    callback(didPickDocumentAtURL)
                 }
+                .ifEmpty { listOf(UTTypeContent) }
+        ).apply {
+            allowsMultipleSelection = false
+        }
+        documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
+            override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
+                callback(didPickDocumentAtURL)
+            }
 
-                override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
-                    callback(null)
+            override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
+                callback(null)
+            }
+        }
+        picker.delegate = documentPickerDelegate
+        val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+        rootViewController?.presentViewController(picker, true, null)
+    }
+
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.main {
+        Coroutines.sync { future ->
+            future.catching {
+                openPicker(mimeType, filter) { url ->
+                    future.send { url?.let { SandboxSource(it).buffered() } }
                 }
             }
-            picker.delegate = documentPickerDelegate
-            val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-            rootViewController?.presentViewController(picker, true, null)
         }
     }
 
-    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.sync { future ->
-        future.catching {
-            openPicker(mimeType, filter) { url ->
-                future.send { url?.let { SandboxSource(it).buffered() } }
+    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = Coroutines.main {
+        Coroutines.sync { future ->
+            future.catching {
+                openPicker(mimeType, filter) { url ->
+                    future.send { url?.let { SandboxUri(it) } }
+                }
             }
         }
     }
 
-    actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = Coroutines.sync { future ->
-        future.catching {
-            openPicker(mimeType, filter) { url ->
-                future.send { url?.let { SandboxUri(it) } }
-            }
-        }
-    }
-
-    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = Coroutines.sync { future ->
-        Coroutines.startMain {
+    actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = Coroutines.main {
+        Coroutines.sync { future ->
             future.catching {
                 val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
                 documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {

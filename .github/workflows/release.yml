@@ -58,7 +58,7 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew ylcs-app:shared:generateDummyFramework
+          ./gradlew ylcs-app:app:portal:generateDummyFramework
           # xcodebuild build -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp
           xcodebuild archive -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp
           # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
