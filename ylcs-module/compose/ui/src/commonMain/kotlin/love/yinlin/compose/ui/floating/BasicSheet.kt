@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.ZeroCornerSize
@@ -157,7 +158,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
         val shape = if (usePortraitRoundedCorner) Theme.shape.v1.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
 
         Surface(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxWidth()
                 .offset { IntOffset(x = 0, y = animatedOffset) }
                 .onSizeChanged { controller.dimension = it.height }
                 .draggable(
@@ -167,7 +168,6 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
                 ).nestedScroll(controller),
             shadowElevation = Theme.shadow.v1,
             tonalLevel = 5,
-            contentPadding = LocalImmersivePadding.current,
             shape = shape
         ) {
             val handlerWidth = Theme.size.input8

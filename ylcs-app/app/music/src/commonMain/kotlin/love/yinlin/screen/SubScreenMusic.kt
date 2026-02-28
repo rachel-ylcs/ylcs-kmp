@@ -480,7 +480,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             val musicList = mp?.musicList
 
             if (items != null && musicList != null) {
-                val currentIndex by rememberDerivedState { musicList.indexOf(mp?.music) }
+                val currentIndex by rememberDerivedState { musicList.indexOfFirst { it.id == mp?.music?.id } }
                 val isEmptyList by rememberDerivedState { musicList.isEmpty() }
 
                 LaunchedEffect(isEmptyList) {
@@ -536,7 +536,6 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     }
                 }
             }
-
         }
     }
 

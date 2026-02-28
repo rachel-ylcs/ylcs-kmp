@@ -22,17 +22,24 @@ import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.common.PathMod
 import love.yinlin.compose.*
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.graphics.PlatformImage
+import love.yinlin.compose.graphics.crop
+import love.yinlin.compose.graphics.decode
+import love.yinlin.compose.graphics.encode
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.UserBar
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
+import love.yinlin.compose.ui.floating.DialogCrop
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.floating.Menus
+import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.floating.download
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -40,9 +47,12 @@ import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryLoadingTextButton
+import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
+import love.yinlin.compose.ui.text.Input
+import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -51,6 +61,7 @@ import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.*
@@ -63,7 +74,7 @@ import love.yinlin.tpl.lyrics.LrcParser
 @Stable
 class ScreenMusicDetails(private val sid: String) : Screen() {
     @Stable
-    private data class ResourceItem(val type: ModResourceType, val size: Int?)
+    private data class ResourceItem(val type: ModResourceType, val size: Long?)
 
     private fun Song.clientPath(type: ModResourceType): Path = Path(PathMod, this.sid, type.filename)
     private fun Song.remotePath(type: ModResourceType): String = ServerRes.Mod.Song(sid).res(type.filename).url
@@ -78,6 +89,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private var remoteSong: Song? by mutableStateOf(null)
     private var lyrics: String? by mutableRefStateOf(null)
 
+    private var modifyFlag by mutableLongStateOf(0L)
+
     private val pageComments = object : Pagination<SongComment, Long, Long>(
         default = 0L,
         pageNum = APIConfig.MIN_PAGE_NUM
@@ -91,7 +104,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private fun requestClientSong(): Song? {
         val musicInfo = mp?.library[sid]
         return if (musicInfo != null) {
-            val items = ModResourceType.entries.associateWith { musicInfo.path(PathMod, it).fileSize.toInt() }
+            val items = ModResourceType.entries.associateWith { musicInfo.path(PathMod, it).fileSize }
             clientResources.replaceAll(items.asSequence().filter { it.value > 0 }.map { ResourceItem(it.key, it.value) }.toList())
             Song(
                 sid = musicInfo.id,
@@ -261,14 +274,46 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
+    private fun resActionReplaceImage(aspectRatio: Float) = ResourceAction("替换", Icons.Replace) { item ->
+        clientSong?.let { song ->
+            launch {
+                app.picker.pickPicture()?.use { source ->
+                    app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+                }?.let { src ->
+                    cropDialog.open(url = src.toString(), aspectRatio = aspectRatio)?.let { region ->
+                        catchingError {
+                            Coroutines.io {
+                                val image = PlatformImage.decode(src.readByteArray()!!)!!
+                                image.crop(region)
+                                song.clientPath(item.type).writeByteArray(image.encode(quality = ImageQuality.Full)!!)
+                            }
+                            mp?.let { player ->
+                                player.library.findAssign(sid) { it.copy(modification = it.modification + 1) }
+                                player.musicList.findAssign(predicate = { it.id == sid }) { it.copy(modification = it.modification + 1) }
+                            }
+                            clientResources.findAssign(item) {
+                                it.copy(type = it.type, size = song.clientPath(it.type).fileSize)
+                            }
+                            ++modifyFlag
+                        }?.let { slot.tip.error("图片载入或裁剪失败") }
+                    }
+                }
+            }
+        }
+    }
+
+    private val resActionConfigEditor = ResourceAction("修改", Icons.Edit) {
+        mp?.library?.get(sid)?.let(configSheet::open)
+    }
+
     private val resAction = ModResourceType.entries.associateWith {
         when (it) {
-            ModResourceType.Config -> emptyList()
+            ModResourceType.Config -> listOf(resActionConfigEditor)
             ModResourceType.Audio -> emptyList()
-            ModResourceType.Record -> emptyList()
-            ModResourceType.Background -> emptyList()
+            ModResourceType.Record -> listOf(resActionReplaceImage(1f))
+            ModResourceType.Background -> listOf(resActionReplaceImage(0.5625f))
             ModResourceType.LineLyrics -> emptyList()
-            ModResourceType.Animation -> emptyList()
+            ModResourceType.Animation -> listOf(resActionDelete)
             ModResourceType.Video -> listOf(resActionDelete)
             ModResourceType.Rhyme -> listOf(resActionDelete)
         }
@@ -303,6 +348,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             clientSong?.let {
                 LocalFileImage(
                     uri = it.clientPath(ModResourceType.Background).toString(),
+                    modifyFlag,
                     modifier = Modifier.matchParentSize().zIndex(1f),
                     contentScale = ContentScale.Crop
                 )
@@ -327,6 +373,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     clientSong?.let {
                         LocalFileImage(
                             uri = it.clientPath(ModResourceType.Record).toString(),
+                            modifyFlag,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
@@ -425,7 +472,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 color = if (remote) Theme.color.disabledContent else Theme.color.onContainer,
                 variantColor = if (remote) Theme.color.disabledContent else Theme.color.onContainerVariant
             ) {
-                val resSize = item.size?.toLong()?.fileSizeString?.let { "($it)" } ?: ""
+                val resSize = item.size?.fileSizeString?.let { "($it)" } ?: ""
 
                 Icon(icon = if (remote) Icons.Download else resIcon[item.type]!!)
                 SimpleEllipsisText(text = "${item.type.description}$resSize", style = Theme.typography.v7.bold, modifier = Modifier.weight(1f))
@@ -573,6 +620,70 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
+    private val configSheet = this land object : SheetContent<MusicInfo>() {
+        private val name = InputState(maxLength = 32)
+        private val singer = InputState(maxLength = 32)
+        private val lyricist = InputState(maxLength = 32)
+        private val composer = InputState(maxLength = 32)
+        private val album = InputState(maxLength = 32)
+
+        private val canSubmit by derivedStateOf {
+            name.isSafe && singer.isSafe && lyricist.isSafe && composer.isSafe && album.isSafe
+        }
+
+        override suspend fun initialize(args: MusicInfo) {
+            name.text = args.name
+            singer.text = args.singer
+            lyricist.text = args.lyricist
+            composer.text = args.composer
+            album.text = args.album
+        }
+
+        @Composable
+        override fun Content(args: MusicInfo) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    SimpleEllipsisText(text = "MOD配置", style = Theme.typography.v6.bold)
+                    PrimaryTextButton(text = "保存", icon = Icons.Check, enabled = canSubmit, onClick = {
+                        mp?.let { player ->
+                            val newInfo = args.copy(
+                                name = name.text,
+                                singer = singer.text,
+                                lyricist = lyricist.text,
+                                composer = composer.text,
+                                album = album.text,
+                                modification = args.modification + 1
+                            )
+                            player.library.findAssign(sid) { newInfo }
+                            player.musicList.findAssign(predicate = { it.id == sid }) { newInfo }
+                            ++modifyFlag
+                            launch {
+                                catching {
+                                    Coroutines.io {
+                                        newInfo.path(PathMod, ModResourceType.Config).writeText(newInfo.toJsonString())
+                                    }
+                                }
+                            }
+                            close()
+                        }
+                    })
+                }
+                Input(state = name, hint = "歌曲名", modifier = Modifier.fillMaxWidth())
+                Input(state = singer, hint = "歌手", modifier = Modifier.fillMaxWidth())
+                Input(state = lyricist, hint = "作词", modifier = Modifier.fillMaxWidth())
+                Input(state = composer, hint = "作曲", modifier = Modifier.fillMaxWidth())
+                Input(state = album, hint = "专辑", modifier = Modifier.fillMaxWidth())
+            }
+        }
+    }
+
     private val commentDialog = this land DialogInput(
         hint = "留下你的足迹...",
         maxLength = 1024,
@@ -581,4 +692,6 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     )
 
     private val downloadDialog = this land DialogDownload()
+
+    private val cropDialog = this land DialogCrop()
 }

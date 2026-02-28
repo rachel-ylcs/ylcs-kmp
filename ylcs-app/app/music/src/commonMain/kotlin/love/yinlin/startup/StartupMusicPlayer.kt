@@ -84,7 +84,7 @@ class StartupMusicPlayer : AsyncStartup() {
     val playMode get() = controller.playMode
     val position: Long get() = controller.position
     val duration: Long get() = controller.duration
-    val musicList: List<MusicInfo> get() = controller.musicList
+    val musicList get() = controller.musicList
     val music: MusicInfo? get() = controller.music
     val error: Throwable? get() = controller.error
     suspend fun play() = controller.play()

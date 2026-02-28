@@ -60,7 +60,7 @@ fun DefaultTopBar(
             ) {
                 Icon(
                     painter = controller.iconPainter,
-                    color = controller.icon?.let { Colors.Unspecified } ?: LocalColor.current,
+                    color = Colors.Unspecified,
                     modifier = Modifier.size(Theme.size.icon)
                 )
 
