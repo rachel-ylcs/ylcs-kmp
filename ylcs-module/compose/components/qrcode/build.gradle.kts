@@ -1,6 +1,7 @@
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinCocoapods,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,

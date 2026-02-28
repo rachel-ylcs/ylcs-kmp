@@ -12,10 +12,6 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val cocoapodsList: List<Pod> = listOf(
-        pod("YLCSCore", moduleName = "YLCSCore", source = C.root.iosApp.core.asFile),
-    )
-
     override fun CocoapodsExtension.cocoapods() {
         name = C.app.projectName
         summary = C.app.description
@@ -68,4 +64,8 @@ template(object : KotlinMultiplatformTemplate() {
             }
         }
     }
+
+    override val cocoapodsList: List<Pod> = listOf(
+        pod("YLCSCore", moduleName = "YLCSCore", source = C.root.iosApp.core.asFile),
+    )
 })

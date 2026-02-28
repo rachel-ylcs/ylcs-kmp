@@ -1,8 +1,8 @@
 [versions]
 
 # Plugins #
-kotlin = "2.3.20-Beta1"
-cmp = "1.11.0-alpha01"
+kotlin = "2.3.20-RC"
+cmp = "1.11.0-alpha03"
 agp = "8.12.3"
 mavenPublish = "0.35.0"
 dokka = "2.2.0-Beta"
@@ -10,19 +10,19 @@ dokka = "2.2.0-Beta"
 # Libs #
 
 # Common
-skiko = "0.9.39"
-lifecycle = "2.10.0-alpha07"
+skiko = "0.9.47"
+lifecycle = "2.10.0-alpha08"
 coroutines = "1.10.2"
 ktor = "3.4.0"
-sketch = "4.4.0-alpha02"
+sketch = "4.4.0-beta01"
 mmkv = "2.3.0"
-lottie = "2.0.2"
+lottie = "2.0.3"
 cryptography = "0.5.0"
 pag = "4.5.23"
 
 # Android
 cmp-android = "1.10.1"
-media3 = "1.9.1"
+media3 = "1.10.0-beta01"
 
 # iOS
 sgQrcode = "4.1.0"
@@ -65,8 +65,8 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
-compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.0" }
-compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.0.0-alpha06" }
+compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.1" }
+compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.0-alpha03" }
 compose-navigation3-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
@@ -76,7 +76,7 @@ kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.31.
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
-kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.8.2" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.10.0" }
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
 kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html", version = "0.12.0" }
@@ -97,8 +97,8 @@ sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", 
 lottie = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "lottie" }
 lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
 
-tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.5" }
-tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.1" }
+tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.6" }
+tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.2" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
 tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.0.1" }
 tool-cryptography = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }
@@ -147,7 +147,7 @@ ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref =
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.26" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.5.32" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-redis = { module = "redis.clients:jedis", version = "7.2.1" }
+redis = { module = "redis.clients:jedis", version = "7.3.0" }
