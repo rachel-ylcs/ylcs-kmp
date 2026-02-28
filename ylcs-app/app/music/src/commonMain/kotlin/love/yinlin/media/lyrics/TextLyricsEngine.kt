@@ -48,7 +48,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     protected abstract fun LineItem(item: E, isCurrent: Boolean)
 
     @Composable
-    protected abstract fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle)
+    protected abstract fun BoxScope.FloatingLine(modifier: Modifier = Modifier, config: LyricsEngineConfig, textStyle: TextStyle)
 
     @CallSuper
     override fun reset() {
@@ -140,13 +140,17 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     }
 
     @Composable
-    final override fun FloatingLyricsCanvas(config: LyricsEngineConfig, textStyle: TextStyle) {
+    final override fun FloatingLyricsCanvas(modifier: Modifier, config: LyricsEngineConfig, textStyle: TextStyle) {
         CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
             Box(
-                modifier = Modifier.fillMaxSize().background(color = Colors(config.backgroundColor)).padding(Theme.padding.value),
+                modifier = modifier,
                 contentAlignment = Alignment.BottomCenter
             ) {
-                FloatingLine(config, textStyle)
+                FloatingLine(
+                    modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(Theme.padding.value),
+                    config = config,
+                    textStyle = textStyle
+                )
             }
         }
     }

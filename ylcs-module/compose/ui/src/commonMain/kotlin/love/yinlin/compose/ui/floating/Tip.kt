@@ -14,9 +14,11 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -29,6 +31,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.animation.AnimationContent
@@ -53,6 +56,8 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
     companion object {
         private const val DEFAULT_DURATION = 3000L
     }
+
+    override val useBack: Boolean = false
 
     override val showScrim: Boolean = false
 
@@ -107,7 +112,10 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
                 Type.Error -> Theme.color.error
             })
 
-            Box(modifier = Modifier.padding(horizontal = Theme.padding.h10, vertical = Theme.padding.v4)
+            val padding = LocalImmersivePadding.current + PaddingValues(horizontal = Theme.padding.h10, vertical = Theme.padding.v4)
+
+            Box(modifier = Modifier
+                .padding(padding)
                 .defaultMinSize(minWidth = Theme.size.cell1)
                 .shadow(shape, Theme.shadow.v7)
                 .clip(shape)

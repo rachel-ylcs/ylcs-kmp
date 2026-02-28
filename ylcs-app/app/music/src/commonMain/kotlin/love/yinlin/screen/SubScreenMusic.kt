@@ -385,20 +385,18 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         ) {
             ThemeContainer(ColorSystem.Default.dark.onBackground, ColorSystem.Default.dark.onBackgroundVariant) {
                 val device = LocalDevice.current.type
-                val immersivePadding = LocalImmersivePadding.current
 
                 MusicBackground(modifier = Modifier.fillMaxSize().blurSource(blurState).zIndex(1f))
 
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(if (device == Device.Type.PORTRAIT) immersivePadding.withoutBottom else immersivePadding.withoutStart)
                         .zIndex(2f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     ToolLayout(modifier = Modifier
-                        .padding(Theme.padding.value9)
+                        .padding(LocalImmersivePadding.current.withoutBottom + Theme.padding.value9)
                         .fillMaxWidth()
                         .clip(Theme.shape.v5)
                         .blurTarget(blurState)

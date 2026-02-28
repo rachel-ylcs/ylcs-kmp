@@ -14,8 +14,6 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                libs.compose.material3.iconsExtended,
-                libs.compose.material3,
                 libs.compose.resources,
                 libs.compose.navigation.event,
                 ExportLib,

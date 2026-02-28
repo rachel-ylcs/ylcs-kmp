@@ -62,6 +62,11 @@ abstract class Floating<A : Any> {
     protected open val zIndex: Float = Z_INDEX_COMMON
 
     /**
+     * 响应返回键
+     */
+    protected open val useBack: Boolean = true
+
+    /**
      * back 关闭
      */
     protected open val dismissOnBackPress: Boolean = true
@@ -145,7 +150,7 @@ abstract class Floating<A : Any> {
             if (!transition.currentState && !transition.targetState) currentArgs = null
         }
 
-        NavigationBack(enabled = isOpen) {
+        NavigationBack(enabled = useBack && isOpen) {
             if (dismissOnBackPress) close()
         }
 

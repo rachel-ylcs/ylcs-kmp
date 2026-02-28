@@ -1,5 +1,6 @@
 package love.yinlin.media.lyrics
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.*
@@ -112,32 +113,34 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
     }
 
     @Composable
-    override fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle) {
+    override fun BoxScope.FloatingLine(modifier: Modifier, config: LyricsEngineConfig, textStyle: TextStyle) {
         val currentText by rememberDerivedState { lines?.getOrNull(currentIndex)?.text ?: "" }
         val style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize)
 
-        SimpleEllipsisText(
-            text = currentText,
-            color = Colors.White,
-            style = style,
-            modifier = Modifier.zIndex(1f).graphicsLayer {
-                clip = true
-                shape = GenericShape { size, _ ->
-                    addRect(Rect(size.width * progress, 0f, size.width, size.height))
+        Box(modifier = modifier) {
+            SimpleEllipsisText(
+                text = currentText,
+                color = Colors.White,
+                style = style,
+                modifier = Modifier.zIndex(1f).graphicsLayer {
+                    clip = true
+                    shape = GenericShape { size, _ ->
+                        addRect(Rect(size.width * progress, 0f, size.width, size.height))
+                    }
                 }
-            }
-        )
+            )
 
-        SimpleEllipsisText(
-            text = currentText,
-            color = Colors(config.textColor),
-            style = style,
-            modifier = Modifier.semantics().zIndex(2f).graphicsLayer {
-                clip = true
-                shape = GenericShape { size, _ ->
-                    addRect(Rect(0f, 0f, size.width * progress, size.height))
+            SimpleEllipsisText(
+                text = currentText,
+                color = Colors(config.textColor),
+                style = style,
+                modifier = Modifier.semantics().zIndex(2f).graphicsLayer {
+                    clip = true
+                    shape = GenericShape { size, _ ->
+                        addRect(Rect(0f, 0f, size.width * progress, size.height))
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }

@@ -8,7 +8,6 @@ object ServerRes : APIRes("public") {
     object Assets : APIRes(this) {
         val DefaultAvatar = APIRes(this, "default_avatar.webp")
         val DefaultWall = APIRes(this, "default_wall.webp")
-        val Poster = APIRes(this, "poster.webp")
     }
 
     object Emoji : APIRes(this) {

@@ -47,7 +47,7 @@ class StartupMusicPlayer : AsyncStartup() {
         override val MusicInfo.audioUri: String get() = this.path(ModResourceType.Audio).toString()
         override val MusicInfo.coverUri: String get() = this.path(ModResourceType.Record).toString()
 
-        override val androidMusicServiceComponentName: Pair<String, String> = "love.yinlin" to "love.yinlin.MusicService"
+        override val androidMusicServiceComponentName: Pair<String, String> = "love.yinlin" to "love.yinlin.RachelMusicService"
     }
 
     // 数据仓库

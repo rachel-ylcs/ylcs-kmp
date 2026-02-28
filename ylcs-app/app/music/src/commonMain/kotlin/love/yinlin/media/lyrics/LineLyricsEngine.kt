@@ -4,9 +4,9 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
@@ -14,7 +14,6 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.text.SimpleEllipsisText
-import love.yinlin.compose.ui.text.Text
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.readText
 import love.yinlin.tpl.lyrics.LrcParser
@@ -46,15 +45,14 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
     }
 
     @Composable
-    override fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle) {
+    override fun BoxScope.FloatingLine(modifier: Modifier, config: LyricsEngineConfig, textStyle: TextStyle) {
         val currentText by rememberDerivedState { lines?.getOrNull(currentIndex)?.text ?: "" }
-        Text(
+        SimpleEllipsisText(
             text = currentText,
             color = Colors(config.textColor),
             style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize),
             textAlign = TextAlign.Center,
-            maxLines = 2,
-            overflow = TextOverflow.MiddleEllipsis
+            modifier = modifier
         )
     }
 }

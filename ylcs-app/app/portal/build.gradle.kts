@@ -14,7 +14,6 @@ plugins {
 template(object : KotlinMultiplatformTemplate() {
     override val cocoapodsList: List<Pod> = listOf(
         pod("YLCSCore", moduleName = "YLCSCore", source = C.root.iosApp.core.asFile),
-        pod("MobileVLCKit", libs.versions.vlcKit),
     )
 
     override fun CocoapodsExtension.cocoapods() {
@@ -45,6 +44,10 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsApp.app.viewer,
             )
         }
+
+        iosMain.configure(commonMain)
+
+        iosMainList.configure(iosMain)
     }
 
     override fun Project.actions() {

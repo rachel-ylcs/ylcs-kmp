@@ -57,7 +57,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".MusicService"
+            android:name=".RachelMusicService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback|mediaProcessing"

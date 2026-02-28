@@ -112,10 +112,11 @@ abstract class BasicScreen : ViewModel() {
     internal fun ComposedUI() {
         NavigationBack(onBack = ::onBack)
 
-        BasicContent()
-
         val immersivePadding = rememberImmersivePadding()
+
         CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
+            BasicContent()
+
             // FAB Layout
             fab.Land()
 

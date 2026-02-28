@@ -88,7 +88,7 @@ actual class FloatingLyrics {
                             modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
                             bgColor = Colors.Transparent
                         ) {
-                            player.engine.FloatingLyricsCanvas(config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
+                            player.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
                         }
                     }
                 }

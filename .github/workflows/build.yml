@@ -44,7 +44,6 @@ jobs:
             common: &common
               - 'gradle/**'
               - 'buildSrc/**'
-              - 'ylcs-base/**'
               - 'ylcs-module/**'
               - 'ylcs-app/cs/**'
               - 'ylcs-app/mod/**'
@@ -54,33 +53,32 @@ jobs:
               - 'libs.versions.toml'
             client: &client
               - *common
-              - 'ylcs-app/mod/**'
-              - 'ylcs-app/libs/**'
-              - 'ylcs-app/shared/proguard/R8Common.pro'
-              - 'ylcs-app/shared/src/commonMain/**'
-              - 'ylcs-app/shared/build.gradle.kts'
+              - 'ylcs-app/app/**/commonMain/**'
+              - 'ylcs-app/app/**/build.gradle.kts'
             android:
               - *client
-              - 'ylcs-app/shared/proguard/R8Android.pro'
-              - 'ylcs-app/shared/src/jvmMain/**'
-              - 'ylcs-app/shared/src/androidMain/**'
+              - 'ylcs-app/app/**/src/jvmMain/**'
+              - 'ylcs-app/app/**/src/androidMain/**'
               - 'ylcs-app/androidApp/src/main/**'
             ios:
               - *client
-              - 'ylcs-app/shared/src/nativeInterop/**'
-              - 'ylcs-app/shared/src/appleMain/**'
-              - 'ylcs-app/shared/src/iosMain/**'
+              - 'ylcs-app/app/**/src/nativeInterop/**'
+              - 'ylcs-app/app/**/src/appleMain/**'
+              - 'ylcs-app/app/**/src/iosMain/**'
               - 'ylcs-app/iosApp/**'
             desktop:
               - *client
-              - 'ylcs-app/shared/proguard/R8Desktop.pro'
-              - 'ylcs-app/shared/src/jvmMain/**'
-              - 'ylcs-app/shared/src/desktopMain/**'
+              - 'ylcs-app/app/**/src/jvmMain/**'
+              - 'ylcs-app/app/**/src/desktopMain/**'
               - 'ylcs-app/desktopApp/src/desktopMain/**'
             web:
               - *client
-              - 'ylcs-app/shared/src/wasmJsMain/**'
+              - 'ylcs-app/app/**/src/jsMain/**'
+              - 'ylcs-app/app/**/src/wasmJsMain/**'
+              - 'ylcs-app/app/**/src/webMain/**'
+              - 'ylcs-app/webApp/src/jsMain/**'
               - 'ylcs-app/webApp/src/wasmJsMain/**'
+              - 'ylcs-app/webApp/src/webMain/**'
             server:
               - *common
               - 'ylcs-app/server/**'
@@ -143,7 +141,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:shared:linkPodDebugFrameworkIosArm64
+        run: ./gradlew ylcs-app:app:portal:linkPodDebugFrameworkIosArm64
 
   build-desktop:
     name: Build Desktop

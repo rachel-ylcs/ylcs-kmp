@@ -15,8 +15,8 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 projects.ylcsModule.compose.ui,
-                projects.ylcsModule.compose.platformView,
                 ExportLib,
+                projects.ylcsModule.compose.platformView,
                 projects.ylcsModule.foundation.context,
             )
         }

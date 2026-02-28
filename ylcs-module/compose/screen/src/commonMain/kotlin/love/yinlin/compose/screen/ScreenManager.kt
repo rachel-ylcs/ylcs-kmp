@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
@@ -26,8 +26,8 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
     @Stable
     companion object {
         @PublishedApi
-        internal val saver = Saver<ScreenManager, List<String>>(
-            save = { it.backStack.toList() },
+        internal val saver = listSaver(
+            save = { it.backStack },
             restore = { ScreenManager(it) }
         )
 
