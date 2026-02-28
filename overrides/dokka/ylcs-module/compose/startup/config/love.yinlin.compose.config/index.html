@@ -1,0 +1,264 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>love.yinlin.compose.config</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:startup:config/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:startup:config/commonMain" data-filter=":ylcs-module:compose:startup:config/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="love.yinlin.compose.startup.config::love.yinlin.compose.config////PointingToDeclaration//-846960746">
+  <div class="breadcrumbs"><a href="../index.html">love.yinlin.compose.startup.config</a><span class="delimiter">/</span><span class="current">love.yinlin.compose.config</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="117100592%2FClasslikes%2F-846960746" anchor-label="CacheState" id="117100592%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cache-state/index.html"><span>Cache</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="117100592%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-cache-state/index.html">CacheState</a> : <a href="-config-state/index.html">ConfigState</a>, <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-write-property/index.html">ReadWriteProperty</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1062837360%2FClasslikes%2F-846960746" anchor-label="CollectionState" id="1062837360%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-collection-state/index.html"><span>Collection</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1062837360%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-collection-state/index.html">CollectionState</a><span class="token operator">&lt;</span><a href="-collection-state/index.html">C</a><span class="token punctuation">, </span><a href="-collection-state/index.html">RC</a><span class="token operator"> : </span><a href="-collection-state/index.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">kv<span class="token operator">: </span><a href="../../../../../ylcs-module/startup/mmkv-kmp/love.yinlin.startup/-startup-k-v/index.html">StartupKV</a><span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">version<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">serializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-collection-state/index.html">C</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">stateFactory<span class="token operator">: </span><span class="token punctuation">(</span><a href="-collection-state/index.html">C</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-collection-state/index.html">RC</a><span class="token punctuation">, </span></span><span class="parameter ">defaultFactory<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="-collection-state/index.html">C</a></span></span><span class="token punctuation">)</span> : <a href="-config-state/index.html">ConfigState</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="940065556%2FClasslikes%2F-846960746" anchor-label="ConfigState" id="940065556%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-config-state/index.html"><span>Config</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="940065556%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">interface </span><a href="-config-state/index.html">ConfigState</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-694477840%2FClasslikes%2F-846960746" anchor-label="ListState" id="-694477840%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-list-state/index.html"><span>List</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-694477840%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">class </span><a href="-list-state/index.html">ListState</a><span class="token operator">&lt;</span><a href="-list-state/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">kv<span class="token operator">: </span><a href="../../../../../ylcs-module/startup/mmkv-kmp/love.yinlin.startup/-startup-k-v/index.html">StartupKV</a><span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">version<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">itemSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-list-state/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultFactory<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-list-state/index.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="-collection-state/index.html">CollectionState</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-list-state/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span data-unresolved-link="androidx.compose.runtime.snapshots/SnapshotStateList///PointingToDeclaration/">SnapshotStateList</span><span class="token operator">&lt;</span><a href="-list-state/index.html">T</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1869182966%2FClasslikes%2F-846960746" anchor-label="MapState" id="-1869182966%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-map-state/index.html"><span>Map</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1869182966%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">class </span><a href="-map-state/index.html">MapState</a><span class="token operator">&lt;</span><a href="-map-state/index.html">K</a><span class="token punctuation">, </span><a href="-map-state/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">kv<span class="token operator">: </span><a href="../../../../../ylcs-module/startup/mmkv-kmp/love.yinlin.startup/-startup-k-v/index.html">StartupKV</a><span class="token punctuation">, </span></span><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">version<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">keySerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-map-state/index.html">K</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">valueSerializer<span class="token operator">: </span><span data-unresolved-link="kotlinx.serialization/KSerializer///PointingToDeclaration/">KSerializer</span><span class="token operator">&lt;</span><a href="-map-state/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">defaultFactory<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="-map-state/index.html">K</a><span class="token punctuation">, </span><a href="-map-state/index.html">V</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span> : <a href="-collection-state/index.html">CollectionState</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="-map-state/index.html">K</a><span class="token punctuation">, </span><a href="-map-state/index.html">V</a><span class="token operator">&gt;</span><span class="token punctuation">, </span><span data-unresolved-link="androidx.compose.runtime.snapshots/SnapshotStateMap///PointingToDeclaration/">SnapshotStateMap</span><span class="token operator">&lt;</span><a href="-map-state/index.html">K</a><span class="token punctuation">, </span><a href="-map-state/index.html">V</a><span class="token operator">&gt;</span><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1763049253%2FClasslikes%2F-846960746" anchor-label="Patch" id="-1763049253%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-patch/index.html"><span><span>Patch</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1763049253%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-patch/index.html">Patch</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>version<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-951717523%2FClasslikes%2F-846960746" anchor-label="Patches" id="-951717523%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-patches/index.html"><span><span>Patches</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-951717523%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><span class="token keyword">typealias </span><a href="-patches/index.html">Patches</a><span class="token operator"> = </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="-patch/index.html">Patch</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1697247%2FClasslikes%2F-846960746" anchor-label="ValueState" id="1697247%2FClasslikes%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-value-state/index.html"><span>Value</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1697247%2FClasslikes%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-value-state/index.html">ValueState</a><span class="token operator">&lt;</span><a href="-value-state/index.html">T</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">version<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">stateFactory<span class="token operator">: </span><span class="token punctuation">(</span><a href="-value-state/index.html">T</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="androidx.compose.runtime/MutableState///PointingToDeclaration/">MutableState</span><span class="token operator">&lt;</span><a href="-value-state/index.html">T</a><span class="token operator">&gt;</span><span class="token operator"> = </span>{ mutableStateOf(it) }</span></span><span class="token punctuation">)</span> : <a href="-config-state/index.html">ConfigState</a>, <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-write-property/index.html">ReadWriteProperty</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span><a href="-value-state/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1624870133%2FFunctions%2F-846960746" anchor-label="patches" id="-1624870133%2FFunctions%2F-846960746" data-filterable-set=":ylcs-module:compose:startup:config/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:startup:config/commonMain" data-filterable-set=":ylcs-module:compose:startup:config/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="patches.html"><span><span>patches</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1624870133%2FFunctions%2F-846960746"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:startup:config/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="patches.html"><span class="token function">patches</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>patches<span class="token operator">: </span><a href="-patch/index.html">Patch</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-patches/index.html">Patches</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,752 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>PAGView</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:plugin:pag-kmp/webMain">web</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:plugin:pag-kmp/webMain" data-filter=":ylcs-module:plugin:pag-kmp/webMain">
+                                <span class="checkbox--icon"></span>
+                                web
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.plugin.pag-kmp::org.libpag/PAGView///PointingToDeclaration//-489046955">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.plugin.pag-kmp</a><span class="delimiter">/</span><a href="../index.html">org.libpag</a><span class="delimiter">/</span><span class="current">PAGView</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>PAGView</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">PAGView</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pagLayer<span class="token operator">: </span><a href="../[web]-p-a-g-layer/index.html">PAGLayer</a><span class="token punctuation">, </span></span><span class="parameter ">canvasElement<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/org.w3c.dom/-h-t-m-l-canvas-element/index.html">HTMLCanvasElement</a></span></span><span class="token punctuation">)</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></div></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="-703716655%2FConstructors%2F-489046955" anchor-label="PAGView" id="-703716655%2FConstructors%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-p-a-g-view.html"><span><span>PAGView</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-703716655%2FConstructors%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pagLayer<span class="token operator">: </span><a href="../[web]-p-a-g-layer/index.html">PAGLayer</a><span class="token punctuation">, </span></span><span class="parameter ">canvasElement<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/org.w3c.dom/-h-t-m-l-canvas-element/index.html">HTMLCanvasElement</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="808049580%2FClasslikes%2F-489046955" anchor-label="Companion" id="808049580%2FClasslikes%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="808049580%2FClasslikes%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-1877470399%2FProperties%2F-489046955" anchor-label="isPlaying" id="-1877470399%2FProperties%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-playing.html"><span>is</span><wbr><span><span>Playing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1877470399%2FProperties%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="is-playing.html">isPlaying</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-183834959%2FProperties%2F-489046955" anchor-label="repeatCount" id="-183834959%2FProperties%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="repeat-count.html"><span>repeat</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-183834959%2FProperties%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="repeat-count.html">repeatCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1625607579%2FFunctions%2F-489046955" anchor-label="addListener" id="1625607579%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="add-listener.html"><span>add</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1625607579%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="add-listener.html"><span class="token function">addListener</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eventName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">listener<span class="token operator">: </span><span class="token punctuation">(</span>event<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1772619882%2FFunctions%2F-489046955" anchor-label="cacheEnabled" id="-1772619882%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cache-enabled.html"><span>cache</span><wbr><span><span>Enabled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1772619882%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="cache-enabled.html"><span class="token function">cacheEnabled</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1567546413%2FFunctions%2F-489046955" anchor-label="cacheScale" id="1567546413%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="cache-scale.html"><span>cache</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1567546413%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="cache-scale.html"><span class="token function">cacheScale</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1486284577%2FFunctions%2F-489046955" anchor-label="currentFrame" id="1486284577%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="current-frame.html"><span>current</span><wbr><span><span>Frame</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1486284577%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="current-frame.html"><span class="token function">currentFrame</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1326383531%2FFunctions%2F-489046955" anchor-label="destroy" id="1326383531%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="destroy.html"><span><span>destroy</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1326383531%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="destroy.html"><span class="token function">destroy</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1194907391%2FFunctions%2F-489046955" anchor-label="duration" id="-1194907391%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="duration.html"><span><span>duration</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1194907391%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="duration.html"><span class="token function">duration</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1043861473%2FFunctions%2F-489046955" anchor-label="flush" id="1043861473%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="flush.html"><span><span>flush</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1043861473%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="flush.html"><span class="token function">flush</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-boolean/index.html">JsBoolean</a><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="4198063%2FFunctions%2F-489046955" anchor-label="freeCache" id="4198063%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="free-cache.html"><span>free</span><wbr><span><span>Cache</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="4198063%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="free-cache.html"><span class="token function">freeCache</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-933330911%2FFunctions%2F-489046955" anchor-label="getComposition" id="-933330911%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-composition.html"><span>get</span><wbr><span><span>Composition</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-933330911%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-composition.html"><span class="token function">getComposition</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../[web]-p-a-g-composition/index.html">PAGComposition</a><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="463336462%2FFunctions%2F-489046955" anchor-label="getDebugData" id="463336462%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-debug-data.html"><span>get</span><wbr><span>Debug</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="463336462%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-debug-data.html"><span class="token function">getDebugData</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-debug-data/index.html">DebugData</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-559165918%2FFunctions%2F-489046955" anchor-label="getProgress" id="-559165918%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-progress.html"><span>get</span><wbr><span><span>Progress</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-559165918%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-progress.html"><span class="token function">getProgress</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="552712835%2FFunctions%2F-489046955" anchor-label="makeSnapshot" id="552712835%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="make-snapshot.html"><span>make</span><wbr><span><span>Snapshot</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="552712835%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="make-snapshot.html"><span class="token function">makeSnapshot</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/org.w3c.dom/-image-bitmap/index.html">ImageBitmap</a><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1719275148%2FFunctions%2F-489046955" anchor-label="matrix" id="-1719275148%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="matrix.html"><span><span>matrix</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1719275148%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="matrix.html"><span class="token function">matrix</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-matrix/index.html">Matrix</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1394281804%2FFunctions%2F-489046955" anchor-label="maxFrameRate" id="1394281804%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-frame-rate.html"><span>max</span><wbr><span>Frame</span><wbr><span><span>Rate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1394281804%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="max-frame-rate.html"><span class="token function">maxFrameRate</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2029779247%2FFunctions%2F-489046955" anchor-label="pause" id="2029779247%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pause.html"><span><span>pause</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2029779247%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="pause.html"><span class="token function">pause</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1314296991%2FFunctions%2F-489046955" anchor-label="play" id="-1314296991%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="play.html"><span><span>play</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1314296991%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="play.html"><span class="token function">play</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a><span class="token operator">?</span><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1685426882%2FFunctions%2F-489046955" anchor-label="prepare" id="-1685426882%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="prepare.html"><span><span>prepare</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1685426882%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="prepare.html"><span class="token function">prepare</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a><span class="token operator">?</span><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="585212245%2FFunctions%2F-489046955" anchor-label="removeListener" id="585212245%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remove-listener.html"><span>remove</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="585212245%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="remove-listener.html"><span class="token function">removeListener</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eventName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">listener<span class="token operator">: </span><span class="token punctuation">(</span>event<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1846444280%2FFunctions%2F-489046955" anchor-label="scaleMode" id="1846444280%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="scale-mode.html"><span>scale</span><wbr><span><span>Mode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1846444280%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="scale-mode.html"><span class="token function">scaleMode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1740388119%2FFunctions%2F-489046955" anchor-label="setCacheEnabled" id="-1740388119%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-cache-enabled.html"><span>set</span><wbr><span>Cache</span><wbr><span><span>Enabled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1740388119%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-cache-enabled.html"><span class="token function">setCacheEnabled</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="550059468%2FFunctions%2F-489046955" anchor-label="setCacheScale" id="550059468%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-cache-scale.html"><span>set</span><wbr><span>Cache</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="550059468%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-cache-scale.html"><span class="token function">setCacheScale</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="69406581%2FFunctions%2F-489046955" anchor-label="setComposition" id="69406581%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-composition.html"><span>set</span><wbr><span><span>Composition</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="69406581%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-composition.html"><span class="token function">setComposition</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pagComposition<span class="token operator">: </span><a href="../[web]-p-a-g-composition/index.html">PAGComposition</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1363760080%2FFunctions%2F-489046955" anchor-label="setDebugData" id="1363760080%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-debug-data.html"><span>set</span><wbr><span>Debug</span><wbr><span><span>Data</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1363760080%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-debug-data.html"><span class="token function">setDebugData</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">debugData<span class="token operator">: </span><a href="../-debug-data/index.html">DebugData</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="628212172%2FFunctions%2F-489046955" anchor-label="setMatrix" id="628212172%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-matrix.html"><span>set</span><wbr><span><span>Matrix</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="628212172%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-matrix.html"><span class="token function">setMatrix</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">matrix<span class="token operator">: </span><a href="../-matrix/index.html">Matrix</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-881324821%2FFunctions%2F-489046955" anchor-label="setMaxFrameRate" id="-881324821%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-max-frame-rate.html"><span>set</span><wbr><span>Max</span><wbr><span>Frame</span><wbr><span><span>Rate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-881324821%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-max-frame-rate.html"><span class="token function">setMaxFrameRate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="391229038%2FFunctions%2F-489046955" anchor-label="setProgress" id="391229038%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-progress.html"><span>set</span><wbr><span><span>Progress</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="391229038%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-progress.html"><span class="token function">setProgress</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">progress<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double/index.html">Double</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1901424065%2FFunctions%2F-489046955" anchor-label="setRepeatCount" id="1901424065%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-repeat-count.html"><span>set</span><wbr><span>Repeat</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1901424065%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-repeat-count.html"><span class="token function">setRepeatCount</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">repeatCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1329602504%2FFunctions%2F-489046955" anchor-label="setScaleMode" id="1329602504%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-scale-mode.html"><span>set</span><wbr><span>Scale</span><wbr><span><span>Mode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1329602504%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-scale-mode.html"><span class="token function">setScaleMode</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="299065890%2FFunctions%2F-489046955" anchor-label="setVideoEnabled" id="299065890%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-video-enabled.html"><span>set</span><wbr><span>Video</span><wbr><span><span>Enabled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="299065890%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-video-enabled.html"><span class="token function">setVideoEnabled</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enable<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="117714008%2FFunctions%2F-489046955" anchor-label="stop" id="117714008%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="stop.html"><span><span>stop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="117714008%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="stop.html"><span class="token function">stop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">notification<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span>definedExternally</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a><span class="token operator">?</span><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1271889131%2FFunctions%2F-489046955" anchor-label="updateSize" id="1271889131%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-size.html"><span>update</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1271889131%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-size.html"><span class="token function">updateSize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1202534543%2FFunctions%2F-489046955" anchor-label="videoEnabled" id="1202534543%2FFunctions%2F-489046955" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="video-enabled.html"><span>video</span><wbr><span><span>Enabled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1202534543%2FFunctions%2F-489046955"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:plugin:pag-kmp/webMain" data-filterable-set=":ylcs-module:plugin:pag-kmp/webMain" data-active="" data-toggle=":ylcs-module:plugin:pag-kmp/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:plugin:pag-kmp/webMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="video-enabled.html"><span class="token function">videoEnabled</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

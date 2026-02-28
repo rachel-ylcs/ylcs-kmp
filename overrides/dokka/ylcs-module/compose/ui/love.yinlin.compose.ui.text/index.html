@@ -1,0 +1,369 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>love.yinlin.compose.ui.text</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:ui/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:ui/commonMain" data-filter=":ylcs-module:compose:ui/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="love.yinlin.compose.ui::love.yinlin.compose.ui.text////PointingToDeclaration//-92011701">
+  <div class="breadcrumbs"><a href="../index.html">love.yinlin.compose.ui</a><span class="delimiter">/</span><span class="current">love.yinlin.compose.ui.text</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="1857048818%2FClasslikes%2F-92011701" anchor-label="AutoSizer" id="1857048818%2FClasslikes%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-auto-sizer/index.html"><span>Auto</span><wbr><span><span>Sizer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1857048818%2FClasslikes%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-auto-sizer/index.html">AutoSizer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">min<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token punctuation">, </span></span><span class="parameter ">max<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token punctuation">, </span></span><span class="parameter ">step<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>0.25.sp</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="611434938%2FClasslikes%2F-92011701" anchor-label="InputDecoration" id="611434938%2FClasslikes%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-input-decoration/index.html"><span>Input</span><wbr><span><span>Decoration</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="611434938%2FClasslikes%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">interface </span><a href="-input-decoration/index.html">InputDecoration</a></div><div class="brief "><p class="paragraph">输入框装饰</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1744136423%2FClasslikes%2F-92011701" anchor-label="InputState" id="1744136423%2FClasslikes%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-input-state/index.html"><span>Input</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1744136423%2FClasslikes%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">class </span><a href="-input-state/index.html">InputState</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>maxLength<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>Int.MAX_VALUE</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="725934774%2FClasslikes%2F-92011701" anchor-label="InputStatusColorProvider" id="725934774%2FClasslikes%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-input-status-color-provider/index.html"><span>Input</span><wbr><span>Status</span><wbr><span>Color</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="725934774%2FClasslikes%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">interface </span><a href="-input-status-color-provider/index.html">InputStatusColorProvider</a></div><div class="brief "><p class="paragraph">颜色状态提供器</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="296274517%2FFunctions%2F-92011701" anchor-label="Input" id="296274517%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-input.html"><span><span>Input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="296274517%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-input.html"><span class="token function">Input</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><a href="-input-state/index.html">InputState</a><span class="token operator"> = </span>rememberInputState()<span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">hint<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">enabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current<span class="token punctuation">, </span></span><span class="parameter ">alignment<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Alignment.Vertical///PointingToDeclaration/">Alignment.Vertical</span><span class="token operator"> = </span>Alignment.CenterVertically<span class="token punctuation">, </span></span><span class="parameter ">maxLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter ">minLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>maxLines<span class="token punctuation">, </span></span><span class="parameter ">imeAction<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.input/ImeAction///PointingToDeclaration/">ImeAction</span><span class="token operator"> = </span>ImeAction.Done<span class="token punctuation">, </span></span><span class="parameter ">onImeClick<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.text/KeyboardActionScope///PointingToDeclaration/">KeyboardActionScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">colorProvider<span class="token operator">: </span><a href="-input-status-color-provider/index.html">InputStatusColorProvider</a><span class="token operator"> = </span>InputStatusColorProvider.Default<span class="token punctuation">, </span></span><span class="parameter ">leading<span class="token operator">: </span><a href="-input-decoration/index.html">InputDecoration</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">trailing<span class="token operator">: </span><a href="-input-decoration/index.html">InputDecoration</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1124304536%2FFunctions%2F-92011701" anchor-label="measureTextHeight" id="1124304536%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="measure-text-height.html"><span>measure</span><wbr><span>Text</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1124304536%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="measure-text-height.html"><span class="token function">measureTextHeight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="measure-text-height.html"><span class="token function">measureTextHeight</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text1<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">style1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter ">text2<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">style2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter ">calc<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-632178337%2FFunctions%2F-92011701" anchor-label="measureTextWidth" id="-632178337%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="measure-text-width.html"><span>measure</span><wbr><span>Text</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-632178337%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="measure-text-width.html"><span class="token function">measureTextWidth</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="measure-text-width.html"><span class="token function">measureTextWidth</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">items<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current<span class="token punctuation">, </span></span><span class="parameter ">standard<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1961187366%2FFunctions%2F-92011701" anchor-label="PasswordInput" id="-1961187366%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-password-input.html"><span>Password</span><wbr><span><span>Input</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1961187366%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-password-input.html"><span class="token function">PasswordInput</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><a href="-input-state/index.html">InputState</a><span class="token operator"> = </span>rememberInputState()<span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">hint<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">enabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current<span class="token punctuation">, </span></span><span class="parameter ">mask<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-char/index.html">Char</a><span class="token operator"> = </span>'\u2022'<span class="token punctuation">, </span></span><span class="parameter ">onImeClick<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.text/KeyboardActionScope///PointingToDeclaration/">KeyboardActionScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">colorProvider<span class="token operator">: </span><a href="-input-status-color-provider/index.html">InputStatusColorProvider</a><span class="token operator"> = </span>InputStatusColorProvider.Default<span class="token punctuation">, </span></span><span class="parameter ">leading<span class="token operator">: </span><a href="-input-decoration/index.html">InputDecoration</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">trailing<span class="token operator">: </span><a href="-input-decoration/index.html">InputDecoration</a><span class="token operator"> = </span>InputDecoration.PasswordViewer</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="167416054%2FFunctions%2F-92011701" anchor-label="rememberInputState" id="167416054%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remember-input-state.html"><span>remember</span><wbr><span>Input</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="167416054%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="remember-input-state.html"><span class="token function">rememberInputState</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">initText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span><span class="token punctuation">, </span></span><span class="parameter ">maxLength<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>Int.MAX_VALUE</span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-input-state/index.html">InputState</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1482946366%2FFunctions%2F-92011701" anchor-label="SelectionBox" id="1482946366%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-selection-box.html"><span>Selection</span><wbr><span><span>Box</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1482946366%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-selection-box.html"><span class="token function">SelectionBox</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">enabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">content<span class="token operator">: </span><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span>&nbsp;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-133314429%2FFunctions%2F-92011701" anchor-label="SimpleClipText" id="-133314429%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-simple-clip-text.html"><span>Simple</span><wbr><span>Clip</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-133314429%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-simple-clip-text.html"><span class="token function">SimpleClipText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">color<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator"> = </span>Color.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">textDecoration<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextDecoration///PointingToDeclaration/">TextDecoration</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">textAlign<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextAlign///PointingToDeclaration/">TextAlign</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="299771411%2FFunctions%2F-92011701" anchor-label="SimpleEllipsisText" id="299771411%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-simple-ellipsis-text.html"><span>Simple</span><wbr><span>Ellipsis</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="299771411%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-simple-ellipsis-text.html"><span class="token function">SimpleEllipsisText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">color<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator"> = </span>Color.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">textDecoration<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextDecoration///PointingToDeclaration/">TextDecoration</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">textAlign<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextAlign///PointingToDeclaration/">TextAlign</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current<span class="token punctuation">, </span></span><span class="parameter ">overflow<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextOverflow///PointingToDeclaration/">TextOverflow</span><span class="token operator"> = </span>TextOverflow.Ellipsis</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="176104360%2FFunctions%2F-92011701" anchor-label="StrokeText" id="176104360%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-stroke-text.html"><span>Stroke</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="176104360%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-stroke-text.html"><span class="token function">StrokeText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">strokeColor<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter ">strokeWidth<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>style.fontSize / 12f<span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">color<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator"> = </span>Color.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">fontSize<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">fontStyle<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontWeight<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontWeight///PointingToDeclaration/">FontWeight</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontFamily<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontFamily///PointingToDeclaration/">FontFamily</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">letterSpacing<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">textDecoration<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextDecoration///PointingToDeclaration/">TextDecoration</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">textAlign<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextAlign///PointingToDeclaration/">TextAlign</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">lineHeight<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">overflow<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextOverflow///PointingToDeclaration/">TextOverflow</span><span class="token operator"> = </span>TextOverflow.Clip<span class="token punctuation">, </span></span><span class="parameter ">softWrap<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">maxLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>Int.MAX_VALUE<span class="token punctuation">, </span></span><span class="parameter ">minLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter ">onTextLayout<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.text/TextLayoutResult///PointingToDeclaration/">TextLayoutResult</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1620795383%2FFunctions%2F-92011701" anchor-label="Text" id="1620795383%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-text.html"><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1620795383%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-text.html"><span class="token function">Text</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">color<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator"> = </span>Color.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">autoSizer<span class="token operator">: </span><a href="-auto-sizer/index.html">AutoSizer</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontSize<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">fontStyle<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontWeight<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontWeight///PointingToDeclaration/">FontWeight</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontFamily<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontFamily///PointingToDeclaration/">FontFamily</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">letterSpacing<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">textDecoration<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextDecoration///PointingToDeclaration/">TextDecoration</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">textAlign<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextAlign///PointingToDeclaration/">TextAlign</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">lineHeight<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">overflow<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextOverflow///PointingToDeclaration/">TextOverflow</span><span class="token operator"> = </span>TextOverflow.Clip<span class="token punctuation">, </span></span><span class="parameter ">softWrap<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">maxLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>Int.MAX_VALUE<span class="token punctuation">, </span></span><span class="parameter ">minLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter ">onTextLayout<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.text/TextLayoutResult///PointingToDeclaration/">TextLayoutResult</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current</span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-text.html"><span class="token function">Text</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/AnnotatedString///PointingToDeclaration/">AnnotatedString</span><span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">color<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator"> = </span>Color.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">autoSizer<span class="token operator">: </span><a href="-auto-sizer/index.html">AutoSizer</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontSize<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">fontStyle<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontWeight<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontWeight///PointingToDeclaration/">FontWeight</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">fontFamily<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontFamily///PointingToDeclaration/">FontFamily</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">letterSpacing<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">textDecoration<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextDecoration///PointingToDeclaration/">TextDecoration</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">textAlign<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextAlign///PointingToDeclaration/">TextAlign</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">lineHeight<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/TextUnit///PointingToDeclaration/">TextUnit</span><span class="token operator"> = </span>TextUnit.Unspecified<span class="token punctuation">, </span></span><span class="parameter ">overflow<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.style/TextOverflow///PointingToDeclaration/">TextOverflow</span><span class="token operator"> = </span>TextOverflow.Clip<span class="token punctuation">, </span></span><span class="parameter ">softWrap<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">maxLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span>Int.MAX_VALUE<span class="token punctuation">, </span></span><span class="parameter ">minLines<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter ">inlineContent<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span><span data-unresolved-link="androidx.compose.foundation.text/InlineTextContent///PointingToDeclaration/">InlineTextContent</span><span class="token operator">&gt;</span><span class="token operator"> = </span>emptyMap()<span class="token punctuation">, </span></span><span class="parameter ">onTextLayout<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="androidx.compose.ui.text/TextLayoutResult///PointingToDeclaration/">TextLayoutResult</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{}<span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator"> = </span>LocalStyle.current</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2034044467%2FFunctions%2F-92011701" anchor-label="TextIconAdapter" id="-2034044467%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-text-icon-adapter.html"><span>Text</span><wbr><span>Icon</span><wbr><span><span>Adapter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2034044467%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-text-icon-adapter.html"><span class="token function">TextIconAdapter</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">ltr<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">gapRatio<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.5f</span><span class="token punctuation">, </span></span><span class="parameter ">content<span class="token operator">: </span><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span>&nbsp;</span><span class="token punctuation">(</span><a href="../love.yinlin.compose.ui.layout/-measure-id-provider/index.html">MeasureIdProvider</a><span class="token punctuation">, </span><a href="../love.yinlin.compose.ui.layout/-measure-id-provider/index.html">MeasureIdProvider</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">图标自适应与文本同高</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1141411282%2FFunctions%2F-92011701" anchor-label="TextIconBinder" id="-1141411282%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-text-icon-binder.html"><span>Text</span><wbr><span>Icon</span><wbr><span><span>Binder</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1141411282%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-text-icon-binder.html"><span class="token function">TextIconBinder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier<span class="token punctuation">, </span></span><span class="parameter ">ttb<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">gapRatio<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">0.5f</span><span class="token punctuation">, </span></span><span class="parameter ">content<span class="token operator">: </span><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span>&nbsp;</span><span class="token punctuation">(</span><a href="../love.yinlin.compose.ui.layout/-measure-id-provider/index.html">MeasureIdProvider</a><span class="token punctuation">, </span><a href="../love.yinlin.compose.ui.layout/-measure-id-provider/index.html">MeasureIdProvider</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">图标自适应与文本视觉同高(实际上图标会略大一些1.2x)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

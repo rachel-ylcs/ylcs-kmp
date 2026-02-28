@@ -1,0 +1,483 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CalendarState</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:ui/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:ui/commonMain" data-filter=":ylcs-module:compose:ui/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.ui::love.yinlin.compose.ui.widget/CalendarState///PointingToDeclaration//-92011701">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.ui</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose.ui.widget</a><span class="delimiter">/</span><span class="current">CalendarState</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Calendar</span><wbr><span><span>State</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">class </span><a href="index.html">CalendarState</a> : <span data-unresolved-link="androidx.compose.foundation.pager/PagerState///PointingToDeclaration/">PagerState</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1111735762%2FConstructors%2F-92011701" anchor-label="CalendarState" id="1111735762%2FConstructors%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-calendar-state.html"><span>Calendar</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1111735762%2FConstructors%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-444461172%2FClasslikes%2F-92011701" anchor-label="Companion" id="-444461172%2FClasslikes%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-444461172%2FClasslikes%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-45830024%2FProperties%2F-92011701" anchor-label="canScrollBackward" id="-45830024%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-45830024%2FProperties%2F-92011701"><span>can</span><wbr><span>Scroll</span><wbr><span><span>Backward</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-45830024%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">var </span><a href="index.html#-45830024%2FProperties%2F-92011701">canScrollBackward</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1148443238%2FProperties%2F-92011701" anchor-label="canScrollForward" id="-1148443238%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1148443238%2FProperties%2F-92011701"><span>can</span><wbr><span>Scroll</span><wbr><span><span>Forward</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1148443238%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">var </span><a href="index.html#-1148443238%2FProperties%2F-92011701">canScrollForward</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="284886992%2FProperties%2F-92011701" anchor-label="currentPage" id="284886992%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#284886992%2FProperties%2F-92011701"><span>current</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="284886992%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#284886992%2FProperties%2F-92011701">currentPage</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="986996827%2FProperties%2F-92011701" anchor-label="currentPageOffsetFraction" id="986996827%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#986996827%2FProperties%2F-92011701"><span>current</span><wbr><span>Page</span><wbr><span>Offset</span><wbr><span><span>Fraction</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="986996827%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.compose.runtime.annotation/FrequentlyChangingValue///PointingToDeclaration/"><span class="token annotation builtin">FrequentlyChangingValue</span></span></div></div><span class="token keyword">val </span><a href="index.html#986996827%2FProperties%2F-92011701">currentPageOffsetFraction</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-74590709%2FProperties%2F-92011701" anchor-label="interactionSource" id="-74590709%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-74590709%2FProperties%2F-92011701"><span>interaction</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-74590709%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-74590709%2FProperties%2F-92011701">interactionSource</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.interaction/InteractionSource///PointingToDeclaration/">InteractionSource</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="738818649%2FProperties%2F-92011701" anchor-label="isScrollInProgress" id="738818649%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#738818649%2FProperties%2F-92011701"><span>is</span><wbr><span>Scroll</span><wbr><span>In</span><wbr><span><span>Progress</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="738818649%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#738818649%2FProperties%2F-92011701">isScrollInProgress</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1263740899%2FProperties%2F-92011701" anchor-label="lastScrolledBackward" id="-1263740899%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1263740899%2FProperties%2F-92011701"><span>last</span><wbr><span>Scrolled</span><wbr><span><span>Backward</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1263740899%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-1263740899%2FProperties%2F-92011701">lastScrolledBackward</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1583215957%2FProperties%2F-92011701" anchor-label="lastScrolledForward" id="1583215957%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1583215957%2FProperties%2F-92011701"><span>last</span><wbr><span>Scrolled</span><wbr><span><span>Forward</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1583215957%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#1583215957%2FProperties%2F-92011701">lastScrolledForward</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1208725078%2FProperties%2F-92011701" anchor-label="layoutInfo" id="-1208725078%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1208725078%2FProperties%2F-92011701"><span>layout</span><wbr><span><span>Info</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1208725078%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-1208725078%2FProperties%2F-92011701">layoutInfo</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.pager/PagerLayoutInfo///PointingToDeclaration/">PagerLayoutInfo</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1922446981%2FProperties%2F-92011701" anchor-label="pageCount" id="1922446981%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="page-count.html"><span>page</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1922446981%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="page-count.html">pageCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">12</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1302301267%2FProperties%2F-92011701" anchor-label="scrollIndicatorState" id="1302301267%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1302301267%2FProperties%2F-92011701"><span>scroll</span><wbr><span>Indicator</span><wbr><span><span>State</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1302301267%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#1302301267%2FProperties%2F-92011701">scrollIndicatorState</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation/ScrollIndicatorState///PointingToDeclaration/">ScrollIndicatorState</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1336511696%2FProperties%2F-92011701" anchor-label="settledPage" id="1336511696%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1336511696%2FProperties%2F-92011701"><span>settled</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1336511696%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#1336511696%2FProperties%2F-92011701">settledPage</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-81045022%2FProperties%2F-92011701" anchor-label="targetPage" id="-81045022%2FProperties%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-81045022%2FProperties%2F-92011701"><span>target</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-81045022%2FProperties%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-81045022%2FProperties%2F-92011701">targetPage</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1776801191%2FFunctions%2F-92011701" anchor-label="animateScrollToPage" id="1776801191%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1776801191%2FFunctions%2F-92011701"><span>animate</span><wbr><span>Scroll</span><wbr><span>To</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1776801191%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html#1776801191%2FFunctions%2F-92011701"><span class="token function">animateScrollToPage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">page<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.annotation/FloatRange///PointingToDeclaration/"><span class="token annotation builtin">FloatRange</span></span><span class="token punctuation">(</span><span>from<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">-0.5</span></span><span class="token punctuation">, </span></span><wbr><span>to<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0.5</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>pageOffsetFraction<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">animationSpec<span class="token operator">: </span><span data-unresolved-link="androidx.compose.animation.core/AnimationSpec///PointingToDeclaration/">AnimationSpec</span><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1815537751%2FFunctions%2F-92011701" anchor-label="dispatchRawDelta" id="-1815537751%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1815537751%2FFunctions%2F-92011701"><span>dispatch</span><wbr><span>Raw</span><wbr><span><span>Delta</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1815537751%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="index.html#-1815537751%2FFunctions%2F-92011701"><span class="token function">dispatchRawDelta</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">delta<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1197907137%2FFunctions%2F-92011701" anchor-label="getOffsetDistanceInPages" id="-1197907137%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1197907137%2FFunctions%2F-92011701"><span>get</span><wbr><span>Offset</span><wbr><span>Distance</span><wbr><span>In</span><wbr><span><span>Pages</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1197907137%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-1197907137%2FFunctions%2F-92011701"><span class="token function">getOffsetDistanceInPages</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">page<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1001281344%2FFunctions%2F-92011701" anchor-label="requestScrollToPage" id="1001281344%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1001281344%2FFunctions%2F-92011701"><span>request</span><wbr><span>Scroll</span><wbr><span>To</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1001281344%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#1001281344%2FFunctions%2F-92011701"><span class="token function">requestScrollToPage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.annotation/IntRange///PointingToDeclaration/"><span class="token annotation builtin">IntRange</span></span><span class="token punctuation">(</span><span>from<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>page<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.annotation/FloatRange///PointingToDeclaration/"><span class="token annotation builtin">FloatRange</span></span><span class="token punctuation">(</span><span>from<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">-0.5</span></span><span class="token punctuation">, </span></span><wbr><span>to<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0.5</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>pageOffsetFraction<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="931790187%2FFunctions%2F-92011701" anchor-label="scroll" id="931790187%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#931790187%2FFunctions%2F-92011701"><span><span>scroll</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="931790187%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend override </span><span class="token keyword">fun </span><a href="index.html#931790187%2FFunctions%2F-92011701"><span class="token function">scroll</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">scrollPriority<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation/MutatePriority///PointingToDeclaration/">MutatePriority</span><span class="token punctuation">, </span></span><span class="parameter ">block<span class="token operator">: </span><span class="token keyword">suspend </span><span data-unresolved-link="androidx.compose.foundation.gestures/ScrollScope///PointingToDeclaration/">ScrollScope</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1605120793%2FFunctions%2F-92011701" anchor-label="scrollToPage" id="-1605120793%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1605120793%2FFunctions%2F-92011701"><span>scroll</span><wbr><span>To</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1605120793%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="index.html#-1605120793%2FFunctions%2F-92011701"><span class="token function">scrollToPage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">page<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.annotation/FloatRange///PointingToDeclaration/"><span class="token annotation builtin">FloatRange</span></span><span class="token punctuation">(</span><span>from<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">-0.5</span></span><span class="token punctuation">, </span></span><wbr><span>to<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0.5</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>pageOffsetFraction<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1672336324%2FFunctions%2F-92011701" anchor-label="updateCurrentPage" id="-1672336324%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1672336324%2FFunctions%2F-92011701"><span>update</span><wbr><span>Current</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1672336324%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="androidx.compose.foundation.gestures/ScrollScope///PointingToDeclaration/">ScrollScope</span><span class="token punctuation">.</span><a href="index.html#-1672336324%2FFunctions%2F-92011701"><span class="token function">updateCurrentPage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">page<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.annotation/FloatRange///PointingToDeclaration/"><span class="token annotation builtin">FloatRange</span></span><span class="token punctuation">(</span><span>from<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">-0.5</span></span><span class="token punctuation">, </span></span><wbr><span>to<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0.5</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>pageOffsetFraction<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1086886516%2FFunctions%2F-92011701" anchor-label="updateTargetPage" id="1086886516%2FFunctions%2F-92011701" data-filterable-set=":ylcs-module:compose:ui/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:ui/commonMain" data-filterable-set=":ylcs-module:compose:ui/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1086886516%2FFunctions%2F-92011701"><span>update</span><wbr><span>Target</span><wbr><span><span>Page</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1086886516%2FFunctions%2F-92011701"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:ui/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="androidx.compose.foundation.gestures/ScrollScope///PointingToDeclaration/">ScrollScope</span><span class="token punctuation">.</span><a href="index.html#1086886516%2FFunctions%2F-92011701"><span class="token function">updateTargetPage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">targetPage<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,368 @@
+$dokka.format:html-v1
+$dokka.linkExtension:html
+$dokka.location:love.yinlin.compose.data/ItemKey.Serializer///PointingToDeclaration/love.yinlin.compose.core/love.yinlin.compose.data/-item-key/[skiko]-serializer/index.html
+$dokka.location:love.yinlin.compose.data/ItemKey.Serializer/descriptor/#/PointingToDeclaration/love.yinlin.compose.core/love.yinlin.compose.data/-item-key/[skiko]-serializer/descriptor.html
+$dokka.location:love.yinlin.compose.data/ItemKey.Serializer/deserialize/#kotlinx.serialization.encoding.Decoder/PointingToDeclaration/love.yinlin.compose.core/love.yinlin.compose.data/-item-key/[skiko]-serializer/deserialize.html
+$dokka.location:love.yinlin.compose.data/ItemKey.Serializer/serialize/#kotlinx.serialization.encoding.Encoder#love.yinlin.compose.data.ItemKey/PointingToDeclaration/love.yinlin.compose.core/love.yinlin.compose.data/-item-key/[skiko]-serializer/serialize.html
+$dokka.location:love.yinlin.compose.data/ItemKey/value/#/PointingToDeclaration/love.yinlin.compose.core/love.yinlin.compose.data/-item-key/[skiko]value.html
+$dokka.location:love.yinlin.compose.ui/PlatformView///PointingToDeclaration/love.yinlin.compose.platform-view/love.yinlin.compose.ui/[web]-platform-view/index.html
+$dokka.location:love.yinlin.compose.ui/PlatformView/HostView/#androidx.compose.ui.Modifier/PointingToDeclaration/love.yinlin.compose.platform-view/love.yinlin.compose.ui/[web]-platform-view/-host-view.html
+$dokka.location:love.yinlin.compose.ui/PlatformView/PlatformView/#/PointingToDeclaration/love.yinlin.compose.platform-view/love.yinlin.compose.ui/[web]-platform-view/-platform-view.html
+$dokka.location:love.yinlin.compose/PlatformApplication/run/#/PointingToDeclaration/love.yinlin.compose.app/love.yinlin.compose/-platform-application/[web]run.html
+$dokka.location:love.yinlin.extension/Destructible///PointingToDeclaration/love.yinlin.core/love.yinlin.extension/[desktop]-destructible/index.html
+$dokka.location:love.yinlin.extension/Destructible/Destructible/#love.yinlin.extension.RAII/PointingToDeclaration/love.yinlin.core/love.yinlin.extension/[desktop]-destructible/-destructible.html
+$dokka.location:love.yinlin.extension/Destructible/nativeHandle/#/PointingToDeclaration/love.yinlin.core/love.yinlin.extension/[desktop]-destructible/native-handle.html
+$dokka.location:love.yinlin.extension/RAII///PointingToDeclaration/love.yinlin.core/love.yinlin.extension/[desktop]-r-a-i-i/index.html
+$dokka.location:love.yinlin.extension/RAII/RAII/#kotlin.Function0[kotlin.Long]#kotlin.Function1[kotlin.Long,kotlin.Unit]/PointingToDeclaration/love.yinlin.core/love.yinlin.extension/[desktop]-r-a-i-i/-r-a-i-i.html
+$dokka.location:love.yinlin.extension/RAII/run/#/PointingToDeclaration/love.yinlin.core/love.yinlin.extension/[desktop]-r-a-i-i/run.html
+$dokka.location:love.yinlin.startup/StartupKV/mmkv/#/PointingToDeclaration/love.yinlin.startup.mmkv-kmp/love.yinlin.startup/-startup-k-v/[ios]mmkv.html
+$dokka.location:org.libpag/PAG///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/index.html
+$dokka.location:org.libpag/PAG/Matrix/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-matrix.html
+$dokka.location:org.libpag/PAG/PAG/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g.html
+$dokka.location:org.libpag/PAG/PAGComposition/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-composition.html
+$dokka.location:org.libpag/PAG/PAGFile/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-file.html
+$dokka.location:org.libpag/PAG/PAGFont/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-font.html
+$dokka.location:org.libpag/PAG/PAGImage/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-image.html
+$dokka.location:org.libpag/PAG/PAGImageLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-image-layer.html
+$dokka.location:org.libpag/PAG/PAGLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-layer.html
+$dokka.location:org.libpag/PAG/PAGPlayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-player.html
+$dokka.location:org.libpag/PAG/PAGSolidLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-solid-layer.html
+$dokka.location:org.libpag/PAG/PAGSurface/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-surface.html
+$dokka.location:org.libpag/PAG/PAGTextLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-text-layer.html
+$dokka.location:org.libpag/PAG/PAGView/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-p-a-g-view.html
+$dokka.location:org.libpag/PAG/SDKVersion/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/-s-d-k-version.html
+$dokka.location:org.libpag/PAG/currentPlayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g/current-player.html
+$dokka.location:org.libpag/PAG/sdkVersion/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g/sdk-version.html
+$dokka.location:org.libpag/PAGComposition.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/-companion/index.html
+$dokka.location:org.libpag/PAGComposition.Companion/make/#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/-companion/make.html
+$dokka.location:org.libpag/PAGComposition///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/index.html
+$dokka.location:org.libpag/PAGComposition/PAGComposition/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/-p-a-g-composition.html
+$dokka.location:org.libpag/PAGComposition/addLayer/#org.libpag.PAGLayer/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/add-layer.html
+$dokka.location:org.libpag/PAGComposition/addLayerAt/#org.libpag.PAGLayer#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/add-layer-at.html
+$dokka.location:org.libpag/PAGComposition/audioBytes/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/audio-bytes.html
+$dokka.location:org.libpag/PAGComposition/audioStartTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/audio-start-time.html
+$dokka.location:org.libpag/PAGComposition/contains/#org.libpag.PAGLayer/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/contains.html
+$dokka.location:org.libpag/PAGComposition/getLayerAt/#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/get-layer-at.html
+$dokka.location:org.libpag/PAGComposition/getLayerIndex/#org.libpag.PAGLayer/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/get-layer-index.html
+$dokka.location:org.libpag/PAGComposition/getLayersByName/#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/get-layers-by-name.html
+$dokka.location:org.libpag/PAGComposition/getLayersUnderPoint/#kotlin.Double#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/get-layers-under-point.html
+$dokka.location:org.libpag/PAGComposition/height/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/height.html
+$dokka.location:org.libpag/PAGComposition/numChildren/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/num-children.html
+$dokka.location:org.libpag/PAGComposition/removeAllLayers/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/remove-all-layers.html
+$dokka.location:org.libpag/PAGComposition/removeLayer/#org.libpag.PAGLayer/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/remove-layer.html
+$dokka.location:org.libpag/PAGComposition/removeLayerAt/#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/remove-layer-at.html
+$dokka.location:org.libpag/PAGComposition/setContentSize/#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/set-content-size.html
+$dokka.location:org.libpag/PAGComposition/setLayerIndex/#org.libpag.PAGLayer#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/set-layer-index.html
+$dokka.location:org.libpag/PAGComposition/swapLayer/#org.libpag.PAGLayer#org.libpag.PAGLayer/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/swap-layer.html
+$dokka.location:org.libpag/PAGComposition/swapLayerAt/#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/swap-layer-at.html
+$dokka.location:org.libpag/PAGComposition/width/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-composition/width.html
+$dokka.location:org.libpag/PAGFile.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/-companion/index.html
+$dokka.location:org.libpag/PAGFile.Companion/MaxSupportedTagLevel/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-file/-companion/-max-supported-tag-level.html
+$dokka.location:org.libpag/PAGFile.Companion/loadFromBuffer/#org.khronos.webgl.ArrayBuffer/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/-companion/load-from-buffer.html
+$dokka.location:org.libpag/PAGFile.Companion/loadFromBytes/#kotlin.ByteArray/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-file/-companion/load-from-bytes.html
+$dokka.location:org.libpag/PAGFile.Companion/loadFromPath/#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-file/-companion/load-from-path.html
+$dokka.location:org.libpag/PAGFile.Companion/maxSupportedTagLevel/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/-companion/max-supported-tag-level.html
+$dokka.location:org.libpag/PAGFile///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/index.html
+$dokka.location:org.libpag/PAGFile/PAGFile/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/-p-a-g-file.html
+$dokka.location:org.libpag/PAGFile/copyOriginal/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/copy-original.html
+$dokka.location:org.libpag/PAGFile/getEditableIndices/#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/get-editable-indices.html
+$dokka.location:org.libpag/PAGFile/getTextData/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/get-text-data.html
+$dokka.location:org.libpag/PAGFile/numImages/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/num-images.html
+$dokka.location:org.libpag/PAGFile/numTexts/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/num-texts.html
+$dokka.location:org.libpag/PAGFile/numVideos/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/num-videos.html
+$dokka.location:org.libpag/PAGFile/path/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-file/path.html
+$dokka.location:org.libpag/PAGFile/replaceImage/#kotlin.Int#org.libpag.PAGImage/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/replace-image.html
+$dokka.location:org.libpag/PAGFile/replaceImageByName/#kotlin.String#org.libpag.PAGImage/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-file/replace-image-by-name.html
+$dokka.location:org.libpag/PAGFile/replaceText/#kotlin.Int#org.libpag.TextDocument/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/replace-text.html
+$dokka.location:org.libpag/PAGFile/setDuration/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/set-duration.html
+$dokka.location:org.libpag/PAGFile/setDuration/#kotlin.Long/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-file/set-duration.html
+$dokka.location:org.libpag/PAGFile/setTimeStretchMode/#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/set-time-stretch-mode.html
+$dokka.location:org.libpag/PAGFile/tagLevel/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/tag-level.html
+$dokka.location:org.libpag/PAGFile/timeStretchMode/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-file/time-stretch-mode.html
+$dokka.location:org.libpag/PAGFont.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/-companion/index.html
+$dokka.location:org.libpag/PAGFont.Companion/create/#kotlin.String#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/-companion/create.html
+$dokka.location:org.libpag/PAGFont.Companion/registerFallbackFontNames/#kotlin.js.JsArray[kotlin.js.JsString]/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/-companion/register-fallback-font-names.html
+$dokka.location:org.libpag/PAGFont.Companion/registerFont/#kotlin.ByteArray#kotlin.Int#org.libpag.PAGFont/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-font/-companion/register-font.html
+$dokka.location:org.libpag/PAGFont.Companion/registerFont/#kotlin.String#kotlin.Int#org.libpag.PAGFont/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-font/-companion/register-font.html
+$dokka.location:org.libpag/PAGFont.Companion/registerFont/#kotlin.String#org.w3c.files.File/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/-companion/register-font.html
+$dokka.location:org.libpag/PAGFont.Companion/setFallbackFont/#kotlin.Array[kotlin.String]#kotlin.IntArray/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-font/-companion/set-fallback-font.html
+$dokka.location:org.libpag/PAGFont.Companion/setFallbackFont/#kotlin.Array[kotlin.String]/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-font/-companion/set-fallback-font.html
+$dokka.location:org.libpag/PAGFont.Companion/unregisterFont/#org.libpag.PAGFont/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-font/-companion/unregister-font.html
+$dokka.location:org.libpag/PAGFont///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/index.html
+$dokka.location:org.libpag/PAGFont/PAGFont/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/-p-a-g-font.html
+$dokka.location:org.libpag/PAGFont/PAGFont/#kotlin.String#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-font/-p-a-g-font.html
+$dokka.location:org.libpag/PAGFont/fontFamily/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/font-family.html
+$dokka.location:org.libpag/PAGFont/fontStyle/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-font/font-style.html
+$dokka.location:org.libpag/PAGImage.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/-companion/index.html
+$dokka.location:org.libpag/PAGImage.Companion/fromFile/#org.w3c.files.File/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/-companion/from-file.html
+$dokka.location:org.libpag/PAGImage.Companion/fromPixels/#org.khronos.webgl.Uint8Array#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/-companion/from-pixels.html
+$dokka.location:org.libpag/PAGImage.Companion/fromSource/#org.khronos.webgl.TexImageSource/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/-companion/from-source.html
+$dokka.location:org.libpag/PAGImage.Companion/fromTexture/#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/-companion/from-texture.html
+$dokka.location:org.libpag/PAGImage.Companion/loadFromBytes/#kotlin.ByteArray/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-image/-companion/load-from-bytes.html
+$dokka.location:org.libpag/PAGImage.Companion/loadFromPath/#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-image/-companion/load-from-path.html
+$dokka.location:org.libpag/PAGImage.Companion/loadFromPixels/#kotlin.IntArray#kotlin.Int#kotlin.Int#kotlin.Long#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-image/-companion/load-from-pixels.html
+$dokka.location:org.libpag/PAGImage///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/index.html
+$dokka.location:org.libpag/PAGImage/PAGImage/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/-p-a-g-image.html
+$dokka.location:org.libpag/PAGImage/close/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-image/close.html
+$dokka.location:org.libpag/PAGImage/destroy/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/destroy.html
+$dokka.location:org.libpag/PAGImage/height/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/height.html
+$dokka.location:org.libpag/PAGImage/matrix/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/matrix.html
+$dokka.location:org.libpag/PAGImage/scaleMode/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/scale-mode.html
+$dokka.location:org.libpag/PAGImage/setMatrix/#org.libpag.Matrix/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/set-matrix.html
+$dokka.location:org.libpag/PAGImage/setScaleMode/#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/set-scale-mode.html
+$dokka.location:org.libpag/PAGImage/width/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image/width.html
+$dokka.location:org.libpag/PAGImageLayer.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/-companion/index.html
+$dokka.location:org.libpag/PAGImageLayer.Companion/make/#kotlin.Int#kotlin.Int#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/-companion/make.html
+$dokka.location:org.libpag/PAGImageLayer.Companion/make/#kotlin.Int#kotlin.Int#kotlin.Long/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-image-layer/-companion/make.html
+$dokka.location:org.libpag/PAGImageLayer///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/index.html
+$dokka.location:org.libpag/PAGImageLayer/PAGImageLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/-p-a-g-image-layer.html
+$dokka.location:org.libpag/PAGImageLayer/contentDuration/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/content-duration.html
+$dokka.location:org.libpag/PAGImageLayer/contentTimeToLayer/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/content-time-to-layer.html
+$dokka.location:org.libpag/PAGImageLayer/contentTimeToLayer/#kotlin.Long/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-image-layer/content-time-to-layer.html
+$dokka.location:org.libpag/PAGImageLayer/getVideoRanges/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/get-video-ranges.html
+$dokka.location:org.libpag/PAGImageLayer/imageBytes/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/image-bytes.html
+$dokka.location:org.libpag/PAGImageLayer/layerTimeToContent/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/layer-time-to-content.html
+$dokka.location:org.libpag/PAGImageLayer/layerTimeToContent/#kotlin.Long/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-image-layer/layer-time-to-content.html
+$dokka.location:org.libpag/PAGImageLayer/replaceImage/#org.libpag.PAGImage/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/replace-image.html
+$dokka.location:org.libpag/PAGImageLayer/setImage/#org.libpag.PAGImage/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-image-layer/set-image.html
+$dokka.location:org.libpag/PAGLayer.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/-companion/index.html
+$dokka.location:org.libpag/PAGLayer///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/index.html
+$dokka.location:org.libpag/PAGLayer/PAGLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/-p-a-g-layer.html
+$dokka.location:org.libpag/PAGLayer/alpha/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/alpha.html
+$dokka.location:org.libpag/PAGLayer/bounds/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-layer/bounds.html
+$dokka.location:org.libpag/PAGLayer/currentTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/current-time.html
+$dokka.location:org.libpag/PAGLayer/duration/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/duration.html
+$dokka.location:org.libpag/PAGLayer/editableIndex/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/editable-index.html
+$dokka.location:org.libpag/PAGLayer/excludedFromTimeline/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/excluded-from-timeline.html
+$dokka.location:org.libpag/PAGLayer/frameRate/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/frame-rate.html
+$dokka.location:org.libpag/PAGLayer/getBounds/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/get-bounds.html
+$dokka.location:org.libpag/PAGLayer/getProgress/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/get-progress.html
+$dokka.location:org.libpag/PAGLayer/getTotalMatrix/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/get-total-matrix.html
+$dokka.location:org.libpag/PAGLayer/globalToLocalTime/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/global-to-local-time.html
+$dokka.location:org.libpag/PAGLayer/globalToLocalTime/#kotlin.Long/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-layer/global-to-local-time.html
+$dokka.location:org.libpag/PAGLayer/isPAGFile/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/is-p-a-g-file.html
+$dokka.location:org.libpag/PAGLayer/layerName/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/layer-name.html
+$dokka.location:org.libpag/PAGLayer/layerType/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/layer-type.html
+$dokka.location:org.libpag/PAGLayer/localTimeToGlobal/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/local-time-to-global.html
+$dokka.location:org.libpag/PAGLayer/localTimeToGlobal/#kotlin.Long/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-layer/local-time-to-global.html
+$dokka.location:org.libpag/PAGLayer/matrix/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/matrix.html
+$dokka.location:org.libpag/PAGLayer/nextFrame/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/next-frame.html
+$dokka.location:org.libpag/PAGLayer/parent/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/parent.html
+$dokka.location:org.libpag/PAGLayer/preFrame/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/pre-frame.html
+$dokka.location:org.libpag/PAGLayer/progress/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-layer/progress.html
+$dokka.location:org.libpag/PAGLayer/resetMatrix/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/reset-matrix.html
+$dokka.location:org.libpag/PAGLayer/setAlpha/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/set-alpha.html
+$dokka.location:org.libpag/PAGLayer/setCurrentTime/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/set-current-time.html
+$dokka.location:org.libpag/PAGLayer/setExcludedFromTimeline/#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/set-excluded-from-timeline.html
+$dokka.location:org.libpag/PAGLayer/setMatrix/#org.libpag.Matrix/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/set-matrix.html
+$dokka.location:org.libpag/PAGLayer/setProgress/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/set-progress.html
+$dokka.location:org.libpag/PAGLayer/setStartTime/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/set-start-time.html
+$dokka.location:org.libpag/PAGLayer/setVisible/#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/set-visible.html
+$dokka.location:org.libpag/PAGLayer/startTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/start-time.html
+$dokka.location:org.libpag/PAGLayer/totalMatrix/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-layer/total-matrix.html
+$dokka.location:org.libpag/PAGLayer/trackMatteLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/track-matte-layer.html
+$dokka.location:org.libpag/PAGLayer/uniqueID/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/unique-i-d.html
+$dokka.location:org.libpag/PAGLayer/visible/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-layer/visible.html
+$dokka.location:org.libpag/PAGPlayer.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/-companion/index.html
+$dokka.location:org.libpag/PAGPlayer.Companion/create/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/-companion/create.html
+$dokka.location:org.libpag/PAGPlayer///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/index.html
+$dokka.location:org.libpag/PAGPlayer/PAGPlayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/-p-a-g-player.html
+$dokka.location:org.libpag/PAGPlayer/autoClear/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/auto-clear.html
+$dokka.location:org.libpag/PAGPlayer/cacheEnabled/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/cache-enabled.html
+$dokka.location:org.libpag/PAGPlayer/cacheScale/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/cache-scale.html
+$dokka.location:org.libpag/PAGPlayer/close/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/close.html
+$dokka.location:org.libpag/PAGPlayer/composition/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/composition.html
+$dokka.location:org.libpag/PAGPlayer/currentFrame/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/current-frame.html
+$dokka.location:org.libpag/PAGPlayer/destroy/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/destroy.html
+$dokka.location:org.libpag/PAGPlayer/duration/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/duration.html
+$dokka.location:org.libpag/PAGPlayer/flush/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/flush.html
+$dokka.location:org.libpag/PAGPlayer/flushAndFenceSync/#kotlin.LongArray/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/flush-and-fence-sync.html
+$dokka.location:org.libpag/PAGPlayer/getBounds/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/get-bounds.html
+$dokka.location:org.libpag/PAGPlayer/getComposition/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/get-composition.html
+$dokka.location:org.libpag/PAGPlayer/getProgress/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/get-progress.html
+$dokka.location:org.libpag/PAGPlayer/getSurface/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/get-surface.html
+$dokka.location:org.libpag/PAGPlayer/graphicsMemory/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/graphics-memory.html
+$dokka.location:org.libpag/PAGPlayer/hitTestPoint/#org.libpag.PAGLayer#kotlin.Double#kotlin.Double#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/hit-test-point.html
+$dokka.location:org.libpag/PAGPlayer/hitTestPoint/#org.libpag.PAGLayer#kotlin.Float#kotlin.Float#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/hit-test-point.html
+$dokka.location:org.libpag/PAGPlayer/imageDecodingTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/image-decoding-time.html
+$dokka.location:org.libpag/PAGPlayer/matrix/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/matrix.html
+$dokka.location:org.libpag/PAGPlayer/maxFrameRate/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/max-frame-rate.html
+$dokka.location:org.libpag/PAGPlayer/nextFrame/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/next-frame.html
+$dokka.location:org.libpag/PAGPlayer/preFrame/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/pre-frame.html
+$dokka.location:org.libpag/PAGPlayer/prepare/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/prepare.html
+$dokka.location:org.libpag/PAGPlayer/presentingTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/presenting-time.html
+$dokka.location:org.libpag/PAGPlayer/progress/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/progress.html
+$dokka.location:org.libpag/PAGPlayer/renderingTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/rendering-time.html
+$dokka.location:org.libpag/PAGPlayer/scaleMode/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/scale-mode.html
+$dokka.location:org.libpag/PAGPlayer/setAutoClear/#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-auto-clear.html
+$dokka.location:org.libpag/PAGPlayer/setCacheEnabled/#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-cache-enabled.html
+$dokka.location:org.libpag/PAGPlayer/setCacheScale/#kotlin.Float/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-cache-scale.html
+$dokka.location:org.libpag/PAGPlayer/setComposition/#org.libpag.PAGComposition?/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-composition.html
+$dokka.location:org.libpag/PAGPlayer/setMatrix/#org.libpag.Matrix/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-matrix.html
+$dokka.location:org.libpag/PAGPlayer/setMaxFrameRate/#kotlin.Float/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-max-frame-rate.html
+$dokka.location:org.libpag/PAGPlayer/setProgress/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-progress.html
+$dokka.location:org.libpag/PAGPlayer/setScaleMode/#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-scale-mode.html
+$dokka.location:org.libpag/PAGPlayer/setSurface/#org.libpag.PAGSurface?/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-surface.html
+$dokka.location:org.libpag/PAGPlayer/setVideoEnabled/#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/set-video-enabled.html
+$dokka.location:org.libpag/PAGPlayer/surface/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/surface.html
+$dokka.location:org.libpag/PAGPlayer/useDiskCache/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/use-disk-cache.html
+$dokka.location:org.libpag/PAGPlayer/videoEnabled/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-player/video-enabled.html
+$dokka.location:org.libpag/PAGPlayer/waitSync/#kotlin.Long/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-player/wait-sync.html
+$dokka.location:org.libpag/PAGSolidLayer.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-solid-layer/-companion/index.html
+$dokka.location:org.libpag/PAGSolidLayer.Companion/make/#kotlin.Double#kotlin.Int#kotlin.Int#org.libpag.Color#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-solid-layer/-companion/make.html
+$dokka.location:org.libpag/PAGSolidLayer.Companion/make/#kotlin.Long#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-solid-layer/-companion/make.html
+$dokka.location:org.libpag/PAGSolidLayer///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-solid-layer/index.html
+$dokka.location:org.libpag/PAGSolidLayer/PAGSolidLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-solid-layer/-p-a-g-solid-layer.html
+$dokka.location:org.libpag/PAGSolidLayer/setSolidColor/#org.libpag.Color/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-solid-layer/set-solid-color.html
+$dokka.location:org.libpag/PAGSolidLayer/solidColor/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-solid-layer/solid-color.html
+$dokka.location:org.libpag/PAGSurface.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/-companion/index.html
+$dokka.location:org.libpag/PAGSurface.Companion/fromCanvas/#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/-companion/from-canvas.html
+$dokka.location:org.libpag/PAGSurface.Companion/fromRenderTarget/#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/-companion/from-render-target.html
+$dokka.location:org.libpag/PAGSurface.Companion/fromTexture/#kotlin.Int#kotlin.Int#kotlin.Int#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/-companion/from-texture.html
+$dokka.location:org.libpag/PAGSurface.Companion/makeOffscreen/#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-surface/-companion/make-offscreen.html
+$dokka.location:org.libpag/PAGSurface///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/index.html
+$dokka.location:org.libpag/PAGSurface/PAGSurface/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/-p-a-g-surface.html
+$dokka.location:org.libpag/PAGSurface/clearAll/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/clear-all.html
+$dokka.location:org.libpag/PAGSurface/close/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-surface/close.html
+$dokka.location:org.libpag/PAGSurface/destroy/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/destroy.html
+$dokka.location:org.libpag/PAGSurface/freeCache/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/free-cache.html
+$dokka.location:org.libpag/PAGSurface/height/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/height.html
+$dokka.location:org.libpag/PAGSurface/readPixels/#kotlin.Int#kotlin.Int#kotlin.Long#kotlin.ByteArray/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-surface/read-pixels.html
+$dokka.location:org.libpag/PAGSurface/readPixels/#kotlin.Int#kotlin.Int/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/read-pixels.html
+$dokka.location:org.libpag/PAGSurface/updateSize/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/update-size.html
+$dokka.location:org.libpag/PAGSurface/width/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-surface/width.html
+$dokka.location:org.libpag/PAGTextLayer.Companion///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/-companion/index.html
+$dokka.location:org.libpag/PAGTextLayer.Companion/make/#kotlin.Double#kotlin.String#kotlin.Double#kotlin.String#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/-companion/make.html
+$dokka.location:org.libpag/PAGTextLayer.Companion/make/#kotlin.Double#org.libpag.TextDocument/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/-companion/make.html
+$dokka.location:org.libpag/PAGTextLayer.Companion/make/#kotlin.Long#kotlin.String#kotlin.Float#org.libpag.PAGFont/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-text-layer/-companion/make.html
+$dokka.location:org.libpag/PAGTextLayer///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/index.html
+$dokka.location:org.libpag/PAGTextLayer/PAGTextLayer/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/-p-a-g-text-layer.html
+$dokka.location:org.libpag/PAGTextLayer/fillColor/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/fill-color.html
+$dokka.location:org.libpag/PAGTextLayer/font/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/font.html
+$dokka.location:org.libpag/PAGTextLayer/fontSize/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/font-size.html
+$dokka.location:org.libpag/PAGTextLayer/reset/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/reset.html
+$dokka.location:org.libpag/PAGTextLayer/setFillColor/#org.libpag.Color/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/set-fill-color.html
+$dokka.location:org.libpag/PAGTextLayer/setFont/#org.libpag.PAGFont/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/set-font.html
+$dokka.location:org.libpag/PAGTextLayer/setFontSize/#kotlin.Double/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/set-font-size.html
+$dokka.location:org.libpag/PAGTextLayer/setStrokeColor/#org.libpag.Color/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/set-stroke-color.html
+$dokka.location:org.libpag/PAGTextLayer/setText/#kotlin.String/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/set-text.html
+$dokka.location:org.libpag/PAGTextLayer/strokeColor/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/stroke-color.html
+$dokka.location:org.libpag/PAGTextLayer/text/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-text-layer/text.html
+$dokka.location:org.libpag/PAGVideoRange///PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-video-range/index.html
+$dokka.location:org.libpag/PAGVideoRange/PAGVideoRange/#kotlin.Long#kotlin.Long#kotlin.Long#kotlin.Boolean/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[desktop]-p-a-g-video-range/-p-a-g-video-range.html
+$dokka.location:org.libpag/PAGVideoRange/endTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-video-range/end-time.html
+$dokka.location:org.libpag/PAGVideoRange/playDuration/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-video-range/play-duration.html
+$dokka.location:org.libpag/PAGVideoRange/reversed/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-video-range/reversed.html
+$dokka.location:org.libpag/PAGVideoRange/startTime/#/PointingToDeclaration/love.yinlin.plugin.pag-kmp/org.libpag/[web]-p-a-g-video-range/start-time.html
+module:love.yinlin.compose.app
+love.yinlin.compose
+module:love.yinlin.compose.components.media
+love.yinlin.compose.ui.media
+love.yinlin.media
+module:love.yinlin.compose.components.pagination-layout
+love.yinlin.compose.ui.layout
+module:love.yinlin.compose.components.qrcode
+love.yinlin.compose.ui.widget
+module:love.yinlin.compose.components.rich-text
+love.yinlin.compose.ui.text
+module:love.yinlin.compose.components.url-image
+love.yinlin.compose.ui.floating
+love.yinlin.compose.ui.image
+love.yinlin.startup
+module:love.yinlin.compose.components.webview
+love.yinlin.compose.ui
+module:love.yinlin.compose.core
+love.yinlin.compose
+love.yinlin.compose.data
+love.yinlin.compose.data.media
+love.yinlin.compose.extension
+love.yinlin.compose.graphics
+love.yinlin.compose.window
+module:love.yinlin.compose.icons
+love.yinlin.compose.ui.icon
+module:love.yinlin.compose.platform-view
+love.yinlin.compose.ui
+module:love.yinlin.compose.plugin.animated-webp-decoder
+love.yinlin.compose.graphics
+module:love.yinlin.compose.plugin.game
+love.yinlin.compose.game
+love.yinlin.compose.game.animation
+love.yinlin.compose.game.asset
+love.yinlin.compose.game.traits
+module:love.yinlin.compose.screen
+love.yinlin.compose.screen
+module:love.yinlin.compose.startup.config
+love.yinlin.compose.config
+love.yinlin.startup
+module:love.yinlin.compose.theme
+love.yinlin.compose
+module:love.yinlin.compose.ui
+love.yinlin.compose.ui.animation
+love.yinlin.compose.ui.collection
+love.yinlin.compose.ui.container
+love.yinlin.compose.ui.floating
+love.yinlin.compose.ui.icon
+love.yinlin.compose.ui.image
+love.yinlin.compose.ui.input
+love.yinlin.compose.ui.layout
+love.yinlin.compose.ui.navigation
+love.yinlin.compose.ui.node
+love.yinlin.compose.ui.status
+love.yinlin.compose.ui.text
+love.yinlin.compose.ui.tool
+love.yinlin.compose.ui.widget
+love.yinlin.compose.ui.window
+love.yinlin.data.compose
+module:love.yinlin.core
+love.yinlin.annotation
+love.yinlin.compatible
+love.yinlin.concurrent
+love.yinlin.coroutines
+love.yinlin.data
+love.yinlin.extension
+love.yinlin.io
+love.yinlin.platform
+love.yinlin.reflect
+love.yinlin.uri
+module:love.yinlin.cs.client-engine
+love.yinlin.cs
+module:love.yinlin.cs.core
+love.yinlin.cs
+module:love.yinlin.cs.server-engine
+love.yinlin.cs
+love.yinlin.cs.service
+love.yinlin.cs.sockets
+module:love.yinlin.foundation.context
+love.yinlin.foundation
+module:love.yinlin.foundation.orientation
+love.yinlin.foundation
+module:love.yinlin.foundation.startup
+love.yinlin.foundation
+module:love.yinlin.native.win32.core
+love.yinlin.native.win32
+module:love.yinlin.platform.ffi.core
+love.yinlin.platform.ffi
+module:love.yinlin.platform.ffi.posix
+love.yinlin.platform.ffi
+module:love.yinlin.platform.ffi.win32
+love.yinlin.platform.ffi
+module:love.yinlin.platform.native-lib-loader
+love.yinlin.platform
+module:love.yinlin.platform.os.auto-update
+love.yinlin.platform
+module:love.yinlin.platform.os.single-instance
+love.yinlin.platform
+module:love.yinlin.platform.os.window
+love.yinlin.platform
+module:love.yinlin.plugin.pag-kmp
+love.yinlin.compose.ui
+org.libpag
+module:love.yinlin.startup.exception
+love.yinlin.startup
+module:love.yinlin.startup.mmkv-kmp
+com.tencent.mmkv
+love.yinlin.startup
+module:love.yinlin.startup.os
+love.yinlin.startup
+module:love.yinlin.startup.picker
+love.yinlin.startup

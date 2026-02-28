@@ -1,0 +1,1645 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Colors</title>
+<link href="../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:theme/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:theme/commonMain" data-filter=":ylcs-module:compose:theme/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.theme::love.yinlin.compose/Colors///PointingToDeclaration//2005978326">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.theme</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose</a><span class="delimiter">/</span><span class="current">Colors</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Colors</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">object </span><a href="index.html">Colors</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1561432492%2FProperties%2F2005978326" anchor-label="Amber1" id="1561432492%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber1.html"><span><span>Amber1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1561432492%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber1.html">Amber1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1592452299%2FProperties%2F2005978326" anchor-label="Amber2" id="1592452299%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber2.html"><span><span>Amber2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1592452299%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber2.html">Amber2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1623472106%2FProperties%2F2005978326" anchor-label="Amber3" id="1623472106%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber3.html"><span><span>Amber3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1623472106%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber3.html">Amber3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1654491913%2FProperties%2F2005978326" anchor-label="Amber4" id="1654491913%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber4.html"><span><span>Amber4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1654491913%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber4.html">Amber4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1685511720%2FProperties%2F2005978326" anchor-label="Amber5" id="1685511720%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber5.html"><span><span>Amber5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1685511720%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber5.html">Amber5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1716531527%2FProperties%2F2005978326" anchor-label="Amber6" id="1716531527%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber6.html"><span><span>Amber6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1716531527%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber6.html">Amber6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1747551334%2FProperties%2F2005978326" anchor-label="Amber7" id="1747551334%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber7.html"><span><span>Amber7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1747551334%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber7.html">Amber7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1778571141%2FProperties%2F2005978326" anchor-label="Amber8" id="1778571141%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-amber8.html"><span><span>Amber8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1778571141%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-amber8.html">Amber8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1116055775%2FProperties%2F2005978326" anchor-label="Black" id="-1116055775%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-black.html"><span><span>Black</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1116055775%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-black.html">Black</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-319374912%2FProperties%2F2005978326" anchor-label="Blue" id="-319374912%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue.html"><span><span>Blue</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-319374912%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue.html">Blue</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1791740151%2FProperties%2F2005978326" anchor-label="Blue1" id="-1791740151%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue1.html"><span><span>Blue1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1791740151%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue1.html">Blue1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1760720344%2FProperties%2F2005978326" anchor-label="Blue2" id="-1760720344%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue2.html"><span><span>Blue2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1760720344%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue2.html">Blue2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1729700537%2FProperties%2F2005978326" anchor-label="Blue3" id="-1729700537%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue3.html"><span><span>Blue3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1729700537%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue3.html">Blue3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1698680730%2FProperties%2F2005978326" anchor-label="Blue4" id="-1698680730%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue4.html"><span><span>Blue4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1698680730%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue4.html">Blue4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1667660923%2FProperties%2F2005978326" anchor-label="Blue5" id="-1667660923%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue5.html"><span><span>Blue5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1667660923%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue5.html">Blue5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1636641116%2FProperties%2F2005978326" anchor-label="Blue6" id="-1636641116%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue6.html"><span><span>Blue6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1636641116%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue6.html">Blue6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1605621309%2FProperties%2F2005978326" anchor-label="Blue7" id="-1605621309%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue7.html"><span><span>Blue7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1605621309%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue7.html">Blue7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1574601502%2FProperties%2F2005978326" anchor-label="Blue8" id="-1574601502%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-blue8.html"><span><span>Blue8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1574601502%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-blue8.html">Blue8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-416113897%2FProperties%2F2005978326" anchor-label="Cyan" id="-416113897%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan.html"><span><span>Cyan</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-416113897%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan.html">Cyan</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-495681390%2FProperties%2F2005978326" anchor-label="Cyan1" id="-495681390%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan1.html"><span><span>Cyan1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-495681390%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan1.html">Cyan1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-464661583%2FProperties%2F2005978326" anchor-label="Cyan2" id="-464661583%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan2.html"><span><span>Cyan2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-464661583%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan2.html">Cyan2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-433641776%2FProperties%2F2005978326" anchor-label="Cyan3" id="-433641776%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan3.html"><span><span>Cyan3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-433641776%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan3.html">Cyan3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-402621969%2FProperties%2F2005978326" anchor-label="Cyan4" id="-402621969%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan4.html"><span><span>Cyan4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-402621969%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan4.html">Cyan4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-371602162%2FProperties%2F2005978326" anchor-label="Cyan5" id="-371602162%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan5.html"><span><span>Cyan5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-371602162%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan5.html">Cyan5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-340582355%2FProperties%2F2005978326" anchor-label="Cyan6" id="-340582355%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan6.html"><span><span>Cyan6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-340582355%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan6.html">Cyan6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-309562548%2FProperties%2F2005978326" anchor-label="Cyan7" id="-309562548%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan7.html"><span><span>Cyan7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-309562548%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan7.html">Cyan7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-278542741%2FProperties%2F2005978326" anchor-label="Cyan8" id="-278542741%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-cyan8.html"><span><span>Cyan8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-278542741%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-cyan8.html">Cyan8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1170207268%2FProperties%2F2005978326" anchor-label="Dark" id="1170207268%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-dark.html"><span><span>Dark</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1170207268%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-dark.html">Dark</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-929792375%2FProperties%2F2005978326" anchor-label="Fuchsia" id="-929792375%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-fuchsia.html"><span><span>Fuchsia</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-929792375%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-fuchsia.html">Fuchsia</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-323125615%2FProperties%2F2005978326" anchor-label="Ghost" id="-323125615%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ghost.html"><span><span>Ghost</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-323125615%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-ghost.html">Ghost</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="980658130%2FProperties%2F2005978326" anchor-label="Gray1" id="980658130%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray1.html"><span><span>Gray1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="980658130%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray1.html">Gray1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1011677937%2FProperties%2F2005978326" anchor-label="Gray2" id="1011677937%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray2.html"><span><span>Gray2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1011677937%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray2.html">Gray2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1042697744%2FProperties%2F2005978326" anchor-label="Gray3" id="1042697744%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray3.html"><span><span>Gray3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1042697744%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray3.html">Gray3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1073717551%2FProperties%2F2005978326" anchor-label="Gray4" id="1073717551%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray4.html"><span><span>Gray4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1073717551%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray4.html">Gray4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1104737358%2FProperties%2F2005978326" anchor-label="Gray5" id="1104737358%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray5.html"><span><span>Gray5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1104737358%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray5.html">Gray5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1135757165%2FProperties%2F2005978326" anchor-label="Gray6" id="1135757165%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray6.html"><span><span>Gray6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1135757165%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray6.html">Gray6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1166776972%2FProperties%2F2005978326" anchor-label="Gray7" id="1166776972%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray7.html"><span><span>Gray7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1166776972%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray7.html">Gray7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1197796779%2FProperties%2F2005978326" anchor-label="Gray8" id="1197796779%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-gray8.html"><span><span>Gray8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1197796779%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-gray8.html">Gray8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-198490979%2FProperties%2F2005978326" anchor-label="Green" id="-198490979%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green.html"><span><span>Green</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-198490979%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green.html">Green</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1955661772%2FProperties%2F2005978326" anchor-label="Green1" id="1955661772%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green1.html"><span><span>Green1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1955661772%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green1.html">Green1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1986681579%2FProperties%2F2005978326" anchor-label="Green2" id="1986681579%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green2.html"><span><span>Green2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1986681579%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green2.html">Green2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2017701386%2FProperties%2F2005978326" anchor-label="Green3" id="2017701386%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green3.html"><span><span>Green3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2017701386%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green3.html">Green3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2048721193%2FProperties%2F2005978326" anchor-label="Green4" id="2048721193%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green4.html"><span><span>Green4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2048721193%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green4.html">Green4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2079741000%2FProperties%2F2005978326" anchor-label="Green5" id="2079741000%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green5.html"><span><span>Green5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2079741000%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green5.html">Green5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2110760807%2FProperties%2F2005978326" anchor-label="Green6" id="2110760807%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green6.html"><span><span>Green6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2110760807%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green6.html">Green6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2141780614%2FProperties%2F2005978326" anchor-label="Green7" id="2141780614%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green7.html"><span><span>Green7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2141780614%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green7.html">Green7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2122166875%2FProperties%2F2005978326" anchor-label="Green8" id="-2122166875%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-green8.html"><span><span>Green8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2122166875%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-green8.html">Green8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1035847907%2FProperties%2F2005978326" anchor-label="Orange1" id="-1035847907%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange1.html"><span><span>Orange1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1035847907%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange1.html">Orange1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1004828100%2FProperties%2F2005978326" anchor-label="Orange2" id="-1004828100%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange2.html"><span><span>Orange2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1004828100%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange2.html">Orange2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-973808293%2FProperties%2F2005978326" anchor-label="Orange3" id="-973808293%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange3.html"><span><span>Orange3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-973808293%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange3.html">Orange3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-942788486%2FProperties%2F2005978326" anchor-label="Orange4" id="-942788486%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange4.html"><span><span>Orange4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-942788486%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange4.html">Orange4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-911768679%2FProperties%2F2005978326" anchor-label="Orange5" id="-911768679%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange5.html"><span><span>Orange5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-911768679%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange5.html">Orange5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-880748872%2FProperties%2F2005978326" anchor-label="Orange6" id="-880748872%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange6.html"><span><span>Orange6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-880748872%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange6.html">Orange6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-849729065%2FProperties%2F2005978326" anchor-label="Orange7" id="-849729065%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange7.html"><span><span>Orange7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-849729065%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange7.html">Orange7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-818709258%2FProperties%2F2005978326" anchor-label="Orange8" id="-818709258%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-orange8.html"><span><span>Orange8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-818709258%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-orange8.html">Orange8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-454746843%2FProperties%2F2005978326" anchor-label="Pink1" id="-454746843%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink1.html"><span><span>Pink1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-454746843%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink1.html">Pink1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-423727036%2FProperties%2F2005978326" anchor-label="Pink2" id="-423727036%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink2.html"><span><span>Pink2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-423727036%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink2.html">Pink2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-392707229%2FProperties%2F2005978326" anchor-label="Pink3" id="-392707229%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink3.html"><span><span>Pink3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-392707229%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink3.html">Pink3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-361687422%2FProperties%2F2005978326" anchor-label="Pink4" id="-361687422%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink4.html"><span><span>Pink4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-361687422%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink4.html">Pink4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-330667615%2FProperties%2F2005978326" anchor-label="Pink5" id="-330667615%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink5.html"><span><span>Pink5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-330667615%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink5.html">Pink5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-299647808%2FProperties%2F2005978326" anchor-label="Pink6" id="-299647808%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink6.html"><span><span>Pink6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-299647808%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink6.html">Pink6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-268628001%2FProperties%2F2005978326" anchor-label="Pink7" id="-268628001%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink7.html"><span><span>Pink7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-268628001%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink7.html">Pink7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-237608194%2FProperties%2F2005978326" anchor-label="Pink8" id="-237608194%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-pink8.html"><span><span>Pink8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-237608194%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-pink8.html">Pink8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1688657109%2FProperties%2F2005978326" anchor-label="Purple1" id="-1688657109%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple1.html"><span><span>Purple1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1688657109%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple1.html">Purple1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1657637302%2FProperties%2F2005978326" anchor-label="Purple2" id="-1657637302%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple2.html"><span><span>Purple2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1657637302%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple2.html">Purple2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1626617495%2FProperties%2F2005978326" anchor-label="Purple3" id="-1626617495%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple3.html"><span><span>Purple3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1626617495%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple3.html">Purple3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1595597688%2FProperties%2F2005978326" anchor-label="Purple4" id="-1595597688%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple4.html"><span><span>Purple4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1595597688%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple4.html">Purple4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1564577881%2FProperties%2F2005978326" anchor-label="Purple5" id="-1564577881%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple5.html"><span><span>Purple5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1564577881%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple5.html">Purple5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1533558074%2FProperties%2F2005978326" anchor-label="Purple6" id="-1533558074%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple6.html"><span><span>Purple6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1533558074%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple6.html">Purple6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1502538267%2FProperties%2F2005978326" anchor-label="Purple7" id="-1502538267%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple7.html"><span><span>Purple7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1502538267%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple7.html">Purple7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1471518460%2FProperties%2F2005978326" anchor-label="Purple8" id="-1471518460%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-purple8.html"><span><span>Purple8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1471518460%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-purple8.html">Purple8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2057853839%2FProperties%2F2005978326" anchor-label="Red" id="2057853839%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red.html"><span><span>Red</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2057853839%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red.html">Red</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1112092902%2FProperties%2F2005978326" anchor-label="Red1" id="-1112092902%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red1.html"><span><span>Red1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1112092902%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red1.html">Red1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1081073095%2FProperties%2F2005978326" anchor-label="Red2" id="-1081073095%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red2.html"><span><span>Red2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1081073095%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red2.html">Red2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1050053288%2FProperties%2F2005978326" anchor-label="Red3" id="-1050053288%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red3.html"><span><span>Red3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1050053288%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red3.html">Red3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1019033481%2FProperties%2F2005978326" anchor-label="Red4" id="-1019033481%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red4.html"><span><span>Red4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1019033481%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red4.html">Red4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-988013674%2FProperties%2F2005978326" anchor-label="Red5" id="-988013674%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red5.html"><span><span>Red5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-988013674%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red5.html">Red5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-956993867%2FProperties%2F2005978326" anchor-label="Red6" id="-956993867%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red6.html"><span><span>Red6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-956993867%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red6.html">Red6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-925974060%2FProperties%2F2005978326" anchor-label="Red7" id="-925974060%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red7.html"><span><span>Red7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-925974060%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red7.html">Red7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-894954253%2FProperties%2F2005978326" anchor-label="Red8" id="-894954253%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-red8.html"><span><span>Red8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-894954253%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-red8.html">Red8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-30302060%2FProperties%2F2005978326" anchor-label="Steel1" id="-30302060%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel1.html"><span><span>Steel1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-30302060%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel1.html">Steel1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="717747%2FProperties%2F2005978326" anchor-label="Steel2" id="717747%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel2.html"><span><span>Steel2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="717747%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel2.html">Steel2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="31737554%2FProperties%2F2005978326" anchor-label="Steel3" id="31737554%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel3.html"><span><span>Steel3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="31737554%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel3.html">Steel3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="62757361%2FProperties%2F2005978326" anchor-label="Steel4" id="62757361%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel4.html"><span><span>Steel4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="62757361%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel4.html">Steel4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="93777168%2FProperties%2F2005978326" anchor-label="Steel5" id="93777168%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel5.html"><span><span>Steel5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="93777168%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel5.html">Steel5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="124796975%2FProperties%2F2005978326" anchor-label="Steel6" id="124796975%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel6.html"><span><span>Steel6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="124796975%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel6.html">Steel6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="155816782%2FProperties%2F2005978326" anchor-label="Steel7" id="155816782%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel7.html"><span><span>Steel7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="155816782%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel7.html">Steel7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="186836589%2FProperties%2F2005978326" anchor-label="Steel8" id="186836589%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-steel8.html"><span><span>Steel8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="186836589%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-steel8.html">Steel8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="658763502%2FProperties%2F2005978326" anchor-label="Transparent" id="658763502%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-transparent.html"><span><span>Transparent</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="658763502%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-transparent.html">Transparent</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2098314409%2FProperties%2F2005978326" anchor-label="Unspecified" id="2098314409%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-unspecified.html"><span><span>Unspecified</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2098314409%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-unspecified.html">Unspecified</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1882668599%2FProperties%2F2005978326" anchor-label="White" id="1882668599%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-white.html"><span><span>White</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1882668599%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-white.html">White</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1439605670%2FProperties%2F2005978326" anchor-label="Yellow" id="1439605670%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow.html"><span><span>Yellow</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1439605670%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow.html">Yellow</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1197050339%2FProperties%2F2005978326" anchor-label="Yellow1" id="1197050339%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow1.html"><span><span>Yellow1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1197050339%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow1.html">Yellow1</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1228070146%2FProperties%2F2005978326" anchor-label="Yellow2" id="1228070146%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow2.html"><span><span>Yellow2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1228070146%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow2.html">Yellow2</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1259089953%2FProperties%2F2005978326" anchor-label="Yellow3" id="1259089953%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow3.html"><span><span>Yellow3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1259089953%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow3.html">Yellow3</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1290109760%2FProperties%2F2005978326" anchor-label="Yellow4" id="1290109760%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow4.html"><span><span>Yellow4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1290109760%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow4.html">Yellow4</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1321129567%2FProperties%2F2005978326" anchor-label="Yellow5" id="1321129567%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow5.html"><span><span>Yellow5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1321129567%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow5.html">Yellow5</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1352149374%2FProperties%2F2005978326" anchor-label="Yellow6" id="1352149374%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow6.html"><span><span>Yellow6</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1352149374%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow6.html">Yellow6</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1383169181%2FProperties%2F2005978326" anchor-label="Yellow7" id="1383169181%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow7.html"><span><span>Yellow7</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1383169181%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow7.html">Yellow7</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1414188988%2FProperties%2F2005978326" anchor-label="Yellow8" id="1414188988%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-yellow8.html"><span><span>Yellow8</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1414188988%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-yellow8.html">Yellow8</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1706681909%2FFunctions%2F2005978326" anchor-label="invoke" id="1706681909%2FFunctions%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="invoke.html"><span><span>invoke</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1706681909%2FFunctions%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-u-long/index.html">ULong</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">red<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">green<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">blue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">alpha<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">1.0f</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">red<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">green<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">blue<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">alpha<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">255</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

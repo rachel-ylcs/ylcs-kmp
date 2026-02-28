@@ -1,0 +1,598 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>love.yinlin.compose</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:theme/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:theme/commonMain" data-filter=":ylcs-module:compose:theme/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="love.yinlin.compose.theme::love.yinlin.compose////PointingToDeclaration//2005978326">
+  <div class="breadcrumbs"><a href="../index.html">love.yinlin.compose.theme</a><span class="delimiter">/</span><span class="current">love.yinlin.compose</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="1643263504%2FClasslikes%2F2005978326" anchor-label="AnimationTheme" id="1643263504%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-animation-theme/index.html"><span>Animation</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1643263504%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-animation-theme/index.html">AnimationTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>duration<span class="token operator">: </span><a href="-duration-theme/index.html">DurationTheme</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>enter<span class="token operator">: </span><span class="token punctuation">(</span>duration<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="androidx.compose.animation/EnterTransition///PointingToDeclaration/">EnterTransition</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>exit<span class="token operator">: </span><span class="token punctuation">(</span>duration<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="androidx.compose.animation/ExitTransition///PointingToDeclaration/">ExitTransition</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="712552816%2FClasslikes%2F2005978326" anchor-label="BorderTheme" id="712552816%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-border-theme/index.html"><span>Border</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="712552816%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-border-theme/index.html">BorderTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>v1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v5<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v6<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v7<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v8<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v9<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v10<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1439202395%2FClasslikes%2F2005978326" anchor-label="Colors" id="-1439202395%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-colors/index.html"><span><span>Colors</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1439202395%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">object </span><a href="-colors/index.html">Colors</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="979797147%2FClasslikes%2F2005978326" anchor-label="ColorSystem" id="979797147%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-color-system/index.html"><span>Color</span><wbr><span><span>System</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="979797147%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-color-system/index.html">ColorSystem</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>light<span class="token operator">: </span><a href="-color-theme/index.html">ColorTheme</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dark<span class="token operator">: </span><a href="-color-theme/index.html">ColorTheme</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="344034223%2FClasslikes%2F2005978326" anchor-label="ColorTheme" id="344034223%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-color-theme/index.html"><span>Color</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="344034223%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-color-theme/index.html">ColorTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>primary<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>secondary<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>tertiary<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>primaryContainer<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>secondaryContainer<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>tertiaryContainer<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onContainer<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onContainerVariant<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>background<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>backgroundVariant<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onBackground<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onBackgroundVariant<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>surface<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSurface<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onSurfaceVariant<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>error<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onError<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>warning<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>onWarning<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>outline<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>disabledContent<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>disabledContainer<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>scrim<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="989319551%2FClasslikes%2F2005978326" anchor-label="Device" id="989319551%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-device/index.html"><span><span>Device</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="989319551%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/Serializable///PointingToDeclaration/"><span class="token annotation builtin">Serializable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-device/index.html">Device</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>size<span class="token operator">: </span><a href="-device/-size/index.html">Device.Size</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>type<span class="token operator">: </span><a href="-device/-type/index.html">Device.Type</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1889129000%2FClasslikes%2F2005978326" anchor-label="DurationTheme" id="-1889129000%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-duration-theme/index.html"><span>Duration</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1889129000%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-duration-theme/index.html">DurationTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>v1<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v2<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v3<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v4<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v5<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v6<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v7<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v8<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v9<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v10<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1078333494%2FClasslikes%2F2005978326" anchor-label="GeometryTheme" id="1078333494%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-geometry-theme/index.html"><span>Geometry</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1078333494%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-geometry-theme/index.html">GeometryTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>size<span class="token operator">: </span><a href="-size-theme/index.html">SizeTheme</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>padding<span class="token operator">: </span><a href="-padding-theme/index.html">PaddingTheme</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>border<span class="token operator">: </span><a href="-border-theme/index.html">BorderTheme</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>shadow<span class="token operator">: </span><a href="-shadow-theme/index.html">ShadowTheme</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1159052801%2FClasslikes%2F2005978326" anchor-label="ImmersivePadding" id="-1159052801%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-immersive-padding/index.html"><span>Immersive</span><wbr><span><span>Padding</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1159052801%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-immersive-padding/index.html">ImmersivePadding</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>start<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>end<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>top<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>bottom<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="androidx.compose.foundation.layout/PaddingValues///PointingToDeclaration/">PaddingValues</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="874154717%2FClasslikes%2F2005978326" anchor-label="PaddingTheme" id="874154717%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-padding-theme/index.html"><span>Padding</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="874154717%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-padding-theme/index.html">PaddingTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>h<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>g<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="68608741%2FClasslikes%2F2005978326" anchor-label="Ripple" id="68608741%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ripple/index.html"><span><span>Ripple</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="68608741%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">object </span><a href="-ripple/index.html">Ripple</a> : <span data-unresolved-link="androidx.compose.foundation/IndicationNodeFactory///PointingToDeclaration/">IndicationNodeFactory</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1106209948%2FClasslikes%2F2005978326" anchor-label="ShadowTheme" id="-1106209948%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-shadow-theme/index.html"><span>Shadow</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1106209948%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-shadow-theme/index.html">ShadowTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>v1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v5<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v6<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v7<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v8<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v9<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v10<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-431477907%2FClasslikes%2F2005978326" anchor-label="ShapeTheme" id="-431477907%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-shape-theme/index.html"><span>Shape</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-431477907%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-shape-theme/index.html">ShapeTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>v1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v5<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v6<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v7<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v8<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v9<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v10<span class="token operator">: </span><span data-unresolved-link="androidx.compose.foundation.shape/RoundedCornerShape///PointingToDeclaration/">RoundedCornerShape</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1716571771%2FClasslikes%2F2005978326" anchor-label="SizeTheme" id="-1716571771%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-size-theme/index.html"><span>Size</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1716571771%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-size-theme/index.html">SizeTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>box1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>box2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>box3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>box4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>icon<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image5<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image6<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image7<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image8<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image9<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>image10<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input5<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input6<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input7<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input8<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input9<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>input10<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell5<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell6<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell7<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell8<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell9<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>cell10<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>sheet<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.unit/Dp///PointingToDeclaration/">Dp</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1921340636%2FClasslikes%2F2005978326" anchor-label="Theme" id="-1921340636%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-theme/index.html"><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1921340636%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">object </span><a href="-theme/index.html">Theme</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-391955135%2FClasslikes%2F2005978326" anchor-label="ThemeMode" id="-391955135%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-theme-mode/index.html"><span>Theme</span><wbr><span><span>Mode</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-391955135%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="kotlinx.serialization/Serializable///PointingToDeclaration/"><span class="token annotation builtin">Serializable</span></span></div></div><span class="token keyword">enum </span><a href="-theme-mode/index.html">ThemeMode</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-theme-mode/index.html">ThemeMode</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="847072342%2FClasslikes%2F2005978326" anchor-label="ToolingTheme" id="847072342%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tooling-theme/index.html"><span>Tooling</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="847072342%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-tooling-theme/index.html">ToolingTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>enableBallonTip<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1341448909%2FClasslikes%2F2005978326" anchor-label="TypographyTheme" id="-1341448909%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-typography-theme/index.html"><span>Typography</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1341448909%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-typography-theme/index.html">TypographyTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>v1<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v2<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v3<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v4<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v5<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v6<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v7<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v8<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v9<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>v10<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2144706243%2FClasslikes%2F2005978326" anchor-label="ValueTheme" id="-2144706243%2FClasslikes%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-value-theme/index.html"><span>Value</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2144706243%2FClasslikes%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">data </span><span class="token keyword">class </span><a href="-value-theme/index.html">ValueTheme</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>lightThemeText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>darkThemeText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>systemThemeText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>statefulBoxDefaultEmptyText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>statefulBoxDefaultNetworkErrorText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>statefulBoxDefaultLoadingText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogYesText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogNoText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogOkText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogCancelText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogInfoTitle<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogConfirmTitle<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogInputTitle<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>dialogLoadingText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>noContent404Text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>backText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>windowMinimizeText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>windowMaximizeText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>windowMaximizeBackText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>windowCloseText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>windowAlwaysTopEnableText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>windowAlwaysTopDisableText<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1135512609%2FProperties%2F2005978326" anchor-label="bold" id="1135512609%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bold.html"><span><span>bold</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1135512609%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">.</span><a href="bold.html">bold</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="213927634%2FProperties%2F2005978326" anchor-label="LocalColor" id="213927634%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-local-color.html"><span>Local</span><wbr><span><span>Color</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="213927634%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-local-color.html">LocalColor</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.runtime/ProvidableCompositionLocal///PointingToDeclaration/">ProvidableCompositionLocal</span><span class="token operator">&lt;</span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1466994109%2FProperties%2F2005978326" anchor-label="LocalColorVariant" id="-1466994109%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-local-color-variant.html"><span>Local</span><wbr><span>Color</span><wbr><span><span>Variant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1466994109%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-local-color-variant.html">LocalColorVariant</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.runtime/ProvidableCompositionLocal///PointingToDeclaration/">ProvidableCompositionLocal</span><span class="token operator">&lt;</span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2036598799%2FProperties%2F2005978326" anchor-label="LocalDevice" id="2036598799%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-local-device.html"><span>Local</span><wbr><span><span>Device</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2036598799%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-local-device.html">LocalDevice</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.runtime/ProvidableCompositionLocal///PointingToDeclaration/">ProvidableCompositionLocal</span><span class="token operator">&lt;</span><a href="-device/index.html">Device</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-300285041%2FProperties%2F2005978326" anchor-label="LocalImmersivePadding" id="-300285041%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-local-immersive-padding.html"><span>Local</span><wbr><span>Immersive</span><wbr><span><span>Padding</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-300285041%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-local-immersive-padding.html">LocalImmersivePadding</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.runtime/ProvidableCompositionLocal///PointingToDeclaration/">ProvidableCompositionLocal</span><span class="token operator">&lt;</span><a href="-immersive-padding/index.html">ImmersivePadding</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1555786820%2FProperties%2F2005978326" anchor-label="LocalStyle" id="1555786820%2FProperties%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-local-style.html"><span>Local</span><wbr><span><span>Style</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1555786820%2FProperties%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="-local-style.html">LocalStyle</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.runtime/ProvidableCompositionLocal///PointingToDeclaration/">ProvidableCompositionLocal</span><span class="token operator">&lt;</span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1091576927%2FFunctions%2F2005978326" anchor-label="blend" id="1091576927%2FFunctions%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="blend.html"><span><span>blend</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1091576927%2FFunctions%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token punctuation">.</span><a href="blend.html"><span class="token function">blend</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2120938174%2FFunctions%2F2005978326" anchor-label="mainFont" id="-2120938174%2FFunctions%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="main-font.html"><span>main</span><wbr><span><span>Font</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2120938174%2FFunctions%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="main-font.html"><span class="token function">mainFont</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontFamily///PointingToDeclaration/">FontFamily</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2068460200%2FFunctions%2F2005978326" anchor-label="rememberFontFamily" id="2068460200%2FFunctions%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remember-font-family.html"><span>remember</span><wbr><span>Font</span><wbr><span><span>Family</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2068460200%2FFunctions%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="remember-font-family.html"><span class="token function">rememberFontFamily</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">resource<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.compose.resources/FontResource///PointingToDeclaration/">FontResource</span><span class="token punctuation">, </span></span><span class="parameter ">weight<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontWeight///PointingToDeclaration/">FontWeight</span><span class="token operator"> = </span>FontWeight.Normal<span class="token punctuation">, </span></span><span class="parameter ">style<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontStyle///PointingToDeclaration/">FontStyle</span><span class="token operator"> = </span>FontStyle.Normal<span class="token punctuation">, </span></span><span class="parameter ">variationSettings<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontVariation.Settings///PointingToDeclaration/">FontVariation.Settings</span><span class="token operator"> = </span>FontVariation.Settings(weight, style)</span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text.font/FontFamily///PointingToDeclaration/">FontFamily</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-369037369%2FFunctions%2F2005978326" anchor-label="rememberImmersivePadding" id="-369037369%2FFunctions%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="remember-immersive-padding.html"><span>remember</span><wbr><span>Immersive</span><wbr><span><span>Padding</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-369037369%2FFunctions%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="remember-immersive-padding.html"><span class="token function">rememberImmersivePadding</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="-immersive-padding/index.html">ImmersivePadding</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="541081970%2FFunctions%2F2005978326" anchor-label="scaleSize" id="541081970%2FFunctions%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="scale-size.html"><span>scale</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="541081970%2FFunctions%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><span class="token keyword">fun </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span><span class="token punctuation">.</span><a href="scale-size.html"><span class="token function">scaleSize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ratio<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">isBold<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.text/TextStyle///PointingToDeclaration/">TextStyle</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1428380600%2FFunctions%2F2005978326" anchor-label="Theme" id="1428380600%2FFunctions%2F2005978326" data-filterable-set=":ylcs-module:compose:theme/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:theme/commonMain" data-filterable-set=":ylcs-module:compose:theme/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-theme.html"><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1428380600%2FFunctions%2F2005978326"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:theme/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">fun </span><a href="-theme.html"><span class="token function">Theme</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">themeMode<span class="token operator">: </span><a href="-theme-mode/index.html">ThemeMode</a><span class="token operator"> = </span>ThemeMode.SYSTEM<span class="token punctuation">, </span></span><span class="parameter ">fontScale<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token operator"> = </span><span class="token constant">1.0f</span><span class="token punctuation">, </span></span><span class="parameter ">mainFontResource<span class="token operator">: </span><span data-unresolved-link="org.jetbrains.compose.resources/FontResource///PointingToDeclaration/">FontResource</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">background<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.graphics/Color///PointingToDeclaration/">Color</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">colorSystem<span class="token operator">: </span><a href="-color-system/index.html">ColorSystem</a><span class="token operator"> = </span>ColorSystem.Default<span class="token punctuation">, </span></span><span class="parameter ">typographyTheme<span class="token operator">: </span><a href="-typography-theme/index.html">TypographyTheme</a><span class="token operator"> = </span>TypographyTheme.Default<span class="token punctuation">, </span></span><span class="parameter ">shapeTheme<span class="token operator">: </span><a href="-shape-theme/index.html">ShapeTheme</a><span class="token operator"> = </span>ShapeTheme.Default<span class="token punctuation">, </span></span><span class="parameter ">geometryTheme<span class="token operator">: </span><a href="-geometry-theme/index.html">GeometryTheme</a><span class="token operator"> = </span>GeometryTheme.Default<span class="token punctuation">, </span></span><span class="parameter ">animationTheme<span class="token operator">: </span><a href="-animation-theme/index.html">AnimationTheme</a><span class="token operator"> = </span>AnimationTheme.Default<span class="token punctuation">, </span></span><span class="parameter ">toolingTheme<span class="token operator">: </span><a href="-tooling-theme/index.html">ToolingTheme</a><span class="token operator"> = </span>ToolingTheme.Default<span class="token punctuation">, </span></span><span class="parameter ">valueTheme<span class="token operator">: </span><a href="-value-theme/index.html">ValueTheme</a><span class="token operator"> = </span>ValueTheme.Default<span class="token punctuation">, </span></span><span class="parameter ">modifier<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui/Modifier///PointingToDeclaration/">Modifier</span><span class="token operator"> = </span>Modifier.fillMaxSize()<span class="token punctuation">, </span></span><span class="parameter ">content<span class="token operator">: </span><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span>&nbsp;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

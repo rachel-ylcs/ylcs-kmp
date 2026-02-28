@@ -1,0 +1,1040 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>love.yinlin.cs</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.0
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:cs:core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:cs:core/commonMain" data-filter=":ylcs-module:cs:core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="love.yinlin.cs.core::love.yinlin.cs////PointingToDeclaration//-1765759586">
+  <div class="breadcrumbs"><a href="../index.html">love.yinlin.cs.core</a><span class="delimiter">/</span><span class="current">love.yinlin.cs</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-4438729%2FClasslikes%2F-1765759586" anchor-label="API" id="-4438729%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i/index.html"><span><span>API</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-4438729%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-353413705%2FClasslikes%2F-1765759586" anchor-label="API00" id="-353413705%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i00/index.html"><span><span>API00</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-353413705%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i00/index.html">API00</a><span class="token operator">&lt;</span><a href="-a-p-i00/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i00/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-322393898%2FClasslikes%2F-1765759586" anchor-label="API01" id="-322393898%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i01/index.html"><span><span>API01</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-322393898%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i01/index.html">API01</a><span class="token operator">&lt;</span><a href="-a-p-i01/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i01/index.html">O1</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i01/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-291374091%2FClasslikes%2F-1765759586" anchor-label="API02" id="-291374091%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i02/index.html"><span><span>API02</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-291374091%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i02/index.html">API02</a><span class="token operator">&lt;</span><a href="-a-p-i02/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i02/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i02/index.html">O2</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i02/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-260354284%2FClasslikes%2F-1765759586" anchor-label="API03" id="-260354284%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i03/index.html"><span><span>API03</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-260354284%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i03/index.html">API03</a><span class="token operator">&lt;</span><a href="-a-p-i03/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i03/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i03/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i03/index.html">O3</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i03/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-229334477%2FClasslikes%2F-1765759586" anchor-label="API04" id="-229334477%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i04/index.html"><span><span>API04</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-229334477%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i04/index.html">API04</a><span class="token operator">&lt;</span><a href="-a-p-i04/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i04/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i04/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i04/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i04/index.html">O4</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i04/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-198314670%2FClasslikes%2F-1765759586" anchor-label="API05" id="-198314670%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i05/index.html"><span><span>API05</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-198314670%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i05/index.html">API05</a><span class="token operator">&lt;</span><a href="-a-p-i05/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i05/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i05/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i05/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i05/index.html">O4</a><span class="token punctuation">, </span><a href="-a-p-i05/index.html">O5</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i05/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="608200312%2FClasslikes%2F-1765759586" anchor-label="API10" id="608200312%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i10/index.html"><span><span>API10</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="608200312%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i10/index.html">API10</a><span class="token operator">&lt;</span><a href="-a-p-i10/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i10/index.html">I1</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i10/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="639220119%2FClasslikes%2F-1765759586" anchor-label="API11" id="639220119%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i11/index.html"><span><span>API11</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="639220119%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i11/index.html">API11</a><span class="token operator">&lt;</span><a href="-a-p-i11/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i11/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i11/index.html">O1</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i11/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="670239926%2FClasslikes%2F-1765759586" anchor-label="API12" id="670239926%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i12/index.html"><span><span>API12</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="670239926%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i12/index.html">API12</a><span class="token operator">&lt;</span><a href="-a-p-i12/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i12/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i12/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i12/index.html">O2</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i12/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="701259733%2FClasslikes%2F-1765759586" anchor-label="API13" id="701259733%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i13/index.html"><span><span>API13</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="701259733%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i13/index.html">API13</a><span class="token operator">&lt;</span><a href="-a-p-i13/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i13/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i13/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i13/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i13/index.html">O3</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i13/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="732279540%2FClasslikes%2F-1765759586" anchor-label="API14" id="732279540%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i14/index.html"><span><span>API14</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="732279540%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i14/index.html">API14</a><span class="token operator">&lt;</span><a href="-a-p-i14/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i14/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i14/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i14/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i14/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i14/index.html">O4</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i14/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="763299347%2FClasslikes%2F-1765759586" anchor-label="API15" id="763299347%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i15/index.html"><span><span>API15</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="763299347%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i15/index.html">API15</a><span class="token operator">&lt;</span><a href="-a-p-i15/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i15/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i15/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i15/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i15/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i15/index.html">O4</a><span class="token punctuation">, </span><a href="-a-p-i15/index.html">O5</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i15/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1569814329%2FClasslikes%2F-1765759586" anchor-label="API20" id="1569814329%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i20/index.html"><span><span>API20</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1569814329%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i20/index.html">API20</a><span class="token operator">&lt;</span><a href="-a-p-i20/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i20/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i20/index.html">I2</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i20/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1600834136%2FClasslikes%2F-1765759586" anchor-label="API21" id="1600834136%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i21/index.html"><span><span>API21</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1600834136%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i21/index.html">API21</a><span class="token operator">&lt;</span><a href="-a-p-i21/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i21/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i21/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i21/index.html">O1</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i21/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1631853943%2FClasslikes%2F-1765759586" anchor-label="API22" id="1631853943%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i22/index.html"><span><span>API22</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1631853943%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i22/index.html">API22</a><span class="token operator">&lt;</span><a href="-a-p-i22/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i22/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i22/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i22/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i22/index.html">O2</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i22/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1662873750%2FClasslikes%2F-1765759586" anchor-label="API23" id="1662873750%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i23/index.html"><span><span>API23</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1662873750%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i23/index.html">API23</a><span class="token operator">&lt;</span><a href="-a-p-i23/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i23/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i23/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i23/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i23/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i23/index.html">O3</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i23/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1693893557%2FClasslikes%2F-1765759586" anchor-label="API24" id="1693893557%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i24/index.html"><span><span>API24</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1693893557%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i24/index.html">API24</a><span class="token operator">&lt;</span><a href="-a-p-i24/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i24/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i24/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i24/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i24/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i24/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i24/index.html">O4</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i24/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1724913364%2FClasslikes%2F-1765759586" anchor-label="API25" id="1724913364%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i25/index.html"><span><span>API25</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1724913364%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i25/index.html">API25</a><span class="token operator">&lt;</span><a href="-a-p-i25/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i25/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i25/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i25/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i25/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i25/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i25/index.html">O4</a><span class="token punctuation">, </span><a href="-a-p-i25/index.html">O5</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i25/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1763538950%2FClasslikes%2F-1765759586" anchor-label="API30" id="-1763538950%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i30/index.html"><span><span>API30</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1763538950%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i30/index.html">API30</a><span class="token operator">&lt;</span><a href="-a-p-i30/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i30/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i30/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i30/index.html">I3</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i30/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1732519143%2FClasslikes%2F-1765759586" anchor-label="API31" id="-1732519143%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i31/index.html"><span><span>API31</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1732519143%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i31/index.html">API31</a><span class="token operator">&lt;</span><a href="-a-p-i31/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i31/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i31/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i31/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i31/index.html">O1</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i31/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1701499336%2FClasslikes%2F-1765759586" anchor-label="API32" id="-1701499336%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i32/index.html"><span><span>API32</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1701499336%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i32/index.html">API32</a><span class="token operator">&lt;</span><a href="-a-p-i32/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i32/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i32/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i32/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i32/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i32/index.html">O2</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i32/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1670479529%2FClasslikes%2F-1765759586" anchor-label="API33" id="-1670479529%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i33/index.html"><span><span>API33</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1670479529%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i33/index.html">API33</a><span class="token operator">&lt;</span><a href="-a-p-i33/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i33/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i33/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i33/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i33/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i33/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i33/index.html">O3</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i33/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1639459722%2FClasslikes%2F-1765759586" anchor-label="API34" id="-1639459722%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i34/index.html"><span><span>API34</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1639459722%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i34/index.html">API34</a><span class="token operator">&lt;</span><a href="-a-p-i34/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i34/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i34/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i34/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i34/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i34/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i34/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i34/index.html">O4</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i34/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1608439915%2FClasslikes%2F-1765759586" anchor-label="API35" id="-1608439915%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i35/index.html"><span><span>API35</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1608439915%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i35/index.html">API35</a><span class="token operator">&lt;</span><a href="-a-p-i35/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">O4</a><span class="token punctuation">, </span><a href="-a-p-i35/index.html">O5</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i35/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-801924933%2FClasslikes%2F-1765759586" anchor-label="API40" id="-801924933%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i40/index.html"><span><span>API40</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-801924933%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i40/index.html">API40</a><span class="token operator">&lt;</span><a href="-a-p-i40/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i40/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i40/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i40/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i40/index.html">I4</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i40/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-770905126%2FClasslikes%2F-1765759586" anchor-label="API41" id="-770905126%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i41/index.html"><span><span>API41</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-770905126%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i41/index.html">API41</a><span class="token operator">&lt;</span><a href="-a-p-i41/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i41/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i41/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i41/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i41/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i41/index.html">O1</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i41/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-739885319%2FClasslikes%2F-1765759586" anchor-label="API42" id="-739885319%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i42/index.html"><span><span>API42</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-739885319%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i42/index.html">API42</a><span class="token operator">&lt;</span><a href="-a-p-i42/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i42/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i42/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i42/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i42/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i42/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i42/index.html">O2</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i42/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-708865512%2FClasslikes%2F-1765759586" anchor-label="API43" id="-708865512%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i43/index.html"><span><span>API43</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-708865512%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i43/index.html">API43</a><span class="token operator">&lt;</span><a href="-a-p-i43/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i43/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i43/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i43/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i43/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i43/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i43/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i43/index.html">O3</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i43/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-677845705%2FClasslikes%2F-1765759586" anchor-label="API44" id="-677845705%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i44/index.html"><span><span>API44</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-677845705%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i44/index.html">API44</a><span class="token operator">&lt;</span><a href="-a-p-i44/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i44/index.html">O4</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i44/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-646825898%2FClasslikes%2F-1765759586" anchor-label="API45" id="-646825898%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i45/index.html"><span><span>API45</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-646825898%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i45/index.html">API45</a><span class="token operator">&lt;</span><a href="-a-p-i45/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">O4</a><span class="token punctuation">, </span><a href="-a-p-i45/index.html">O5</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i45/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="159689084%2FClasslikes%2F-1765759586" anchor-label="API50" id="159689084%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i50/index.html"><span><span>API50</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="159689084%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i50/index.html">API50</a><span class="token operator">&lt;</span><a href="-a-p-i50/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i50/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i50/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i50/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i50/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i50/index.html">I5</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i50/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="190708891%2FClasslikes%2F-1765759586" anchor-label="API51" id="190708891%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i51/index.html"><span><span>API51</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="190708891%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i51/index.html">API51</a><span class="token operator">&lt;</span><a href="-a-p-i51/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i51/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i51/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i51/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i51/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i51/index.html">I5</a><span class="token punctuation">, </span><a href="-a-p-i51/index.html">O1</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i51/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="221728698%2FClasslikes%2F-1765759586" anchor-label="API52" id="221728698%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i52/index.html"><span><span>API52</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="221728698%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i52/index.html">API52</a><span class="token operator">&lt;</span><a href="-a-p-i52/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i52/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i52/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i52/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i52/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i52/index.html">I5</a><span class="token punctuation">, </span><a href="-a-p-i52/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i52/index.html">O2</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i52/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="252748505%2FClasslikes%2F-1765759586" anchor-label="API53" id="252748505%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i53/index.html"><span><span>API53</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="252748505%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i53/index.html">API53</a><span class="token operator">&lt;</span><a href="-a-p-i53/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">I5</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i53/index.html">O3</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i53/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="283768312%2FClasslikes%2F-1765759586" anchor-label="API54" id="283768312%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i54/index.html"><span><span>API54</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="283768312%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i54/index.html">API54</a><span class="token operator">&lt;</span><a href="-a-p-i54/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">I5</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i54/index.html">O4</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i54/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="314788119%2FClasslikes%2F-1765759586" anchor-label="API55" id="314788119%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i55/index.html"><span><span>API55</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="314788119%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i55/index.html">API55</a><span class="token operator">&lt;</span><a href="-a-p-i55/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">I5</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">O4</a><span class="token punctuation">, </span><a href="-a-p-i55/index.html">O5</a><span class="token operator">&gt;</span> : <a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><a href="-a-p-i55/index.html">T</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-212144664%2FClasslikes%2F-1765759586" anchor-label="APIChain0" id="-212144664%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain0/index.html"><span><span>APIChain0</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-212144664%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain0/index.html">APIChain0</a><span class="token operator">&lt;</span><a href="-a-p-i-chain0/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-181124857%2FClasslikes%2F-1765759586" anchor-label="APIChain1" id="-181124857%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain1/index.html"><span><span>APIChain1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-181124857%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain1/index.html">APIChain1</a><span class="token operator">&lt;</span><a href="-a-p-i-chain1/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i-chain1/index.html">I1</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-150105050%2FClasslikes%2F-1765759586" anchor-label="APIChain2" id="-150105050%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain2/index.html"><span><span>APIChain2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-150105050%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain2/index.html">APIChain2</a><span class="token operator">&lt;</span><a href="-a-p-i-chain2/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i-chain2/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i-chain2/index.html">I2</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-119085243%2FClasslikes%2F-1765759586" anchor-label="APIChain3" id="-119085243%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain3/index.html"><span><span>APIChain3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-119085243%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain3/index.html">APIChain3</a><span class="token operator">&lt;</span><a href="-a-p-i-chain3/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i-chain3/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i-chain3/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i-chain3/index.html">I3</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-88065436%2FClasslikes%2F-1765759586" anchor-label="APIChain4" id="-88065436%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain4/index.html"><span><span>APIChain4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-88065436%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain4/index.html">APIChain4</a><span class="token operator">&lt;</span><a href="-a-p-i-chain4/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i-chain4/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i-chain4/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i-chain4/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i-chain4/index.html">I4</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-57045629%2FClasslikes%2F-1765759586" anchor-label="APIChain5" id="-57045629%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain5/index.html"><span><span>APIChain5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-57045629%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain5/index.html">APIChain5</a><span class="token operator">&lt;</span><a href="-a-p-i-chain5/index.html">T</a><span class="token operator"> : </span><a href="-a-p-i-type/index.html">APIType</a><span class="token punctuation">, </span><a href="-a-p-i-chain5/index.html">I1</a><span class="token punctuation">, </span><a href="-a-p-i-chain5/index.html">I2</a><span class="token punctuation">, </span><a href="-a-p-i-chain5/index.html">I3</a><span class="token punctuation">, </span><a href="-a-p-i-chain5/index.html">I4</a><span class="token punctuation">, </span><a href="-a-p-i-chain5/index.html">I5</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1184054918%2FClasslikes%2F-1765759586" anchor-label="APIChainForm" id="1184054918%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain-form/index.html"><span>APIChain</span><wbr><span><span>Form</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1184054918%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain-form/index.html">APIChainForm</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="703889962%2FClasslikes%2F-1765759586" anchor-label="APIChainPost" id="703889962%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-chain-post/index.html"><span>APIChain</span><wbr><span><span>Post</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="703889962%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-chain-post/index.html">APIChainPost</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-864726734%2FClasslikes%2F-1765759586" anchor-label="APIDelegate" id="-864726734%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-delegate/index.html"><span><span>APIDelegate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-864726734%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-a-p-i-delegate/index.html">APIDelegate</a><span class="token operator">&lt;</span><a href="-a-p-i-delegate/index.html">A</a><span class="token operator"> : </span><a href="-a-p-i/index.html">API</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="-a-p-i-type/index.html">APIType</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.properties/-read-only-property/index.html">ReadOnlyProperty</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span><span class="token punctuation">, </span><a href="-a-p-i-delegate/index.html">A</a><span class="token operator">&gt; </span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1004019539%2FClasslikes%2F-1765759586" anchor-label="APIDoc" id="1004019539%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-doc/index.html"><span><span>APIDoc</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1004019539%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-a-p-i-doc/index.html">APIDoc</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>description<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-771313637%2FClasslikes%2F-1765759586" anchor-label="APIFile" id="-771313637%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-file/index.html"><span><span>APIFile</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-771313637%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-a-p-i-file/index.html">APIFile</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-624748770%2FClasslikes%2F-1765759586" anchor-label="APIParam" id="-624748770%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-param/index.html"><span><span>APIParam</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-624748770%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-a-p-i-param/index.html">APIParam</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>default<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>description<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1202786539%2FClasslikes%2F-1765759586" anchor-label="APIRes" id="1202786539%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-res/index.html"><span><span>APIRes</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1202786539%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="-a-p-i-res/index.html">APIRes</a> : <a href="-a-p-i-file/index.html">APIFile</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="151531351%2FClasslikes%2F-1765759586" anchor-label="APIResult1" id="151531351%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-result1/index.html"><span><span>APIResult1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="151531351%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-a-p-i-result1/index.html">APIResult1</a><span class="token operator">&lt;</span><a href="-a-p-i-result1/index.html">O1</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>o1<span class="token operator">: </span><a href="-a-p-i-result1/index.html">O1</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="182551158%2FClasslikes%2F-1765759586" anchor-label="APIResult2" id="182551158%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-result2/index.html"><span><span>APIResult2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="182551158%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-a-p-i-result2/index.html">APIResult2</a><span class="token operator">&lt;</span><a href="-a-p-i-result2/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i-result2/index.html">O2</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>o1<span class="token operator">: </span><a href="-a-p-i-result2/index.html">O1</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o2<span class="token operator">: </span><a href="-a-p-i-result2/index.html">O2</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="213570965%2FClasslikes%2F-1765759586" anchor-label="APIResult3" id="213570965%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-result3/index.html"><span><span>APIResult3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="213570965%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-a-p-i-result3/index.html">APIResult3</a><span class="token operator">&lt;</span><a href="-a-p-i-result3/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i-result3/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i-result3/index.html">O3</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>o1<span class="token operator">: </span><a href="-a-p-i-result3/index.html">O1</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o2<span class="token operator">: </span><a href="-a-p-i-result3/index.html">O2</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o3<span class="token operator">: </span><a href="-a-p-i-result3/index.html">O3</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="244590772%2FClasslikes%2F-1765759586" anchor-label="APIResult4" id="244590772%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-result4/index.html"><span><span>APIResult4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="244590772%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-a-p-i-result4/index.html">APIResult4</a><span class="token operator">&lt;</span><a href="-a-p-i-result4/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i-result4/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i-result4/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i-result4/index.html">O4</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>o1<span class="token operator">: </span><a href="-a-p-i-result4/index.html">O1</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o2<span class="token operator">: </span><a href="-a-p-i-result4/index.html">O2</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o3<span class="token operator">: </span><a href="-a-p-i-result4/index.html">O3</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o4<span class="token operator">: </span><a href="-a-p-i-result4/index.html">O4</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="275610579%2FClasslikes%2F-1765759586" anchor-label="APIResult5" id="275610579%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-result5/index.html"><span><span>APIResult5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="275610579%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-a-p-i-result5/index.html">APIResult5</a><span class="token operator">&lt;</span><a href="-a-p-i-result5/index.html">O1</a><span class="token punctuation">, </span><a href="-a-p-i-result5/index.html">O2</a><span class="token punctuation">, </span><a href="-a-p-i-result5/index.html">O3</a><span class="token punctuation">, </span><a href="-a-p-i-result5/index.html">O4</a><span class="token punctuation">, </span><a href="-a-p-i-result5/index.html">O5</a><span class="token operator">&gt;</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>o1<span class="token operator">: </span><a href="-a-p-i-result5/index.html">O1</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o2<span class="token operator">: </span><a href="-a-p-i-result5/index.html">O2</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o3<span class="token operator">: </span><a href="-a-p-i-result5/index.html">O3</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o4<span class="token operator">: </span><a href="-a-p-i-result5/index.html">O4</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>o5<span class="token operator">: </span><a href="-a-p-i-result5/index.html">O5</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-577152665%2FClasslikes%2F-1765759586" anchor-label="APIReturn" id="-577152665%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-return/index.html"><span><span>APIReturn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-577152665%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-target/index.html"><span class="token annotation builtin">Target</span></a><span class="token punctuation">(</span><span>allowedTargets<span class="token operator"> = </span><span class="token punctuation">[</span><span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.annotation/-annotation-target/-p-r-o-p-e-r-t-y/index.html">AnnotationTarget.PROPERTY</a></span><wbr><span class="token punctuation">]</span></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">annotation class </span><a href="-a-p-i-return/index.html">APIReturn</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>description<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">""</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="112846877%2FClasslikes%2F-1765759586" anchor-label="APIType" id="112846877%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i-type/index.html"><span><span>APIType</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="112846877%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="-a-p-i-type/index.html">APIType</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1422856204%2FClasslikes%2F-1765759586" anchor-label="FailureException" id="1422856204%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-failure-exception/index.html"><span>Failure</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1422856204%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-failure-exception/index.html">FailureException</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/index.html">Exception</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1326808084%2FClasslikes%2F-1765759586" anchor-label="RequestTimeoutException" id="1326808084%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-request-timeout-exception/index.html"><span>Request</span><wbr><span>Timeout</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1326808084%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-request-timeout-exception/index.html">RequestTimeoutException</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">timeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/index.html">Exception</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="416798385%2FClasslikes%2F-1765759586" anchor-label="Sockets" id="416798385%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-sockets/index.html"><span><span>Sockets</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="416798385%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="-sockets/index.html">Sockets</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>path<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>title<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-81738%2FClasslikes%2F-1765759586" anchor-label="UnauthorizedException" id="-81738%2FClasslikes%2F-1765759586" data-filterable-set=":ylcs-module:cs:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:cs:core/commonMain" data-filterable-set=":ylcs-module:cs:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-unauthorized-exception/index.html"><span>Unauthorized</span><wbr><span><span>Exception</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-81738%2FClasslikes%2F-1765759586"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:cs:core/commonMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-unauthorized-exception/index.html">UnauthorizedException</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-exception/index.html">Exception</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
