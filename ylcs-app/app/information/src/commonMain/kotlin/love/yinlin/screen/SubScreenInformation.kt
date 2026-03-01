@@ -41,6 +41,7 @@ import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.widget.Calendar
@@ -206,17 +207,9 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                SimpleEllipsisText(
-                    text = intervalString,
-                    style = Theme.typography.v6.bold,
-                    color = intervalColor
-                )
-                SimpleEllipsisText(
-                    text = "${activity.title ?: "未知活动"} / ${activity.ts ?: "?"}",
-                    overflow = TextOverflow.StartEllipsis,
-                    textAlign = TextAlign.End,
-                    modifier = Modifier.weight(1f)
-                )
+                SimpleEllipsisText(text = intervalString, style = Theme.typography.v6.bold, color = intervalColor)
+                SimpleEllipsisText(text = activity.title ?: "", textAlign = TextAlign.End, modifier = Modifier.weight(1f))
+                SimpleEllipsisText(text = activity.ts ?: "????-??-??")
             }
         }
     }
@@ -235,6 +228,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
             CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) {
                 ToolBarLayout()
             }
+            Space(Theme.padding.v9)
             for (activity in activities) CalendarBarItem(activity)
         }
     }
@@ -260,6 +254,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                 BannerLayout(modifier = Modifier.fillMaxWidth().aspectRatio(1.77778f))
                 SectionLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value8))
                 CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) { }
+                Space(Theme.padding.v9)
                 for (activity in activities) CalendarBarItem(activity)
             }
         }
@@ -281,7 +276,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                     .weight(1f)
                     .padding(LocalImmersivePadding.current.withoutTop)
                     .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.width(Theme.size.cell1 * 1.5f)) {
@@ -290,6 +285,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                     }
                     CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) { }
                 }
+                Space(Theme.padding.v9)
                 for (activity in activities) CalendarBarItem(activity)
             }
         }

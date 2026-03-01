@@ -16,6 +16,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
+import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.Surface
@@ -150,19 +151,32 @@ class SubScreenDiscovery(parent: NavigationScreen) : SubScreen(parent) {
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
+                contentPadding = immersivePadding.withoutBottom,
                 shadowElevation = Theme.shadow.v3
             ) {
-                TabBar(
-                    size = DiscoveryItem.entries.size,
-                    index = DataSourceDiscovery.currentPage,
-                    onNavigate = {
-                        DataSourceDiscovery.currentPage = it
-                        launch { requestNewData(true) }
-                    },
-                    titleProvider = { Comment.Section.sectionName(DiscoveryItem.entries[it].id) },
-                    iconProvider = { DiscoveryItem.entries[it].icon },
-                    modifier = Modifier.fillMaxWidth().padding(immersivePadding.withoutBottom)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TabBar(
+                        size = DiscoveryItem.entries.size,
+                        index = DataSourceDiscovery.currentPage,
+                        onNavigate = {
+                            DataSourceDiscovery.currentPage = it
+                            launch { requestNewData(true) }
+                        },
+                        titleProvider = { Comment.Section.sectionName(DiscoveryItem.entries[it].id) },
+                        iconProvider = { DiscoveryItem.entries[it].icon },
+                        modifier = Modifier.weight(1f)
+                    )
+                    ActionScope.Right.Container(modifier = Modifier.padding(end = Theme.padding.e)) {
+                        Icon(icon = Icons.Edit, tip = "发表", onClick = {
+                            if (app.config.userProfile != null) navigate(::ScreenAddTopic)
+                            else slot.tip.warning("请先登录")
+                        })
+                    }
+                }
             }
 
             StatefulBox(
@@ -190,27 +204,14 @@ class SubScreenDiscovery(parent: NavigationScreen) : SubScreen(parent) {
     }
 
     override val fab: FAB = object : FAB() {
-        override val expandable: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
+        private val isScrollTop by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
 
         override val action: FABAction = FABAction(
-            iconProvider = { if (expandable) Icons.Add else Icons.ArrowUpward },
-            onClick = { gridState.animateScrollToItem(0) }
-        )
-
-        override val menus: List<FABAction> = listOf(
-            FABAction(
-                iconProvider = { Icons.Edit },
-                onClick = {
-                    if (app.config.userProfile != null) navigate(::ScreenAddTopic)
-                    else slot.tip.warning("请先登录")
-                }
-            ),
-            FABAction(
-                iconProvider = { Icons.Refresh },
-                onClick = {
-                    launch { requestNewData(true) }
-                }
-            )
+            iconProvider = { if (isScrollTop) Icons.Refresh else Icons.ArrowUpward },
+            onClick = {
+                if (isScrollTop) requestNewData(true)
+                else gridState.animateScrollToItem(0)
+            }
         )
     }
 }

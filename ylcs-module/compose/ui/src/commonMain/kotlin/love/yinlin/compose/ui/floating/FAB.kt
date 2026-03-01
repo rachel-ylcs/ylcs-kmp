@@ -78,7 +78,7 @@ open class FAB {
 
     @Composable
     private fun ActionButton(scope: CoroutineScope, action: FABAction, overrideClick: (() -> Boolean)? = null) {
-        val buttonSize = size ?: Theme.size.input8
+        val buttonSize = size ?: Theme.size.input7
         val enabled by rememberDerivedState(action.enabledProvider)
         val backgroundColor = if (enabled) {
             action.backgroundColorProvider?.invoke() ?: Theme.color.primaryContainer

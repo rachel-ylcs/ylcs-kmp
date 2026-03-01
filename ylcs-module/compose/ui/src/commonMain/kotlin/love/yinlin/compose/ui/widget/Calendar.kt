@@ -241,7 +241,7 @@ private fun CalendarDayGrid(
                             modifier = Modifier.weight(1f).aspectRatio(1f).clip(Theme.shape.v7).clickable {
                                 if (eventTitle != null) onEventClick(date)
                             }.drawWithContent {
-                                if (isToday) drawCircle(todayBackgroundColor)
+                                if (isToday) drawRect(todayBackgroundColor)
                                 drawContent()
                             },
                             horizontalAlignment = Alignment.CenterHorizontally,

@@ -46,11 +46,7 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
     DataSourceAccount, DataSourceInformation, DataSourceDiscovery, DataSourceWeibo
 ) {
     @Stable
-    private enum class TabItem(
-        val title: String,
-        val iconNormal: DrawableResource,
-        val iconActive: DrawableResource
-    ) {
+    private enum class TabItem(val title: String, val iconNormal: DrawableResource, val iconActive: DrawableResource) {
         Information("资讯", Res.drawable.tab_information_normal, Res.drawable.tab_information_active),
         Music("音乐", Res.drawable.tab_world_normal, Res.drawable.tab_world_active),
         Discovery("发现", Res.drawable.tab_music_normal, Res.drawable.tab_music_active),
@@ -58,11 +54,9 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
         Me("银子", Res.drawable.tab_me_normal, Res.drawable.tab_me_active),
     }
 
-    val information = create(::SubScreenInformation)
-    val music = create(::SubScreenMusic)
-    val discovery = create(::SubScreenDiscovery)
-    val world = create(::SubScreenWorld)
-    val me = create(::SubScreenMe)
+    init {
+        createSubScreen(::SubScreenInformation, ::SubScreenMusic, ::SubScreenDiscovery, ::SubScreenWorld, ::SubScreenMe)
+    }
 
     private fun navigateSubScreen(index: Int) {
         if (isAppInitialized) pageIndex = index

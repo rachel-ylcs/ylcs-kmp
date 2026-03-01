@@ -29,11 +29,7 @@ abstract class NavigationScreen : BasicScreen() {
     /**
      * 创建子页面
      */
-    fun <S : SubScreen> create(factory: (NavigationScreen) -> S): S {
-        val subScreen = factory(this)
-        subScreenList += SubScreenInfo(screen = subScreen)
-        return subScreen
-    }
+    fun createSubScreen(vararg callbacks: (NavigationScreen) -> SubScreen) = subScreenList.addAll(callbacks.map { SubScreenInfo(screen = it(this)) })
 
     private val pagerState = PagerState { subScreenList.size }
 
