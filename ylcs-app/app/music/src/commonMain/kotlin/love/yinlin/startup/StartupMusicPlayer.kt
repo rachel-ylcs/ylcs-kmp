@@ -10,6 +10,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.io.files.Path
 import love.yinlin.app
+import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.coroutines.Coroutines
@@ -40,12 +41,13 @@ class StartupMusicPlayer : AsyncStartup() {
     private fun MusicInfo.path(type: ModResourceType) = this.path(rootPath, type)
 
     // 外部数据提取器
-    val fetcher = object : MediaMetadataFetcher<MusicInfo> {
+    val fetcher = object : MediaMetadataFetcher {
         override val audioFocus: Boolean get() = app.config.audioFocus
         override val interval: Long get() = engine.interval
 
-        override val MusicInfo.audioUri: String get() = this.path(ModResourceType.Audio).toString()
-        override val MusicInfo.coverUri: String get() = this.path(ModResourceType.Record).toString()
+        override fun extractAudioUri(id: String): String? = library[id]?.path(ModResourceType.Audio)?.toString()
+        override fun extractCoverUri(id: String): String? = library[id]?.path(ModResourceType.Record)?.toString()
+        override fun extractMetadata(id: String): MediaInfo? = library[id]
 
         override val androidMusicServiceComponentName: Pair<String, String> = "love.yinlin" to "love.yinlin.RachelMusicService"
     }
@@ -56,11 +58,11 @@ class StartupMusicPlayer : AsyncStartup() {
     val library = mutableStateMapOf<String, MusicInfo>()
 
     // 回调监听器
-    val listener = object : MusicPlayerListener<MusicInfo> {
-        override fun onMusicChanged(info: MusicInfo?) {
+    val listener = object : MusicPlayerListener {
+        override fun onMusicChanged(id: String?) {
             val lastPlaylist = playlist?.name ?: ""
             app.config.lastPlaylist = lastPlaylist
-            if (lastPlaylist.isNotEmpty()) info?.let { app.config.lastMusic = it.id }
+            if (lastPlaylist.isNotEmpty()) id?.let { app.config.lastMusic = it }
             else app.config.lastMusic = ""
         }
 
@@ -85,7 +87,8 @@ class StartupMusicPlayer : AsyncStartup() {
     val position: Long get() = controller.position
     val duration: Long get() = controller.duration
     val musicList get() = controller.musicList
-    val music: MusicInfo? get() = controller.music
+    val currentId: String? get() = controller.currentId
+    val currentMusic: MusicInfo? get() = controller.currentId?.let { library[it] }
     val error: Throwable? get() = controller.error
     suspend fun play() = controller.play()
     suspend fun pause() = controller.pause()
@@ -94,7 +97,7 @@ class StartupMusicPlayer : AsyncStartup() {
     suspend fun gotoNext() = controller.gotoNext()
     suspend fun gotoIndex(index: Int) = controller.gotoIndex(index)
     suspend fun seekTo(position: Long) = controller.seekTo(position)
-    suspend fun addMedias(medias: List<MusicInfo>) = controller.addMedias(medias)
+    suspend fun addMedias(medias: List<String>) = controller.addMedias(medias)
     suspend fun removeMedia(index: Int) = controller.removeMedia(index)
 
     // 歌词引擎
@@ -137,14 +140,11 @@ class StartupMusicPlayer : AsyncStartup() {
 
     suspend fun startPlaylist(playlist: MusicPlaylist, startId: String? = null, playing: Boolean) {
         if (controller.isInit && this.playlist != playlist) {
-            val actualMusicList = mutableListOf<MusicInfo>()
-            for (id in playlist.items) {
-                library[id]?.let { actualMusicList += it }
-            }
+            val actualMusicList = playlist.items.filter { it in library }
             controller.stop()
             if (actualMusicList.isNotEmpty()) {
                 this.playlist = playlist
-                val index = if (startId != null) actualMusicList.indexOfFirst { it.id == startId } else -1
+                val index = if (startId != null) actualMusicList.indexOf(startId) else -1
                 controller.prepareMedias(actualMusicList, if (index != -1) index else null, playing)
             }
         }

@@ -4,13 +4,12 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
-import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.extension.replaceAll
 import kotlin.random.Random
 
 @Stable
-abstract class CommonMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) : MusicPlayer<Info>(fetcher) {
+abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
     private var shuffledList = ShuffledOrder()
     protected var currentIndex: Int by mutableIntStateOf(-1)
 
@@ -72,7 +71,7 @@ abstract class CommonMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher
         if (isReady) innerGotoIndex(index)
     }
 
-    final override suspend fun prepareMedias(medias: List<Info>, startIndex: Int?, playing: Boolean) {
+    final override suspend fun prepareMedias(medias: List<String>, startIndex: Int?, playing: Boolean) {
         val index = startIndex ?: 0
         if (index >= 0 && index < medias.size) {
             musicList.replaceAll(medias)
@@ -81,7 +80,7 @@ abstract class CommonMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher
         }
     }
 
-    final override suspend fun addMedias(medias: List<Info>) {
+    final override suspend fun addMedias(medias: List<String>) {
         if (isReady) {
             musicList.addAll(medias)
 

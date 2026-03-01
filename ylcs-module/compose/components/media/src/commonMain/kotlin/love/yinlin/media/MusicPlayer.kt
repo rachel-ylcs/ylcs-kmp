@@ -7,12 +7,11 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.foundation.Context
 
 @Stable
-abstract class MusicPlayer<Info : MediaInfo>(protected val fetcher: MediaMetadataFetcher<Info>) {
+abstract class MusicPlayer(protected val fetcher: MediaMetadataFetcher) {
     /**
      * 是否初始化
      */
@@ -34,7 +33,7 @@ abstract class MusicPlayer<Info : MediaInfo>(protected val fetcher: MediaMetadat
     /**
      * 播放列表
      */
-    val musicList = mutableStateListOf<Info>()
+    val musicList = mutableStateListOf<String>()
 
     /**
      * 是否就绪
@@ -60,15 +59,15 @@ abstract class MusicPlayer<Info : MediaInfo>(protected val fetcher: MediaMetadat
         protected set
 
     /**
-     * 当前音乐
+     * 当前音乐ID
      */
-    var music: Info? by mutableStateOf(null)
+    var currentId: String? by mutableStateOf(null)
         protected set
 
     /**
      * 回调
      */
-    var listener: MusicPlayerListener<Info>? = null
+    var listener: MusicPlayerListener? = null
 
     /**
      * 初始化
@@ -123,12 +122,12 @@ abstract class MusicPlayer<Info : MediaInfo>(protected val fetcher: MediaMetadat
     /**
      * 加载媒体
      */
-    abstract suspend fun prepareMedias(medias: List<Info>, startIndex: Int?, playing: Boolean)
+    abstract suspend fun prepareMedias(medias: List<String>, startIndex: Int?, playing: Boolean)
 
     /**
      * 添加媒体
      */
-    abstract suspend fun addMedias(medias: List<Info>)
+    abstract suspend fun addMedias(medias: List<String>)
 
     /**
      * 移除媒体
@@ -136,4 +135,4 @@ abstract class MusicPlayer<Info : MediaInfo>(protected val fetcher: MediaMetadat
     abstract suspend fun removeMedia(index: Int)
 }
 
-expect fun <Info : MediaInfo> buildMusicPlayer(fetcher: MediaMetadataFetcher<Info>): MusicPlayer<Info>
+expect fun buildMusicPlayer(fetcher: MediaMetadataFetcher): MusicPlayer

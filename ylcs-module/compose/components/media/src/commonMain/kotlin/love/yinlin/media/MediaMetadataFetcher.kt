@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import love.yinlin.compose.data.media.MediaInfo
 
 @Stable
-interface MediaMetadataFetcher<Info : MediaInfo> {
+interface MediaMetadataFetcher {
     /**
      * 开启音频焦点
      */
@@ -18,12 +18,17 @@ interface MediaMetadataFetcher<Info : MediaInfo> {
     /**
      * 提取音频
      */
-    val Info.audioUri: String
+    fun extractAudioUri(id: String): String?
 
     /**
      * 提取封面
      */
-    val Info.coverUri: String
+    fun extractCoverUri(id: String): String?
+
+    /**
+     * 提取元信息
+     */
+    fun extractMetadata(id: String): MediaInfo?
 
     /**
      * Android 后台服务名

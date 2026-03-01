@@ -1,8 +1,10 @@
 package love.yinlin.media
 
 import android.os.Bundle
+import androidx.annotation.OptIn
 import androidx.compose.runtime.Stable
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaSession
 import androidx.media3.session.SessionCommand
@@ -11,6 +13,7 @@ import love.yinlin.compose.components.media.R
 import love.yinlin.compose.data.media.MediaPlayMode
 
 @Stable
+@OptIn(UnstableApi::class)
 object MediaCommands {
     object Args {
         const val SET_MODE_ARG_MODE = "SET_MODE_ARG_MODE"

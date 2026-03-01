@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.await
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.concurrent.Lock
 import org.libpag.PAGInit
 import kotlin.js.ExperimentalWasmJsInterop
 

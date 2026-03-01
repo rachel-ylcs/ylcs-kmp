@@ -11,6 +11,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSourceBitmapLoader
 import androidx.media3.session.MediaController
@@ -26,7 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.compose.data.media.MediaPlayMode
@@ -40,7 +40,7 @@ import love.yinlin.uri.toAndroidUri
 
 @OptIn(UnstableApi::class)
 @Stable
-class AndroidMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) : MusicPlayer<Info>(fetcher) {
+class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
     private var controller: MediaController? by mutableRefStateOf(null)
 
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
@@ -64,6 +64,16 @@ class AndroidMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) 
             isPlayingFlow.value = value
         } ?: Unit
 
+        override fun onTimelineChanged(timeline: Timeline, reason: Int)= withPlayer {
+            when (reason) {
+                Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED if timeline !is Timeline.RemotableTimeline -> {
+                    // timeline可能是 Timeline.RemotableTimeline 或 PlaylistTimeline
+                    musicList.replaceAll(timeline.extractMediaItems.map { it.mediaId })
+                }
+                Player.TIMELINE_CHANGE_REASON_SOURCE_UPDATE -> { }
+            }
+        } ?: Unit
+
         override fun onPlaybackStateChanged(playbackState: Int) = withPlayer {
             when (playbackState) {
                 Player.STATE_IDLE -> { }
@@ -78,7 +88,7 @@ class AndroidMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) 
                         isPlayingFlow.value = false
                         position = 0L
                         duration = 0L
-                        music = null
+                        currentId = null
                         listener?.onPlayerStop()
                     }
                 }
@@ -91,9 +101,8 @@ class AndroidMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) 
                 it.stop()
             }
             else {
-                val musicInfo = musicList.find { item -> item.id == mediaItem.mediaId }
-                music = musicInfo
-                listener?.onMusicChanged(musicInfo)
+                currentId = mediaItem.mediaId
+                listener?.onMusicChanged(mediaItem.mediaId)
                 updateDuration(it)
             }
         } ?: Unit
@@ -163,20 +172,25 @@ class AndroidMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) 
         }
     }
 
-    private val Info.asMediaItem: MediaItem get() = MediaItem.Builder()
-        .setMediaId(this.id)
-        .setUri(with(fetcher) { audioUri })
-        .setMediaMetadata(
-            MediaMetadata.Builder()
-                .setTitle(this.name)
-                .setArtist(this.singer)
-                .setAlbumTitle(this.album)
-                .setAlbumArtist(this.singer)
-                .setComposer(this.composer)
-                .setWriter(this.lyricist)
-                .setArtworkUri(Uri.parse(with(fetcher) { coverUri })?.toAndroidUri() ?: android.net.Uri.EMPTY)
-                .build()
-        ).build()
+    private fun buildMediaItem(id: String): MediaItem? {
+        val info = fetcher.extractMetadata(id)
+        val audioUri = fetcher.extractAudioUri(id)
+        val coverUri = fetcher.extractCoverUri(id)
+        return if (info != null && audioUri != null && coverUri != null) MediaItem.Builder()
+            .setMediaId(id)
+            .setUri(audioUri)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(info.name)
+                    .setArtist(info.singer)
+                    .setAlbumTitle(info.album)
+                    .setAlbumArtist(info.singer)
+                    .setComposer(info.composer)
+                    .setWriter(info.lyricist)
+                    .setArtworkUri(Uri.parse(coverUri)?.toAndroidUri())
+                    .build()
+            ).build() else null
+    }
 
     private fun updateDuration(player: Player) {
         position = player.currentPosition.let { if (it == C.TIME_UNSET) 0L else it }
@@ -212,15 +226,14 @@ class AndroidMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) 
 
     override suspend fun seekTo(position: Long) = withMainPlayer { it.seekTo(position) } ?: Unit
 
-    override suspend fun prepareMedias(medias: List<Info>, startIndex: Int?, playing: Boolean) = withMainPlayer {
-        musicList.replaceAll(medias)
-        it.setMediaItems(medias.map { item -> item.asMediaItem }, startIndex ?: C.INDEX_UNSET, C.TIME_UNSET)
+    override suspend fun prepareMedias(medias: List<String>, startIndex: Int?, playing: Boolean) = withMainPlayer {
+        it.setMediaItems(medias.mapNotNull(::buildMediaItem), startIndex ?: C.INDEX_UNSET, C.TIME_UNSET)
         if (playing) it.play()
         else it.prepare()
     } ?: Unit
 
-    override suspend fun addMedias(medias: List<Info>) = withMainPlayer {
-        it.addMediaItems(medias.map { item -> item.asMediaItem })
+    override suspend fun addMedias(medias: List<String>) = withMainPlayer {
+        it.addMediaItems(medias.mapNotNull(::buildMediaItem))
     } ?: Unit
 
     override suspend fun removeMedia(index: Int) = withMainPlayer {
@@ -228,4 +241,4 @@ class AndroidMusicPlayer<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) 
     } ?: Unit
 }
 
-actual fun <Info : MediaInfo> buildMusicPlayer(fetcher: MediaMetadataFetcher<Info>): MusicPlayer<Info> = AndroidMusicPlayer(fetcher)
+actual fun buildMusicPlayer(fetcher: MediaMetadataFetcher): MusicPlayer = AndroidMusicPlayer(fetcher)

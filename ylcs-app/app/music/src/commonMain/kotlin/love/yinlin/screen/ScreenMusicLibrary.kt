@@ -143,9 +143,7 @@ class ScreenMusicLibrary : Screen() {
                         // 添加到当前播放的列表
                         mp?.let { player ->
                             if (player.playlist?.name == name) {
-                                player.addMedias(newItems.asSequence().filter { id ->
-                                    player.musicList.find { it.id == id } == null
-                                }.mapNotNull { player.library[it] }.toList())
+                                player.addMedias(newItems.asSequence().filter { it !in player.musicList }.toList())
                             }
                         }
                         slot.tip.success("已添加${newItems.size}首歌曲")

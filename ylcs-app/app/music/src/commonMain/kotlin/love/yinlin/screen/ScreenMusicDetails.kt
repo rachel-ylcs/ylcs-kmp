@@ -229,7 +229,13 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             this.launch {
                 lyrics = catchingNull {
                     Coroutines.io {
-                        LrcParser(currentClientSong!!.clientPath(ModResourceType.LineLyrics).readText()!!).plainText
+                        val lyricsText = if (currentClientSong == null) {
+                            NetClient.simpleDownload(ServerRes.Mod.Song(sid).res(ModResourceType.LineLyrics.filename).url)!!.decodeToString()
+                        }
+                        else {
+                            currentClientSong.clientPath(ModResourceType.LineLyrics).readText()!!
+                        }
+                        LrcParser(lyricsText).plainText
                     }
                 }
             }
@@ -270,6 +276,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             if (slot.confirm.open(content = "删除${item.type.description}资源")) {
                 clientResources.remove(item)
                 clientSong?.clientPath(item.type)?.delete()
+                ++modifyFlag
             }
         }
     }
@@ -287,10 +294,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                                 image.crop(region)
                                 song.clientPath(item.type).writeByteArray(image.encode(quality = ImageQuality.Full)!!)
                             }
-                            mp?.let { player ->
-                                player.library.findAssign(sid) { it.copy(modification = it.modification + 1) }
-                                player.musicList.findAssign(predicate = { it.id == sid }) { it.copy(modification = it.modification + 1) }
-                            }
+                            mp?.library?.findAssign(sid) { it.copy(modification = it.modification + 1) }
                             clientResources.findAssign(item) {
                                 it.copy(type = it.type, size = song.clientPath(it.type).fileSize)
                             }
@@ -491,12 +495,14 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     @Composable
     private fun ResourceLayout(modifier: Modifier = Modifier) {
         Column(modifier = modifier) {
-            val downloadResources by rememberDerivedState {
-                remoteResources.filter { item -> clientResources.find { it.type == item.type } == null }
-            }
+            if (clientResources.isNotEmpty()) {
+                val downloadResources by rememberDerivedState {
+                    remoteResources.filter { item -> clientResources.find { it.type == item.type } == null }
+                }
 
-            for (item in clientResources) ResourceItemLayout(item = item, remote = false)
-            for (item in downloadResources) ResourceItemLayout(item = item, remote = true)
+                for (item in clientResources) ResourceItemLayout(item = item, remote = false)
+                for (item in downloadResources) ResourceItemLayout(item = item, remote = true)
+            }
         }
     }
 
@@ -653,6 +659,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     SimpleEllipsisText(text = "MOD配置", style = Theme.typography.v6.bold)
                     PrimaryTextButton(text = "保存", icon = Icons.Check, enabled = canSubmit, onClick = {
                         mp?.let { player ->
+                            // 更新 library
                             val newInfo = args.copy(
                                 name = name.text,
                                 singer = singer.text,
@@ -662,8 +669,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                                 modification = args.modification + 1
                             )
                             player.library.findAssign(sid) { newInfo }
-                            player.musicList.findAssign(predicate = { it.id == sid }) { newInfo }
                             ++modifyFlag
+                            // 写入文件
                             launch {
                                 catching {
                                     Coroutines.io {
@@ -671,6 +678,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                                     }
                                 }
                             }
+                            // 关闭 sheet
                             close()
                         }
                     })

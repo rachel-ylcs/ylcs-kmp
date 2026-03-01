@@ -237,4 +237,14 @@ object NetClient {
             }
         }
     }
+
+    suspend inline fun simpleDownload(url: String): ByteArray? = catchingNull {
+        Coroutines.io {
+            internalPrepareStatement(HttpMethod.Get, true, url) {
+                this.headers { accept(ContentType.Any) }
+            }.execute { response ->
+                response.bodyAsBytes()
+            }
+        }
+    }
 }

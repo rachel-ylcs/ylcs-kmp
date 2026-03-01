@@ -140,7 +140,7 @@ class ScreenPlaylistLibrary : Screen() {
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
                 mp?.let {
-                    val playingIndex = it.musicList.indexOfFirst { info -> info.id == musicInfo.id }
+                    val playingIndex = it.musicList.indexOf(musicInfo.id)
                     if (it.playlist?.name == name && playingIndex != -1) it.removeMedia(playingIndex)
                 }
 

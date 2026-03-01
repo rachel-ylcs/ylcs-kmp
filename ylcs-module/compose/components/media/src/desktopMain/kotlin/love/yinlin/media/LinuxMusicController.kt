@@ -2,12 +2,11 @@ package love.yinlin.media
 
 import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.foundation.Context
 
 @Stable
 @NativeLibApi
-internal class LinuxMusicController<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) : CommonMusicPlayer<Info>(fetcher) {
+internal class LinuxMusicController(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher) {
     override suspend fun init(context: Context) { }
     override fun release() { }
     override suspend fun play() { }

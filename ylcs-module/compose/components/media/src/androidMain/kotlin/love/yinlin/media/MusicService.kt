@@ -6,7 +6,9 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.annotation.OptIn
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -18,6 +20,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import love.yinlin.compose.data.media.MediaPlayMode
 import kotlin.reflect.KClass
 
+@OptIn(UnstableApi::class)
 abstract class MusicService : MediaSessionService() {
     abstract val audioFocus: Boolean
     abstract val activityClass: KClass<out ComponentActivity>

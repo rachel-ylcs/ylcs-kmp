@@ -99,7 +99,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             }
         }
 
-        monitor(state = { mp?.music }) { music ->
+        monitor(state = { mp?.currentMusic }) { music ->
             mp?.apply {
                 // 重置引擎
                 engine.reset()
@@ -141,7 +141,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
     @Composable
     private fun MusicBackground(modifier: Modifier = Modifier) {
-        val music = mp?.music
+        val music = mp?.currentMusic
         if (music != null) {
             LocalFileImage(
                 uri = music.path(PathMod, if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).toString(),
@@ -184,14 +184,16 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 }
             )
 
-            AnimationContent(mp?.music?.name) {
+            val music = mp?.currentMusic
+
+            AnimationContent(music?.name) {
                 SimpleEllipsisText(text = it ?: "无音源", color = Colors.Green4, style = Theme.typography.v4.bold)
             }
 
             ActionScope.SplitContainer(
                 modifier = Modifier.fillMaxWidth(),
                 left = {
-                    AnimationContent(mp?.music?.singer) {
+                    AnimationContent(music?.singer) {
                         SimpleEllipsisText(text = it ?: "未知歌手", color = Colors.Green1, style = Theme.typography.v6)
                     }
                 },
@@ -211,7 +213,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             mp?.let {
                                 launch {
                                     it.pause()
-                                    it.music?.path(PathMod, ModResourceType.Video)?.let { path ->
+                                    it.currentMusic?.path(PathMod, ModResourceType.Video)?.let { path ->
                                         navigate(::ScreenVideo, path.toString())
                                     }
                                 }
@@ -219,7 +221,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         }
                     )
                     Icon(icon = Icons.Comment, tip = "歌评", onClick = {
-                        mp?.music?.let { navigate(::ScreenMusicDetails, it.id) }
+                        mp?.currentMusic?.let { navigate(::ScreenMusicDetails, it.id) }
                     })
                 }
             )
@@ -266,7 +268,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
             AnimationContent(
-                state = mp?.music,
+                state = mp?.currentMusic,
                 duration = Theme.animation.duration.v1,
                 enter = { fadeIn(animationSpec = tween(it)) },
                 exit = { fadeOut(animationSpec = tween(it, delayMillis = it / 2)) },
@@ -309,7 +311,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 showThumb = false,
                 modifier = Modifier.weight(1f)
             ) {
-                val chorus = mp?.music?.chorus
+                val chorus by rememberDerivedState { mp?.currentMusic?.chorus }
                 if (chorus != null && duration != 0L) {
                     Box(modifier = Modifier.matchParentSize()) {
                         for (hotpot in chorus) {
@@ -478,9 +480,10 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         override fun Content() {
             val items = mp?.playlist
             val musicList = mp?.musicList
+            val library = mp?.library
 
-            if (items != null && musicList != null) {
-                val currentIndex by rememberDerivedState { musicList.indexOfFirst { it.id == mp?.music?.id } }
+            if (items != null && musicList != null && library != null) {
+                val currentIndex by rememberDerivedState { musicList.indexOf(mp?.currentId) }
                 val isEmptyList by rememberDerivedState { musicList.isEmpty() }
 
                 LaunchedEffect(isEmptyList) {
@@ -495,6 +498,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     ) {
                         SimpleEllipsisText(text = items.name, style = Theme.typography.v6.bold, color = Theme.color.secondary)
                         Icon(icon = Icons.StopCircle, onClick = {
+                            close()
                             launch { mp?.stop() }
                         })
                     }
@@ -505,9 +509,10 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     ) {
                         itemsIndexed(
                             items = musicList,
-                            key = { _, info -> info.id }
-                        ) { index, info ->
+                            key = { _, info -> info }
+                        ) { index, id ->
                             val isCurrent = index == currentIndex
+                            val musicInfo = library[id]
 
                             Row(
                                 modifier = Modifier.fillMaxWidth().clickable {
@@ -518,14 +523,14 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 SimpleEllipsisText(
-                                    text = info.name,
+                                    text = musicInfo?.name ?: "未知歌曲",
                                     color = if (isCurrent) Theme.color.primary else LocalColor.current,
                                     style = if (isCurrent) Theme.typography.v7.bold else Theme.typography.v7,
                                     modifier = Modifier.weight(2f),
                                     textAlign = TextAlign.Start
                                 )
                                 SimpleEllipsisText(
-                                    text = info.singer,
+                                    text = musicInfo?.singer ?: "未知歌手",
                                     style = if (isCurrent) Theme.typography.v8.bold else Theme.typography.v8,
                                     color = if (isCurrent) Theme.color.primary else LocalColorVariant.current,
                                     modifier = Modifier.weight(1f),

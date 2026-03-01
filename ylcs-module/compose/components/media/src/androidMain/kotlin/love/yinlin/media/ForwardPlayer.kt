@@ -1,8 +1,12 @@
 package love.yinlin.media
 
+import androidx.annotation.OptIn
 import androidx.compose.runtime.Stable
 import androidx.media3.common.ForwardingPlayer
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import love.yinlin.compose.data.media.MediaPlayMode
 
@@ -12,6 +16,17 @@ fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MediaPlayMode =
     else -> MediaPlayMode.Order
 }
 
+val Timeline.extractMediaItems: List<MediaItem> get() {
+    val items = mutableListOf<MediaItem>()
+    val window = Timeline.Window()
+    for (index in 0 ..< windowCount) {
+        getWindow(index, window)
+        items += window.mediaItem
+    }
+    return items
+}
+
+@OptIn(UnstableApi::class)
 @Stable
 class ForwardPlayer(basePlayer: ExoPlayer) : ForwardingPlayer(basePlayer) {
     override fun getAvailableCommands(): Player.Commands = MediaCommands.NotificationPlayerCommands

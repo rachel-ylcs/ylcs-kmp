@@ -10,14 +10,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.coroutines.mainContext
 import love.yinlin.foundation.Context
 
 @Stable
 @NativeLibApi
-internal class WindowsMusicController<Info : MediaInfo>(fetcher: MediaMetadataFetcher<Info>) : CommonMusicPlayer<Info>(fetcher) {
+internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher) {
     @Stable
     private enum class PlaybackState { None, Opening, Buffering, Playing, Paused; }
 
@@ -73,8 +72,8 @@ internal class WindowsMusicController<Info : MediaInfo>(fetcher: MediaMetadataFe
 
     override fun innerStop() {
         musicList.clear()
-        music = null
         duration = 0L
+        currentId = null
         currentIndex = -1
         resetShuffled()
         nativeSetSource(nativeHandle, null)
@@ -83,12 +82,15 @@ internal class WindowsMusicController<Info : MediaInfo>(fetcher: MediaMetadataFe
 
     override fun innerGotoIndex(index: Int, playing: Boolean) {
         if (index in musicList.indices) {
-            currentIndex = index
-            val uri = with(fetcher) { musicList[index].audioUri }
-            nativeSetSource(nativeHandle, uri)
-            shouldImmediatePlay = playing
+            val path = fetcher.extractAudioUri(musicList[index])
+            if (path != null) {
+                currentIndex = index
+                nativeSetSource(nativeHandle, path)
+                shouldImmediatePlay = playing
+                return
+            }
         }
-        else innerStop()
+        innerStop()
     }
 
     // Callback
@@ -110,10 +112,10 @@ internal class WindowsMusicController<Info : MediaInfo>(fetcher: MediaMetadataFe
     private fun nativeSourceChange() {
         if (!isReady) return
 
-        val newInfo = musicList.getOrNull(currentIndex)
-        if (newInfo?.id != music?.id) {
-            music = newInfo
-            listener?.onMusicChanged(newInfo)
+        val newId = musicList.getOrNull(currentIndex)
+        if (newId != currentId) {
+            currentId = newId
+            listener?.onMusicChanged(newId)
         }
     }
 

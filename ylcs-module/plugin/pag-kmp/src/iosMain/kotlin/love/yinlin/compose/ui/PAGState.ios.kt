@@ -16,11 +16,11 @@ actual open class PAGState : PlatformView<PlatformPAGView>(), Releasable<Platfor
     internal var flushFlag: Long by mutableLongStateOf(0L)
 
     private val pagListener = object : NSObject(), PlatformPAGListener {
-        override fun onAnimationStart(view: PlatformPAGView?) = this@PAGState.onAnimationStart()
-        override fun onAnimationEnd(view: PlatformPAGView?) = this@PAGState.onAnimationEnd()
-        override fun onAnimationCancel(view: PlatformPAGView?) = this@PAGState.onAnimationCancel()
-        override fun onAnimationRepeat(view: PlatformPAGView?) = this@PAGState.onAnimationRepeat()
-        override fun onAnimationUpdate(view: PlatformPAGView?) { this@PAGState.stateProgress = view?.getProgress() ?: 0.0 }
+        override fun onAnimationStart(pagView: PlatformPAGView?) = this@PAGState.onAnimationStart()
+        override fun onAnimationEnd(pagView: PlatformPAGView?) = this@PAGState.onAnimationEnd()
+        override fun onAnimationCancel(pagView: PlatformPAGView?) = this@PAGState.onAnimationCancel()
+        override fun onAnimationRepeat(pagView: PlatformPAGView?) = this@PAGState.onAnimationRepeat()
+        override fun onAnimationUpdate(pagView: PlatformPAGView?) { this@PAGState.stateProgress = pagView?.getProgress() ?: 0.0 }
     }
 
     override fun build(): PlatformPAGView {
