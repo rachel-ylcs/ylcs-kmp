@@ -158,7 +158,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
         val shape = if (usePortraitRoundedCorner) Theme.shape.v1.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
 
         Surface(
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
                 .offset { IntOffset(x = 0, y = animatedOffset) }
                 .onSizeChanged { controller.dimension = it.height }
                 .draggable(
@@ -166,6 +166,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
                     orientation = Orientation.Vertical,
                     onDragStopped = { controller.stop() },
                 ).nestedScroll(controller),
+            contentPadding = LocalImmersivePadding.current,
             shadowElevation = Theme.shadow.v1,
             tonalLevel = 5,
             shape = shape
