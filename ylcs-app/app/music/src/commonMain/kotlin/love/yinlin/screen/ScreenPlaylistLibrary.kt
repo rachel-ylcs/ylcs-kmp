@@ -1,6 +1,6 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -120,12 +120,12 @@ class ScreenPlaylistLibrary : Screen() {
         }
     }
 
-    private suspend fun playPlaylist() {
+    private suspend fun playPlaylist(startId: String?) {
         val name = tabs[currentPage]
         val playlist = playlistLibrary[name]
         if (playlist != null) {
             if (playlist.items.isNotEmpty()) {
-                mp?.startPlaylist(playlist, null, true)
+                mp?.startPlaylist(playlist, startId, true)
                 pop()
             }
             else slot.tip.warning("歌单中还没有添加歌曲哦")
@@ -246,10 +246,20 @@ class ScreenPlaylistLibrary : Screen() {
                     key = { _, item -> item.id }
                 ) { index, item ->
                     ReorderableItem(state = reorderState, key = item.id) {
+                        val canDrag = mp?.isReady != true
+
                         Row(
-                            modifier = Modifier.fillMaxWidth().clickable {
-                                if (mp?.isReady == true) slot.tip.warning("调整歌曲顺序需要停止播放器")
-                            }.padding(Theme.padding.value),
+                            modifier = Modifier.fillMaxWidth().combinedClickable(
+                                onClick = {
+                                    launch {
+                                        if (item.isDeleted) slot.tip.warning("此歌曲已不在曲库中")
+                                        else playPlaylist(item.id)
+                                    }
+                                },
+                                onLongClick = {
+                                    if (!canDrag) slot.tip.warning("调整歌曲顺序需要停止播放器")
+                                }
+                            ).padding(Theme.padding.value),
                             horizontalArrangement = Arrangement.spacedBy(Theme.padding.g5),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -272,7 +282,7 @@ class ScreenPlaylistLibrary : Screen() {
                             )
                             LoadingIcon(icon = Icons.Delete, tip = "删除", onClick = { deleteMusicFromPlaylist(index) })
                             Icon(icon = Icons.DragHandle, modifier = Modifier.draggableHandle(
-                                enabled = mp?.isReady != true,
+                                enabled = canDrag,
                                 onDragStarted = {
                                     dragStartIndex = -1
                                     dragEndIndex = -1
@@ -292,7 +302,7 @@ class ScreenPlaylistLibrary : Screen() {
 
     @Composable
     override fun RowScope.LeftActions() {
-        if (currentPage != -1) LoadingIcon(icon = Icons.PlayArrow, tip = "播放", onClick = ::playPlaylist)
+        if (currentPage != -1) LoadingIcon(icon = Icons.PlayArrow, tip = "播放", onClick = { playPlaylist(null) })
     }
 
     @Composable

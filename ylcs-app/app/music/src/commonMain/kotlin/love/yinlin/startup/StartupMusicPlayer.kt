@@ -139,13 +139,23 @@ class StartupMusicPlayer : AsyncStartup() {
     }
 
     suspend fun startPlaylist(playlist: MusicPlaylist, startId: String? = null, playing: Boolean) {
-        if (controller.isInit && this.playlist != playlist) {
-            val actualMusicList = playlist.items.filter { it in library }
-            controller.stop()
-            if (actualMusicList.isNotEmpty()) {
-                this.playlist = playlist
-                val index = if (startId != null) actualMusicList.indexOf(startId) else -1
-                controller.prepareMedias(actualMusicList, if (index != -1) index else null, playing)
+        if (controller.isInit) {
+            if (this.playlist == playlist) {
+                // 切换本歌单的其他歌曲
+                if (currentId != startId && startId != null) {
+                    val targetIndex = musicList.indexOf(startId)
+                    if (targetIndex != -1) controller.gotoIndex(targetIndex)
+                }
+            }
+            else {
+                // 切换其他歌单
+                val actualMusicList = playlist.items.filter { it in library }
+                controller.stop()
+                if (actualMusicList.isNotEmpty()) {
+                    this.playlist = playlist
+                    val index = if (startId != null) actualMusicList.indexOf(startId) else -1
+                    controller.prepareMedias(actualMusicList, if (index != -1) index else null, playing)
+                }
             }
         }
     }
