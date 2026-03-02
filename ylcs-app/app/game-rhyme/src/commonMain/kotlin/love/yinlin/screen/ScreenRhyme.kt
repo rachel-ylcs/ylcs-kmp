@@ -8,8 +8,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.font.FontStyle
@@ -33,19 +31,10 @@ import love.yinlin.common.rhyme.data.ActionResult
 import love.yinlin.compose.*
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberState
-import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.CircleLoading
-import love.yinlin.compose.ui.common.ArgsSlider
-import love.yinlin.compose.ui.common.ResumeNumberBrush
-import love.yinlin.compose.ui.common.RhymeAcrylicButton
-import love.yinlin.compose.ui.common.RhymeAcrylicSurface
-import love.yinlin.compose.ui.common.RhymeButton
-import love.yinlin.compose.ui.common.RhymeMusicCard
-import love.yinlin.compose.ui.common.RhymeOverlayLayout
-import love.yinlin.compose.ui.common.SliderArgs
-import love.yinlin.compose.ui.common.value
+import love.yinlin.compose.ui.common.*
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -55,8 +44,6 @@ import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.Filter
-import love.yinlin.compose.ui.input.Slider
-import love.yinlin.compose.ui.input.SliderLongConverter
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
@@ -95,8 +82,6 @@ class ScreenRhyme : Screen() {
     )
 
     private var resumePauseJob: Job? = null
-
-    private val orientationStarter = LaunchFlag()
 
     private var prologueBackground: Path? = null
 
@@ -435,6 +420,9 @@ class ScreenRhyme : Screen() {
     override val title: String? = null
 
     override suspend fun initialize() {
+        // 首次打开切换横屏
+        orientationController.orientation = Orientation.Landscape
+
         rhymeManager.init()
         if (rhymeManager.isInit) coroutineScope {
             val count = atomic(0)
@@ -470,6 +458,7 @@ class ScreenRhyme : Screen() {
     }
 
     override fun finalize() {
+        orientationController.restore()
         rhymeManager.release()
     }
 
@@ -491,13 +480,6 @@ class ScreenRhyme : Screen() {
         LaunchedEffect(deviceType) {
             // 监听屏幕朝向变化
             onScreenOrientationChanged(deviceType)
-        }
-
-        // 首次打开切换横屏
-        LaunchedEffect(Unit) {
-            orientationStarter {
-                orientationController.orientation = Orientation.Landscape
-            }
         }
 
         OffScreenEffect { isForeground ->
