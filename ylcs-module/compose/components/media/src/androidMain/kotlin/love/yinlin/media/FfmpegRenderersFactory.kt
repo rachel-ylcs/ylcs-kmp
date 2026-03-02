@@ -44,7 +44,7 @@ class FfmpegRenderersFactory(context: AndroidContext) : DefaultRenderersFactory(
         eventListener: AudioRendererEventListener,
         out: ArrayList<Renderer>
     ) {
-        out += FfmpegAudioRenderer()
+        out += FfmpegAudioRenderer(context)
         super.buildAudioRenderers(context, extensionRendererMode, mediaCodecSelector, enableDecoderFallback, audioSink, eventHandler, eventListener, out)
     }
 }

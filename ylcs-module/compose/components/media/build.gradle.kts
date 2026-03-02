@@ -23,7 +23,6 @@ template(object : KotlinMultiplatformTemplate() {
 
         androidMain.configure(commonMain) {
             lib(
-                files("libs/android/lib-decoder-ffmpeg.aar"),
                 ExportLib,
                 libs.media3.ui,
                 libs.media3.player,

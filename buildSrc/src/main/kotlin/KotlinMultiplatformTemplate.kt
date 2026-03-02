@@ -3,7 +3,6 @@ import com.android.build.api.dsl.LibraryExtension
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.internal.catalog.DelegatingProjectDependency
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
