@@ -157,8 +157,11 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
         val animatedOffset by animateIntAsState(targetValue = controller.offset)
         val shape = if (usePortraitRoundedCorner) Theme.shape.v1.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
 
+        // 顶部是外边距, 去掉状态栏, 因为竖屏 sheet 并不会铺满整个窗口; 底部是内边距, 把三键导航背景调整与 surface 一致
+        val immersivePadding = LocalImmersivePadding.current
+
         Surface(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(top = immersivePadding.top).fillMaxWidth()
                 .offset { IntOffset(x = 0, y = animatedOffset) }
                 .onSizeChanged { controller.dimension = it.height }
                 .draggable(
@@ -166,7 +169,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
                     orientation = Orientation.Vertical,
                     onDragStopped = { controller.stop() },
                 ).nestedScroll(controller),
-            contentPadding = LocalImmersivePadding.current,
+            contentPadding = immersivePadding.withoutTop,
             shadowElevation = Theme.shadow.v1,
             tonalLevel = 5,
             shape = shape

@@ -3,9 +3,7 @@ import kotlinx.html.*
 import kotlinx.html.js.onClickFunction
 import love.yinlin.Local
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.createElement
 import love.yinlin.extension.getElementById
-import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLElement
 
 object MainPage : Page {

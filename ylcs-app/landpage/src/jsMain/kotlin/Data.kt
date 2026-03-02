@@ -129,7 +129,7 @@ enum class AppPlatform(
                 href = url
                 target = "_blank"
                 style.display = "none"
-                download = url.substringAfterLast('.')
+                download = url.substringAfterLast('/')
                 click()
             }
         }
