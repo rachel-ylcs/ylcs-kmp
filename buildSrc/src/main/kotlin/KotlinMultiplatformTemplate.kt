@@ -1,5 +1,4 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
-import com.android.build.api.dsl.LibraryExtension
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -96,8 +95,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
     // Android
     open fun KotlinMultiplatformAndroidLibraryTarget.android() { }
-    open fun LibraryExtension.android() { }
-    open val buildNDK: Boolean = false
 
     // iOS
     open val iosTarget: Boolean = true
@@ -156,81 +153,38 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             }
 
             // Android
-            val oldAndroidPlugin = this@build.extensions.findByType<LibraryExtension>()
-            val newAndroidPlugin = extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()
-            if (oldAndroidPlugin != null || newAndroidPlugin != null) {
-                oldAndroidPlugin?.apply {
-                    @Suppress("Deprecation")
-                    androidTarget {
+            extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()?.apply {
+                namespace = uniqueSafeModuleName
+                compileSdk = C.android.compileSdk
+                minSdk = C.android.minSdk
+                lint.targetSdk = C.android.targetSdk
+
+                compilations.configureEach {
+                    compileTaskProvider.configure {
                         compilerOptions {
                             jvmTarget.set(C.jvm.androidTarget)
                         }
                     }
-
-                    namespace = uniqueSafeModuleName
-                    compileSdk = C.android.compileSdk
-
-                    defaultConfig {
-                        minSdk = C.android.minSdk
-                        lint.targetSdk = C.android.targetSdk
-
-                        val proguardDir = androidProguardKMPDir.asFile
-                        if (proguardDir.isDirectory) {
-                            val proguardFiles = proguardDir.listFiles { it.extension == "pro" }
-                            consumerProguardFiles.addAll(proguardFiles)
-                        }
-
-                        ndk {
-                            for (abi in C.android.ndkAbi) abiFilters += abi
-                        }
-                    }
-
-                    if (buildNDK) {
-                        ndkVersion = C.android.ndkVersion
-
-                        externalNativeBuild {
-                            cmake {
-                                path = file("src/androidMain/cpp/CMakeLists.txt")
-                            }
-                        }
-                    }
-
-                    android()
                 }
 
-                newAndroidPlugin?.apply {
-                    namespace = uniqueSafeModuleName
-                    compileSdk = C.android.compileSdk
-                    minSdk = C.android.minSdk
-                    lint.targetSdk = C.android.targetSdk
-
-                    compilations.configureEach {
-                        compileTaskProvider.configure {
-                            compilerOptions {
-                                jvmTarget.set(C.jvm.androidTarget)
-                            }
+                @Suppress("UnstableApiUsage")
+                optimization {
+                    val proguardDir = androidProguardKMPDir.asFile
+                    if (proguardDir.isDirectory) {
+                        val proguardFiles = proguardDir.listFiles { it.extension == "pro" }
+                        consumerKeepRules.apply {
+                            publish = true
+                            files(*proguardFiles)
                         }
                     }
+                }
 
+                if (exportResources) {
                     @Suppress("UnstableApiUsage")
-                    optimization {
-                        val proguardDir = androidProguardKMPDir.asFile
-                        if (proguardDir.isDirectory) {
-                            val proguardFiles = proguardDir.listFiles { it.extension == "pro" }
-                            consumerKeepRules.apply {
-                                publish = true
-                                files(*proguardFiles)
-                            }
-                        }
-                    }
-
-                    if (exportResources) {
-                        @Suppress("UnstableApiUsage")
-                        androidResources.enable = true
-                    }
-
-                    android()
+                    androidResources.enable = true
                 }
+
+                android()
             }
 
             // iOS

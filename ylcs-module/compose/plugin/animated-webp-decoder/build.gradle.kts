@@ -3,7 +3,7 @@ plugins {
         libs.plugins.kotlinMultiplatform,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
-        libs.plugins.androidLibrary,
+        libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
@@ -11,7 +11,6 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val buildNDK: Boolean = true
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
@@ -21,7 +20,10 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         androidMain.configure(commonMain) {
-            lib(projects.ylcsModule.platform.nativeLibLoader)
+            lib(
+                projects.ylcsModule.compose.plugin.animatedWebpDecoderNdk,
+                projects.ylcsModule.platform.nativeLibLoader
+            )
         }
 
         val skikoMain by create(commonMain)
