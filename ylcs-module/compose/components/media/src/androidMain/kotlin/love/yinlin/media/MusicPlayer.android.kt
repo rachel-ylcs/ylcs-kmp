@@ -6,6 +6,7 @@ import androidx.annotation.OptIn
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -176,6 +177,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
         val info = fetcher.extractMetadata(id)
         val audioUri = fetcher.extractAudioUri(id)
         val coverUri = fetcher.extractCoverUri(id)
+
         return if (info != null && audioUri != null && coverUri != null) MediaItem.Builder()
             .setMediaId(id)
             .setUri(audioUri)
@@ -187,7 +189,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
                     .setAlbumArtist(info.singer)
                     .setComposer(info.composer)
                     .setWriter(info.lyricist)
-                    .setArtworkUri(Uri.parse(coverUri)?.toAndroidUri())
+                    .setArtworkUri(coverUri.toUri())
                     .build()
             ).build() else null
     }
