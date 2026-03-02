@@ -62,7 +62,7 @@ val Path.size: Long get() = catchingDefault(0L) {
             val queue = ArrayDeque<Path>()
             queue.add(this)
             while (queue.isNotEmpty()) {
-                val front = queue.removeFirst()
+                val front = queue.removeAt(0)
                 val metadata = SystemFileSystem.metadataOrNull(front)
                 when {
                     metadata == null -> {}
@@ -82,16 +82,16 @@ fun Path.deleteRecursively(): Boolean = catchingDefault(false) {
         val top = stack.last()
         val metadata = SystemFileSystem.metadataOrNull(top)
         when {
-            metadata == null -> stack.removeLast()
+            metadata == null -> stack.removeAt(stack.lastIndex)
             metadata.isRegularFile -> {
                 SystemFileSystem.delete(top, mustExist = false)
-                stack.removeLast()
+                stack.removeAt(stack.lastIndex)
             }
             metadata.isDirectory -> {
                 val list = SystemFileSystem.list(top)
                 if (list.isEmpty()) {
                     SystemFileSystem.delete(top, mustExist = false)
-                    stack.removeLast()
+                    stack.removeAt(stack.lastIndex)
                 }
                 else stack.addAll(list)
             }

@@ -169,7 +169,9 @@ fun PaintCanvas(
                 PaintCanvasTool {
                     val canRemove by rememberDerivedState { state.paths.isNotEmpty() }
 
-                    Icon(icon = Icons.Undo, enabled = canRemove, onClick = state.paths::removeLastOrNull)
+                    Icon(icon = Icons.Undo, enabled = canRemove, onClick = {
+                        if (state.paths.isNotEmpty()) state.paths.removeAt(state.paths.lastIndex)
+                    })
                     Icon(icon = Icons.Delete, enabled = canRemove, onClick = state.paths::clear)
                     PaintCanvasState.colors1.forEach { color ->
                         Icon(

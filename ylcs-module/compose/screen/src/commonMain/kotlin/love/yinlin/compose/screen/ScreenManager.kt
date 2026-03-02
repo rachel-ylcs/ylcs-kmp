@@ -128,7 +128,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
     }
 
     fun pop() {
-        if (backStack.size > 1) backStack.removeLast()
+        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
     }
 
     @PublishedApi
