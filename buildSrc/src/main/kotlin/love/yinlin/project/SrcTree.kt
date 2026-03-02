@@ -38,12 +38,6 @@ class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
     val modManager: Directory = dir("modManager")
 }
 
-class AndroidAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("androidApp") {
-    private val build: Directory = dir("build")
-
-    val originOutput: RegularFile = build.dir("outputs").dir("apk").dir("release").file("androidApp-release.apk")
-}
-
 class IosAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("iosApp") {
     val core: Directory = dir("core")
     val podfile: RegularFile = file("Podfile")
@@ -97,7 +91,6 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val script = ScriptNode(this)
     val artifacts = ArtifactsNode(this)
     val work = WorkNode(this)
-    val androidApp = AndroidAppNode(this, c)
     val iosApp = IosAppNode(this, c)
     val desktopApp = DesktopAppNode(this, c)
     val webApp = WebAppNode(this, c)

@@ -12,13 +12,13 @@ plugins {
 }
 
 template(object : KotlinAndroidTemplate() {
-    override val packageName: String = C.app.packageName
-    override val packageVersion: Int = C.app.version
-    override val packageVersionName: String = C.app.versionName
+    override val packageName: String = "love.yinlin.lyricseditor"
+    override val packageVersion: Int = 100
+    override val packageVersionName: String = "1.0.0"
 
     override fun KotlinAndroidSourceSetsScope.source() {
         main.configure {
-            lib(projects.ylcsApp.app.portal)
+            lib(projects.ylcsModule.compose.app)
         }
     }
 
@@ -43,12 +43,6 @@ template(object : KotlinAndroidTemplate() {
     }
 
     override fun Project.actions() {
-        // 安卓打包
-        val androidPackage by tasks.registering {
-            dependsOn(tasks.named("assembleDebug"))
-        }
-
-        // 发布安卓安装包
         val androidPublish by tasks.registering {
             dependsOn(tasks.named("assembleRelease"))
 
@@ -56,7 +50,7 @@ template(object : KotlinAndroidTemplate() {
                 copy {
                     from(originOutput)
                     into(C.root.outputs)
-                    rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.APK" }
+                    rename { _ -> "RachelModLyricsEditor.APK" }
                 }
             }
         }

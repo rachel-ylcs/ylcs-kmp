@@ -2,6 +2,7 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import com.android.build.gradle.internal.dsl.SigningConfig
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFile
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -22,6 +23,8 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
     abstract val packageVersionName: String
     open fun BaseAppModuleExtension.sign(): SigningConfig? = null
     open fun BaseAppModuleExtension.android() { }
+
+    val Project.originOutput: RegularFile get() = layout.buildDirectory.get().dir("outputs").dir("apk").dir("release").file("${project.name}-release.apk")
 
     final override fun Project.build(extension: KotlinAndroidExtension) {
         with(extension) {
