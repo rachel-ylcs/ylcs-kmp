@@ -231,11 +231,13 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
             }
         }
         CommonButtonContainer("超管空间") {
-            CommonButton("活动", Icons.Link) {
-                navigate(::ScreenActivityLink)
-            }
-            CommonButton("测试", Icons.BugReport) {
-                navigate(::ScreenTest)
+            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                CommonButton("活动", Icons.Link) {
+                    navigate(::ScreenActivityLink)
+                }
+                CommonButton("测试", Icons.BugReport) {
+                    navigate(::ScreenTest)
+                }
             }
         }
     }
