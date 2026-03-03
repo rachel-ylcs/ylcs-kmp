@@ -18,7 +18,12 @@ template(object : KotlinAndroidTemplate() {
 
     override fun KotlinAndroidSourceSetsScope.source() {
         main.configure {
-            lib(projects.ylcsModule.compose.app)
+            lib(
+                projects.ylcsModule.compose.app,
+                projects.ylcsModule.compose.screen,
+
+                projects.ylcsApp.mod,
+            )
         }
     }
 

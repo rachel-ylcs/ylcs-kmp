@@ -98,7 +98,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
             val lineText = StringBuilder()
             for (match in matches) {
                 val ch = match.groupValues[1]
-                if (ch.length != 1) continue
+                if (ch.length != 1 || ch.isBlank()) continue
                 lineText.append(ch)
                 theme += RhymeAction.Note(
                     ch = ch,
