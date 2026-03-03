@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -25,6 +26,7 @@ import love.yinlin.app.information.resources.*
 import love.yinlin.common.DataSourceInformation
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Device
+import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -74,6 +76,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
     private fun LinkIcon(
         text: String,
         painter: Painter,
+        iconColor: Color = LocalColor.current,
         onClick: () -> Unit
     ) {
         val shape = Theme.shape.v5
@@ -86,7 +89,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h / 2),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(painter = painter, color = Colors.Unspecified, modifier = Modifier.size(Theme.size.icon))
+            Icon(painter = painter, color = iconColor, modifier = Modifier.size(Theme.size.icon))
             SimpleEllipsisText(text = text)
         }
     }
@@ -173,7 +176,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
                     link.showstart?.ifEmpty { null }?.let { showstart ->
-                        LinkIcon("秀动", painterResource(Res.drawable.img_showstart)) {
+                        LinkIcon("秀动", painterResource(Res.drawable.img_showstart), Colors.Unspecified) {
                             launch {
                                 val uri = Uri.parse(showstart)
                                 if (uri == null) slot.tip.warning("链接已失效")
@@ -182,12 +185,12 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                         }
                     }
                     link.damai?.ifEmpty { null }?.let { damai ->
-                        LinkIcon("大麦", painterResource(Res.drawable.img_damai)) {
+                        LinkIcon("大麦", painterResource(Res.drawable.img_damai), Colors.Unspecified) {
                             navigateScreenWebPage("https://m.damai.cn/shows/item.html?itemId=${damai}")
                         }
                     }
                     link.maoyan?.ifEmpty { null }?.let { maoyan ->
-                        LinkIcon("猫眼", painterResource(Res.drawable.img_maoyan)) {
+                        LinkIcon("猫眼", painterResource(Res.drawable.img_maoyan), Colors.Unspecified) {
                             navigateScreenWebPage("https://show.maoyan.com/qqw#/detail/${maoyan}")
                         }
                     }
