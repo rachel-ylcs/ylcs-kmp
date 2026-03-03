@@ -54,7 +54,7 @@ template(object : KotlinAndroidTemplate() {
 
             doLast {
                 copy {
-                    from(C.root.androidApp.originOutput)
+                    from(originOutput)
                     into(C.root.outputs)
                     rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.APK" }
                 }

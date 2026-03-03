@@ -72,6 +72,8 @@ include(
 
     /* -----------------  应用模块  ----------------- */
 
+    "ylcs-app:lyricsEditor",
+
     "ylcs-app:app:account",
     "ylcs-app:app:community",
     "ylcs-app:app:game",
