@@ -81,6 +81,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     private var isAnimationBackground by mutableStateOf(false)
     private var hasAnimation by mutableStateOf(false)
     private var hasVideo by mutableStateOf(false)
+    private var hasAccompaniment by mutableStateOf(false)
 
     private val blurState = BlurState()
 
@@ -120,12 +121,14 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             // 更新状态标志
                             hasAnimation = music.path(PathMod, ModResourceType.Animation).isFile
                             hasVideo = music.path(PathMod, ModResourceType.Video).isFile
+                            hasAccompaniment = music.path(PathMod, ModResourceType.Accompaniment).isFile
                         }
                     }
                 }
                 else {
                     hasAnimation = false
                     hasVideo = false
+                    hasAccompaniment = false
                     sleepJob?.cancel()
                     sleepJob = null
                 }
@@ -204,6 +207,19 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         color = if (isAnimationBackground) Theme.color.primary else LocalColor.current,
                         enabled = hasAnimation,
                         onClick = { isAnimationBackground = !isAnimationBackground }
+                    )
+                    Icon(
+                        icon = Icons.MusicNote,
+                        tip = "伴奏",
+                        enabled = hasAccompaniment,
+                        onClick = {
+                            mp?.let { player ->
+                                launch {
+                                    player.pause()
+                                    player.currentMusic?.let { navigate(::ScreenAccompaniment, it) }
+                                }
+                            }
+                        }
                     )
                     Icon(
                         icon = Icons.MusicVideo,

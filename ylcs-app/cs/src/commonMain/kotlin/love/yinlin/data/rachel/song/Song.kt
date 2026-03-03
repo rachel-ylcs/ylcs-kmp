@@ -16,4 +16,5 @@ data class Song(
     val animation: Boolean = false,
     val video: Boolean = false,
     val rhyme: Boolean = false,
+    val accompaniment: Boolean = false
 )

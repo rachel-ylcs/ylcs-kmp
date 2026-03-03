@@ -46,6 +46,10 @@ enum class ModResourceType(
     Rhyme(
         type = "rhyme",
         description = "音游配置"
+    ),
+    Accompaniment(
+        type = "accompaniment",
+        description = "伴奏"
     );
 
     val filename: String get() = "$type.$RES_EXT"
@@ -68,6 +72,7 @@ enum class ModResourceType(
             Animation.type -> Animation
             Video.type -> Video
             Rhyme.type -> Rhyme
+            Accompaniment.type -> Accompaniment
             else -> null
         }
     }
