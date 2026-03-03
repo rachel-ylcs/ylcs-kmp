@@ -71,12 +71,6 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
     private var hide: Boolean by mutableStateOf(activity.hide)
     private var photo by mutableRefStateOf(activity.photo)
 
-    private val canSubmit by derivedStateOf {
-        shortTitle.isSafe && fullTitle.isSafe && timeInfo.isSafe && location.isSafe && content.isSafe
-                && showstart.isSafe && damai.isSafe && maoyan.isSafe && link.isSafe
-                && qqGroupPhone.isSafe && qqGroupLink.isSafe
-    }
-
     private suspend fun updateActivity() {
         // 检查
         val ts = date.text
@@ -259,7 +253,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             onClick = { hide = !hide }
         )
 
-        LoadingIcon(icon = Icons.Check, tip = "提交", enabled = canSubmit, onClick = {
+        LoadingIcon(icon = Icons.Check, tip = "提交", onClick = {
             updateActivity()
         })
     }
