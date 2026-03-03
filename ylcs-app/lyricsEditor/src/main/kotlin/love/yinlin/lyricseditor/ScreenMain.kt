@@ -165,8 +165,8 @@ class ScreenMain : BasicScreen() {
                 Icon(tip = "添加副歌开始", icon = Icons.AlignHorizontalLeft, color = Theme.color.primary, onClick = {
                     val lineStart = line.start
                     val chorus = config.chorus
-                    var findIndex = chorus.indexOfFirst { lineStart <= it.start }
-                    if (findIndex == -1) findIndex = 0
+                    var findIndex = chorus.binarySearchBy(lineStart) { it.start }
+                    if (findIndex < 0) findIndex = -(findIndex + 1)
                     val newChorus = chorus.toMutableList()
                     newChorus.add(findIndex, Chorus(lineStart, lineStart))
                     rhymeConfig = config.copy(chorus = newChorus)
@@ -174,17 +174,18 @@ class ScreenMain : BasicScreen() {
                 Icon(tip = "标记副歌结尾", icon = Icons.AlignHorizontalRight, color = Theme.color.primary, onClick = {
                     val lineEnd = line.theme.last().end + line.start
                     val chorus = config.chorus
-                    var findIndex = chorus.lastIndex
-                    for ((index, v) in chorus.withIndex()) {
-                        if (lineEnd < v.start) {
-                            findIndex = index - 1
-                            break
+                    if (chorus.isNotEmpty()) {
+                        val findIndex = chorus.indexOfFirst { it.start > lineEnd }
+                        val index = when {
+                            findIndex == -1 -> chorus.lastIndex
+                            findIndex > 0 -> findIndex - 1
+                            else -> null
                         }
-                    }
-                    if (findIndex in chorus.indices) {
-                        val newChorus = chorus.toMutableList()
-                        newChorus[findIndex] = newChorus[findIndex].copy(end = lineEnd)
-                        rhymeConfig = config.copy(chorus = newChorus)
+                        if (index != null) {
+                            val newChorus = chorus.toMutableList()
+                            newChorus[index] = newChorus[index].copy(end = lineEnd)
+                            rhymeConfig = config.copy(chorus = newChorus)
+                        }
                     }
                 })
                 Icon(tip = "删除", icon = Icons.Delete, color = Theme.color.primary, onClick = {
