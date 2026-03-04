@@ -20,7 +20,7 @@ fun APIScope.songAPI() {
 
     ApiSongGetSong.response { sid ->
         val song = db.querySQLSingle("""
-            SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme
+            SELECT sid, version, name, singer, lyricist, composer, album, animation, video, rhyme, accompaniment
 			FROM song
             WHERE sid = ?
         """, sid)
