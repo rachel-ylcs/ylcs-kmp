@@ -39,7 +39,7 @@ abstract class AudioPlayer(val context: Context, val onEndListener: () -> Unit) 
     /**
      * 加载
      */
-    abstract suspend fun load(path: Path)
+    abstract suspend fun load(path: Path, playing: Boolean)
 
     /**
      * 播放

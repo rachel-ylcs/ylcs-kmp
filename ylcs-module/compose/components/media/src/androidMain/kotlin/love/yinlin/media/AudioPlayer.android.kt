@@ -48,11 +48,11 @@ internal class AndroidAudioPlayer(context: Context, onEndListener: () -> Unit) :
         player = null
     }
 
-    override suspend fun load(path: Path) {
+    override suspend fun load(path: Path, playing: Boolean) {
         player?.let {
             it.setMediaItem(MediaItem.fromUri(path.toString()))
             it.prepare()
-            it.play()
+            if (playing) it.play()
         }
     }
 

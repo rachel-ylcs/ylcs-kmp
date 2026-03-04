@@ -252,7 +252,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             ModResourceType.Animation -> listOf(Colors.Orange5, Colors.Orange6)
             ModResourceType.Video -> listOf(Colors.Green5, Colors.Green6)
             ModResourceType.Rhyme -> listOf(Colors.Cyan5, Colors.Cyan6)
-            ModResourceType.Accompaniment -> listOf(Colors.Amber2, Colors.Amber3)
+            ModResourceType.Accompaniment -> listOf(Colors.Red4, Colors.Red5)
         })
     }
 

@@ -35,9 +35,9 @@ internal class WindowsAudioController(context: Context, onEndListener: () -> Uni
         }
     }
 
-    override suspend fun load(path: Path) {
+    override suspend fun load(path: Path, playing: Boolean) {
         nativeSetSource(nativeHandle, path.toString())
-        nativePlay(nativeHandle)
+        if (playing) nativePlay(nativeHandle)
     }
 
     override fun play() {

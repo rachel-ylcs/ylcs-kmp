@@ -205,35 +205,41 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         icon = Icons.GifBox,
                         tip = "动画",
                         color = if (isAnimationBackground) Theme.color.primary else LocalColor.current,
-                        enabled = hasAnimation,
-                        onClick = { isAnimationBackground = !isAnimationBackground }
+                        onClick = {
+                            if (hasAnimation) isAnimationBackground = !isAnimationBackground
+                            else slot.tip.warning("未安装动画资源")
+                        }
                     )
                     Icon(
                         icon = Icons.MusicNote,
                         tip = "伴奏",
-                        enabled = hasAccompaniment,
                         onClick = {
-                            mp?.let { player ->
-                                launch {
-                                    player.pause()
-                                    player.currentMusic?.let { navigate(::ScreenAccompaniment, it) }
+                            if (hasAccompaniment) {
+                                mp?.let { player ->
+                                    launch {
+                                        player.pause()
+                                        player.currentMusic?.let { navigate(::ScreenAccompaniment, it, player.engine.type) }
+                                    }
                                 }
                             }
+                            else slot.tip.warning("未安装伴奏资源")
                         }
                     )
                     Icon(
                         icon = Icons.MusicVideo,
                         tip = "视频",
-                        enabled = hasVideo,
                         onClick = {
-                            mp?.let {
-                                launch {
-                                    it.pause()
-                                    it.currentMusic?.path(PathMod, ModResourceType.Video)?.let { path ->
-                                        navigate(::ScreenVideo, path.toString())
+                            if (hasVideo) {
+                                mp?.let {
+                                    launch {
+                                        it.pause()
+                                        it.currentMusic?.path(PathMod, ModResourceType.Video)?.let { path ->
+                                            navigate(::ScreenVideo, path.toString())
+                                        }
                                     }
                                 }
                             }
+                            else slot.tip.warning("未安装视频资源")
                         }
                     )
                     Icon(icon = Icons.Comment, tip = "歌评", onClick = {
@@ -397,10 +403,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
     @Composable
     override fun Content() {
-        Box(
-            modifier = Modifier.fillMaxSize().background(ColorSystem.Default.dark.background),
-            contentAlignment = Alignment.BottomCenter
-        ) {
+        Box(modifier = Modifier.fillMaxSize().background(ColorSystem.Default.dark.background)) {
             ThemeContainer(ColorSystem.Default.dark.onBackground, ColorSystem.Default.dark.onBackgroundVariant) {
                 val device = LocalDevice.current.type
                 val immersivePadding = LocalImmersivePadding.current
