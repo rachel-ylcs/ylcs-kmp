@@ -81,6 +81,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     private var isAnimationBackground by mutableStateOf(false)
     private var hasAnimation by mutableStateOf(false)
     private var hasVideo by mutableStateOf(false)
+    private var hasAccompaniment by mutableStateOf(false)
 
     private val blurState = BlurState()
 
@@ -120,12 +121,14 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             // 更新状态标志
                             hasAnimation = music.path(PathMod, ModResourceType.Animation).isFile
                             hasVideo = music.path(PathMod, ModResourceType.Video).isFile
+                            hasAccompaniment = music.path(PathMod, ModResourceType.Accompaniment).isFile
                         }
                     }
                 }
                 else {
                     hasAnimation = false
                     hasVideo = false
+                    hasAccompaniment = false
                     sleepJob?.cancel()
                     sleepJob = null
                 }
@@ -202,22 +205,41 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         icon = Icons.GifBox,
                         tip = "动画",
                         color = if (isAnimationBackground) Theme.color.primary else LocalColor.current,
-                        enabled = hasAnimation,
-                        onClick = { isAnimationBackground = !isAnimationBackground }
+                        onClick = {
+                            if (hasAnimation) isAnimationBackground = !isAnimationBackground
+                            else slot.tip.warning("未安装动画资源")
+                        }
+                    )
+                    Icon(
+                        icon = Icons.MusicNote,
+                        tip = "伴奏",
+                        onClick = {
+                            if (hasAccompaniment) {
+                                mp?.let { player ->
+                                    launch {
+                                        player.pause()
+                                        player.currentMusic?.let { navigate(::ScreenAccompaniment, it, player.engine.type) }
+                                    }
+                                }
+                            }
+                            else slot.tip.warning("未安装伴奏资源")
+                        }
                     )
                     Icon(
                         icon = Icons.MusicVideo,
                         tip = "视频",
-                        enabled = hasVideo,
                         onClick = {
-                            mp?.let {
-                                launch {
-                                    it.pause()
-                                    it.currentMusic?.path(PathMod, ModResourceType.Video)?.let { path ->
-                                        navigate(::ScreenVideo, path.toString())
+                            if (hasVideo) {
+                                mp?.let {
+                                    launch {
+                                        it.pause()
+                                        it.currentMusic?.path(PathMod, ModResourceType.Video)?.let { path ->
+                                            navigate(::ScreenVideo, path.toString())
+                                        }
                                     }
                                 }
                             }
+                            else slot.tip.warning("未安装视频资源")
                         }
                     )
                     Icon(icon = Icons.Comment, tip = "歌评", onClick = {
@@ -381,10 +403,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
     @Composable
     override fun Content() {
-        Box(
-            modifier = Modifier.fillMaxSize().background(ColorSystem.Default.dark.background),
-            contentAlignment = Alignment.BottomCenter
-        ) {
+        Box(modifier = Modifier.fillMaxSize().background(ColorSystem.Default.dark.background)) {
             ThemeContainer(ColorSystem.Default.dark.onBackground, ColorSystem.Default.dark.onBackgroundVariant) {
                 val device = LocalDevice.current.type
                 val immersivePadding = LocalImmersivePadding.current

@@ -61,7 +61,7 @@ class RhymeManager(
             lyricsConfig = lyricsConfig
         ))
 
-        ap.load(audio)
+        ap.load(audio, true)
 
         resume()
     }

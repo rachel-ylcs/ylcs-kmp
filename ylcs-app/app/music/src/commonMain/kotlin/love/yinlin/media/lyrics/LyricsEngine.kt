@@ -27,6 +27,11 @@ interface LyricsEngine {
 
         val Default: LyricsEngine by lazy { Line }
 
+        internal fun clone(type: LyricsEngineType): LyricsEngine = when (type) {
+            LyricsEngineType.Line -> LineLyricsEngine()
+            LyricsEngineType.Rhyme -> RhymeLyricsEngine()
+        }
+
         operator fun get(type: LyricsEngineType): LyricsEngine = when (type) {
             LyricsEngineType.Line -> Line
             LyricsEngineType.Rhyme -> Rhyme

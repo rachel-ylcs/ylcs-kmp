@@ -13,7 +13,7 @@ internal class MacOSAudioController(context: Context, onEndListener: () -> Unit)
     override val position: Long = 0L
     override val duration: Long = 0L
     override suspend fun init() {}
-    override suspend fun load(path: Path) {}
+    override suspend fun load(path: Path, playing: Boolean) {}
     override fun play() {}
     override fun pause() {}
     override fun stop() {}

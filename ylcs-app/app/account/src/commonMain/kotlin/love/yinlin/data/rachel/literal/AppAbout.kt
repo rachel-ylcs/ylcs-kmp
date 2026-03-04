@@ -12,7 +12,7 @@ internal object AppAbout {
         title = "银临茶舍界面重制版",
         force = true,
         maintenance = false,
-        date = LocalDate(2026, 3, 1),
+        date = LocalDate(2026, 3, 4),
         groups = listOf(
             AppUpdateRecordGroup(
                 type = "新功能",
@@ -20,10 +20,11 @@ internal object AppAbout {
                 color = Colors.Steel5,
                 background = Colors.Steel2,
                 records = listOf(
-                    "1. APP界面重制, 引入丰富动画",
-                    "2. 官网落地, 后续更新可以在线下载",
-                    "3. 动态歌词引擎支持, 与音游共享配置",
-                    "4. 音游内测上线, 内测期将陆续支持银临全曲集, 公测后将开放玩家排行榜",
+                    "1. 伴奏系统上线, 全曲库纯净伴奏解锁",
+                    "2. 动态歌词引擎支持, 与音游共享配置",
+                    "3. APP界面重制, 引入丰富动画",
+                    "4. 官网落地, 后续更新可以在线下载",
+                    "5. 音游内测上线, 内测期将陆续支持银临全曲集, 公测后将开放玩家排行榜",
                 )
             ),
             AppUpdateRecordGroup(
