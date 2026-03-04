@@ -128,6 +128,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             if (data.animation) remoteResources.add(ResourceItem(ModResourceType.Animation, null))
             if (data.video) remoteResources.add(ResourceItem(ModResourceType.Video, null))
             if (data.rhyme) remoteResources.add(ResourceItem(ModResourceType.Rhyme, null))
+            if (data.accompaniment) remoteResources.add(ResourceItem(ModResourceType.Accompaniment, null))
             song = data
         }
         return song
