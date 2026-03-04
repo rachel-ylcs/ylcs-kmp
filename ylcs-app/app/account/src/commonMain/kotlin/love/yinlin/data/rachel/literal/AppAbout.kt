@@ -9,8 +9,8 @@ import love.yinlin.compose.ui.icon.Icons
 internal object AppAbout {
      val updateInfo = AppUpdateInfo(
         platform = "Android/Windows/Web 先行发布",
-        title = "银临茶舍界面重制版",
-        force = true,
+        title = "银临茶舍 伴奏功能上线",
+        force = false,
         maintenance = false,
         date = LocalDate(2026, 3, 4),
         groups = listOf(
@@ -33,13 +33,9 @@ internal object AppAbout {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = listOf(
-                    "1. 优化各端APP性能, 减小安装包体积",
-                    "2. 电脑端显示活动日历",
-                    "3. 优化电脑端窗口最大化和最小化, 移除托盘",
-                    "4. 优化音游性能表现",
-                    "5. 恢复MOD修改信息与图片资源的功能",
-                    "6. 优化歌单调整顺序的方式",
-                    "7. 优化世界页游戏对局展示",
+                    "1. 歌单歌曲单击后立即从此位置播放该歌单",
+                    "2. 恢复MOD修改信息与图片资源的功能",
+                    "3. 优化歌单调整顺序的方式",
                 )
             ),
             AppUpdateRecordGroup(
@@ -48,8 +44,13 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复视频播放时崩溃的问题",
-                    "2. 修复音游部分颜色异常的问题",
+                    "1. 修复弹出面板拖柄边距异常的问题",
+                    "2. 修复Android13以下设备崩溃的问题",
+                    "3. 修复输入框非空条件限制的问题",
+                    "4. 修复音游和视频页退出后不能从横屏恢复到竖屏的问题",
+                    "5. 修复活动详情在深色模式下颜色异常的问题",
+                    "6. 修复超管空间越权查看的问题",
+                    "7. 修复Android端灵动岛歌曲封面异常的问题"
                 )
             )
         )

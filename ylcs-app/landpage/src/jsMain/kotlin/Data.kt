@@ -42,7 +42,7 @@ enum class AppPlatform(
         AppPlatformVersion.STABLE,
         "下载",
         {
-            downloadApp("$HOMEPAGE_URL/app/[Android]银临茶舍${Local.info.versionName}.APK")
+            downloadApp("$HOMEPAGE_URL/app/[Android]银临茶舍${Local.info.versionName}.apk")
         }
     ),
     IOS(
