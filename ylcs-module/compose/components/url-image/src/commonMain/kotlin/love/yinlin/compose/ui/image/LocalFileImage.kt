@@ -13,7 +13,7 @@ import kotlinx.io.files.Path
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.extension.fileSize
+import love.yinlin.fs.fileSize
 
 @Composable
 fun LocalFileImage(

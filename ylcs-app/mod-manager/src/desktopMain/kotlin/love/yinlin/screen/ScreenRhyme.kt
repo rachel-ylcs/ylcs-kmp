@@ -55,6 +55,7 @@ import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLine
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.*
+import love.yinlin.fs.*
 import love.yinlin.mod_manager.resources.Res
 import love.yinlin.mod_manager.resources.music
 import love.yinlin.util.QrcDecrypter

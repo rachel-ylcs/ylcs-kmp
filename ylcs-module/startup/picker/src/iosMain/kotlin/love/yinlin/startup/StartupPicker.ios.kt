@@ -15,11 +15,9 @@ import love.yinlin.io.Sources
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
-import love.yinlin.extension.bufferedSink
-import love.yinlin.extension.safeSources
+import love.yinlin.fs.*
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
-import love.yinlin.uri.toPath
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.Foundation.temporaryDirectory
@@ -69,7 +67,7 @@ actual class StartupPicker : SyncStartup() {
                         pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
                                 url, _ ->
                             val tempUrl = copyToTempDir(url)
-                            tempUrl?.toPath()?.let { path -> images.add(path) }
+                            tempUrl?.path?.let(::Path)?.let { path -> images.add(path) }
                             processedImages++
                             if (processedImages == results.size) {
                                 future.send(images.safeSources())
@@ -172,7 +170,7 @@ actual class StartupPicker : SyncStartup() {
         val fileManager = NSFileManager.defaultManager
         val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(filename) ?: return null
         val url = NSURL.fileURLWithPathComponents(tempPath) ?: return null
-        val path = url.toPath() ?: return null
+        val path = url.path?.let(::Path) ?: return null
         return SaveType.Video(filename, url) to path.bufferedSink
     }
 

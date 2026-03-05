@@ -44,6 +44,7 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.activity.ActivityLink
 import love.yinlin.data.rachel.activity.ActivityPrice
 import love.yinlin.extension.*
+import love.yinlin.fs.readByteArray
 
 @Stable
 class ScreenModifyActivity(private val aid: Int) : Screen() {

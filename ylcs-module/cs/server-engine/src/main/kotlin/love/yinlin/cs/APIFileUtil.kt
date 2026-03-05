@@ -1,7 +1,7 @@
 package love.yinlin.cs
 
 import kotlinx.io.files.Path
-import love.yinlin.extension.deleteRecursively
+import love.yinlin.fs.deleteRecursively
 import java.io.File
 
 val EmptyAPIFile = object : APIFile {

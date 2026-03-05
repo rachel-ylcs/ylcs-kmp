@@ -54,6 +54,7 @@ include(
     "ylcs-module:cs:client-engine",
     "ylcs-module:cs:server-engine",
     "ylcs-module:foundation:context",
+    "ylcs-module:foundation:filesystem",
     "ylcs-module:foundation:orientation",
     "ylcs-module:foundation:startup",
     "ylcs-module:native:win32:core",

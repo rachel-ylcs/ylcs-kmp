@@ -58,11 +58,11 @@ import love.yinlin.cs.url
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.exists
-import love.yinlin.extension.readByteArray
-import love.yinlin.extension.readText
 import love.yinlin.foundation.Orientation
 import love.yinlin.foundation.OrientationController
+import love.yinlin.fs.exists
+import love.yinlin.fs.readByteArray
+import love.yinlin.fs.readText
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable

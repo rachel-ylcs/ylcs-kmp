@@ -38,12 +38,8 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.lazyProvider
-import love.yinlin.extension.mkdir
-import love.yinlin.extension.readByteArray
 import love.yinlin.extension.toJsonString
-import love.yinlin.extension.write
-import love.yinlin.extension.writeText
-import love.yinlin.extension.writeTo
+import love.yinlin.fs.*
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.tpl.lyrics.LrcParser
 import love.yinlin.uri.ImplicitUri

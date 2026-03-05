@@ -20,8 +20,8 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.kotlinx.atomicfu,
                 ExportLib,
                 libs.kotlinx.coroutines,
-                libs.kotlinx.datetime,
                 libs.kotlinx.io,
+                libs.kotlinx.datetime,
                 libs.kotlinx.json,
             )
         }

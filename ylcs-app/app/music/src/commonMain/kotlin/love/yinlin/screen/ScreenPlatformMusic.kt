@@ -35,13 +35,9 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.fileSize
 import love.yinlin.extension.lazyProvider
-import love.yinlin.extension.mkdir
 import love.yinlin.extension.toJsonString
-import love.yinlin.extension.writeByteArray
-import love.yinlin.extension.writeText
-import love.yinlin.extension.writeTo
+import love.yinlin.fs.*
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.tpl.PlatformMusicParser
 import love.yinlin.uri.Uri

@@ -2,9 +2,9 @@ package love.yinlin.startup
 
 import kotlinx.io.files.Path
 import love.yinlin.foundation.Context
-import love.yinlin.extension.deleteRecursively
-import love.yinlin.extension.mkdir
-import love.yinlin.extension.size
+import love.yinlin.fs.deleteRecursively
+import love.yinlin.fs.mkdir
+import love.yinlin.fs.size
 import love.yinlin.platform.unsupportedPlatform
 
 actual fun buildOSStorage(context: Context, appName: String): OSStorage = object : OSStorage() {

@@ -6,8 +6,8 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.foundation.Context
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.mkdir
-import love.yinlin.extension.write
+import love.yinlin.fs.mkdir
+import love.yinlin.fs.write
 
 abstract class OSStorage {
     abstract val appPath: Path

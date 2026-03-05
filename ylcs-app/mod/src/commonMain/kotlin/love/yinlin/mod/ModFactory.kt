@@ -12,6 +12,7 @@ import love.yinlin.data.mod.ModMetadata
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
+import love.yinlin.fs.*
 import kotlin.random.Random
 
 object ModFactory {
@@ -47,7 +48,7 @@ object ModFactory {
         private suspend fun Sink.writeResource(resourcePath: Path, resource: ModResourceType) {
             Coroutines.io {
                 writeLengthString(resource.type)
-                val resLength = resourcePath.size.toInt()
+                val resLength = resourcePath.fileSize.toInt()
                 require(resLength > 0) { "资源长度非法 $resourcePath Length: $resLength" }
                 val times = resLength / INTERVAL
                 val remain = resLength - times * INTERVAL

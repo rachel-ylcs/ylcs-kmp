@@ -11,10 +11,10 @@ import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupNative
 import love.yinlin.foundation.SyncStartup
-import love.yinlin.extension.bufferedSink
-import love.yinlin.extension.bufferedSource
-import love.yinlin.extension.delete
-import love.yinlin.extension.safeSources
+import love.yinlin.fs.bufferedSink
+import love.yinlin.fs.bufferedSource
+import love.yinlin.fs.delete
+import love.yinlin.fs.safeSources
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 

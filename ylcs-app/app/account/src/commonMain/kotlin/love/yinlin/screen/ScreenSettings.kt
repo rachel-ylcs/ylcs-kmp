@@ -72,7 +72,7 @@ import love.yinlin.data.rachel.literal.AppPrivacyPolicy
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.fileSizeString
-import love.yinlin.extension.readByteArray
+import love.yinlin.fs.readByteArray
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 

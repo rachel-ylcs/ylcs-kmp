@@ -48,9 +48,9 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.deleteRecursively
 import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.replaceAll
+import love.yinlin.fs.deleteRecursively
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
 

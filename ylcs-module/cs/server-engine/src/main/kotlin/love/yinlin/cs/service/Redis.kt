@@ -5,6 +5,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig
 import redis.clients.jedis.Connection
 import redis.clients.jedis.DefaultJedisClientConfig
 import redis.clients.jedis.RedisClient
+import redis.clients.jedis.params.SetParams
 
 class Redis internal constructor(config: Config) {
     @Serializable
@@ -32,7 +33,7 @@ class Redis internal constructor(config: Config) {
         .build()
 
     operator fun set(key: String, value: String) { dataSource.set(key, value) }
-    fun setex(key: String, value: String, seconds: Long) { dataSource.setex(key, seconds, value) }
+    fun setex(key: String, value: String, seconds: Long) { dataSource.set(key, value, SetParams().ex(seconds)) }
     operator fun get(key: String): String? = dataSource.get(key)
     fun remove(key: String) { dataSource.del(key) }
     fun close() = dataSource.close()

@@ -15,7 +15,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.extension.catchingDefault
-import love.yinlin.extension.readText
+import love.yinlin.fs.readText
 import love.yinlin.tpl.lyrics.LrcParser
 
 @Stable

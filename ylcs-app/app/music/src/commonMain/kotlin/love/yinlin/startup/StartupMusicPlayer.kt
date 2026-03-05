@@ -20,13 +20,13 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.list
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.extension.readText
 import love.yinlin.foundation.AsyncStartup
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupFetcher
+import love.yinlin.fs.list
+import love.yinlin.fs.readText
 import love.yinlin.media.MediaMetadataFetcher
 import love.yinlin.media.MusicPlayerListener
 import love.yinlin.media.buildMusicPlayer

@@ -15,13 +15,13 @@ import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.cs.ClientEngine
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.mkdir
 import love.yinlin.foundation.PlatformContextDelegate
 import love.yinlin.foundation.StartupDelegate
 import love.yinlin.foundation.StartupLazyFetcher
 import love.yinlin.foundation.StartupNative
 import love.yinlin.foundation.useNotPlatformStartupLazyFetcher
 import love.yinlin.foundation.usePlatformStartupLazyFetcher
+import love.yinlin.fs.mkdir
 import love.yinlin.platform.Platform
 import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupKV

@@ -142,6 +142,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open val windowsTarget: Boolean = false
     open val linuxTarget: Boolean = false
     open val macosTarget: Boolean = false
+    open fun KotlinNativeTarget.androidNative() { }
+    open fun KotlinNativeTarget.windows() { }
+    open fun KotlinNativeTarget.linux() { }
+    open fun KotlinNativeTarget.macos() { }
     open fun KotlinNativeTarget.native() { }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
@@ -313,10 +317,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
             // DesktopNative
             buildList {
-                if (androidNativeTarget) add(androidNativeArm64("androidNative"))
-                if (windowsTarget) add(mingwX64("windows"))
-                if (linuxTarget) add(linuxX64("linux"))
-                if (macosTarget) add(macosArm64("macos"))
+                if (androidNativeTarget) add(androidNativeArm64("androidNative") { androidNative() })
+                if (windowsTarget) add(mingwX64("windows") { windows() })
+                if (linuxTarget) add(linuxX64("linux") { linux() })
+                if (macosTarget) add(macosArm64("macos") { macos() })
             }.forEach { target ->
                 target.native()
             }

@@ -21,8 +21,9 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.ktor.client.negotiation,
                 libs.ktor.client.websockets,
                 ExportLib,
-                projects.ylcsModule.cs.core,
                 libs.ktor.client,
+                projects.ylcsModule.foundation.filesystem,
+                projects.ylcsModule.cs.core,
             )
         }
 

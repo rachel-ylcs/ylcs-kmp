@@ -8,8 +8,8 @@ import love.yinlin.compose.PlatformApplication
 import love.yinlin.compose.ToolingTheme
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.extension.LazyReference
-import love.yinlin.extension.mkdir
 import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.fs.mkdir
 import love.yinlin.mod.ModFactory
 import love.yinlin.screen.ScreenMain
 import love.yinlin.screen.ScreenRhyme

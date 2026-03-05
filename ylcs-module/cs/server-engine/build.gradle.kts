@@ -24,9 +24,10 @@ template(object : KotlinJvmTemplate() {
                 libs.ktor.server.host,
                 libs.ktor.server.websockets,
                 ExportLib,
-                projects.ylcsModule.cs.core,
                 libs.logback,
                 libs.ktor.server,
+                projects.ylcsModule.foundation.filesystem,
+                projects.ylcsModule.cs.core,
             )
         }
     }

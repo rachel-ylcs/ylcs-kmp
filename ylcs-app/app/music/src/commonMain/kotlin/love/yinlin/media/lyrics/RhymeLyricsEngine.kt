@@ -21,7 +21,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.extension.readText
+import love.yinlin.fs.readText
 
 @Stable
 internal data class DynamicLineItem(val ch: String, val end: Long)

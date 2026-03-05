@@ -13,6 +13,7 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 ExportLib,
+                projects.ylcsModule.foundation.filesystem,
                 projects.ylcsModule.foundation.startup,
             )
         }
