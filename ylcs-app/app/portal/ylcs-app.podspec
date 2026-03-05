@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'ylcs-app'
-    spec.version                  = '3.5.0'
+    spec.version                  = '3.5.1'
     spec.homepage                 = 'https://github.com/rachel-ylcs/ylcs-kmp'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
