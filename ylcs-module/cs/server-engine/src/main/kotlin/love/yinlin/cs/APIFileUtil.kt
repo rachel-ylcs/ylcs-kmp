@@ -1,7 +1,5 @@
 package love.yinlin.cs
 
-import kotlinx.io.files.Path
-import love.yinlin.fs.deleteRecursively
 import java.io.File
 
 val EmptyAPIFile = object : APIFile {
@@ -30,6 +28,6 @@ val APIFile.num: Int get() = files.size
 
 fun APIFile.copy(other: APIFile): File = first.copyTo(other.first, true)
 
-suspend fun APIFile.delete() = files.map(::Path).forEach { it.deleteRecursively() }
+fun APIFile.delete() = files.forEach { File(it).deleteRecursively() }
 
 fun APIFile.mkdir() = first.mkdirs()

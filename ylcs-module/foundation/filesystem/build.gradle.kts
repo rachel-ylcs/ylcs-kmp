@@ -16,6 +16,8 @@ template(object : KotlinMultiplatformTemplate() {
     override val linuxTarget: Boolean = true
     override val macosTarget: Boolean = true
 
+    override val webTestHeadless: Boolean = false
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
@@ -45,6 +47,13 @@ template(object : KotlinMultiplatformTemplate() {
         jsMain.configure(webMain)
 
         wasmJsMain.configure(webMain)
+
+        wasmJsTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test,
+            )
+        }
 
         androidNativeMain.configure(nativeMain)
 

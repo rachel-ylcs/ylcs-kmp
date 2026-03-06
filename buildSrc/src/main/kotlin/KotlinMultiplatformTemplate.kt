@@ -133,6 +133,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
     // Web
     open val webTarget: Boolean = true
+    open val webTestHeadless: Boolean = true
     open fun KotlinWasmJsTargetDsl.wasmJs() { }
     open fun KotlinJsTargetDsl.js() { }
     open fun KotlinWebpackConfig.webpack() { }
@@ -268,7 +269,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     browser {
                         testTask {
                             useKarma {
-                                useChromeHeadless()
+                                if (webTestHeadless) useChromeHeadless()
+                                else useChrome()
                             }
                         }
 
@@ -297,7 +299,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     browser {
                         testTask {
                             useKarma {
-                                useChromeHeadless()
+                                if (webTestHeadless) useChromeHeadless()
+                                else useChrome()
                             }
                         }
 

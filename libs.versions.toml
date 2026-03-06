@@ -2,8 +2,8 @@
 
 # Plugins #
 kotlin = "2.3.20-RC"
-cmp = "1.11.0-alpha03"
 agp = "8.12.3"
+cmp = "1.11.0-alpha03"
 mavenPublish = "0.35.0"
 dokka = "2.2.0-Beta"
 
@@ -21,7 +21,7 @@ cryptography = "0.5.0"
 pag = "4.5.36"
 
 # Android
-cmp-android = "1.10.1"
+androidx-activity = "1.12.4"
 media3 = "1.10.0-beta01"
 
 # iOS
@@ -59,7 +59,6 @@ test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
-compose-collection = { module = "androidx.collection:collection", version = "1.6.0-rc01" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
@@ -109,8 +108,10 @@ tool-cryptography-asn1 = { module = "dev.whyoleg.cryptography:cryptography-seria
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
-compose-annotation = { module = "androidx.annotation:annotation-jvm", version = "1.9.1" }
-compose-activity = { module = "androidx.activity:activity", version = "1.12.4" }
+androidx-annotation = { module = "androidx.annotation:annotation-jvm", version = "1.9.1" }
+androidx-collection = { module = "androidx.collection:collection", version = "1.6.0-rc01" }
+androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 

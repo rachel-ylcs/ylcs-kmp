@@ -7,15 +7,7 @@ import love.yinlin.data.rachel.prize.Prize
 import love.yinlin.data.rachel.prize.PrizeItem
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserPrivilege
-import love.yinlin.extension.DateEx
-import love.yinlin.extension.Int
-import love.yinlin.extension.IntNull
-import love.yinlin.extension.Object
-import love.yinlin.extension.String
-import love.yinlin.extension.StringNull
-import love.yinlin.extension.to
-import love.yinlin.extension.toJson
-import love.yinlin.extension.makeObject
+import love.yinlin.extension.*
 import java.security.MessageDigest
 import java.security.SecureRandom
 import java.math.BigInteger
@@ -239,9 +231,7 @@ fun APIScope.prizeAPI() {
         """, pid)
 
         // 只要没开奖就可以修改奖品
-        if (prize["is_drawn"].Int == 1) {
-            failure("已开奖的抽奖无法修改奖品")
-        }
+        if (prize["is_drawn"].Int == 1) failure("已开奖的抽奖无法修改奖品")
 
         db.throwTransaction {
             // 处理图片更新
@@ -252,24 +242,14 @@ fun APIScope.prizeAPI() {
                     val prizePic = ServerRes.Prize.prize(itemID)
 
                     // 删除旧图片
-                    if (oldPic != null) {
-                        try {
-                            prizePic.delete()
-                        } catch (e: Exception) {
-                            // 忽略删除失败
-                        }
-                    }
+                    if (oldPic != null) prizePic.delete()
 
                     pic.copy(prizePic)
                     newPicName
                 }
                 pic == null && oldPic != null -> {
                     // pic传入null表示无图片
-                    try {
-                        val prizePic = ServerRes.Prize.prize(itemID)
-                        prizePic.delete()
-                    } catch (e: Exception) {
-                    }
+                    ServerRes.Prize.prize(itemID).delete()
                     null
                 }
                 else -> {

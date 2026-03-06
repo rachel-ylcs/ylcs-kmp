@@ -18,7 +18,6 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.core,
                 libs.compose.runtime,
                 libs.compose.ui,
-                libs.compose.collection,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
                 libs.compose.lifecycle,
@@ -28,7 +27,7 @@ template(object : KotlinMultiplatformTemplate() {
         androidMain.configure(commonMain) {
             lib(
                 ExportLib,
-                libs.compose.activity,
+                libs.androidx.activity,
             )
         }
 

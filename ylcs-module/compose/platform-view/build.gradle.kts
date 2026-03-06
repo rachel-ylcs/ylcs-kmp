@@ -19,6 +19,10 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        androidMain.configure(commonMain) {
+            lib(libs.androidx.activity.compose)
+        }
+
         iosMain.configure(commonMain)
 
         iosMainList.configure(iosMain)

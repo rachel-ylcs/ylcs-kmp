@@ -25,7 +25,7 @@ template(object : KotlinMultiplatformTemplate() {
         androidMain.configure(commonMain) {
             lib(
                 ExportLib,
-                libs.compose.activity,
+                libs.androidx.activity,
             )
         }
 
