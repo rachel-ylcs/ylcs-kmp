@@ -122,9 +122,7 @@ class ScreenCreateMusic : Screen() {
                     info.path(PathMod, ModResourceType.Config).writeText(info.toJsonString())
                     // 6. 写入音频
                     info.path(PathMod, ModResourceType.Audio).write { sink ->
-                        audioFile.read { source ->
-                            source.transferTo(sink)
-                        }
+                        audioFile.read { source -> source.transferTo(sink) }
                     }
                     // 7. 写入封面
                     Path(recordFile).writeTo(info.path(PathMod, ModResourceType.Record))

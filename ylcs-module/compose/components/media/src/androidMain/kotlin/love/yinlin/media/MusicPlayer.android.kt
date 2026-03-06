@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.compose.data.media.MediaPlayMode
+import love.yinlin.coroutines.MainCoroutine
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
@@ -164,7 +165,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
         }
     }
 
-    private suspend inline fun <R> withMainPlayer(crossinline block: (MediaController) -> R): R? = controller?.let { player ->
+    private suspend inline fun <R> withMainPlayer(@MainCoroutine crossinline block: (MediaController) -> R): R? = controller?.let { player ->
         catchingDefault({
             error = it
             null

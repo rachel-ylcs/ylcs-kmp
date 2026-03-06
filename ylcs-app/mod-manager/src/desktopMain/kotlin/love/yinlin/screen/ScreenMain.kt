@@ -75,27 +75,20 @@ class ScreenMain : BasicScreen() {
     private suspend fun loadLibrary() {
         onSearching = false
         boxStatus.status = StatefulStatus.Loading
+
         val result = Coroutines.io {
-            app.libraryPath.list().filter { it.isDirectory }.map { folder ->
-                var id = ""
-                var name = "未知"
-                var enabled = true
-                catchingError {
-                    require(Path(folder, ModResourceType.Record.filename).exists)
-                    require(Path(folder, ModResourceType.Background.filename).exists)
-                    require(Path(folder, ModResourceType.LineLyrics.filename).exists)
-                    require(Path(folder, ModResourceType.Audio.filename).exists)
-                    val musicInfo =
-                        Path(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
-                    id = musicInfo.id
-                    name = musicInfo.name
-                }?.let {
-                    it.printStackTrace()
-                    enabled = false
+            app.libraryPath.list().filter { it.isDirectory() }.map { folder ->
+                catchingDefault({ ModItem(id = folder.name, name = folder.name, path = folder, enabled = false) }) {
+                    require(Path(folder, ModResourceType.Record.filename).exists())
+                    require(Path(folder, ModResourceType.Background.filename).exists())
+                    require(Path(folder, ModResourceType.LineLyrics.filename).exists())
+                    require(Path(folder, ModResourceType.Audio.filename).exists())
+                    val musicInfo = Path(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
+                    ModItem(id = musicInfo.id, name = musicInfo.name, path = folder, enabled = true)
                 }
-                ModItem(id = id, name = name, path = folder, enabled = enabled)
             }.distinctBy { it.id }
         }
+
         library.replaceAll(result)
         boxStatus.status = if (result.isEmpty()) StatefulStatus.Empty else StatefulStatus.Content
     }
@@ -180,8 +173,7 @@ class ScreenMain : BasicScreen() {
                     }
                     // 基础资源打包
                     Path(itemPath, ModResourceType.BASE_RES).write { sink ->
-                        ModFactory.Merge(listOf(item.path), sink)
-                            .process(filters = ModResourceType.BASE) { _, _, _ -> }
+                        ModFactory.Merge(listOf(item.path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
                     }
                 }
             }
@@ -403,9 +395,7 @@ class ScreenMain : BasicScreen() {
                             reset()
                             isRunning = true
                             catchingError {
-                                result = Coroutines.io {
-                                    paths[0].read { source -> ModFactory.Preview(source).process() }
-                                }
+                                result = paths[0].read { source -> ModFactory.Preview(source).process() }
                                 statusText = ""
                             }?.let { statusText = it.message ?: "未知错误" }
                             isRunning = false
@@ -459,10 +449,7 @@ class ScreenMain : BasicScreen() {
             statusText = ""
         }
 
-        private suspend fun runReleaseTask(
-            path: Path,
-            onProcess: (index: Int, total: Int, id: String) -> Unit
-        ) {
+        private suspend fun runReleaseTask(path: Path, onProcess: (index: Int, total: Int, id: String) -> Unit) {
             path.read { source ->
                 ModFactory.Release(source, app.libraryPath).process(onProcess)
             }
@@ -521,7 +508,7 @@ class ScreenMain : BasicScreen() {
         private var configText: String? by mutableStateOf(null)
 
         override suspend fun initialize(args: ModItem) {
-            configText = Coroutines.io { Path(args.path, ModResourceType.Config.filename).readText() }
+            configText = Path(args.path, ModResourceType.Config.filename).readText()
         }
 
         @Composable

@@ -38,7 +38,7 @@ abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : Pl
         factory = ::StartupOS
     )
 
-    private val createDirectories by sync {
+    private val createDirectories by async(priority = StartupDelegate.HIGH7) {
         Platform.useNot(*Platform.Web) {
             os.storage.dataPath.mkdir()
             os.storage.cachePath.mkdir()

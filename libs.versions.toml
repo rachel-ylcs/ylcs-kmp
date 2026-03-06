@@ -110,7 +110,7 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 compose-annotation = { module = "androidx.annotation:annotation-jvm", version = "1.9.1" }
-compose-activity = { module = "androidx.activity:activity-compose", version = "1.12.4" }
+compose-activity = { module = "androidx.activity:activity", version = "1.12.4" }
 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 

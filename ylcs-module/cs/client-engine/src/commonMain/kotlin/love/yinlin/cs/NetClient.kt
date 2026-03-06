@@ -39,6 +39,7 @@ import io.ktor.utils.io.copyAndClose
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.io.Sink
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.extension.Json
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
@@ -82,6 +83,7 @@ internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useFileTimeout() {
 
 object NetClient {
     @OptIn(InternalAPI::class)
+    @IOCoroutine
     suspend inline fun <reified Body : Any, reified Output : Any> request(
         crossinline onRequest: RequestScope.() -> Unit,
         crossinline onResponse: suspend ResponseScope<Body>.() -> Output
@@ -160,6 +162,7 @@ object NetClient {
     suspend fun internalWebSocketSession(block: HttpRequestBuilder.() -> Unit): ClientWebSocketSession = internalSockets.webSocketSession(block)
 
     @JvmName("requestWithBody")
+    @IOCoroutine
     suspend inline fun <reified Body : Any, reified Output : Any> request(
         url: String,
         crossinline onRequest: RequestScope.() -> Unit = {},
@@ -172,6 +175,7 @@ object NetClient {
     }
 
     @JvmName("requestWithString")
+    @IOCoroutine
     suspend inline fun <reified Output : Any> request(
         url: String,
         crossinline onRequest: RequestScope.() -> Unit = {},
@@ -184,6 +188,7 @@ object NetClient {
     }
 
     @JvmName("requestWithByteArray")
+    @IOCoroutine
     suspend inline fun <reified Output : Any> request(
         url: String,
         crossinline onRequest: RequestScope.() -> Unit = {},
@@ -195,6 +200,7 @@ object NetClient {
         onResponse(bodyBytes)
     }
 
+    @IOCoroutine
     suspend inline fun download(
         url: String,
         sink: Sink,
@@ -228,6 +234,7 @@ object NetClient {
         }
     }
 
+    @IOCoroutine
     suspend inline fun simpleDownload(url: String, sink: Sink): Boolean = catchingDefault(false) {
         Coroutines.io {
             internalPrepareStatement(HttpMethod.Get, true, url) {
@@ -238,6 +245,7 @@ object NetClient {
         }
     }
 
+    @IOCoroutine
     suspend inline fun simpleDownload(url: String): ByteArray? = catchingNull {
         Coroutines.io {
             internalPrepareStatement(HttpMethod.Get, true, url) {

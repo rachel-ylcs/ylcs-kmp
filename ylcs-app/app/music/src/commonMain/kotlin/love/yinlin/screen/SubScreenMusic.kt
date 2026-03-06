@@ -119,9 +119,9 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             }
 
                             // 更新状态标志
-                            hasAnimation = music.path(PathMod, ModResourceType.Animation).isFile
-                            hasVideo = music.path(PathMod, ModResourceType.Video).isFile
-                            hasAccompaniment = music.path(PathMod, ModResourceType.Accompaniment).isFile
+                            hasAnimation = music.path(PathMod, ModResourceType.Animation).isFile()
+                            hasVideo = music.path(PathMod, ModResourceType.Video).isFile()
+                            hasAccompaniment = music.path(PathMod, ModResourceType.Accompaniment).isFile()
                         }
                     }
                 }

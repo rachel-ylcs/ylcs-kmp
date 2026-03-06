@@ -353,9 +353,7 @@ class ScreenSettings : Screen() {
             var cacheSizeText: String? by rememberState { null }
 
             LaunchedEffect(Unit) {
-                cacheSizeText = Coroutines.io {
-                    app.os.storage.calcCacheSize().fileSizeString
-                }
+                cacheSizeText = Coroutines.io { app.os.storage.calcCacheSize().fileSizeString }
             }
 
             ItemExpanderSuspend(

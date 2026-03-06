@@ -106,11 +106,13 @@ class StartupMusicPlayer : AsyncStartup() {
     val floatingLyrics: FloatingLyrics = FloatingLyrics()
 
     private suspend fun initLibrary() {
-        rootPath.list().map { it.name }.forEach { id ->
-            val configPath = Path(rootPath, id, ModResourceType.Config.filename)
-            val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
-            if (info != null) library[info.id] = info
+        val items = Coroutines.io {
+            rootPath.list().mapNotNull {
+                val configPath = Path(rootPath, it.name, ModResourceType.Config.filename)
+                catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
+            }
         }
+        for (item in items) library[item.id] = item
     }
 
     private suspend fun initLastStatus() {
@@ -167,13 +169,15 @@ class StartupMusicPlayer : AsyncStartup() {
     override suspend fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
         args.fetch<Path?>(0)?.let {
             rootPath = it
-            awaitAll(
-                scope.async(ioContext) { initLibrary() },
-                scope.async { controller.init(context) }
-            )
-            if (controller.isInit) {
-                controller.listener = listener
-                initLastStatus()
+            scope.launch {
+                awaitAll(
+                    scope.async { initLibrary() },
+                    scope.async { controller.init(context) }
+                )
+                if (controller.isInit) {
+                    controller.listener = listener
+                    initLastStatus()
+                }
             }
         }
     }

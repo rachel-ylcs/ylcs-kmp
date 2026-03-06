@@ -72,9 +72,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
         step = Step.Preview(path, null)
 
         catchingError {
-            val data = Coroutines.io {
-                path.read { ModFactory.Preview(it).process() }
-            }
+            val data = path.read { ModFactory.Preview(it).process() }
             step = Step.Preview(path, data)
         }?.let {
             step = Step.Initial(it.message ?: "未知错误", isError = true)
@@ -85,11 +83,9 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
         mp?.let { player ->
             if (player.isReady) slot.tip.warning("请先停止播放器")
             else catchingError {
-                val data = Coroutines.io {
-                    path.read { source ->
-                        ModFactory.Release(source, PathMod).process { current, total, id ->
-                            step = Step.Processing(message = "解压中... [$id] $current / $total")
-                        }
+                val data = path.read { source ->
+                    ModFactory.Release(source, PathMod).process { current, total, id ->
+                        step = Step.Processing(message = "解压中... [$id] $current / $total")
                     }
                 }
                 player.updateMusicLibraryInfo(data.medias)

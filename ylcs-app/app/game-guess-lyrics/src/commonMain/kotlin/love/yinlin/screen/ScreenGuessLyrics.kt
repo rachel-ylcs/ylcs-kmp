@@ -104,9 +104,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
 
     private suspend fun openSockets() {
-        Coroutines.io {
-            connection.connect(LyricsSockets)
-        }
+        Coroutines.io { connection.connect(LyricsSockets) }
     }
 
     private suspend fun sendInvite(info: LyricsSockets.PlayerInfo) {

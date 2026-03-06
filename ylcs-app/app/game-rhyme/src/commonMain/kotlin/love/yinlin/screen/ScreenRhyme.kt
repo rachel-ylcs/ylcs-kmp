@@ -40,7 +40,6 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
-import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.Filter
@@ -51,12 +50,14 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.concurrent.atomic
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
 import love.yinlin.cs.NetClient
 import love.yinlin.cs.ServerRes
 import love.yinlin.cs.url
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
+import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.foundation.Orientation
 import love.yinlin.foundation.OrientationController
@@ -98,20 +99,21 @@ class ScreenRhyme : Screen() {
 
     private fun startGame(info: MusicInfo, playConfig: RhymePlayConfig) {
         launch {
-            val task1 = async(ioContext) {
-                catchingNull {
-                    info.path(PathMod, ModResourceType.Rhyme).readText()!!.parseJsonValue<RhymeLyricsConfig>()
-                }
-            }
-            val task2 = async(ioContext) {
-                info.path(PathMod, ModResourceType.Record).readByteArray()
-            }
-            val lyricsConfig = task1.await()
-            val recordImage = task2.await()
             catchingError {
-                require(lyricsConfig != null) { "歌词资源文件丢失或损坏" }
+                val (lyricsConfig, recordImage) = coroutineScope {
+                    val task1 = async {
+                        val lyricsText = info.path(PathMod, ModResourceType.Rhyme).readText()
+                        require(lyricsText != null) { "歌词资源文件丢失或损坏" }
+                        lyricsText.parseJsonValue<RhymeLyricsConfig>()
+                    }
+                    val task2 = async {
+                        val data = info.path(PathMod, ModResourceType.Record).readByteArray()
+                        require(data != null) { "封面资源文件丢失" }
+                        data
+                    }
+                    task1.await() to task2.await()
+                }
                 require(lyricsConfig.id == info.id) { "歌词资源文件与MOD不匹配" }
-                require(recordImage != null) { "封面资源文件丢失" }
                 rhymeManager.apply {
                     start(
                         playConfig = playConfig,
@@ -334,13 +336,15 @@ class ScreenRhyme : Screen() {
                 RhymeButton(
                     icon = Icons.PlayArrow,
                     onClick = {
-                        if (entry.enabled) startGame(
-                            info = entry.musicInfo,
-                            playConfig = RhymePlayConfig(
-                                difficulty = difficulty,
-                                audioDelay = audioDelay.value
+                        if (entry.enabled) {
+                            startGame(
+                                info = entry.musicInfo,
+                                playConfig = RhymePlayConfig(
+                                    difficulty = difficulty,
+                                    audioDelay = audioDelay.value
+                                )
                             )
-                        )
+                        }
                         else slot.tip.warning("此MOD不支持")
                     }
                 )
@@ -424,36 +428,31 @@ class ScreenRhyme : Screen() {
         orientationController.orientation = Orientation.Landscape
 
         rhymeManager.init()
-        if (rhymeManager.isInit) coroutineScope {
-            val count = atomic(0)
-            val tasks = arrayOf(
-                async(ioContext) {
-                    catching { // 下载开屏背景图
-                        prologueBackground = NetClient.downloadCacheWithPath(ServerRes.Game.Rhyme.res("prologue.webp").url)
-                        count.incrementAndGet()
-                    }
-                },
-                async(ioContext) {
-                    catching { // 从服务器下载资源文件
-                        rhymeManager.run { downloadAssets() }
-                        count.incrementAndGet()
-                    }
-                },
-                async(ioContext) {
-                    catching { // 检查包含游戏配置文件的 MOD
-                        library = app.startup<StartupMusicPlayer>()?.library?.values?.map { info ->
-                            RhymeMusic(
-                                musicInfo = info,
-                                enabled = info.path(PathMod, ModResourceType.Rhyme).exists
-                            )
-                        } ?: emptyList()
-                        count.incrementAndGet()
-                    }
+        if (rhymeManager.isInit) {
+            catchingError {
+                coroutineScope {
+                    listOf(
+                        async { // 下载开屏背景图
+                            prologueBackground = NetClient.downloadCacheWithPath(ServerRes.Game.Rhyme.res("prologue.webp").url)
+                        },
+                        async(ioContext) { // 从服务器下载资源文件
+                            rhymeManager.run { downloadAssets() }
+                        },
+                        async { // 检查包含游戏配置文件的 MOD
+                            val items = app.startup<StartupMusicPlayer>()!!.library.values
+                            library = Coroutines.io {
+                                items.map { info ->
+                                    RhymeMusic(
+                                        musicInfo = info,
+                                        enabled = info.path(PathMod, ModResourceType.Rhyme).exists()
+                                    )
+                                }
+                            }
+                        },
+                    ).awaitAll()
                 }
-            )
-            awaitAll(*tasks)
-            if (count.value == tasks.size) state = GameState.Start
-            else slot.tip.warning("下载资源失败")
+                state = GameState.Start
+            }?.let { slot.tip.warning("下载资源失败") }
         }
     }
 

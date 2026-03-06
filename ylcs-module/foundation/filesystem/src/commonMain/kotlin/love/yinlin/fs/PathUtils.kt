@@ -1,14 +1,9 @@
 package love.yinlin.fs
 
-import kotlinx.io.RawSink
-import kotlinx.io.RawSource
-import kotlinx.io.Sink
-import kotlinx.io.Source
-import kotlinx.io.buffered
+import kotlinx.io.*
 import kotlinx.io.files.Path
-import kotlinx.io.readByteArray
-import kotlinx.io.readString
-import kotlinx.io.writeString
+import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.io.Sources
@@ -27,154 +22,203 @@ val Path.nameWithoutExtension: String get() = this.name.substringBeforeLast('.')
 /**
  * 是否存在
  */
-val Path.exists: Boolean get() = PlatformFileSystem.exists(this)
+@IOCoroutine
+suspend fun Path.exists(): Boolean = Coroutines.io { PlatformFileSystem.exists(this@exists) }
 
 /**
  * 是否是普通文件
  */
-val Path.isFile: Boolean get() = PlatformFileSystem.metadataOrNull(this)?.isRegularFile ?: false
+@IOCoroutine
+suspend fun Path.isFile(): Boolean = Coroutines.io { PlatformFileSystem.metadataOrNull(this@isFile)?.isRegularFile ?: false }
 
 /**
  * 是否是目录
  */
-val Path.isDirectory: Boolean get() = PlatformFileSystem.metadataOrNull(this)?.isDirectory ?: false
+@IOCoroutine
+suspend fun Path.isDirectory(): Boolean = Coroutines.io { PlatformFileSystem.metadataOrNull(this@isDirectory)?.isDirectory ?: false }
 
 /**
  * 子目录
  */
-fun Path.list(): List<Path> = catchingDefault(emptyList()) { PlatformFileSystem.list(this).toList() }
+@IOCoroutine
+suspend fun Path.list(): List<Path> = catchingDefault(emptyList()) {
+    Coroutines.io {
+        PlatformFileSystem.list(this@list).toList()
+    }
+}
 
 /**
  * 创建文件夹，支持多级目录
  */
-fun Path.mkdir(): Boolean = catchingDefault(false) {
-    PlatformFileSystem.createDirectories(this, mustCreate = false)
-    true
+@IOCoroutine
+suspend fun Path.mkdir(): Boolean = catchingDefault(false) {
+    Coroutines.io {
+        PlatformFileSystem.createDirectories(this@mkdir, mustCreate = false)
+        true
+    }
 }
 
 /**
  * 删除文件
  */
-fun Path.delete(): Boolean = catchingDefault(false) {
-    PlatformFileSystem.delete(this, mustExist = false)
-    true
+@IOCoroutine
+suspend fun Path.delete(): Boolean = catchingDefault(false) {
+    Coroutines.io {
+        PlatformFileSystem.delete(this@delete, mustExist = false)
+        true
+    }
 }
 
 /**
  * 删除文件或目录
  */
-fun Path.deleteRecursively(): Boolean = catchingDefault(false) {
-    val stack = ArrayDeque<Path>()
-    stack.add(this)
-    while (stack.isNotEmpty()) {
-        val top = stack.last()
-        val metadata = PlatformFileSystem.metadataOrNull(top)
-        when {
-            metadata == null -> stack.removeAt(stack.lastIndex)
-            metadata.isRegularFile -> {
-                PlatformFileSystem.delete(top, mustExist = false)
-                stack.removeAt(stack.lastIndex)
-            }
-            metadata.isDirectory -> {
-                val list = PlatformFileSystem.list(top)
-                if (list.isEmpty()) {
+@IOCoroutine
+suspend fun Path.deleteRecursively(): Boolean = catchingDefault(false) {
+    Coroutines.io {
+        val stack = ArrayDeque<Path>()
+        stack.add(this@deleteRecursively)
+        while (stack.isNotEmpty()) {
+            val top = stack.last()
+            val metadata = PlatformFileSystem.metadataOrNull(top)
+            when {
+                metadata == null -> stack.removeAt(stack.lastIndex)
+                metadata.isRegularFile -> {
                     PlatformFileSystem.delete(top, mustExist = false)
                     stack.removeAt(stack.lastIndex)
                 }
-                else stack.addAll(list)
+                metadata.isDirectory -> {
+                    val list = PlatformFileSystem.list(top)
+                    if (list.isEmpty()) {
+                        PlatformFileSystem.delete(top, mustExist = false)
+                        stack.removeAt(stack.lastIndex)
+                    }
+                    else stack.addAll(list)
+                }
             }
         }
+        true
     }
-    true
 }
 
 /**
  * 移动
  */
-fun Path.move(dest: Path): Boolean = catchingDefault(false) {
-    PlatformFileSystem.atomicMove(this, dest)
-    true
+@IOCoroutine
+suspend fun Path.move(dest: Path): Boolean = catchingDefault(false) {
+    Coroutines.io {
+        PlatformFileSystem.atomicMove(this@move, dest)
+        true
+    }
 }
 
 /**
  * 重命名
  */
-fun Path.rename(filename: String): Path? = catchingNull {
-    val parent = this.parent
-    val newPath = if (parent == null) Path(this.toString().replace(this.name, filename)) else Path(parent, filename)
-    PlatformFileSystem.atomicMove(this, newPath)
-    newPath
+@IOCoroutine
+suspend fun Path.rename(filename: String): Path? = catchingNull {
+    Coroutines.io {
+        val path = this@rename
+        val parent = path.parent
+        val newPath = if (parent == null) Path(this.toString().replace(path.name, filename)) else Path(parent, filename)
+        PlatformFileSystem.atomicMove(path, newPath)
+        newPath
+    }
 }
 
 /**
  * 文件大小
  */
-val Path.fileSize: Long get() = catchingDefault(0L) {
-    val metadata = PlatformFileSystem.metadataOrNull(this)
-    if (metadata?.isRegularFile == true) metadata.size else 0L
+@IOCoroutine
+suspend fun Path.fileSize(): Long = catchingDefault(0L) {
+    Coroutines.io {
+        val metadata = PlatformFileSystem.metadataOrNull(this@fileSize)
+        if (metadata?.isRegularFile == true) metadata.size else 0L
+    }
 }
 
 /**
  * 文件或目录大小
  */
-val Path.size: Long get() = catchingDefault(0L) {
-    var size = 0L
-    val metadata = PlatformFileSystem.metadataOrNull(this)
-    when {
-        metadata == null -> {}
-        metadata.isRegularFile -> size += metadata.size
-        metadata.isDirectory -> {
-            val queue = ArrayDeque<Path>()
-            queue.add(this)
-            while (queue.isNotEmpty()) {
-                val front = queue.removeAt(0)
-                val metadata = PlatformFileSystem.metadataOrNull(front)
-                when {
-                    metadata == null -> {}
-                    metadata.isRegularFile -> size += metadata.size
-                    metadata.isDirectory -> queue.addAll(PlatformFileSystem.list(front))
+@IOCoroutine
+suspend fun Path.size(): Long = catchingDefault(0L) {
+    Coroutines.io {
+        var size = 0L
+        val metadata = PlatformFileSystem.metadataOrNull(this@size)
+        when {
+            metadata == null -> {}
+            metadata.isRegularFile -> size += metadata.size
+            metadata.isDirectory -> {
+                val queue = ArrayDeque<Path>()
+                queue.add(this@size)
+                while (queue.isNotEmpty()) {
+                    val front = queue.removeAt(0)
+                    val metadata = PlatformFileSystem.metadataOrNull(front)
+                    when {
+                        metadata == null -> {}
+                        metadata.isRegularFile -> size += metadata.size
+                        metadata.isDirectory -> queue.addAll(PlatformFileSystem.list(front))
+                    }
                 }
             }
         }
+        size
     }
-    size
 }
 
-val Path.rawSource: RawSource get() = PlatformFileSystem.source(this)
+@IOCoroutine
+suspend fun Path.rawSource(): RawSource = Coroutines.io { PlatformFileSystem.source(this@rawSource) }
 
-val Path.rawSink: RawSink get() = PlatformFileSystem.sink(this)
+@IOCoroutine
+suspend fun Path.rawSink(): RawSink = Coroutines.io { PlatformFileSystem.sink(this@rawSink) }
 
-val Path.bufferedSource: Source get() = PlatformFileSystem.source(this).buffered()
+@IOCoroutine
+suspend fun Path.bufferedSource(): Source = Coroutines.io { PlatformFileSystem.source(this@bufferedSource).buffered() }
 
-val Path.bufferedSink: Sink get() = PlatformFileSystem.sink(this).buffered()
+@IOCoroutine
+suspend fun Path.bufferedSink(): Sink = Coroutines.io { PlatformFileSystem.sink(this@bufferedSink).buffered() }
 
-fun List<Path>.safeRawSources(): Sources<RawSource>? = this.safeToSources { PlatformFileSystem.source(it) }
+@IOCoroutine
+suspend fun List<Path>.safeRawSources(): Sources<RawSource>? = Coroutines.io {
+    this@safeRawSources.safeToSources { PlatformFileSystem.source(it) }
+}
 
-fun List<Path>.safeSources(): Sources<Source>? = this.safeToSources { PlatformFileSystem.source(it).buffered() }
+@IOCoroutine
+suspend fun List<Path>.safeSources(): Sources<Source>? = Coroutines.io {
+    this@safeSources.safeToSources { PlatformFileSystem.source(it).buffered() }
+}
 
 /**
  * 读文件
  */
-suspend inline fun <R> Path.read(crossinline block: suspend (Source) -> R): R = PlatformFileSystem.source(this@read).buffered().use { block(it) }
+@IOCoroutine
+suspend inline fun <R> Path.read(@IOCoroutine crossinline block: suspend (Source) -> R): R = Coroutines.io {
+    PlatformFileSystem.source(this@read).buffered().use { block(it) }
+}
 
 /**
  * 读文本文件
  */
+@IOCoroutine
 suspend fun Path.readText(): String? = catchingNull { read { it.readString() } }
 
 /**
  * 读字节文件
  */
+@IOCoroutine
 suspend fun Path.readByteArray(): ByteArray? = catchingNull { read { it.readByteArray() } }
 
 /**
  * 写文件
  */
-suspend inline fun Path.write(crossinline block: suspend (Sink) -> Unit) = PlatformFileSystem.sink(this@write).buffered().use { block(it) }
+@IOCoroutine
+suspend inline fun Path.write(@IOCoroutine crossinline block: suspend (Sink) -> Unit) = Coroutines.io {
+    PlatformFileSystem.sink(this@write).buffered().use { block(it) }
+}
 
 /**
  * 写文本文件
  */
+@IOCoroutine
 suspend fun Path.writeText(text: String): Boolean = catchingDefault(false) {
     write { it.writeString(text) }
     true
@@ -183,6 +227,7 @@ suspend fun Path.writeText(text: String): Boolean = catchingDefault(false) {
 /**
  * 写字节文件
  */
+@IOCoroutine
 suspend fun Path.writeByteArray(data: ByteArray): Boolean = catchingDefault(false) {
     write { it.write(data) }
     true
@@ -191,6 +236,7 @@ suspend fun Path.writeByteArray(data: ByteArray): Boolean = catchingDefault(fals
 /**
  * 写入文件
  */
+@IOCoroutine
 suspend fun Path.writeTo(other: Path): Boolean = catchingDefault(false) {
     this.read { source ->
         other.write { sink ->

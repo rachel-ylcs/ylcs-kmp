@@ -70,7 +70,7 @@ actual class StartupPicker : SyncStartup() {
                             tempUrl?.path?.let(::Path)?.let { path -> images.add(path) }
                             processedImages++
                             if (processedImages == results.size) {
-                                future.send(images.safeSources())
+                                future.send(images)
                             }
                         }
                     }
@@ -92,7 +92,7 @@ actual class StartupPicker : SyncStartup() {
                 val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
                 rootViewController?.presentViewController(picker, true, null)
             }
-        }
+        }?.safeSources()
     }
 
     private fun openPicker(mimeType: List<String>, filter: List<String>, callback: (NSURL?) -> Unit) {
@@ -171,7 +171,7 @@ actual class StartupPicker : SyncStartup() {
         val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(filename) ?: return null
         val url = NSURL.fileURLWithPathComponents(tempPath) ?: return null
         val path = url.path?.let(::Path) ?: return null
-        return SaveType.Video(filename, url) to path.bufferedSink
+        return SaveType.Video(filename, url) to path.bufferedSink()
     }
 
     @OptIn(InternalIoApi::class, ExperimentalForeignApi::class)

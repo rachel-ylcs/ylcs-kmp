@@ -63,8 +63,8 @@ class ScreenPlatformMusic(deeplink: Uri?, type: PlatformMusicType) : Screen() {
                         // 2. 下载封面
                         val recordFile = app.os.storage.createTempFile { NetClient.simpleDownload(item.pic, it) }
                         if (audioFile == null || recordFile == null) continue
-                        if (audioFile.fileSize <= 1024 * 1024L) continue
-                        if (recordFile.fileSize <= 1024 * 10L) continue
+                        if (audioFile.fileSize() <= 1024 * 1024L) continue
+                        if (recordFile.fileSize() <= 1024 * 10L) continue
                         // 3. 生成目录
                         val id = "${platformType.prefix}${item.id}"
                         val musicPath = Path(PathMod, id)

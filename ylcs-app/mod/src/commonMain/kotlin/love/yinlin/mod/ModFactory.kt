@@ -7,6 +7,7 @@ import kotlinx.io.files.Path
 import kotlinx.io.readByteArray
 import kotlinx.io.readTo
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.MainCoroutine
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.mod.ModMetadata
 import love.yinlin.data.mod.ModResourceType
@@ -48,7 +49,7 @@ object ModFactory {
         private suspend fun Sink.writeResource(resourcePath: Path, resource: ModResourceType) {
             Coroutines.io {
                 writeLengthString(resource.type)
-                val resLength = resourcePath.fileSize.toInt()
+                val resLength = resourcePath.fileSize().toInt()
                 require(resLength > 0) { "资源长度非法 $resourcePath Length: $resLength" }
                 val times = resLength / INTERVAL
                 val remain = resLength - times * INTERVAL
@@ -89,7 +90,7 @@ object ModFactory {
 
         suspend fun process(
             filters: List<ModResourceType>,
-            onProcess: (index: Int, total: Int, name: String) -> Unit
+            @MainCoroutine onProcess: (index: Int, total: Int, name: String) -> Unit
         ) {
             sink.writeMetadata()
             for ((index, mediaPath) in mediaPaths.withIndex()) {
@@ -165,7 +166,7 @@ object ModFactory {
             id
         }
 
-        suspend fun process(onProcess: (index: Int, total: Int, id: String) -> Unit): ReleaseResult {
+        suspend fun process(@MainCoroutine onProcess: (index: Int, total: Int, id: String) -> Unit): ReleaseResult {
             val metadata = source.readMetadata()
             val ids = mutableListOf<String>()
             repeat(metadata.mediaNum) { index ->

@@ -24,7 +24,7 @@ class MainApplication : PlatformApplication<MainApplication>(appReference, Platf
     val outputPath = Path(rootPath, "output")
     val modPath = Path(rootPath, "mod")
 
-    override fun onCreate() {
+    val createDirectories by async {
         libraryPath.mkdir()
         outputPath.mkdir()
     }

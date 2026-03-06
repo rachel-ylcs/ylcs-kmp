@@ -8,26 +8,23 @@ import kotlinx.io.files.SystemFileSystem
 import java.io.File
 
 actual object PlatformFileSystem {
-    actual suspend fun init() { }
     actual val PathSeparator: Char = File.separatorChar
     actual val LineSeparator: String = System.lineSeparator()
 
     @PublishedApi
-    internal actual fun exists(path: Path): Boolean = SystemFileSystem.exists(path)
+    internal actual suspend fun exists(path: Path): Boolean = SystemFileSystem.exists(path)
     @PublishedApi
-    internal actual fun delete(path: Path, mustExist: Boolean) = SystemFileSystem.delete(path)
+    internal actual suspend fun delete(path: Path, mustExist: Boolean) = SystemFileSystem.delete(path)
     @PublishedApi
-    internal actual fun createDirectories(path: Path, mustCreate: Boolean) = SystemFileSystem.createDirectories(path, mustCreate)
+    internal actual suspend fun createDirectories(path: Path, mustCreate: Boolean) = SystemFileSystem.createDirectories(path, mustCreate)
     @PublishedApi
-    internal actual fun atomicMove(source: Path, destination: Path) = SystemFileSystem.atomicMove(source, destination)
+    internal actual suspend fun atomicMove(source: Path, destination: Path) = SystemFileSystem.atomicMove(source, destination)
     @PublishedApi
-    internal actual fun source(path: Path): RawSource = SystemFileSystem.source(path)
+    internal actual suspend fun source(path: Path): RawSource = SystemFileSystem.source(path)
     @PublishedApi
-    internal actual fun sink(path: Path, append: Boolean): RawSink = SystemFileSystem.sink(path, append)
+    internal actual suspend fun sink(path: Path, append: Boolean): RawSink = SystemFileSystem.sink(path, append)
     @PublishedApi
-    internal actual fun metadataOrNull(path: Path): FileMetadata? = SystemFileSystem.metadataOrNull(path)
+    internal actual suspend fun metadataOrNull(path: Path): FileMetadata? = SystemFileSystem.metadataOrNull(path)
     @PublishedApi
-    internal actual fun resolve(path: Path): Path = SystemFileSystem.resolve(path)
-    @PublishedApi
-    internal actual fun list(directory: Path): Collection<Path> = SystemFileSystem.list(directory)
+    internal actual suspend fun list(directory: Path): Collection<Path> = SystemFileSystem.list(directory)
 }

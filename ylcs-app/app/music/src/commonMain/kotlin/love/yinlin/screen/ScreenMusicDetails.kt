@@ -102,10 +102,10 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
 
     private val listState = LazyListState()
 
-    private fun requestClientSong(): Song? {
+    private suspend fun requestClientSong(): Song? {
         val musicInfo = mp?.library[sid]
         return if (musicInfo != null) {
-            val items = ModResourceType.entries.associateWith { musicInfo.path(PathMod, it).fileSize }
+            val items = ModResourceType.entries.associateWith { musicInfo.path(PathMod, it).fileSize() }
             clientResources.replaceAll(items.asSequence().filter { it.value > 0 }.map { ResourceItem(it.key, it.value) }.toList())
             Song(
                 sid = musicInfo.id,
@@ -158,14 +158,12 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         if (path != null) {
             catchingError {
                 slot.loading.open {
-                    Coroutines.io {
-                        // 解压
-                        path.read { source ->
-                            val result = ModFactory.Release(source, PathMod).process { _, _, _ ->  }
-                            require(result.metadata.version == ModFactory.VERSION) { "不匹配的MOD版本" }
-                        }
-                        path.delete() // 删除临时文件
+                    // 解压
+                    path.read { source ->
+                        val result = ModFactory.Release(source, PathMod).process { _, _, _ ->  }
+                        require(result.metadata.version == ModFactory.VERSION) { "不匹配的MOD版本" }
                     }
+                    path.delete() // 删除临时文件
                 }
                 // 通知
                 mp?.updateMusicLibraryInfo(listOf(sid))
@@ -181,10 +179,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         if (slot.confirm.open(content = "下载资源: ${item.type.description}?")) {
             // 下载资源
             catchingError {
-                Coroutines.io {
-                    Path(PathMod, sid, item.type.filename).write { sink ->
-                        require(downloadDialog.download(song.remotePath(item.type), sink) { })
-                    }
+                Path(PathMod, sid, item.type.filename).write { sink ->
+                    require(downloadDialog.download(song.remotePath(item.type), sink) { })
                 }
                 // 通知
                 mp?.updateMusicLibraryInfo(listOf(sid))
@@ -300,7 +296,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                             }
                             mp?.library?.findAssign(sid) { it.copy(modification = it.modification + 1) }
                             clientResources.findAssign(item) {
-                                it.copy(type = it.type, size = song.clientPath(it.type).fileSize)
+                                it.copy(type = it.type, size = song.clientPath(it.type).fileSize())
                             }
                             ++modifyFlag
                         }?.let { slot.tip.error("图片载入或裁剪失败") }
@@ -677,11 +673,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                             ++modifyFlag
                             // 写入文件
                             launch {
-                                catching {
-                                    Coroutines.io {
-                                        newInfo.path(PathMod, ModResourceType.Config).writeText(newInfo.toJsonString())
-                                    }
-                                }
+                                catching { newInfo.path(PathMod, ModResourceType.Config).writeText(newInfo.toJsonString()) }
                             }
                             // 关闭 sheet
                             close()

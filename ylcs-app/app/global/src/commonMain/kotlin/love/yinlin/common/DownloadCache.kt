@@ -2,6 +2,7 @@ package love.yinlin.common
 
 import kotlinx.io.files.Path
 import love.yinlin.app
+import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.cs.NetClient
 import love.yinlin.fs.*
 
@@ -31,17 +32,19 @@ fun urlDigest32(s: String): String {
     }
 }
 
+@IOCoroutine
 suspend fun NetClient.downloadCacheWithPath(url: String): Path? {
     val path = Path(app.os.storage.cachePath, urlDigest32(url))
-    return if (path.isFile && path.fileSize > 0L) path
-    else if (simpleDownload(url, path.bufferedSink) && path.size > 0L) path
+    return if (path.fileSize() > 0L) path
+    else if (simpleDownload(url, path.bufferedSink()) && path.fileSize() > 0L) path
     else null
 }
 
+@IOCoroutine
 suspend fun NetClient.downloadCache(url: String): ByteArray? {
     val path = Path(app.os.storage.cachePath, urlDigest32(url))
     var result: ByteArray? = null
-    if (path.isFile && path.fileSize > 0L) result = path.readByteArray()
-    else if (simpleDownload(url, path.bufferedSink)) result = path.readByteArray()
+    if (path.fileSize() > 0L) result = path.readByteArray()
+    else if (simpleDownload(url, path.bufferedSink())) result = path.readByteArray()
     return if (result?.isEmpty() ?: true) null else result
 }

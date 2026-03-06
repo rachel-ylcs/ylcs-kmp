@@ -9,7 +9,7 @@ class Sources<S : RawSource>(private val sources: MutableList<S> = mutableListOf
     }
 }
 
-inline fun <T, S : RawSource> Collection<T>.safeToSources(crossinline block: (T) -> S?): Sources<S>? {
+inline fun <T, S : RawSource> Collection<T>.safeToSources(block: (T) -> S?): Sources<S>? {
     val sources = Sources<S>()
     return catchingDefault({
         sources.close()

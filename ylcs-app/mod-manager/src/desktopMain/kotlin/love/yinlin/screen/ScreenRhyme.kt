@@ -136,7 +136,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
 
     override suspend fun initialize() {
         catchingError {
-            rhymeConfig = Coroutines.io {
+            val (musicName, musicConfig) = Coroutines.io {
                 path?.let {
                     val musicInfo = Path(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
                     val rhymePath = Path(it, ModResourceType.Rhyme.filename)
@@ -147,14 +147,12 @@ class ScreenRhyme(private val path: String?) : Screen() {
                         lyrics = emptyList(),
                         offset = 0,
                     )
-                    if (!rhymePath.exists) rhymePath.writeText(prettyJson.encodeToString(newConfig))
-                    name = musicInfo.name
-                    rhymePath.readText()!!.parseJsonValue()
-                } ?: run {
-                    name = "未知歌曲"
-                    defaultConfig
-                }
+                    if (!rhymePath.exists()) rhymePath.writeText(prettyJson.encodeToString(newConfig))
+                    musicInfo.name to rhymePath.readText()!!.parseJsonValue()
+                } ?: ("未知歌曲" to defaultConfig)
             }
+            name = musicName
+            rhymeConfig = musicConfig
         }.errorTip
     }
 

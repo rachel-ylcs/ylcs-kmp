@@ -2,8 +2,7 @@ package love.yinlin.compose.ui.image
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -12,6 +11,7 @@ import com.github.panpf.sketch.AsyncImage
 import kotlinx.io.files.Path
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.fs.fileSize
 
@@ -27,19 +27,27 @@ fun LocalFileImage(
     animated: Boolean = true,
     onClick: (() -> Unit)? = null
 ) {
+    var actualUri: String? by rememberState { null }
+
+    LaunchedEffect(uri, *key) {
+        actualUri = buildWebImageKeyUrl(uri, Path(uri).fileSize())
+    }
+
     Box(modifier = modifier) {
-        AsyncImage(
-            uri = remember(uri, *key) { buildWebImageKeyUrl(uri, Path(uri).fileSize) },
-            contentDescription = null,
-            state = rememberWebImageState(ImageQuality.Full, background = null, animated = animated),
-            alignment = alignment,
-            contentScale = contentScale,
-            filterQuality = ImageQuality.Full.filterQuality,
-            alpha = alpha,
-            modifier = Modifier
-                .matchParentSize()
-                .condition(circle) { clip(Theme.shape.circle) }
-                .condition(onClick != null) { clickable(onClick = onClick) }
-        )
+        actualUri?.let {
+            AsyncImage(
+                uri = it,
+                contentDescription = null,
+                state = rememberWebImageState(ImageQuality.Full, background = null, animated = animated),
+                alignment = alignment,
+                contentScale = contentScale,
+                filterQuality = ImageQuality.Full.filterQuality,
+                alpha = alpha,
+                modifier = Modifier
+                    .matchParentSize()
+                    .condition(circle) { clip(Theme.shape.circle) }
+                    .condition(onClick != null) { clickable(onClick = onClick) }
+            )
+        }
     }
 }

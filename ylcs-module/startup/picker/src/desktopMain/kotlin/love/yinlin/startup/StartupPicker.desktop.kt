@@ -31,7 +31,7 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun pickPicture(): Source? = catchingNull {
         Coroutines.io {
             val path = NativePicker.openFileDialog(handle, "选择一张图片", "图片", "*.jpg;*.png;*.webp")
-            Path(path!!).bufferedSource
+            Path(path!!).bufferedSource()
         }
     }
 
@@ -48,7 +48,7 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = catchingNull {
         Coroutines.io {
             val path = NativePicker.openFileDialog(handle, "选择一个文件", "文件", filter.joinToString(";"))
-            Path(path!!).bufferedSource
+            Path(path!!).bufferedSource()
         }
     }
 
@@ -69,14 +69,14 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = catchingNull {
         Coroutines.io {
             val path = Path(NativePicker.saveFileDialog(handle, "保存图片", filename, "*.webp", "图片")!!)
-            path to path.bufferedSink
+            path to path.bufferedSink()
         }
     }
 
     actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = catchingNull {
         Coroutines.io {
             val path = Path(NativePicker.saveFileDialog(handle, "保存视频", filename, "*.mp4", "视频")!!)
-            path to path.bufferedSink
+            path to path.bufferedSink()
         }
     }
 

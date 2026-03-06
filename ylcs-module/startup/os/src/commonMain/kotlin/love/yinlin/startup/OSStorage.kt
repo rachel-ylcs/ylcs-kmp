@@ -2,7 +2,6 @@ package love.yinlin.startup
 
 import kotlinx.io.Sink
 import kotlinx.io.files.Path
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.foundation.Context
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
@@ -18,18 +17,12 @@ abstract class OSStorage {
 
     suspend inline fun createTempFile(filename: String? = null, crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
         val name = filename ?: DateEx.CurrentLong.toString()
-        Path(cachePath, name).apply {
-            Coroutines.io {
-                write { require(block(it)) }
-            }
-        }
+        Path(cachePath, name).apply { write { require(block(it)) } }
     }
 
     suspend fun createTempFolder(filename: String? = null): Path? = catchingNull {
         val name = filename ?: DateEx.CurrentLong.toString()
-        Path(cachePath, name).apply {
-            Coroutines.io { mkdir() }
-        }
+        Path(cachePath, name).apply { mkdir() }
     }
 }
 

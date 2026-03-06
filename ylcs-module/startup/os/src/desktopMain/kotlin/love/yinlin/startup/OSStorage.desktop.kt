@@ -29,7 +29,7 @@ actual fun buildOSStorage(context: Context, appName: String): OSStorage = object
 
     override val cachePath: Path = Path(System.getProperty("java.io.tmpdir"), appName, "temp")
 
-    override suspend fun calcCacheSize(): Long = cachePath.parent?.size ?: 0L
+    override suspend fun calcCacheSize(): Long = cachePath.parent?.size() ?: 0L
 
     override suspend fun clearCache() {
         cachePath.deleteRecursively()
