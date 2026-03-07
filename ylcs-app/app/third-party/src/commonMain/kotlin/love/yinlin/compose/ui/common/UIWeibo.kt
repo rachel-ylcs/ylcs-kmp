@@ -117,6 +117,7 @@ fun BasicScreen.WeiboLayout(
         NineGrid(
             pics = weibo.pictures,
             modifier = Modifier.fillMaxWidth(),
+            unique = true,
             onImageClick = { index, _ ->
                 with(DataSourceWeibo.processor) { onWeiboPicClick(weibo.pictures, index) }
             },

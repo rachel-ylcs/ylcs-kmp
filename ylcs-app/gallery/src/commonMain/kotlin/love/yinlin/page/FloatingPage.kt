@@ -153,7 +153,7 @@ object FloatingPage : Page() {
                             dialogProgress.open {
                                 total = "100"
                                 for (i in 0 .. 100) {
-                                    delay(50)
+                                    delay(50L)
                                     current = i.toString()
                                     progress = i / 100f
                                 }

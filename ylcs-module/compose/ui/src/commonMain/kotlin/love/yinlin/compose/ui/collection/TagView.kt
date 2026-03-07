@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +45,7 @@ fun TagView(
     size: Int,
     titleProvider: (Int) -> String,
     modifier: Modifier = Modifier,
+    key: ((Int) -> Any)? = null,
     iconProvider: ((Int) -> ImageVector?)? = null,
     readonly: Boolean = false,
     onClick: ((Int) -> Unit)? = null,
@@ -65,43 +67,45 @@ fun TagView(
             // 确保任何时刻只能最多有一个元素处于删除状态
             var deletingIndex by rememberValueState(-1)
             repeat(size) { index ->
-                val isDeleting = index == deletingIndex
-                val backgroundColor = when {
-                    isDeleting -> Theme.color.error
-                    deletingIndex == -1 -> containerColor
-                    else -> Theme.color.disabledContainer
-                }
-                val color = when {
-                    isDeleting -> Theme.color.onError
-                    deletingIndex == -1 -> contentColor
-                    else -> Theme.color.disabledContent
-                }
-                val title = titleProvider(index)
-                val icon = if (isDeleting) Icons.Delete else iconProvider?.invoke(index)
+                key(key?.invoke(index) ?: index) {
+                    val isDeleting = index == deletingIndex
+                    val backgroundColor = when {
+                        isDeleting -> Theme.color.error
+                        deletingIndex == -1 -> containerColor
+                        else -> Theme.color.disabledContainer
+                    }
+                    val color = when {
+                        isDeleting -> Theme.color.onError
+                        deletingIndex == -1 -> contentColor
+                        else -> Theme.color.disabledContent
+                    }
+                    val title = titleProvider(index)
+                    val icon = if (isDeleting) Icons.Delete else iconProvider?.invoke(index)
 
-                ThemeContainer(color) {
-                    TextIconAdapter(modifier = Modifier
-                        .animateBounds(this@LookaheadScope)
-                        .clip(Theme.shape.v5)
-                        .background(backgroundColor)
-                        .condition(!readonly) {
-                            combinedClickable(
-                                onLongClick = {
-                                    if (onDelete != null) deletingIndex = if (isDeleting) -1 else index
-                                },
-                                onClick = {
-                                    if (isDeleting) {
-                                        deletingIndex = -1
-                                        onDelete?.invoke(index)
+                    ThemeContainer(color) {
+                        TextIconAdapter(modifier = Modifier
+                            .animateBounds(this@LookaheadScope)
+                            .clip(Theme.shape.v5)
+                            .background(backgroundColor)
+                            .condition(!readonly) {
+                                combinedClickable(
+                                    onLongClick = {
+                                        if (onDelete != null) deletingIndex = if (isDeleting) -1 else index
+                                    },
+                                    onClick = {
+                                        if (isDeleting) {
+                                            deletingIndex = -1
+                                            onDelete?.invoke(index)
+                                        }
+                                        else if (deletingIndex == -1) onClick?.invoke(index)
+                                        else deletingIndex = -1
                                     }
-                                    else if (deletingIndex == -1) onClick?.invoke(index)
-                                    else deletingIndex = -1
-                                }
-                            )
-                        }.padding(Theme.padding.value)
-                    ) { idIcon, idText ->
-                        if (icon != null) Icon(icon = icon, modifier = Modifier.idIcon())
-                        Text(text = title, style = style, modifier = Modifier.idText())
+                                )
+                            }.padding(Theme.padding.value)
+                        ) { idIcon, idText ->
+                            if (icon != null) Icon(icon = icon, modifier = Modifier.idIcon())
+                            Text(text = title, style = style, modifier = Modifier.idText())
+                        }
                     }
                 }
             }

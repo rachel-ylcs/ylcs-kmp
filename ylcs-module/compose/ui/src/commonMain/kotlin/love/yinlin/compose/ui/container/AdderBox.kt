@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +46,7 @@ fun <T> AdderBox(
     maxNum: Int,
     items: List<T>,
     modifier: Modifier = Modifier,
+    key: ((T) -> Any)? = null,
     size: Dp = Theme.size.cell9,
     shape: Shape = Theme.shape.v7,
     onAdd: () -> Unit = {},
@@ -65,15 +67,18 @@ fun <T> AdderBox(
 
                 for (index in 0 ..< min(itemNum, maxNum))  {
                     val item = items[index]
-                    AdderBoxCell(
-                        size = size,
-                        shape = shape,
-                        clickModifier = Modifier.combinedClickable(
-                            onClick = { onReplace(index, item) },
-                            onLongClick = { onDelete(index, item) }
-                        )
-                    ) {
-                        content(index, item)
+
+                    key(key?.invoke(item) ?: index) {
+                        AdderBoxCell(
+                            size = size,
+                            shape = shape,
+                            clickModifier = Modifier.combinedClickable(
+                                onClick = { onReplace(index, item) },
+                                onLongClick = { onDelete(index, item) }
+                            )
+                        ) {
+                            content(index, item)
+                        }
                     }
                 }
 

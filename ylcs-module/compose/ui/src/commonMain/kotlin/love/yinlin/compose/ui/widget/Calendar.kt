@@ -221,40 +221,42 @@ private fun CalendarDayGrid(
                 Row {
                     repeat(7) { j ->
                         val dayIndex = 7 * i + j
-
                         val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
-                        val isToday = date == today
                         val dateDays = date.toEpochDays()
-                        val eventTitle = events[dateDays]
-                        val color = when {
-                            isToday -> Theme.color.onContainer
-                            eventTitle != null -> Theme.color.primary
-                            dayIndex !in startDay..endDay -> LocalColorVariant.current.copy(alpha = 0.5f)
-                            date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Theme.color.tertiary
-                            else -> LocalColor.current
-                        }
-                        val todayBackgroundColor = Theme.color.primaryContainer
 
-                        val text = remember(eventTitle, date, LunarLoader.table) { eventTitle ?: LunarLoader.lunar(date) }
-
-                        Column(
-                            modifier = Modifier.weight(1f).aspectRatio(1f).clip(Theme.shape.v7).clickable {
-                                if (eventTitle != null) onEventClick(date)
-                            }.drawWithContent {
-                                if (isToday) drawRect(todayBackgroundColor)
-                                drawContent()
-                            },
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            val fontSize = Theme.typography.v8.fontSize / when (text.length) {
-                                in 0 .. 2 -> 1f
-                                in 3 .. 4 -> 1.25f
-                                else -> 1.5f
+                        key(dateDays) {
+                            val isToday = date == today
+                            val eventTitle = events[dateDays]
+                            val color = when {
+                                isToday -> Theme.color.onContainer
+                                eventTitle != null -> Theme.color.primary
+                                dayIndex !in startDay..endDay -> LocalColorVariant.current.copy(alpha = 0.5f)
+                                date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Theme.color.tertiary
+                                else -> LocalColor.current
                             }
+                            val todayBackgroundColor = Theme.color.primaryContainer
 
-                            SimpleClipText(text = date.day.toString(), color = color, style = LocalCalendarDayNumberStyle.current)
-                            SimpleClipText(text = text, color = color, style = LocalCalendarDayTextStyle.current.copy(fontSize = fontSize))
+                            val text = remember(eventTitle, date, LunarLoader.table) { eventTitle ?: LunarLoader.lunar(date) }
+
+                            Column(
+                                modifier = Modifier.weight(1f).aspectRatio(1f).clip(Theme.shape.v7).clickable {
+                                    if (eventTitle != null) onEventClick(date)
+                                }.drawWithContent {
+                                    if (isToday) drawRect(todayBackgroundColor)
+                                    drawContent()
+                                },
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                val fontSize = Theme.typography.v8.fontSize / when (text.length) {
+                                    in 0 .. 2 -> 1f
+                                    in 3 .. 4 -> 1.25f
+                                    else -> 1.5f
+                                }
+
+                                SimpleClipText(text = date.day.toString(), color = color, style = LocalCalendarDayNumberStyle.current)
+                                SimpleClipText(text = text, color = color, style = LocalCalendarDayTextStyle.current.copy(fontSize = fontSize))
+                            }
                         }
                     }
                 }

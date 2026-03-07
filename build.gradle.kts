@@ -8,7 +8,6 @@ plugins {
             libs.plugins.composeMultiplatform,
             libs.plugins.composeCompiler,
             libs.plugins.kotlinJvm,
-            libs.plugins.kotlinAndroid,
             libs.plugins.androidApplication,
             libs.plugins.androidLibrary,
             libs.plugins.androidLibraryNew,

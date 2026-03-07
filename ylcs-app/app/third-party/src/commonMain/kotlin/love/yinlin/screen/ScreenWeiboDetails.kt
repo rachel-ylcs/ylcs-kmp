@@ -67,24 +67,26 @@ class ScreenWeiboDetails : Screen() {
                         verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                     ) {
                         for (subComment in subComments) {
-                            WeiboUserBar(
-                                info = subComment.info,
-                                location = subComment.location,
-                                time = subComment.timeString
-                            )
-                            RachelRichText(
-                                text = subComment.text,
-                                modifier = Modifier.fillMaxWidth(),
-                                onLinkClick = {
-                                    with(DataSourceWeibo.processor) { onWeiboLinkClick(it) }
-                                },
-                                onTopicClick = {
-                                    with(DataSourceWeibo.processor) { onWeiboTopicClick(it) }
-                                },
-                                onAtClick = {
-                                    with(DataSourceWeibo.processor) { onWeiboAtClick(it) }
-                                }
-                            )
+                            key(subComment.id) {
+                                WeiboUserBar(
+                                    info = subComment.info,
+                                    location = subComment.location,
+                                    time = subComment.timeString
+                                )
+                                RachelRichText(
+                                    text = subComment.text,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onLinkClick = {
+                                        with(DataSourceWeibo.processor) { onWeiboLinkClick(it) }
+                                    },
+                                    onTopicClick = {
+                                        with(DataSourceWeibo.processor) { onWeiboTopicClick(it) }
+                                    },
+                                    onAtClick = {
+                                        with(DataSourceWeibo.processor) { onWeiboAtClick(it) }
+                                    }
+                                )
+                            }
                         }
                     }
                 }

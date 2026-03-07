@@ -337,21 +337,23 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 if (chorus != null && duration != 0L) {
                     Box(modifier = Modifier.matchParentSize()) {
                         for (hotpot in chorus) {
-                            val color by animateColorAsState(
-                                targetValue = if (position >= hotpot) Colors.Green2 else LocalColor.current,
-                                animationSpec = tween(durationMillis = 1000)
-                            )
+                            key(hotpot) {
+                                val color by animateColorAsState(
+                                    targetValue = if (position >= hotpot) Colors.Green2 else LocalColor.current,
+                                    animationSpec = tween(durationMillis = 1000)
+                                )
 
-                            Box(modifier = Modifier
-                                .align(BiasAlignment(horizontalBias = hotpot / duration.toFloat() * 2 - 1, verticalBias = 0f))
-                                .width((trackHeight + Theme.padding.g) * 2)
-                                .height(trackHeight * 2)
-                                .silentClick {
-                                    launch { mp?.seekTo(hotpot) }
-                                }
-                                .padding(horizontal = Theme.padding.g)
-                                .background(color = color, shape = Theme.shape.circle)
-                            )
+                                Box(modifier = Modifier
+                                    .align(BiasAlignment(horizontalBias = hotpot / duration.toFloat() * 2 - 1, verticalBias = 0f))
+                                    .width((trackHeight + Theme.padding.g) * 2)
+                                    .height(trackHeight * 2)
+                                    .silentClick {
+                                        launch { mp?.seekTo(hotpot) }
+                                    }
+                                    .padding(horizontal = Theme.padding.g)
+                                    .background(color = color, shape = Theme.shape.circle)
+                                )
+                            }
                         }
                     }
                 }

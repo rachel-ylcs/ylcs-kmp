@@ -171,6 +171,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
             TagView(
                 size = tags.size,
                 titleProvider = { tags[it] },
+                key = { tags[it] },
                 onDelete = { items.remove(tags[it]) },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -259,6 +260,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
                 TagView(
                     size = tags.size,
                     titleProvider = { tags[it] },
+                    key = { tags[it] },
                     onDelete = { items.remove(tags[it]) },
                     modifier = Modifier.fillMaxWidth()
                 )

@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -172,11 +173,13 @@ class SubScreenWorld(parent: NavigationScreen) : SubScreen(parent) {
             LookaheadScope {
                 FlowRow(modifier = Modifier.fillMaxWidth()) {
                     for (game in group) {
-                        GameCard(
-                            game = game,
-                            brush = brush,
-                            modifier = Modifier.width(Theme.size.cell1).padding(Theme.padding.value9).animateBounds(this@LookaheadScope)
-                        )
+                        key(game) {
+                            GameCard(
+                                game = game,
+                                brush = brush,
+                                modifier = Modifier.width(Theme.size.cell1).padding(Theme.padding.value9).animateBounds(this@LookaheadScope)
+                            )
+                        }
                     }
                 }
             }
@@ -196,7 +199,9 @@ class SubScreenWorld(parent: NavigationScreen) : SubScreen(parent) {
             }
 
             for ((type, group) in GameMapper.Groups) {
-                GameGroupLayout(type = type, group = group, modifier = Modifier.fillMaxWidth())
+                key(type) {
+                    GameGroupLayout(type = type, group = group, modifier = Modifier.fillMaxWidth())
+                }
             }
         }
     }

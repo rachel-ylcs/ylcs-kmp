@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,38 +39,42 @@ internal fun ContributorLayout(
         verticalArrangement = Arrangement.spacedBy(Theme.padding.v7),
     ) {
         for (contributorGroup in contributors) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ThemeContainer(contributorGroup.color) {
-                    Icon(icon = contributorGroup.icon)
-                    SimpleEllipsisText(text = contributorGroup.title, style = Theme.typography.v6.bold)
+            key(contributorGroup.title) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ThemeContainer(contributorGroup.color) {
+                        Icon(icon = contributorGroup.icon)
+                        SimpleEllipsisText(text = contributorGroup.title, style = Theme.typography.v6.bold)
+                    }
                 }
-            }
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
-                maxItemsInEachRow = 3
-            ) {
-                for (contributor in contributorGroup.names) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth(0.3f).clip(Theme.shape.v7).clickable { onClick(contributor) },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(Theme.padding.eValue),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
-                        ) {
-                            WebImage(
-                                uri = ServerRes.Users.User(contributor.uid).avatar.url,
-                                key = remember { DateEx.TodayString },
-                                circle = true,
-                                modifier = Modifier.size(Theme.size.image8)
-                            )
-                            SimpleEllipsisText(text = contributor.name)
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+                    maxItemsInEachRow = 3
+                ) {
+                    for (contributor in contributorGroup.names) {
+                        key(contributor.uid) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(0.3f).clip(Theme.shape.v7).clickable { onClick(contributor) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(Theme.padding.eValue),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                                ) {
+                                    WebImage(
+                                        uri = ServerRes.Users.User(contributor.uid).avatar.url,
+                                        key = remember { DateEx.TodayString },
+                                        circle = true,
+                                        modifier = Modifier.size(Theme.size.image8)
+                                    )
+                                    SimpleEllipsisText(text = contributor.name)
+                                }
+                            }
                         }
                     }
                 }
@@ -112,29 +117,31 @@ internal fun UpdateInfoLayout(updateInfo: AppUpdateInfo, modifier: Modifier = Mo
         }
 
         for (group in updateInfo.groups) {
-            if (group.records.isNotEmpty()) {
-                Surface(modifier = Modifier.fillMaxWidth(), shape = Theme.shape.v5) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().background(group.background.copy(alpha = 0.2f)).padding(Theme.padding.value9),
-                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                            verticalAlignment = Alignment.CenterVertically
+            key(group.type) {
+                if (group.records.isNotEmpty()) {
+                    Surface(modifier = Modifier.fillMaxWidth(), shape = Theme.shape.v5) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().background(group.background.copy(alpha = 0.2f)).padding(Theme.padding.value9),
+                            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
                         ) {
-                            ThemeContainer(group.color) {
-                                Icon(icon = group.icon)
-                                SimpleEllipsisText(text = group.type, style = Theme.typography.v6.bold)
-                            }
-                        }
-
-                        for (record in group.records) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Box(modifier = Modifier.offset(y = Theme.size.box4).size(Theme.size.box3).clip(Theme.shape.circle).background(LocalColor.current))
-                                SelectionBox { Text(text = record) }
+                                ThemeContainer(group.color) {
+                                    Icon(icon = group.icon)
+                                    SimpleEllipsisText(text = group.type, style = Theme.typography.v6.bold)
+                                }
+                            }
+
+                            for (record in group.records) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+                                ) {
+                                    Box(modifier = Modifier.offset(y = Theme.size.box4).size(Theme.size.box3).clip(Theme.shape.circle).background(LocalColor.current))
+                                    SelectionBox { Text(text = record) }
+                                }
                             }
                         }
                     }

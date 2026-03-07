@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.Theme
@@ -80,15 +81,17 @@ fun ModPreviewLayout(modifier: Modifier = Modifier, result: PreviewResult) {
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     for ((resource, length) in mediaItem.resources) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Theme.color.outline).padding(Theme.padding.value),
-                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
-                        ) {
-                            Text(
-                                text = "${resource.description} (${resource.type})",
-                                modifier = Modifier.weight(1f)
-                            )
-                            Text(text = length.toLong().fileSizeString)
+                        key(resource) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Theme.color.outline).padding(Theme.padding.value),
+                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
+                            ) {
+                                Text(
+                                    text = "${resource.description} (${resource.type})",
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(text = length.toLong().fileSizeString)
+                            }
                         }
                     }
                 }

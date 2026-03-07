@@ -19,7 +19,7 @@ actual fun Modifier.dragAndDrop(
     enabled: Boolean,
     flag: DragFlag,
     onDrop: (DropResult) -> Unit
-): Modifier = composed {
+): Modifier = this.composed {
     if (enabled) {
         val onDropFunc by rememberUpdatedState(onDrop)
 

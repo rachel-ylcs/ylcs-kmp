@@ -485,7 +485,9 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 else {
                     ActionScope.Right.Container {
                         for (action in resAction[item.type]!!) {
-                            Icon(icon = action.icon, tip = action.text, onClick = { action.action(item) })
+                            key(action.text) {
+                                Icon(icon = action.icon, tip = action.text, onClick = { action.action(item) })
+                            }
                         }
                     }
                 }
@@ -501,8 +503,16 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     remoteResources.filter { item -> clientResources.find { it.type == item.type } == null }
                 }
 
-                for (item in clientResources) ResourceItemLayout(item = item, remote = false)
-                for (item in downloadResources) ResourceItemLayout(item = item, remote = true)
+                for (item in clientResources) {
+                    key(item.type) {
+                        ResourceItemLayout(item = item, remote = false)
+                    }
+                }
+                for (item in downloadResources) {
+                    key(item.type) {
+                        ResourceItemLayout(item = item, remote = true)
+                    }
+                }
             }
         }
     }

@@ -269,13 +269,17 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             SimpleEllipsisText(text = text, style = Theme.typography.v7.bold)
             Icon(icon = Icons.Add, onClick = {
                 launch {
-                    inputDialog.open(initText())?.let { list += it }
+                    inputDialog.open(initText())?.let {
+                        if (it in list) slot.tip.warning("$it 已存在")
+                        else list += it
+                    }
                 }
             })
         }
         TagView(
             size = list.size,
             titleProvider = { list[it] },
+            key = { list[it] },
             modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h),
             onClick = { index ->
                 launch {
@@ -395,6 +399,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             AdderBox(
                 maxNum = 9,
                 items = photo.posters,
+                key = { it },
                 modifier = Modifier.fillMaxWidth(),
                 onAdd = {
                     launch {

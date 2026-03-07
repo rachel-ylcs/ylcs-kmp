@@ -313,6 +313,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                 )
                 NineGrid(
                     pics = pics,
+                    unique = true,
                     modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v),
                     onImageClick = { index, _ ->
                         navigate(::ScreenImagePreview, pics, index)

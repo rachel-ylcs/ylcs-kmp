@@ -273,20 +273,22 @@ class ScreenMain : BasicScreen() {
                                         ) {
                                             repeat(21) { index ->
                                                 val newScaleValue = (index / 7 * 7 + index % 7 + 1).toByte()
-                                                Text(
-                                                    text = scaleTable[newScaleValue.toInt()],
-                                                    style = Theme.typography.v3.bold,
-                                                    fontFamily = fontFamily,
-                                                    modifier = Modifier.clickable {
-                                                        val newTheme = line.theme.toMutableList()
-                                                        newTheme[actionIndex] = if (isAddMode) RhymeAction.Slur(action.ch, action.end, currentScale.toMutableList().also { it += newScaleValue })
-                                                        else RhymeAction.Note(action.ch, action.end, newScaleValue)
-                                                        val newLyrics = config.lyrics.toMutableList()
-                                                        newLyrics[lineIndex] = line.copy(theme = newTheme)
-                                                        rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
-                                                        isOpen = false
-                                                    }
-                                                )
+                                                key(newScaleValue) {
+                                                    Text(
+                                                        text = scaleTable[newScaleValue.toInt()],
+                                                        style = Theme.typography.v3.bold,
+                                                        fontFamily = fontFamily,
+                                                        modifier = Modifier.clickable {
+                                                            val newTheme = line.theme.toMutableList()
+                                                            newTheme[actionIndex] = if (isAddMode) RhymeAction.Slur(action.ch, action.end, currentScale.toMutableList().also { it += newScaleValue })
+                                                            else RhymeAction.Note(action.ch, action.end, newScaleValue)
+                                                            val newLyrics = config.lyrics.toMutableList()
+                                                            newLyrics[lineIndex] = line.copy(theme = newTheme)
+                                                            rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
+                                                            isOpen = false
+                                                        }
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -363,6 +365,7 @@ class ScreenMain : BasicScreen() {
                         val chorus = rhymeConfig.chorus[it]
                         "${chorus.start} - ${chorus.end}"
                     },
+                    key = { rhymeConfig.chorus[it].start },
                     onDelete = { index ->
                         val newChorus = rhymeConfig.chorus.toMutableList()
                         newChorus.removeAt(index)

@@ -1,13 +1,12 @@
 package love.yinlin.compose.ui.image
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
@@ -22,6 +21,7 @@ import kotlin.math.min
 fun NineGrid(
     pics: List<Picture>,
     modifier: Modifier = Modifier,
+    unique: Boolean = false,
     space: Dp = Theme.padding.g3,
     onImageClick: (Int, Picture) -> Unit = { _, _ -> },
     onVideoClick: (Picture) -> Unit = {},
@@ -44,16 +44,18 @@ fun NineGrid(
                 val pic = pics[index]
                 val isVideo = pic.isVideo
 
-                Box(contentAlignment = Alignment.Center) {
-                    content(isSingle, pic) {
-                        if (isVideo) onVideoClick(pic) else onImageClick(index, pic)
-                    }
-                    if (isVideo) {
-                        Icon(
-                            icon = Icons.SmartDisplay,
-                            color = Theme.color.onContainer,
-                            modifier = Modifier.size(Theme.size.image8).zIndex(2f)
-                        )
+                key(if (unique) pic.image else index) {
+                    Box(contentAlignment = Alignment.Center) {
+                        content(isSingle, pic) {
+                            if (isVideo) onVideoClick(pic) else onImageClick(index, pic)
+                        }
+                        if (isVideo) {
+                            Icon(
+                                icon = Icons.SmartDisplay,
+                                color = Theme.color.onContainer,
+                                modifier = Modifier.size(Theme.size.image8).zIndex(2f)
+                            )
+                        }
                     }
                 }
             }

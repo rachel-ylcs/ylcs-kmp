@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +44,7 @@ fun Filter(
     selectedProvider: (Int) -> Boolean,
     titleProvider: (Int) -> String,
     modifier: Modifier = Modifier,
+    key: ((Int) -> Any)? = null,
     iconProvider: ((Int) -> ImageVector?)? = null,
     enabledProvider: ((Int) -> Boolean)? = null,
     padding: PaddingValues = Theme.padding.value,
@@ -67,38 +69,40 @@ fun Filter(
             maxLines = maxLines
         ) {
             repeat(size) { index ->
-                val selected = selectedProvider(index)
-                val title = titleProvider(index)
-                val icon = iconProvider?.invoke(index)
-                val enabled = enabledProvider?.invoke(index) ?: true
+                key(key?.invoke(index) ?: index) {
+                    val selected = selectedProvider(index)
+                    val title = titleProvider(index)
+                    val icon = iconProvider?.invoke(index)
+                    val enabled = enabledProvider?.invoke(index) ?: true
 
-                val backgroundColor by animateColorAsState(
-                    targetValue = if (selected) Theme.color.primaryContainer else Theme.color.backgroundVariant,
-                    animationSpec = tween(Theme.animation.duration.default)
-                )
+                    val backgroundColor by animateColorAsState(
+                        targetValue = if (selected) Theme.color.primaryContainer else Theme.color.backgroundVariant,
+                        animationSpec = tween(Theme.animation.duration.default)
+                    )
 
-                val contentColor = when {
-                    !enabled -> Theme.color.disabledContent
-                    selected -> Theme.color.onContainer
-                    else -> Theme.color.onBackground
-                }
+                    val contentColor = when {
+                        !enabled -> Theme.color.disabledContent
+                        selected -> Theme.color.onContainer
+                        else -> Theme.color.onBackground
+                    }
 
-                val contentIcon = if (selected) activeIcon else icon
+                    val contentIcon = if (selected) activeIcon else icon
 
-                ThemeContainer(contentColor) {
-                    TextIconAdapter(modifier = Modifier
-                        .animateBounds(this@LookaheadScope)
-                        .clip(shape)
-                        .semantics(Role.RadioButton)
-                        .background(if (enabled) backgroundColor else Theme.color.disabledContainer)
-                        .border(border, Theme.color.outline, shape)
-                        .clickable(enabled = enabled) { onClick(index, !selected) }
-                        .padding(padding),
-                    ) { iconId, textId ->
-                        if (contentIcon != null) {
-                            Icon(icon = contentIcon, color = iconColor ?: LocalColor.current, modifier = Modifier.iconId())
+                    ThemeContainer(contentColor) {
+                        TextIconAdapter(modifier = Modifier
+                            .animateBounds(this@LookaheadScope)
+                            .clip(shape)
+                            .semantics(Role.RadioButton)
+                            .background(if (enabled) backgroundColor else Theme.color.disabledContainer)
+                            .border(border, Theme.color.outline, shape)
+                            .clickable(enabled = enabled) { onClick(index, !selected) }
+                            .padding(padding),
+                        ) { iconId, textId ->
+                            if (contentIcon != null) {
+                                Icon(icon = contentIcon, color = iconColor ?: LocalColor.current, modifier = Modifier.iconId())
+                            }
+                            SimpleClipText(text = title, modifier = Modifier.textId(), style = style)
                         }
-                        SimpleClipText(text = title, modifier = Modifier.textId(), style = style)
                     }
                 }
             }

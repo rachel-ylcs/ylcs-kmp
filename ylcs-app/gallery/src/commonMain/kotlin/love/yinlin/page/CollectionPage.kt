@@ -40,6 +40,7 @@ object CollectionPage : Page() {
                     modifier = Modifier.fillMaxWidth(),
                     size = items.size,
                     titleProvider = { items[it] },
+                    key = { items[it] },
                     iconProvider = { if (it % 7 == 0) Icons.Tag else null },
                     onDelete = { items.removeAt(it) }
                 )

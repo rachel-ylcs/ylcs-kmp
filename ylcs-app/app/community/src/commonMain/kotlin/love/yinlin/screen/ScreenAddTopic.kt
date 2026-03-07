@@ -179,6 +179,7 @@ class ScreenAddTopic : Screen() {
                 AdderBox(
                     maxNum = 9,
                     items = input.pics,
+                    key = { it.image },
                     modifier = Modifier.fillMaxWidth(),
                     onAdd = { launch { pickPictures() } },
                     onReplace = { index, _ -> navigate(::ScreenImagePreview, input.pics.toList(), index) },

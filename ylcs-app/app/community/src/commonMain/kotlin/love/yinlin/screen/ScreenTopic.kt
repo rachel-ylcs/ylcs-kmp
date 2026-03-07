@@ -332,6 +332,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                 if (pics.isNotEmpty()) {
                     NineGrid(
                         pics = pics,
+                        unique = true,
                         modifier = Modifier.fillMaxWidth(),
                         onImageClick = { index, _ -> onImageClick(pics, index) }
                     ) { isSingle, pic, onClick ->

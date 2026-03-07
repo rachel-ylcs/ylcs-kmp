@@ -422,8 +422,14 @@ class ScreenPlaylistLibrary : Screen() {
                         indent = 0.dp
                     ) {
                         for ((name, playlist) in playlists) {
-                            TreeNode(text = name) {
-                                for (id in playlist) TreeNode(text = id.name, icon = Icons.MusicNote)
+                            key(name) {
+                                TreeNode(text = name) {
+                                    for (id in playlist) {
+                                        key(id.name) {
+                                            TreeNode(text = id.name, icon = Icons.MusicNote)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

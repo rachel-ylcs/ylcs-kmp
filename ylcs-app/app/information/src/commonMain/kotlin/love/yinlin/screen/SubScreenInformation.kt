@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -215,6 +216,15 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
     }
 
     @Composable
+    private fun CalendarBarItemLayout() {
+        for (activity in activities) {
+            key(activity.aid) {
+                CalendarBarItem(activity)
+            }
+        }
+    }
+
+    @Composable
     private fun Portrait() {
         Column(
             modifier = Modifier
@@ -229,7 +239,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                 ToolBarLayout()
             }
             Space(Theme.padding.v9)
-            for (activity in activities) CalendarBarItem(activity)
+            CalendarBarItemLayout()
         }
     }
 
@@ -255,7 +265,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                 SectionLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value8))
                 CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) { }
                 Space(Theme.padding.v9)
-                for (activity in activities) CalendarBarItem(activity)
+                CalendarBarItemLayout()
             }
         }
     }
@@ -286,7 +296,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                     CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) { }
                 }
                 Space(Theme.padding.v9)
-                for (activity in activities) CalendarBarItem(activity)
+                CalendarBarItemLayout()
             }
         }
     }
