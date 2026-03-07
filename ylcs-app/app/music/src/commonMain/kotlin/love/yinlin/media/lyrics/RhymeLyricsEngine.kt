@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.zIndex
@@ -16,6 +15,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.ui.node.fastClip
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.music.RhymeLyricsConfig
@@ -88,26 +88,24 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
         SimpleEllipsisText(
             text = item.text,
             style = if (isCurrent) Theme.typography.v5.bold else Theme.typography.v6,
-            modifier = Modifier.zIndex(1f).graphicsLayer {
+            modifier = Modifier.fastClip {
                 if (isCurrent) {
-                    clip = true
-                    shape = GenericShape { size, _ ->
+                    GenericShape { size, _ ->
                         addRect(Rect(size.width * progress, 0f, size.width, size.height))
                     }
-                }
-            }
+                } else null
+            }.zIndex(1f)
         )
         if (isCurrent) {
             SimpleEllipsisText(
                 text = item.text,
                 color = Colors.Green5,
                 style = Theme.typography.v5.bold,
-                modifier = Modifier.semantics().zIndex(2f).graphicsLayer {
-                    clip = true
-                    shape = GenericShape { size, _ ->
+                modifier = Modifier.fastClip {
+                    GenericShape { size, _ ->
                         addRect(Rect(0f, 0f, size.width * progress, size.height))
                     }
-                }
+                }.semantics().zIndex(2f)
             )
         }
     }
@@ -122,24 +120,22 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
                 text = currentText,
                 color = Colors.White,
                 style = style,
-                modifier = Modifier.zIndex(1f).graphicsLayer {
-                    clip = true
-                    shape = GenericShape { size, _ ->
+                modifier = Modifier.fastClip {
+                    GenericShape { size, _ ->
                         addRect(Rect(size.width * progress, 0f, size.width, size.height))
                     }
-                }
+                }.zIndex(1f)
             )
 
             SimpleEllipsisText(
                 text = currentText,
                 color = Colors(config.textColor),
                 style = style,
-                modifier = Modifier.semantics().zIndex(2f).graphicsLayer {
-                    clip = true
-                    shape = GenericShape { size, _ ->
+                modifier = Modifier.fastClip {
+                    GenericShape { size, _ ->
                         addRect(Rect(0f, 0f, size.width * progress, size.height))
                     }
-                }
+                }.semantics().zIndex(2f)
             )
         }
     }

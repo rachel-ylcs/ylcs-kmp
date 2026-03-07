@@ -51,6 +51,7 @@ import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationColumn
+import love.yinlin.compose.ui.node.fastClipCircle
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.SelectionBox
@@ -371,7 +372,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             ) {
                 Box(Modifier
                     .size(Theme.size.image5)
-                    .clip(Theme.shape.circle)
+                    .fastClipCircle()
                     .border(Theme.border.v5, Theme.color.secondary, Theme.shape.circle)
                     .zIndex(2f)
                 ) {

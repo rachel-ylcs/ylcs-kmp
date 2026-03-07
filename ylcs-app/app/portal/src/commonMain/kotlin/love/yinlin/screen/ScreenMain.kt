@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -36,6 +35,7 @@ import love.yinlin.compose.screen.MultiDataSource
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.compose.ui.text.TextIconBinder
@@ -115,7 +115,7 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                         ) { idIcon, idText ->
                             Icon(
                                 icon = if (isCurrent) item.iconActive else item.iconNormal,
-                                modifier = Modifier.rotate(iconAngle).idIcon()
+                                modifier = Modifier.fastRotate { iconAngle }.idIcon()
                             )
                             SimpleClipText(
                                 text = item.title,
@@ -168,7 +168,7 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                         ) { idIcon, idText ->
                             Icon(
                                 icon = if (isCurrent) item.iconActive else item.iconNormal,
-                                modifier = Modifier.rotate(iconAngle).idIcon()
+                                modifier = Modifier.fastRotate { iconAngle }.idIcon()
                             )
                             SimpleClipText(
                                 text = item.title,

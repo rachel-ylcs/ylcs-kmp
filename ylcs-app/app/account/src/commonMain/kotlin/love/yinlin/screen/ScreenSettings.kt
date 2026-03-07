@@ -54,6 +54,7 @@ import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.input.PrimaryLoadingTextButton
 import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.TertiaryButton
+import love.yinlin.compose.ui.node.fastClipCircle
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputDecoration
@@ -540,7 +541,7 @@ class ScreenSettings : Screen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v5)
             ) {
-                Image(res = Res.drawable.img_logo, modifier = Modifier.size(Theme.size.image7).clip(Theme.shape.circle))
+                Image(res = Res.drawable.img_logo, modifier = Modifier.size(Theme.size.image7).fastClipCircle())
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,

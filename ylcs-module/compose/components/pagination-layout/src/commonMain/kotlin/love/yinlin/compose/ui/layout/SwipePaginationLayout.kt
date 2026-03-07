@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -25,6 +24,7 @@ import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Theme
+import love.yinlin.compose.ui.node.fastOffsetY
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
@@ -140,12 +140,12 @@ internal fun SwipePaginationLayout(
                 .fillMaxWidth()
                 .height(headerHeight)
                 .align(Alignment.TopCenter)
-                .graphicsLayer { translationY = -headerHeightPx + state.indicatorOffset }
+                .fastOffsetY { -headerHeightPx + state.indicatorOffset }
         ) {
             header(state.refreshStatus, abs(state.indicatorOffset) / headerHeightPx)
         }
         Box(
-            modifier = Modifier.fillMaxSize().graphicsLayer { translationY = state.indicatorOffset },
+            modifier = Modifier.fillMaxSize().fastOffsetY { state.indicatorOffset },
             content = content
         )
         Box(
@@ -153,7 +153,7 @@ internal fun SwipePaginationLayout(
                 .fillMaxWidth()
                 .height(footerHeight)
                 .align(Alignment.BottomCenter)
-                .graphicsLayer { translationY = footerHeightPx + state.indicatorOffset }
+                .fastOffsetY { footerHeightPx + state.indicatorOffset }
         ) {
             footer(state.loadingStatus, -state.indicatorOffset / footerHeightPx)
         }

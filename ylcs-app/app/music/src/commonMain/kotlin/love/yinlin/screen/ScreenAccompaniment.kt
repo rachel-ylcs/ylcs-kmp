@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
@@ -37,6 +36,8 @@ import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.node.blurSource
 import love.yinlin.compose.ui.node.blurTarget
+import love.yinlin.compose.ui.node.fastClipCircle
+import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
@@ -125,7 +126,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
         LocalFileImage(
             uri = music.path(PathMod, ModResourceType.Record).toString(),
             contentScale = ContentScale.Crop,
-            modifier = modifier.rotate(degrees = animationRecord.value)
+            modifier = modifier.fastRotate(animationRecord)
         )
     }
 
@@ -191,7 +192,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                         contentAlignment = Alignment.Center
                     ) {
                         Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
-                        MusicCover(modifier = Modifier.fillMaxSize(fraction = 0.641f).clip(Theme.shape.circle).border(
+                        MusicCover(modifier = Modifier.fillMaxSize(fraction = 0.641f).fastClipCircle().border(
                             width = Theme.border.v10,
                             color = Theme.color.outline,
                             shape = Theme.shape.circle

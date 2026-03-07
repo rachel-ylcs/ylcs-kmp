@@ -18,6 +18,7 @@ import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.node.fastClipCircle
 import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
@@ -139,7 +140,7 @@ internal fun UpdateInfoLayout(updateInfo: AppUpdateInfo, modifier: Modifier = Mo
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                                 ) {
-                                    Box(modifier = Modifier.offset(y = Theme.size.box4).size(Theme.size.box3).clip(Theme.shape.circle).background(LocalColor.current))
+                                    Box(modifier = Modifier.offset(y = Theme.size.box4).size(Theme.size.box3).fastClipCircle().background(LocalColor.current))
                                     SelectionBox { Text(text = record) }
                                 }
                             }

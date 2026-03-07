@@ -15,7 +15,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -32,6 +31,7 @@ import love.yinlin.compose.ui.floating.FlyoutPosition
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.Text
@@ -116,12 +116,12 @@ fun ComboBox(
                 modifier = Modifier.padding(end = Theme.padding.h / 2).width(maxTextWidth)
             )
 
-            val angle by animateFloatAsState(
+            val angle = animateFloatAsState(
                 targetValue = if (isOpen) 180f else 0f,
                 animationSpec = tween(Theme.animation.duration.default)
             )
 
-            Icon(icon = Icons.KeyboardArrowDown, color = contentColor, modifier = Modifier.rotate(angle))
+            Icon(icon = Icons.KeyboardArrowDown, color = contentColor, modifier = Modifier.fastRotate(angle))
         }
     }
 }

@@ -75,4 +75,5 @@ private data class FadingEdgeElement(
 }
 
 fun Modifier.fadingEdge(startAlpha: Float = 1f, endAlpha: Float = 0f, padding: PaddingValues): Modifier =
-    this.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }.then(FadingEdgeElement(startAlpha, endAlpha, padding))
+    this.graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+        .then(FadingEdgeElement(startAlpha, endAlpha, padding))

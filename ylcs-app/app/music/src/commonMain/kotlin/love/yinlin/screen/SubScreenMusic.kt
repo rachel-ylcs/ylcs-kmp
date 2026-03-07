@@ -20,10 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
@@ -57,6 +55,9 @@ import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.node.blurSource
 import love.yinlin.compose.ui.node.blurTarget
+import love.yinlin.compose.ui.node.fastClipCircle
+import love.yinlin.compose.ui.node.fastOffsetXDp
+import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
@@ -280,7 +281,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             uri = musicInfo.path(PathMod, ModResourceType.Record).toString(),
             musicInfo,
             contentScale = ContentScale.Crop,
-            modifier = modifier.rotate(degrees = animationRecord.value),
+            modifier = modifier.fastRotate(animationRecord),
             onClick = { navigate(::ScreenMusicDetails, musicInfo.id) }
         )
     }
@@ -294,7 +295,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 duration = Theme.animation.duration.v1,
                 enter = { fadeIn(animationSpec = tween(it)) },
                 exit = { fadeOut(animationSpec = tween(it, delayMillis = it / 2)) },
-                modifier = Modifier.fillMaxSize(fraction = 0.641f).clip(Theme.shape.circle).zIndex(2f)
+                modifier = Modifier.fillMaxSize(fraction = 0.641f).fastClipCircle().zIndex(2f)
             ) {
                 if (it != null) {
                     MusicCover(musicInfo = it, modifier = Modifier.fillMaxSize().border(
@@ -379,7 +380,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             )
             LoadingIcon(icon = Icons.GotoPrevious, color = Colors.Green1, onClick = { mp?.gotoPrevious() })
             Box(
-                modifier = Modifier.wrapContentSize().clip(Theme.shape.circle)
+                modifier = Modifier.wrapContentSize()
+                    .fastClipCircle()
                     .background(Colors.Green5).clickable {
                         launch {
                             mp?.let {
@@ -393,7 +395,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 val isPlaying = mp?.isPlaying ?: false
                 Icon(
                     icon = if (isPlaying) Icons.Pause else Icons.Play,
-                    modifier = Modifier.offset { if (isPlaying) IntOffset.Zero else IntOffset(1.5.dp.roundToPx(), 0) }
+                    modifier = Modifier.fastOffsetXDp { if (isPlaying) null else 1.5.dp }
                 )
             }
             LoadingIcon(icon = Icons.GotoNext, color = Colors.Green1, onClick = { mp?.gotoNext() })
@@ -518,7 +520,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
+                        modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -544,7 +546,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 modifier = Modifier.fillMaxWidth().clickable {
                                     launch { mp?.gotoIndex(index) }
                                     close()
-                                }.padding(Theme.padding.value),
+                                }.padding(Theme.padding.value9),
                                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {

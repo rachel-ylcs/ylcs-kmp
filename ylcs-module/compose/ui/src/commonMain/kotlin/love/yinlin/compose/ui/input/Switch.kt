@@ -4,16 +4,16 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.semantics.Role
 import love.yinlin.compose.Theme
+import love.yinlin.compose.ui.node.fastClipCircle
+import love.yinlin.compose.ui.node.fastOffsetX
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.node.shadow
@@ -53,13 +53,13 @@ fun Switch(
         .then(modifier),
         contentAlignment = Alignment.CenterStart
     ) {
-        val offsetX by animateDpAsState(
+        val offsetX = animateDpAsState(
             targetValue = if (checked) width / 2 else width / 24,
             animationSpec = tween(durationMillis = duration),
         )
-        Box(modifier = Modifier.offset(x = offsetX)
+        Box(modifier = Modifier.fastOffsetX(offsetX)
             .size(width * 5 / 12)
-            .clip(Theme.shape.circle)
+            .fastClipCircle()
             .background(trackColor)
         )
     }

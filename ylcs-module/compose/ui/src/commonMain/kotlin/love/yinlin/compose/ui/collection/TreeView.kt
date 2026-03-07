@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
@@ -35,6 +34,7 @@ import love.yinlin.compose.ui.layout.MeasureId
 import love.yinlin.compose.ui.layout.find
 import love.yinlin.compose.ui.layout.measureId
 import love.yinlin.compose.ui.layout.require
+import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import kotlin.math.max
 
@@ -130,11 +130,11 @@ object TreeViewScope {
                 )
 
                 if (expandable) {
-                    val expandDegree by animateFloatAsState(
+                    val expandDegree = animateFloatAsState(
                         targetValue = if (expanded) 90f else 0f,
                         animationSpec = tween(Theme.animation.duration.default)
                     )
-                    Icon(icon = Icons.KeyboardArrowRight, color = nodeColor, modifier = Modifier.rotate(expandDegree).measureId(TreeViewMeasureId.ExpandIcon))
+                    Icon(icon = Icons.KeyboardArrowRight, color = nodeColor, modifier = Modifier.fastRotate(expandDegree).measureId(TreeViewMeasureId.ExpandIcon))
                 }
 
                 if (icon != null) Icon(icon = icon, color = nodeColor, modifier = Modifier.measureId(TreeViewMeasureId.Icon))

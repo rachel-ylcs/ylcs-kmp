@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.layout.MeasurePolicies
+import love.yinlin.compose.ui.node.fastClipCircle
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.Text
@@ -63,7 +64,7 @@ fun Radio(
 
         val onClick = { group.index = if (index == group.index) null else index }
 
-        Layout(modifier = Modifier.size(radius * 2).clip(Theme.shape.circle).drawBehind {
+        Layout(modifier = Modifier.size(radius * 2).fastClipCircle().drawBehind {
             val radiusPx = radius.toPx()
             drawCircle(backgroundColor, radiusPx, center, style = Fill)
             drawCircle(contentColor, dotRadius.toPx(), center, style = Fill)

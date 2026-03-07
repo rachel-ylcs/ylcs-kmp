@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.layout.MeasurePolicies
+import love.yinlin.compose.ui.node.fastClipCircle
 
 /**
  * @param icon 图标资源
@@ -38,7 +39,7 @@ fun ColorIcon(
     Layout(
         modifier = Modifier
             .size(size)
-            .clip(Theme.shape.circle)
+            .fastClipCircle()
             .background(background)
             .padding(Theme.padding.g5)
             .then(modifier)
