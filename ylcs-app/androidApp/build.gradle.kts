@@ -1,10 +1,9 @@
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
-import com.android.build.gradle.internal.dsl.SigningConfig
+import com.android.build.api.dsl.ApkSigningConfig
+import com.android.build.api.dsl.ApplicationExtension
 import java.util.Properties
 
 plugins {
     install(
-        libs.plugins.kotlinAndroid,
         libs.plugins.androidApplication,
         libs.plugins.composeCompiler,
         libs.plugins.kotlinSerialization,
@@ -17,12 +16,10 @@ template(object : KotlinAndroidTemplate() {
     override val packageVersionName: String = C.app.versionName
 
     override fun KotlinAndroidSourceSetsScope.source() {
-        main.configure {
-            lib(projects.ylcsApp.app.portal)
-        }
+        lib(projects.ylcsApp.app.portal)
     }
 
-    override fun BaseAppModuleExtension.sign(): SigningConfig? = try {
+    override fun ApplicationExtension.sign(): ApkSigningConfig? = try {
         val localProperties = Properties().also { p ->
             C.root.localProperties.asFile.inputStream().use { p.load(it) }
         }

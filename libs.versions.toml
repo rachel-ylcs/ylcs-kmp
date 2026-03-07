@@ -2,16 +2,16 @@
 
 # Plugins #
 kotlin = "2.3.20-RC"
-agp = "8.12.3"
+agp = "9.0.0-alpha06"
 cmp = "1.11.0-alpha03"
-mavenPublish = "0.35.0"
+mavenPublish = "0.36.0"
 dokka = "2.2.0-Beta"
 
 # Libs #
 
 # Common
 skiko = "0.9.47"
-lifecycle = "2.10.0-alpha08"
+lifecycle = "2.10.0-beta01"
 coroutines = "1.10.2"
 ktor = "3.4.1"
 sketch = "4.4.0-beta02"

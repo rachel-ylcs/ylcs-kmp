@@ -1,18 +1,25 @@
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
-import com.android.build.gradle.internal.dsl.SigningConfig
-import org.gradle.api.NamedDomainObjectContainer
+import com.android.build.api.dsl.ApkSigningConfig
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.file.RegularFile
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
-class KotlinAndroidSourceSetsScope(
-    p: Project,
-    set: NamedDomainObjectContainer<KotlinSourceSet>
-) : KotlinSourceSetsScope(p, set) {
-    val main: KotlinSourceSet by lazy { set.named("main").get() }
-    val test: KotlinSourceSet by lazy { set.named("test").get() }
+class KotlinAndroidSourceSetsScope(private val handler: DependencyHandler) {
+    private fun implementation(dependencyNotation: Any) = handler.add("implementation", dependencyNotation)
+    private fun api(dependencyNotation: Any) = handler.add("api", dependencyNotation)
+
+    fun lib(vararg libs: Any) {
+        var isExport = false
+        for (item in libs) {
+            when {
+                item is ExportLib -> isExport = true
+                isExport -> api(item)
+                else -> implementation(item)
+            }
+        }
+    }
 }
 
 abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() {
@@ -21,8 +28,8 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
     open val packageName: String get() = uniqueSafeModuleName
     abstract val packageVersion: Int
     abstract val packageVersionName: String
-    open fun BaseAppModuleExtension.sign(): SigningConfig? = null
-    open fun BaseAppModuleExtension.android() { }
+    open fun ApplicationExtension.sign(): ApkSigningConfig? = null
+    open fun ApplicationExtension.android() { }
 
     val Project.originOutput: RegularFile get() = layout.buildDirectory.get().dir("outputs").dir("apk").dir("release").file("${project.name}-release.apk")
 
@@ -33,12 +40,12 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
                 jvmTarget.set(C.jvm.androidTarget)
             }
 
-            KotlinAndroidSourceSetsScope(this@build, sourceSets).source()
-
             action()
         }
 
-        extensions.configure<BaseAppModuleExtension> {
+        KotlinAndroidSourceSetsScope(dependencies).source()
+
+        extensions.configure<ApplicationExtension> {
             namespace = packageName
             compileSdk = C.android.compileSdk
 
