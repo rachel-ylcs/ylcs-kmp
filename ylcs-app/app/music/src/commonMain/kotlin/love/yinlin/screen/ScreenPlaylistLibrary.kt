@@ -252,7 +252,7 @@ class ScreenPlaylistLibrary : Screen() {
                     ReorderableItem(state = reorderState, key = item.id) {
                         val canDrag = mp?.isReady != true
 
-                        Row(
+                        Column(
                             modifier = Modifier.fillMaxWidth().combinedClickable(
                                 onClick = {
                                     launch {
@@ -264,39 +264,39 @@ class ScreenPlaylistLibrary : Screen() {
                                     if (!canDrag) slot.tip.warning("调整歌曲顺序需要停止播放器")
                                 }
                             ).padding(Theme.padding.value),
-                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.g5),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                         ) {
                             SimpleEllipsisText(
                                 text = item.name,
                                 style = Theme.typography.v7.bold,
                                 color = if (item.isDeleted) Theme.color.error else LocalColor.current,
-                                textDecoration = if (item.isDeleted) TextDecoration.LineThrough else null,
-                                textAlign = TextAlign.Start,
-                                overflow = TextOverflow.MiddleEllipsis,
-                                modifier = Modifier.weight(2f)
+                                textDecoration = if (item.isDeleted) TextDecoration.LineThrough else null
                             )
-                            SimpleEllipsisText(
-                                text = item.singer,
-                                style = Theme.typography.v8,
-                                textAlign = TextAlign.End,
-                                overflow = TextOverflow.MiddleEllipsis,
-                                color = LocalColorVariant.current,
-                                modifier = Modifier.weight(1f)
-                            )
-                            LoadingIcon(icon = Icons.Delete, tip = "删除", onClick = { deleteMusicFromPlaylist(index) })
-                            Icon(icon = Icons.DragHandle, modifier = Modifier.draggableHandle(
-                                enabled = canDrag,
-                                onDragStarted = {
-                                    dragStartIndex = -1
-                                    dragEndIndex = -1
-                                },
-                                onDragStopped = {
-                                    if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
-                                        moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
-                                    }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                SimpleEllipsisText(text = item.singer, style = Theme.typography.v8, color = LocalColorVariant.current)
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    LoadingIcon(icon = Icons.Delete, tip = "删除", onClick = { deleteMusicFromPlaylist(index) })
+                                    Icon(icon = Icons.DragHandle, modifier = Modifier.draggableHandle(
+                                        enabled = canDrag,
+                                        onDragStarted = {
+                                            dragStartIndex = -1
+                                            dragEndIndex = -1
+                                        },
+                                        onDragStopped = {
+                                            if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
+                                                moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
+                                            }
+                                        }
+                                    ))
                                 }
-                            ))
+                            }
                         }
                     }
                 }
