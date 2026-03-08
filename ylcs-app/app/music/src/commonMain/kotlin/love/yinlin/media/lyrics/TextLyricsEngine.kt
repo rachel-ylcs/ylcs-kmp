@@ -54,6 +54,8 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     override fun reset() {
         lines = null
         currentIndex = -1
+        lastPosition = 0L
+        listState.requestScrollToItem(0)
     }
 
     @CallSuper
@@ -104,8 +106,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
 
         LaunchedEffect(currentIndex) {
             if (!listState.isScrollInProgress && lines != null) {
-                val targetIndex = currentIndex.coerceAtLeast(0)
-                listState.animateScrollToItem(targetIndex)
+                listState.animateScrollToItem(currentIndex.coerceAtLeast(0))
             }
         }
 

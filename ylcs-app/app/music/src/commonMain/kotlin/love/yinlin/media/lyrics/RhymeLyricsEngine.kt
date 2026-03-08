@@ -61,6 +61,7 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
 
     override fun update(position: Long) {
         super.update(position)
+
         val line = lines?.getOrNull(currentIndex)
         val items = line?.items ?: return
         var currentLength = 0f

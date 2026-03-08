@@ -20,12 +20,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import love.yinlin.app
 import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
@@ -53,10 +56,11 @@ import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.BlurState
+import love.yinlin.compose.ui.node.align
 import love.yinlin.compose.ui.node.blurSource
 import love.yinlin.compose.ui.node.blurTarget
 import love.yinlin.compose.ui.node.fastClipCircle
-import love.yinlin.compose.ui.node.fastOffsetXDp
+import love.yinlin.compose.ui.node.fastOffsetX
 import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.node.silentClick
@@ -109,22 +113,25 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
                 if (music != null) {
                     catching {
-                        Coroutines.io {
+                        // 更新引擎
+                        engine = Coroutines.io {
                             // 按引擎顺序依次检查是否成功加载
                             val rootPath = music.path(PathMod)
+                            var currentEngine = engine
                             for (engineType in app.config.lyricsEngineOrder) {
                                 val newEngine = LyricsEngine[engineType]
                                 if (newEngine.load(rootPath)) {
-                                    engine = newEngine
+                                    currentEngine = newEngine
                                     break
                                 }
                             }
-
-                            // 更新状态标志
-                            hasAnimation = music.path(PathMod, ModResourceType.Animation).isFile()
-                            hasVideo = music.path(PathMod, ModResourceType.Video).isFile()
-                            hasAccompaniment = music.path(PathMod, ModResourceType.Accompaniment).isFile()
+                            currentEngine
                         }
+
+                        // 更新状态标志
+                        hasAnimation = music.path(PathMod, ModResourceType.Animation).isFile()
+                        hasVideo = music.path(PathMod, ModResourceType.Video).isFile()
+                        hasAccompaniment = music.path(PathMod, ModResourceType.Accompaniment).isFile()
                     }
                 }
                 else {
@@ -309,6 +316,12 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
+    @Stable
+    private class ChorusState(val hotpot: Long) {
+        var isArrived: Boolean by mutableStateOf(false)
+        override fun toString(): String = hotpot.toString()
+    }
+
     @Composable
     private fun MusicProgressLayout(modifier: Modifier = Modifier) {
         Row(
@@ -316,12 +329,19 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val position = currentDebounceTime
             val duration = mp?.duration?: 0L
-            val progress = if (duration == 0L) 0f else position / duration.toFloat()
+            val progress = if (duration == 0L) 0f else currentDebounceTime / duration.toFloat()
             val trackHeight = Theme.size.box4
 
-            SimpleClipText(text = position.timeString)
+            val chorus by rememberDerivedState { mp?.currentMusic?.chorus?.map { ChorusState(it) } ?: emptyList() }
+
+            LaunchedEffect(Unit) {
+                snapshotFlow { currentDebounceTime }.collectLatest { value ->
+                    chorus.fastForEach { it.isArrived = value >= it.hotpot }
+                }
+            }
+
+            SimpleClipText(text = currentDebounceTime.timeString)
             Slider(
                 value = progress,
                 onValueChangeFinished = { newProgress ->
@@ -335,27 +355,24 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 showThumb = false,
                 modifier = Modifier.weight(1f)
             ) {
-                val chorus by rememberDerivedState { mp?.currentMusic?.chorus }
-                if (chorus != null && duration != 0L) {
-                    Box(modifier = Modifier.matchParentSize()) {
-                        for (hotpot in chorus) {
-                            key(hotpot) {
-                                val color by animateColorAsState(
-                                    targetValue = if (position >= hotpot) Colors.Green2 else LocalColor.current,
-                                    animationSpec = tween(durationMillis = 1000)
-                                )
+                Box(modifier = Modifier.matchParentSize()) {
+                    chorus.fastForEach {
+                        val hotpot = it.hotpot
+                        key(hotpot) {
+                            val color by animateColorAsState(
+                                targetValue = if (it.isArrived) Colors.Green2 else LocalColor.current,
+                                animationSpec = tween(durationMillis = 1000)
+                            )
 
-                                Box(modifier = Modifier
-                                    .align(BiasAlignment(horizontalBias = hotpot / duration.toFloat() * 2 - 1, verticalBias = 0f))
-                                    .width((trackHeight + Theme.padding.g) * 2)
-                                    .height(trackHeight * 2)
-                                    .silentClick {
-                                        launch { mp?.seekTo(hotpot) }
-                                    }
-                                    .padding(horizontal = Theme.padding.g)
-                                    .background(color = color, shape = Theme.shape.circle)
-                                )
-                            }
+                            Box(modifier = Modifier
+                                .align(xPercent = { if (duration == 0L) 0f else hotpot / duration.toFloat() })
+                                .size(trackHeight * 2)
+                                .silentClick {
+                                    launch { mp?.seekTo(hotpot) }
+                                }
+                                .fastClipCircle()
+                                .background(color)
+                            )
                         }
                     }
                 }
@@ -396,7 +413,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 val isPlaying = mp?.isPlaying ?: false
                 Icon(
                     icon = if (isPlaying) Icons.Pause else Icons.Play,
-                    modifier = Modifier.fastOffsetXDp { if (isPlaying) null else 1.5.dp }
+                    modifier = Modifier.fastOffsetX { if (isPlaying) null else 1.5.dp.toPx() }
                 )
             }
             LoadingIcon(icon = Icons.GotoNext, color = Colors.Green1, onClick = { mp?.gotoNext() })
