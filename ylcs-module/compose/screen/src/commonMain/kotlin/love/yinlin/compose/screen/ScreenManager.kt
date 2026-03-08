@@ -19,6 +19,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import love.yinlin.extension.Array
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJson
 
 @Stable
@@ -131,8 +132,15 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
     }
 
+    private var lastNavigateTime = 0L
+
     @PublishedApi
     internal fun navigate(dstRoute: String, navigationPolicy: NavigationPolicy) {
+        // 防抖处理
+        val currentTime = DateEx.CurrentLong
+        if (currentTime - lastNavigateTime <= 300L) return
+        lastNavigateTime = currentTime
+
         val (createPolicy, clearPolicy) = navigationPolicy
 
         if (createPolicy == CreatePolicy.New) {
