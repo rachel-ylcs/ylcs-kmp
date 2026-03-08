@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastFilter
@@ -29,6 +30,7 @@ import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogChoice
 import love.yinlin.compose.ui.floating.DialogInput
+import love.yinlin.compose.ui.floating.DialogTemplate
 import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.icon.Icons
@@ -37,7 +39,9 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.PrimaryLoadingButton
+import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.layout.Divider
+import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.coroutines.Coroutines
@@ -65,6 +69,11 @@ class ScreenMusicLibrary : Screen() {
         val selected: Boolean = false
     ) {
         constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, modification = musicInfo.modification)
+    }
+
+    @Stable
+    private fun interface ModFilter {
+        fun check(musicInfo: MusicInfo): Boolean
     }
 
     private fun MusicInfoPreview.path(type: ModResourceType) = Path(PathMod, this.id, type.filename)
@@ -104,6 +113,16 @@ class ScreenMusicLibrary : Screen() {
         if (result != null) {
             library.replaceAll(mp?.library?.asSequence()?.filter {
                 it.value.name.contains(result, true)
+            }?.map { MusicInfoPreview(it.value) }?.toList() ?: emptyList())
+            isSearching = true
+        }
+    }
+
+    private suspend fun openSearchFilter() {
+        val result = searchFilterDialog.open()
+        if (result != null) {
+            library.replaceAll(mp?.library?.asSequence()?.filter {
+                result.check(it.value)
             }?.map { MusicInfoPreview(it.value) }?.toList() ?: emptyList())
             isSearching = true
         }
@@ -229,7 +248,10 @@ class ScreenMusicLibrary : Screen() {
         }
         else {
             if (isSearching) Icon(icon = Icons.Home, tip = "返回曲库", onClick = ::closeSearch)
-            else LoadingIcon(icon = Icons.Search, tip = "搜索", onClick = ::openSearch)
+            else {
+                LoadingIcon(icon = Icons.Search, tip = "搜索", onClick = ::openSearch)
+                LoadingIcon(icon = Icons.Filter, tip = "筛选", onClick = ::openSearchFilter)
+            }
         }
     }
 
@@ -357,7 +379,51 @@ class ScreenMusicLibrary : Screen() {
         }
     }
 
+    private val addMusicDialog = this land DialogChoice.ByDynamicList()
+
     private val searchDialog = this land DialogInput(hint = "歌曲名", maxLength = 32)
 
-    private val addMusicDialog = this land DialogChoice.ByDynamicList()
+    private val searchFilterDialog = this land object : DialogTemplate<ModFilter>() {
+        override val icon: ImageVector = Icons.Filter
+
+        override val actions: @Composable (RowScope.() -> Unit) = {
+            TextButton(text = Theme.value.dialogOkText, color = Theme.color.primary, onClick = {
+                future?.send()
+            })
+            TextButton(text = Theme.value.dialogCancelText, onClick = ::close)
+        }
+
+        @Composable
+        private fun FilterLayout(
+            title: String,
+            content: @Composable () -> Unit
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .dashBorder(Theme.border.v7, Theme.color.primary, Theme.shape.v7)
+            ) {
+                SimpleEllipsisText(title)
+                content()
+            }
+        }
+
+        @Composable
+        override fun Land() {
+            LandDialogTemplate("筛选MOD") {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                ) {
+                    FilterLayout("专辑") {
+
+                    }
+                }
+            }
+        }
+
+        suspend fun open(): ModFilter? {
+            return awaitResult()
+        }
+    }
 }
