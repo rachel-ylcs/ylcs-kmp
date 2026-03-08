@@ -237,10 +237,6 @@ class ScreenMusicLibrary : Screen() {
     override fun ColumnScope.SecondTitleBar() {
         Divider()
         ActionScope.Left.Container(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value)) {
-            Icon(icon = Icons.Token, tip = "工坊", onClick = {
-                pop()
-                navigate(::ScreenModCenter)
-            })
             Icon(icon = Icons.Upload, tip = "导入", onClick = {
                 pop()
                 navigate(::ScreenImportMusic, null)

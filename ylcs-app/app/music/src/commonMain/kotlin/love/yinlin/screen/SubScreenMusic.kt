@@ -17,10 +17,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -186,6 +184,9 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     Icon(icon = Icons.Lyrics, tip = "歌词", onClick = {
                         if (mp?.isInit == true) navigate(::ScreenLyricsSettings)
                         else slot.tip.warning("播放器初始化失败")
+                    })
+                    Icon(icon = Icons.Token, tip = "工坊", onClick = {
+                        navigate(::ScreenModCenter)
                     })
                 },
                 right = {
@@ -611,7 +612,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
             ) {
                 var sleepHour by rememberValueState(0)
                 var sleepMinutes by rememberValueState(0)
