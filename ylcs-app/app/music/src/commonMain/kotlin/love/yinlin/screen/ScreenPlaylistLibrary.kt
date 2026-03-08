@@ -192,7 +192,10 @@ class ScreenPlaylistLibrary : Screen() {
             size = tabs.size,
             index = currentPage,
             onNavigate = { currentPage = it },
-            titleProvider = { tabs[it] },
+            titleProvider = {
+                val playlist = tabs[it]
+                "${playlist}(${playlistLibrary[playlist]?.items?.size ?: 0})"
+            },
             onLongClick = { launch { processPlaylist(it) } },
             modifier = modifier
         )

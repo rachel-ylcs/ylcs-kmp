@@ -524,7 +524,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        SimpleEllipsisText(text = items.name, style = Theme.typography.v6.bold, color = Theme.color.secondary)
+                        SimpleEllipsisText(text = "${items.name}(${items.items.size})", style = Theme.typography.v6.bold, color = Theme.color.secondary)
                         Icon(icon = Icons.StopCircle, onClick = {
                             close()
                             launch { mp?.stop() }
