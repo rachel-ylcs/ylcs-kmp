@@ -16,7 +16,6 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 ExportLib,
                 projects.ylcsModule.compose.plugin.animatedWebpDecoder,
-                libs.compose.foundation,
             )
         }
     }

@@ -26,6 +26,7 @@ sealed interface DropResult {
     data class Text(val text: String) : DropResult
 }
 
+@Stable
 expect fun Modifier.dragAndDrop(
     enabled: Boolean,
     flag: DragFlag,

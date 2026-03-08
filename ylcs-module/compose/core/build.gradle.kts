@@ -18,6 +18,7 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.core,
                 libs.compose.runtime,
                 libs.compose.ui,
+                libs.compose.foundation,
                 libs.compose.savedstate,
                 libs.compose.viewmodel,
                 libs.compose.lifecycle,

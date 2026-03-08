@@ -1,7 +1,5 @@
 package love.yinlin.compose.ui.container
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -85,19 +83,14 @@ private fun BannerIndicator(
             val actualIndex = state.currentPage % size
             repeat(size) { index ->
                 val isCurrent = actualIndex == index
-                val radius by animateDpAsState(
-                    targetValue = if (isCurrent) indicatorSize else indicatorSize * 0.75f,
-                    animationSpec = tween(Theme.animation.duration.default)
-                )
-
                 val shape = Theme.shape.circle
                 val borderColor = if (isCurrent) Theme.color.onContainer else Theme.color.onSurface
                 val backgroundColor = if (isCurrent) Theme.color.primaryContainer else Theme.color.surface
 
-                Box(modifier = Modifier.size(radius)
+                Box(modifier = Modifier.size(indicatorSize)
                     .border(Theme.border.v10, borderColor.copy(alpha = 0.25f), shape)
                     .clip(shape)
-                    .background(backgroundColor.copy(alpha = 0.9f))
+                    .background(backgroundColor.copy(alpha = 0.75f))
                     .clickable(enabled = !isCurrent) { onClick(index) }
                 )
             }

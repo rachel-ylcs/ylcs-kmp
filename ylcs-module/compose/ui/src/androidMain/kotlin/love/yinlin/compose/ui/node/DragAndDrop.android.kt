@@ -1,7 +1,9 @@
 package love.yinlin.compose.ui.node
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 
+@Stable
 actual fun Modifier.dragAndDrop(
     enabled: Boolean,
     flag: DragFlag,

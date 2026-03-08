@@ -140,7 +140,7 @@ internal fun SwipePaginationLayout(
                 .fillMaxWidth()
                 .height(headerHeight)
                 .align(Alignment.TopCenter)
-                .fastOffsetY { -headerHeightPx + state.indicatorOffset }
+                .fastOffsetY { -headerHeight.toPx() + state.indicatorOffset }
         ) {
             header(state.refreshStatus, abs(state.indicatorOffset) / headerHeightPx)
         }
@@ -153,7 +153,7 @@ internal fun SwipePaginationLayout(
                 .fillMaxWidth()
                 .height(footerHeight)
                 .align(Alignment.BottomCenter)
-                .fastOffsetY { footerHeightPx + state.indicatorOffset }
+                .fastOffsetY { footerHeight.toPx() + state.indicatorOffset }
         ) {
             footer(state.loadingStatus, -state.indicatorOffset / footerHeightPx)
         }

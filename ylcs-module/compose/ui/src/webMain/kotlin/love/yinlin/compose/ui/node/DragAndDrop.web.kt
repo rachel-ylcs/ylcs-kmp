@@ -1,6 +1,7 @@
 package love.yinlin.compose.ui.node
 
 import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -22,6 +23,7 @@ import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsString
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
+@Stable
 actual fun Modifier.dragAndDrop(
     enabled: Boolean,
     flag: DragFlag,

@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.interaction.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActionScope
@@ -29,6 +28,7 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
+import love.yinlin.compose.interaction.collectState
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.shadow
 
@@ -46,13 +46,12 @@ internal fun DecorationBox(
     val minWidth = Theme.size.input3
     val shape = Theme.shape.v8
 
-    val isFocused by state.interactionSource.collectIsFocusedAsState()
-    val isHovered by state.interactionSource.collectIsHoveredAsState()
-    val isPressed by state.interactionSource.collectIsPressedAsState()
-    val isDragged by state.interactionSource.collectIsDraggedAsState()
+    val interactionState by state.interactionSource.collectState(
+        colorProvider.useFocused, colorProvider.useHovered, colorProvider.usePressed, colorProvider.useDragged
+    )
 
     val lightColor by animateColorAsState(
-        targetValue = if (enabled) colorProvider.color(state, isFocused, isHovered, isPressed, isDragged) else Theme.color.disabledContent,
+        targetValue = if (enabled) colorProvider.color(state, interactionState) else Theme.color.disabledContent,
         animationSpec = tween(Theme.animation.duration.default)
     )
     val backgroundColor = if (enabled) Theme.color.backgroundVariant else Theme.color.disabledContainer

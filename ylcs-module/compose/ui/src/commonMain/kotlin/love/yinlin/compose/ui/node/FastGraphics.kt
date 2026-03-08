@@ -3,136 +3,268 @@ package love.yinlin.compose.ui.node
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import love.yinlin.compose.platform.inspector
 import kotlin.jvm.JvmName
 
-inline fun Modifier.fastRotate(crossinline degreeProvider: () -> Float?) = this.graphicsLayer {
-    degreeProvider()?.let { rotationZ = it }
-}
+val NullFloatProvider: GraphicsLayerScope.() -> Float? = { null }
 
-inline fun Modifier.fastRotate(crossinline xProvider: () -> Float?, crossinline yProvider: () -> Float?, crossinline zProvider: () -> Float?) = this.graphicsLayer {
-    xProvider()?.let { rotationX = it }
-    yProvider()?.let { rotationY = it }
-    zProvider()?.let { rotationZ = it }
-}
+// FastRotate
 
-fun Modifier.fastRotate(animatable: Animatable<Float, AnimationVector1D>) = this.graphicsLayer {
-    rotationZ = animatable.value
-}
-
-fun Modifier.fastRotate(state: State<Float>) = this.graphicsLayer {
-    rotationZ = state.value
-}
-
-inline fun Modifier.fastScale(crossinline scaleXProvider: () -> Float?, crossinline scaleYProvider: () -> Float?) = this.graphicsLayer {
-    scaleXProvider()?.let { scaleX = it }
-    scaleYProvider()?.let { scaleY = it }
-}
-
-inline fun Modifier.fastScale(crossinline scaleProvider: () -> Float?) = this.graphicsLayer {
-    scaleProvider()?.let {
-        scaleX = it
-        scaleY = it
+private class FastRotateNode(var angleProvider: GraphicsLayerScope.() -> Float?) : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0) {
+                angleProvider()?.let { rotationZ = it }
+            }
+        }
     }
 }
 
-fun Modifier.fastScale(animatable: Animatable<Float, AnimationVector1D>) = this.graphicsLayer {
-    val value = animatable.value
-    scaleX = value
-    scaleY = value
-}
-
-fun Modifier.fastScale(state: State<Float>) = this.graphicsLayer {
-    val value = state.value
-    scaleX = value
-    scaleY = value
-}
-
-inline fun Modifier.fastAlpha(crossinline alphaProvider: () -> Float?) = this.graphicsLayer {
-    alphaProvider()?.let { alpha = it }
-}
-
-fun Modifier.fastAlpha(animatable: Animatable<Float, AnimationVector1D>) = this.graphicsLayer {
-    alpha = animatable.value
-}
-
-fun Modifier.fastAlpha(state: State<Float>) = this.graphicsLayer {
-    alpha = state.value
-}
-
-inline fun Modifier.fastBackground(crossinline colorProvider: () -> Color?) = this.drawBehind {
-    colorProvider()?.let { drawRect(it) }
-}
-
-fun Modifier.fastBackground(state: State<Color>) = this.drawBehind {
-    drawRect(state.value)
-}
-
-inline fun Modifier.fastClip(crossinline shapeProvider: () -> Shape?) = this.graphicsLayer {
-    shapeProvider()?.let {
-        shape = it
-        clip = true
+private data class FastRotateElement(val angleProvider: GraphicsLayerScope.() -> Float?) : ModifierNodeElement<FastRotateNode>() {
+    override fun create(): FastRotateNode = FastRotateNode(angleProvider)
+    override fun update(node: FastRotateNode) {
+        node.angleProvider = angleProvider
+    }
+    override fun InspectorInfo.inspectableProperties() = inspector("fastRotate") {
+        "angleProvider" bind angleProvider
     }
 }
 
-fun Modifier.fastClipCircle() = this.graphicsLayer {
-    shape = CircleShape
-    clip = true
+@Stable
+fun Modifier.fastRotate(degreeProvider: GraphicsLayerScope.() -> Float?) =
+    this then FastRotateElement(degreeProvider)
+
+@Stable
+fun Modifier.fastRotate(animatable: Animatable<Float, AnimationVector1D>) =
+    this then FastRotateElement { animatable.value }
+
+@Stable
+fun Modifier.fastRotate(state: State<Float>) =
+    this then FastRotateElement { state.value }
+
+
+// FastScale
+
+private class FastScaleNode(
+    var scaleXProvider: GraphicsLayerScope.() -> Float?,
+    var scaleYProvider: GraphicsLayerScope.() -> Float?,
+) : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0) {
+                scaleXProvider()?.let { scaleX = it }
+                scaleYProvider()?.let { scaleY = it }
+            }
+        }
+    }
 }
 
-inline fun Modifier.fastOffsetX(crossinline offsetXProvider: () -> Float?) = this.graphicsLayer {
-    offsetXProvider()?.let { translationX = it }
+private data class FastScaleElement(
+    val scaleXProvider: GraphicsLayerScope.() -> Float?,
+    val scaleYProvider: GraphicsLayerScope.() -> Float? = scaleXProvider,
+) : ModifierNodeElement<FastScaleNode>() {
+    override fun create(): FastScaleNode = FastScaleNode(scaleXProvider, scaleYProvider)
+    override fun update(node: FastScaleNode) {
+        node.scaleXProvider = scaleXProvider
+        node.scaleYProvider = scaleYProvider
+    }
+    override fun InspectorInfo.inspectableProperties() = inspector("fastScale") {
+        "scaleXProvider" bind scaleXProvider
+        "scaleYProvider" bind scaleYProvider
+    }
 }
 
-inline fun Modifier.fastOffsetXDp(crossinline offsetXProvider: () -> Dp?) = this.graphicsLayer {
-    offsetXProvider()?.let { translationX = it.toPx() }
+@Stable
+fun Modifier.fastScale(scaleXProvider: GraphicsLayerScope.() -> Float?, scaleYProvider: GraphicsLayerScope.() -> Float?) =
+    this then FastScaleElement(scaleXProvider, scaleYProvider)
+
+@Stable
+fun Modifier.fastScale(scaleProvider: GraphicsLayerScope.() -> Float?) =
+    this then FastScaleElement(scaleProvider)
+
+@Stable
+fun Modifier.fastScale(animatable: Animatable<Float, AnimationVector1D>) =
+    this then FastScaleElement({ animatable.value })
+
+@Stable
+fun Modifier.fastScale(state: State<Float>) =
+    this then FastScaleElement({ state.value })
+
+
+// FastAlpha
+
+private class FastAlphaNode(var alphaProvider: GraphicsLayerScope.() -> Float?) : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0) {
+                alphaProvider()?.let { alpha = it }
+            }
+        }
+    }
 }
 
-@JvmName("fastOffsetXByStatePx")
-fun Modifier.fastOffsetX(state: State<Float>) = this.graphicsLayer {
-    translationX = state.value
+private data class FastAlphaElement(val alphaProvider: GraphicsLayerScope.() -> Float?) : ModifierNodeElement<FastAlphaNode>() {
+    override fun create(): FastAlphaNode = FastAlphaNode(alphaProvider)
+    override fun update(node: FastAlphaNode) {
+        node.alphaProvider = alphaProvider
+    }
+    override fun InspectorInfo.inspectableProperties() = inspector("fastAlpha") {
+        "alphaProvider" bind alphaProvider
+    }
 }
 
-@JvmName("fastOffsetXByStatePxInt")
-fun Modifier.fastOffsetX(state: State<Int>) = this.graphicsLayer {
-    translationX = state.value.toFloat()
+@Stable
+fun Modifier.fastAlpha(alphaProvider: GraphicsLayerScope.() -> Float?) =
+    this then FastAlphaElement(alphaProvider)
+
+@Stable
+fun Modifier.fastAlpha(animatable: Animatable<Float, AnimationVector1D>) =
+    this then FastAlphaElement { animatable.value }
+
+@Stable
+fun Modifier.fastAlpha(state: State<Float>) =
+    this then FastAlphaElement { state.value }
+
+// fastClip
+
+private class FastClipNode(var shapeProvider: GraphicsLayerScope.() -> Shape?) : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0) {
+                shapeProvider()?.let {
+                    shape = it
+                    clip = true
+                }
+            }
+        }
+    }
 }
+
+private data class FastClipElement(val shapeProvider: GraphicsLayerScope.() -> Shape?) : ModifierNodeElement<FastClipNode>() {
+    override fun create(): FastClipNode = FastClipNode(shapeProvider)
+    override fun update(node: FastClipNode) {
+        node.shapeProvider = shapeProvider
+    }
+    override fun InspectorInfo.inspectableProperties() = inspector("fastClip") {
+        "shapeProvider" bind shapeProvider
+    }
+}
+
+@Stable
+fun Modifier.fastClip(shapeProvider: GraphicsLayerScope.() -> Shape?) =
+    this then FastClipElement(shapeProvider)
+
+
+// FastClipCircle
+
+private class FastClipCircleNode : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0) {
+                shape = CircleShape
+                clip = true
+            }
+        }
+    }
+}
+
+private data object FastClipCircleElement : ModifierNodeElement<FastClipCircleNode>() {
+    override fun create(): FastClipCircleNode = FastClipCircleNode()
+    override fun update(node: FastClipCircleNode) { }
+    override fun InspectorInfo.inspectableProperties() = inspector("fastClipCircle")
+}
+
+@Stable
+fun Modifier.fastClipCircle(): Modifier = this then FastClipCircleElement
+
+// FastOffset
+
+private class FastOffsetNode(
+    var offsetXProvider: GraphicsLayerScope.() -> Float?,
+    var offsetYProvider: GraphicsLayerScope.() -> Float?
+) : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.placeWithLayer(0, 0) {
+                offsetXProvider()?.let { translationX = it }
+                offsetYProvider()?.let { translationY = it }
+            }
+        }
+    }
+}
+
+private data class FastOffsetElement(
+    val offsetXProvider: GraphicsLayerScope.() -> Float?,
+    val offsetYProvider: GraphicsLayerScope.() -> Float?,
+) : ModifierNodeElement<FastOffsetNode>() {
+    override fun create(): FastOffsetNode = FastOffsetNode(offsetXProvider, offsetYProvider)
+    override fun update(node: FastOffsetNode) {
+        node.offsetXProvider = offsetXProvider
+        node.offsetYProvider = offsetYProvider
+    }
+    override fun InspectorInfo.inspectableProperties() = inspector("fastOffset") {
+        "offsetXProvider" bind offsetXProvider
+        "offsetYProvider" bind offsetYProvider
+    }
+}
+
+@Stable
+fun Modifier.fastOffsetX(offsetProvider: GraphicsLayerScope.() -> Float?) =
+    this then FastOffsetElement(offsetProvider, NullFloatProvider)
+
+@JvmName("fastOffsetXByStateFloat")
+@Stable
+fun Modifier.fastOffsetX(state: State<Float>) =
+    this then FastOffsetElement({ state.value }, NullFloatProvider)
+
+@JvmName("fastOffsetXByStateInt")
+@Stable
+fun Modifier.fastOffsetX(state: State<Int>) =
+    this then FastOffsetElement({ state.value.toFloat() }, NullFloatProvider)
 
 @JvmName("fastOffsetXByStateDp")
-fun Modifier.fastOffsetX(state: State<Dp>) = this.graphicsLayer {
-    translationX = state.value.toPx()
-}
+@Stable
+fun Modifier.fastOffsetX(state: State<Dp>) =
+    this then FastOffsetElement({ state.value.toPx() }, NullFloatProvider)
 
-inline fun Modifier.fastOffsetY(crossinline offsetYProvider: () -> Float?) = this.graphicsLayer {
-    offsetYProvider()?.let { translationY = it }
-}
+@Stable
+fun Modifier.fastOffsetY(offsetProvider: GraphicsLayerScope.() -> Float?) =
+    this then FastOffsetElement(NullFloatProvider, offsetProvider)
 
-inline fun Modifier.fastOffsetYDp(crossinline offsetYProvider: () -> Dp?) = this.graphicsLayer {
-    offsetYProvider()?.let { translationY = it.toPx() }
-}
+@JvmName("fastOffsetYByStateFloat")
+@Stable
+fun Modifier.fastOffsetY(state: State<Float>) =
+    this then FastOffsetElement(NullFloatProvider) { state.value }
 
-@JvmName("fastOffsetYByStatePx")
-fun Modifier.fastOffsetY(state: State<Float>) = this.graphicsLayer {
-    translationY = state.value
-}
-
-@JvmName("fastOffsetYByStatePxInt")
-fun Modifier.fastOffsetY(state: State<Int>) = this.graphicsLayer {
-    translationY = state.value.toFloat()
-}
+@JvmName("fastOffsetYByStateInt")
+@Stable
+fun Modifier.fastOffsetY(state: State<Int>) =
+    this then FastOffsetElement(NullFloatProvider) { state.value.toFloat() }
 
 @JvmName("fastOffsetYByStateDp")
-fun Modifier.fastOffsetY(state: State<Dp>) = this.graphicsLayer {
-    translationY = state.value.toPx()
-}
+@Stable
+fun Modifier.fastOffsetY(state: State<Dp>) =
+    this then FastOffsetElement(NullFloatProvider) { state.value.toPx() }
 
-inline fun Modifier.fastOffset(crossinline offsetXProvider: () -> Float?, crossinline offsetYProvider: () -> Float?) = this.graphicsLayer {
-    offsetXProvider()?.let { translationX = it }
-    offsetYProvider()?.let { translationY = it }
-}
+@Stable
+fun Modifier.fastOffset(offsetXProvider: GraphicsLayerScope.() -> Float?, offsetYProvider: GraphicsLayerScope.() -> Float?) =
+    this then FastOffsetElement(offsetXProvider, offsetYProvider)

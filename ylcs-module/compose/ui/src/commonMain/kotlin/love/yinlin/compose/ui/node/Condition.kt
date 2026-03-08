@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui.node
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
@@ -9,6 +10,7 @@ import kotlin.contracts.contract
 /**
  * 当 value == true 时应用 callback
  */
+@Stable
 inline fun Modifier.condition(value: Boolean, callback: Modifier.() -> Modifier): Modifier {
     @Suppress("RETURN_VALUE_NOT_USED")
     @OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)
@@ -22,6 +24,7 @@ inline fun Modifier.condition(value: Boolean, callback: Modifier.() -> Modifier)
 /**
  * 当 value == true 时应用 ifTrue, 否则应用 ifFalse
  */
+@Stable
 inline fun Modifier.condition(value: Boolean, ifTrue: Modifier.() -> Modifier, ifFalse: Modifier.() -> Modifier): Modifier {
     @Suppress("RETURN_VALUE_NOT_USED")
     @OptIn(ExperimentalContracts::class, ExperimentalExtendedContracts::class)

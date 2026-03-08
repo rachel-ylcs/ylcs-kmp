@@ -152,7 +152,10 @@ private fun CalendarHeader(
     settledPage: Int,
     actions: @Composable RowScope.() -> Unit = { }
 ) {
-    val currentDate = remember(settledPage) { CalendarState.indexShadowDate(settledPage) }
+    val currentDateText = remember(settledPage) {
+        val date = CalendarState.indexShadowDate(settledPage)
+        "${date.year}年${date.month.number}月"
+    }
 
     val dayTextStyle = LocalCalendarDayTextStyle.current
     val headerStyle = dayTextStyle.scaleSize(1.6f, true)
@@ -165,7 +168,7 @@ private fun CalendarHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         SimpleEllipsisText(
-            text = "${currentDate.year}年${currentDate.month.number}月",
+            text = currentDateText,
             modifier = Modifier.weight(1f).padding(start = Theme.padding.h / 2),
             style = headerStyle,
         )
