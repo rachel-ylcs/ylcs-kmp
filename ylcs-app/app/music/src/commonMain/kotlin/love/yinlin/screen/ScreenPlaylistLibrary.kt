@@ -24,6 +24,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TreeView
 import love.yinlin.compose.ui.floating.DialogChoice
@@ -199,8 +200,8 @@ class ScreenPlaylistLibrary : Screen() {
 
     @Composable
     private fun PlaylistGrid(modifier: Modifier = Modifier) {
-        var dragStartIndex = remember { -1 }
-        var dragEndIndex = remember { -1 }
+        var dragStartIndex by rememberValueState(-1)
+        var dragEndIndex by rememberValueState(-1)
         val gridState = rememberLazyGridState()
         val reorderState = rememberReorderableLazyGridState(gridState) { from, to ->
             if (dragStartIndex == -1) dragStartIndex = from.index

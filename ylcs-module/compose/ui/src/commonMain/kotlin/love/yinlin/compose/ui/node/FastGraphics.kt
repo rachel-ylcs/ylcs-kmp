@@ -128,7 +128,7 @@ fun Modifier.fastOffsetY(state: State<Int>) = this.graphicsLayer {
 }
 
 @JvmName("fastOffsetYByStateDp")
-fun Modifier.fastOffsetYDp(state: State<Dp>) = this.graphicsLayer {
+fun Modifier.fastOffsetY(state: State<Dp>) = this.graphicsLayer {
     translationY = state.value.toPx()
 }
 

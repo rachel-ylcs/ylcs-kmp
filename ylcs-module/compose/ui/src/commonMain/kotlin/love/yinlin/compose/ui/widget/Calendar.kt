@@ -149,10 +149,10 @@ private fun rememberCalendarSize(): Triple<Dp, Dp, Dp> {
 
 @Composable
 private fun CalendarHeader(
-    state: CalendarState,
+    settledPage: Int,
     actions: @Composable RowScope.() -> Unit = { }
 ) {
-    val currentDate = remember(state.settledPage) { CalendarState.indexShadowDate(state.settledPage) }
+    val currentDate = remember(settledPage) { CalendarState.indexShadowDate(settledPage) }
 
     val dayTextStyle = LocalCalendarDayTextStyle.current
     val headerStyle = dayTextStyle.scaleSize(1.6f, true)
@@ -291,7 +291,7 @@ fun Calendar(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(cellSize * 0.3f),
         ) {
-            CalendarHeader(state = state, actions = actions)
+            CalendarHeader(settledPage = state.settledPage, actions = actions)
             CalendarWeekGrid()
             CalendarDayGrid(state = state, events = events, onEventClick = onEventClick)
         }
