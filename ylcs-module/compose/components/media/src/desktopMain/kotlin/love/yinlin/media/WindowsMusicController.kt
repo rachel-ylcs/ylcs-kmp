@@ -13,11 +13,13 @@ import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.coroutines.mainContext
 import love.yinlin.foundation.Context
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 @NativeLibApi
 internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher) {
     @Stable
+    @Suppress("unused")
     private enum class PlaybackState { None, Opening, Buffering, Playing, Paused; }
 
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
@@ -38,7 +40,7 @@ internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMus
                 if (value) {
                     while (isActive && !isRelease) {
                         position = nativeGetPosition(nativeHandle)
-                        delay(fetcher.interval)
+                        delay(fetcher.interval.milliseconds)
                     }
                 }
             }

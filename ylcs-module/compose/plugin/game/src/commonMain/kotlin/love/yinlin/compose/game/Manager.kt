@@ -32,6 +32,7 @@ import love.yinlin.compose.game.traits.PointerDownEvent
 import love.yinlin.compose.game.traits.PointerMoveEvent
 import love.yinlin.compose.game.traits.PointerUpEvent
 import love.yinlin.compose.game.traits.Spirit
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 abstract class Manager {
@@ -68,7 +69,7 @@ abstract class Manager {
 
                 val compensation = tick2 - tick1
 
-                delay(1000L / fps - compensation)
+                delay((1000 / fps - compensation).milliseconds)
             }
         }
         tickJob = null

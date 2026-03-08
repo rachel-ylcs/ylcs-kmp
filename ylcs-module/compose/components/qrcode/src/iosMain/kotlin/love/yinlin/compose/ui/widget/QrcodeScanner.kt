@@ -82,7 +82,7 @@ private class QrcodeScannerWrapper : PlatformView<QrcodeView>(), Releasable<Qrco
     var scanResult: String? by mutableStateOf(null)
     var isStart: Boolean by mutableStateOf(false)
 
-    val scanCode = SGScanCode().apply {
+    val scanCode: SGScanCode = SGScanCode().apply {
         delegate = object : SGScanCodeDelegateProtocol, NSObject() {
             override fun scanCode(scanCode: SGScanCode?, result: String?) {
                 scanCode?.stopRunning()

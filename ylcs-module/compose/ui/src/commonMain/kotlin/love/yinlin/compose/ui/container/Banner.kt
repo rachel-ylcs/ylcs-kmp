@@ -40,6 +40,7 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.keepSize
 import love.yinlin.extension.catching
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 private fun BannerArrow(
@@ -180,7 +181,7 @@ fun Banner(
     LaunchedEffect(state, interval, autoPlay) {
         if (autoPlay) {
             while (true) {
-                delay(interval)
+                delay(interval.milliseconds)
                 catching { state.animateScrollToPage(state.currentPage + 1) }
             }
         }

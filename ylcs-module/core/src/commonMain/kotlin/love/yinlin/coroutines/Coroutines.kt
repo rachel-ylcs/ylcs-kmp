@@ -12,6 +12,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalContracts::class)
 object Coroutines {
@@ -47,7 +48,7 @@ object Coroutines {
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         }
-        return withTimeout(limit.toLong(), block)
+        return withTimeout(limit.milliseconds, block)
     }
 
     suspend fun isActive(): Boolean = currentCoroutineContext().isActive

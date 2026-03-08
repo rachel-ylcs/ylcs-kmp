@@ -27,6 +27,8 @@ import love.yinlin.compose.ui.text.InputDecoration
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.mainScope
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 object FloatingPage : Page() {
@@ -143,7 +145,7 @@ object FloatingPage : Page() {
                     Example("Loading") {
                         PrimaryLoadingButton("open", onClick = {
                             dialogLoading.open("Please wait 3s!") {
-                                delay(3000L)
+                                delay(3.seconds)
                             }
                         })
                     }
@@ -153,7 +155,7 @@ object FloatingPage : Page() {
                             dialogProgress.open {
                                 total = "100"
                                 for (i in 0 .. 100) {
-                                    delay(50L)
+                                    delay(50.milliseconds)
                                     current = i.toString()
                                     progress = i / 100f
                                 }

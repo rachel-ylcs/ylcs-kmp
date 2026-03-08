@@ -136,7 +136,6 @@ object SettingsScope {
         }
     }
 
-    @Suppress("AssignedValueIsNeverRead")
     @Composable
     fun ItemExpanderSuspend(
         title: String,

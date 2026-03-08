@@ -37,8 +37,7 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.replaceAll
 import love.yinlin.foundation.Context
-import love.yinlin.uri.Uri
-import love.yinlin.uri.toAndroidUri
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(UnstableApi::class)
 @Stable
@@ -125,7 +124,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
                 if (value) {
                     while (isActive) {
                         position = controller?.currentPosition ?: 0L
-                        delay(fetcher.interval)
+                        delay(fetcher.interval.milliseconds)
                     }
                 }
             }

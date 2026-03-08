@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.coroutines.mainContext
 import love.yinlin.media.FfmpegRenderersFactory
 import love.yinlin.foundation.Context
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 actual abstract class VideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
@@ -50,7 +51,7 @@ internal class AndroidVideoController(context: Context, topBar: VideoActionBar?,
                 if (value) {
                     while (isActive) {
                         position = exoPlayer.currentPosition
-                        delay(100L)
+                        delay(100.milliseconds)
                     }
                 }
             }

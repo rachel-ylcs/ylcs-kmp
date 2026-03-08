@@ -12,6 +12,7 @@ import love.yinlin.compose.data.ImageQuality
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingNull
 import java.io.ByteArrayOutputStream
+import androidx.core.graphics.scale
 
 // ByteArray <-> ImageBitmap
 
@@ -74,12 +75,7 @@ actual fun PlatformImage.crop(rect: CropRegion) = catching {
 actual fun PlatformImage.thumbnail(longImageThreshold: Float, maxSizeNormal: Int, minSizeLong: Int) = catching {
     val (thumbWidth, thumbHeight, scale) = calculateThumbnailScale(bitmap.width, bitmap.height, longImageThreshold, maxSizeNormal, minSizeLong)
     if (scale) {
-        val thumbBitmap = Bitmap.createScaledBitmap(
-            bitmap,
-            thumbWidth,
-            thumbHeight,
-            true
-        )
+        val thumbBitmap = bitmap.scale(thumbWidth, thumbHeight)
         bitmap.recycle()
         bitmap = thumbBitmap
     }

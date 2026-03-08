@@ -78,8 +78,7 @@ actual class StartupPicker : SyncStartup() {
                 phPickerDelegate = object : NSObject(), PHPickerViewControllerDelegateProtocol {
                     override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
                         picker.dismissViewControllerAnimated(true, null)
-                        val results = didFinishPicking.mapNotNull { it as PHPickerResult }
-                        onImagesPicked(results)
+                        onImagesPicked(didFinishPicking.filterIsInstance<PHPickerResult>())
                     }
                 }
                 phPickerDismissDelegate = object : NSObject(), UIAdaptivePresentationControllerDelegateProtocol {

@@ -410,12 +410,12 @@ val ApiSongDeleteSongComment by API.post.i<String, Long>().o()
 val ApiPrizeGetPrize by API.post.i<Int, Int>().o<List<Prize>>()
 
 @APIParam("token")
-@APIParam("Prizedata")
+@APIParam("prizeData")
 val ApiPrizeCreatePrize by API.post.i<String, Prizedata>().o<Int>()
 
 @APIParam("token")
 @APIParam("pid")
-@APIParam("Prizedata")
+@APIParam("prizeData")
 val ApiPrizeUpdatePrize by API.post.i<String, Int, Prizedata>().o()
 
 @APIParam("token")
@@ -425,7 +425,7 @@ val ApiPrizeDeletePrize by API.post.i<String, Int>().o<Int>()
 @APIParam("token")
 @APIParam("pid")
 @APIParam("pic")
-@APIParam("PrizeItemdata")
+@APIParam("prizeItemData")
 val ApiPrizeAddItem by API.form.i<String, Int, APIFile?, PrizeItemdata>().o<Int>()
 
 @APIParam("token")
@@ -436,7 +436,7 @@ val ApiPrizeDeleteItem by API.post.i<String, Int, Int>().o()
 @APIParam("token")
 @APIParam("itemID")
 @APIParam("pic")
-@APIParam("PrizeItemdata")
+@APIParam("prizeItemData")
 val ApiPrizeUpdateItem by API.form.i<String, Int, APIFile?, PrizeItemdata>().o<Int>()
 
 @APIParam("token")
@@ -445,7 +445,7 @@ val ApiPrizeParticipate by API.post.i<String, Int>().o()
 
 
 @APIParam("pid")
-@APIReturn("Map<Int, List<Int>>") // {itemid1:[uid1,uid2], itemid2:[uid3], ...}
+@APIReturn("Map<Int, List<Int>>") // {itemId1:[uid1,uid2], itemid2:[uid3], ...}
 val ApiPrizeGetWinners by API.post.i<Int>().o<String>()
 
 

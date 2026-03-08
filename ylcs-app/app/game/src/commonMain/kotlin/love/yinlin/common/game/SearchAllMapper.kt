@@ -54,6 +54,7 @@ import love.yinlin.extension.json
 import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRecordInfo {
@@ -220,7 +221,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
                         if (time > 1000L) time -= 1000L
                         else if (time > 0L) time = 0L
                         else break
-                        delay(1000L)
+                        delay(1.seconds)
                     }
                 }
             }

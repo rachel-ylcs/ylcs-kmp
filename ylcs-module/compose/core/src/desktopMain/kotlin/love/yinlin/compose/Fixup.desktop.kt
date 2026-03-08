@@ -7,8 +7,6 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.FrameWindowScope
-import kotlinx.coroutines.delay
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.platform.Platform
 import java.awt.Dimension
 import java.awt.Rectangle

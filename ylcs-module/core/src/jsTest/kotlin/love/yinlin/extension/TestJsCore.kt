@@ -1,9 +1,6 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.extension
 
-import kotlinx.io.buffered
-import kotlinx.io.readByteArray
-import love.yinlin.io.ArrayBufferSource
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.toByteArray
 import org.khronos.webgl.toInt8Array
@@ -27,22 +24,12 @@ class TestJsCore {
         assertTypes<JsArray<JsString>, Array<String>>()
         assertTypes<JsException, Throwable>()
         assertTypes<JsPromiseError, Throwable>()
-        assertTypes<JsReference<String>, Any>()
-    }
-
-    @Test
-    fun testArrayBufferSource() {
-        val text = "Hello World"
-        val data = text.encodeToByteArray().toInt8Array()
-        val value = ArrayBufferSource(data.buffer).buffered().use { it.readByteArray() }
-        val result = value.decodeToString()
-        assertEquals(text, result)
     }
 
     @Test
     fun testJsArrayOf() {
-        val arr1 = jsArrayOf(0.0.raw, "alice".raw, false.raw)
-        assertContentEquals(arrayOf(0.0.raw, "alice".raw, false.raw), arr1.toArray())
+        val arr1 = jsArrayOf(0.0.raw, "Alice".raw, false.raw)
+        assertContentEquals(arrayOf(0.0.raw, "Alice".raw, false.raw), arr1.toArray())
 
         val arr2 = jsArrayOf(2, 3.0, 5L)
         assertContentEquals(arrayOf(2.0.raw, 3.0.raw, 5.0.raw), arr2.toArray())

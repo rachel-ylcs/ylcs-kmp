@@ -18,7 +18,6 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.TopPager

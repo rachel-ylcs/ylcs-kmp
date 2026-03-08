@@ -37,7 +37,6 @@ import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.measureTextWidth
 
-@Suppress("AssignedValueIsNeverRead")
 @Composable
 fun ComboBox(
     items: List<String>,

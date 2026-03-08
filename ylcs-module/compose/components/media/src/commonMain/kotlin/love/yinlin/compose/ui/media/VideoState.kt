@@ -19,6 +19,7 @@ import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.OrientationController
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 abstract class VideoState(context: Context, val topBar: VideoActionBar?, val bottomBar: VideoActionBar?) {
@@ -89,7 +90,7 @@ abstract class VideoState(context: Context, val topBar: VideoActionBar?, val bot
 
             LaunchedEffect(isShowControls) {
                 if (isShowControls) {
-                    delay(5000L)
+                    delay(5.seconds)
                     isShowControls = false
                 }
             }

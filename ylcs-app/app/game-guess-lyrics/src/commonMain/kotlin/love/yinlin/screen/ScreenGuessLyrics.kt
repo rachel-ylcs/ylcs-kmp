@@ -50,6 +50,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen() {
@@ -113,7 +114,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
             currentStatus = GLStatus.InviteLoading(info, LyricsSockets.INVITE_TIME)
             launch {
                 for (_ in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
-                    delay(1000L)
+                    delay(1.seconds)
                     (currentStatus as? GLStatus.InviteLoading)?.let { status ->
                         val time = status.time - 1000L
                         if (time <= 0L) break
@@ -135,7 +136,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
             currentStatus = GLStatus.InvitedLoading(info, LyricsSockets.INVITE_TIME)
             launch {
                 for (_ in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
-                    delay(1000L)
+                    delay(1.seconds)
                     (currentStatus as? GLStatus.InvitedLoading)?.let { status ->
                         val time = status.time - 1000L
                         if (time <= 0L) break
@@ -151,7 +152,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
         currentStatus = GLStatus.Preparing(info1, info2, LyricsSockets.PREPARE_TIME)
         launch {
             for (_ in 0 ..< (LyricsSockets.PREPARE_TIME / 1000L).toInt()) {
-                delay(1000L)
+                delay(1.seconds)
                 (currentStatus as? GLStatus.Preparing)?.let { status ->
                     val time = status.time - 1000L
                     if (time <= 0L) break
@@ -165,7 +166,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
         currentStatus = GLStatus.Playing(info1, info2, LyricsSockets.PLAYING_TIME, questions, questions.map { null }, 0, 0)
         launch {
             for (_ in 0 ..< (LyricsSockets.PLAYING_TIME / 1000L).toInt()) {
-                delay(1000L)
+                delay(1.seconds)
                 (currentStatus as? GLStatus.Playing)?.let { status ->
                     val time = status.time - 1000L
                     if (time <= 0L) break

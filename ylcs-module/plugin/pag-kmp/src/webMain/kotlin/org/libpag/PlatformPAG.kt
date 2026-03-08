@@ -128,9 +128,7 @@ external class PAGImage : JsAny {
 }
 
 open external class PAGLayer : JsAny {
-    companion object {
-
-    }
+    companion object
 
     fun uniqueID(): Int
     fun layerType(): Int
@@ -284,7 +282,7 @@ external class PAGPlayer : JsAny {
     fun currentFrame(): Int
     fun videoEnabled(): Boolean
     fun setVideoEnabled(enabled: Boolean)
-    fun cacheEnabled(): Boolean;
+    fun cacheEnabled(): Boolean
     fun setCacheEnabled(enabled: Boolean)
     fun cacheScale(): Float
     fun setCacheScale(value: Float)

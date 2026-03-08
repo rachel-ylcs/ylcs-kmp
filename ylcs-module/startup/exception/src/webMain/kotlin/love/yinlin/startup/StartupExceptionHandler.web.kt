@@ -10,7 +10,6 @@ import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupHandler
 import love.yinlin.foundation.SyncStartup
 import kotlin.js.ExperimentalWasmJsInterop
-import kotlin.js.toJsBoolean
 
 @StartupArg(index = 0, name = "crashKey", type = String::class)
 @StartupHandler(

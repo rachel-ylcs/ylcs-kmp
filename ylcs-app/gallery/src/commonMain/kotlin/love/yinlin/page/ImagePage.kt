@@ -25,6 +25,7 @@ import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.data.compose.Picture
 import love.yinlin.gallery.resources.*
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 object ImagePage : Page() {
@@ -54,7 +55,7 @@ object ImagePage : Page() {
                             icon = Icons.Home,
                             animation = CircleLoading,
                             onClick = {
-                                delay(2000)
+                                delay(2.seconds)
                             }
                         )
                     }

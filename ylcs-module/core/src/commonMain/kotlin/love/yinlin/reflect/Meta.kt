@@ -16,6 +16,7 @@ expect inline fun <reified T> metaClassName(): String
 @CompatibleRachelApi
 expect inline val <T : Any> T.metaClassName: String
 
+@Suppress("UnusedReceiverParameter")
 @CompatibleRachelApi
 @get:JvmName("metaClassNameByType")
 inline val <reified T> T.metaClassName: String get() = metaClassName<T>()
@@ -26,6 +27,7 @@ expect inline fun <reified T> metaIsAnonymousClass(): Boolean
 @CompatibleRachelApi
 expect inline val <T : Any> T.metaIsAnonymousClass: Boolean
 
+@Suppress("UnusedReceiverParameter")
 @CompatibleRachelApi
 @get:JvmName("metaIsAnonymousClassByType")
 inline val <reified T> T.metaIsAnonymousClass: Boolean get() = metaIsAnonymousClass<T>()

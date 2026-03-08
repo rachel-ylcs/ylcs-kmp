@@ -420,7 +420,7 @@ object QrcDecrypter {
     }
 
     private fun bytesToHex(byteData: ByteArray): String {
-        return byteData.toHexString(kotlin.text.HexFormat.UpperCase)
+        return byteData.toHexString(HexFormat.UpperCase)
     }
 
     private fun xorHexStrings(hexStr1: String): String {

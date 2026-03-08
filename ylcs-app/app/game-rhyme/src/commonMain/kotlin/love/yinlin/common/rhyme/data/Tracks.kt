@@ -17,13 +17,13 @@ object Tracks {
     // 虚拟顶点
     const val VirtualTopHeight = VerticesTopRatio * RhymeConfig.HEIGHT
     // 虚拟画布宽度
-    const val VirutalWidth = RhymeConfig.WIDTH
+    const val VirtualWidth = RhymeConfig.WIDTH
     // 虚拟画布高度
     const val VirtualHeight = RhymeConfig.HEIGHT + VirtualTopHeight
     // 顶点
-    val Vertices = Offset(VirutalWidth / 2, 0f)
+    val Vertices = Offset(VirtualWidth / 2, 0f)
     // 轨道宽
-    val Width = VirutalWidth / Size
+    val Width = VirtualWidth / Size
 
     // 轨道
     val mTracks = buildList {

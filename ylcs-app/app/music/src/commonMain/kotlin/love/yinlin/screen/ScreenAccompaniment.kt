@@ -49,6 +49,7 @@ import love.yinlin.media.buildAudioPlayer
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.media.lyrics.LyricsEngineHost
 import love.yinlin.media.lyrics.LyricsEngineType
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngineType) : BasicScreen() {
@@ -87,7 +88,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                             val newPosition = player.position
                             position = newPosition
                             engine.update(newPosition)
-                            delay(engine.interval)
+                            delay(engine.interval.milliseconds)
                         }
                     }
                 }

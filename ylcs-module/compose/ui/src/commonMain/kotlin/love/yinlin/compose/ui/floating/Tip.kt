@@ -42,6 +42,7 @@ import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catching
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
@@ -85,7 +86,7 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
         job = scope.launch(mainContext) {
             val self = coroutineContext[Job]
             openFloating(Data(type, text ?: ""))
-            catching { delay(duration) }
+            catching { delay(duration.milliseconds) }
             // 防止并发时旧 tip 将新 tip 给置 null
             if (job === self) {
                 close()

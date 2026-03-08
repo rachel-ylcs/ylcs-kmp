@@ -25,6 +25,7 @@ import love.yinlin.extension.lazyProvider
 import love.yinlin.foundation.Context
 import love.yinlin.platform.NativeWindow
 import love.yinlin.startup.StartupMusicPlayer
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 actual class FloatingLyrics {
@@ -73,10 +74,10 @@ actual class FloatingLyrics {
             }
 
             LaunchedEffect(windowState) {
-                snapshotFlow { windowState.size }.debounce(300L).onEach { size: DpSize ->
+                snapshotFlow { windowState.size }.debounce(300.milliseconds).onEach { size: DpSize ->
                     app.config.lyricsEngineConfig = config.copy(desktop = config.desktop.copy(width = size.width.value, height = size.height.value))
                 }.launchIn(this)
-                snapshotFlow { windowState.position }.debounce(300L).filter { it.isSpecified }.onEach { position: WindowPosition ->
+                snapshotFlow { windowState.position }.debounce(300.milliseconds).filter { it.isSpecified }.onEach { position: WindowPosition ->
                     app.config.lyricsEngineConfig = config.copy(desktop = config.desktop.copy(x = position.x.value, y = position.y.value))
                 }.launchIn(this)
             }

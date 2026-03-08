@@ -27,6 +27,7 @@ import love.yinlin.compose.scaleSize
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.input.*
 import love.yinlin.compose.ui.text.Text
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 object InputPage : Page() {
@@ -56,11 +57,11 @@ object InputPage : Page() {
                     }
 
                     Example("LoadingButton") {
-                        PrimaryLoadingButton("Click me", onClick = { delay(2000) })
+                        PrimaryLoadingButton("Click me", onClick = { delay(2.seconds) })
                     }
 
                     Example("LoadingIconButton") {
-                        PrimaryLoadingButton("Click me", icon = Icons.Home, onClick = { delay(2000) })
+                        PrimaryLoadingButton("Click me", icon = Icons.Home, onClick = { delay(2.seconds) })
                     }
 
                     Example("Disabled") {
@@ -80,11 +81,11 @@ object InputPage : Page() {
                     }
 
                     Example("LoadingTextButton") {
-                        PrimaryLoadingTextButton("Click me", onClick = { delay(2000) })
+                        PrimaryLoadingTextButton("Click me", onClick = { delay(2.seconds) })
                     }
 
                     Example("LoadingIconTextButton") {
-                        PrimaryLoadingTextButton("Click me", icon = Icons.Home, onClick = { delay(2000) })
+                        PrimaryLoadingTextButton("Click me", icon = Icons.Home, onClick = { delay(2.seconds) })
                     }
 
                     Example("Disabled") {

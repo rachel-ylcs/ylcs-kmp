@@ -20,8 +20,6 @@ import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.common.WeiboLayout
 import love.yinlin.compose.ui.common.WeiboUserBar
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.layout.Divider
-import love.yinlin.compose.ui.layout.HorizontalDivider
 import love.yinlin.compose.ui.text.RachelRichText
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment

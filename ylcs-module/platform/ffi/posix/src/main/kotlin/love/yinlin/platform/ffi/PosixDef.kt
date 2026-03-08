@@ -8,6 +8,4 @@ object Posix {
     const val LOCK_UN = 8
 }
 
-object PosixType {
-
-}
+object PosixType

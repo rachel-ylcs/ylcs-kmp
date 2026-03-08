@@ -16,7 +16,6 @@ import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.text.Text
 
-@Suppress("AssignedValueIsNeverRead")
 @Composable
 private fun BalloonTip(text: String, content: @Composable () -> Unit) {
     var visible by rememberFalse()

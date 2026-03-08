@@ -29,7 +29,7 @@ class TrackMap(
     playConfig: RhymePlayConfig,
 ) : Spirit(rhymeManager), BoxBody {
     override val preTransform: List<Transform> = listOf(Transform.Translate(0f, -Tracks.VirtualTopHeight))
-    override val size: Size = Size(Tracks.VirutalWidth, Tracks.VirtualHeight)
+    override val size: Size = Size(Tracks.VirtualWidth, Tracks.VirtualHeight)
 
     // 难度影响
     private val showHitArea = playConfig.difficulty < RhymeDifficulty.Hard

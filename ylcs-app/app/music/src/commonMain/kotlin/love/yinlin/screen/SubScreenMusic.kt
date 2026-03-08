@@ -72,6 +72,7 @@ import love.yinlin.fs.isFile
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.startup.StartupMusicPlayer
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
@@ -580,7 +581,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             sleepJob = launch {
                 sleepRemainSeconds = seconds
                 repeat(seconds) {
-                    delay(1000L)
+                    delay(1.seconds)
                     --sleepRemainSeconds
                 }
                 mp?.stop()

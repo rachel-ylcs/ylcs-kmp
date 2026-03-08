@@ -17,6 +17,7 @@ import love.yinlin.extension.toJsonString
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
 
 class LyricsSocketsManager(private val db: Database, session: Any) : SocketsManager(session) {
     companion object {
@@ -72,7 +73,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
     suspend fun send(data: LyricsSockets.SM) = super.send(data.toJsonString())
 
     private suspend fun onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
-        delay(LyricsSockets.INVITE_TIME)
+        delay(LyricsSockets.INVITE_TIME.milliseconds)
         if (Coroutines.isActive()) {
             // 超时自动拒绝
             val target = players[targetInfo.uid]
@@ -89,7 +90,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
 
     private suspend fun prepareGame(room: Room) {
         // 启动准备计时
-        delay(LyricsSockets.PREPARE_TIME)
+        delay(LyricsSockets.PREPARE_TIME.milliseconds)
         // 更新创建时间
         val newCreateTime = System.currentTimeMillis()
         room.submitTime1?.let { room.submitTime1 = it - room.createTime + newCreateTime + LyricsSockets.PLAYING_TIME }
@@ -105,7 +106,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
 
     private suspend fun onPlayingTimer(room: Room) {
         // 启动游戏计时
-        delay(LyricsSockets.PLAYING_TIME)
+        delay(LyricsSockets.PLAYING_TIME.milliseconds)
         // 强制结算
         players[room.info1.uid]?.room?.let { room1 ->
             if (room.roomId == room1.roomId) submitAnswers(room, room.info1.uid)

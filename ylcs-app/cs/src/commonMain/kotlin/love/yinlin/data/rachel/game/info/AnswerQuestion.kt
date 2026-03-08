@@ -70,7 +70,7 @@ sealed class AQAnswer {
             require(question is AQQuestion.Choice)
             require(question.title.isNotBlank())
             require(question.options.size in config.minOptionCount .. config.maxOptionCount)
-            require(value in 0 ..< question.options.size)
+            require(value in question.options.indices)
         }
     }
 
@@ -84,7 +84,7 @@ sealed class AQAnswer {
             require(question.title.isNotBlank())
             require(question.options.size in config.minOptionCount .. config.maxOptionCount)
             require(value.size > 1)
-            require(value.all { it in 0 ..< question.options.size })
+            require(value.all { it in question.options.indices })
             require(value.size == value.toSet().size)
         }
     }

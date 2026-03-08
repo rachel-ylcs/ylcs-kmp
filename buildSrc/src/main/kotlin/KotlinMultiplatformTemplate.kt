@@ -184,10 +184,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
                 }
 
-                if (exportResources) {
-                    @Suppress("UnstableApiUsage")
-                    androidResources.enable = true
-                }
+                if (exportResources) androidResources.enable = true
 
                 android()
             }

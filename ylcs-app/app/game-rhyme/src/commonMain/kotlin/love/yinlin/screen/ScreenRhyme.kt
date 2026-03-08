@@ -49,7 +49,6 @@ import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.compose.ui.text.Text
-import love.yinlin.concurrent.atomic
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
 import love.yinlin.cs.NetClient
@@ -57,7 +56,6 @@ import love.yinlin.cs.ServerRes
 import love.yinlin.cs.url
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
-import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.foundation.Orientation
 import love.yinlin.foundation.OrientationController
@@ -65,6 +63,7 @@ import love.yinlin.fs.exists
 import love.yinlin.fs.readByteArray
 import love.yinlin.fs.readText
 import love.yinlin.startup.StartupMusicPlayer
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class ScreenRhyme : Screen() {
@@ -157,7 +156,7 @@ class ScreenRhyme : Screen() {
                     // 倒计时解除暂停状态
                     lockState = GameLockState.Resume(RhymeConfig.PAUSE_TIME)
                     repeat(RhymeConfig.PAUSE_TIME) {
-                        delay(1000L)
+                        delay(1.seconds)
                         --(lockState as? GameLockState.Resume)?.time
                     }
                     lockState = GameLockState.Normal
