@@ -389,6 +389,9 @@ val ApiSongGetSong by API.post.i<String>().o<Song>()
 @APIParam("key")
 val ApiSongSearchSongs by API.post.i<String>().o<List<SongPreview>>()
 
+@APIParam("album")
+val ApiSongSearchSongsByAlbum by API.post.i<String>().o<List<SongPreview>>()
+
 @APIParam("sid")
 @APIParam("cid", default = "0L")
 @APIParam("num", default = "APIConfig.MIN_PAGE_NUM")

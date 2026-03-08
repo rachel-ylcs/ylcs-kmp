@@ -2910,6 +2910,17 @@ object Icons {
         close()
     }
 
+    val Filter by icon {
+        moveTo(22f, 3f)
+        lineTo(2f, 3f)
+        lineTo(10f, 12.46f)
+        lineTo(10f, 19f)
+        lineTo(14f, 21f)
+        lineTo(14f, 12.46f)
+        lineTo(22f, 3f)
+        close()
+    }
+
     val SelectAll by icon {
         moveTo(3.0f, 5.0f)
         horizontalLineToRelative(2.0f)

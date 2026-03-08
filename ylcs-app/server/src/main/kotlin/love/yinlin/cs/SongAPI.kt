@@ -37,6 +37,16 @@ fun APIScope.songAPI() {
         result(songs.to())
     }
 
+    ApiSongSearchSongsByAlbum.response { album ->
+        val songs = db.throwQuerySQL("""
+            SELECT sid, version, name
+            FROM song
+            WHERE album = ?
+            ORDER BY sid ASC
+        """, album)
+        result(songs.to())
+    }
+
     ApiSongGetSongComments.response { sid, cid, num ->
         val songComment = db.throwQuerySQL("""
             SELECT cid, user.uid, ts, content, name, label, exp

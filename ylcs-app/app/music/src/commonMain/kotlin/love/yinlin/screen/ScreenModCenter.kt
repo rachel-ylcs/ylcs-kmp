@@ -4,10 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,6 +18,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
+import love.yinlin.compose.ui.floating.DialogChoice
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.floating.FABAction
@@ -38,6 +36,23 @@ import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
 class ScreenModCenter : Screen() {
+    companion object {
+        val AlbumList = listOf(
+            "银临EP",
+            "腐草为萤",
+            "蚍蜉渡海",
+            "风花雪月",
+            "琉璃",
+            "离地十公分·A面",
+            "离地十公分·B面",
+            "山色有无中",
+            "粼粼",
+            "单曲集",
+            "影视剧OST",
+            "游戏OST"
+        )
+    }
+
     private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
 
     private val provider = RachelStatefulProvider()
@@ -73,6 +88,16 @@ class ScreenModCenter : Screen() {
         }
     }
 
+    private suspend fun filterAlbumNewData(album: String) {
+        provider.withLoading {
+            gridState.requestScrollToItem(0)
+            val result = ApiSongSearchSongsByAlbum.requestNull(album)!!.o1
+            pageSongs.newData(result)
+            pageSongs.canLoading = false
+            result.isNotEmpty()
+        }
+    }
+
     override val title: String = "工坊"
 
     override suspend fun initialize() {
@@ -84,6 +109,10 @@ class ScreenModCenter : Screen() {
         LoadingIcon(icon = Icons.Search, tip = "搜索", onClick = {
             val result = searchDialog.open()
             if (result != null) searchNewData(result)
+        })
+        LoadingIcon(icon = Icons.Filter, tip = "专辑筛选", onClick = {
+            val result = albumDialog.open()
+            if (result != null) filterAlbumNewData(AlbumList[result])
         })
     }
 
@@ -153,4 +182,6 @@ class ScreenModCenter : Screen() {
     }
 
     private val searchDialog = this land DialogInput(hint = "歌曲名", maxLength = 32)
+
+    private val albumDialog = this land DialogChoice.fromItems(AlbumList)
 }
