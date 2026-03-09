@@ -29,7 +29,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build
-        run: ./gradlew ylcs-app:androidApp:androidPublish
+        run: ./gradlew ylcs-app:androidApp:androidArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -99,7 +99,9 @@ jobs:
           export-path-to-vs: VS_PATH
 
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: |
+          ./gradlew ylcs-app:desktopApp:desktopJar
+          ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -133,7 +135,9 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: |
+          ./gradlew ylcs-app:desktopApp:desktopJar
+          ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -161,7 +165,9 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: |
+          ./gradlew ylcs-app:desktopApp:desktopJar
+          ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -189,7 +195,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:webApp:webPublish
+        run: ./gradlew ylcs-app:webApp:webArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -217,12 +223,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:server:serverPublish
-
-      - name: Compress
-        run: |
-          cd outputs
-          mv ylcs.jar "[Server]银临茶舍${{ github.ref_name }}.jar"
+        run: ./gradlew ylcs-app:server:serverArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7

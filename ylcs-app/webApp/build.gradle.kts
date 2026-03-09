@@ -50,6 +50,26 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("wasmJsBrowserDevelopmentRun"))
         }
 
+        val webArtifact by tasks.registering {
+            dependsOn(tasks.named("jsBrowserDistribution"))
+            dependsOn(tasks.named("wasmJsBrowserDistribution"))
+
+            doLast {
+                copy {
+                    from(C.root.webApp.originJsOutput)
+                    into(C.root.webApp.jsOutput)
+                }
+                delete(*C.root.webApp.jsOutput.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                copy {
+                    from(C.root.webApp.originWasmOutput)
+                    into(C.root.webApp.wasmOutput)
+                }
+                delete(*C.root.webApp.wasmOutput.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(C.root.webApp.jsOutput, C.root.outputs.file("ylcs-js.zip"))
+                zip(C.root.webApp.wasmOutput, C.root.outputs.file("ylcs-wasm.zip"))
+            }
+        }
+
         // 发布 Web 应用程序
         val webPublish by tasks.registering {
             dependsOn(tasks.named("jsBrowserDistribution"))

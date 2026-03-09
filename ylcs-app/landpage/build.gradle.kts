@@ -1,3 +1,4 @@
+import love.yinlin.task.spec.zip
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -40,6 +41,7 @@ template(object : KotlinJsTemplate() {
                     into(C.root.landpage.output)
                 }
                 delete(*C.root.landpage.output.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(C.root.landpage.output, C.root.outputs.file("landpage.zip"))
             }
         }
     }

@@ -45,6 +45,18 @@ template(object : KotlinAndroidTemplate() {
             dependsOn(tasks.named("assembleDebug"))
         }
 
+        val androidArtifact by tasks.registering {
+            dependsOn(tasks.named("assembleRelease"))
+
+            doLast {
+                copy {
+                    from(originOutput)
+                    into(C.root.outputs)
+                    rename { _ -> "ylcs-android.apk" }
+                }
+            }
+        }
+
         // 发布安卓安装包
         val androidPublish by tasks.registering {
             dependsOn(tasks.named("assembleRelease"))
