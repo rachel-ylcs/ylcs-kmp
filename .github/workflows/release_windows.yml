@@ -24,14 +24,17 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Debug Paths
+        # Windows PowerShell 语法
         run: |
-          echo "JAVA_HOME is: $JAVA_HOME"
-          ls -l $JAVA_HOME/jmods/java.base.jmod
+          Write-Host "JAVA_HOME is: $env:JAVA_HOME"
+          # 检查 jmods 文件夹是否存在
+          Get-ChildItem "$env:JAVA_HOME\jmods\java.base.jmod"
 
       - name: Set Classpath Environment
+        # 注意：Windows 环境变量分隔符是分号 ";"，变量引用是 $env:
         run: |
-          echo "CLASSPATH=$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar" >> $GITHUB_ENV
-          echo "JAVA_MODS=$JAVA_HOME/jmods" >> $GITHUB_ENV
+          echo "CLASSPATH=$env:JAVA_HOME\lib\tools.jar;$env:JAVA_HOME\lib\dt.jar" >> $env:GITHUB_ENV
+          echo "JAVA_MODS=$env:JAVA_HOME\jmods" >> $env:GITHUB_ENV
 
       - name: Setup MSVC
         uses: TheMrMilchmann/setup-msvc-dev@v4
