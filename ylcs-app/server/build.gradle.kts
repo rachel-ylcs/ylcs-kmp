@@ -38,6 +38,19 @@ template(object : KotlinJvmTemplate() {
             dependsOn(tasks.named("run"))
         }
 
+        val serverArtifact by tasks.registering {
+            dependsOn(tasks.named("buildFatJar"))
+
+            doLast {
+                delete(C.root.outputs.file(C.server.outputName))
+                copy {
+                    from(C.root.server.originOutput)
+                    into(C.root.outputs)
+                    rename { _ -> "ylcs-server.jar" }
+                }
+            }
+        }
+
         // 发布服务端
         val serverPublish by tasks.registering {
             dependsOn(tasks.named("buildFatJar"))

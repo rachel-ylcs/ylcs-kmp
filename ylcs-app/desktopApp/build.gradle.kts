@@ -83,13 +83,30 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         // 复制桌面动态库
-        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class) {
-
-        }
+        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class)
 
         if ("desktopPublish" in currentTaskName) {
             tasks.named("prepareAppResources") {
                 dependsOn(desktopCopyNativeLib)
+            }
+        }
+
+        val desktopArtifact by tasks.registering {
+            dependsOn(tasks.named("createReleaseDistributable"))
+
+            doLast {
+                val outputDir = C.root.outputs
+                delete(packageResourcesDir)
+                copy {
+                    from(C.root.desktopApp.originOutput)
+                    into(outputDir)
+                }
+
+                when (C.platform) {
+                    BuildPlatform.Windows -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-windows.zip"))
+                    BuildPlatform.Linux -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-linux.zip"))
+                    BuildPlatform.Mac -> zip(outputDir.dir("${C.app.name}.app"), outputDir.file("ylcs-mac.zip"))
+                }
             }
         }
 
@@ -98,19 +115,29 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("createReleaseDistributable"))
 
             doLast {
+                val outputDir = C.root.outputs
                 delete(packageResourcesDir)
                 copy {
                     from(C.root.desktopApp.originOutput)
-                    into(C.root.outputs)
+                    into(outputDir)
                 }
-                val platformName = when (C.platform) {
-                    BuildPlatform.Windows -> "[Windows]"
-                    BuildPlatform.Linux -> "[Linux]"
-                    BuildPlatform.Mac -> "[MacOS]"
+
+                val artifactName = "${C.app.displayName}${C.app.versionName}"
+                when (C.platform) {
+                    BuildPlatform.Windows -> {
+                        zip(outputDir.dir(C.app.name).dir("app"), outputDir.file("[Windows]${artifactName}升级包.zip"))
+                        zip(outputDir.dir(C.app.name), outputDir.file("[Windows]${artifactName}.zip"))
+                    }
+                    BuildPlatform.Linux -> {
+                        zip(outputDir.dir(C.app.name).dir("lib").dir("app"), outputDir.file("[Linux]${artifactName}升级包.zip"))
+                        zip(outputDir.dir(C.app.name), outputDir.file("[Linux]${artifactName}.zip"))
+                    }
+                    BuildPlatform.Mac -> {
+                        zip(outputDir.dir("${C.app.name}.app"), outputDir.file("[macOS]${artifactName}.zip"))
+                    }
                 }
-                zip (C.root.outputs.dir(C.app.name).dir("app"), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}升级包.zip"))
-                zip (C.root.outputs.dir(C.app.name), C.root.outputs.file("$platformName${C.app.displayName}${C.app.versionName}.zip"))
-                delete(C.root.outputs.dir(C.app.name))
+
+                delete(outputDir.dir(C.app.name))
             }
         }
     }

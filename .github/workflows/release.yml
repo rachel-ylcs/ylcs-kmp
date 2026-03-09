@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -29,27 +29,27 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build
-        run: ./gradlew ylcs-app:androidApp:androidPublish
+        run: ./gradlew ylcs-app:androidApp:androidArtifact
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: android
-          path: outputs/*.apk
+          path: outputs/ylcs-android.apk
 
   package-ios:
     name: Package iOS
     runs-on: macos-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -65,27 +65,27 @@ jobs:
           mkdir -p outputs/Payload
           cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
           cd outputs
-          zip -r "[iOS]银临茶舍${{ github.ref_name }}.ipa" Payload
+          zip -r "ylcs-ios.ipa" Payload
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ios
-          path: outputs/*.ipa
+          path: outputs/ylcs-ios.ipa
 
   package-windows:
     name: Package Windows
     runs-on: windows-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -98,19 +98,16 @@ jobs:
           arch: x64
           export-path-to-vs: VS_PATH
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: |
+          ./gradlew ylcs-app:desktopApp:desktopJar
+          ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows
-          path: outputs/*.zip
+          path: outputs/ylcs-windows.zip
 
   package-linux:
     name: Package Linux
@@ -118,7 +115,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -128,75 +125,69 @@ jobs:
           sudo apt-get install -y libgtk-3-dev
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: |
+          ./gradlew ylcs-app:desktopApp:desktopJar
+          ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: linux
-          path: outputs/*.zip
+          path: outputs/ylcs-linux.zip
 
   package-macos:
     name: Package macOS
     runs-on: macos-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: |
+          ./gradlew ylcs-app:desktopApp:desktopJar
+          ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: macos
-          path: outputs/*.zip
+          path: outputs/*
 
   package-web:
     name: Package Web
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -204,27 +195,33 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:webApp:webPublish
+        run: ./gradlew ylcs-app:webApp:webArtifact
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: web
-          path: outputs/*.zip
+          name: js
+          path: outputs/ylcs-js.zip
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: wasm
+          path: outputs/ylcs-wasm.zip
 
   package-server:
     name: Package Server
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -232,32 +229,27 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:server:serverPublish
-
-      - name: Compress
-        run: |
-          cd outputs
-          mv ylcs.jar "[Server]银临茶舍${{ github.ref_name }}.jar"
+        run: ./gradlew ylcs-app:server:serverArtifact
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: server
-          path: outputs/*.jar
+          path: outputs/ylcs-server.jar
 
   package-modManager:
     name: Package Mod Manager
     runs-on: windows-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -275,9 +267,9 @@ jobs:
           ./gradlew ylcs-app:mod-manager:modManagerPublish
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: windows
+          name: modManager
           path: outputs/*.zip
 
   package-landpage:
@@ -285,14 +277,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -303,9 +295,9 @@ jobs:
         run: ./gradlew ylcs-app:landpage:landpagePublish
 
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: web
+          name: landpage
           path: outputs/*.zip
 
   publish-release:
@@ -317,7 +309,7 @@ jobs:
       contents: write # 发布 Release 需要写权限
     steps:
       - name: Generate Changelog
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v6
         id: changelog
         with:
           mode: "COMMIT"
@@ -362,7 +354,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: artifacts
 
