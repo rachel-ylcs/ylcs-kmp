@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ValueTheme
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputDecoration
@@ -37,7 +38,7 @@ class DialogInput(
     private val focusRequester = FocusRequester()
 
     override val actions: @Composable (RowScope.() -> Unit) = {
-        TextButton(text = Theme.value.dialogOkText, enabled = textInputState.isSafe, color = Theme.color.primary, onClick = { future?.send(textInputState.text) })
+        PrimaryTextButton(text = Theme.value.dialogOkText, enabled = textInputState.isSafe, onClick = { future?.send(textInputState.text) })
         TextButton(text = Theme.value.dialogCancelText, onClick = ::close)
     }
 

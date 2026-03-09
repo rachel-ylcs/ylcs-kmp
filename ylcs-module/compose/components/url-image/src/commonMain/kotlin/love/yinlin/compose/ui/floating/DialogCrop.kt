@@ -10,7 +10,8 @@ import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.CropImage
 import love.yinlin.compose.ui.image.CropState
-import love.yinlin.compose.ui.input.TextButton
+import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.input.SecondaryTextButton
 
 @Stable
 class DialogCrop : Dialog<CropRegion>() {
@@ -34,16 +35,14 @@ class DialogCrop : Dialog<CropRegion>() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
+                    SecondaryTextButton(
                         text = "取消",
                         icon = Icons.ArrowBack,
-                        color = Theme.color.secondary,
                         onClick = ::close
                     )
-                    TextButton(
+                    PrimaryTextButton(
                         text = "裁剪",
                         icon = Icons.CropSquare,
-                        color = Theme.color.primary,
                         onClick = { future?.send(cropState.result) }
                     )
                 }

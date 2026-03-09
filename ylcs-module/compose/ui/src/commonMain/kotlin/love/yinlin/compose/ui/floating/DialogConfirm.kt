@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ValueTheme
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Text
 
@@ -20,7 +21,7 @@ class DialogConfirm : DialogTemplate<Unit>() {
     private var content: String by mutableStateOf("")
 
     override val actions: @Composable (RowScope.() -> Unit) = {
-        TextButton(text = Theme.value.dialogYesText, color = Theme.color.primary, onClick = { future?.send(Unit) })
+        PrimaryTextButton(text = Theme.value.dialogYesText, onClick = { future?.send(Unit) })
         TextButton(text = Theme.value.dialogNoText, onClick = ::close)
     }
 

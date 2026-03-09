@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ValueTheme
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputDecoration
@@ -49,10 +50,9 @@ class DialogPairInput(
     private val canSubmit by derivedStateOf { textInputState1.isSafe && textInputState2.isSafe }
 
     override val actions: @Composable (RowScope.() -> Unit) = {
-        TextButton(
+        PrimaryTextButton(
             text = Theme.value.dialogOkText,
             enabled = canSubmit,
-            color = Theme.color.primary,
             onClick = { future?.send(textInputState1.text to textInputState2.text) }
         )
         TextButton(text = Theme.value.dialogCancelText, onClick = ::close)

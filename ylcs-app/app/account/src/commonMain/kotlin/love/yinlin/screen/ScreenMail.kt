@@ -28,7 +28,9 @@ import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.input.TextButton
+import love.yinlin.compose.ui.input.ErrorTextButton
+import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.input.SecondaryTextButton
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.text.RachelRichParser
@@ -195,17 +197,17 @@ class ScreenMail : Screen() {
                 )
                 ActionScope.Right.Container(modifier = Modifier.fillMaxWidth()) {
                     if (args.withYes) {
-                        TextButton(text = "接受", icon = Icons.Check, onClick = {
+                        PrimaryTextButton(text = "接受", icon = Icons.Check, onClick = {
                             launch { onProcessMail("接受此邮件结果?", args.mid, true) }
                         })
                     }
                     if (args.withNo) {
-                        TextButton(text = "拒绝", icon = Icons.Cancel, color = Theme.color.error, onClick = {
+                        ErrorTextButton(text = "拒绝", icon = Icons.Cancel, onClick = {
                             launch { onProcessMail("拒绝此邮件结果?", args.mid, false) }
                         })
                     }
                     if (args.processed) {
-                        TextButton(text = "删除", icon = Icons.Delete, color = Theme.color.secondary, onClick = {
+                        SecondaryTextButton(text = "删除", icon = Icons.Delete, onClick = {
                             launch { onDeleteMail(args.mid) }
                         })
                     }

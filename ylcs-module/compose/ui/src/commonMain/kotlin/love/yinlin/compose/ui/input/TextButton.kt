@@ -103,3 +103,15 @@ fun TertiaryTextButton(
 ) {
     TextButton(text = text, icon = icon, color = Theme.color.tertiary, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
 }
+
+@Composable
+fun ErrorTextButton(
+    text: String,
+    icon: ImageVector? = null,
+    style: TextStyle = LocalStyle.current.bold,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    TextButton(text = text, icon = icon, color = Theme.color.error, style = style, enabled = enabled, modifier = modifier, onClick = onClick)
+}
