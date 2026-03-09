@@ -365,7 +365,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                     version.set(C.proguard.version)
                                     isEnabled.set(true)
                                     optimize.set(true)
-                                    obfuscate.set(true)
+                                    //obfuscate.set(true)
                                     joinOutputJars.set(true)
 //
 //                                    /*
