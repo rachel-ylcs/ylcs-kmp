@@ -74,7 +74,7 @@ abstract class DialogTemplate<R : Any> : Dialog<R>() {
                         maxWidth = minContentWidth * 1.75f,
                         minHeight = minContentHeight,
                         maxHeight = minContentWidth * 2f
-                    ).condition(scrollable) { verticalScroll(state = rememberScrollState()) },
+                    ).weight(1f, false).condition(scrollable) { verticalScroll(state = rememberScrollState()) },
                     contentAlignment = contentAlignment
                 ) {
                     block()
