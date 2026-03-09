@@ -21,15 +21,6 @@ private fun emptyOption(): JsAny = js("{}")
 private fun recursiveOption(): JsAny = js("{ recursive: true }")
 private fun createOption(): JsAny = js("{ create: true }")
 private fun keepExistingDataOption(): JsAny = js("{ keepExistingData: true }")
-internal fun <R : JsAny?> awaitEnumIterator(value: JsAny): Promise<JsArray<R>> = js("""
-{
-    (async function(items) {
-        const entries = [];
-        for await (const v of items) entries.push(v);
-        return entries;
-    })(value)
-}
-""")
 
 actual object PlatformFileSystem {
     private val isWin32 by lazy { webPlatformName().startsWith("win", true) }

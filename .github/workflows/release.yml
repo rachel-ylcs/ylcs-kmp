@@ -104,8 +104,7 @@ jobs:
           node-version: 'lts/*'
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -144,8 +143,7 @@ jobs:
           node-version: 'lts/*'
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Upload
         uses: actions/upload-artifact@v4
@@ -178,8 +176,7 @@ jobs:
           node-version: 'lts/*'
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: ./gradlew ylcs-app:desktopApp:desktopPublish
 
       - name: Upload
         uses: actions/upload-artifact@v4
