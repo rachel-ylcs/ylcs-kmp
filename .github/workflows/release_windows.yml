@@ -16,7 +16,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          distribution: corretto
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
