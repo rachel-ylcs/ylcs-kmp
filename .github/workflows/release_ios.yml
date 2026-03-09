@@ -1,0 +1,35 @@
+name: ReleaseIOS
+on:
+  push:
+    tags:
+      - 'ios*'
+jobs:
+  package-ios:
+    name: Package iOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build
+        run: |
+          ./gradlew ylcs-app:app:portal:generateDummyFramework
+          # xcodebuild build -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp
+          xcodebuild archive -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp
+          # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
+          mkdir -p outputs/Payload
+          cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
+          cd outputs
+          zip -r "[iOS]银临茶舍${{ github.ref_name }}.ipa" Payload

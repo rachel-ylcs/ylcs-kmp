@@ -1,0 +1,27 @@
+name: ReleaseWeb
+on:
+  push:
+    tags:
+      - 'web*'
+jobs:
+  package-web:
+    name: Package Web
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:webApp:webPublish

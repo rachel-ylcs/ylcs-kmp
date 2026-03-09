@@ -1,0 +1,38 @@
+name: ReleaseLinux
+on:
+  push:
+    tags:
+      - 'linux*'
+jobs:
+  package-linux:
+    name: Package Linux
+    # 用太新的 Ubuntu 会导致 native 库链接的 glibc 版本过高，导致无法在较旧的 Linux 上运行
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Build
+        run: ./gradlew ylcs-app:desktopApp:desktopPublish
