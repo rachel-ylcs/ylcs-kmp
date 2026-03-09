@@ -10,6 +10,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.plus
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.selects.select
 import love.yinlin.compose.Device
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.coroutines.Coroutines
@@ -105,7 +107,7 @@ abstract class Dialog<R : Any> : Floating<Unit>() {
     protected fun LandDialog(block: @Composable () -> Unit) {
         LandFloating {
             Surface(
-                modifier = Modifier.padding(Theme.padding.eValue9),
+                modifier = Modifier.padding(LocalImmersivePadding.current + Theme.padding.eValue9),
                 shadowElevation = Theme.shadow.v1,
                 shape = Theme.shape.v1,
                 border = BorderStroke(Theme.border.v10, Theme.color.outline)
