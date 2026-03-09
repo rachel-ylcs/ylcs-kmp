@@ -34,7 +34,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: android
+          name: ylcs-android
           path: outputs/ylcs-android.apk
 
   package-ios:
@@ -70,7 +70,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: ios
+          name: ylcs-ios
           path: outputs/ylcs-ios.ipa
 
   package-windows:
@@ -106,7 +106,13 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: windows
+          name: ylcs-windows-upgrade
+          path: outputs/ylcs-windows-upgrade.zip
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: ylcs-windows
           path: outputs/ylcs-windows.zip
 
   package-linux:
@@ -142,7 +148,13 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: linux
+          name: ylcs-linux-upgrade
+          path: outputs/ylcs-linux-upgrade.zip
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: ylcs-linux
           path: outputs/ylcs-linux.zip
 
   package-macos:
@@ -172,8 +184,8 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: macos
-          path: outputs/*
+          name: ylcs-macos
+          path: outputs/ylcs-macos.zip
 
   package-web:
     name: Package Web
@@ -200,13 +212,13 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: js
+          name: ylcs-js
           path: outputs/ylcs-js.zip
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: wasm
+          name: ylcs-wasm
           path: outputs/ylcs-wasm.zip
 
   package-server:
@@ -234,7 +246,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: server
+          name: ylcs-server
           path: outputs/ylcs-server.jar
 
   package-modManager:
@@ -269,8 +281,8 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: modManager
-          path: outputs/*.zip
+          name: ylcs-modManager
+          path: outputs/modManager.zip
 
   package-landpage:
     name: Package Landpage
@@ -297,8 +309,8 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: landpage
-          path: outputs/*.zip
+          name: ylcs-landpage
+          path: outputs/landpage.zip
 
   publish-release:
     name: Publish Release

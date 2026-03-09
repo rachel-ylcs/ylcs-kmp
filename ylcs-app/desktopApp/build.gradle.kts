@@ -85,7 +85,7 @@ template(object : KotlinMultiplatformTemplate() {
         // 复制桌面动态库
         val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class)
 
-        if ("desktopPublish" in currentTaskName) {
+        if ("desktopPublish" in currentTaskName || "desktopArtifact" in currentTaskName) {
             tasks.named("prepareAppResources") {
                 dependsOn(desktopCopyNativeLib)
             }
@@ -103,9 +103,17 @@ template(object : KotlinMultiplatformTemplate() {
                 }
 
                 when (C.platform) {
-                    BuildPlatform.Windows -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-windows.zip"))
-                    BuildPlatform.Linux -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-linux.zip"))
-                    BuildPlatform.Mac -> zip(outputDir.dir("${C.app.name}.app"), outputDir.file("ylcs-mac.zip"))
+                    BuildPlatform.Windows -> {
+                        zip(outputDir.dir(C.app.name).dir("app"), outputDir.file("ylcs-windows-upgrade.zip"))
+                        zip(outputDir.dir(C.app.name), outputDir.file("ylcs-windows.zip"))
+                    }
+                    BuildPlatform.Linux -> {
+                        zip(outputDir.dir(C.app.name).dir("lib").dir("app"), outputDir.file("ylcs-linux-upgrade.zip"))
+                        zip(outputDir.dir(C.app.name), outputDir.file("ylcs-linux.zip"))
+                    }
+                    BuildPlatform.Mac -> {
+                        zip(outputDir.dir("${C.app.name}.app"), outputDir.file("ylcs-macos.zip"))
+                    }
                 }
             }
         }
