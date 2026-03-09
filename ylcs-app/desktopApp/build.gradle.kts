@@ -105,11 +105,7 @@ template(object : KotlinMultiplatformTemplate() {
                 when (C.platform) {
                     BuildPlatform.Windows -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-windows.zip"))
                     BuildPlatform.Linux -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-linux.zip"))
-                    BuildPlatform.Mac -> {
-                        outputDir.asFileTree.visit {
-                            println(this.path)
-                        }
-                    }
+                    BuildPlatform.Mac -> zip(outputDir.dir("${C.app.name}.app"), outputDir.file("ylcs-mac.zip"))
                 }
             }
         }
@@ -136,7 +132,9 @@ template(object : KotlinMultiplatformTemplate() {
                         zip(outputDir.dir(C.app.name).dir("lib").dir("app"), outputDir.file("[Linux]${artifactName}升级包.zip"))
                         zip(outputDir.dir(C.app.name), outputDir.file("[Linux]${artifactName}.zip"))
                     }
-                    BuildPlatform.Mac -> {}
+                    BuildPlatform.Mac -> {
+                        zip(outputDir.dir("${C.app.name}.app"), outputDir.file("[macOS]${artifactName}.zip"))
+                    }
                 }
 
                 delete(outputDir.dir(C.app.name))
