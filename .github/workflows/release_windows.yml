@@ -23,6 +23,16 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
+      - name: Debug Paths
+        run: |
+          echo "JAVA_HOME is: $JAVA_HOME"
+          ls -l $JAVA_HOME/jmods/java.base.jmod
+
+      - name: Set Classpath Environment
+        run: |
+          echo "CLASSPATH=$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar" >> $GITHUB_ENV
+          echo "JAVA_MODS=$JAVA_HOME/jmods" >> $GITHUB_ENV
+
       - name: Setup MSVC
         uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
