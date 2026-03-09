@@ -1,6 +1,6 @@
 import SwiftUI
 import MMKV
-import portal
+import ylcs_app
 
 @main
 struct RachelApp: App {

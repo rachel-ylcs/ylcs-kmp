@@ -23,6 +23,8 @@ Pod::Spec.new do |spec|
         'KOTLIN_PROJECT_PATH' => ':ylcs-app:app:portal',
         'PRODUCT_MODULE_NAME' => 'ylcs_app',
     }
+    spec.dependency 'MMKV', '2.3.0'
+    spec.dependency 'SGQRCode', '4.1.0'
     spec.script_phases = [
         {
             :name => 'Build ylcs-app',

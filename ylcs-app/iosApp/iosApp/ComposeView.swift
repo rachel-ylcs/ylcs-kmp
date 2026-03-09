@@ -1,6 +1,6 @@
 import SwiftUI
 import UIKit
-import portal
+import ylcs_app
 
 struct ComposeView: UIViewControllerRepresentable {
     let instance: IOSDelegateApplication
