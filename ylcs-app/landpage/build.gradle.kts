@@ -42,6 +42,7 @@ template(object : KotlinJsTemplate() {
                 }
                 delete(*C.root.landpage.output.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
                 zip(C.root.landpage.output, C.root.outputs.file("landpage.zip"))
+                delete(C.root.landpage.output)
             }
         }
     }
