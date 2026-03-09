@@ -367,32 +367,32 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                     optimize.set(true)
                                     obfuscate.set(true)
                                     joinOutputJars.set(true)
-
-                                    /*
-                                     * Compose Desktop 似乎还不支持内嵌 Proguard 规则
-                                     * 手动解析依赖
-                                     */
-                                    val proguardFiles = mutableListOf<File>()
-                                    for (dependency in desktopProguard) {
-                                        findProject(dependency)?.let { submoduleProject ->
-                                            submoduleProject.desktopProguardKMPDir.asFile.let { subDir ->
-                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
-                                            }
-                                            submoduleProject.desktopProguardJVMDir.asFile.let { subDir ->
-                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
-                                            }
-                                        }
-                                    }
-                                    // 再添加自身
-                                    desktopProguardKMPDir.asFile.let { subDir ->
-                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
-                                    }
-                                    desktopProguardJVMDir.asFile.let { subDir ->
-                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
-                                    }
-
-                                    // 合并所有混淆规则
-                                    configurationFiles.from(*proguardFiles.toTypedArray())
+//
+//                                    /*
+//                                     * Compose Desktop 似乎还不支持内嵌 Proguard 规则
+//                                     * 手动解析依赖
+//                                     */
+//                                    val proguardFiles = mutableListOf<File>()
+//                                    for (dependency in desktopProguard) {
+//                                        findProject(dependency)?.let { submoduleProject ->
+//                                            submoduleProject.desktopProguardKMPDir.asFile.let { subDir ->
+//                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+//                                            }
+//                                            submoduleProject.desktopProguardJVMDir.asFile.let { subDir ->
+//                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+//                                            }
+//                                        }
+//                                    }
+//                                    // 再添加自身
+//                                    desktopProguardKMPDir.asFile.let { subDir ->
+//                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+//                                    }
+//                                    desktopProguardJVMDir.asFile.let { subDir ->
+//                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+//                                    }
+//
+//                                    // 合并所有混淆规则
+//                                    configurationFiles.from(*proguardFiles.toTypedArray())
                                 }
                             }
                         }
