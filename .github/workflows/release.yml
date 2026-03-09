@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: android
-          path: outputs/*.apk
+          path: outputs/ylcs-android.apk
 
   package-ios:
     name: Package iOS
@@ -71,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ios
-          path: outputs/*.ipa
+          path: outputs/ylcs-ios.ipa
 
   package-windows:
     name: Package Windows
@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: windows
-          path: outputs/*.zip
+          path: outputs/ylcs-windows.zip
 
   package-linux:
     name: Package Linux
@@ -143,7 +143,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: linux
-          path: outputs/*.zip
+          path: outputs/ylcs-linux.zip
 
   package-macos:
     name: Package macOS
@@ -173,7 +173,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: macos
-          path: outputs/*.zip
+          path: outputs/ylcs-macos.zip
 
   package-web:
     name: Package Web
@@ -200,8 +200,14 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: web
-          path: outputs/*.zip
+          name: js
+          path: outputs/ylcs-js.zip
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: wasm
+          path: outputs/ylcs-wasm.zip
 
   package-server:
     name: Package Server
@@ -229,7 +235,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: server
-          path: outputs/*.jar
+          path: outputs/ylcs-server.jar
 
   package-modManager:
     name: Package Mod Manager
@@ -263,7 +269,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: windows
+          name: modManager
           path: outputs/*.zip
 
   package-landpage:
@@ -291,7 +297,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: web
+          name: landpage
           path: outputs/*.zip
 
   publish-release:
