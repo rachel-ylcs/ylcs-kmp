@@ -137,9 +137,7 @@ template(object : KotlinMultiplatformTemplate() {
                         zip(outputDir.dir(C.app.name).dir("lib").dir("app"), outputDir.file("[Linux]${artifactName}升级包.zip"))
                         zip(outputDir.dir(C.app.name), outputDir.file("[Linux]${artifactName}.zip"))
                     }
-                    BuildPlatform.Mac -> {
-                        zip(outputDir.dir(C.app.name), outputDir.file("[macOS]${artifactName}.zip"))
-                    }
+                    BuildPlatform.Mac -> {}
                 }
 
                 delete(outputDir.dir(C.app.name))

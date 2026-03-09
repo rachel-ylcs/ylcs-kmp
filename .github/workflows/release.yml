@@ -173,7 +173,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: macos
-          path: outputs/ylcs-macos.zip
+          path: outputs/*
 
   package-web:
     name: Package Web
