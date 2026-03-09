@@ -65,7 +65,7 @@ jobs:
           mkdir -p outputs/Payload
           cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
           cd outputs
-          zip -r "[iOS]银临茶舍${{ github.ref_name }}.ipa" Payload
+          zip -r "ylcs-ios.ipa" Payload
 
       - name: Upload
         uses: actions/upload-artifact@v7
