@@ -33,7 +33,7 @@ jobs:
       gallery: ${{ steps.filter.outputs.gallery }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
@@ -101,14 +101,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -128,14 +128,14 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -155,7 +155,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -166,9 +166,9 @@ jobs:
           sudo apt-get install -y libgtk-3-dev
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -192,14 +192,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -216,12 +216,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -238,12 +238,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -269,9 +269,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |
@@ -291,9 +291,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
+          distribution: oracle
           java-version: 25
           cache: gradle
           cache-dependency-path: |

@@ -9,7 +9,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -23,29 +23,11 @@ jobs:
             ./*.gradle*
             ./**/gradle-wrapper.properties
 
-      - name: Debug Paths
-        # Windows PowerShell 语法
-        run: |
-          Write-Host "JAVA_HOME is: $env:JAVA_HOME"
-          # 检查 jmods 文件夹是否存在
-          Get-ChildItem "$env:JAVA_HOME\jmods\java.base.jmod"
-
-      - name: Set Classpath Environment
-        # 注意：Windows 环境变量分隔符是分号 ";"，变量引用是 $env:
-        run: |
-          echo "CLASSPATH=$env:JAVA_HOME\lib\tools.jar;$env:JAVA_HOME\lib\dt.jar" >> $env:GITHUB_ENV
-          echo "JAVA_MODS=$env:JAVA_HOME\jmods" >> $env:GITHUB_ENV
-
       - name: Setup MSVC
         uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
           arch: x64
           export-path-to-vs: VS_PATH
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
 
       - name: Build
         run: ./gradlew ylcs-app:desktopApp:desktopPublish
