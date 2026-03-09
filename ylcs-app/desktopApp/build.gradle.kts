@@ -106,10 +106,9 @@ template(object : KotlinMultiplatformTemplate() {
                     BuildPlatform.Windows -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-windows.zip"))
                     BuildPlatform.Linux -> zip(outputDir.dir(C.app.name), outputDir.file("ylcs-linux.zip"))
                     BuildPlatform.Mac -> {
-                        outputDir.dir(C.app.name).asFileTree.visit {
+                        outputDir.asFileTree.visit {
                             println(this.path)
                         }
-                        zip(outputDir.dir(C.app.name), outputDir.file("ylcs-macos.zip"))
                     }
                 }
             }
