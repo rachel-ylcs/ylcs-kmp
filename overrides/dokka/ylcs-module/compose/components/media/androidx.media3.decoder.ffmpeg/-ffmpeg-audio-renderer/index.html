@@ -1,0 +1,820 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>FfmpegAudioRenderer</title>
+<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.3
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:components:media/androidMain">android</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:components:media/androidMain" data-filter=":ylcs-module:compose:components:media/androidMain">
+                                <span class="checkbox--icon"></span>
+                                android
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.components.media::androidx.media3.decoder.ffmpeg/FfmpegAudioRenderer///PointingToDeclaration//393069187">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.components.media</a><span class="delimiter">/</span><a href="../index.html">androidx.media3.decoder.ffmpeg</a><span class="delimiter">/</span><span class="current">FfmpegAudioRenderer</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Ffmpeg</span><wbr><span>Audio</span><wbr><span><span>Renderer</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.media3.common.util/UnstableApi///PointingToDeclaration/"><span class="token annotation builtin">UnstableApi</span></span></div></div><span class="token keyword">class </span><a href="index.html">FfmpegAudioRenderer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eventHandler<span class="token operator">: </span><span data-unresolved-link="android.os/Handler///PointingToDeclaration/">Handler</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">eventListener<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.audio/AudioRendererEventListener///PointingToDeclaration/">AudioRendererEventListener</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">audioSink<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.audio/AudioSink///PointingToDeclaration/">AudioSink</span></span></span><span class="token punctuation">)</span> : <span data-unresolved-link="androidx.media3.exoplayer.audio/DecoderAudioRenderer///PointingToDeclaration/">DecoderAudioRenderer</span><span class="token operator">&lt;</span><a href="../-ffmpeg-audio-decoder/index.html">FfmpegAudioDecoder</a><span class="token operator">?</span><span class="token operator">&gt; </span></div><p class="paragraph">Creates a new instance.</p><h4 class="tableheader">Parameters</h4><div class="table"><div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>event</span><wbr><span><span>Handler</span></span></u></div></span></div><div><div class="title"><p class="paragraph">A handler to use when delivering events to <code class="lang-kotlin">eventListener</code>. May be null if delivery of events is not required.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>event</span><wbr><span><span>Listener</span></span></u></div></span></div><div><div class="title"><p class="paragraph">A listener of events. May be null if delivery of events is not required.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>audio</span><wbr><span><span>Sink</span></span></u></div></span></div><div><div class="title"><p class="paragraph">The sink to which audio will be output.</p></div></div></div></div></div></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="-124422640%2FConstructors%2F393069187" anchor-label="FfmpegAudioRenderer" id="-124422640%2FConstructors%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-ffmpeg-audio-renderer.html"><span>Ffmpeg</span><wbr><span>Audio</span><wbr><span><span>Renderer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-124422640%2FConstructors%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">eventHandler<span class="token operator">: </span><span data-unresolved-link="android.os/Handler///PointingToDeclaration/">Handler</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">eventListener<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.audio/AudioRendererEventListener///PointingToDeclaration/">AudioRendererEventListener</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">audioSink<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.audio/AudioSink///PointingToDeclaration/">AudioSink</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="android.content/Context///PointingToDeclaration/">Context</span></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><span data-unresolved-link="android.content/Context///PointingToDeclaration/">Context</span><span class="token punctuation">, </span></span><span class="parameter ">eventHandler<span class="token operator">: </span><span data-unresolved-link="android.os/Handler///PointingToDeclaration/">Handler</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">eventListener<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.audio/AudioRendererEventListener///PointingToDeclaration/">AudioRendererEventListener</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">vararg </span>audioProcessors<span class="token operator">: </span><span data-unresolved-link="androidx.media3.common.audio/AudioProcessor///PointingToDeclaration/">AudioProcessor</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Creates a new instance.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="279629701%2FClasslikes%2F393069187" anchor-label="Companion" id="279629701%2FClasslikes%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="279629701%2FClasslikes%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-786641320%2FProperties%2F393069187" anchor-label="capabilities" id="-786641320%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-786641320%2FProperties%2F393069187"><span><span>capabilities</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-786641320%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-786641320%2FProperties%2F393069187">capabilities</a><span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer/RendererCapabilities///PointingToDeclaration/">RendererCapabilities</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1492214585%2FProperties%2F393069187" anchor-label="isCurrentStreamFinal" id="-1492214585%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1492214585%2FProperties%2F393069187"><span>is</span><wbr><span>Current</span><wbr><span>Stream</span><wbr><span><span>Final</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1492214585%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#-1492214585%2FProperties%2F393069187">isCurrentStreamFinal</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1268901891%2FProperties%2F393069187" anchor-label="isEnded" id="1268901891%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1268901891%2FProperties%2F393069187"><span>is</span><wbr><span><span>Ended</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1268901891%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#1268901891%2FProperties%2F393069187">isEnded</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-72924870%2FProperties%2F393069187" anchor-label="isReady" id="-72924870%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-72924870%2FProperties%2F393069187"><span>is</span><wbr><span><span>Ready</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-72924870%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-72924870%2FProperties%2F393069187">isReady</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-229448003%2FProperties%2F393069187" anchor-label="mediaClock" id="-229448003%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-229448003%2FProperties%2F393069187"><span>media</span><wbr><span><span>Clock</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-229448003%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#-229448003%2FProperties%2F393069187">mediaClock</a><span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer/MediaClock///PointingToDeclaration/">MediaClock</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1981094799%2FProperties%2F393069187" anchor-label="name" id="-1981094799%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1981094799%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="name.html">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1851487554%2FProperties%2F393069187" anchor-label="playbackParameters" id="1851487554%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1851487554%2FProperties%2F393069187"><span>playback</span><wbr><span><span>Parameters</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1851487554%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">var </span><a href="index.html#1851487554%2FProperties%2F393069187">playbackParameters</a><span class="token operator">: </span><span data-unresolved-link="androidx.media3.common/PlaybackParameters///PointingToDeclaration/">PlaybackParameters</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="136412736%2FProperties%2F393069187" anchor-label="positionUs" id="136412736%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#136412736%2FProperties%2F393069187"><span>position</span><wbr><span><span>Us</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="136412736%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="index.html#136412736%2FProperties%2F393069187">positionUs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2077875929%2FProperties%2F393069187" anchor-label="readingPositionUs" id="2077875929%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#2077875929%2FProperties%2F393069187"><span>reading</span><wbr><span>Position</span><wbr><span><span>Us</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2077875929%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#2077875929%2FProperties%2F393069187">readingPositionUs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="421290971%2FProperties%2F393069187" anchor-label="state" id="421290971%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#421290971%2FProperties%2F393069187"><span><span>state</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="421290971%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#421290971%2FProperties%2F393069187">state</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="427673230%2FProperties%2F393069187" anchor-label="stream" id="427673230%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#427673230%2FProperties%2F393069187"><span><span>stream</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="427673230%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@get:</span><span data-unresolved-link="androidx.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span></div></div><span class="token keyword">val </span><a href="index.html#427673230%2FProperties%2F393069187">stream</a><span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.source/SampleStream///PointingToDeclaration/">SampleStream</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1651973293%2FProperties%2F393069187" anchor-label="timeline" id="1651973293%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1651973293%2FProperties%2F393069187"><span><span>timeline</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1651973293%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">protected </span><span class="token keyword">var </span><a href="index.html#1651973293%2FProperties%2F393069187">timeline</a><span class="token operator">: </span><span data-unresolved-link="androidx.media3.common/Timeline///PointingToDeclaration/">Timeline</span><span class="token operator">?</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2074263623%2FProperties%2F393069187" anchor-label="trackType" id="2074263623%2FProperties%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#2074263623%2FProperties%2F393069187"><span>track</span><wbr><span><span>Type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2074263623%2FProperties%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="index.html#2074263623%2FProperties%2F393069187">trackType</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1513795514%2FFunctions%2F393069187" anchor-label="clearListener" id="-1513795514%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1513795514%2FFunctions%2F393069187"><span>clear</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1513795514%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-1513795514%2FFunctions%2F393069187"><span class="token function">clearListener</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-669667467%2FFunctions%2F393069187" anchor-label="disable" id="-669667467%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-669667467%2FFunctions%2F393069187"><span><span>disable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-669667467%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-669667467%2FFunctions%2F393069187"><span class="token function">disable</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1699108960%2FFunctions%2F393069187" anchor-label="enable" id="1699108960%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1699108960%2FFunctions%2F393069187"><span><span>enable</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1699108960%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#1699108960%2FFunctions%2F393069187"><span class="token function">enable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">configuration<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer/RendererConfiguration///PointingToDeclaration/">RendererConfiguration</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">formats<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><span class="token keyword">out </span><span data-unresolved-link="androidx.media3.common/Format///PointingToDeclaration/">Format</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">stream<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.source/SampleStream///PointingToDeclaration/">SampleStream</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">positionUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">joining<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">mayRenderStartOfStream<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">startPositionUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">offsetUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">mediaPeriodId<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.source/MediaSource.MediaPeriodId///PointingToDeclaration/">MediaSource.MediaPeriodId</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1445562180%2FFunctions%2F393069187" anchor-label="enableMayRenderStartOfStream" id="-1445562180%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1445562180%2FFunctions%2F393069187"><span>enable</span><wbr><span>May</span><wbr><span>Render</span><wbr><span>Start</span><wbr><span>Of</span><wbr><span><span>Stream</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1445562180%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1445562180%2FFunctions%2F393069187"><span class="token function">enableMayRenderStartOfStream</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-940930618%2FFunctions%2F393069187" anchor-label="getDurationToProgressUs" id="-940930618%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-940930618%2FFunctions%2F393069187"><span>get</span><wbr><span>Duration</span><wbr><span>To</span><wbr><span>Progress</span><wbr><span><span>Us</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-940930618%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-940930618%2FFunctions%2F393069187"><span class="token function">getDurationToProgressUs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">positionUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">elapsedRealtimeUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1151367837%2FFunctions%2F393069187" anchor-label="getName" id="1151367837%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-name.html"><span>get</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1151367837%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-name.html"><span class="token function">getName</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-769106470%2FFunctions%2F393069187" anchor-label="getOutputFormat" id="-769106470%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-output-format.html"><span>get</span><wbr><span>Output</span><wbr><span><span>Format</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-769106470%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="get-output-format.html"><span class="token function">getOutputFormat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoder<span class="token operator">: </span><a href="../-ffmpeg-audio-decoder/index.html">FfmpegAudioDecoder</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="androidx.media3.common/Format///PointingToDeclaration/">Format</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1250944905%2FFunctions%2F393069187" anchor-label="handleMessage" id="1250944905%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1250944905%2FFunctions%2F393069187"><span>handle</span><wbr><span><span>Message</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1250944905%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#1250944905%2FFunctions%2F393069187"><span class="token function">handleMessage</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">messageType<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.annotation/Nullable///PointingToDeclaration/"><span class="token annotation builtin">Nullable</span></span>&nbsp;</span>message<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-918023987%2FFunctions%2F393069187" anchor-label="hasReadStreamToEnd" id="-918023987%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-918023987%2FFunctions%2F393069187"><span>has</span><wbr><span>Read</span><wbr><span>Stream</span><wbr><span>To</span><wbr><span><span>End</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-918023987%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-918023987%2FFunctions%2F393069187"><span class="token function">hasReadStreamToEnd</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-52101983%2FFunctions%2F393069187" anchor-label="hasSkippedSilenceSinceLastCall" id="-52101983%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-52101983%2FFunctions%2F393069187"><span>has</span><wbr><span>Skipped</span><wbr><span>Silence</span><wbr><span>Since</span><wbr><span>Last</span><wbr><span><span>Call</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-52101983%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-52101983%2FFunctions%2F393069187"><span class="token function">hasSkippedSilenceSinceLastCall</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-373192259%2FFunctions%2F393069187" anchor-label="init" id="-373192259%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-373192259%2FFunctions%2F393069187"><span><span>init</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-373192259%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-373192259%2FFunctions%2F393069187"><span class="token function">init</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">index<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">playerId<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.analytics/PlayerId///PointingToDeclaration/">PlayerId</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">clock<span class="token operator">: </span><span data-unresolved-link="androidx.media3.common.util/Clock///PointingToDeclaration/">Clock</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="723259507%2FFunctions%2F393069187" anchor-label="maybeThrowStreamError" id="723259507%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#723259507%2FFunctions%2F393069187"><span>maybe</span><wbr><span>Throw</span><wbr><span>Stream</span><wbr><span><span>Error</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="723259507%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#723259507%2FFunctions%2F393069187"><span class="token function">maybeThrowStreamError</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="939744054%2FFunctions%2F393069187" anchor-label="release" id="939744054%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#939744054%2FFunctions%2F393069187"><span><span>release</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="939744054%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#939744054%2FFunctions%2F393069187"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-745335828%2FFunctions%2F393069187" anchor-label="render" id="-745335828%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-745335828%2FFunctions%2F393069187"><span><span>render</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-745335828%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-745335828%2FFunctions%2F393069187"><span class="token function">render</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">positionUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">elapsedRealtimeUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1164793060%2FFunctions%2F393069187" anchor-label="replaceStream" id="1164793060%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1164793060%2FFunctions%2F393069187"><span>replace</span><wbr><span><span>Stream</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1164793060%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#1164793060%2FFunctions%2F393069187"><span class="token function">replaceStream</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">formats<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><span class="token keyword">out </span><span data-unresolved-link="androidx.media3.common/Format///PointingToDeclaration/">Format</span><span class="token operator">?</span><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">stream<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.source/SampleStream///PointingToDeclaration/">SampleStream</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">startPositionUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">offsetUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">mediaPeriodId<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer.source/MediaSource.MediaPeriodId///PointingToDeclaration/">MediaSource.MediaPeriodId</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-355119378%2FFunctions%2F393069187" anchor-label="reset" id="-355119378%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-355119378%2FFunctions%2F393069187"><span><span>reset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-355119378%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-355119378%2FFunctions%2F393069187"><span class="token function">reset</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-610465872%2FFunctions%2F393069187" anchor-label="resetPosition" id="-610465872%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-610465872%2FFunctions%2F393069187"><span>reset</span><wbr><span><span>Position</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-610465872%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-610465872%2FFunctions%2F393069187"><span class="token function">resetPosition</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">positionUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">sampleStreamIsResetToKeyFrame<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2145500062%2FFunctions%2F393069187" anchor-label="setCurrentStreamFinal" id="2145500062%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#2145500062%2FFunctions%2F393069187"><span>set</span><wbr><span>Current</span><wbr><span>Stream</span><wbr><span><span>Final</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2145500062%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#2145500062%2FFunctions%2F393069187"><span class="token function">setCurrentStreamFinal</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-21752877%2FFunctions%2F393069187" anchor-label="setListener" id="-21752877%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-21752877%2FFunctions%2F393069187"><span>set</span><wbr><span><span>Listener</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-21752877%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-21752877%2FFunctions%2F393069187"><span class="token function">setListener</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">listener<span class="token operator">: </span><span data-unresolved-link="androidx.media3.exoplayer/RendererCapabilities.Listener///PointingToDeclaration/">RendererCapabilities.Listener</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1839151284%2FFunctions%2F393069187" anchor-label="setPlaybackSpeed" id="-1839151284%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1839151284%2FFunctions%2F393069187"><span>set</span><wbr><span>Playback</span><wbr><span><span>Speed</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1839151284%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-1839151284%2FFunctions%2F393069187"><span class="token function">setPlaybackSpeed</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">currentPlaybackSpeed<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a><span class="token punctuation">, </span></span><span class="parameter ">targetPlaybackSpeed<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1369158459%2FFunctions%2F393069187" anchor-label="start" id="1369158459%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#1369158459%2FFunctions%2F393069187"><span><span>start</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1369158459%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#1369158459%2FFunctions%2F393069187"><span class="token function">start</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="646843483%2FFunctions%2F393069187" anchor-label="stop" id="646843483%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#646843483%2FFunctions%2F393069187"><span><span>stop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="646843483%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#646843483%2FFunctions%2F393069187"><span class="token function">stop</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1347544118%2FFunctions%2F393069187" anchor-label="supportsFormat" id="-1347544118%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-1347544118%2FFunctions%2F393069187"><span>supports</span><wbr><span><span>Format</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1347544118%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="index.html#-1347544118%2FFunctions%2F393069187"><span class="token function">supportsFormat</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">format<span class="token operator">: </span><span data-unresolved-link="androidx.media3.common/Format///PointingToDeclaration/">Format</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1455985402%2FFunctions%2F393069187" anchor-label="supportsMixedMimeTypeAdaptation" id="-1455985402%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="supports-mixed-mime-type-adaptation.html"><span>supports</span><wbr><span>Mixed</span><wbr><span>Mime</span><wbr><span>Type</span><wbr><span><span>Adaptation</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1455985402%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="supports-mixed-mime-type-adaptation.html"><span class="token function">supportsMixedMimeTypeAdaptation</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.media3.exoplayer/RendererCapabilities.AdaptiveSupport///PointingToDeclaration/"><span class="token annotation builtin">RendererCapabilities.AdaptiveSupport</span></span>&nbsp;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-11651959%2FFunctions%2F393069187" anchor-label="supportsResetPositionWithoutKeyFrameReset" id="-11651959%2FFunctions%2F393069187" data-filterable-set=":ylcs-module:compose:components:media/androidMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="index.html#-11651959%2FFunctions%2F393069187"><span>supports</span><wbr><span>Reset</span><wbr><span>Position</span><wbr><span>Without</span><wbr><span>Key</span><wbr><span>Frame</span><wbr><span><span>Reset</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-11651959%2FFunctions%2F393069187"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:compose:components:media/androidMain" data-filterable-set=":ylcs-module:compose:components:media/androidMain" data-active="" data-toggle=":ylcs-module:compose:components:media/androidMain">android</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:components:media/androidMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="index.html#-11651959%2FFunctions%2F393069187"><span class="token function">supportsResetPositionWithoutKeyFrameReset</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">positionUs<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

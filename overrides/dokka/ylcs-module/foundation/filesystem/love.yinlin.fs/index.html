@@ -1,0 +1,943 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>love.yinlin.fs</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.3
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/androidMain">android</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/androidNativeMain">androidNative</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/commonMain">common</button>
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/desktopMain">desktop</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/iosMain">ios</button>
+                <button class="platform-tag platform-selector js-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/jsMain">js</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/linuxMain">linux</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/macosMain">macos</button>
+                <button class="platform-tag platform-selector wasm-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/wasmJsMain">wasmJs</button>
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/webMain">web</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:foundation:filesystem/windowsMain">windows</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/androidMain" data-filter=":ylcs-module:foundation:filesystem/androidMain">
+                                <span class="checkbox--icon"></span>
+                                android
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/androidNativeMain" data-filter=":ylcs-module:foundation:filesystem/androidNativeMain">
+                                <span class="checkbox--icon"></span>
+                                androidNative
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/commonMain" data-filter=":ylcs-module:foundation:filesystem/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/desktopMain" data-filter=":ylcs-module:foundation:filesystem/desktopMain">
+                                <span class="checkbox--icon"></span>
+                                desktop
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/iosMain" data-filter=":ylcs-module:foundation:filesystem/iosMain">
+                                <span class="checkbox--icon"></span>
+                                ios
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option js-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/jsMain" data-filter=":ylcs-module:foundation:filesystem/jsMain">
+                                <span class="checkbox--icon"></span>
+                                js
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/linuxMain" data-filter=":ylcs-module:foundation:filesystem/linuxMain">
+                                <span class="checkbox--icon"></span>
+                                linux
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/macosMain" data-filter=":ylcs-module:foundation:filesystem/macosMain">
+                                <span class="checkbox--icon"></span>
+                                macos
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option wasm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/wasmJsMain" data-filter=":ylcs-module:foundation:filesystem/wasmJsMain">
+                                <span class="checkbox--icon"></span>
+                                wasmJs
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/webMain" data-filter=":ylcs-module:foundation:filesystem/webMain">
+                                <span class="checkbox--icon"></span>
+                                web
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:foundation:filesystem/windowsMain" data-filter=":ylcs-module:foundation:filesystem/windowsMain">
+                                <span class="checkbox--icon"></span>
+                                windows
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="love.yinlin.foundation.filesystem::love.yinlin.fs////PointingToDeclaration//1173473398">
+  <div class="breadcrumbs"><a href="../index.html">love.yinlin.foundation.filesystem</a><span class="delimiter">/</span><span class="current">love.yinlin.fs</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="2029002744%2FClasslikes%2F392167471" anchor-label="DriverInfo" id="2029002744%2FClasslikes%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-driver-info/index.html"><span>Driver</span><wbr><span><span>Info</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2029002744%2FClasslikes%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-driver-info/index.html">DriverInfo</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>totalSpace<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>freeSpace<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">驱动器操作</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2054836410%2FClasslikes%2F557119229" anchor-label="Estimate" id="-2054836410%2FClasslikes%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-estimate/index.html"><span><span>Estimate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2054836410%2FClasslikes%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-estimate/index.html">Estimate</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1958827306%2FClasslikes%2F557119229" anchor-label="FileSystemDirectoryHandle" id="1958827306%2FClasslikes%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-file-system-directory-handle/index.html"><span>File</span><wbr><span>System</span><wbr><span>Directory</span><wbr><span><span>Handle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1958827306%2FClasslikes%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-file-system-directory-handle/index.html">FileSystemDirectoryHandle</a> : <a href="-file-system-handle/index.html">FileSystemHandle</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1216898337%2FClasslikes%2F557119229" anchor-label="FileSystemFileHandle" id="-1216898337%2FClasslikes%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-file-system-file-handle/index.html"><span>File</span><wbr><span>System</span><wbr><span>File</span><wbr><span><span>Handle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1216898337%2FClasslikes%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-file-system-file-handle/index.html">FileSystemFileHandle</a> : <a href="-file-system-handle/index.html">FileSystemHandle</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1673817861%2FClasslikes%2F557119229" anchor-label="FileSystemHandle" id="-1673817861%2FClasslikes%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-file-system-handle/index.html"><span>File</span><wbr><span>System</span><wbr><span><span>Handle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1673817861%2FClasslikes%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-file-system-handle/index.html">FileSystemHandle</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="224455324%2FClasslikes%2F557119229" anchor-label="FileSystemSyncAccessHandle" id="224455324%2FClasslikes%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-file-system-sync-access-handle/index.html"><span>File</span><wbr><span>System</span><wbr><span>Sync</span><wbr><span>Access</span><wbr><span><span>Handle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="224455324%2FClasslikes%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-file-system-sync-access-handle/index.html">FileSystemSyncAccessHandle</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1879414073%2FClasslikes%2F557119229" anchor-label="FileSystemWritableFileStream" id="-1879414073%2FClasslikes%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-file-system-writable-file-stream/index.html"><span>File</span><wbr><span>System</span><wbr><span>Writable</span><wbr><span>File</span><wbr><span><span>Stream</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1879414073%2FClasslikes%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-file-system-writable-file-stream/index.html">FileSystemWritableFileStream</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="735307088%2FClasslikes%2F59101133" anchor-label="PlatformFileSystem" id="735307088%2FClasslikes%2F59101133" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain,:ylcs-module:foundation:filesystem/androidMain,:ylcs-module:foundation:filesystem/androidNativeMain,:ylcs-module:foundation:filesystem/desktopMain,:ylcs-module:foundation:filesystem/iosMain,:ylcs-module:foundation:filesystem/linuxMain,:ylcs-module:foundation:filesystem/macosMain,:ylcs-module:foundation:filesystem/webMain,:ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain,:ylcs-module:foundation:filesystem/androidMain,:ylcs-module:foundation:filesystem/androidNativeMain,:ylcs-module:foundation:filesystem/desktopMain,:ylcs-module:foundation:filesystem/iosMain,:ylcs-module:foundation:filesystem/linuxMain,:ylcs-module:foundation:filesystem/macosMain,:ylcs-module:foundation:filesystem/webMain,:ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain,:ylcs-module:foundation:filesystem/androidMain,:ylcs-module:foundation:filesystem/androidNativeMain,:ylcs-module:foundation:filesystem/desktopMain,:ylcs-module:foundation:filesystem/iosMain,:ylcs-module:foundation:filesystem/linuxMain,:ylcs-module:foundation:filesystem/macosMain,:ylcs-module:foundation:filesystem/webMain,:ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-platform-file-system/index.html"><span>Platform</span><wbr><span>File</span><wbr><span><span>System</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="735307088%2FClasslikes%2F59101133"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/androidMain" data-filterable-set=":ylcs-module:foundation:filesystem/androidMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/androidMain">android</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/androidNativeMain" data-filterable-set=":ylcs-module:foundation:filesystem/androidNativeMain" data-toggle=":ylcs-module:foundation:filesystem/androidNativeMain">androidNative</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain" data-toggle=":ylcs-module:foundation:filesystem/commonMain">common</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/desktopMain" data-filterable-set=":ylcs-module:foundation:filesystem/desktopMain" data-toggle=":ylcs-module:foundation:filesystem/desktopMain">desktop</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/iosMain" data-filterable-set=":ylcs-module:foundation:filesystem/iosMain" data-toggle=":ylcs-module:foundation:filesystem/iosMain">ios</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/linuxMain" data-filterable-set=":ylcs-module:foundation:filesystem/linuxMain" data-toggle=":ylcs-module:foundation:filesystem/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/macosMain" data-filterable-set=":ylcs-module:foundation:filesystem/macosMain" data-toggle=":ylcs-module:foundation:filesystem/macosMain">macos</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/androidMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/androidNativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/desktopMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/iosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/macosMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">object </span><a href="-platform-file-system/index.html">PlatformFileSystem</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2006239572%2FClasslikes%2F392167471" anchor-label="StandardPath" id="-2006239572%2FClasslikes%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-standard-path/index.html"><span>Standard</span><wbr><span><span>Path</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2006239572%2FClasslikes%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">enum </span><a href="-standard-path/index.html">StandardPath</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-enum/index.html">Enum</a><span class="token operator">&lt;</span><a href="-standard-path/index.html">StandardPath</a><span class="token operator">&gt; </span></div><div class="brief "><p class="paragraph">标准目录</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1141321020%2FClasslikes%2F557119229" anchor-label="StorageManager" id="1141321020%2FClasslikes%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-storage-manager/index.html"><span>Storage</span><wbr><span><span>Manager</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1141321020%2FClasslikes%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-storage-manager/index.html">StorageManager</a> : <a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="712353001%2FProperties%2F392167471" anchor-label="accessTime" id="712353001%2FProperties%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="access-time.html"><span>access</span><wbr><span><span>Time</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="712353001%2FProperties%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">var </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="access-time.html">accessTime</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.datetime/LocalDateTime///PointingToDeclaration/">LocalDateTime</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">文件访问时间</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="341604993%2FProperties%2F392167471" anchor-label="createTime" id="341604993%2FProperties%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-time.html"><span>create</span><wbr><span><span>Time</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="341604993%2FProperties%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">var </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="create-time.html">createTime</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.datetime/LocalDateTime///PointingToDeclaration/">LocalDateTime</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">文件创建时间</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1274543681%2FProperties%2F1710155335" anchor-label="extension" id="-1274543681%2FProperties%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="extension.html"><span><span>extension</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1274543681%2FProperties%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="extension.html">extension</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">拓展名(不含点)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1123668858%2FProperties%2F392167471" anchor-label="isRecycleBinEmpty" id="1123668858%2FProperties%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-recycle-bin-empty.html"><span>is</span><wbr><span>Recycle</span><wbr><span>Bin</span><wbr><span><span>Empty</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1123668858%2FProperties%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-recycle-bin-empty.html">isRecycleBinEmpty</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">回收站是否为空</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1614224921%2FProperties%2F392167471" anchor-label="isRecycleBinNotEmpty" id="1614224921%2FProperties%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-recycle-bin-not-empty.html"><span>is</span><wbr><span>Recycle</span><wbr><span>Bin</span><wbr><span>Not</span><wbr><span><span>Empty</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1614224921%2FProperties%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-recycle-bin-not-empty.html">isRecycleBinNotEmpty</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">回收站是否非空</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1525427494%2FProperties%2F1710155335" anchor-label="nameWithoutExtension" id="-1525427494%2FProperties%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="name-without-extension.html"><span>name</span><wbr><span>Without</span><wbr><span><span>Extension</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1525427494%2FProperties%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="name-without-extension.html">nameWithoutExtension</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">文件名(不含拓展名)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1592742001%2FProperties%2F392167471" anchor-label="shortcutTarget" id="-1592742001%2FProperties%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="shortcut-target.html"><span>shortcut</span><wbr><span><span>Target</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1592742001%2FProperties%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="shortcut-target.html">shortcutTarget</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">取快捷方式目标</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-251474040%2FProperties%2F557119229" anchor-label="storage" id="-251474040%2FProperties%2F557119229" data-filterable-set=":ylcs-module:foundation:filesystem/webMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="storage.html"><span><span>storage</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-251474040%2FProperties%2F557119229"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/org.w3c.dom/-navigator/index.html">Navigator</a><span class="token punctuation">.</span><a href="storage.html">storage</a><span class="token operator">: </span><a href="-storage-manager/index.html">StorageManager</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1697426956%2FProperties%2F392167471" anchor-label="writeTime" id="1697426956%2FProperties%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_PROPERTY" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write-time.html"><span>write</span><wbr><span><span>Time</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1697426956%2FProperties%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">var </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="write-time.html">writeTime</a><span class="token operator">: </span><span data-unresolved-link="kotlinx.datetime/LocalDateTime///PointingToDeclaration/">LocalDateTime</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">文件修改时间</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1785541030%2FFunctions%2F2066459704" anchor-label="awaitEnumIterator" id="-1785541030%2FFunctions%2F2066459704" data-filterable-set=":ylcs-module:foundation:filesystem/jsMain,:ylcs-module:foundation:filesystem/webMain,:ylcs-module:foundation:filesystem/wasmJsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/jsMain,:ylcs-module:foundation:filesystem/webMain,:ylcs-module:foundation:filesystem/wasmJsMain" data-filterable-set=":ylcs-module:foundation:filesystem/jsMain,:ylcs-module:foundation:filesystem/webMain,:ylcs-module:foundation:filesystem/wasmJsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="await-enum-iterator.html"><span>await</span><wbr><span>Enum</span><wbr><span><span>Iterator</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1785541030%2FFunctions%2F2066459704"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/jsMain" data-filterable-set=":ylcs-module:foundation:filesystem/jsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/jsMain">js</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/wasmJsMain" data-filterable-set=":ylcs-module:foundation:filesystem/wasmJsMain" data-toggle=":ylcs-module:foundation:filesystem/wasmJsMain">wasmJs</button><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/webMain" data-filterable-set=":ylcs-module:foundation:filesystem/webMain" data-toggle=":ylcs-module:foundation:filesystem/webMain">web</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/jsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="await-enum-iterator.html">R</a><span class="token operator">&gt; </span><a href="await-enum-iterator.html"><span class="token function">awaitEnumIterator</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-array/index.html">JsArray</a><span class="token operator">&lt;</span><a href="await-enum-iterator.html">R</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/wasmJsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="await-enum-iterator.html">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a><span class="token operator">?</span><span class="token operator">&gt; </span><a href="await-enum-iterator.html"><span class="token function">awaitEnumIterator</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-array/index.html">JsArray</a><span class="token operator">&lt;</span><a href="await-enum-iterator.html">R</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div><div class="content sourceset-dependent-content" data-togglable=":ylcs-module:foundation:filesystem/webMain"><div class="symbol monospace"><span class="token keyword">expect </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="await-enum-iterator.html">R</a><span class="token operator"> : </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a><span class="token operator">?</span><span class="token operator">&gt; </span><a href="await-enum-iterator.html"><span class="token function">awaitEnumIterator</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">value<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-any/index.html">JsAny</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-promise/index.html">Promise</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.js/-js-array/index.html">JsArray</a><span class="token operator">&lt;</span><a href="await-enum-iterator.html">R</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1780237846%2FFunctions%2F1710155335" anchor-label="bufferedSink" id="-1780237846%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="buffered-sink.html"><span>buffered</span><wbr><span><span>Sink</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1780237846%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="buffered-sink.html"><span class="token function">bufferedSink</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.io/Sink///PointingToDeclaration/">Sink</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1058049714%2FFunctions%2F1710155335" anchor-label="bufferedSource" id="1058049714%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="buffered-source.html"><span>buffered</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1058049714%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="buffered-source.html"><span class="token function">bufferedSource</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.io/Source///PointingToDeclaration/">Source</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-146615795%2FFunctions%2F392167471" anchor-label="clearRecycleBin" id="-146615795%2FFunctions%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="clear-recycle-bin.html"><span>clear</span><wbr><span>Recycle</span><wbr><span><span>Bin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-146615795%2FFunctions%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="clear-recycle-bin.html"><span class="token function">clearRecycleBin</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tip<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">清空回收站</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-135341885%2FFunctions%2F1710155335" anchor-label="delete" id="-135341885%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete.html"><span><span>delete</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-135341885%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="delete.html"><span class="token function">delete</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">删除文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-85882028%2FFunctions%2F1710155335" anchor-label="deleteRecursively" id="-85882028%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete-recursively.html"><span>delete</span><wbr><span><span>Recursively</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-85882028%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="delete-recursively.html"><span class="token function">deleteRecursively</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">删除文件或目录</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1392007134%2FFunctions%2F392167471" anchor-label="deleteToRecycleBin" id="1392007134%2FFunctions%2F392167471" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete-to-recycle-bin.html"><span>delete</span><wbr><span>To</span><wbr><span>Recycle</span><wbr><span><span>Bin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1392007134%2FFunctions%2F392167471"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":ylcs-module:foundation:filesystem/windowsMain" data-filterable-set=":ylcs-module:foundation:filesystem/windowsMain" data-active="" data-toggle=":ylcs-module:foundation:filesystem/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/windowsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="delete-to-recycle-bin.html"><span class="token function">deleteToRecycleBin</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">path<span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">删除到回收站</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1169016396%2FFunctions%2F1710155335" anchor-label="exists" id="-1169016396%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exists.html"><span><span>exists</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1169016396%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="exists.html"><span class="token function">exists</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">是否存在</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1899744203%2FFunctions%2F1710155335" anchor-label="fileSize" id="-1899744203%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="file-size.html"><span>file</span><wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1899744203%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="file-size.html"><span class="token function">fileSize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">文件大小</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-695518749%2FFunctions%2F1710155335" anchor-label="isDirectory" id="-695518749%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-directory.html"><span>is</span><wbr><span><span>Directory</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-695518749%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="is-directory.html"><span class="token function">isDirectory</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">是否是目录</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-546820706%2FFunctions%2F1710155335" anchor-label="isFile" id="-546820706%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-file.html"><span>is</span><wbr><span><span>File</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-546820706%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="is-file.html"><span class="token function">isFile</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">是否是普通文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1332722314%2FFunctions%2F1710155335" anchor-label="list" id="-1332722314%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="list.html"><span><span>list</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1332722314%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="list.html"><span class="token function">list</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">子目录</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1316043345%2FFunctions%2F1710155335" anchor-label="mkdir" id="-1316043345%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="mkdir.html"><span><span>mkdir</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1316043345%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="mkdir.html"><span class="token function">mkdir</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">创建文件夹，支持多级目录</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2121495564%2FFunctions%2F1710155335" anchor-label="move" id="2121495564%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="move.html"><span><span>move</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2121495564%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="move.html"><span class="token function">move</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">dest<span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">移动</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1705515099%2FFunctions%2F1710155335" anchor-label="rawSink" id="1705515099%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="raw-sink.html"><span>raw</span><wbr><span><span>Sink</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1705515099%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="raw-sink.html"><span class="token function">rawSink</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.io/RawSink///PointingToDeclaration/">RawSink</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="792138979%2FFunctions%2F1710155335" anchor-label="rawSource" id="792138979%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="raw-source.html"><span>raw</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="792138979%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="raw-source.html"><span class="token function">rawSource</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.io/RawSource///PointingToDeclaration/">RawSource</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-203857981%2FFunctions%2F1710155335" anchor-label="read" id="-203857981%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="read.html"><span><span>read</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-203857981%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="read.html">R</a><span class="token operator">&gt; </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="read.html"><span class="token function">read</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a>&nbsp;</span><span class="token keyword">crossinline </span>block<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span data-unresolved-link="kotlinx.io/Source///PointingToDeclaration/">Source</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="read.html">R</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="read.html">R</a></div><div class="brief "><p class="paragraph">读文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2031003579%2FFunctions%2F1710155335" anchor-label="readByteArray" id="2031003579%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="read-byte-array.html"><span>read</span><wbr><span>Byte</span><wbr><span><span>Array</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2031003579%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="read-byte-array.html"><span class="token function">readByteArray</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">读字节文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1184901637%2FFunctions%2F1710155335" anchor-label="readText" id="-1184901637%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="read-text.html"><span>read</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1184901637%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="read-text.html"><span class="token function">readText</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">读文本文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1566786478%2FFunctions%2F1710155335" anchor-label="rename" id="1566786478%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="rename.html"><span><span>rename</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1566786478%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="rename.html"><span class="token function">rename</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">filename<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token operator">?</span></div><div class="brief "><p class="paragraph">重命名</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="590611899%2FFunctions%2F1710155335" anchor-label="safeRawSources" id="590611899%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="safe-raw-sources.html"><span>safe</span><wbr><span>Raw</span><wbr><span><span>Sources</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="590611899%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="safe-raw-sources.html"><span class="token function">safeRawSources</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../love.yinlin.io/-sources/index.html">Sources</a><span class="token operator">&lt;</span><span data-unresolved-link="kotlinx.io/RawSource///PointingToDeclaration/">RawSource</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-882725627%2FFunctions%2F1710155335" anchor-label="safeSources" id="-882725627%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="safe-sources.html"><span>safe</span><wbr><span><span>Sources</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-882725627%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token operator">&gt;</span><span class="token punctuation">.</span><a href="safe-sources.html"><span class="token function">safeSources</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../love.yinlin.io/-sources/index.html">Sources</a><span class="token operator">&lt;</span><span data-unresolved-link="kotlinx.io/Source///PointingToDeclaration/">Source</span><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-23724135%2FFunctions%2F1710155335" anchor-label="size" id="-23724135%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="size.html"><span><span>size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-23724135%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="size.html"><span class="token function">size</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div><div class="brief "><p class="paragraph">文件或目录大小</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="189613911%2FFunctions%2F1710155335" anchor-label="write" id="189613911%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write.html"><span><span>write</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="189613911%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">inline suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="write.html"><span class="token function">write</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a>&nbsp;</span><span class="token keyword">crossinline </span>block<span class="token operator">: </span><span class="token keyword">suspend </span><span class="token punctuation">(</span><span data-unresolved-link="kotlinx.io/Sink///PointingToDeclaration/">Sink</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">写文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="177454086%2FFunctions%2F1710155335" anchor-label="writeByteArray" id="177454086%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write-byte-array.html"><span>write</span><wbr><span>Byte</span><wbr><span><span>Array</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="177454086%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="write-byte-array.html"><span class="token function">writeByteArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">data<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">写字节文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1529653272%2FFunctions%2F1710155335" anchor-label="writeText" id="1529653272%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write-text.html"><span>write</span><wbr><span><span>Text</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1529653272%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="write-text.html"><span class="token function">writeText</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">text<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">写文本文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-990167525%2FFunctions%2F1710155335" anchor-label="writeTo" id="-990167525%2FFunctions%2F1710155335" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="EXTENSION_FUNCTION" data-filterable-current=":ylcs-module:foundation:filesystem/commonMain" data-filterable-set=":ylcs-module:foundation:filesystem/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write-to.html"><span>write</span><wbr><span><span>To</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-990167525%2FFunctions%2F1710155335"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:foundation:filesystem/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><a href="../../../../ylcs-module/core/love.yinlin.coroutines/-i-o-coroutine/index.html"><span class="token annotation builtin">IOCoroutine</span></a></div></div><span class="token keyword">suspend </span><span class="token keyword">fun </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span><span class="token punctuation">.</span><a href="write-to.html"><span class="token function">writeTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><span data-unresolved-link="kotlinx.io.files/Path///PointingToDeclaration/">Path</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">写入文件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
