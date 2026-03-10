@@ -1,6 +1,7 @@
 package love.yinlin.startup
 
 import androidx.compose.runtime.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.serializer
 import love.yinlin.compose.config.CacheState
 import love.yinlin.compose.config.ListState
@@ -28,7 +29,7 @@ open class StartupConfig : SyncStartup() {
     lateinit var patches: Patches
         private set
 
-    override fun init(context: Context, args: StartupArgs) {
+    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
         kv = args.fetch(0)
         version = args[1]
         patches = args[2]

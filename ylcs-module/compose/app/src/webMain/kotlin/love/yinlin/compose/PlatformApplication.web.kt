@@ -8,8 +8,11 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.uri.Uri
+import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
@@ -24,11 +27,13 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
         val mainScope = MainScope()
-        openService(scope = mainScope, later = false, immediate = true)
+        openService(scope = mainScope)
+        mainScope.launch { openServiceLater() }
 
         // 有待考证
         window.onclose = {
-            closeService(before = true, immediate = true)
+            closeServiceBefore()
+            closeService()
             mainScope.cancel()
         }
 
@@ -43,5 +48,16 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 Content()
             }
         }
+    }
+
+    actual fun openUri(uri: Uri): Boolean {
+        window.open(uri.toString(), "_blank")
+        return true
+    }
+
+    @OptIn(ExperimentalWasmJsInterop::class)
+    actual fun copyText(text: String): Boolean {
+        window.navigator.clipboard.writeText(text)
+        return true
     }
 }

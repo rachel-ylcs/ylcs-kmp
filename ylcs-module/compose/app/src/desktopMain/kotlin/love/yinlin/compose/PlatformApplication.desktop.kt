@@ -21,7 +21,12 @@ import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.uri.Uri
+import love.yinlin.uri.toJvmUri
 import org.jetbrains.compose.resources.DrawableResource
+import java.awt.Desktop
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import kotlin.system.exitProcess
 
 @Stable
@@ -63,11 +68,11 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     val mainScope = MainScope()
 
     fun run() {
-        openService(scope = mainScope, later = false, immediate = false)
+        openService(scope = mainScope)
 
         application(exitProcessOnExit = false) {
             val onMainWindowClose = {
-                closeService(before = true, immediate = false)
+                closeServiceBefore()
                 exitApplication()
             }
 
@@ -87,9 +92,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     Fixup.swingWindowMaximizeBounds(window)
                     context.bindWindow(window.windowHandle)
 
-                    windowStarter {
-                        openService(scope = this, later = true, immediate = false)
-                    }
+                    windowStarter { openServiceLater() }
                 }
 
                 Fixup.swingWindowMinimize(this, minSize)
@@ -130,10 +133,25 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             MultipleWindow()
         }
 
-        closeService(before = false, immediate = false)
+        closeService()
 
         mainScope.cancel()
 
         exitProcess(0)
+    }
+
+    actual fun openUri(uri: Uri): Boolean {
+        val desktop = Desktop.getDesktop()
+        return if (desktop.isSupported(Desktop.Action.BROWSE)) {
+            desktop.browse(uri.toJvmUri())
+            true
+        } else false
+    }
+
+    actual fun copyText(text: String): Boolean {
+        val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+        val selection = StringSelection(text)
+        clipboard.setContents(selection, null)
+        return true
     }
 }

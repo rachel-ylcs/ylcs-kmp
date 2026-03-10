@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import love.yinlin.common.PathMod
+import love.yinlin.app
 import love.yinlin.common.rhyme.RhymeMusic
 import love.yinlin.compose.*
 import love.yinlin.compose.ui.container.Surface
@@ -138,7 +138,7 @@ internal fun RhymeMusicCard(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             LocalFileImage(
-                uri = entry.musicInfo.path(PathMod, ModResourceType.Record).toString(),
+                uri = entry.musicInfo.path(app.modPath, ModResourceType.Record).toString(),
                 entry,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f)

@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.files.Path
@@ -24,7 +25,7 @@ actual class StartupPicker : SyncStartup() {
     private lateinit var context: Context
     private val handle: Long get() = context.handle
 
-    actual override fun init(context: Context, args: StartupArgs) {
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
         this.context = context
     }
 

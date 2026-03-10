@@ -80,10 +80,10 @@ import love.yinlin.uri.Uri
 class ScreenSettings : Screen() {
     private suspend fun pickPicture(aspectRatio: Float): Path? {
         return app.picker.pickPicture()?.use { source ->
-            app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }?.let { path ->
             cropDialog.open(url = path.toString(), aspectRatio = aspectRatio)?.let { region ->
-                app.os.storage.createTempFile { sink ->
+                app.createTempFile { sink ->
                     val image = PlatformImage.decode(path.readByteArray()!!)!!
                     image.crop(region)
                     image.thumbnail()
@@ -353,7 +353,7 @@ class ScreenSettings : Screen() {
             var cacheSizeText: String? by rememberState { null }
 
             LaunchedEffect(Unit) {
-                cacheSizeText = Coroutines.io { app.os.storage.calcCacheSize().fileSizeString }
+                cacheSizeText = Coroutines.io { app.calcCacheSize().fileSizeString }
             }
 
             ItemExpanderSuspend(
@@ -365,8 +365,8 @@ class ScreenSettings : Screen() {
                     else {
                         Coroutines.io {
                             app.urlImage.clearCache()
-                            app.os.storage.clearCache()
-                            cacheSizeText = app.os.storage.calcCacheSize().fileSizeString
+                            app.clearCache()
+                            cacheSizeText = app.calcCacheSize().fileSizeString
                         }
                     }
                 }
@@ -573,12 +573,12 @@ class ScreenSettings : Screen() {
                     SecondaryButton(
                         text = "银临茶舍官网",
                         icon = Icons.Home,
-                        onClick = { app.os.net.openUri(Uri(scheme = Scheme.Https, host = "yinlin.love")) }
+                        onClick = { app.openUri(Uri(scheme = Scheme.Https, host = "yinlin.love")) }
                     )
                     TertiaryButton(
                         text = "Github开源",
                         icon = Icons2.Github,
-                        onClick = { app.os.net.openUri(Uri(scheme = Scheme.Https, host = "github.com", path = "/rachel-ylcs/ylcs-kmp")) }
+                        onClick = { app.openUri(Uri(scheme = Scheme.Https, host = "github.com", path = "/rachel-ylcs/ylcs-kmp")) }
                     )
                 }
 

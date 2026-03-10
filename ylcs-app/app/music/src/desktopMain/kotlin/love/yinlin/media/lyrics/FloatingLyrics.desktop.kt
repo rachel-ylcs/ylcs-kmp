@@ -21,16 +21,13 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
-import love.yinlin.extension.lazyProvider
 import love.yinlin.foundation.Context
 import love.yinlin.platform.NativeWindow
 import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-actual class FloatingLyrics {
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
-
+actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) {
     actual var isAttached: Boolean by mutableStateOf(false)
         private set
 
@@ -82,15 +79,13 @@ actual class FloatingLyrics {
                 }.launchIn(this)
             }
 
-            mp?.let { player ->
-                if (player.isPlaying) {
-                    DragArea(enabled = canMove) {
-                        app.ComposedLayout(
-                            modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
-                            bgColor = Colors.Transparent
-                        ) {
-                            player.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
-                        }
+            if (startup.isInit && startup.isPlaying) {
+                DragArea(enabled = canMove) {
+                    app.ComposedLayout(
+                        modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
+                        bgColor = Colors.Transparent
+                    ) {
+                        startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
                     }
                 }
             }

@@ -1,22 +1,24 @@
 package love.yinlin.startup
 
 import com.tencent.mmkv.MMKV
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.files.Path
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.foundation.Context
+import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupFetcher
 import love.yinlin.foundation.StartupNative
 import love.yinlin.foundation.SyncStartup
 
-@StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
+@StartupArg(index = 0, name = "initPath", type = Path::class)
 @StartupNative
 @NativeLibApi
 actual class StartupKV : SyncStartup() {
     lateinit var kv: MMKV
 
-    actual override fun init(context: Context, args: StartupArgs) {
-        kv = MMKV(args.fetch<Path>(0).toString())
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
+        val initPath: Path = args[0]
+        kv = MMKV(initPath.toString())
     }
     actual fun set(key: String, value: Boolean, expire: Int) = kv.set(key, value, expire)
     actual fun set(key: String, value: Int, expire: Int) = kv.set(key, value, expire)

@@ -5,10 +5,28 @@ import kotlinx.io.RawSource
 import kotlinx.io.files.FileMetadata
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.foundation.PlatformContextDelegate
+import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSHomeDirectory
+import platform.Foundation.NSSearchPathDirectory
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDomainMask
 
 actual object PlatformFileSystem {
     actual val PathSeparator: Char = '/'
     actual val LineSeparator: String = "\n"
+
+    private fun searchPath(directory: NSSearchPathDirectory): Path {
+        val paths = NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true)
+        return Path(paths[0]!! as String)
+    }
+
+    actual fun appPath(context: PlatformContextDelegate, appName: String): Path = Path(NSHomeDirectory())
+
+    actual fun dataPath(context: PlatformContextDelegate, appName: String): Path = searchPath(NSDocumentDirectory)
+
+    actual fun cachePath(context: PlatformContextDelegate, appName: String): Path = Path(searchPath(NSCachesDirectory), "temp")
 
     @PublishedApi
     internal actual suspend fun exists(path: Path): Boolean = SystemFileSystem.exists(path)

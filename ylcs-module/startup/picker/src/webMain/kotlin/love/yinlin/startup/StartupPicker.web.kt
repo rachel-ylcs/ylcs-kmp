@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.startup
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -34,7 +35,7 @@ import kotlin.js.get
 import kotlin.js.toList
 
 actual class StartupPicker : SyncStartup() {
-    actual override fun init(context: Context, args: StartupArgs) {}
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) { }
 
     private fun htmlFileInput(multiple: Boolean, filter: String, block: (FileList?) -> Unit) {
         createElement<HTMLInputElement> {

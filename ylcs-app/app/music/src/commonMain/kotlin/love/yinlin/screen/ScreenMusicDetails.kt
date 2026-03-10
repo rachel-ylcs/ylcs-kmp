@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.io.files.Path
 import love.yinlin.app
-import love.yinlin.common.PathMod
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.mutableRefStateOf
@@ -77,7 +76,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     @Stable
     private data class ResourceItem(val type: ModResourceType, val size: Long?)
 
-    private fun Song.clientPath(type: ModResourceType): Path = Path(PathMod, this.sid, type.filename)
+    private fun Song.clientPath(type: ModResourceType): Path = Path(app.modPath, this.sid, type.filename)
     private fun Song.remotePath(type: ModResourceType): String = ServerRes.Mod.Song(sid).res(type.filename).url
     private val remoteModPath: String get() = ServerRes.Mod.Song(sid).res(ModResourceType.BASE_RES).url
 
@@ -105,7 +104,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private suspend fun requestClientSong(): Song? {
         val musicInfo = mp?.library[sid]
         return if (musicInfo != null) {
-            val items = ModResourceType.entries.associateWith { musicInfo.path(PathMod, it).fileSize() }
+            val items = ModResourceType.entries.associateWith { musicInfo.path(app.modPath, it).fileSize() }
             clientResources.replaceAll(items.asSequence().filter { it.value > 0 }.map { ResourceItem(it.key, it.value) }.toList())
             Song(
                 sid = musicInfo.id,
@@ -150,7 +149,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private suspend fun downloadMod() {
         // 下载MOD
         val path = Coroutines.io {
-            app.os.storage.createTempFile { sink ->
+            app.createTempFile { sink ->
                 downloadDialog.download(remoteModPath, sink) { }
             }
         }
@@ -160,7 +159,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 slot.loading.open {
                     // 解压
                     path.read { source ->
-                        val result = ModFactory.Release(source, PathMod).process { _, _, _ ->  }
+                        val result = ModFactory.Release(source, app.modPath).process { _, _, _ ->  }
                         require(result.metadata.version == ModFactory.VERSION) { "不匹配的MOD版本" }
                     }
                     path.delete() // 删除临时文件
@@ -179,7 +178,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         if (slot.confirm.open(content = "下载资源: ${item.type.description}?")) {
             // 下载资源
             catchingError {
-                Path(PathMod, sid, item.type.filename).write { sink ->
+                Path(app.modPath, sid, item.type.filename).write { sink ->
                     require(downloadDialog.download(song.remotePath(item.type), sink) { })
                 }
                 // 通知
@@ -285,7 +284,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         clientSong?.let { song ->
             launch {
                 app.picker.pickPicture()?.use { source ->
-                    app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+                    app.createTempFile { sink -> source.transferTo(sink) > 0L }
                 }?.let { src ->
                     cropDialog.open(url = src.toString(), aspectRatio = aspectRatio)?.let { region ->
                         catchingError {
@@ -683,7 +682,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                             ++modifyFlag
                             // 写入文件
                             launch {
-                                catching { newInfo.path(PathMod, ModResourceType.Config).writeText(newInfo.toJsonString()) }
+                                catching { newInfo.path(app.modPath, ModResourceType.Config).writeText(newInfo.toJsonString()) }
                             }
                             // 关闭 sheet
                             close()

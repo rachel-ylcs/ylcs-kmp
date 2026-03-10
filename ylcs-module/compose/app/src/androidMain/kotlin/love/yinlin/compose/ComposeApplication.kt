@@ -5,17 +5,23 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 
 abstract class ComposeApplication : Application() {
-    abstract val instance: PlatformApplication<*>
+    abstract fun buildInstance(): PlatformApplication<*>
+
+    internal lateinit var instance: PlatformApplication<*>
+        private set
 
     private val applicationScope = MainScope()
 
     final override fun onCreate() {
         super.onCreate()
-        instance.openService(scope = applicationScope, later = false, immediate = false)
+        if (!::instance.isInitialized) {
+            instance = buildInstance()
+            instance.openService(scope = applicationScope)
+        }
     }
 
     override fun onTerminate() {
-        instance.closeService(before = false, immediate = false)
+        if (::instance.isInitialized) instance.closeService()
         applicationScope.cancel()
         super.onTerminate()
     }

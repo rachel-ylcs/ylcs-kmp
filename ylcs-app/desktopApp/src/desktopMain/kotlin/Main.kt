@@ -25,6 +25,24 @@ import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.compose.resources.DrawableResource
 
 fun main() = object : RachelApplication(PlatformContextDelegate()) {
+    init {
+        sync(
+            priority = StartupDelegate.HIGH10,
+            name = "setupSingleInstance"
+        ) {
+            SingleInstance.run("${Local.info.appName}.lock")
+        }
+        service(
+            name = "setComposeRender",
+            factory = ::StartupComposeSwingRender
+        )
+        service(
+            StartupMacOSDeepLink.Handler { DeepLink.openUri(it) },
+            name = "setupMacOSDeepLink",
+            factory = ::StartupMacOSDeepLink
+        )
+    }
+
     private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
 
     override val title: String = "银临茶舍"
@@ -67,13 +85,4 @@ fun main() = object : RachelApplication(PlatformContextDelegate()) {
             if (it.isAttached) it.Content()
         }
     }
-
-    private val setupSingleInstance by sync(priority = StartupDelegate.HIGH7) { SingleInstance.run("${Local.info.appName}.lock") }
-
-    private val setComposeRender by service(factory = ::StartupComposeSwingRender)
-
-    private val setupMacOSDeepLink by service(
-        StartupMacOSDeepLink.Handler { DeepLink.openUri(it) },
-        factory = ::StartupMacOSDeepLink
-    )
 }.run()

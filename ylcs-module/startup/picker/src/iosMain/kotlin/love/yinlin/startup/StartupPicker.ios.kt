@@ -1,6 +1,7 @@
 package love.yinlin.startup
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Buffer
 import kotlinx.io.InternalIoApi
 import kotlinx.io.Sink
@@ -36,7 +37,7 @@ actual class StartupPicker : SyncStartup() {
     lateinit var phPickerDismissDelegate: UIAdaptivePresentationControllerDelegateProtocol
     lateinit var documentPickerDelegate: UIDocumentPickerDelegateProtocol
 
-    actual override fun init(context: Context, args: StartupArgs) {}
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {}
 
     @OptIn(ExperimentalForeignApi::class)
     private fun copyToTempDir(url: NSURL?): NSURL? {

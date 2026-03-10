@@ -17,7 +17,6 @@ import kotlinx.coroutines.isActive
 import love.yinlin.app
 import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
-import love.yinlin.common.PathMod
 import love.yinlin.compose.ColorSystem
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
@@ -73,10 +72,10 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
 
         catchingError {
             require(player.isInit)
-            player.load(music.path(PathMod, ModResourceType.Accompaniment), false)
+            player.load(music.path(app.modPath, ModResourceType.Accompaniment), false)
 
             Coroutines.io {
-                engine.load(music.path(PathMod))
+                engine.load(music.path(app.modPath))
             }
 
             launch {
@@ -125,7 +124,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
         }
 
         LocalFileImage(
-            uri = music.path(PathMod, ModResourceType.Record).toString(),
+            uri = music.path(app.modPath, ModResourceType.Record).toString(),
             contentScale = ContentScale.Crop,
             modifier = modifier.fastRotate(animationRecord)
         )
@@ -177,7 +176,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                 val maxWidth = Theme.size.cell1 * 1.25f
 
                 LocalFileImage(
-                    uri = music.path(PathMod, ModResourceType.Background).toString(),
+                    uri = music.path(app.modPath, ModResourceType.Background).toString(),
                     contentScale = ContentScale.Crop,
                     alpha = 0.85f,
                     modifier = Modifier.widthIn(max = maxWidth).fillMaxSize().blurSource(blurState).zIndex(1f)

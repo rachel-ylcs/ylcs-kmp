@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.collectLatest
 import love.yinlin.app
 import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
-import love.yinlin.common.PathMod
 import love.yinlin.compose.*
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.compose.extension.mutableRefStateOf
@@ -112,9 +111,10 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 if (music != null) {
                     catching {
                         // 更新引擎
+                        val modPath = app.modPath
                         engine = Coroutines.io {
                             // 按引擎顺序依次检查是否成功加载
-                            val rootPath = music.path(PathMod)
+                            val rootPath = music.path(modPath)
                             var currentEngine = engine
                             for (engineType in app.config.lyricsEngineOrder) {
                                 val newEngine = LyricsEngine[engineType]
@@ -127,9 +127,9 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         }
 
                         // 更新状态标志
-                        hasAnimation = music.path(PathMod, ModResourceType.Animation).isFile()
-                        hasVideo = music.path(PathMod, ModResourceType.Video).isFile()
-                        hasAccompaniment = music.path(PathMod, ModResourceType.Accompaniment).isFile()
+                        hasAnimation = music.path(modPath, ModResourceType.Animation).isFile()
+                        hasVideo = music.path(modPath, ModResourceType.Video).isFile()
+                        hasAccompaniment = music.path(modPath, ModResourceType.Accompaniment).isFile()
                     }
                 }
                 else {
@@ -154,7 +154,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         val music = mp?.currentMusic
         if (music != null) {
             LocalFileImage(
-                uri = music.path(PathMod, if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).toString(),
+                uri = music.path(app.modPath, if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).toString(),
                 music, isAnimationBackground,
                 contentScale = ContentScale.Crop,
                 alpha = 0.85f,
@@ -243,7 +243,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 mp?.let {
                                     launch {
                                         it.pause()
-                                        it.currentMusic?.path(PathMod, ModResourceType.Video)?.let { path ->
+                                        it.currentMusic?.path(app.modPath, ModResourceType.Video)?.let { path ->
                                             navigate(::ScreenVideo, path.toString())
                                         }
                                     }
@@ -287,7 +287,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
 
         LocalFileImage(
-            uri = musicInfo.path(PathMod, ModResourceType.Record).toString(),
+            uri = musicInfo.path(app.modPath, ModResourceType.Record).toString(),
             musicInfo,
             contentScale = ContentScale.Crop,
             modifier = modifier.fastRotate(animationRecord),

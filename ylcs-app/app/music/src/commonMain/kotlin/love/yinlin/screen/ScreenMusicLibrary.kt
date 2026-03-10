@@ -24,7 +24,6 @@ import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMapNotNull
 import kotlinx.io.files.Path
 import love.yinlin.app
-import love.yinlin.common.PathMod
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -82,7 +81,7 @@ class ScreenMusicLibrary : Screen() {
         constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, modification = musicInfo.modification)
     }
 
-    private fun MusicInfoPreview.path(type: ModResourceType) = Path(PathMod, this.id, type.filename)
+    private fun MusicInfoPreview.path(type: ModResourceType) = Path(app.modPath, this.id, type.filename)
 
     private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
 
@@ -206,7 +205,7 @@ class ScreenMusicLibrary : Screen() {
                 val deleteItems = selectIdList
                 for (item in deleteItems) {
                     val removeItem = player.library.remove(item)
-                    removeItem?.path(PathMod)?.deleteRecursively()
+                    removeItem?.path(app.modPath)?.deleteRecursively()
                 }
                 resetLibrary()
             }
@@ -223,7 +222,7 @@ class ScreenMusicLibrary : Screen() {
                             slot.loading.open {
                                 val packageItems = selectIdList
                                 ModFactory.Merge(
-                                    mediaPaths = packageItems.fastMapNotNull { player.library[it]?.path(PathMod) },
+                                    mediaPaths = packageItems.fastMapNotNull { player.library[it]?.path(app.modPath) },
                                     sink = sink,
                                     info = ModInfo(author = app.config.userProfile?.name ?: "无名")
                                 ).process(filters = ModResourceType.ALL) { _, _, _ -> }
@@ -446,7 +445,7 @@ class ScreenMusicLibrary : Screen() {
         @Stable
         class ResourceModFilter(val resourceType: ModResourceType): ModFilter() {
             override val isSuspend: Boolean = true
-            override suspend fun checkSuspend(musicInfo: MusicInfo): Boolean = musicInfo.path(PathMod, resourceType).exists()
+            override suspend fun checkSuspend(musicInfo: MusicInfo): Boolean = musicInfo.path(app.modPath, resourceType).exists()
         }
 
         @Stable

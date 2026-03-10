@@ -6,7 +6,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import love.yinlin.app
-import love.yinlin.common.PathMod
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -83,7 +82,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
             if (player.isReady) slot.tip.warning("请先停止播放器")
             else catchingError {
                 val data = path.read { source ->
-                    ModFactory.Release(source, PathMod).process { current, total, id ->
+                    ModFactory.Release(source, app.modPath).process { current, total, id ->
                         step = Step.Processing(message = "解压中... [$id] $current / $total")
                     }
                 }

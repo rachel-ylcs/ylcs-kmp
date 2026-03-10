@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.files.Path
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
@@ -8,13 +9,13 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.foundation.Context
+import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupFetcher
 import love.yinlin.foundation.SyncStartup
 
-@StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
+@StartupArg(index = 0, name = "initPath", type = Path::class)
 expect class StartupKV() : SyncStartup {
-    override fun init(context: Context, args: StartupArgs)
+    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs)
 
     fun set(key: String, value: Boolean, expire: Int = KVExpire.NEVER)
     fun set(key: String, value: Int, expire: Int = KVExpire.NEVER)

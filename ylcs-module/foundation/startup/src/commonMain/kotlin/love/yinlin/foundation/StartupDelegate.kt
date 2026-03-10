@@ -9,6 +9,7 @@ import kotlin.reflect.KProperty
 class StartupDelegate<S : Startup>(
     type: StartupType,
     val priority: Int,
+    name: String? = null,
     private val factory: () -> S,
     args: Array<Any?>,
 ) : ReadOnlyProperty<Any?, Startup> {
@@ -38,10 +39,10 @@ class StartupDelegate<S : Startup>(
 
     private val startupArgs = StartupArgs(args)
     private lateinit var startup: S
-    private var serviceName: String? = null
+    private var serviceName: String? = name
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): S {
-        serviceName = property.name.ifEmpty { null }
+        if (serviceName == null) serviceName = property.name.ifEmpty { null }
         return startup
     }
 
@@ -52,31 +53,34 @@ class StartupDelegate<S : Startup>(
     val isAsync: Boolean = type == StartupType.Async
 
     @OptIn(CompatibleRachelApi::class)
-    override fun toString(): String = when {
-        !::startup.isInitialized -> "uninitialized"
-        !startup.metaIsAnonymousClass -> startup.toString()
-        serviceName != null -> startup.toString().replace("null", serviceName!!)
-        else -> startup.toString().replace("null", "unnamed")
-    }
-
-    fun initStartup(context: Context, later: Boolean) {
-        if (later) startup.initLater(context, startupArgs)
-        else {
-            startup = factory()
-            startup.init(context, startupArgs)
+    override fun toString(): String {
+        val serviceClassName = when {
+            !::startup.isInitialized -> "Uninitialized"
+            !startup.metaIsAnonymousClass -> startup.toString()
+            else -> "Anonymous"
         }
+        return "$serviceClassName-${serviceName ?: "unnamed"}"
     }
 
-    suspend fun initStartup(scope: CoroutineScope, context: Context, later: Boolean) {
-        if (later) startup.initLater(scope, context, startupArgs)
-        else {
-            startup = factory()
-            startup.init(scope, context, startupArgs)
-        }
+    fun createStartup() { startup = factory() }
+
+    fun initStartup(scope: CoroutineScope, context: Context) {
+        startup.init(scope, context, startupArgs)
     }
 
-    fun destroyStartup(context: Context, before: Boolean) {
-        if (before) startup.destroy(context, startupArgs)
-        else startup.destroyBefore(context, startupArgs)
+    suspend fun CoroutineScope.initStartup(context: Context) {
+        with(startup) { init(context, startupArgs) }
+    }
+
+    suspend fun CoroutineScope.initStartupLater(context: Context) {
+        with(startup) { initLater(context, startupArgs) }
+    }
+
+    fun destroyStartup(context: Context) {
+        startup.destroyBefore(context, startupArgs)
+    }
+
+    fun destroyStartupBefore(context: Context) {
+        startup.destroy(context, startupArgs)
     }
 }

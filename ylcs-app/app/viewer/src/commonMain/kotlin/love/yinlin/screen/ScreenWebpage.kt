@@ -40,7 +40,7 @@ fun BasicScreen.navigateScreenWebPage(arg: String) {
     Platform.use(
         *Platform.Desktop,
         ifTrue = {
-            Uri.parse(arg)?.let { app.os.net.openUri(it) }
+            Uri.parse(arg)?.let { app.openUri(it) }
         },
         ifFalse = {
             navigate(::ScreenWebpage, arg)

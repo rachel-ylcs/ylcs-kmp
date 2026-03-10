@@ -2,20 +2,21 @@ package love.yinlin.startup
 
 import cocoapods.MMKV.MMKV
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.files.Path
 import love.yinlin.extension.toNSData
 import love.yinlin.extension.toByteArray
 import love.yinlin.foundation.Context
+import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupFetcher
 import love.yinlin.foundation.SyncStartup
 
-@StartupFetcher(index = 0, name = "initPath", returnType = Path::class)
+@StartupArg(index = 0, name = "initPath", type = Path::class)
 @OptIn(ExperimentalForeignApi::class)
 actual class StartupKV : SyncStartup() {
     lateinit var mmkv: MMKV
 
-    actual override fun init(context: Context, args: StartupArgs) {
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
         // MMKV initialized in RachelApp.swift
         mmkv = MMKV.defaultMMKV()!!
     }

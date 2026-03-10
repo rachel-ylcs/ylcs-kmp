@@ -24,9 +24,11 @@ class MainApplication : PlatformApplication<MainApplication>(appReference, Platf
     val outputPath = Path(rootPath, "output")
     val modPath = Path(rootPath, "mod")
 
-    val createDirectories by async {
-        libraryPath.mkdir()
-        outputPath.mkdir()
+    init {
+        async(name = "createDirectories") {
+            libraryPath.mkdir()
+            outputPath.mkdir()
+        }
     }
 
     @Composable
