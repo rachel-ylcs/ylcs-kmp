@@ -33,7 +33,7 @@ abstract class Application<out A : Application<A>>(
     protected open val localProvider: Array<ProvidedValue<*>> = emptyArray()
 
     protected open fun onCreate() { }
-    protected open fun onCreateLater() { }
+    protected open suspend fun onCreateLater() { }
     protected open fun onDestroyBefore() { }
     protected open fun onDestroy() { }
 
@@ -66,23 +66,25 @@ abstract class Application<out A : Application<A>>(
         }
     }
 
-    internal fun openService(scope: CoroutineScope, later: Boolean, immediate: Boolean) {
-        if (later) {
-            initService(scope, context, later = later, immediate = false)
-            onCreateLater()
-        }
-        else {
-            @Suppress("UNCHECKED_CAST")
-            self.init(this as A)
-            initService(scope, context, later = later, immediate = immediate)
-            onCreate()
-        }
+    internal fun openService(scope: CoroutineScope) {
+        @Suppress("UNCHECKED_CAST")
+        self.init(this as A)
+        initService(scope, context)
+        onCreate()
     }
 
-    internal fun closeService(before: Boolean, immediate: Boolean) {
-        destroyService(context, before)
-        if (before) onDestroyBefore()
-        else onDestroy()
-        if (immediate && before) closeService(before = false, immediate = false)
+    internal suspend fun CoroutineScope.openServiceLater() {
+        initServiceLater(context)
+        onCreateLater()
+    }
+
+    internal fun closeServiceBefore() {
+        destroyServiceBefore(context)
+        onDestroyBefore()
+    }
+
+    internal fun closeService() {
+        destroyService(context)
+        onDestroy()
     }
 }

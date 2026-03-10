@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.asSink
@@ -30,9 +31,9 @@ actual class StartupPicker : SyncStartup() {
     private lateinit var resolver: ContentResolver
     private lateinit var activityResultRegistry: ActivityResultRegistry
 
-    actual override fun init(context: Context, args: StartupArgs) {}
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) { }
 
-    actual override fun initLater(context: Context, args: StartupArgs) {
+    actual override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) {
         activity = context.activity
         resolver = activity.contentResolver
         activityResultRegistry = activity.activityResultRegistry

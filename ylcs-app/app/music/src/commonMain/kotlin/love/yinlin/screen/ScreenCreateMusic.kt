@@ -10,7 +10,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
 import kotlinx.io.files.Path
 import love.yinlin.app
-import love.yinlin.common.PathMod
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -72,11 +71,11 @@ class ScreenCreateMusic : Screen() {
 
     private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (Path) -> Unit) {
         val path = app.picker.pickPicture()?.use { source ->
-            app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.open(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
-                app.os.storage.createTempFile { sink ->
+                app.createTempFile { sink ->
                     val image = PlatformImage.decode(path.readByteArray()!!)!!
                     image.crop(rect)
                     sink.write(image.encode(quality = ImageQuality.Full)!!)
@@ -105,7 +104,8 @@ class ScreenCreateMusic : Screen() {
                 require(audioFile != null && recordFile != null && backgroundFile != null) { "资源文件异常" }
                 Coroutines.io {
                     // 4. 生成目录
-                    val musicPath = Path(PathMod, id)
+                    val modPath = app.modPath
+                    val musicPath = Path(modPath, id)
                     musicPath.mkdir()
                     // 5. 写入配置
                     val info = MusicInfo(
@@ -119,17 +119,17 @@ class ScreenCreateMusic : Screen() {
                         album = input.album.text,
                         chorus = null
                     )
-                    info.path(PathMod, ModResourceType.Config).writeText(info.toJsonString())
+                    info.path(modPath, ModResourceType.Config).writeText(info.toJsonString())
                     // 6. 写入音频
-                    info.path(PathMod, ModResourceType.Audio).write { sink ->
+                    info.path(modPath, ModResourceType.Audio).write { sink ->
                         audioFile.read { source -> source.transferTo(sink) }
                     }
                     // 7. 写入封面
-                    Path(recordFile).writeTo(info.path(PathMod, ModResourceType.Record))
+                    Path(recordFile).writeTo(info.path(modPath, ModResourceType.Record))
                     // 8. 写入壁纸
-                    Path(backgroundFile).writeTo(info.path(PathMod, ModResourceType.Background))
+                    Path(backgroundFile).writeTo(info.path(modPath, ModResourceType.Background))
                     // 9. 写入歌词
-                    info.path(PathMod, ModResourceType.LineLyrics).writeText(lyrics.toString())
+                    info.path(modPath, ModResourceType.LineLyrics).writeText(lyrics.toString())
                 }
                 // 10. 更新曲库
                 player.updateMusicLibraryInfo(listOf(id))

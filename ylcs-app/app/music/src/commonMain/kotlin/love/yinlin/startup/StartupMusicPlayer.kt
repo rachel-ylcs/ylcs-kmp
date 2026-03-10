@@ -23,7 +23,6 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.foundation.AsyncStartup
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupFetcher
 import love.yinlin.fs.list
 import love.yinlin.fs.readText
 import love.yinlin.media.MediaMetadataFetcher
@@ -33,11 +32,9 @@ import love.yinlin.media.lyrics.FloatingLyrics
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.media.lyrics.LyricsEngineHost
 
-@StartupFetcher(index = 0, name = "rootPath", returnType = Path::class)
 @Stable
 class StartupMusicPlayer : AsyncStartup() {
-    private lateinit var rootPath: Path
-    private fun MusicInfo.path(type: ModResourceType) = this.path(rootPath, type)
+    private fun MusicInfo.path(type: ModResourceType) = this.path(app.modPath, type)
 
     // 外部数据提取器
     val fetcher = object : MediaMetadataFetcher {
@@ -102,12 +99,12 @@ class StartupMusicPlayer : AsyncStartup() {
     // 歌词引擎
     val engineHost = LyricsEngineHost { controller.seekTo(it) }
     var engine by mutableRefStateOf(LyricsEngine.Default)
-    val floatingLyrics: FloatingLyrics = FloatingLyrics()
+    val floatingLyrics: FloatingLyrics = FloatingLyrics(this)
 
     private suspend fun initLibrary() {
         val items = Coroutines.io {
-            rootPath.list().mapNotNull {
-                val configPath = Path(rootPath, it.name, ModResourceType.Config.filename)
+            app.modPath.list().mapNotNull {
+                val configPath = Path(app.modPath, it.name, ModResourceType.Config.filename)
                 catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
             }
         }
@@ -132,7 +129,7 @@ class StartupMusicPlayer : AsyncStartup() {
         Coroutines.io {
             for (id in ids) {
                 val modification = library[id]?.modification ?: 0
-                val configPath = Path(rootPath, id, ModResourceType.Config.filename)
+                val configPath = Path(app.modPath, id, ModResourceType.Config.filename)
                 val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
                 if (info != null) library[id] = info.copy(modification = modification + 1)
             }
@@ -165,28 +162,27 @@ class StartupMusicPlayer : AsyncStartup() {
         if (controller.isInit) controller.updatePlayMode(controller.playMode.next)
     }
 
-    override suspend fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
-        args.fetch<Path?>(0)?.let {
-            rootPath = it
-            scope.launch {
-                awaitAll(
-                    scope.async { initLibrary() },
-                    scope.async { controller.init(context) }
-                )
-                if (controller.isInit) {
-                    controller.listener = listener
-                    initLastStatus()
-                }
+    override suspend fun CoroutineScope.init(context: Context, args: StartupArgs) {
+        launch {
+            awaitAll(
+                async { initLibrary() },
+                async { controller.init(context) }
+            )
+            if (controller.isInit) {
+                controller.listener = listener
+                initLastStatus()
             }
         }
     }
 
-    override suspend fun initLater(scope: CoroutineScope, context: Context, args: StartupArgs) {
-        scope.launch { floatingLyrics.initDelay(context) }
+    override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) {
+        launch { floatingLyrics.initDelay(context) }
     }
 
     override fun destroy(context: Context, args: StartupArgs) {
         controller.listener = null
         controller.release()
     }
+
+    override val isSafeAccess: Boolean get() = isInit
 }

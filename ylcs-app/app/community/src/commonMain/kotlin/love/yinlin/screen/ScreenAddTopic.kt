@@ -57,7 +57,7 @@ class ScreenAddTopic : Screen() {
     private suspend fun pickPictures() {
         app.picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
             for (source in sources) {
-                app.os.storage.createTempFile { sink ->
+                app.createTempFile { sink ->
                     val image = PlatformImage.decode(source.readByteArray())!!
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)

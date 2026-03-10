@@ -3,6 +3,7 @@ package love.yinlin.foundation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.coroutines.mainContext
+import love.yinlin.extension.catchingError
 import kotlin.jvm.JvmName
 
 open class Service {
@@ -11,74 +12,97 @@ open class Service {
     inline fun <reified T : Startup> startup(): T? {
         for (delegate in startupList) {
             val unsafeStartup = delegate.unsafeStartup
-            if (unsafeStartup is T) return unsafeStartup
+            if (unsafeStartup is T) {
+                return if (unsafeStartup.isSafeAccess) unsafeStartup else null
+            }
         }
         return null
     }
 
     @JvmName("serviceSync")
-    protected inline fun <reified S : SyncStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
-        val delegate = StartupDelegate(type = StartupType.Sync, priority = priority, factory = factory, arrayOf(*args))
+    protected inline fun <reified S : SyncStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, name: String? = null, noinline factory: () -> S) : StartupDelegate<S> {
+        val delegate = StartupDelegate(type = StartupType.Sync, priority = priority, name = name, factory = factory, arrayOf(*args))
         startupList += delegate
         return delegate
     }
 
     @JvmName("serviceASync")
-    protected inline fun <reified S : AsyncStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
-        val delegate = StartupDelegate(type = StartupType.Async, priority = priority, factory = factory, arrayOf(*args))
+    protected inline fun <reified S : AsyncStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, name: String? = null, noinline factory: () -> S) : StartupDelegate<S> {
+        val delegate = StartupDelegate(type = StartupType.Async, priority = priority, name = name, factory = factory, arrayOf(*args))
         startupList += delegate
         return delegate
     }
 
-    @JvmName("serviceFree")
-    protected inline fun <reified S : FreeStartup> service(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, noinline factory: () -> S) : StartupDelegate<S> {
-        val delegate = StartupDelegate(type = StartupType.Free, priority = priority, factory = factory, arrayOf(*args))
-        startupList += delegate
-        return delegate
-    }
+    protected inline fun sync(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, name: String? = null, crossinline factory: CoroutineScope.(StartupArgs) -> Unit) =
+        service<SyncStartup>(*args, priority = priority, name = name) { SyncStartup.build(factory) }
 
-    protected fun sync(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, factory: (StartupArgs) -> Unit) =
-        service<SyncStartup>(*args, priority = priority) { SyncStartup.build(factory) }
+    protected inline fun async(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, name: String? = null, crossinline factory: suspend CoroutineScope.(StartupArgs) -> Unit) =
+        service<AsyncStartup>(*args, priority = priority, name = name) { AsyncStartup.build(factory) }
 
-    protected fun async(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, factory: suspend CoroutineScope.(StartupArgs) -> Unit) =
-        service<AsyncStartup>(*args, priority = priority) { AsyncStartup.build(factory) }
-
-    protected fun free(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, factory: suspend CoroutineScope.(StartupArgs) -> Unit) =
-        service<FreeStartup>(*args, priority = priority) { FreeStartup.build(factory) }
-
-    private val split: Array<List<StartupDelegate<out Startup>>> get() {
-        val (sync, other) = startupList.partition { it.isSync }
-        val (async, free) = other.partition { it.isAsync }
-        return arrayOf(sync, async, free)
-    }
-
-    protected fun initService(scope: CoroutineScope, context: Context, later: Boolean, immediate: Boolean) {
-        val (sync, async, free) = split
-
-        for (delegate in free.sortedByDescending { it.priority }) {
-            scope.launch(mainContext) {
-                delegate.initStartup(this, context, later)
-            }
-        }
+    protected fun initService(scope: CoroutineScope, context: Context) {
+        val (sync, async) = startupList.partition { it.isSync }
 
         for (delegate in sync.sortedByDescending { it.priority }) {
-            delegate.initStartup(context, later)
+            catchingError {
+                delegate.createStartup()
+                delegate.initStartup(scope, context)
+            }?.let { throw IllegalStateException("SyncStartup initialize failed: $delegate", it) }
         }
 
+        val asyncStartupList = async.sortedByDescending { it.priority }
+        for (delegate in asyncStartupList) delegate.createStartup()
         scope.launch(mainContext) {
-            for (delegate in async.sortedByDescending { it.priority }) {
-                delegate.initStartup(this, context, later)
+            for (delegate in asyncStartupList) {
+                catchingError {
+                    with(delegate) { initStartup(context) }
+                }?.let { throw IllegalStateException("AsyncStartup initialize failed: $delegate", it) }
             }
-            if (immediate && !later) initService(this, context, later = true, immediate = false)
         }
     }
 
-    protected fun destroyService(context: Context, before: Boolean) {
-        // free服务不允许析构, 因为其构造时是任意时刻, 而程序析构时是同步的, 无法确定其析构顺序
-        val (sync, async, _) = split
+    protected suspend fun CoroutineScope.initServiceLater(context: Context) {
+        val (sync, async) = startupList.partition { it.isSync }
+
+        for (delegate in sync.sortedByDescending { it.priority }) {
+            catchingError {
+                with(delegate) { initStartupLater(context) }
+            }?.let { throw IllegalStateException("SyncStartup initialize later failed: $delegate", it) }
+        }
+
+        for (delegate in async.sortedByDescending { it.priority }) {
+            catchingError {
+                with(delegate) { initStartupLater(context) }
+            }?.let { throw IllegalStateException("AsyncStartup initialize later failed: $delegate", it) }
+        }
+    }
+
+    protected fun destroyServiceBefore(context: Context) {
+        val (sync, async) = startupList.partition { it.isSync }
         // 这里必须先倒序排列再反向才能提供正确的析构顺序, 因为 sortedByDescending 排序是稳定的
-        for (delegate in async.sortedByDescending { it.priority }.asReversed()) delegate.destroyStartup(context, before)
-        for (delegate in sync.sortedByDescending { it.priority }.asReversed()) delegate.destroyStartup(context, before)
+        for (delegate in async.sortedByDescending { it.priority }.asReversed()) {
+            catchingError {
+                delegate.destroyStartupBefore(context)
+            }?.let { throw IllegalStateException("AsyncStartup destroy before failed: $delegate", it) }
+        }
+        for (delegate in sync.sortedByDescending { it.priority }.asReversed()) {
+            catchingError {
+                delegate.destroyStartupBefore(context)
+            }?.let { throw IllegalStateException("SyncStartup destroy before failed: $delegate", it) }
+        }
+    }
+
+    protected fun destroyService(context: Context) {
+        val (sync, async) = startupList.partition { it.isSync }
+        for (delegate in async.sortedByDescending { it.priority }.asReversed()) {
+            catchingError {
+                delegate.destroyStartup(context)
+            }?.let { throw IllegalStateException("AsyncStartup destroy failed: $delegate", it) }
+        }
+        for (delegate in sync.sortedByDescending { it.priority }.asReversed()) {
+            catchingError {
+                delegate.destroyStartup(context)
+            }?.let { throw IllegalStateException("SyncStartup destroy failed: $delegate", it) }
+        }
         startupList.clear()
     }
 }

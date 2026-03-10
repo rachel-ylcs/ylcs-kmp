@@ -1,10 +1,10 @@
 package love.yinlin
 
 import androidx.compose.runtime.Stable
+import kotlinx.io.Sink
 import kotlinx.io.files.Path
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.xwwk
-import love.yinlin.common.PathMod
 import love.yinlin.compose.AnimationTheme
 import love.yinlin.compose.DurationTheme
 import love.yinlin.compose.PlatformApplication
@@ -15,56 +15,62 @@ import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.cs.ClientEngine
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.catchingNull
 import love.yinlin.foundation.PlatformContextDelegate
 import love.yinlin.foundation.StartupDelegate
 import love.yinlin.foundation.StartupLazyFetcher
 import love.yinlin.foundation.StartupNative
-import love.yinlin.foundation.useNotPlatformStartupLazyFetcher
-import love.yinlin.foundation.usePlatformStartupLazyFetcher
+import love.yinlin.fs.PlatformFileSystem
+import love.yinlin.fs.deleteRecursively
 import love.yinlin.fs.mkdir
+import love.yinlin.fs.size
+import love.yinlin.fs.write
 import love.yinlin.platform.Platform
 import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupKV
-import love.yinlin.startup.StartupOS
 import love.yinlin.startup.StartupPicker
 import love.yinlin.startup.StartupUrlImage
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : PlatformApplication<AbstractRachelApplication>(mApp, delegate), DeepLink {
-    val os by service(
-        Local.info.appName,
-        priority = StartupDelegate.HIGH8,
-        factory = ::StartupOS
-    )
+    val dataPath: Path = PlatformFileSystem.dataPath(delegate, Local.info.appName)
+    val cachePath: Path = PlatformFileSystem.cachePath(delegate, Local.info.appName)
+    val configPath: Path = Path(dataPath, "config")
+    val modPath: Path = Path(dataPath, "mod")
 
-    private val createDirectories by async(priority = StartupDelegate.HIGH7) {
-        Platform.useNot(*Platform.Web) {
-            os.storage.dataPath.mkdir()
-            os.storage.cachePath.mkdir()
-            PathMod.mkdir()
+    init {
+        async(priority = StartupDelegate.HIGH9, name = "createDirectories") {
+            Platform.useNot(*Platform.Web) {
+                dataPath.mkdir()
+                cachePath.mkdir()
+                modPath.mkdir()
+            }
         }
-    }
 
-    private val initClientBaseUrl by sync {
-        ClientEngine.init(Local.API_BASE_URL)
+        sync(name = "initClientBaseUrl") {
+            ClientEngine.init(Local.API_BASE_URL)
+        }
     }
 
     @StartupNative
     val picker by service(
+        name = "picker",
         factory = ::StartupPicker
     )
 
     val urlImage by service(
-        useNotPlatformStartupLazyFetcher(*Platform.Web) { os.storage.cachePath.parent!! },
+        cachePath,
         Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
         ImageQuality.Medium,
+        name = "urlImage",
         factory = ::StartupUrlImage
     )
 
     @StartupNative
     val kv by service(
-        usePlatformStartupLazyFetcher(*Platform.Desktop) { Path(os.storage.dataPath, "config") },
+        configPath,
+        name = "kv",
         factory = ::StartupKV
     )
 
@@ -72,6 +78,7 @@ abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : Pl
         StartupLazyFetcher { kv },
         Local.info.version,
         patches(),
+        name = "config",
         factory = ::StartupAppConfig,
     )
 
@@ -81,6 +88,7 @@ abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : Pl
             kv.set(key, "${DateEx.CurrentString}\n$error")
             println(e.stackTraceToString())
         },
+        name = "exceptionHandler",
         factory = ::StartupExceptionHandler
     )
 
@@ -89,4 +97,21 @@ abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : Pl
     override val mainFontResource: FontResource = Res.font.xwwk
     override val animationTheme: AnimationTheme get() = AnimationTheme.Default.copy(duration = DurationTheme.Default.clone(config.animationSpeed.value))
     override val toolingTheme: ToolingTheme get() = ToolingTheme(enableBallonTip = config.enabledTip)
+
+    /**
+     * 目录操作
+     */
+    suspend fun calcCacheSize(): Long = cachePath.parent?.size() ?: 0L
+    suspend fun clearCache() {
+        cachePath.deleteRecursively()
+        cachePath.mkdir()
+    }
+    suspend inline fun createTempFile(filename: String? = null, crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
+        val name = filename ?: DateEx.CurrentLong.toString()
+        Path(cachePath, name).apply { write { require(block(it)) } }
+    }
+    suspend fun createTempFolder(filename: String? = null): Path? = catchingNull {
+        val name = filename ?: DateEx.CurrentLong.toString()
+        Path(cachePath, name).apply { mkdir() }
+    }
 }

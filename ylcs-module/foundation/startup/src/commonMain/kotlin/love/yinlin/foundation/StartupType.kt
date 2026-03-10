@@ -1,5 +1,3 @@
 package love.yinlin.foundation
 
-enum class StartupType {
-    Sync, Async, Free
-}
+enum class StartupType { Sync, Async }

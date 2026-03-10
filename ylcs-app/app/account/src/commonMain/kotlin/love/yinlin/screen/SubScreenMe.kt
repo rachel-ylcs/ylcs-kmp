@@ -221,13 +221,11 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
             CommonButton("水群", Icons2.QQ) {
                 launch {
                     val uri = Platform.use(*Platform.Phone, ifTrue = UriGenerator.qqGroup("828049503"), ifFalse = UriGenerator.qqGroupLink("eAli22ljj4"))
-                    if (!app.os.application.startAppIntent(uri)) slot.tip.warning("未安装QQ")
+                    if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
                 }
             }
             CommonButton("店铺", Icons2.Taobao) {
-                launch {
-                    if (!app.os.application.startAppIntent(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
-                }
+                if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
             }
         }
         CommonButtonContainer("超管空间") {

@@ -11,6 +11,7 @@ import love.yinlin.compatible.await
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
+import love.yinlin.foundation.PlatformContextDelegate
 import love.yinlin.io.WebFileSink
 import love.yinlin.io.WebFileSource
 import love.yinlin.platform.unsupportedPlatform
@@ -44,6 +45,12 @@ actual object PlatformFileSystem {
         for (i in 0 ..< segments.size - 1) current = catchingNull { current.getDirectoryHandle(segments[i]).await() } ?: return null
         return current to segments.last()
     }
+
+    actual fun appPath(context: PlatformContextDelegate, appName: String): Path = Path("$PathSeparator$appName")
+
+    actual fun dataPath(context: PlatformContextDelegate, appName: String): Path = Path("$PathSeparator$appName${PathSeparator}data")
+
+    actual fun cachePath(context: PlatformContextDelegate, appName: String): Path = Path("$PathSeparator$appName${PathSeparator}cache${PathSeparator}temp")
 
     @PublishedApi
     internal actual suspend fun exists(path: Path): Boolean {

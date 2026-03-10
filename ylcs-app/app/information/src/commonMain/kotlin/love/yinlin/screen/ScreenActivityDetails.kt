@@ -177,11 +177,9 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                 ) {
                     link.showstart?.ifEmpty { null }?.let { showstart ->
                         LinkIcon("秀动", painterResource(Res.drawable.img_showstart), Colors.Unspecified) {
-                            launch {
-                                val uri = Uri.parse(showstart)
-                                if (uri == null) slot.tip.warning("链接已失效")
-                                else if (!app.os.application.startAppIntent(uri)) slot.tip.warning("未安装秀动")
-                            }
+                            val uri = Uri.parse(showstart)
+                            if (uri == null) slot.tip.warning("链接已失效")
+                            else if (!app.openUri(uri)) slot.tip.warning("未安装秀动")
                         }
                     }
                     link.damai?.ifEmpty { null }?.let { damai ->
@@ -210,9 +208,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     )
                     qqGroupUri?.let { uri ->
                         LinkIcon("官群", rememberVectorPainter(Icons2.QQ)) {
-                            launch {
-                                if (!app.os.application.startAppIntent(uri)) slot.tip.warning("未安装QQ")
-                            }
+                            if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
                         }
                     }
                 }

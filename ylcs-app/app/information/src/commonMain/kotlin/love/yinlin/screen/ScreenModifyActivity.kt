@@ -173,7 +173,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
 
     private suspend fun updatePhotos(key: String, index: Int) {
         app.picker.pickPicture()?.use { source ->
-            app.os.storage.createTempFile { sink ->
+            app.createTempFile { sink ->
                 val image = PlatformImage.decode(source.readByteArray())!!
                 image.thumbnail()
                 sink.write(image.encode(quality = ImageQuality.High)!!)
@@ -214,11 +214,11 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
 
     suspend fun pickPicture(onPicAdd: suspend (Path) -> Unit) {
         val path = app.picker.pickPicture()?.use { source ->
-            app.os.storage.createTempFile { sink -> source.transferTo(sink) > 0L }
+            app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (path != null) {
             cropDialog.open(url = path.toString(), aspectRatio = 2f)?.let { region ->
-                app.os.storage.createTempFile { sink ->
+                app.createTempFile { sink ->
                     val image = PlatformImage.decode(path.readByteArray()!!)!!
                     image.crop(region)
                     image.thumbnail()
@@ -233,7 +233,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
         app.picker.pickPicture((9 - currentSize).coerceAtLeast(1))?.use { sources ->
             val path = mutableListOf<Path>()
             for (source in sources) {
-                app.os.storage.createTempFile { sink ->
+                app.createTempFile { sink ->
                     val image = PlatformImage.decode(source.readByteArray())!!
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)

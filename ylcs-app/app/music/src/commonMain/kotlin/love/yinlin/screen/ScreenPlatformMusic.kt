@@ -11,7 +11,6 @@ import androidx.compose.ui.layout.ContentScale
 import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.common.DataBin
-import love.yinlin.common.PathMod
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -59,15 +58,16 @@ class ScreenPlatformMusic(deeplink: Uri?, type: PlatformMusicType) : Screen() {
                 Coroutines.io {
                     for (item in items) {
                         // 1. 下载音频
-                        val audioFile = app.os.storage.createTempFile { NetClient.simpleDownload(item.audioUrl, it) }
+                        val audioFile = app.createTempFile { NetClient.simpleDownload(item.audioUrl, it) }
                         // 2. 下载封面
-                        val recordFile = app.os.storage.createTempFile { NetClient.simpleDownload(item.pic, it) }
+                        val recordFile = app.createTempFile { NetClient.simpleDownload(item.pic, it) }
                         if (audioFile == null || recordFile == null) continue
                         if (audioFile.fileSize() <= 1024 * 1024L) continue
                         if (recordFile.fileSize() <= 1024 * 10L) continue
                         // 3. 生成目录
                         val id = "${platformType.prefix}${item.id}"
-                        val musicPath = Path(PathMod, id)
+                        val modPath = app.modPath
+                        val musicPath = Path(modPath, id)
                         musicPath.mkdir()
                         // 4. 写入配置
                         val info = MusicInfo(
@@ -81,15 +81,15 @@ class ScreenPlatformMusic(deeplink: Uri?, type: PlatformMusicType) : Screen() {
                             album = "未知",
                             chorus = null
                         )
-                        info.path(PathMod, ModResourceType.Config).writeText(info.toJsonString())
+                        info.path(modPath, ModResourceType.Config).writeText(info.toJsonString())
                         // 5. 写入音频
-                        audioFile.writeTo(info.path(PathMod, ModResourceType.Audio))
+                        audioFile.writeTo(info.path(modPath, ModResourceType.Audio))
                         // 6. 写入封面
-                        recordFile.writeTo(info.path(PathMod, ModResourceType.Record))
+                        recordFile.writeTo(info.path(modPath, ModResourceType.Record))
                         // 7. 写入壁纸
-                        info.path(PathMod, ModResourceType.Background).writeByteArray(DataBin.BlackBackgroundPicture)
+                        info.path(modPath, ModResourceType.Background).writeByteArray(DataBin.BlackBackgroundPicture)
                         // 8. 写入歌词
-                        info.path(PathMod, ModResourceType.LineLyrics).writeText(item.lyrics)
+                        info.path(modPath, ModResourceType.LineLyrics).writeText(item.lyrics)
                         // 9. 更新曲库
                         ids += id
                     }

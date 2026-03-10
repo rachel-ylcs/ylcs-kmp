@@ -11,14 +11,11 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.window.FloatingView
-import love.yinlin.extension.lazyProvider
 import love.yinlin.foundation.Context
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
-actual class FloatingLyrics {
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
-
+actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) {
     private lateinit var activity: ComponentActivity
 
     actual var isAttached: Boolean by mutableStateOf(false)
@@ -46,26 +43,24 @@ actual class FloatingLyrics {
 
     @Composable
     actual fun Content() {
-        mp?.let { player ->
-            if (player.isPlaying) {
-                app.ComposedLayout(
-                    modifier = Modifier.fillMaxWidth(),
-                    bgColor = Colors.Transparent
-                ) {
-                    val config = app.config.lyricsEngineConfig
-                    Box(modifier = Modifier.fillMaxWidth().layout { measurable, constraints ->
-                        val maxWidth = constraints.maxWidth
-                        val start = (maxWidth * config.android.left.coerceIn(0f, 1f)).toInt()
-                        val end = (maxWidth * (1 - config.android.right).coerceIn(0f, 1f)).toInt()
-                        val top = (config.android.top * 30.dp.roundToPx()).toInt()
-                        val childWidth = (maxWidth - start - end).coerceAtLeast(0)
-                        val placeable = measurable.measure(constraints.copy(minWidth = childWidth, maxWidth = childWidth))
-                        layout(maxWidth, placeable.height + top) {
-                            placeable.placeRelative(start, top)
-                        }
-                    }) {
-                        player.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxWidth(), config = config, textStyle = Theme.typography.v6.bold)
+        if (startup.isInit && startup.isPlaying) {
+            app.ComposedLayout(
+                modifier = Modifier.fillMaxWidth(),
+                bgColor = Colors.Transparent
+            ) {
+                val config = app.config.lyricsEngineConfig
+                Box(modifier = Modifier.fillMaxWidth().layout { measurable, constraints ->
+                    val maxWidth = constraints.maxWidth
+                    val start = (maxWidth * config.android.left.coerceIn(0f, 1f)).toInt()
+                    val end = (maxWidth * (1 - config.android.right).coerceIn(0f, 1f)).toInt()
+                    val top = (config.android.top * 30.dp.roundToPx()).toInt()
+                    val childWidth = (maxWidth - start - end).coerceAtLeast(0)
+                    val placeable = measurable.measure(constraints.copy(minWidth = childWidth, maxWidth = childWidth))
+                    layout(maxWidth, placeable.height + top) {
+                        placeable.placeRelative(start, top)
                     }
+                }) {
+                    startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxWidth(), config = config, textStyle = Theme.typography.v6.bold)
                 }
             }
         }

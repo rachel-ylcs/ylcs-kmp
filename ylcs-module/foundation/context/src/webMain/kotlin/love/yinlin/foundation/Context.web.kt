@@ -1,3 +1,3 @@
 package love.yinlin.foundation
 
-actual class Context actual constructor(delegate: PlatformContextDelegate)
+actual class Context actual constructor(val delegate: PlatformContextDelegate)

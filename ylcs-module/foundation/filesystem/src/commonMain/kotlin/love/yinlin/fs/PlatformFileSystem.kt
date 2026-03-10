@@ -4,6 +4,7 @@ import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.files.FileMetadata
 import kotlinx.io.files.Path
+import love.yinlin.foundation.PlatformContextDelegate
 
 expect object PlatformFileSystem {
     /**
@@ -15,6 +16,21 @@ expect object PlatformFileSystem {
      * 换行符
      */
     val LineSeparator: String
+
+    /**
+     * App目录
+     */
+    fun appPath(context: PlatformContextDelegate, appName: String): Path
+
+    /**
+     * 数据目录
+     */
+    fun dataPath(context: PlatformContextDelegate, appName: String): Path
+
+    /**
+     * 缓存目录
+     */
+    fun cachePath(context: PlatformContextDelegate, appName: String): Path
 
     @PublishedApi
     internal suspend fun exists(path: Path): Boolean

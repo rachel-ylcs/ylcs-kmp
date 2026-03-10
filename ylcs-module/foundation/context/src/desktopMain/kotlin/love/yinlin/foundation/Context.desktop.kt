@@ -1,6 +1,6 @@
 package love.yinlin.foundation
 
-actual class Context actual constructor(delegate: PlatformContextDelegate) {
+actual class Context actual constructor(val delegate: PlatformContextDelegate) {
     // 在 initDelay 后可用
     var handle: Long = 0L
         private set

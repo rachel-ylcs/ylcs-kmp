@@ -3,9 +3,10 @@ package love.yinlin.media.lyrics
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import love.yinlin.foundation.Context
+import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
-expect class FloatingLyrics() {
+expect class FloatingLyrics(startup: StartupMusicPlayer) {
     var isAttached: Boolean
         private set
 

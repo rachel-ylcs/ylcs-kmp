@@ -24,7 +24,6 @@ import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.app.game_rhyme.resources.Res
 import love.yinlin.app.game_rhyme.resources.rhyme
-import love.yinlin.common.PathMod
 import love.yinlin.common.downloadCacheWithPath
 import love.yinlin.common.rhyme.*
 import love.yinlin.common.rhyme.data.ActionResult
@@ -101,12 +100,12 @@ class ScreenRhyme : Screen() {
             catchingError {
                 val (lyricsConfig, recordImage) = coroutineScope {
                     val task1 = async {
-                        val lyricsText = info.path(PathMod, ModResourceType.Rhyme).readText()
+                        val lyricsText = info.path(app.modPath, ModResourceType.Rhyme).readText()
                         require(lyricsText != null) { "歌词资源文件丢失或损坏" }
                         lyricsText.parseJsonValue<RhymeLyricsConfig>()
                     }
                     val task2 = async {
-                        val data = info.path(PathMod, ModResourceType.Record).readByteArray()
+                        val data = info.path(app.modPath, ModResourceType.Record).readByteArray()
                         require(data != null) { "封面资源文件丢失" }
                         data
                     }
@@ -119,7 +118,7 @@ class ScreenRhyme : Screen() {
                         name = info.name,
                         lyricsConfig = lyricsConfig,
                         recordImage = recordImage,
-                        audio = info.path(PathMod, ModResourceType.Audio)
+                        audio = info.path(app.modPath, ModResourceType.Audio)
                     )
                 }
                 state = GameState.Playing(playConfig, info)
@@ -443,7 +442,7 @@ class ScreenRhyme : Screen() {
                                 items.map { info ->
                                     RhymeMusic(
                                         musicInfo = info,
-                                        enabled = info.path(PathMod, ModResourceType.Rhyme).exists()
+                                        enabled = info.path(app.modPath, ModResourceType.Rhyme).exists()
                                     )
                                 }
                             }

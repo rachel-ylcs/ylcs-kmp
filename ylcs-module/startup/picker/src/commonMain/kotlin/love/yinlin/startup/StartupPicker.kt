@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.data.MimeType
@@ -10,8 +11,8 @@ import love.yinlin.foundation.SyncStartup
 import love.yinlin.uri.ImplicitUri
 
 expect class StartupPicker() : SyncStartup {
-    override fun init(context: Context, args: StartupArgs)
-    override fun initLater(context: Context, args: StartupArgs)
+    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs)
+    override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs)
 
     suspend fun pickPicture(): Source?
     suspend fun pickPicture(maxNum: Int): Sources<Source>?

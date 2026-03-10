@@ -5,11 +5,21 @@ import kotlinx.io.RawSource
 import kotlinx.io.files.FileMetadata
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
+import love.yinlin.foundation.PlatformContextDelegate
 import java.io.File
 
 actual object PlatformFileSystem {
     actual val PathSeparator: Char = File.separatorChar
     actual val LineSeparator: String = System.lineSeparator()
+
+    actual fun appPath(context: PlatformContextDelegate, appName: String): Path = Path(context.dataDir.absolutePath)
+
+    actual fun dataPath(context: PlatformContextDelegate, appName: String): Path = run {
+
+        Path(context.filesDir.absolutePath)
+    }
+
+    actual fun cachePath(context: PlatformContextDelegate, appName: String): Path = Path(context.cacheDir.absolutePath, "temp")
 
     @PublishedApi
     internal actual suspend fun exists(path: Path): Boolean = SystemFileSystem.exists(path)

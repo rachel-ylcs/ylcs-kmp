@@ -12,17 +12,17 @@ import com.github.panpf.sketch.fetch.ComposeResourceUriFetcher
 import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.files.Path
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupFetcher
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.platform.Platform
 import okio.Path.Companion.toPath
 
-@StartupFetcher(index = 0, name = "cachePath", returnType = Path::class, nullable = true)
+@StartupArg(index = 0, name = "cachePath", type = Path::class)
 @StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 @Stable
@@ -37,8 +37,8 @@ class StartupUrlImage : SyncStartup() {
         addDecoder(AnimatedWebpDecoder.Factory())
     }
 
-    override fun init(context: Context, args: StartupArgs) {
-        val cachePath: Path? = args.fetch(0)
+    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
+        val cachePath: Path = args[0]
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
         sketch = buildSketch(context).apply {
@@ -48,7 +48,6 @@ class StartupUrlImage : SyncStartup() {
                 registerComponent()
             }
             Platform.useNot(*Platform.Web) {
-                require(cachePath != null)
                 downloadCacheOptions {
                     DiskCache.Options(
                         appCacheDirectory = cachePath.toString().toPath(),

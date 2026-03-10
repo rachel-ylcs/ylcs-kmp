@@ -7,20 +7,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import love.yinlin.extension.catching
 
 abstract class ComposeActivity : ComponentActivity() {
-    private val instance get() = (application as ComposeApplication).instance
+    private val instance by lazy { (application as ComposeApplication).instance }
 
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         instance.context.bindActivity(this)
 
-        instance.openService(scope = lifecycleScope, later = true, immediate = false)
-
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
+
+        lifecycleScope.launch {
+            with(instance) { openServiceLater() }
+        }
 
         intent?.let {
             catching { instance.onIntent(it) }
@@ -37,7 +40,7 @@ abstract class ComposeActivity : ComponentActivity() {
     }
 
     final override fun onDestroy() {
-        instance.closeService(before = true, immediate = false)
+        instance.closeServiceBefore()
 
         super.onDestroy()
     }

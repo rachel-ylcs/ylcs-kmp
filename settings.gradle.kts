@@ -68,7 +68,6 @@ include(
     "ylcs-module:plugin:pag-kmp",
     "ylcs-module:startup:exception",
     "ylcs-module:startup:mmkv-kmp",
-    "ylcs-module:startup:os",
     "ylcs-module:startup:picker",
 
     /* -----------------  应用模块  ----------------- */

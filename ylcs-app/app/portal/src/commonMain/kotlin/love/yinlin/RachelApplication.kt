@@ -2,12 +2,9 @@ package love.yinlin
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import love.yinlin.common.PathMod
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.foundation.PlatformContextDelegate
-import love.yinlin.foundation.useNotPlatformStartupLazyFetcher
-import love.yinlin.platform.Platform
 import love.yinlin.screen.*
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.Scheme
@@ -16,7 +13,7 @@ import love.yinlin.uri.Uri
 @Stable
 abstract class RachelApplication(delegate: PlatformContextDelegate) : AbstractRachelApplication(delegate) {
     private val mp by service(
-        useNotPlatformStartupLazyFetcher(*Platform.Web) { PathMod },
+        name = "MusicPlayer",
         factory = ::StartupMusicPlayer
     )
 

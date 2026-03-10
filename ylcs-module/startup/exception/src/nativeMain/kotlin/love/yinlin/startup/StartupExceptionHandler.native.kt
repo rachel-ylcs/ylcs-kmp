@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import kotlinx.coroutines.CoroutineScope
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
@@ -25,7 +26,7 @@ actual class StartupExceptionHandler : SyncStartup() {
     actual val crashKey: String get() = mCrashKey
 
     @OptIn(ExperimentalNativeApi::class)
-    actual override fun init(context: Context, args: StartupArgs) {
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
         mCrashKey = args[0]
         val handler: Handler = args[1]
         setUnhandledExceptionHook { e ->

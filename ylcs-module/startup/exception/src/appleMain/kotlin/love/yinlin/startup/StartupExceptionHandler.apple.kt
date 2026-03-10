@@ -3,6 +3,7 @@ package love.yinlin.startup
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
+import kotlinx.coroutines.CoroutineScope
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
@@ -35,7 +36,7 @@ actual class StartupExceptionHandler : SyncStartup() {
     }
 
     @OptIn(ExperimentalNativeApi::class, ExperimentalForeignApi::class)
-    actual override fun init(context: Context, args: StartupArgs) {
+    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
         instance = this
         mCrashKey = args[0]
         mHandler = args[1]

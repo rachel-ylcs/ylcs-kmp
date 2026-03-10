@@ -379,12 +379,17 @@ jobs:
           prerelease: false
           preserve_order: true
           files: |
-            artifacts/android/*
-            artifacts/ios/*
-            artifacts/windows/*
-            artifacts/macos/*
-            artifacts/linux/*
-            artifacts/web/*
-            artifacts/server/*
+            artifacts/ylcs-android/*
+            artifacts/ylcs-ios/*
+            artifacts/ylcs-windows/*
+            artifacts/ylcs-windows-upgrade/*
+            artifacts/ylcs-linux/*
+            artifacts/ylcs-linux-upgrade/*
+            artifacts/ylcs-macos/*
+            artifacts/ylcs-js/*
+            artifacts/ylcs-wasm/*
+            artifacts/ylcs-server/*
+            artifacts/ylcs-modManager/*
+            artifacts/ylcs-landpage/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

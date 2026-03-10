@@ -1,5 +1,6 @@
 package love.yinlin.startup
 
+import kotlinx.coroutines.CoroutineScope
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
@@ -21,5 +22,5 @@ expect class StartupExceptionHandler() : SyncStartup {
 
     val crashKey: String
 
-    override fun init(context: Context, args: StartupArgs)
+    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs)
 }
