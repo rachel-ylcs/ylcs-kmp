@@ -84,6 +84,9 @@ template(object : KotlinMultiplatformTemplate() {
 
         // 复制桌面动态库
         val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class)
+        desktopCopyNativeLib {
+            dependsOn(tasks.named("desktopJar"))
+        }
 
         if ("desktopPublish" in currentTaskName || "desktopArtifact" in currentTaskName) {
             tasks.named("prepareAppResources") {

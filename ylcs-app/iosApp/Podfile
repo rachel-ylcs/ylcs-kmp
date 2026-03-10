@@ -2,6 +2,6 @@ use_frameworks!
 
 target 'iosApp' do
     platform :ios, '16.0'
-    pod 'portal', :path => '../app/portal'
+    pod 'ylcs-app', :path => '../app/portal'
     pod 'YLCSCore', :path => '../iosApp/core'
 end
