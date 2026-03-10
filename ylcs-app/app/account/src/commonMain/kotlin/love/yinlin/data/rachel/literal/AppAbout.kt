@@ -8,11 +8,11 @@ import love.yinlin.compose.ui.icon.Icons
 @Stable
 internal object AppAbout {
      val updateInfo = AppUpdateInfo(
-        platform = "Android/Windows/Web 先行发布",
+        platform = "Android/Windows/Linux/macOS/Web 先行发布",
         title = "银临茶舍 伴奏功能上线",
         force = false,
         maintenance = false,
-        date = LocalDate(2026, 3, 4),
+        date = LocalDate(2026, 3, 10),
         groups = listOf(
             AppUpdateRecordGroup(
                 type = "新功能",
@@ -45,11 +45,12 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复电脑端表情显示崩溃的问题",
-                    "2. 修复对话框边距的问题",
-                    "3. 修复歌单顺序调整异常的问题",
-                    "4. 修复歌词引擎切换时歌词空置的问题",
-                    "5. 修复页面切换未防抖的问题",
+                    "1. 修复安卓端悬浮歌词崩溃的问题",
+                    "2. 修复电脑端表情显示崩溃的问题",
+                    "3. 修复对话框边距的问题",
+                    "4. 修复歌单顺序调整异常的问题",
+                    "5. 修复歌词引擎切换时歌词空置的问题",
+                    "6. 修复页面切换未防抖的问题",
                 )
             )
         )
