@@ -31,19 +31,18 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
     open fun ApplicationExtension.sign(): ApkSigningConfig? = null
     open fun ApplicationExtension.android() { }
 
-    val Project.originOutput: File
-        get() {
-            val outputDir = layout.buildDirectory.get().dir("outputs").dir("apk").dir("release").asFile
-            val outputList = outputDir.listFiles { file ->
-                file.isFile && file.extension.equals("apk", true)
-            }?.sortedBy { it.name }.orEmpty()
-            return when {
-                outputList.size == 1 -> outputList.first()
-                else -> outputList.firstOrNull { it.name == "${project.name}-release.apk" }
-                    ?: outputList.firstOrNull()
-                    ?: outputDir.resolve("${project.name}-release.apk")
-            }
+    val Project.originOutput: File get() {
+        val outputDir = layout.buildDirectory.get().dir("outputs").dir("apk").dir("release").asFile
+        val outputList = outputDir.listFiles { file ->
+            file.isFile && file.extension.equals("apk", true)
+        }?.sortedBy { it.name }.orEmpty()
+        return when {
+            outputList.size == 1 -> outputList.first()
+            else -> outputList.firstOrNull { it.name == "${project.name}-release.apk" }
+                ?: outputList.firstOrNull()
+                ?: outputDir.resolve("${project.name}-release.apk")
         }
+    }
 
     final override fun Project.build(extension: KotlinAndroidExtension) {
         with(extension) {

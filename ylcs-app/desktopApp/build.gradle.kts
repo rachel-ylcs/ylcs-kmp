@@ -83,8 +83,7 @@ template(object : KotlinMultiplatformTemplate() {
         }
 
         // 复制桌面动态库
-        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class)
-        desktopCopyNativeLib {
+        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class) {
             dependsOn(tasks.named("desktopJar"))
         }
 
