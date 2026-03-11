@@ -144,7 +144,7 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew podInstall
+          ./gradlew ylcs-app:app:portal:podInstall
           ./gradlew ylcs-app:app:portal:linkPodDebugFrameworkIosArm64
 
   build-desktop:

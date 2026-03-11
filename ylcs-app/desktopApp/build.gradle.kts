@@ -87,7 +87,8 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("desktopJar"))
         }
 
-        if ("desktopPublish" in currentTaskName || "desktopArtifact" in currentTaskName) {
+        val taskName = currentTaskName
+        if ("desktopPublish" in taskName || "desktopArtifact" in taskName) {
             tasks.named("prepareAppResources") {
                 dependsOn(desktopCopyNativeLib)
             }
