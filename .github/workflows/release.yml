@@ -100,7 +100,6 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew ylcs-app:desktopApp:desktopJar
           ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
@@ -142,7 +141,6 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew ylcs-app:desktopApp:desktopJar
           ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
@@ -178,7 +176,6 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew ylcs-app:desktopApp:desktopJar
           ./gradlew ylcs-app:desktopApp:desktopArtifact
 
       - name: Upload
