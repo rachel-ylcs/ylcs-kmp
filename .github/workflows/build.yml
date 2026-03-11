@@ -143,7 +143,9 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:app:portal:linkPodDebugFrameworkIosArm64
+        run: |
+          ./gradlew podInstall
+          ./gradlew ylcs-app:app:portal:linkPodDebugFrameworkIosArm64
 
   build-desktop:
     name: Build Desktop
