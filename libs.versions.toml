@@ -10,7 +10,7 @@ dokka = "2.2.0-Beta"
 # Libs #
 
 # Common
-skiko = "0.9.47"
+skiko = "0.144.4"
 lifecycle = "2.10.0-beta01"
 coroutines = "1.10.2"
 ktor = "3.4.1"
