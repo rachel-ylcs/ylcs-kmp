@@ -34,8 +34,8 @@ internal fun UIView.asImage(): UIImage {
 }
 
 internal fun UIImage.asBuffer(): CVPixelBufferRef? = memScoped {
-    val width = size.useContents { width }.toLong()
-    val height = size.useContents { height }.toLong()
+    val width = size.useContents { width }.toULong()
+    val height = size.useContents { height }.toULong()
 
     // 构建属性字典
     val dict = CFDictionaryCreateMutable(null, 0, null, null)
@@ -99,9 +99,18 @@ internal fun UIImage.asSampleBuffer(): CMSampleBufferRef? {
         val scale: CMTimeScale = 1_000_000_000 // NSEC_PER_SEC
 
         val timingInfo = alloc<CMSampleTimingInfo>().apply {
-            presentationTimeStamp = CMTimeMake(0, scale)
-            duration = CMTimeMakeWithSeconds(10.0, scale)
-            decodeTimeStamp = CMTimeMake(0, scale)
+            presentationTimeStamp.value = 0L
+            presentationTimeStamp.timescale = scale
+            presentationTimeStamp.flags = 1U
+            presentationTimeStamp.epoch = 0L
+            duration.value = 10L * scale
+            duration.timescale = scale
+            duration.flags = 1U
+            duration.epoch = 0L
+            decodeTimeStamp.value = 0L
+            decodeTimeStamp.timescale = scale
+            decodeTimeStamp.flags = 1U
+            decodeTimeStamp.epoch = 0L
         }
 
         val formatDescriptionVar = alloc<CMFormatDescriptionRefVar>()
