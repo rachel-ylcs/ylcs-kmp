@@ -39,7 +39,6 @@ class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
 }
 
 class IosAppNode(root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app").dir("iosApp") {
-    val core: Directory = dir("core")
     val podfile: RegularFile = file("Podfile")
     val configuration: Directory = dir("Configuration")
     val configurationFile: RegularFile = configuration.file("Version.xcconfig")
