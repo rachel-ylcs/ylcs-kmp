@@ -1,9 +1,9 @@
 [versions]
 
 # Plugins #
-kotlin = "2.3.20-RC"
+kotlin = "2.3.20-RC3"
 agp = "9.0.0-alpha06"
-cmp = "1.11.0-alpha03"
+cmp = "1.11.0-alpha04"
 mavenPublish = "0.36.0"
 dokka = "2.2.0-Beta"
 
@@ -21,8 +21,8 @@ cryptography = "0.5.0"
 pag = "4.5.36"
 
 # Android
-androidx-activity = "1.12.4"
-media3 = "1.10.0-beta01"
+androidx-activity = "1.13.0"
+media3 = "1.10.0-rc01"
 
 # iOS
 sgQrcode = "4.1.0"
@@ -108,7 +108,7 @@ ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 # Android
 androidx-annotation = { module = "androidx.annotation:annotation-jvm", version = "1.9.1" }
-androidx-collection = { module = "androidx.collection:collection", version = "1.6.0-rc01" }
+androidx-collection = { module = "androidx.collection:collection", version = "1.6.0" }
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 
@@ -150,4 +150,4 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.32" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-redis = { module = "redis.clients:jedis", version = "7.3.0" }
+redis = { module = "redis.clients:jedis", version = "7.4.0" }
