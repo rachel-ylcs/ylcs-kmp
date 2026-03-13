@@ -1,8 +1,10 @@
 package love.yinlin.screen
 
 import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -12,6 +14,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastForEachIndexed
@@ -42,6 +50,7 @@ import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.node.dragAndDrop
 import love.yinlin.compose.ui.text.SelectionBox
@@ -61,6 +70,7 @@ import love.yinlin.mod_manager.resources.music
 import love.yinlin.util.QrcDecrypter
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import kotlin.collections.plusAssign
 
 @Stable
 class ScreenRhyme(private val path: String?) : Screen() {
@@ -75,6 +85,9 @@ class ScreenRhyme(private val path: String?) : Screen() {
     private var selectedTab by mutableIntStateOf(0)
 
     private var notationImage by mutableRefStateOf<String?>(null)
+
+    private var currentSelectItem: Pair<Int, Int>? by mutableStateOf(null)
+    private var isHotKeyAddMode by mutableStateOf(false)
 
     private var copyData by mutableRefStateOf<List<RhymeAction>?>(null)
 
@@ -169,6 +182,72 @@ class ScreenRhyme(private val path: String?) : Screen() {
         "\u0086", "\u0087", "\u0088", "*", "%", "^", "&",
     )
 
+    val scaleKeyMap = mapOf(
+        Key.Q to 1, Key.W to 2, Key.E to 3, Key.R to 4, Key.T to 5, Key.Y to 6, Key.U to 7,
+        Key.A to 8, Key.S to 9, Key.D to 10, Key.F to 11, Key.G to 12, Key.H to 13, Key.J to 14,
+        Key.Z to 15, Key.X to 16, Key.C to 17, Key.V to 18, Key.B to 19, Key.N to 20, Key.M to 21,
+    )
+
+    private fun onHotKey(currentItem: Pair<Int, Int>, key: Key) {
+        val (lineIndex, actionIndex) = currentItem
+        val lineNum = rhymeConfig.lyrics.size
+        val line = rhymeConfig.lyrics.getOrNull(lineIndex) ?: return
+        val action = line.theme.getOrNull(actionIndex) ?: return
+        val lineSize = line.theme.size
+
+        val newSelectItem = when (key) {
+            Key.Spacebar -> {
+                isHotKeyAddMode = !isHotKeyAddMode
+                return
+            }
+            Key.DirectionLeft, Key.NumPadDirectionLeft -> {
+                if (actionIndex <= 0) {
+                    val newLineIndex = lineIndex - 1
+                    if (newLineIndex < 0) null else {
+                        val newActionIndex = rhymeConfig.lyrics.getOrNull(newLineIndex)?.theme?.size
+                        newLineIndex to (newActionIndex?.let { it - 1 } ?: 0)
+                    }
+                } else lineIndex to actionIndex - 1
+            }
+            Key.DirectionRight, Key.NumPadDirectionRight, in scaleKeyMap -> {
+                if (actionIndex >= lineSize - 1) {
+                    val newLineIndex = lineIndex + 1
+                    if (newLineIndex >= lineNum - 1) null else newLineIndex to 0
+                } else lineIndex to actionIndex + 1
+            }
+            Key.DirectionUp, Key.NumPadDirectionUp -> {
+                val newLineIndex = lineIndex - 1
+                if (newLineIndex < 0) null else {
+                    val newLineSize = rhymeConfig.lyrics.getOrNull(newLineIndex)?.theme?.size ?: 0
+                    newLineIndex to (if (actionIndex >= newLineSize) newLineSize - 1 else actionIndex)
+                }
+            }
+            Key.DirectionDown, Key.NumPadDirectionDown -> {
+                val newLineIndex = lineIndex + 1
+                if (newLineIndex >= lineNum - 1) null else {
+                    val newLineSize = rhymeConfig.lyrics.getOrNull(newLineIndex)?.theme?.size ?: 0
+                    newLineIndex to (if (actionIndex >= newLineSize) newLineSize - 1 else actionIndex)
+                }
+            }
+            else -> return
+        }
+
+        currentSelectItem = newSelectItem
+
+        val resultScale = scaleKeyMap[key] ?: return
+        val newScaleValue = resultScale.toByte()
+        val newTheme = line.theme.toMutableList()
+        val currentScale = when (action) {
+            is RhymeAction.Note -> listOf(action.scale)
+            is RhymeAction.Slur -> action.scale
+        }
+        newTheme[actionIndex] = if (isHotKeyAddMode) RhymeAction.Slur(action.ch, action.end, currentScale.toMutableList().also { it += newScaleValue })
+        else RhymeAction.Note(action.ch, action.end, newScaleValue)
+        val newLyrics = rhymeConfig.lyrics.toMutableList()
+        newLyrics[lineIndex] = line.copy(theme = newTheme)
+        rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
+    }
+
     @Composable
     private fun LyricsLineEditor(
         modifier: Modifier = Modifier,
@@ -222,6 +301,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                     val newLyrics = config.lyrics.toMutableList()
                     newLyrics.removeAt(lineIndex)
                     rhymeConfig = config.copy(lyrics = newLyrics)
+                    currentSelectItem = null
                 })
                 Icon(tip = "复制", icon = Icons.ContentCopy, color = Theme.color.primary, onClick = {
                     copyData = line.theme
@@ -245,8 +325,12 @@ class ScreenRhyme(private val path: String?) : Screen() {
             }
             FlowRow(modifier = Modifier.fillMaxWidth()) {
                 for ((actionIndex, action) in line.theme.withIndex()) {
+                    val background = if (currentSelectItem?.first == lineIndex && currentSelectItem?.second == actionIndex) {
+                        if (isHotKeyAddMode) Colors.Red4.copy(alpha = 0.2f) else Colors.Steel4.copy(alpha = 0.2f)
+                    } else Colors.Transparent
+
                     Column(
-                        modifier = Modifier.border(width = Theme.border.v7, color = Theme.color.tertiary),
+                        modifier = Modifier.border(width = Theme.border.v7, color = Theme.color.tertiary).background(background),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(text = action.ch, style = Theme.typography.v6.bold)
@@ -324,7 +408,10 @@ class ScreenRhyme(private val path: String?) : Screen() {
                                 color = Theme.color.tertiary,
                                 style = Theme.typography.v3.bold,
                                 fontFamily = fontFamily,
-                                modifier = Modifier.clickable { isOpen = true }.padding(Theme.padding.value)
+                                modifier = Modifier.clickable {
+                                    currentSelectItem = lineIndex to actionIndex
+                                    isOpen = true
+                                }.padding(Theme.padding.value)
                             )
                         }
                     }
@@ -400,7 +487,10 @@ class ScreenRhyme(private val path: String?) : Screen() {
 
     @Composable
     override fun Content() {
-        Row(modifier = Modifier.fillMaxSize()) {
+        Row(modifier = Modifier.fillMaxSize().onPreviewKeyEvent { keyEvent ->
+            if (keyEvent.type == KeyEventType.KeyUp) currentSelectItem?.let { onHotKey(it, keyEvent.key) }
+            true
+        }) {
             val scrollState = rememberScrollState()
 
             Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
