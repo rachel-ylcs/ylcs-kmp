@@ -60,23 +60,7 @@ jobs:
         run: |
           ./gradlew ylcs-app:app:portal:generateDummyFramework
           ./gradlew ylcs-app:app:portal:podspec
-          cat > ./ylcs-app/iosApp/core/YLCSCore.podspec <<'EOF'
-          Pod::Spec.new do |spec|
-              spec.name = 'YLCSCore'
-              spec.version = '1.0.0'
-              spec.summary = 'YLCS iOS core helpers'
-              spec.homepage = 'https://github.com/rachel-ylcs/ylcs-kmp'
-              spec.license = { :type => 'MIT' }
-              spec.author = { 'rachel-ylcs' => '76944654+masterQian@users.noreply.github.com' }
-              spec.platform = :ios, '16.0'
-              spec.swift_version = '5.0'
-              spec.source = { :path => '.' }
-              spec.source_files = '*.swift'
-          end
-          EOF
-          cd ylcs-app/iosApp
-          pod install
-          cd ../..
+          ./gradlew ylcs-app:app:portal:podInstall
           # xcodebuild build -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp
           xcodebuild archive -workspace ./ylcs-app/iosApp/iosApp.xcworkspace -scheme iosApp -archivePath ./outputs/iosApp CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
           # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
