@@ -64,8 +64,4 @@ template(object : KotlinMultiplatformTemplate() {
             }
         }
     }
-
-    override val cocoapodsList: List<Pod> = listOf(
-        pod("YLCSCore", moduleName = "YLCSCore", source = C.root.iosApp.core.asFile),
-    )
 })
