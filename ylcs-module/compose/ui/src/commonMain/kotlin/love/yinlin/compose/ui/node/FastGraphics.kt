@@ -8,9 +8,12 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectorInfo
@@ -23,18 +26,17 @@ val NullFloatProvider: GraphicsLayerScope.() -> Float? = { null }
 
 // FastRotate
 
-private class FastRotateNode(var angleProvider: GraphicsLayerScope.() -> Float?) : Modifier.Node(), LayoutModifierNode {
-    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
-        val placeable = measurable.measure(constraints)
-        return layout(placeable.width, placeable.height) {
-            placeable.placeWithLayer(0, 0) {
-                angleProvider()?.let { rotationZ = it }
-            }
+private class FastRotateNode(var angleProvider: () -> Float?) : Modifier.Node(), DrawModifierNode {
+    override fun ContentDrawScope.draw() {
+        withTransform({
+            angleProvider()?.let { rotate(degrees = it) }
+        }) {
+            this@draw.drawContent()
         }
     }
 }
 
-private data class FastRotateElement(val angleProvider: GraphicsLayerScope.() -> Float?) : ModifierNodeElement<FastRotateNode>() {
+private data class FastRotateElement(val angleProvider: () -> Float?) : ModifierNodeElement<FastRotateNode>() {
     override fun create(): FastRotateNode = FastRotateNode(angleProvider)
     override fun update(node: FastRotateNode) {
         node.angleProvider = angleProvider
@@ -45,7 +47,7 @@ private data class FastRotateElement(val angleProvider: GraphicsLayerScope.() ->
 }
 
 @Stable
-fun Modifier.fastRotate(degreeProvider: GraphicsLayerScope.() -> Float?) =
+fun Modifier.fastRotate(degreeProvider: () -> Float?) =
     this then FastRotateElement(degreeProvider)
 
 @Stable

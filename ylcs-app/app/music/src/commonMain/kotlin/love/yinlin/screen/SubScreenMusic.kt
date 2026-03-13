@@ -61,7 +61,7 @@ import love.yinlin.compose.ui.node.fastOffsetX
 import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.node.silentClick
-import love.yinlin.compose.ui.text.SimpleClipText
+import love.yinlin.compose.ui.text.FixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
@@ -342,7 +342,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 }
             }
 
-            SimpleClipText(text = currentDebounceTime.timeString)
+            FixedText("00:00", { currentDebounceTime.timeString })
+
             Slider(
                 value = progress,
                 onValueChangeFinished = { newProgress ->
@@ -378,7 +379,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     }
                 }
             }
-            SimpleClipText(text = duration.timeString)
+
+            FixedText("00:00", { duration.timeString })
         }
     }
 

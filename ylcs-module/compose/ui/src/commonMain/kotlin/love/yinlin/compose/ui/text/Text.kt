@@ -135,21 +135,10 @@ fun SimpleClipText(
         modifier = modifier,
         style = style.merge(
             color = color.takeOrElse { style.color.takeOrElse { LocalColor.current } },
-            fontSize = TextUnit.Unspecified,
-            fontWeight = null,
             textAlign = textAlign ?: TextAlign.Unspecified,
-            lineHeight = TextUnit.Unspecified,
-            fontFamily = null,
-            textDecoration = textDecoration,
-            fontStyle = null,
-            letterSpacing = TextUnit.Unspecified,
+            textDecoration = textDecoration
         ),
-        onTextLayout = null,
-        overflow = TextOverflow.Clip,
-        softWrap = true,
-        maxLines = 1,
-        minLines = 1,
-        autoSize = null,
+        maxLines = 1
     )
 }
 
@@ -168,20 +157,10 @@ fun SimpleEllipsisText(
         modifier = modifier,
         style = style.merge(
             color = color.takeOrElse { style.color.takeOrElse { LocalColor.current } },
-            fontSize = TextUnit.Unspecified,
-            fontWeight = null,
             textAlign = textAlign ?: TextAlign.Unspecified,
-            lineHeight = TextUnit.Unspecified,
-            fontFamily = null,
-            textDecoration = textDecoration,
-            fontStyle = null,
-            letterSpacing = TextUnit.Unspecified,
+            textDecoration = textDecoration
         ),
-        onTextLayout = null,
         overflow = overflow,
-        softWrap = true,
-        maxLines = 1,
-        minLines = 1,
-        autoSize = null,
+        maxLines = 1
     )
 }
