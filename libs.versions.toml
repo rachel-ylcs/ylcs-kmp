@@ -3,7 +3,7 @@
 # Plugins #
 kotlin = "2.3.20-RC3"
 agp = "9.0.0-alpha06"
-cmp = "1.11.0-alpha04"
+cmp = "1.11.0-alpha03" # 1.11.0-alpha04的shader二进制不兼容, 要等第三方库适配
 mavenPublish = "0.36.0"
 dokka = "2.2.0-Beta"
 
