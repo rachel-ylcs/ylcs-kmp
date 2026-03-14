@@ -33,6 +33,7 @@ include(
     /* -----------------  库模块  ----------------- */
 
     "ylcs-module:compose:app",
+    "ylcs-module:compose:components:lottie",
     "ylcs-module:compose:components:media",
     "ylcs-module:compose:components:pagination-layout",
     "ylcs-module:compose:components:qrcode",

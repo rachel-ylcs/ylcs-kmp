@@ -2,41 +2,41 @@ package love.yinlin.compose.ui.text
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import io.github.alexzhirkevich.compottie.*
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.compose.rememberOffScreenState
-import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.lottie.LottieManager
+import love.yinlin.cs.NetClient
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
 
 @Stable
 data object RichEmojiDrawer : RichDrawer {
+    private val manager: LottieManager = LottieManager()
+
     override val type: String = RichType.Emoji.value
 
     override fun RichRenderScope.render(item: RichObject) = item.cast<RichNodeEmoji> {
-        val emoji = Emoji.fromId(item.id) ?: return@cast
+        val emojiId = item.id
+        val emoji = Emoji.fromId(emojiId) ?: return@cast
         val emojiType = emoji.type
         val size = if (emojiType == EmojiType.Lottie) 1.5f else 3f
         renderCompose(size, size) {
             val emojiPath = emoji.showPath
             if (emojiType == EmojiType.Lottie) {
-                val composition by rememberLottieComposition(emojiPath) { LottieCompositionSpec.Url(emojiPath) }
-                Image(
-                    painter = rememberLottiePainter(composition = composition, iterations = Compottie.IterateForever, isPlaying = rememberOffScreenState()),
-                    modifier = Modifier.fillMaxSize()
-                )
+                val lottieId = emojiId.toString()
+                LaunchedEffect(lottieId) {
+                    if (manager[lottieId] == null) NetClient.simpleDownload(emojiPath)?.decodeToString()?.let { manager[lottieId] = it }
+                }
+
+                manager.Content(lottieId, modifier = Modifier.fillMaxSize())
             }
             else WebImage(uri = emojiPath, modifier = Modifier.fillMaxSize())
         }

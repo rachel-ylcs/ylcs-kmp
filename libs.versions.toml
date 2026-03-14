@@ -16,7 +16,6 @@ coroutines = "1.10.2"
 ktor = "3.4.1"
 sketch = "4.4.0-beta02"
 mmkv = "2.3.0"
-lottie = "2.1.0"
 cryptography = "0.5.0"
 pag = "4.5.36"
 
@@ -64,7 +63,7 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
 compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.1" }
-compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.0-alpha03" }
+compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.0-alpha04" }
 compose-navigation3-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
@@ -92,9 +91,6 @@ sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version
 sketch-extensions-compose = { module = "io.github.panpf.sketch4:sketch-extensions-compose", version.ref = "sketch" }
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.4.0" }
 
-lottie = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "lottie" }
-lottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "lottie" }
-
 tool-html = { module = "com.fleeksoft.ksoup:ksoup", version = "0.2.6" }
 tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.2" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.0.0" }
@@ -120,7 +116,9 @@ media3-player = { module = "androidx.media3:media3-exoplayer", version.ref = "me
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.4.0" }
-scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "1.4.0" }
+scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "1.4.1" }
+
+lottie-android = { module = "com.airbnb.android:lottie-compose", version = "6.7.1" }
 
 pag-android = { module = "com.tencent.tav:libpag", version.ref = "pag" }
 

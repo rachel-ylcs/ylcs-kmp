@@ -13,8 +13,6 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 libs.compose.resources,
-                libs.lottie,
-                libs.lottie.network,
 
                 ExportLib,
 
@@ -32,6 +30,7 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.icons,
 
                 projects.ylcsModule.compose.components.urlImage,
+                projects.ylcsModule.compose.components.lottie,
                 projects.ylcsModule.compose.components.richText,
             )
         }
