@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.skiaCanvas
 import androidx.compose.ui.zIndex
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.Colors
@@ -38,7 +38,7 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
                         Rect.makeXYWH((canvasWidth - dstWidth) / 2, 0f, dstWidth, canvasHeight)
                     }
                     drawIntoCanvas { canvas ->
-                        canvas.nativeCanvas.drawImageRect(
+                        canvas.skiaCanvas.drawImageRect(
                             image = it,
                             src = Rect.makeWH(imageWidth, imageHeight),
                             dst = dst,

@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asSkiaColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.skiaCanvas
 import androidx.compose.ui.graphics.toSkiaRect
 import love.yinlin.data.MimeType
 import love.yinlin.compose.data.ImageFormat
@@ -36,7 +36,7 @@ actual class AnimatedWebp internal constructor(
 ) {
     actual fun DrawScope.drawFrame(index: Int, dst: Rect, alpha: Float, filter: ColorFilter?, blendMode: BlendMode) {
         if (index >= 0 && !image.isClosed) {
-            val canvas = drawContext.canvas.nativeCanvas
+            val canvas = drawContext.canvas.skiaCanvas
             val oldAlpha = paint.alpha
             val oldColorFilter = paint.colorFilter
             val oldBlendMode = paint.blendMode
