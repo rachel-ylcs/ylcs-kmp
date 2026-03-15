@@ -61,16 +61,16 @@ internal object AppAbout {
             AppContributor("方旖旎", 7),
             AppContributor("木棠", 1563),
             AppContributor("竹香满亭", 11),
-            AppContributor("尘落", 89)
+            AppContributor("尘落", 89),
         )),
         AppContributorGroup("运营", Icons.Store, Colors.Steel4, listOf(
             AppContributor("思懿", 6),
             AppContributor("清逸", 74),
-            AppContributor("青栀", 87)
+            AppContributor("青栀", 87),
         )),
         AppContributorGroup("宣发", Icons.Campaign, Colors.Red4, listOf(
             AppContributor("姜辞", 5),
-            AppContributor("晨晨", 15)
+            AppContributor("晨晨", 15),
         )),
         AppContributorGroup("经办", Icons.LocalFireDepartment, Colors.Orange4, listOf(
             AppContributor("寒山", 1),
@@ -78,11 +78,12 @@ internal object AppAbout {
             AppContributor("韩非", 12),
             AppContributor("泸沽寻临", 8),
             AppContributor("名字不太喵", 18),
-            AppContributor("圈圈临", 2)
+            AppContributor("圈圈临", 2),
         )),
         AppContributorGroup("数据", Icons.Token, Colors.Purple4, listOf(
             AppContributor("海屿悼词", 9),
             AppContributor("桑檀", 1768),
+            AppContributor("黎耘", 1844),
         )),
         AppContributorGroup("开发", Icons.Code, Colors.Green4, listOf(
             AppContributor("焦骨", 10),
@@ -90,7 +91,7 @@ internal object AppAbout {
             AppContributor("yingfeng", 14),
             AppContributor("双花", 429),
             AppContributor("桃花坞里桃花庵", 20),
-            AppContributor("苏晚卿", 359)
+            AppContributor("苏晚卿", 359),
         )),
     )
 }
