@@ -235,19 +235,23 @@ private fun PullIndicator(
 }
 
 @Composable
-fun PullLayout(
-    canRefresh: Boolean = true,
-    canLoading: Boolean = false,
-    onRefresh: (suspend () -> Unit)? = null,
-    onLoading: (suspend () -> Unit)? = null,
+internal fun PullLayout(
+    canContainerRefresh: () -> Boolean,
+    canContainerLoading: () -> Boolean,
+    canRefresh: Boolean,
+    canLoading: Boolean,
+    onRefresh: (suspend () -> Unit)?,
+    onLoading: (suspend () -> Unit)?,
     indicatorPadding: Dp = Theme.padding.v4,
     thresholdRatio: Float = 0.75f,
     content: @Composable BoxScope.() -> Unit
 ) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
-    val canRefreshUpdate = rememberUpdatedState(canRefresh)
-    val canLoadingUpdate = rememberUpdatedState(canLoading)
+    val canContainerRefreshUpdate by rememberUpdatedState(canContainerRefresh)
+    val canContainerLoadingUpdate by rememberUpdatedState(canContainerLoading)
+    val canRefreshUpdate = rememberDerivedState { canRefresh && canContainerRefreshUpdate() }
+    val canLoadingUpdate = rememberDerivedState { canLoading && canContainerLoadingUpdate() }
     val onRefreshUpdate = rememberUpdatedState(onRefresh)
     val onLoadingUpdate = rememberUpdatedState(onLoading)
     val pullState = remember(density, scope, indicatorPadding, thresholdRatio) {

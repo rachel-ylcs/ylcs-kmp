@@ -26,6 +26,8 @@ fun <T> PaginationColumn(
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
     PullLayout(
+        canContainerRefresh = { state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0 },
+        canContainerLoading = { !state.canScrollForward },
         canRefresh = canRefresh,
         canLoading = canLoading,
         onRefresh = onRefresh,
