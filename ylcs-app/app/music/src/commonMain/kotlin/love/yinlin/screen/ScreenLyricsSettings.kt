@@ -73,7 +73,7 @@ class ScreenLyricsSettings : Screen() {
                 modifier = Modifier.padding(
                     start = this.maxWidth * config.android.left.coerceIn(0f, 1f),
                     end = this.maxWidth * (1 - config.android.right).coerceIn(0f, 1f),
-                    top = Theme.padding.v3 * config.android.top
+                    top = Theme.padding.v3 * config.android.top.coerceIn(0f, 1f)
                 ).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
@@ -151,7 +151,7 @@ class ScreenLyricsSettings : Screen() {
                 .fillMaxHeight()
                 .padding(Theme.padding.eValue9)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v5)
         ) {
             SimpleEllipsisText("歌词引擎优先级", color = Theme.color.primary, style = Theme.typography.v6.bold)
 

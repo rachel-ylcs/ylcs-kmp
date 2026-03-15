@@ -33,16 +33,16 @@ data class LyricsEngineConfig(
         val left: Float = 0f,
         // 右侧偏移 0.0 ~ 1.0
         val right: Float = 1f,
-        // 纵向偏移 0.0 ~ 2.0
+        // 纵向偏移 0.0 ~ 1.0
         val top: Float = 1f,
     ) {
         val leftProgress: Float get() = left
         val rightProgress: Float get() = right
-        val topProgress: Float get() = top / 2f
+        val topProgress: Float get() = top
 
         fun copyLeft(percent: Float) = this.copy(left = percent.coerceIn(0f, 1f))
         fun copyRight(percent: Float) = this.copy(right = percent.coerceIn(0f, 1f))
-        fun copyTop(percent: Float) = this.copy(top = (percent * 2f).coerceIn(0f, 2f))
+        fun copyTop(percent: Float) = this.copy(top = percent.coerceIn(0f, 1f))
     }
 
     @Stable

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.unit.dp
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
@@ -43,7 +42,7 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
 
     @Composable
     actual fun Content() {
-        if (startup.isInit && startup.isPlaying) {
+        if (startup.isInit) {
             app.ComposedLayout(
                 modifier = Modifier.fillMaxWidth(),
                 bgColor = Colors.Transparent
@@ -51,16 +50,19 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
                 val config = app.config.lyricsEngineConfig
                 Box(modifier = Modifier.fillMaxWidth().layout { measurable, constraints ->
                     val maxWidth = constraints.maxWidth
+                    val maxHeight = constraints.maxHeight
                     val start = (maxWidth * config.android.left.coerceIn(0f, 1f)).toInt()
                     val end = (maxWidth * (1 - config.android.right).coerceIn(0f, 1f)).toInt()
-                    val top = (config.android.top * 30.dp.roundToPx()).toInt()
+                    val top = (maxHeight * 0.2f * config.android.top.coerceIn(0f, 1f)).toInt()
                     val childWidth = (maxWidth - start - end).coerceAtLeast(0)
                     val placeable = measurable.measure(constraints.copy(minWidth = childWidth, maxWidth = childWidth))
                     layout(maxWidth, placeable.height + top) {
                         placeable.placeRelative(start, top)
                     }
                 }) {
-                    startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxWidth(), config = config, textStyle = Theme.typography.v6.bold)
+                    if (startup.isPlaying) {
+                        startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxWidth(), config = config, textStyle = Theme.typography.v6.bold)
+                    }
                 }
             }
         }

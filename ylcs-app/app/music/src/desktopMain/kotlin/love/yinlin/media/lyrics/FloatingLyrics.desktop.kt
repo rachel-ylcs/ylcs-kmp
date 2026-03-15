@@ -79,13 +79,15 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
                 }.launchIn(this)
             }
 
-            if (startup.isInit && startup.isPlaying) {
+            if (startup.isInit) {
                 DragArea(enabled = canMove) {
                     app.ComposedLayout(
                         modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
                         bgColor = Colors.Transparent
                     ) {
-                        startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
+                        if (startup.isPlaying) {
+                            startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
+                        }
                     }
                 }
             }
