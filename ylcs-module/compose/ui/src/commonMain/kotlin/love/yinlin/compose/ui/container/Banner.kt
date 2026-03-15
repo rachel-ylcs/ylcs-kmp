@@ -123,12 +123,14 @@ fun Banner(
     Box(modifier = modifier.hoverable(interactionSource)) {
         if (size > 0) {
             // Content
-            HorizontalPager(
-                state = state,
-                beyondViewportPageCount = 1,
-                modifier = Modifier.keepSize().matchParentSize().zIndex(1f)
-            ) { virtualIndex ->
-                content(virtualIndex % size)
+            HorizontalScrollContainer(state = state, modifier = Modifier.matchParentSize()) {
+                HorizontalPager(
+                    state = state,
+                    beyondViewportPageCount = 1,
+                    modifier = Modifier.keepSize().matchParentSize().zIndex(1f)
+                ) { virtualIndex ->
+                    content(virtualIndex % size)
+                }
             }
 
             if (size > 1) {

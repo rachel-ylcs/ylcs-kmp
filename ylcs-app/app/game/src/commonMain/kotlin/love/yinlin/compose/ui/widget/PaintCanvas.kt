@@ -30,6 +30,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.BackgroundContainer
+import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
@@ -82,11 +83,19 @@ class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
 }
 
 @Composable
-private inline fun PaintCanvasTool(content: @Composable RowScope.() -> Unit) {
-    ActionScope.Left.Container(
-        modifier = Modifier.fillMaxWidth().background(Theme.color.backgroundVariant).padding(Theme.padding.value).horizontalScroll(rememberScrollState()),
-        content = content
-    )
+private inline fun PaintCanvasTool(crossinline content: @Composable RowScope.() -> Unit) {
+    val state = rememberScrollState()
+
+    HorizontalScrollContainer(state = state) {
+        ActionScope.Left.Container(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Theme.color.backgroundVariant)
+                .padding(Theme.padding.value)
+                .horizontalScroll(state),
+            content = content
+        )
+    }
 }
 
 @Composable

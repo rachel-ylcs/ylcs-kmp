@@ -2,21 +2,15 @@ package love.yinlin.page
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,19 +19,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import love.yinlin.Page
 import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
-import love.yinlin.compose.ui.container.ActionScope
-import love.yinlin.compose.ui.container.AdaptiveTwoBox
-import love.yinlin.compose.ui.container.AdderBox
-import love.yinlin.compose.ui.container.Banner
-import love.yinlin.compose.ui.container.DefaultStatefulProvider
-import love.yinlin.compose.ui.container.OffsetBox
-import love.yinlin.compose.ui.container.ReplaceableBox
-import love.yinlin.compose.ui.container.StatefulBox
-import love.yinlin.compose.ui.container.StatefulStatus
-import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.container.ThemeContainer
+import love.yinlin.compose.graphics.HSV
+import love.yinlin.compose.ui.container.*
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
@@ -215,6 +201,75 @@ object ContainerPage : Page() {
                 ) {
                     Box(modifier = Modifier.size(Theme.size.cell1, Theme.size.cell2).background(Theme.color.primaryContainer))
                     Box(modifier = Modifier.size(Theme.size.cell2, Theme.size.cell3).background(Theme.color.secondaryContainer))
+                }
+            }
+
+            Component("HorizontalScrollContainer") {
+                val num = 30
+                val colorList = remember(num) {
+                    List(num) {
+                        val normalizedIndex = (it - 1) % num
+                        val hue = normalizedIndex * (360f / num)
+                        val saturation = 0.7f
+                        val value = 0.9f
+                        HSV(hue, saturation, value).color
+                    }
+                }
+
+                Text(
+                    text = "Use the mouse wheel to swipe directly horizontally without pressing SHIFT.",
+                    style = Theme.typography.v5.bold,
+                    color = Theme.color.secondary
+                )
+
+                ExampleRow {
+                    Example("Row + horizontalScroll", modifier = Modifier.fillMaxWidth()) {
+                        val state = rememberScrollState()
+
+                        HorizontalScrollContainer(state) {
+                            Row(modifier = Modifier.fillMaxWidth().horizontalScroll(state)) {
+                                repeat(num) {
+                                    Text(
+                                        text = "Item $it",
+                                        modifier = Modifier.background(colorList[it]).padding(Theme.padding.value)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Example("LazyRow", modifier = Modifier.fillMaxWidth()) {
+                        val state = rememberLazyListState()
+
+                        HorizontalScrollContainer(state) {
+                            LazyRow(state = state, modifier = Modifier.fillMaxWidth()) {
+                                items(num) {
+                                    Text(
+                                        text = "Item $it",
+                                        modifier = Modifier.background(colorList[it]).padding(Theme.padding.value)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Example("HorizontalPager", modifier = Modifier.fillMaxWidth()) {
+                        val state = rememberPagerState { num }
+
+                        HorizontalScrollContainer(state) {
+                            HorizontalPager(
+                                state = state,
+                                modifier = Modifier
+                                    .width(Theme.size.cell3)
+                                    .aspectRatio(1f)
+                                    .background(Theme.color.error.copy(alpha = 0.25f))
+                                    .padding(Theme.padding.eValue7)
+                            ) {
+                                Text(
+                                    text = "Item $it",
+                                    modifier = Modifier.background(colorList[it]).padding(Theme.padding.value)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

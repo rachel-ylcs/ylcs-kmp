@@ -26,6 +26,7 @@ import love.yinlin.compose.extension.localComposition
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.scaleSize
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.node.keepSize
 import love.yinlin.compose.ui.resources.Res
 import love.yinlin.compose.ui.text.SimpleClipText
@@ -204,61 +205,63 @@ private fun CalendarDayGrid(
     val (cellSize, cellPadding, totalWidth) = rememberCalendarSize()
     val today = remember { DateEx.Today }
 
-    HorizontalPager(
-        modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12),
-        state = state,
-        beyondViewportPageCount = 2,
-        key = { it },
-    ) { pageIndex ->
-        val currentDate = remember(pageIndex) { CalendarState.indexShadowDate(pageIndex) }
-        val startDay = currentDate.dayOfWeek.isoDayNumber - 1
-        val endDay = run {
-            val tmp = currentDate.plus(1, DateTimeUnit.MONTH)
-            val endOfMonth = LocalDate(tmp.year, tmp.month, 1).minus(1, DateTimeUnit.DAY)
-            startDay + endOfMonth.day - 1
-        }
-        val startDate = currentDate.minus(startDay, DateTimeUnit.DAY)
+    HorizontalScrollContainer(state = state) {
+        HorizontalPager(
+            modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12),
+            state = state,
+            beyondViewportPageCount = 2,
+            key = { it },
+        ) { pageIndex ->
+            val currentDate = remember(pageIndex) { CalendarState.indexShadowDate(pageIndex) }
+            val startDay = currentDate.dayOfWeek.isoDayNumber - 1
+            val endDay = run {
+                val tmp = currentDate.plus(1, DateTimeUnit.MONTH)
+                val endOfMonth = LocalDate(tmp.year, tmp.month, 1).minus(1, DateTimeUnit.DAY)
+                startDay + endOfMonth.day - 1
+            }
+            val startDate = currentDate.minus(startDay, DateTimeUnit.DAY)
 
-        Column {
-            repeat(6) { i ->
-                Row {
-                    repeat(7) { j ->
-                        val dayIndex = 7 * i + j
-                        val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
-                        val dateDays = date.toEpochDays()
+            Column {
+                repeat(6) { i ->
+                    Row {
+                        repeat(7) { j ->
+                            val dayIndex = 7 * i + j
+                            val date = startDate.plus(dayIndex, DateTimeUnit.DAY)
+                            val dateDays = date.toEpochDays()
 
-                        key(dateDays) {
-                            val isToday = date == today
-                            val eventTitle = events[dateDays]
-                            val color = when {
-                                isToday -> Theme.color.onContainer
-                                eventTitle != null -> Theme.color.primary
-                                dayIndex !in startDay..endDay -> LocalColorVariant.current.copy(alpha = 0.5f)
-                                date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Theme.color.tertiary
-                                else -> LocalColor.current
-                            }
-                            val todayBackgroundColor = Theme.color.primaryContainer
-
-                            val text = remember(eventTitle, date, LunarLoader.table) { eventTitle ?: LunarLoader.lunar(date) }
-
-                            Column(
-                                modifier = Modifier.weight(1f).aspectRatio(1f).clip(Theme.shape.v7).clickable {
-                                    if (eventTitle != null) onEventClick(date)
-                                }.drawWithContent {
-                                    if (isToday) drawRect(todayBackgroundColor)
-                                    drawContent()
-                                },
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                val fontSize = Theme.typography.v8.fontSize / when (text.length) {
-                                    in 0 .. 2 -> 1f
-                                    in 3 .. 4 -> 1.25f
-                                    else -> 1.5f
+                            key(dateDays) {
+                                val isToday = date == today
+                                val eventTitle = events[dateDays]
+                                val color = when {
+                                    isToday -> Theme.color.onContainer
+                                    eventTitle != null -> Theme.color.primary
+                                    dayIndex !in startDay..endDay -> LocalColorVariant.current.copy(alpha = 0.5f)
+                                    date.dayOfWeek == DayOfWeek.SATURDAY || date.dayOfWeek == DayOfWeek.SUNDAY -> Theme.color.tertiary
+                                    else -> LocalColor.current
                                 }
+                                val todayBackgroundColor = Theme.color.primaryContainer
 
-                                SimpleClipText(text = date.day.toString(), color = color, style = LocalCalendarDayNumberStyle.current)
-                                SimpleClipText(text = text, color = color, style = LocalCalendarDayTextStyle.current.copy(fontSize = fontSize))
+                                val text = remember(eventTitle, date, LunarLoader.table) { eventTitle ?: LunarLoader.lunar(date) }
+
+                                Column(
+                                    modifier = Modifier.weight(1f).aspectRatio(1f).clip(Theme.shape.v7).clickable {
+                                        if (eventTitle != null) onEventClick(date)
+                                    }.drawWithContent {
+                                        if (isToday) drawRect(todayBackgroundColor)
+                                        drawContent()
+                                    },
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    val fontSize = Theme.typography.v8.fontSize / when (text.length) {
+                                        in 0 .. 2 -> 1f
+                                        in 3 .. 4 -> 1.25f
+                                        else -> 1.5f
+                                    }
+
+                                    SimpleClipText(text = date.day.toString(), color = color, style = LocalCalendarDayNumberStyle.current)
+                                    SimpleClipText(text = text, color = color, style = LocalCalendarDayTextStyle.current.copy(fontSize = fontSize))
+                                }
                             }
                         }
                     }

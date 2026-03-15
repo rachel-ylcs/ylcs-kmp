@@ -3,6 +3,7 @@ package love.yinlin.screen
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
@@ -11,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.screen.Screen
+import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.floating.DialogInput
@@ -120,21 +122,26 @@ class ScreenAlbum : Screen() {
                     SimpleEllipsisText("${album.ts}  ${album.location ?: ""}")
                     SimpleEllipsisText(album.author ?: "")
                 }
-                LazyRow(modifier = Modifier.fillMaxWidth()) {
-                    items(album.picNum) { index ->
-                        Row(modifier = Modifier.width(Theme.size.cell4).aspectRatio(0.66667f)) {
-                            WebImage(
-                                uri = album.thumbPath(index).url,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.weight(1f).fillMaxHeight(),
-                                onClick = {
-                                    val pics = List(album.picNum) {
-                                        Picture(album.thumbPath(it).url, album.picPath(it).url)
+
+                val state = rememberLazyListState()
+
+                HorizontalScrollContainer(state = state) {
+                    LazyRow(state = state, modifier = Modifier.fillMaxWidth()) {
+                        items(album.picNum) { index ->
+                            Row(modifier = Modifier.width(Theme.size.cell4).aspectRatio(0.66667f)) {
+                                WebImage(
+                                    uri = album.thumbPath(index).url,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                                    onClick = {
+                                        val pics = List(album.picNum) {
+                                            Picture(album.thumbPath(it).url, album.picPath(it).url)
+                                        }
+                                        navigate(::ScreenImagePreview, pics, index)
                                     }
-                                    navigate(::ScreenImagePreview, pics, index)
-                                }
-                            )
-                            if (index != album.picNum - 1) VerticalDivider(Theme.border.v4, Theme.color.tertiary)
+                                )
+                                if (index != album.picNum - 1) VerticalDivider(Theme.border.v4, Theme.color.tertiary)
+                            }
                         }
                     }
                 }

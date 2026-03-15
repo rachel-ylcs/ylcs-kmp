@@ -33,6 +33,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TagView
+import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.Icons2
@@ -132,29 +133,34 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     style = Theme.typography.v7.bold,
                     modifier = Modifier.padding(Theme.padding.value)
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v).horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    for (item in activity.price) {
-                        Surface(
-                            modifier = Modifier.padding(horizontal = Theme.padding.h / 2),
-                            shape = Theme.shape.v5,
-                            contentPadding = Theme.padding.eValue10,
-                            shadowElevation = Theme.shadow.v3,
-                            border = BorderStroke(Theme.border.v9, Theme.color.outline),
-                            onClick = { }
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+
+                val state = rememberScrollState()
+
+                HorizontalScrollContainer(state = state) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v).horizontalScroll(state),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        for (item in activity.price) {
+                            Surface(
+                                modifier = Modifier.padding(horizontal = Theme.padding.h / 2),
+                                shape = Theme.shape.v5,
+                                contentPadding = Theme.padding.eValue10,
+                                shadowElevation = Theme.shadow.v3,
+                                border = BorderStroke(Theme.border.v9, Theme.color.outline),
+                                onClick = { }
                             ) {
-                                Text(
-                                    text = "￥${item.value}",
-                                    style = Theme.typography.v5,
-                                    color = Theme.color.primary
-                                )
-                                Text(text = item.name)
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                                ) {
+                                    Text(
+                                        text = "￥${item.value}",
+                                        style = Theme.typography.v5,
+                                        color = Theme.color.primary
+                                    )
+                                    Text(text = item.name)
+                                }
                             }
                         }
                     }
