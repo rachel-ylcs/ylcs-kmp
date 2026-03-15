@@ -2,15 +2,12 @@ package love.yinlin.compose.ui.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemScope
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import love.yinlin.platform.Platform
+import love.yinlin.compose.data.ItemKey
 
 @Composable
 fun <T> PaginationStaggeredGrid(
@@ -29,38 +26,30 @@ fun <T> PaginationStaggeredGrid(
     header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
     itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
-    if (Platform.contains(*Platform.Phone)) {
-        SwipePaginationStaggeredGrid(
-            items = items,
-            key = key,
+    PullLayout(
+        canRefresh = canRefresh,
+        canLoading = canLoading,
+        onRefresh = onRefresh,
+        onLoading = onLoading
+    ) {
+        LazyVerticalStaggeredGrid(
             columns = columns,
-            state = state,
-            canRefresh = canRefresh,
-            canLoading = canLoading,
-            onRefresh = onRefresh,
-            onLoading = onLoading,
             modifier = modifier,
+            state = state,
             contentPadding = contentPadding,
             verticalItemSpacing = verticalItemSpacing,
-            horizontalArrangement = horizontalArrangement,
-            header = header,
-            itemContent = itemContent
-        )
-    }
-    else {
-        ClickPaginationStaggeredGrid(
-            items = items,
-            key = key,
-            columns = columns,
-            state = state,
-            canLoading = canLoading,
-            onLoading = onLoading,
-            modifier = modifier,
-            contentPadding = contentPadding,
-            verticalItemSpacing = verticalItemSpacing,
-            horizontalArrangement = horizontalArrangement,
-            header = header,
-            itemContent = itemContent
-        )
+            horizontalArrangement = horizontalArrangement
+        ) {
+            if (header != null) {
+                item(
+                    key = ItemKey("Header"),
+                    span = StaggeredGridItemSpan.FullLine
+                ) {
+                    header()
+                }
+            }
+
+            items(items = items, key = key, itemContent = itemContent)
+        }
     }
 }

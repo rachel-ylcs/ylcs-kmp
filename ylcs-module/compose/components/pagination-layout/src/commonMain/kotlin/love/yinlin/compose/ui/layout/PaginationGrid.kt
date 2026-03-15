@@ -2,13 +2,10 @@ package love.yinlin.compose.ui.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridItemScope
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import love.yinlin.platform.Platform
+import love.yinlin.compose.data.ItemKey
 
 @Composable
 fun <T> PaginationGrid(
@@ -27,38 +24,30 @@ fun <T> PaginationGrid(
     header: (@Composable LazyGridItemScope.() -> Unit)? = null,
     itemContent: @Composable LazyGridItemScope.(T) -> Unit
 ) {
-    if (Platform.contains(*Platform.Phone)) {
-        SwipePaginationGrid(
-            items = items,
-            key = key,
+    PullLayout(
+        canRefresh = canRefresh,
+        canLoading = canLoading,
+        onRefresh = onRefresh,
+        onLoading = onLoading
+    ) {
+        LazyVerticalGrid(
             columns = columns,
-            state = state,
-            canRefresh = canRefresh,
-            canLoading = canLoading,
-            onRefresh = onRefresh,
-            onLoading = onLoading,
             modifier = modifier,
+            state = state,
             contentPadding = contentPadding,
             verticalArrangement = verticalArrangement,
             horizontalArrangement = horizontalArrangement,
-            header = header,
-            itemContent = itemContent
-        )
-    }
-    else {
-        ClickPaginationGrid(
-            items = items,
-            key = key,
-            columns = columns,
-            state = state,
-            canLoading = canLoading,
-            onLoading = onLoading,
-            modifier = modifier,
-            contentPadding = contentPadding,
-            verticalArrangement = verticalArrangement,
-            horizontalArrangement = horizontalArrangement,
-            header = header,
-            itemContent = itemContent
-        )
+        ) {
+            if (header != null) {
+                item(
+                    key = ItemKey("Header"),
+                    span = { GridItemSpan(maxLineSpan) }
+                ) {
+                    header()
+                }
+            }
+
+            items(items = items, key = key, itemContent = itemContent)
+        }
     }
 }

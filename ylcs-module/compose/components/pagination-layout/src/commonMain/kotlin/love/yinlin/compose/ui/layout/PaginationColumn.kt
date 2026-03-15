@@ -2,13 +2,11 @@ package love.yinlin.compose.ui.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import love.yinlin.platform.Platform
+import love.yinlin.compose.data.ItemKey
 
 @Composable
 fun <T> PaginationColumn(
@@ -27,38 +25,29 @@ fun <T> PaginationColumn(
     itemDivider: (@Composable () -> Unit)? = null,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
-    if (Platform.contains(*Platform.Phone)) {
-        SwipePaginationColumn(
-            items = items,
-            key = key,
-            state = state,
-            canRefresh = canRefresh,
-            onRefresh = onRefresh,
-            canLoading = canLoading,
-            onLoading = onLoading,
+    PullLayout(
+        canRefresh = canRefresh,
+        canLoading = canLoading,
+        onRefresh = onRefresh,
+        onLoading = onLoading
+    ) {
+        LazyColumn(
             modifier = modifier,
+            state = state,
             contentPadding = contentPadding,
             verticalArrangement = verticalArrangement,
             horizontalAlignment = horizontalAlignment,
-            header = header,
-            itemDivider = itemDivider,
-            itemContent = itemContent
-        )
-    }
-    else {
-        ClickPaginationColumn(
-            items = items,
-            key = key,
-            state = state,
-            canLoading = canLoading,
-            onLoading = onLoading,
-            modifier = modifier,
-            contentPadding = contentPadding,
-            verticalArrangement = verticalArrangement,
-            horizontalAlignment = horizontalAlignment,
-            header = header,
-            itemDivider = itemDivider,
-            itemContent = itemContent
-        )
+        ) {
+            if (header != null) {
+                item(key = ItemKey("Header")) {
+                    header()
+                }
+            }
+
+            itemsIndexed(items = items, key = key?.let { { _, item -> it(item) } }) {index, item->
+                itemContent(item)
+                if (itemDivider != null && index != items.lastIndex) itemDivider()
+            }
+        }
     }
 }
