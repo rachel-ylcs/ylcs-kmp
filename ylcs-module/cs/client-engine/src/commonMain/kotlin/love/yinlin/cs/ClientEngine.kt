@@ -7,7 +7,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.currentCoroutineContext
 import love.yinlin.data.Data
-import love.yinlin.extension.catchingDefault
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.uri.Uri
 import kotlin.jvm.JvmName
@@ -27,9 +26,10 @@ suspend inline fun <reified R : Any> API<out APIType>.internalRequest(
     uploadFile: Boolean,
     crossinline block: suspend (HttpResponse) -> R
 ): R {
-    val result = catchingDefault(Data.Failure(IllegalStateException("Unknown Error: 未知错误"))) {
+    val result = try {
         val context = currentCoroutineContext()
         val url = "${ClientEngine.baseUrl}$route"
+
         Coroutines.io {
             NetClient.internalPrepareStatement(HttpMethod.Post, uploadFile, url, builder).execute { response ->
                 when (response.status) {
@@ -37,11 +37,12 @@ suspend inline fun <reified R : Any> API<out APIType>.internalRequest(
                     HttpStatusCode.Accepted -> Data.Failure(FailureException(response.bodyAsText()))
                     HttpStatusCode.Unauthorized -> Data.Failure(UnauthorizedException("Unauthorized: 登录验证已过期"))
                     HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> Data.Failure(RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp))
-                    else -> Data.Failure(IllegalArgumentException("Unknown Error: 未知错误"))
+                    else -> Data.Failure(IllegalArgumentException("HTTP Error: ${response.status}"))
                 }
             }
         }
     }
+    catch (e: Throwable) { Data.Failure(e) }
     when (result) {
         is Data.Success -> return result.data
         is Data.Failure -> throw result.throwable

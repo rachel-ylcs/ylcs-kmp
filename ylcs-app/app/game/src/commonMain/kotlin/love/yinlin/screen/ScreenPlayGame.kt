@@ -8,12 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.app
 import love.yinlin.common.GameMapper
-import love.yinlin.compose.Colors
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
+import love.yinlin.compose.*
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.GameItem
@@ -76,7 +71,10 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
         ) {
             when (status) {
                 Status.Preparing -> {
-                    PrimaryLoadingButton(text = "开始", icon = Icons.Check, onClick = ::preflight)
+                    PrimaryLoadingButton(text = "开始", icon = Icons.Check, onClick = {
+                        // preflight 会切换到 Playing 从而丢失此处的协程作用域
+                        launch { preflight() }
+                    })
                 }
                 Status.Playing -> {
                     if (preflightResult != null) {
@@ -132,9 +130,11 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
                                 with(state) { Settlement() }
 
                                 SecondaryButton(text = "返回", icon = Icons.ArrowBack, onClick = {
-                                    preflightResult = null
-                                    gameResult = null
-                                    status = Status.Preparing
+                                    launch {
+                                        preflightResult = null
+                                        gameResult = null
+                                        status = Status.Preparing
+                                    }
                                 })
                             }
                         }
