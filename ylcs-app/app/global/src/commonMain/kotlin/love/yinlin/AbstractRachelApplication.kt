@@ -2,7 +2,6 @@ package love.yinlin
 
 import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
-import kotlinx.io.files.Path
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.AnimationTheme
@@ -20,11 +19,8 @@ import love.yinlin.foundation.PlatformContextDelegate
 import love.yinlin.foundation.StartupDelegate
 import love.yinlin.foundation.StartupLazyFetcher
 import love.yinlin.foundation.StartupNative
+import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
-import love.yinlin.fs.deleteRecursively
-import love.yinlin.fs.mkdir
-import love.yinlin.fs.size
-import love.yinlin.fs.write
 import love.yinlin.platform.Platform
 import love.yinlin.startup.StartupExceptionHandler
 import love.yinlin.startup.StartupKV
@@ -34,18 +30,16 @@ import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : PlatformApplication<AbstractRachelApplication>(mApp, delegate), DeepLink {
-    val dataPath: Path = PlatformFileSystem.dataPath(delegate, Local.info.appName)
-    val cachePath: Path = PlatformFileSystem.cachePath(delegate, Local.info.appName)
-    val configPath: Path = Path(dataPath, "config")
-    val modPath: Path = Path(dataPath, "mod")
+    val dataPath: File = PlatformFileSystem.dataPath(delegate, Local.info.appName)
+    val cachePath: File = PlatformFileSystem.cachePath(delegate, Local.info.appName)
+    val configPath: File = File(dataPath, "config")
+    val modPath: File = File(dataPath, "mod")
 
     init {
         async(priority = StartupDelegate.HIGH9, name = "createDirectories") {
-            Platform.useNot(*Platform.Web) {
-                dataPath.mkdir()
-                cachePath.mkdir()
-                modPath.mkdir()
-            }
+            dataPath.mkdir()
+            cachePath.mkdir()
+            modPath.mkdir()
         }
 
         sync(name = "initClientBaseUrl") {
@@ -106,12 +100,12 @@ abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : Pl
         cachePath.deleteRecursively()
         cachePath.mkdir()
     }
-    suspend inline fun createTempFile(filename: String? = null, crossinline block: suspend (Sink) -> Boolean): Path? = catchingNull {
+    suspend inline fun createTempFile(filename: String? = null, crossinline block: suspend (Sink) -> Boolean): File? = catchingNull {
         val name = filename ?: DateEx.CurrentLong.toString()
-        Path(cachePath, name).apply { write { require(block(it)) } }
+        File(cachePath, name).apply { write { require(block(it)) } }
     }
-    suspend fun createTempFolder(filename: String? = null): Path? = catchingNull {
+    suspend fun createTempFolder(filename: String? = null): File? = catchingNull {
         val name = filename ?: DateEx.CurrentLong.toString()
-        Path(cachePath, name).apply { mkdir() }
+        File(cachePath, name).apply { mkdir() }
     }
 }

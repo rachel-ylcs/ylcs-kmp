@@ -20,7 +20,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.app.game_rhyme.resources.Res
 import love.yinlin.app.game_rhyme.resources.rhyme
@@ -58,9 +57,7 @@ import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
 import love.yinlin.foundation.Orientation
 import love.yinlin.foundation.OrientationController
-import love.yinlin.fs.exists
-import love.yinlin.fs.readByteArray
-import love.yinlin.fs.readText
+import love.yinlin.fs.File
 import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.seconds
 
@@ -82,7 +79,7 @@ class ScreenRhyme : Screen() {
 
     private var resumePauseJob: Job? = null
 
-    private var prologueBackground: Path? = null
+    private var prologueBackground: File? = null
 
     private fun onScreenOrientationChanged(type: Device.Type) {
         if (type == Device.Type.LANDSCAPE) {
@@ -245,7 +242,7 @@ class ScreenRhyme : Screen() {
     private fun GameOverlayStart() {
         Box(modifier = Modifier.fillMaxSize()) {
             LocalFileImage(
-                uri = prologueBackground?.toString() ?: "",
+                uri = prologueBackground?.path ?: "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize().zIndex(1f)
             )
@@ -384,7 +381,7 @@ class ScreenRhyme : Screen() {
         val rhymeFont = rememberFontFamily(Res.font.rhyme)
 
         LocalFileImage(
-            uri = prologueBackground?.toString() ?: "",
+            uri = prologueBackground?.path ?: "",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize().background(Colors.Black).zIndex(1f),
             alpha = 0.9f

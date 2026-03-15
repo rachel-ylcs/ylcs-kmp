@@ -11,12 +11,12 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.domDataTransferOrNull
-import kotlinx.io.files.Path
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ArrayCompatible
 import love.yinlin.data.MimeType
 import love.yinlin.extension.asArray
 import love.yinlin.extension.cast
+import love.yinlin.fs.File
 import org.w3c.dom.get
 import org.w3c.files.get
 import kotlin.js.ExperimentalWasmJsInterop
@@ -45,8 +45,8 @@ actual fun Modifier.dragAndDrop(
                         else if ("files" in types) {
                             val files = transferData.files
                             val len = files.length
-                            val paths = mutableListOf<Path>()
-                            for (i in 0 ..< len) paths += Path(files[i]?.name ?: "")
+                            val paths = mutableListOf<File>()
+                            for (i in 0 ..< len) paths += File(files[i]?.name ?: "")
                             onDropFunc(DropResult.File(paths))
                             return true
                         }

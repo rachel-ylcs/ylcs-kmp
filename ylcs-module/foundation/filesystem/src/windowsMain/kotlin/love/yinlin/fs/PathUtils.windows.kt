@@ -4,7 +4,6 @@ package love.yinlin.fs
 import kotlinx.cinterop.*
 import kotlinx.datetime.LocalDateTime
 import kotlinx.io.bytestring.buildByteString
-import kotlinx.io.files.Path
 import love.yinlin.extension.merge64
 import love.yinlin.extension.toLocalDateTime
 import love.yinlin.extension.toLong
@@ -47,7 +46,7 @@ enum class StandardPath(val code: Int) {
  * 驱动器操作
  */
 data class DriverInfo(
-    val name: Path, // 驱动器路径
+    val name: File, // 驱动器路径
     val totalSpace: Long, // 总空间 Byte
     val freeSpace: Long, // 剩余空间 Byte
 ) {
@@ -69,7 +68,7 @@ data class DriverInfo(
                 GetDiskFreeSpaceW(name, data, data + 1, data + 2, data + 3)
                 val m = (data[1] * data[0]).toLong()
                 DriverInfo(
-                    name = Path(name),
+                    name = File(name),
                     totalSpace = data[3].toLong() * m,
                     freeSpace = data[2].toLong() * m
                 )
@@ -78,8 +77,7 @@ data class DriverInfo(
     }
 }
 
-private inline fun Path.fileTime(block: (WIN32_FIND_DATAW) -> FILETIME): LocalDateTime? = memScoped {
-    val path = this@fileTime.toString()
+private inline fun File.fileTime(block: (WIN32_FIND_DATAW) -> FILETIME): LocalDateTime? = memScoped {
     val data = alloc<WIN32_FIND_DATAW>()
     GetFileAttributesExW(path, GET_FILEEX_INFO_LEVELS.GetFileExInfoStandard, data.ptr)
     if (data.dwFileAttributes != INVALID_FILE_ATTRIBUTES) {
@@ -90,11 +88,11 @@ private inline fun Path.fileTime(block: (WIN32_FIND_DATAW) -> FILETIME): LocalDa
     else null
 }
 
-private fun Path.fileTime(time: LocalDateTime, index: Int) = memScoped {
-    val path = this@fileTime.toString()
-    val attr = GetFileAttributesW(path)
+private fun File.fileTime(time: LocalDateTime, index: Int) = memScoped {
+    val pathStr = path
+    val attr = GetFileAttributesW(pathStr)
     val flag = if (attr != INVALID_FILE_ATTRIBUTES && (attr.toInt() and FILE_ATTRIBUTE_DIRECTORY) != 0) 0x02000000U else 0U
-    val hFile = CreateFileW(path, GENERIC_WRITE.convert(), 0U, null, OPEN_EXISTING.convert(), flag, null)
+    val hFile = CreateFileW(pathStr, GENERIC_WRITE.convert(), 0U, null, OPEN_EXISTING.convert(), flag, null)
     if (hFile != INVALID_HANDLE_VALUE) {
         val value = (time.toLong.toULong() * 10000UL + 116444736000000000UL).toLong()
         val ft = alloc<FILETIME>()
@@ -107,30 +105,29 @@ private fun Path.fileTime(time: LocalDateTime, index: Int) = memScoped {
 /**
  * 文件创建时间
  */
-var Path.createTime: LocalDateTime?
+var File.createTime: LocalDateTime?
     get() = this.fileTime { it.ftCreationTime }
     set(value) { value?.let { time -> this.fileTime(time, 0) } }
 
 /**
  * 文件修改时间
  */
-var Path.writeTime: LocalDateTime?
+var File.writeTime: LocalDateTime?
     get() = this.fileTime { it.ftLastWriteTime }
     set(value) { value?.let { time -> this.fileTime(time, 1) } }
 
 /**
  * 文件访问时间
  */
-var Path.accessTime: LocalDateTime?
+var File.accessTime: LocalDateTime?
     get() = this.fileTime { it.ftLastAccessTime }
     set(value) { value?.let { time -> this.fileTime(time, 2) } }
 
 /**
  * 取快捷方式目标
  */
-val Path.shortcutTarget: Path? get() = memScoped {
-    val shortcutPath = this@shortcutTarget.toString()
-    val hFile = CreateFileW(shortcutPath, GENERIC_READ, FILE_SHARE_READ.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
+val File.shortcutTarget: File? get() = memScoped {
+    val hFile = CreateFileW(path, GENERIC_READ, FILE_SHARE_READ.convert(), null, OPEN_EXISTING.convert(), FILE_ATTRIBUTE_NORMAL.convert(), null)
     if (hFile == INVALID_HANDLE_VALUE) return null
     val vFileSize = alloc<LARGE_INTEGER>()
     if (GetFileSizeEx(hFile, vFileSize.ptr) == FALSE) {
@@ -164,8 +161,7 @@ val Path.shortcutTarget: Path? get() = memScoped {
                     v = p.pointed.value.toInt()
                 }
             }
-            val targetPath = data.toByteArray().decodeToString()
-            return Path(targetPath)
+            return File(data.toByteArray().decodeToString())
         }
     }
     return null
@@ -174,8 +170,8 @@ val Path.shortcutTarget: Path? get() = memScoped {
 /**
  * 删除到回收站
  */
-fun deleteToRecycleBin(path: Path): Boolean = memScoped {
-    val pathStr = path.toString()
+fun deleteToRecycleBin(file: File): Boolean = memScoped {
+    val pathStr = file.path
     val length = pathStr.length
     val dst = allocArray<UShortVar>(length + 2)
     val shDelFile = alloc<SHFILEOPSTRUCTW>()

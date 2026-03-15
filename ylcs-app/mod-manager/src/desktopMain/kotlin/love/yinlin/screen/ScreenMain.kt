@@ -16,7 +16,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
@@ -54,7 +53,6 @@ import love.yinlin.extension.*
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
 import java.awt.Desktop
-import java.io.File
 
 @Stable
 class ScreenMain : BasicScreen() {
@@ -79,11 +77,11 @@ class ScreenMain : BasicScreen() {
         val result = Coroutines.io {
             app.libraryPath.list().filter { it.isDirectory() }.map { folder ->
                 catchingDefault({ ModItem(id = folder.name, name = folder.name, path = folder, enabled = false) }) {
-                    require(Path(folder, ModResourceType.Record.filename).exists())
-                    require(Path(folder, ModResourceType.Background.filename).exists())
-                    require(Path(folder, ModResourceType.LineLyrics.filename).exists())
-                    require(Path(folder, ModResourceType.Audio.filename).exists())
-                    val musicInfo = Path(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
+                    require(File(folder, ModResourceType.Record.filename).exists())
+                    require(File(folder, ModResourceType.Background.filename).exists())
+                    require(File(folder, ModResourceType.LineLyrics.filename).exists())
+                    require(File(folder, ModResourceType.Audio.filename).exists())
+                    val musicInfo = File(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
                     ModItem(id = musicInfo.id, name = musicInfo.name, path = folder, enabled = true)
                 }
             }.distinctBy { it.id }
@@ -118,11 +116,11 @@ class ScreenMain : BasicScreen() {
 
     private suspend fun mergeSingleMod(
         filename: String,
-        paths: List<Path>,
+        paths: List<File>,
         filters: List<ModResourceType>,
         onProcess: (index: Int, total: Int, name: String) -> Unit
     ) {
-        Path(app.outputPath, filename).write { sink ->
+        File(app.outputPath, filename).write { sink ->
             ModFactory.Merge(paths, sink).process(filters = filters, onProcess = onProcess)
         }
     }
@@ -164,15 +162,15 @@ class ScreenMain : BasicScreen() {
                 modPath.deleteRecursively()
                 modPath.mkdir()
                 for (item in items) {
-                    val itemPath = Path(modPath, item.id)
+                    val itemPath = File(modPath, item.id)
                     itemPath.mkdir()
                     // 复制基础资源
                     for (resPath in item.path.list()) {
                         val type = ModResourceType.fromType(resPath.nameWithoutExtension)!!
-                        if (type in ModResourceType.DEPLOYMENT) resPath.writeTo(Path(itemPath, resPath.name))
+                        if (type in ModResourceType.DEPLOYMENT) resPath.writeTo(File(itemPath, resPath.name))
                     }
                     // 基础资源打包
-                    Path(itemPath, ModResourceType.BASE_RES).write { sink ->
+                    File(itemPath, ModResourceType.BASE_RES).write { sink ->
                         ModFactory.Merge(listOf(item.path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
                     }
                 }
@@ -206,9 +204,9 @@ class ScreenMain : BasicScreen() {
                     }
                 }
             }
-            item("打开所在目录") { Desktop.getDesktop().open(File(item.path.toString())) }
+            item("打开所在目录") { Desktop.getDesktop().open(java.io.File(item.path.path)) }
             item("音游编辑") {
-                launch { navigate(::ScreenRhyme, item.path.toString()) }
+                launch { navigate(::ScreenRhyme, item.path.path) }
             }
         }) {
             Column(modifier = modifier.clickable {
@@ -216,7 +214,7 @@ class ScreenMain : BasicScreen() {
                 library[index] = item.copy(selected = !item.selected)
             }.padding(Theme.padding.eValue)) {
                 LocalFileImage(
-                    uri = Path(item.path, ModResourceType.Record.filename).toString(),
+                    uri = File(item.path, ModResourceType.Record.filename).path,
                     item.id,
                     modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                     contentScale = ContentScale.Crop
@@ -449,7 +447,7 @@ class ScreenMain : BasicScreen() {
             statusText = ""
         }
 
-        private suspend fun runReleaseTask(path: Path, onProcess: (index: Int, total: Int, id: String) -> Unit) {
+        private suspend fun runReleaseTask(path: File, onProcess: (index: Int, total: Int, id: String) -> Unit) {
             path.read { source ->
                 ModFactory.Release(source, app.libraryPath).process(onProcess)
             }
@@ -508,7 +506,7 @@ class ScreenMain : BasicScreen() {
         private var configText: String? by mutableStateOf(null)
 
         override suspend fun initialize(args: ModItem) {
-            configText = Path(args.path, ModResourceType.Config.filename).readText()
+            configText = File(args.path, ModResourceType.Config.filename).readText()
         }
 
         @Composable
@@ -524,12 +522,12 @@ class ScreenMain : BasicScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     LocalFileImage(
-                        uri = Path(args.path, ModResourceType.Record.filename).toString(),
+                        uri = File(args.path, ModResourceType.Record.filename).path,
                         args.id,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     LocalFileImage(
-                        uri = Path(args.path, ModResourceType.Background.filename).toString(),
+                        uri = File(args.path, ModResourceType.Background.filename).path,
                         args.id,
                         modifier = Modifier.weight(1f).aspectRatio(0.5625f)
                     )

@@ -2,10 +2,10 @@ package love.yinlin.media
 
 import androidx.compose.ui.util.fastMap
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.io.files.Path
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
 import love.yinlin.extension.toNSData
+import love.yinlin.fs.File
 import platform.AVFAudio.*
 import platform.Foundation.NSURL
 
@@ -32,11 +32,11 @@ actual class SoundPlayer {
         }
     }
 
-    actual suspend fun loadFromPath(data: List<Path>) {
+    actual suspend fun loadFromPath(data: List<File>) {
         catching {
             caches = Coroutines.cpu {
                 data.fastMap { path ->
-                    AVAudioPlayer(NSURL.URLWithString(path.toString())!!, error = null).also {
+                    AVAudioPlayer(NSURL.URLWithString(path.path)!!, error = null).also {
                         it.prepareToPlay()
                     }
                 }

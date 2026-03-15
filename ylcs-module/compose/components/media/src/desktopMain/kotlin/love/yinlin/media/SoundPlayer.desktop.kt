@@ -1,11 +1,10 @@
 package love.yinlin.media
 
 import androidx.compose.ui.util.fastMap
-import kotlinx.io.files.Path
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
+import love.yinlin.fs.File
 import java.io.ByteArrayInputStream
-import java.io.File
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 
@@ -24,11 +23,11 @@ actual class SoundPlayer {
         }
     }
 
-    actual suspend fun loadFromPath(data: List<Path>) {
+    actual suspend fun loadFromPath(data: List<File>) {
         catching {
             caches = Coroutines.io {
                 data.fastMap { path ->
-                    AudioSystem.getAudioInputStream(File(path.toString())).use { stream ->
+                    AudioSystem.getAudioInputStream(java.io.File(path.path)).use { stream ->
                         AudioSystem.getClip().also { it.open(stream) }
                     }
                 }

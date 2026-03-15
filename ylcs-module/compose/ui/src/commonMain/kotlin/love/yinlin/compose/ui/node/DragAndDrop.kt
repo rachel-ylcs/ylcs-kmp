@@ -2,7 +2,6 @@ package love.yinlin.compose.ui.node
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import kotlinx.io.files.Path
 
 @Stable
 class DragFlag private constructor(val value: Int) {
@@ -21,7 +20,7 @@ class DragFlag private constructor(val value: Int) {
 @Stable
 sealed interface DropResult {
     @Stable
-    data class File(val path: List<Path>) : DropResult
+    data class File(val path: List<love.yinlin.fs.File>) : DropResult
     @Stable
     data class Text(val text: String) : DropResult
 }

@@ -6,8 +6,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import kotlinx.io.files.Path
 import love.yinlin.foundation.Context
+import love.yinlin.fs.File
 
 @Stable
 internal class AndroidAudioPlayer(context: Context, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
@@ -48,9 +48,9 @@ internal class AndroidAudioPlayer(context: Context, onEndListener: () -> Unit) :
         player = null
     }
 
-    override suspend fun load(path: Path, playing: Boolean) {
+    override suspend fun load(path: File, playing: Boolean) {
         player?.let {
-            it.setMediaItem(MediaItem.fromUri(path.toString()))
+            it.setMediaItem(MediaItem.fromUri(path.path))
             it.prepare()
             if (playing) it.play()
         }

@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
-import kotlinx.io.files.Path
+import love.yinlin.fs.File
 
 @Stable
 interface LyricsEngine {
     val interval: Long
     val type: LyricsEngineType
 
-    suspend fun load(rootPath: Path): Boolean
+    suspend fun load(rootPath: File): Boolean
     fun reset()
     fun update(position: Long)
 

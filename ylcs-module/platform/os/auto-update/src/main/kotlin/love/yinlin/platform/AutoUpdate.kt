@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.catching
 import java.io.File
 import java.nio.file.Files
@@ -61,7 +62,7 @@ object AutoUpdate {
 
         // 1. 解压更新包到当前目录
         val zipPath = File(filename)
-        val newName = System.currentTimeMillis().toString()
+        val newName = DateEx.CurrentLong.toString()
         val unzipPath = currentDir.resolve(newName)
         unzipPackage(unzipPath, zipPath)
         // 2. 启动脚本

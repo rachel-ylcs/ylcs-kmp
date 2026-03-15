@@ -3,15 +3,15 @@ package love.yinlin.startup
 import cocoapods.MMKV.MMKV
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.io.files.Path
 import love.yinlin.extension.toNSData
 import love.yinlin.extension.toByteArray
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
+import love.yinlin.fs.File
 
-@StartupArg(index = 0, name = "initPath", type = Path::class)
+@StartupArg(index = 0, name = "initPath", type = File::class)
 @OptIn(ExperimentalForeignApi::class)
 actual class StartupKV : SyncStartup() {
     lateinit var mmkv: MMKV

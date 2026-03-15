@@ -69,7 +69,6 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catching
 import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.timeString
-import love.yinlin.fs.isFile
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.startup.StartupMusicPlayer
 import kotlin.math.abs
@@ -154,7 +153,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         val music = mp?.currentMusic
         if (music != null) {
             LocalFileImage(
-                uri = music.path(app.modPath, if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).toString(),
+                uri = music.path(app.modPath, if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).path,
                 music, isAnimationBackground,
                 contentScale = ContentScale.Crop,
                 alpha = 0.85f,
@@ -243,8 +242,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 mp?.let {
                                     launch {
                                         it.pause()
-                                        it.currentMusic?.path(app.modPath, ModResourceType.Video)?.let { path ->
-                                            navigate(::ScreenVideo, path.toString())
+                                        it.currentMusic?.path(app.modPath, ModResourceType.Video)?.let { file ->
+                                            navigate(::ScreenVideo, file.path)
                                         }
                                     }
                                 }
@@ -287,7 +286,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
 
         LocalFileImage(
-            uri = musicInfo.path(app.modPath, ModResourceType.Record).toString(),
+            uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
             musicInfo,
             contentScale = ContentScale.Crop,
             modifier = modifier.fastRotate(animationRecord),

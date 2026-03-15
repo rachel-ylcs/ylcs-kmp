@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -69,14 +68,14 @@ class ScreenCreateMusic : Screen() {
 
     private val input = MusicInfoState()
 
-    private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (Path) -> Unit) {
-        val path = app.picker.pickPicture()?.use { source ->
+    private suspend fun pickPicture(aspectRatio: Float, onPicAdd: (File) -> Unit) {
+        val file = app.picker.pickPicture()?.use { source ->
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
-        if (path != null) {
-            cropDialog.open(url = path.toString(), aspectRatio = aspectRatio)?.let { rect ->
+        if (file != null) {
+            cropDialog.open(url = file.path, aspectRatio = aspectRatio)?.let { rect ->
                 app.createTempFile { sink ->
-                    val image = PlatformImage.decode(path.readByteArray()!!)!!
+                    val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(rect)
                     sink.write(image.encode(quality = ImageQuality.Full)!!)
                     true
@@ -105,7 +104,7 @@ class ScreenCreateMusic : Screen() {
                 Coroutines.io {
                     // 4. 生成目录
                     val modPath = app.modPath
-                    val musicPath = Path(modPath, id)
+                    val musicPath = File(modPath, id)
                     musicPath.mkdir()
                     // 5. 写入配置
                     val info = MusicInfo(
@@ -125,9 +124,9 @@ class ScreenCreateMusic : Screen() {
                         audioFile.read { source -> source.transferTo(sink) }
                     }
                     // 7. 写入封面
-                    Path(recordFile).writeTo(info.path(modPath, ModResourceType.Record))
+                    File(recordFile).writeTo(info.path(modPath, ModResourceType.Record))
                     // 8. 写入壁纸
-                    Path(backgroundFile).writeTo(info.path(modPath, ModResourceType.Background))
+                    File(backgroundFile).writeTo(info.path(modPath, ModResourceType.Background))
                     // 9. 写入歌词
                     info.path(modPath, ModResourceType.LineLyrics).writeText(lyrics.toString())
                 }
@@ -212,7 +211,7 @@ class ScreenCreateMusic : Screen() {
                 value = input.record,
                 onReplace = {
                     launch {
-                        pickPicture(1f) { input.record = it.toString() }
+                        pickPicture(1f) { input.record = it.path }
                     }
                 },
                 onDelete = { input.record = null }
@@ -229,7 +228,7 @@ class ScreenCreateMusic : Screen() {
                 value = input.background,
                 onReplace = {
                     launch {
-                        pickPicture(0.5625f) { input.background = it.toString() }
+                        pickPicture(0.5625f) { input.background = it.path }
                     }
                 },
                 onDelete = { input.background = null }

@@ -3,12 +3,12 @@ package love.yinlin.common.rhyme
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.io.files.Path
 import love.yinlin.compose.game.Manager
 import love.yinlin.compose.game.asset.ImageAsset
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.foundation.Context
 import love.yinlin.common.rhyme.spirit.Scene
+import love.yinlin.fs.File
 import love.yinlin.media.SoundPlayer
 import love.yinlin.media.buildAudioPlayer
 
@@ -48,7 +48,7 @@ class RhymeManager(
         name: String,
         lyricsConfig: RhymeLyricsConfig,
         recordImage: ByteArray,
-        audio: Path
+        audio: File
     ) {
         config = playConfig
 

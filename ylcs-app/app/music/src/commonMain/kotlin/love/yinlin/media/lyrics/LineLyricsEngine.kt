@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
@@ -15,7 +14,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.extension.catchingDefault
-import love.yinlin.fs.readText
+import love.yinlin.fs.File
 import love.yinlin.tpl.lyrics.LrcParser
 
 @Stable
@@ -26,8 +25,8 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
     override val interval: Long = 150L
     override val type: LyricsEngineType = LyricsEngineType.Line
 
-    override suspend fun load(rootPath: Path): Boolean = catchingDefault(false) {
-        val source = Path(rootPath, type.resType.filename).readText()
+    override suspend fun load(rootPath: File): Boolean = catchingDefault(false) {
+        val source = File(rootPath, type.resType.filename).readText()
         lines = source?.let { LrcParser(it).lines }?.map { StaticLine(it.position, it.text) }
         currentIndex = -1
         lines!!.isNotEmpty()

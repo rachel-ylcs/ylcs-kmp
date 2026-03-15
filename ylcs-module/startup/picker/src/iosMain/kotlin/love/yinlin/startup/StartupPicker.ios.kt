@@ -2,13 +2,7 @@ package love.yinlin.startup
 
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.io.Buffer
-import kotlinx.io.InternalIoApi
-import kotlinx.io.Sink
-import kotlinx.io.Source
-import kotlinx.io.buffered
-import kotlinx.io.files.Path
-import kotlinx.io.readByteArray
+import kotlinx.io.*
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.toNSData
 import love.yinlin.io.SandboxSource
@@ -25,10 +19,7 @@ import platform.Foundation.temporaryDirectory
 import platform.Photos.PHPhotoLibrary
 import platform.PhotosUI.*
 import platform.UIKit.*
-import platform.UniformTypeIdentifiers.UTType
-import platform.UniformTypeIdentifiers.UTTypeContent
-import platform.UniformTypeIdentifiers.UTTypeFolder
-import platform.UniformTypeIdentifiers.UTTypeImage
+import platform.UniformTypeIdentifiers.*
 import platform.darwin.NSObject
 
 actual class StartupPicker : SyncStartup() {
@@ -62,13 +53,13 @@ actual class StartupPicker : SyncStartup() {
                 }
                 val picker = PHPickerViewController(configuration)
                 val onImagesPicked: (List<PHPickerResult>) -> Unit = { results ->
-                    val images = mutableListOf<Path>()
+                    val images = mutableListOf<File>()
                     var processedImages = 0
                     results.forEach { pickerResult ->
                         pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
                                 url, _ ->
                             val tempUrl = copyToTempDir(url)
-                            tempUrl?.path?.let(::Path)?.let { path -> images.add(path) }
+                            tempUrl?.path?.let { path -> images.add(File(path)) }
                             processedImages++
                             if (processedImages == results.size) {
                                 future.send(images)
@@ -170,7 +161,7 @@ actual class StartupPicker : SyncStartup() {
         val fileManager = NSFileManager.defaultManager
         val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(filename) ?: return null
         val url = NSURL.fileURLWithPathComponents(tempPath) ?: return null
-        val path = url.path?.let(::Path) ?: return null
+        val path = url.path?.let { File(it) } ?: return null
         return SaveType.Video(filename, url) to path.bufferedSink()
     }
 

@@ -24,12 +24,16 @@ import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
-import java.util.UUID
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 actual class StartupPicker : SyncStartup() {
     private lateinit var activity: ComponentActivity
     private lateinit var resolver: ContentResolver
     private lateinit var activityResultRegistry: ActivityResultRegistry
+
+    @OptIn(ExperimentalUuidApi::class)
+    private val generateKey: String get() = Uuid.generateV4().toString()
 
     actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) { }
 
@@ -42,7 +46,7 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun pickPicture(): Source? = Coroutines.sync { future ->
         future.catching {
             activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
+                key = generateKey,
                 contract = ActivityResultContracts.PickVisualMedia()
             ) { uri ->
                 future.send { resolver.openInputStream(uri!!)!!.asSource().buffered() }
@@ -53,7 +57,7 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.sync { future ->
         future.catching {
             activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
+                key = generateKey,
                 contract = ActivityResultContracts.PickMultipleVisualMedia(maxNum)
             ) { result ->
                 future.send(result.safeToSources { resolver.openInputStream(it)!!.asSource().buffered() })
@@ -64,7 +68,7 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.sync { future ->
         future.catching {
             activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
+                key = generateKey,
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri ->
                 future.send { resolver.openInputStream(uri!!)!!.asSource().buffered() }
@@ -75,7 +79,7 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = Coroutines.sync { future ->
         future.catching {
             activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
+                key = generateKey,
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri ->
                 future.send { ContentUri(activity, uri!!.toString()) }
@@ -87,7 +91,7 @@ actual class StartupPicker : SyncStartup() {
     actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = Coroutines.sync { future ->
         future.catching {
             activityResultRegistry.register(
-                key = UUID.randomUUID().toString(),
+                key = generateKey,
                 contract = ActivityResultContracts.CreateDocument(mimeType)
             ) { uri ->
                 future.send { ContentUri(activity, uri!!.toString()) }

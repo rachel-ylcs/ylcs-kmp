@@ -10,7 +10,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.util.fastJoinToString
 import androidx.compose.ui.zIndex
-import kotlinx.io.files.Path
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -21,7 +20,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.fs.readText
+import love.yinlin.fs.File
 
 @Stable
 internal data class DynamicLineItem(val ch: String, val end: Long)
@@ -36,8 +35,8 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
 
     private var progress by mutableFloatStateOf(0f)
 
-    override suspend fun load(rootPath: Path): Boolean = catchingDefault(false) {
-        val config = Path(rootPath, type.resType.filename).readText()!!.parseJsonValue<RhymeLyricsConfig>()
+    override suspend fun load(rootPath: File): Boolean = catchingDefault(false) {
+        val config = File(rootPath, type.resType.filename).readText()!!.parseJsonValue<RhymeLyricsConfig>()
         // 偏移校准
         val offset = config.offset
         lines = config.lyrics.map { rhymeLine ->

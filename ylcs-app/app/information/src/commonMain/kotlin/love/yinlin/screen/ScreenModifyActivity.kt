@@ -9,7 +9,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
-import kotlinx.io.files.Path
 import kotlinx.io.readByteArray
 import love.yinlin.app
 import love.yinlin.common.DataSourceInformation
@@ -44,7 +43,7 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.activity.ActivityLink
 import love.yinlin.data.rachel.activity.ActivityPrice
 import love.yinlin.extension.*
-import love.yinlin.fs.readByteArray
+import love.yinlin.fs.File
 
 @Stable
 class ScreenModifyActivity(private val aid: Int) : Screen() {
@@ -127,7 +126,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
         }.errorTip
     }
 
-    private suspend fun updatePhoto(key: String, path: Path) {
+    private suspend fun updatePhoto(key: String, path: File) {
         slot.loading.open(content = "正在上传...") {
             ApiActivityUpdateActivityPhoto.request(app.config.userToken, aid, key, apiFile(path)) { newPic ->
                 activities.findAssign(predicate = { it.aid == aid }) {
@@ -155,7 +154,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
         }
     }
 
-    private suspend fun addPhotos(key: String, files: List<Path>) {
+    private suspend fun addPhotos(key: String, files: List<File>) {
         slot.loading.open(content = "正在上传...") {
             ApiActivityAddActivityPhotos.request(app.config.userToken, aid, key, apiFile(files)!!) { newPics ->
                 activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
@@ -212,14 +211,14 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
         }
     }
 
-    suspend fun pickPicture(onPicAdd: suspend (Path) -> Unit) {
-        val path = app.picker.pickPicture()?.use { source ->
+    suspend fun pickPicture(onPicAdd: suspend (File) -> Unit) {
+        val file = app.picker.pickPicture()?.use { source ->
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
-        if (path != null) {
-            cropDialog.open(url = path.toString(), aspectRatio = 2f)?.let { region ->
+        if (file != null) {
+            cropDialog.open(url = file.path, aspectRatio = 2f)?.let { region ->
                 app.createTempFile { sink ->
-                    val image = PlatformImage.decode(path.readByteArray()!!)!!
+                    val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(region)
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)
@@ -229,9 +228,9 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
         }
     }
 
-    suspend fun pickPictures(currentSize: Int, onPicsAdd: suspend (List<Path>) -> Unit) {
+    suspend fun pickPictures(currentSize: Int, onPicsAdd: suspend (List<File>) -> Unit) {
         app.picker.pickPicture((9 - currentSize).coerceAtLeast(1))?.use { sources ->
-            val path = mutableListOf<Path>()
+            val path = mutableListOf<File>()
             for (source in sources) {
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(source.readByteArray())!!

@@ -138,7 +138,7 @@ internal fun RhymeMusicCard(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             LocalFileImage(
-                uri = entry.musicInfo.path(app.modPath, ModResourceType.Record).toString(),
+                uri = entry.musicInfo.path(app.modPath, ModResourceType.Record).path,
                 entry,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth().aspectRatio(1f)

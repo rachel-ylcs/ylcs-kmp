@@ -2,14 +2,14 @@ package love.yinlin.startup
 
 import kotlinx.browser.localStorage
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.io.files.Path
 import love.yinlin.extension.*
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
+import love.yinlin.fs.File
 
-@StartupArg(index = 0, name = "initPath", type = Path::class)
+@StartupArg(index = 0, name = "initPath", type = File::class)
 actual class StartupKV : SyncStartup() {
     actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {}
 

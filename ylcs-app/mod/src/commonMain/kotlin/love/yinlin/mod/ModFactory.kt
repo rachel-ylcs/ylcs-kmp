@@ -3,7 +3,6 @@ package love.yinlin.mod
 import androidx.compose.runtime.Stable
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import kotlinx.io.files.Path
 import kotlinx.io.readByteArray
 import kotlinx.io.readTo
 import love.yinlin.coroutines.Coroutines
@@ -23,7 +22,7 @@ object ModFactory {
 
     @Stable
     class Merge(
-        private val mediaPaths: List<Path>,
+        private val mediaPaths: List<File>,
         private val sink: Sink,
         private val info: ModInfo = ModInfo()
     ) {
@@ -35,7 +34,7 @@ object ModFactory {
             }
         }
 
-        constructor(mediaPath: Path, sink: Sink) : this(listOf(mediaPath), sink)
+        constructor(mediaPath: File, sink: Sink) : this(listOf(mediaPath), sink)
 
         private suspend fun Sink.writeMetadata() {
             Coroutines.io {
@@ -46,7 +45,7 @@ object ModFactory {
             }
         }
 
-        private suspend fun Sink.writeResource(resourcePath: Path, resource: ModResourceType) {
+        private suspend fun Sink.writeResource(resourcePath: File, resource: ModResourceType) {
             Coroutines.io {
                 writeLengthString(resource.type)
                 val resLength = resourcePath.fileSize().toInt()
@@ -65,14 +64,14 @@ object ModFactory {
             }
         }
 
-        private suspend fun Sink.writeMedia(mediaPath: Path, filters: List<ModResourceType>) {
+        private suspend fun Sink.writeMedia(mediaPath: File, filters: List<ModResourceType>) {
             Coroutines.io {
                 // 先读 config
-                val configPath = Path(mediaPath, ModResourceType.Config.filename)
+                val configPath = File(mediaPath, ModResourceType.Config.filename)
                 val musicInfo = configPath.readText()!!.parseJsonValue<MusicInfo>()
                 writeLengthString(musicInfo.id) // 写媒体ID
 
-                val resourcePaths = mutableListOf<Pair<Path, ModResourceType>>()
+                val resourcePaths = mutableListOf<Pair<File, ModResourceType>>()
                 for (path in mediaPath.list()) {
                     val type = ModResourceType.fromType(path.nameWithoutExtension)
                     if (path.extension == ModResourceType.RES_EXT && type != null && type in filters) {
@@ -129,7 +128,7 @@ object ModFactory {
     @Stable
     class Release(
         source: Source,
-        private val savePath: Path
+        private val savePath: File
     ): BaseRelease(source) {
         @Stable
         data class ReleaseResult(
@@ -137,7 +136,7 @@ object ModFactory {
             val medias: List<String>
         )
 
-        private suspend fun Source.readResource(mediaPath: Path) = Coroutines.io {
+        private suspend fun Source.readResource(mediaPath: File) = Coroutines.io {
             val resName = readLengthString() // 读资源名称
             val type = ModResourceType.fromType(resName)
             require(type != null) { "未知资源类型: $resName" }
@@ -146,7 +145,7 @@ object ModFactory {
             val times = resLength / INTERVAL
             val remain = resLength - times * INTERVAL
             // 读资源数据
-            Path(mediaPath, type.filename).write { sink ->
+            File(mediaPath, type.filename).write { sink ->
                 repeat(times) {
                     readTo(sink, INTERVAL.toLong())
                     val _ = readByte()
@@ -157,7 +156,7 @@ object ModFactory {
 
         private suspend fun Source.readMedia(): String = Coroutines.io {
             val id = readLengthString() // 读媒体ID
-            val mediaPath = Path(savePath, id)
+            val mediaPath = File(savePath, id)
             mediaPath.mkdir()
             val resourceNum = readInt() // 读资源数
             repeat(resourceNum) {

@@ -4,7 +4,6 @@ import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -17,14 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
-import kotlinx.io.files.Path
 import kotlinx.serialization.json.Json
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
@@ -50,7 +47,6 @@ import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
-import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.node.dragAndDrop
 import love.yinlin.compose.ui.text.SelectionBox
@@ -132,7 +128,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
     private suspend fun saveConfig() {
         path?.let {
             if (!slot.confirm.open(content = "替换音游配置到库")) return
-            val rhymePath = Path(it, ModResourceType.Rhyme.filename)
+            val rhymePath = File(it, ModResourceType.Rhyme.filename)
             rhymePath.writeText(prettyJson.encodeToString(rhymeConfig))
             slot.tip.success("保存成功")
         }
@@ -141,7 +137,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
     private suspend fun deleteConfig() {
         path?.let {
             if (!slot.confirm.open(content = "删除音游配置")) return
-            val rhymePath = Path(it, ModResourceType.Rhyme.filename)
+            val rhymePath = File(it, ModResourceType.Rhyme.filename)
             rhymePath.delete()
             pop()
         }
@@ -151,8 +147,8 @@ class ScreenRhyme(private val path: String?) : Screen() {
         catchingError {
             val (musicName, musicConfig) = Coroutines.io {
                 path?.let {
-                    val musicInfo = Path(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
-                    val rhymePath = Path(it, ModResourceType.Rhyme.filename)
+                    val musicInfo = File(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
+                    val rhymePath = File(it, ModResourceType.Rhyme.filename)
                     val newConfig = RhymeLyricsConfig(
                         id = musicInfo.id,
                         duration = 0L,
@@ -534,7 +530,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                         }
                         1 -> {
                             Box(modifier = Modifier.fillMaxSize().dragAndDrop(true, DragFlag.File) { dropResult ->
-                                catching { notationImage = (dropResult as DropResult.File).path.first().toString() }
+                                catching { notationImage = (dropResult as DropResult.File).path.first().path }
                             }) {
                                 val showImage = notationImage
                                 if (showImage != null) {
