@@ -16,8 +16,6 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationArgs
@@ -144,11 +142,6 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
             )
             SimpleEllipsisText(text = item.name, modifier = Modifier.weight(1f))
         }
-    }
-
-    @Composable
-    override fun RowScope.RightActions() {
-        LoadingIcon(icon = Icons.Refresh, tip = "刷新", onClick = ::requestNewData)
     }
 
     @Composable

@@ -21,7 +21,7 @@ import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.FAB
-import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
@@ -203,15 +203,5 @@ class SubScreenDiscovery(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    override val fab: FAB = object : FAB() {
-        private val isScrollTop by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
-
-        override val action: FABAction = FABAction(
-            iconProvider = { if (isScrollTop) Icons.Refresh else Icons.ArrowUpward },
-            onClick = {
-                if (isScrollTop) requestNewData(true)
-                else gridState.animateScrollToItem(0)
-            }
-        )
-    }
+    override val fab: FAB = FABScrollTop(gridState)
 }

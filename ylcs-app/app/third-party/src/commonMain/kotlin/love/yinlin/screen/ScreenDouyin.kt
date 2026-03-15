@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,7 +27,7 @@ import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.FAB
-import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.floating.downloadVideo
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -186,18 +185,7 @@ class ScreenDouyin : Screen() {
         else UnsupportedPlatformComponent(modifier = Modifier.fillMaxSize())
     }
 
-    override val fab: FAB = object : FAB() {
-        private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
-
-        override val action: FABAction? by derivedStateOf {
-            if (platform == Platform.Android && isScrollTop) {
-                FABAction(
-                    iconProvider = { Icons.ArrowUpward },
-                    onClick = { gridState.animateScrollToItem(0) }
-                )
-            } else null
-        }
-    }
+    override val fab: FAB = FABScrollTop(gridState)
 
     private val downloadVideoDialog = this land DialogDownload()
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,8 +21,7 @@ import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.FAB
-import love.yinlin.compose.ui.floating.FABAction
-import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.tpl.WeiboAPI
@@ -95,17 +93,7 @@ class ScreenChaohua : Screen() {
         }
     }
 
-    override val fab: FAB = object : FAB() {
-        private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
-
-        override val action: FABAction = FABAction(
-            iconProvider = { if (isScrollTop) Icons.Refresh else Icons.ArrowUpward },
-            onClick = {
-                if (isScrollTop) requestNewData(true)
-                else gridState.animateScrollToItem(0)
-            }
-        )
-    }
+    override val fab: FAB = FABScrollTop(gridState)
 
     private val downloadDialog = this land DialogDownload()
 }

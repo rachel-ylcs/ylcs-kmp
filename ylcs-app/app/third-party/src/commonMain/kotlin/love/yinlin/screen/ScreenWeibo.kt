@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import love.yinlin.app
@@ -19,9 +17,10 @@ import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.FAB
-import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.tpl.WeiboAPI
 
@@ -62,6 +61,7 @@ class ScreenWeibo : Screen() {
 
     @Composable
     override fun RowScope.RightActions() {
+        LoadingIcon(icon = Icons.Refresh, onClick = ::requestWeibo)
         Icon(icon = Icons.AccountCircle, tip = "关注列表", onClick = {
             navigate(::ScreenWeiboFollows)
         })
@@ -82,17 +82,7 @@ class ScreenWeibo : Screen() {
         }
     }
 
-    override val fab: FAB = object : FAB() {
-        private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
-
-        override val action: FABAction = FABAction(
-            iconProvider = { if (isScrollTop) Icons.Refresh else Icons.ArrowUpward },
-            onClick = {
-                if (isScrollTop) requestWeibo()
-                else gridState.animateScrollToItem(0)
-            }
-        )
-    }
+    override val fab: FAB = FABScrollTop(gridState)
 
     private val downloadDialog = this land DialogDownload()
 }

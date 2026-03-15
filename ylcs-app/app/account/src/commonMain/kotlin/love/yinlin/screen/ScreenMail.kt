@@ -6,8 +6,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +23,7 @@ import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.FAB
-import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.input.ErrorTextButton
@@ -170,17 +168,7 @@ class ScreenMail : Screen() {
         }
     }
 
-    override val fab: FAB = object : FAB() {
-        private val isScrollTop: Boolean by derivedStateOf { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
-
-        override val action: FABAction = FABAction(
-            iconProvider = { if (isScrollTop) Icons.Refresh else Icons.ArrowUpward },
-            onClick = {
-                if (isScrollTop) requestNewMails(true)
-                else gridState.animateScrollToItem(0)
-            }
-        )
-    }
+    override val fab: FAB = FABScrollTop(gridState)
 
     private val mailDetailsSheet = this land object : SheetContent<Mail>() {
         @Composable

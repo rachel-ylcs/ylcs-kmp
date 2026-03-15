@@ -5,8 +5,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -17,7 +15,7 @@ import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.floating.FAB
-import love.yinlin.compose.ui.floating.FABAction
+import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
@@ -56,9 +54,11 @@ class ScreenAlbum : Screen() {
 
     private val listState = LazyListState()
 
-    private suspend fun requestNewPhotos() {
+    private suspend fun requestNewPhotos(newKeyword: String? = null) {
+        keyword = newKeyword
         provider.withLoading {
-            val result = ApiPhotoSearchPhotoAlbums.requestNull(keyword, page.default, page.default1,page.pageNum)!!
+            val result = ApiPhotoSearchPhotoAlbums.requestNull(newKeyword, page.default, page.default1,page.pageNum)!!
+            listState.requestScrollToItem(0)
             page.newData(result.o1)
         }
     }
@@ -72,17 +72,13 @@ class ScreenAlbum : Screen() {
     override val title: String = "美图"
 
     override suspend fun initialize() {
-        keyword = null
         requestNewPhotos()
     }
 
     @Composable
     override fun RowScope.RightActions() {
         LoadingIcon(icon = Icons.Search, tip = "搜索", onClick = {
-            searchDialog.open()?.let {
-                keyword = it
-                requestNewPhotos()
-            }
+            searchDialog.open()?.let { requestNewPhotos(it) }
         })
 
         LoadingIcon(icon = Icons.EmojiObjects, tip = "分享", onClick = {
@@ -156,8 +152,9 @@ class ScreenAlbum : Screen() {
                 items = page.items,
                 key = { it.aid },
                 state = listState,
-                canRefresh = false,
+                canRefresh = true,
                 canLoading = page.canLoading,
+                onRefresh = ::requestNewPhotos,
                 onLoading = ::requestMorePhotos,
                 itemDivider = { HorizontalDivider(Theme.border.v3, Theme.color.secondary) },
                 modifier = Modifier.fillMaxSize()
@@ -167,20 +164,7 @@ class ScreenAlbum : Screen() {
         }
     }
 
-    override val fab: FAB = object : FAB() {
-        private val isScrollTop: Boolean by derivedStateOf { listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0 }
-
-        override val action: FABAction = FABAction(
-            iconProvider = { if (isScrollTop) Icons.Refresh else Icons.ArrowUpward },
-            onClick = {
-                if (isScrollTop) {
-                    keyword = null
-                    requestNewPhotos()
-                }
-                else listState.animateScrollToItem(0)
-            }
-        )
-    }
+    override val fab: FAB = FABScrollTop(listState)
 
     private val searchDialog = this land DialogInput(hint = "关键字/地点/作者", maxLength = 16)
 }
