@@ -1,7 +1,6 @@
 package love.yinlin.startup
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.io.files.Path
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import love.yinlin.extension.catching
@@ -12,8 +11,9 @@ import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
+import love.yinlin.fs.File
 
-@StartupArg(index = 0, name = "initPath", type = Path::class)
+@StartupArg(index = 0, name = "initPath", type = File::class)
 expect class StartupKV() : SyncStartup {
     override fun init(scope: CoroutineScope, context: Context, args: StartupArgs)
 

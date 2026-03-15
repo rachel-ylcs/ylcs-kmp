@@ -1,6 +1,5 @@
 package love.yinlin.common
 
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.cs.NetClient
@@ -33,8 +32,8 @@ fun urlDigest32(s: String): String {
 }
 
 @IOCoroutine
-suspend fun NetClient.downloadCacheWithPath(url: String): Path? {
-    val path = Path(app.cachePath, urlDigest32(url))
+suspend fun NetClient.downloadCacheWithPath(url: String): File? {
+    val path = File(app.cachePath, urlDigest32(url))
     return if (path.fileSize() > 0L) path
     else if (simpleDownload(url, path.bufferedSink()) && path.fileSize() > 0L) path
     else null
@@ -42,7 +41,7 @@ suspend fun NetClient.downloadCacheWithPath(url: String): Path? {
 
 @IOCoroutine
 suspend fun NetClient.downloadCache(url: String): ByteArray? {
-    val path = Path(app.cachePath, urlDigest32(url))
+    val path = File(app.cachePath, urlDigest32(url))
     var result: ByteArray? = null
     if (path.fileSize() > 0L) result = path.readByteArray()
     else if (simpleDownload(url, path.bufferedSink())) result = path.readByteArray()

@@ -1,11 +1,11 @@
 package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
-import kotlinx.io.files.Path
 import kotlinx.serialization.Transient
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.fs.File
 
 @Stable
 @Serializable
@@ -21,5 +21,5 @@ data class MusicInfo(
     val chorus: List<Long>?, // 副歌点
     @Transient val modification: Int = 0 // 修改标记
 ) : MediaInfo {
-    fun path(root: Path, type: ModResourceType? = null) = if (type == null) Path(root, id) else Path(root, id, type.filename)
+    fun path(root: File, type: ModResourceType? = null) = if (type == null) File(root, id) else File(root, id, type.filename)
 }

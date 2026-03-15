@@ -11,7 +11,6 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import kotlinx.io.RawSource
 import kotlinx.io.buffered
-import kotlinx.io.files.Path
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.data.Data
@@ -20,7 +19,7 @@ import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
-import love.yinlin.fs.rawSource
+import love.yinlin.fs.File
 import love.yinlin.fs.safeRawSources
 import love.yinlin.io.Sources
 import love.yinlin.reflect.metaClassName
@@ -33,8 +32,8 @@ fun apiFile(data: String): APIFile = ClientAPIFile(value = data.encodeToByteArra
 fun apiFile(data: ByteArray): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: RawSource): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: Sources<RawSource>): APIFile = ClientAPIFile(value = data)
-suspend fun apiFile(data: Path): APIFile = ClientAPIFile(data.rawSource())
-suspend fun apiFile(data: List<Path>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let { ClientAPIFile(it) }
+suspend fun apiFile(data: File): APIFile = ClientAPIFile(data.rawSource())
+suspend fun apiFile(data: List<File>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let { ClientAPIFile(it) }
 
 class APIFormScope {
     val formParts = mutableListOf<FormPart<*>>()

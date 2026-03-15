@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
-import kotlinx.io.files.Path
 import kotlinx.io.readByteArray
 import love.yinlin.app
 import love.yinlin.common.DataSourceDiscovery
@@ -39,6 +38,7 @@ import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.fs.File
 
 @Stable
 class ScreenAddTopic : Screen() {
@@ -63,7 +63,7 @@ class ScreenAddTopic : Screen() {
                     sink.write(image.encode(quality = ImageQuality.High)!!)
                     true
                 }?.let {
-                    input.pics += Picture(it.toString())
+                    input.pics += Picture(it.path)
                 }
             }
         }
@@ -76,7 +76,7 @@ class ScreenAddTopic : Screen() {
     private suspend fun addTopic(profile: UserProfile) {
         val title = input.title.text
         val section = input.section
-        ApiTopicSendTopic.request(app.config.userToken, title, input.content.richString.toString(), section, apiFile(input.pics.map { Path(it.image) })) { tid, pic ->
+        ApiTopicSendTopic.request(app.config.userToken, title, input.content.richString.toString(), section, apiFile(input.pics.map { File(it.image) })) { tid, pic ->
             val currentSection = DataSourceDiscovery.currentSection
             if (currentSection == Comment.Section.LATEST_TOPIC || currentSection == section) {
                 DataSourceDiscovery.page.items.add(0, Topic(

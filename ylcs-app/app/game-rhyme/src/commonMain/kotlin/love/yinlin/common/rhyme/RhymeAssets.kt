@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.io.files.Path
 import love.yinlin.common.downloadCache
 import love.yinlin.common.downloadCacheWithPath
 import love.yinlin.compose.game.asset.Assets
@@ -12,6 +11,7 @@ import love.yinlin.cs.NetClient
 import love.yinlin.cs.ServerRes
 import love.yinlin.cs.url
 import love.yinlin.extension.lazyName
+import love.yinlin.fs.File
 
 @Stable
 class RhymeAssets : Assets() {
@@ -50,7 +50,7 @@ class RhymeAssets : Assets() {
         return NetClient.downloadCache("${ServerRes.Game.Rhyme.res(filename).url}?v=$version")
     }
 
-    suspend fun CoroutineScope.initSound(): List<Path> = sounds.map { item ->
+    suspend fun CoroutineScope.initSound(): List<File> = sounds.map { item ->
         val filename = "${item.name}.wav"
         async { NetClient.downloadCacheWithPath("${ServerRes.Game.Rhyme.res(filename).url}?v=${item.version}")!! }
     }.awaitAll()

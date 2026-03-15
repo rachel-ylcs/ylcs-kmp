@@ -22,7 +22,6 @@ import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMapNotNull
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
@@ -63,8 +62,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.replaceAll
-import love.yinlin.fs.deleteRecursively
-import love.yinlin.fs.exists
+import love.yinlin.fs.File
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
 
@@ -81,7 +79,7 @@ class ScreenMusicLibrary : Screen() {
         constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, modification = musicInfo.modification)
     }
 
-    private fun MusicInfoPreview.path(type: ModResourceType) = Path(app.modPath, this.id, type.filename)
+    private fun MusicInfoPreview.path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
 
     private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
 
@@ -333,7 +331,7 @@ class ScreenMusicLibrary : Screen() {
                 variantColor = if (musicInfo.selected) Theme.color.onContainerVariant else Theme.color.onSurfaceVariant
             ) {
                 LocalFileImage(
-                    uri = musicInfo.path(ModResourceType.Record).toString(),
+                    uri = musicInfo.path(ModResourceType.Record).path,
                     musicInfo,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.aspectRatio(1f).fillMaxHeight()

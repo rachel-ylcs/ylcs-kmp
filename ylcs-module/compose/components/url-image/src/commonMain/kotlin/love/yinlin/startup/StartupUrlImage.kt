@@ -13,16 +13,16 @@ import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.io.files.Path
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
+import love.yinlin.fs.File
 import love.yinlin.platform.Platform
 import okio.Path.Companion.toPath
 
-@StartupArg(index = 0, name = "cachePath", type = Path::class)
+@StartupArg(index = 0, name = "cachePath", type = File::class)
 @StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 @Stable
@@ -38,7 +38,7 @@ class StartupUrlImage : SyncStartup() {
     }
 
     override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
-        val cachePath: Path = args[0]
+        val cachePath: File = args[0]
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
         sketch = buildSketch(context).apply {
@@ -50,13 +50,13 @@ class StartupUrlImage : SyncStartup() {
             Platform.useNot(*Platform.Web) {
                 downloadCacheOptions {
                     DiskCache.Options(
-                        appCacheDirectory = cachePath.toString().toPath(),
+                        appCacheDirectory = cachePath.path.toPath(),
                         maxSize = maxCacheSize * 1024 * 1024L
                     )
                 }
                 resultCacheOptions {
                     DiskCache.Options(
-                        appCacheDirectory = cachePath.toString().toPath(),
+                        appCacheDirectory = cachePath.path.toPath(),
                         maxSize = maxCacheSize * 1024 * 1024L
                     )
                 }

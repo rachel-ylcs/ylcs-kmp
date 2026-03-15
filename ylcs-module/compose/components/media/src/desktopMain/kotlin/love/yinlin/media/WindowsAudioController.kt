@@ -1,9 +1,9 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
-import kotlinx.io.files.Path
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.foundation.Context
+import love.yinlin.fs.File
 
 @Stable
 @NativeLibApi
@@ -35,8 +35,8 @@ internal class WindowsAudioController(context: Context, onEndListener: () -> Uni
         }
     }
 
-    override suspend fun load(path: Path, playing: Boolean) {
-        nativeSetSource(nativeHandle, path.toString())
+    override suspend fun load(path: File, playing: Boolean) {
+        nativeSetSource(nativeHandle, path.path)
         if (playing) nativePlay(nativeHandle)
     }
 

@@ -24,8 +24,6 @@ import love.yinlin.data.MimeType
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.lazyProvider
 import love.yinlin.mod.ModFactory
-import love.yinlin.platform.Platform
-import love.yinlin.platform.UnsupportedPlatformText
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
@@ -55,15 +53,9 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
     }
 
     private suspend fun loadModFile() {
-        Platform.use(
-            *Platform.Web,
-            ifTrue = { slot.tip.warning(UnsupportedPlatformText) },
-            ifFalse = {
-                app.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
-                    step = Step.Prepare(it)
-                }
-            }
-        )
+        app.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
+            step = Step.Prepare(it)
+        }
     }
 
     private suspend fun previewMod(path: ImplicitUri) {
@@ -150,7 +142,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
                 onDrop = {
                     val files = (it as? DropResult.File)?.path
                     if (files != null) {
-                        if (files.size == 1) step = Step.Prepare(RegularUri(files[0].toString()))
+                        if (files.size == 1) step = Step.Prepare(RegularUri(files[0].path))
                         else slot.tip.warning("最多一次只能导入一个MOD")
                     }
                 }

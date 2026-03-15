@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.common.DataBin
 import love.yinlin.compose.Colors
@@ -67,7 +66,7 @@ class ScreenPlatformMusic(deeplink: Uri?, type: PlatformMusicType) : Screen() {
                         // 3. 生成目录
                         val id = "${platformType.prefix}${item.id}"
                         val modPath = app.modPath
-                        val musicPath = Path(modPath, id)
+                        val musicPath = File(modPath, id)
                         musicPath.mkdir()
                         // 4. 写入配置
                         val info = MusicInfo(

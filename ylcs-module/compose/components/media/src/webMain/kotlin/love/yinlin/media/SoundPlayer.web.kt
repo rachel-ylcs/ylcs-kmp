@@ -1,13 +1,14 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
+@file:Suppress("unused")
 package love.yinlin.media
 
 import androidx.compose.ui.util.fastMap
-import kotlinx.io.files.Path
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ByteArrayCompatible
 import love.yinlin.compatible.await
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
+import love.yinlin.fs.File
 import org.khronos.webgl.ArrayBuffer
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
@@ -40,7 +41,7 @@ actual class SoundPlayer {
         }
     }
 
-    actual suspend fun loadFromPath(data: List<Path>) { }
+    actual suspend fun loadFromPath(data: List<File>) { }
 
     actual fun play(index: Int) {
         caches.getOrNull(index)?.let { buffer -> playAudioBuffer(context, buffer) }

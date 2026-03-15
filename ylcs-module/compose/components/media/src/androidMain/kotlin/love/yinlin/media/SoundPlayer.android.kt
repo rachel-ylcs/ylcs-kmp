@@ -3,9 +3,9 @@ package love.yinlin.media
 import android.media.AudioAttributes
 import android.media.SoundPool
 import androidx.compose.ui.util.fastMap
-import kotlinx.io.files.Path
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
+import love.yinlin.fs.File
 
 actual class SoundPlayer {
     private var caches = emptyList<Int>()
@@ -20,7 +20,7 @@ actual class SoundPlayer {
 
     actual suspend fun loadFromByteArray(data: List<ByteArray>) { }
 
-    actual suspend fun loadFromPath(data: List<Path>) {
+    actual suspend fun loadFromPath(data: List<File>) {
         catching {
             caches = Coroutines.io {
                 data.fastMap { path ->
@@ -30,7 +30,7 @@ actual class SoundPlayer {
                             if (status == 0) future.send(sampleId)
                             else future.send()
                         }
-                        pool.load(path.toString(), 1)
+                        pool.load(path.path, 1)
                     }!!
                 }
             }

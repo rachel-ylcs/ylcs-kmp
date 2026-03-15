@@ -8,12 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.github.panpf.sketch.AsyncImage
-import kotlinx.io.files.Path
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.fs.fileSize
+import love.yinlin.fs.File
 
 @Composable
 fun LocalFileImage(
@@ -30,7 +29,7 @@ fun LocalFileImage(
     var actualUri: String? by rememberState { null }
 
     LaunchedEffect(uri, *key) {
-        actualUri = buildWebImageKeyUrl(uri, Path(uri).fileSize())
+        actualUri = buildWebImageKeyUrl(uri, File(uri).fileSize())
     }
 
     Box(modifier = modifier) {

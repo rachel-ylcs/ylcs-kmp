@@ -1,8 +1,8 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
-import kotlinx.io.files.Path
 import love.yinlin.foundation.Context
+import love.yinlin.fs.File
 
 @Stable
 internal class WebAudioPlayer(context: Context, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
@@ -11,7 +11,7 @@ internal class WebAudioPlayer(context: Context, onEndListener: () -> Unit) : Aud
     override val position: Long = 0L
     override val duration: Long = 0L
     override suspend fun init() {}
-    override suspend fun load(path: Path, playing: Boolean) {}
+    override suspend fun load(path: File, playing: Boolean) {}
     override fun play() {}
     override fun pause() {}
     override fun stop() {}

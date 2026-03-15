@@ -5,17 +5,11 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import kotlinx.io.files.Path
 import love.yinlin.Local
 import love.yinlin.app
 import love.yinlin.app.global.resources.Res
@@ -72,19 +66,19 @@ import love.yinlin.data.rachel.literal.AppPrivacyPolicy
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.fileSizeString
-import love.yinlin.fs.readByteArray
+import love.yinlin.fs.File
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 
 @Stable
 class ScreenSettings : Screen() {
-    private suspend fun pickPicture(aspectRatio: Float): Path? {
+    private suspend fun pickPicture(aspectRatio: Float): File? {
         return app.picker.pickPicture()?.use { source ->
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
-        }?.let { path ->
-            cropDialog.open(url = path.toString(), aspectRatio = aspectRatio)?.let { region ->
+        }?.let { file ->
+            cropDialog.open(url = file.path, aspectRatio = aspectRatio)?.let { region ->
                 app.createTempFile { sink ->
-                    val image = PlatformImage.decode(path.readByteArray()!!)!!
+                    val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(region)
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)

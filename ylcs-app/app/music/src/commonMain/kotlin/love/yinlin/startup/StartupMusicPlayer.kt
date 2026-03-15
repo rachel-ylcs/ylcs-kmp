@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
@@ -23,8 +22,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.foundation.AsyncStartup
 import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
-import love.yinlin.fs.list
-import love.yinlin.fs.readText
+import love.yinlin.fs.File
 import love.yinlin.media.MediaMetadataFetcher
 import love.yinlin.media.MusicPlayerListener
 import love.yinlin.media.buildMusicPlayer
@@ -41,8 +39,8 @@ class StartupMusicPlayer : AsyncStartup() {
         override val audioFocus: Boolean get() = app.config.audioFocus
         override val interval: Long get() = engine.interval
 
-        override fun extractAudioUri(id: String): String? = library[id]?.path(ModResourceType.Audio)?.toString()
-        override fun extractCoverUri(id: String): String? = library[id]?.path(ModResourceType.Record)?.toString()
+        override fun extractAudioUri(id: String): String? = library[id]?.path(ModResourceType.Audio)?.path
+        override fun extractCoverUri(id: String): String? = library[id]?.path(ModResourceType.Record)?.path
         override fun extractMetadata(id: String): MediaInfo? = library[id]
 
         override val androidMusicServiceComponentName: Pair<String, String> = "love.yinlin" to "love.yinlin.RachelMusicService"
@@ -104,7 +102,7 @@ class StartupMusicPlayer : AsyncStartup() {
     private suspend fun initLibrary() {
         val items = Coroutines.io {
             app.modPath.list().mapNotNull {
-                val configPath = Path(app.modPath, it.name, ModResourceType.Config.filename)
+                val configPath = File(app.modPath, it.name, ModResourceType.Config.filename)
                 catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
             }
         }
@@ -129,7 +127,7 @@ class StartupMusicPlayer : AsyncStartup() {
         Coroutines.io {
             for (id in ids) {
                 val modification = library[id]?.modification ?: 0
-                val configPath = Path(app.modPath, id, ModResourceType.Config.filename)
+                val configPath = File(app.modPath, id, ModResourceType.Config.filename)
                 val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
                 if (info != null) library[id] = info.copy(modification = modification + 1)
             }

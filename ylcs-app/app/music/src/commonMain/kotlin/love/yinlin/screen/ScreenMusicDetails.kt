@@ -17,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlinx.io.files.Path
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
@@ -66,8 +65,6 @@ import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.*
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
-import love.yinlin.platform.Platform
-import love.yinlin.platform.UnsupportedPlatformText
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.tpl.lyrics.LrcParser
 
@@ -76,7 +73,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     @Stable
     private data class ResourceItem(val type: ModResourceType, val size: Long?)
 
-    private fun Song.clientPath(type: ModResourceType): Path = Path(app.modPath, this.sid, type.filename)
+    private fun Song.clientPath(type: ModResourceType): File = File(app.modPath, this.sid, type.filename)
     private fun Song.remotePath(type: ModResourceType): String = ServerRes.Mod.Song(sid).res(type.filename).url
     private val remoteModPath: String get() = ServerRes.Mod.Song(sid).res(ModResourceType.BASE_RES).url
 
@@ -178,7 +175,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         if (slot.confirm.open(content = "下载资源: ${item.type.description}?")) {
             // 下载资源
             catchingError {
-                Path(app.modPath, sid, item.type.filename).write { sink ->
+                File(app.modPath, sid, item.type.filename).write { sink ->
                     require(downloadDialog.download(song.remotePath(item.type), sink) { })
                 }
                 // 通知
@@ -286,7 +283,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 app.picker.pickPicture()?.use { source ->
                     app.createTempFile { sink -> source.transferTo(sink) > 0L }
                 }?.let { src ->
-                    cropDialog.open(url = src.toString(), aspectRatio = aspectRatio)?.let { region ->
+                    cropDialog.open(url = src.path, aspectRatio = aspectRatio)?.let { region ->
                         catchingError {
                             Coroutines.io {
                                 val image = PlatformImage.decode(src.readByteArray()!!)!!
@@ -328,12 +325,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         if (clientResources.isEmpty() && remoteSong != null) {
             LoadingIcon(icon = Icons.Download, tip = "下载", onClick = {
                 if (app.config.userProfile == null) slot.tip.warning("请先登录")
-                else Platform.use(*Platform.Web,
-                    ifTrue = { slot.tip.warning(UnsupportedPlatformText) },
-                    ifFalse = {
-                        if (slot.confirm.open(content = "下载该MOD?")) launch { downloadMod() }
-                    }
-                )
+                else if (slot.confirm.open(content = "下载该MOD?")) launch { downloadMod() }
             })
         }
         Icon(icon = Icons.Share, tip = "分享", onClick = {
@@ -351,7 +343,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
 
             clientSong?.let {
                 LocalFileImage(
-                    uri = it.clientPath(ModResourceType.Background).toString(),
+                    uri = it.clientPath(ModResourceType.Background).path,
                     modifyFlag,
                     modifier = Modifier.matchParentSize().zIndex(1f),
                     contentScale = ContentScale.Crop
@@ -376,7 +368,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 ) {
                     clientSong?.let {
                         LocalFileImage(
-                            uri = it.clientPath(ModResourceType.Record).toString(),
+                            uri = it.clientPath(ModResourceType.Record).path,
                             modifyFlag,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop

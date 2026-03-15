@@ -124,7 +124,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
         }
 
         LocalFileImage(
-            uri = music.path(app.modPath, ModResourceType.Record).toString(),
+            uri = music.path(app.modPath, ModResourceType.Record).path,
             contentScale = ContentScale.Crop,
             modifier = modifier.fastRotate(animationRecord)
         )
@@ -176,7 +176,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                 val maxWidth = Theme.size.cell1 * 1.25f
 
                 LocalFileImage(
-                    uri = music.path(app.modPath, ModResourceType.Background).toString(),
+                    uri = music.path(app.modPath, ModResourceType.Background).path,
                     contentScale = ContentScale.Crop,
                     alpha = 0.85f,
                     modifier = Modifier.widthIn(max = maxWidth).fillMaxSize().blurSource(blurState).zIndex(1f)

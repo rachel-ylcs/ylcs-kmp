@@ -14,10 +14,11 @@ import love.yinlin.cs.user.AN
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
-import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 class LyricsSocketsManager(private val db: Database, session: Any) : SocketsManager(session) {
     companion object {
@@ -58,7 +59,9 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
             }
             set.map { library[it] }
         }
-        val roomId: String = UUID.randomUUID().toString()
+
+        @OptIn(ExperimentalUuidApi::class)
+        val roomId: String = Uuid.generateV4().toString()
         var createTime: Long = System.currentTimeMillis()
         var submitTime1: Long? = null
         var submitTime2: Long? = null

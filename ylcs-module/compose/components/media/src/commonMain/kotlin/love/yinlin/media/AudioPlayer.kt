@@ -1,8 +1,8 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
-import kotlinx.io.files.Path
 import love.yinlin.foundation.Context
+import love.yinlin.fs.File
 
 @Stable
 abstract class AudioPlayer(val context: Context, val onEndListener: () -> Unit) {
@@ -39,7 +39,7 @@ abstract class AudioPlayer(val context: Context, val onEndListener: () -> Unit) 
     /**
      * 加载
      */
-    abstract suspend fun load(path: Path, playing: Boolean)
+    abstract suspend fun load(path: File, playing: Boolean)
 
     /**
      * 播放
