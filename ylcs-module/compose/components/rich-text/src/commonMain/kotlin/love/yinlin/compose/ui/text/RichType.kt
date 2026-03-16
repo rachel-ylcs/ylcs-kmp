@@ -9,7 +9,7 @@ enum class RichType(val value: String) {
     Emoji("em"),
     Br("br"),
     Image("img"),
-    Link("link"),
+    Link("lk"),
     Topic("tp"),
     At("at"),
     Style("s");
