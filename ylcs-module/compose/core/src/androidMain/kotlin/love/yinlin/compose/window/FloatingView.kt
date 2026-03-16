@@ -22,6 +22,9 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 abstract class FloatingView {
+    open val layoutInScreen: Boolean = true
+    open val touchable: Boolean = true
+
     abstract fun onAttached()
 
     abstract fun onDetached()
@@ -52,15 +55,23 @@ abstract class FloatingView {
                 composeView.setContent(::Content)
                 view = composeView
 
+                var flags = 0
+                if (layoutInScreen) {
+                    flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                }
+                if (!touchable) {
+                    flags = flags or
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                }
+
                 val params = WindowManager.LayoutParams(
                     WindowManager.LayoutParams.MATCH_PARENT,
                     WindowManager.LayoutParams.WRAP_CONTENT,
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    flags,
                     PixelFormat.TRANSLUCENT
                 ).apply { gravity = Gravity.TOP }
 
@@ -85,9 +96,9 @@ abstract class FloatingView {
 
     fun detach(activity: ComponentActivity) {
         view?.let { composeView ->
-            composeView.removeOnAttachStateChangeListener(listener)
             val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
             manager?.removeViewImmediate(composeView)
+            composeView.removeOnAttachStateChangeListener(listener)
         }
         view = null
     }
