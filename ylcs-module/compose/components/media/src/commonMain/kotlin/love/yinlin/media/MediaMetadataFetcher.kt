@@ -1,6 +1,7 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.compose.data.media.MediaInfo
 
 @Stable
@@ -33,5 +34,6 @@ interface MediaMetadataFetcher {
     /**
      * Android 后台服务名
      */
-    val androidMusicServiceComponentName: Pair<String, String>
+    @LooseTyped
+    val androidMusicServiceClassName: String
 }

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.compose.data.media.MediaPlayMode
@@ -114,9 +115,9 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
         } ?: Unit
     }
 
+    @kotlin.OptIn(LooseTyped::class)
     override suspend fun init(context: Context) {
         val ctx = context.application
-        val (pkg, cls) = fetcher.androidMusicServiceComponentName
 
         scope.launch {
             isPlayingFlow.collectLatest { value ->
@@ -132,7 +133,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
 
         catchingNull {
             val mediaController: MediaController? = Coroutines.sync { future ->
-                val token = SessionToken(ctx, ComponentName(pkg, cls))
+                val token = SessionToken(ctx, ComponentName(ctx, fetcher.androidMusicServiceClassName))
                 val bitmapLoader = DataSourceBitmapLoader.Builder(ctx).setMakeShared(true).build()
                 val callback = MediaController.Builder(ctx, token).setBitmapLoader(bitmapLoader).buildAsync()
                 callback.addListener({

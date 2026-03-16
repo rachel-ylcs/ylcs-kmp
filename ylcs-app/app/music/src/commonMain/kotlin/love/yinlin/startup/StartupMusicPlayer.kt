@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.app
 import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
@@ -43,7 +44,8 @@ class StartupMusicPlayer : AsyncStartup() {
         override fun extractCoverUri(id: String): String? = library[id]?.path(ModResourceType.Record)?.path
         override fun extractMetadata(id: String): MediaInfo? = library[id]
 
-        override val androidMusicServiceComponentName: Pair<String, String> = "love.yinlin" to "love.yinlin.RachelMusicService"
+        @LooseTyped
+        override val androidMusicServiceClassName: String = "love.yinlin.RachelMusicService"
     }
 
     // 数据仓库

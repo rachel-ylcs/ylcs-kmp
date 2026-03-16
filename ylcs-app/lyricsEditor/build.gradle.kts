@@ -11,7 +11,7 @@ plugins {
 }
 
 template(object : KotlinAndroidTemplate() {
-    override val packageName: String = "love.yinlin.lyricseditor"
+    override val packageName: String = "${C.app.packageName}.lyricseditor"
     override val packageVersion: Int = 100
     override val packageVersionName: String = "1.0.0"
 
