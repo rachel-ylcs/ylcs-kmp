@@ -133,7 +133,9 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
 
         catchingNull {
             val mediaController: MediaController? = Coroutines.sync { future ->
-                val token = SessionToken(ctx, ComponentName(ctx, fetcher.androidMusicServiceClassName))
+                val packageName = ctx.packageName
+                val serviceClassName = "$packageName.${fetcher.androidMusicServiceClassName}"
+                val token = SessionToken(ctx, ComponentName(packageName, serviceClassName))
                 val bitmapLoader = DataSourceBitmapLoader.Builder(ctx).setMakeShared(true).build()
                 val callback = MediaController.Builder(ctx, token).setBitmapLoader(bitmapLoader).buildAsync()
                 callback.addListener({
