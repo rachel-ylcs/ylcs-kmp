@@ -45,7 +45,7 @@ class StartupMusicPlayer : AsyncStartup() {
         override fun extractMetadata(id: String): MediaInfo? = library[id]
 
         @LooseTyped
-        override val androidMusicServiceClassName: String = "RachelMusicService"
+        override val androidMusicServiceClassName: String = "love.yinlin.RachelMusicService"
     }
 
     // 数据仓库
