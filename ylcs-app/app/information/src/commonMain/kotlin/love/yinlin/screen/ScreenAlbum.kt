@@ -125,8 +125,8 @@ class ScreenAlbum : Screen() {
 
                 val state = rememberLazyListState()
 
-                HorizontalScrollContainer(state = state) {
-                    LazyRow(state = state, modifier = Modifier.fillMaxWidth()) {
+                HorizontalScrollContainer(state = state, modifier = Modifier.fillMaxWidth()) {
+                    LazyRow(state = state) {
                         items(album.picNum) { index ->
                             Row(modifier = Modifier.width(Theme.size.cell4).aspectRatio(0.66667f)) {
                                 WebImage(

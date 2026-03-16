@@ -2,6 +2,7 @@ package love.yinlin.compose.ui.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,11 +33,11 @@ fun <T> PaginationStaggeredGrid(
         canRefresh = canRefresh,
         canLoading = canLoading,
         onRefresh = onRefresh,
-        onLoading = onLoading
+        onLoading = onLoading,
+        modifier = modifier,
     ) {
         LazyVerticalStaggeredGrid(
             columns = columns,
-            modifier = modifier,
             state = state,
             contentPadding = contentPadding,
             verticalItemSpacing = verticalItemSpacing,

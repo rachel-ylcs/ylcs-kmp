@@ -2,6 +2,7 @@ package love.yinlin.compose.ui.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,10 +32,10 @@ fun <T> PaginationColumn(
         canRefresh = canRefresh,
         canLoading = canLoading,
         onRefresh = onRefresh,
-        onLoading = onLoading
+        onLoading = onLoading,
+        modifier = modifier,
     ) {
         LazyColumn(
-            modifier = modifier,
             state = state,
             contentPadding = contentPadding,
             verticalArrangement = verticalArrangement,

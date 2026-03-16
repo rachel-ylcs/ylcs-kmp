@@ -242,6 +242,7 @@ internal fun PullLayout(
     canLoading: Boolean,
     onRefresh: (suspend () -> Unit)?,
     onLoading: (suspend () -> Unit)?,
+    modifier: Modifier = Modifier,
     indicatorPadding: Dp = Theme.padding.v4,
     thresholdRatio: Float = 0.75f,
     content: @Composable BoxScope.() -> Unit
@@ -266,17 +267,13 @@ internal fun PullLayout(
         )
     }
 
-    // 确保指示器不会绘制到容器外部
-    Box(
-        modifier = Modifier
-            .pointerInput(Unit) {
-                with(pullState) { fixOverflowScroll() }
-            }
-            .nestedScroll(pullState.connection)
-            .pointerInput(pullState) {
-                with(pullState) { awaitDrag() }
-            }.clipToBounds()
-    ) {
+    val pullModifier = Modifier.pointerInput(Unit) {
+        with(pullState) { fixOverflowScroll() }
+    }.nestedScroll(pullState.connection).pointerInput(pullState) {
+        with(pullState) { awaitDrag() }
+    }.clipToBounds() // 确保指示器不会绘制到容器外部
+
+    Box(modifier = modifier then pullModifier) {
         Box(modifier = Modifier.zIndex(1f), content = content)
         if (canRefresh) {
             PullIndicator(

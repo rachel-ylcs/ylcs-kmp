@@ -45,10 +45,9 @@ fun Breadcrumb(
     padding: PaddingValues = Theme.padding.value,
     activeColor: Color = Theme.color.primary,
 ) {
-    HorizontalScrollContainer(state = state) {
+    HorizontalScrollContainer(state = state, modifier = modifier.semantics(Role.Tab)) {
         LazyRow(
             state = state,
-            modifier = modifier.semantics(Role.Tab),
             verticalAlignment = Alignment.CenterVertically
         ) {
             items(count = size, key = key) { index ->

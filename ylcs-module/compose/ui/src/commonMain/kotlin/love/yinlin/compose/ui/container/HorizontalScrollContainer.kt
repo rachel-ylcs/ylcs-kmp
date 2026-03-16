@@ -40,24 +40,23 @@ internal inline fun HorizontalScrollContainer(
 ) {
     val scope = rememberCoroutineScope()
 
-    Box(
-        modifier = modifier.pointerInput(state) {
-            awaitPointerEventScope {
-                while (true) {
-                    val event = awaitPointerEvent(PointerEventPass.Main)
-                    val change = event.changes.first()
-                    if (event.type == PointerEventType.Scroll && change.type == PointerType.Mouse) {
-                        val delta = change.scrollDelta.y
-                        if (delta != 0f) {
-                            if (enabled.value) scope.launch { onConsume(delta) }
-                            event.changes.forEach { it.consume() }
-                        }
+    val scrollModifier = Modifier.pointerInput(state) {
+        awaitPointerEventScope {
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Main)
+                val change = event.changes.first()
+                if (event.type == PointerEventType.Scroll && change.type == PointerType.Mouse) {
+                    val delta = change.scrollDelta.y
+                    if (delta != 0f) {
+                        if (enabled.value) scope.launch { onConsume(delta) }
+                        event.changes.forEach { it.consume() }
                     }
                 }
             }
-        }.nestedScroll(DisableVerticalConnection),
-        content = content
-    )
+        }
+    }.nestedScroll(DisableVerticalConnection)
+
+    Box(modifier = modifier then scrollModifier, content = content)
 }
 
 @Composable
@@ -66,7 +65,12 @@ fun HorizontalScrollContainer(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    HorizontalScrollContainer(state, content, modifier, rememberTrue()) {
+    HorizontalScrollContainer(
+        state = state,
+        content = content,
+        modifier = modifier,
+        enabled = rememberTrue()
+    ) {
         state.scrollBy(it * 64f)
     }
 }
@@ -77,7 +81,12 @@ fun HorizontalScrollContainer(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    HorizontalScrollContainer(state, content, modifier, rememberDerivedState { !state.isScrollInProgress }) {
+    HorizontalScrollContainer(
+        state = state,
+        content = content,
+        modifier = modifier,
+        enabled = rememberDerivedState { !state.isScrollInProgress }
+    ) {
         val targetPage = if (it > 0) (state.currentPage + 1).coerceAtMost(state.pageCount - 1)
         else (state.currentPage - 1).coerceAtLeast(0)
         if (targetPage != state.currentPage) state.animateScrollToPage(targetPage)

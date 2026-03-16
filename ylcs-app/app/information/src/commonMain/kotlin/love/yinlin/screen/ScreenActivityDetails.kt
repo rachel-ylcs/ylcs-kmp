@@ -1,17 +1,8 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,13 +15,7 @@ import androidx.compose.ui.util.fastMap
 import love.yinlin.app
 import love.yinlin.app.information.resources.*
 import love.yinlin.common.DataSourceInformation
-import love.yinlin.compose.Colors
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalColor
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
+import love.yinlin.compose.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TagView
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
@@ -136,9 +121,9 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
 
                 val state = rememberScrollState()
 
-                HorizontalScrollContainer(state = state) {
+                HorizontalScrollContainer(state = state, modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v)) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v).horizontalScroll(state),
+                        modifier = Modifier.horizontalScroll(state),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         for (item in activity.price) {

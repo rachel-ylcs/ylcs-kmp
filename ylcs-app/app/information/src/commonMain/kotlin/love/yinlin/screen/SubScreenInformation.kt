@@ -165,6 +165,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
         Banner(
             size = pics.size,
             modifier = modifier,
+            key = { pics[it].aid },
             interval = 5000L
         ) { index ->
             val activity = pics[index]

@@ -205,9 +205,8 @@ private fun CalendarDayGrid(
     val (cellSize, cellPadding, totalWidth) = rememberCalendarSize()
     val today = remember { DateEx.Today }
 
-    HorizontalScrollContainer(state = state) {
+    HorizontalScrollContainer(state = state, modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12)) {
         HorizontalPager(
-            modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12),
             state = state,
             beyondViewportPageCount = 2,
             key = { it },

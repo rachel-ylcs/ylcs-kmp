@@ -47,10 +47,9 @@ fun TabBar(
     activeColor: Color = Theme.color.primary,
     onLongClick: ((Int) -> Unit)? = null,
 ) {
-    HorizontalScrollContainer(state = state) {
+    HorizontalScrollContainer(state = state, modifier = modifier.semantics(Role.Tab)) {
         LazyRow(
             state = state,
-            modifier = modifier.semantics(Role.Tab),
             verticalAlignment = Alignment.CenterVertically
         ) {
             items(count = size, key = key) { i ->

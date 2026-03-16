@@ -10,6 +10,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -103,6 +104,7 @@ fun Banner(
     size: Int,
     modifier: Modifier = Modifier,
     initIndex: Int = 0,
+    key: ((Int) -> Any)? = null,
     interval: Long = 0L,
     indicatorSize: Dp = Theme.size.box2,
     content: @Composable (Int) -> Unit
@@ -123,11 +125,11 @@ fun Banner(
     Box(modifier = modifier.hoverable(interactionSource)) {
         if (size > 0) {
             // Content
-            HorizontalScrollContainer(state = state, modifier = Modifier.matchParentSize()) {
+            HorizontalScrollContainer(state = state, modifier = Modifier.keepSize().fillMaxSize().zIndex(1f)) {
                 HorizontalPager(
                     state = state,
-                    beyondViewportPageCount = 1,
-                    modifier = Modifier.keepSize().matchParentSize().zIndex(1f)
+                    key = { it to key?.invoke(it % size) },
+                    beyondViewportPageCount = 1
                 ) { virtualIndex ->
                     content(virtualIndex % size)
                 }

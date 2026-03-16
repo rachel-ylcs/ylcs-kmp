@@ -86,13 +86,15 @@ class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
 private inline fun PaintCanvasTool(crossinline content: @Composable RowScope.() -> Unit) {
     val state = rememberScrollState()
 
-    HorizontalScrollContainer(state = state) {
+    HorizontalScrollContainer(
+        state = state,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Theme.color.backgroundVariant)
+            .padding(Theme.padding.value),
+    ) {
         ActionScope.Left.Container(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Theme.color.backgroundVariant)
-                .padding(Theme.padding.value)
-                .horizontalScroll(state),
+            modifier = Modifier.fillMaxWidth().horizontalScroll(state),
             content = content
         )
     }
