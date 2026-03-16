@@ -9,6 +9,7 @@ import love.yinlin.compose.OffScreenEffect
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.input.Slider
+import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 
 @Composable
@@ -51,6 +52,24 @@ actual fun ScreenLyricsSettings.PlatformContent() {
                 onValueChangeFinished = { app.config.lyricsEngineConfig = config },
                 modifier = Modifier.weight(1f)
             )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SimpleEllipsisText("垂直方向", style = Theme.typography.v7.bold)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SimpleEllipsisText(if (config.android.placeTop) "顶部" else "底部")
+                Switch(checked = config.android.placeTop, onCheckedChange = {
+                    config = config.copy(android = config.android.copy(placeTop = it))
+                    app.config.lyricsEngineConfig = config
+                })
+            }
         }
 
         Row(

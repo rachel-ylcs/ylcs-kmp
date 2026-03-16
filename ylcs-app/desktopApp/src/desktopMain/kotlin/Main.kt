@@ -81,8 +81,6 @@ fun main() = object : RachelApplication(PlatformContextDelegate()) {
 
     @Composable
     override fun ApplicationScope.MultipleWindow() {
-        mp?.floatingLyrics?.let {
-            if (it.isAttached) it.Content()
-        }
+        mp?.floatingLyrics?.Content()
     }
 }.run()

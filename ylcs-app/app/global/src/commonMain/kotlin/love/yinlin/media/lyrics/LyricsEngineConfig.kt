@@ -35,6 +35,8 @@ data class LyricsEngineConfig(
         val right: Float = 1f,
         // 纵向偏移 0.0 ~ 1.0
         val top: Float = 1f,
+        // 布局方向 true 顶部
+        val placeTop: Boolean = true,
     ) {
         val leftProgress: Float get() = left
         val rightProgress: Float get() = right

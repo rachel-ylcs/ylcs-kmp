@@ -1,11 +1,7 @@
 package love.yinlin.screen
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -52,15 +48,7 @@ import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.layout.Divider
-import love.yinlin.compose.ui.node.BlurState
-import love.yinlin.compose.ui.node.align
-import love.yinlin.compose.ui.node.blurSource
-import love.yinlin.compose.ui.node.blurTarget
-import love.yinlin.compose.ui.node.fastClipCircle
-import love.yinlin.compose.ui.node.fastOffsetX
-import love.yinlin.compose.ui.node.fastRotate
-import love.yinlin.compose.ui.node.shadow
-import love.yinlin.compose.ui.node.silentClick
+import love.yinlin.compose.ui.node.*
 import love.yinlin.compose.ui.text.FixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.coroutines.Coroutines
@@ -97,7 +85,6 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     if (abs(position - currentDebounceTime) > 1000L - player.engine.interval) currentDebounceTime = position
                     // 处理歌词
                     player.engine.update(position)
-                    if (player.floatingLyrics.isAttached) player.floatingLyrics.update()
                 }
             }
         }

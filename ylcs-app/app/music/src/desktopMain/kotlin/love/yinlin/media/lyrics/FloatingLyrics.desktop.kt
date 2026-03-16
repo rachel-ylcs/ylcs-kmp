@@ -51,42 +51,42 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
         if (app.config.enabledFloatingLyrics && !isAttached) attach()
     }
 
-    actual fun update() { }
-
     @OptIn(FlowPreview::class)
     @Composable
-    actual fun Content() {
-        Window(
-            onCloseRequest = {},
-            state = windowState,
-            title = "",
-            undecorated = true,
-            transparent = true,
-            resizable = canMove,
-            focusable = false,
-            alwaysOnTop = true
-        ) {
-            LaunchedEffect(canMove) {
-                NativeWindow.updateClickThrough(window.windowHandle, !canMove)
-            }
+    fun Content() {
+        if (isAttached) {
+            Window(
+                onCloseRequest = {},
+                state = windowState,
+                title = "",
+                undecorated = true,
+                transparent = true,
+                resizable = canMove,
+                focusable = false,
+                alwaysOnTop = true
+            ) {
+                LaunchedEffect(canMove) {
+                    NativeWindow.updateClickThrough(window.windowHandle, !canMove)
+                }
 
-            LaunchedEffect(windowState) {
-                snapshotFlow { windowState.size }.debounce(300.milliseconds).onEach { size: DpSize ->
-                    app.config.lyricsEngineConfig = config.copy(desktop = config.desktop.copy(width = size.width.value, height = size.height.value))
-                }.launchIn(this)
-                snapshotFlow { windowState.position }.debounce(300.milliseconds).filter { it.isSpecified }.onEach { position: WindowPosition ->
-                    app.config.lyricsEngineConfig = config.copy(desktop = config.desktop.copy(x = position.x.value, y = position.y.value))
-                }.launchIn(this)
-            }
+                LaunchedEffect(windowState) {
+                    snapshotFlow { windowState.size }.debounce(300.milliseconds).onEach { size: DpSize ->
+                        app.config.lyricsEngineConfig = config.copy(desktop = config.desktop.copy(width = size.width.value, height = size.height.value))
+                    }.launchIn(this)
+                    snapshotFlow { windowState.position }.debounce(300.milliseconds).filter { it.isSpecified }.onEach { position: WindowPosition ->
+                        app.config.lyricsEngineConfig = config.copy(desktop = config.desktop.copy(x = position.x.value, y = position.y.value))
+                    }.launchIn(this)
+                }
 
-            if (startup.isInit) {
-                DragArea(enabled = canMove) {
-                    app.ComposedLayout(
-                        modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
-                        bgColor = Colors.Transparent
-                    ) {
-                        if (startup.isPlaying) {
-                            startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
+                if (startup.isInit) {
+                    DragArea(enabled = canMove) {
+                        app.ComposedLayout(
+                            modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
+                            bgColor = Colors.Transparent
+                        ) {
+                            if (startup.isPlaying) {
+                                startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
+                            }
                         }
                     }
                 }

@@ -11,12 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import love.yinlin.app
-import love.yinlin.compose.Colors
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
+import love.yinlin.compose.*
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.icon.Icons
