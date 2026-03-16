@@ -78,6 +78,8 @@ object DateEx {
 
     val Today: LocalDate get() = Current.date
 
+    val TodayLong: Long get() = Today.toEpochDays()
+
     val TodayString: String get() = Formatter.standardDate.format(Today)!!
 }
 

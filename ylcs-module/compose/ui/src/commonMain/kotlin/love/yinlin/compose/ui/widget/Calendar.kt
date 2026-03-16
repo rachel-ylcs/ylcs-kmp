@@ -203,7 +203,6 @@ private fun CalendarDayGrid(
     onEventClick: (LocalDate) -> Unit,
 ) {
     val (cellSize, cellPadding, totalWidth) = rememberCalendarSize()
-    val today = remember { DateEx.Today }
 
     HorizontalScrollContainer(state = state, modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12)) {
         HorizontalPager(
@@ -219,6 +218,7 @@ private fun CalendarDayGrid(
                 startDay + endOfMonth.day - 1
             }
             val startDate = currentDate.minus(startDay, DateTimeUnit.DAY)
+            val today = DateEx.Today
 
             Column {
                 repeat(6) { i ->

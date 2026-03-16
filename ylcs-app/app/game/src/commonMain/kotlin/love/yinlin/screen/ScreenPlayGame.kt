@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import love.yinlin.app
 import love.yinlin.common.GameMapper
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.GameItem
@@ -63,10 +64,15 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
         else pop()
     }
 
-    @Composable
-    private fun GameLayout(modifier: Modifier = Modifier) {
+    private val gameLayout = movableComposable { itemModifier: Modifier, contentModifier: Modifier ->
+        GameItem(
+            gameDetails = gameDetails,
+            modifier = itemModifier,
+            onClick = { }
+        )
+
         Box(
-            modifier = modifier,
+            modifier = contentModifier,
             contentAlignment = Alignment.TopCenter,
         ) {
             when (status) {
@@ -151,12 +157,7 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Theme.padding.e7)
         ) {
-            GameItem(
-                gameDetails = gameDetails,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { }
-            )
-            GameLayout(modifier = Modifier.fillMaxWidth())
+            gameLayout(Modifier.fillMaxWidth(), Modifier.fillMaxWidth())
         }
     }
 
@@ -166,18 +167,7 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
             modifier = Modifier.fillMaxSize().padding(Theme.padding.eValue9),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.e7)
         ) {
-            GameItem(
-                gameDetails = gameDetails,
-                modifier = Modifier.width(Theme.size.cell1),
-                onClick = { }
-            )
-            Column(
-                modifier = Modifier.width(Theme.size.cell1).fillMaxHeight().verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
-            ) {
-                GameLayout(modifier = Modifier.fillMaxWidth())
-            }
+            gameLayout(Modifier.width(Theme.size.cell1), Modifier.width(Theme.size.cell1).fillMaxHeight().verticalScroll(rememberScrollState()))
         }
     }
 

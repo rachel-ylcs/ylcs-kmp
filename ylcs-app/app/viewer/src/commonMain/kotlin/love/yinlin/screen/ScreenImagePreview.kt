@@ -14,6 +14,7 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.downloadPhoto
@@ -50,6 +51,10 @@ class ScreenImagePreview(private val images: List<Picture>, initIndex: Int) : Sc
         Icon(icon = Icons.Download, tip = "下载", onClick = ::downloadPicture)
     }
 
+    private val previewImageLayout = movableComposable { index: Int, modifier: Modifier ->
+        ZoomWebImage(uri = images[index].image, modifier = modifier)
+    }
+
     @Composable
     private fun Portrait() {
         HorizontalPager(
@@ -58,7 +63,7 @@ class ScreenImagePreview(private val images: List<Picture>, initIndex: Int) : Sc
             beyondViewportPageCount = 1,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
-            ZoomWebImage(uri = images[it].image, modifier = Modifier.fillMaxSize())
+            previewImageLayout(it, Modifier.fillMaxSize())
         }
     }
 
@@ -83,7 +88,7 @@ class ScreenImagePreview(private val images: List<Picture>, initIndex: Int) : Sc
                 }
             }
             Divider()
-            ZoomWebImage(uri = images[pagerState.settledPage].image, modifier = Modifier.weight(1f).fillMaxHeight())
+            previewImageLayout(pagerState.settledPage, Modifier.weight(1f).fillMaxHeight())
         }
     }
 

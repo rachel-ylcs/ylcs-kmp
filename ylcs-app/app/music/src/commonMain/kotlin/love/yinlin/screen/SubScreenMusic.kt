@@ -28,6 +28,7 @@ import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
 import love.yinlin.compose.*
 import love.yinlin.compose.data.media.MediaPlayMode
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberRefState
@@ -281,8 +282,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         )
     }
 
-    @Composable
-    private fun MusicCoverLayout(modifier: Modifier = Modifier) {
+    private val musicCoverLayout = movableComposable { modifier: Modifier ->
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
             AnimationContent(
@@ -303,14 +303,19 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
+    private val lyricsLayout = movableComposable { player: StartupMusicPlayer, modifier: Modifier ->
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
+            player.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, host = player.engineHost)
+        }
+    }
+
     @Stable
     private class ChorusState(val hotpot: Long) {
         var isArrived: Boolean by mutableStateOf(false)
         override fun toString(): String = hotpot.toString()
     }
 
-    @Composable
-    private fun MusicProgressLayout(modifier: Modifier = Modifier) {
+    private val musicProgressLayout = movableComposable { modifier: Modifier ->
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
@@ -370,8 +375,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    @Composable
-    private fun MusicControlLayout(modifier: Modifier = Modifier) {
+    private val musicControlLayout = movableComposable { modifier: Modifier ->
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -441,7 +445,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
                     if (device == Device.Type.PORTRAIT) {
                         if (isReady) {
-                            MusicCoverLayout(modifier = Modifier
+                            musicCoverLayout(Modifier
                                 .weight(1f, fill = false)
                                 .heightIn(max = Theme.size.image2)
                                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
@@ -456,7 +460,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             if (isReady) {
-                                MusicCoverLayout(modifier = Modifier
+                                musicCoverLayout(Modifier
                                     .weight(1f, fill = false)
                                     .widthIn(max = Theme.size.image1)
                                     .aspectRatio(1f)
@@ -464,12 +468,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 )
 
                                 val width = if (device == Device.Type.LANDSCAPE) Theme.size.cell1 else Theme.size.cell2
-                                Box(
-                                    modifier = Modifier.width(width).fillMaxHeight().clip(Theme.shape.v5).blurTarget(blurState),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    player.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, host = player.engineHost)
-                                }
+                                lyricsLayout(player, Modifier.width(width).fillMaxHeight().clip(Theme.shape.v5).blurTarget(blurState))
                             }
                         }
                     }
@@ -479,14 +478,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         .fillMaxWidth()
                         .blurTarget(blurState)
                     ) {
-                        if (device == Device.Type.PORTRAIT && isReady) {
-                            Box(
-                                modifier = Modifier.fillMaxWidth().height(Theme.size.cell4),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                player.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, host = player.engineHost)
-                            }
-                        }
+                        if (device == Device.Type.PORTRAIT && isReady) lyricsLayout(player, Modifier.fillMaxWidth().height(Theme.size.cell4))
 
                         if (device == Device.Type.LANDSCAPE) {
                             Row(
@@ -494,13 +486,13 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                MusicControlLayout(modifier = Modifier.weight(1f))
-                                MusicProgressLayout(modifier = Modifier.weight(3f))
+                                musicControlLayout(Modifier.weight(1f))
+                                musicProgressLayout(Modifier.weight(3f))
                             }
                         }
                         else {
-                            MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(PaddingValues(start = Theme.padding.h9, end = Theme.padding.h9, top = Theme.padding.v9)))
-                            MusicControlLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
+                            musicProgressLayout(Modifier.fillMaxWidth().padding(PaddingValues(start = Theme.padding.h9, end = Theme.padding.h9, top = Theme.padding.v9)))
+                            musicControlLayout(Modifier.fillMaxWidth().padding(Theme.padding.value9))
                         }
                     }
                 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -20,6 +21,7 @@ import kotlinx.coroutines.supervisorScope
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberFalse
@@ -333,8 +335,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         })
     }
 
-    @Composable
-    private fun DetailsLayout(modifier: Modifier = Modifier) {
+    private val detailsLayout = movableComposable { modifier: Modifier ->
         Box(
             modifier = modifier,
             contentAlignment = Alignment.Center
@@ -486,8 +487,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    @Composable
-    private fun ResourceLayout(modifier: Modifier = Modifier) {
+    private val resourceLayout = movableComposable { modifier: Modifier ->
         Column(modifier = modifier) {
             if (clientResources.isNotEmpty()) {
                 val downloadResources by rememberDerivedState {
@@ -508,8 +508,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    @Composable
-    private fun SongCommentHeader(modifier: Modifier = Modifier) {
+    private val songCommentHeader = movableComposable { modifier: Modifier ->
         Row(modifier = modifier) {
             PrimaryLoadingTextButton(
                 text = "写歌评",
@@ -563,8 +562,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    @Composable
-    private fun Portrait() {
+    private val commentListLayout = movableComposable { modifier: Modifier, header: @Composable LazyItemScope.() -> Unit ->
         PaginationColumn(
             items = pageComments.items,
             key = { it.cid },
@@ -572,14 +570,19 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
             canRefresh = false,
             canLoading = pageComments.canLoading,
             onLoading = ::requestMoreSongComments,
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-            header = {
-                DetailsLayout(modifier = Modifier.fillMaxWidth())
-                ResourceLayout(modifier = Modifier.fillMaxWidth())
-                SongCommentHeader(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value))
-            }
+            modifier = modifier,
+            header = header
         ) {
             SongCommentLayout(comment = it, modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h))
+        }
+    }
+
+    @Composable
+    private fun Portrait() {
+        commentListLayout(Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+            detailsLayout(Modifier.fillMaxWidth())
+            resourceLayout(Modifier.fillMaxWidth())
+            songCommentHeader(Modifier.fillMaxWidth().padding(Theme.padding.value))
         }
     }
 
@@ -588,34 +591,22 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         Row(modifier = Modifier.fillMaxSize()) {
             val immersivePadding = LocalImmersivePadding.current
 
-            DetailsLayout(modifier = Modifier
+            detailsLayout(Modifier
                 .padding(immersivePadding.withoutEnd)
                 .weight(1f)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
             )
             Divider()
-            ResourceLayout(modifier = Modifier
+            resourceLayout(Modifier
                 .padding(immersivePadding.withoutHorizontal)
                 .weight(1f)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
             )
             Divider()
-            PaginationColumn(
-                items = pageComments.items,
-                key = { it.cid },
-                state = listState,
-                canRefresh = false,
-                canLoading = pageComments.canLoading,
-                onLoading = ::requestMoreSongComments,
-                modifier = Modifier
-                    .padding(immersivePadding.withoutStart)
-                    .weight(1f)
-                    .fillMaxHeight(),
-                header = { SongCommentHeader(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value)) }
-            ) {
-                SongCommentLayout(comment = it, modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h))
+            commentListLayout(Modifier.padding(immersivePadding.withoutStart).weight(1f).fillMaxHeight()) {
+                songCommentHeader(Modifier.fillMaxWidth().padding(Theme.padding.value))
             }
         }
     }

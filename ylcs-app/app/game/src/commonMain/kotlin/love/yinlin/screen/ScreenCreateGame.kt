@@ -3,11 +3,7 @@ package love.yinlin.screen
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import love.yinlin.app
 import love.yinlin.common.GameMapper
@@ -15,6 +11,7 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.ArgsSlider
@@ -62,8 +59,8 @@ class ScreenCreateGame(private val game: Game) : Screen() {
 
     override val title: String = "${game.title} - 创建"
 
-    @Composable
-    private fun TitleLayout() {
+    private val baseInfoLayout = movableComposable { scope: ColumnScope ->
+        // TitleLayout
         Input(
             state = gameTitle,
             hint = "标题与介绍",
@@ -71,10 +68,8 @@ class ScreenCreateGame(private val game: Game) : Screen() {
             minLines = 1,
             modifier = Modifier.fillMaxWidth()
         )
-    }
 
-    @Composable
-    private fun BasicConfigLayout() {
+        // BasicConfigLayout
         ArgsSlider(
             title = "奖励银币(手续+20%)",
             args = args.rewardArgs,
@@ -93,6 +88,13 @@ class ScreenCreateGame(private val game: Game) : Screen() {
             onValueChange = { args = args.copy(tmpCost = it) },
             modifier = Modifier.fillMaxWidth()
         )
+
+        // ConfigContent
+        with(state) { scope.ConfigContent() }
+    }
+
+    private val extraInfoLayout = movableComposable { scope: ColumnScope ->
+        with(state) { scope.Content() }
     }
 
     @Composable
@@ -105,10 +107,8 @@ class ScreenCreateGame(private val game: Game) : Screen() {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-            TitleLayout()
-            BasicConfigLayout()
-            with(state) { this@Column.ConfigContent() }
-            with(state) { this@Column.Content() }
+            baseInfoLayout(this)
+            extraInfoLayout(this)
         }
     }
 
@@ -124,8 +124,7 @@ class ScreenCreateGame(private val game: Game) : Screen() {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
-                TitleLayout()
-                with(state) { this@Column.Content() }
+                baseInfoLayout(this)
             }
             Column(
                 modifier = Modifier.width(Theme.size.cell1).fillMaxHeight()
@@ -133,8 +132,7 @@ class ScreenCreateGame(private val game: Game) : Screen() {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
-                BasicConfigLayout()
-                with(state) { this@Column.ConfigContent() }
+                extraInfoLayout(this)
             }
         }
     }

@@ -1,18 +1,18 @@
 package love.yinlin.compose.extension
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.referentialEqualityPolicy
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import love.yinlin.extension.BaseLazyReference
+import kotlin.jvm.JvmName
 import kotlin.reflect.KProperty
+
+class LazyStateReference<T : Any> : BaseLazyReference<T> {
+    private var mValue: T? by mutableStateOf(null)
+    override val isInit: Boolean by derivedStateOf { mValue != null }
+    override fun init(value: T) {
+        if (mValue == null) mValue = value
+    }
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = mValue!!
+}
 
 fun <T> mutableRefStateOf(value: T) = mutableStateOf(value, referentialEqualityPolicy())
 
@@ -106,11 +106,43 @@ fun <T> rememberDerivedState(key1: Any?, key2: Any?, key3: Any?, calculation: ()
 fun <T> rememberDerivedState(vararg keys: Any?, calculation: () -> T) =
     remember(*keys) { derivedStateOf(calculation) }
 
-class LazyStateReference<T : Any> : BaseLazyReference<T> {
-    private var mValue: T? by mutableStateOf(null)
-    override val isInit: Boolean by derivedStateOf { mValue != null }
-    override fun init(value: T) {
-        if (mValue == null) mValue = value
-    }
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T = mValue!!
-}
+@Composable
+@JvmName("rememberMovableContent0")
+fun rememberMovableContent(content: @Composable () -> Unit) =
+    remember(content) { movableContentOf(content) }
+
+@Composable
+@JvmName("rememberMovableContent1")
+fun <T1> rememberMovableContent(content: @Composable (T1) -> Unit) =
+    remember(content) { movableContentOf(content) }
+
+@Composable
+@JvmName("rememberMovableContent2")
+fun <T1, T2> rememberMovableContent(content: @Composable (T1, T2) -> Unit) =
+    remember(content) { movableContentOf(content) }
+
+@Composable
+@JvmName("rememberMovableContent3")
+fun <T1, T2, T3> rememberMovableContent(content: @Composable (T1, T2, T3) -> Unit) =
+    remember(content) { movableContentOf(content) }
+
+@Composable
+@JvmName("rememberMovableContent4")
+fun <T1, T2, T3, T4> rememberMovableContent(content: @Composable (T1, T2, T3, T4) -> Unit) =
+    remember(content) { movableContentOf(content) }
+
+@Suppress("UnusedReceiverParameter")
+@JvmName("movableComposable0")
+fun <R> R.movableComposable(content: @Composable R.() -> Unit) = movableContentWithReceiverOf(content)
+
+@Suppress("UnusedReceiverParameter")
+@JvmName("movableComposable1")
+fun <R, T1> R.movableComposable(content: @Composable R.(T1) -> Unit) = movableContentWithReceiverOf(content)
+
+@Suppress("UnusedReceiverParameter")
+@JvmName("movableComposable2")
+fun <R, T1, T2> R.movableComposable(content: @Composable R.(T1, T2) -> Unit) = movableContentWithReceiverOf(content)
+
+@Suppress("UnusedReceiverParameter")
+@JvmName("movableComposable3")
+fun <R, T1, T2, T3> R.movableComposable(content: @Composable R.(T1, T2, T3) -> Unit) = movableContentWithReceiverOf(content)

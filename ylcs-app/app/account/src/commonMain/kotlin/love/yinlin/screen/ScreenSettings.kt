@@ -1,8 +1,6 @@
 package love.yinlin.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
@@ -15,15 +13,10 @@ import love.yinlin.app
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.img_logo
 import love.yinlin.common.DataSourceAccount
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.Theme
-import love.yinlin.compose.ThemeMode
-import love.yinlin.compose.bold
+import love.yinlin.compose.*
 import love.yinlin.compose.config.CacheState
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.graphics.PlatformImage
@@ -49,13 +42,7 @@ import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.TertiaryButton
 import love.yinlin.compose.ui.node.fastClipCircle
 import love.yinlin.compose.ui.node.shadow
-import love.yinlin.compose.ui.text.Input
-import love.yinlin.compose.ui.text.InputDecoration
-import love.yinlin.compose.ui.text.PasswordInput
-import love.yinlin.compose.ui.text.SelectionBox
-import love.yinlin.compose.ui.text.SimpleEllipsisText
-import love.yinlin.compose.ui.text.Text
-import love.yinlin.compose.ui.text.rememberInputState
+import love.yinlin.compose.ui.text.*
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.*
 import love.yinlin.data.config.AnimationSpeedConfig
@@ -165,7 +152,7 @@ class ScreenSettings : Screen() {
     override val title: String = "设置"
 
     @Composable
-    private fun AccountSettings(profile: UserProfile?, modifier: Modifier = Modifier) {
+    private fun AccountSettings(profile: UserProfile?, modifier: Modifier) {
         SettingsLayout(
             modifier = modifier,
             title = "账号",
@@ -252,7 +239,7 @@ class ScreenSettings : Screen() {
     }
 
     @Composable
-    private fun PreferencesSettings(modifier: Modifier = Modifier) {
+    private fun PreferencesSettings(modifier: Modifier) {
         SettingsLayout(
             modifier = modifier,
             title = "偏好",
@@ -337,7 +324,7 @@ class ScreenSettings : Screen() {
     }
 
     @Composable
-    private fun ApplicationSettings(modifier: Modifier = Modifier) {
+    private fun ApplicationSettings(modifier: Modifier) {
         SettingsLayout(
             modifier = modifier,
             title = "应用",
@@ -406,6 +393,12 @@ class ScreenSettings : Screen() {
         }
     }
 
+    private val settingsPanel = movableComposable { profile: UserProfile?, modifier: Modifier ->
+        AccountSettings(profile, modifier)
+        PreferencesSettings(modifier)
+        ApplicationSettings(modifier)
+    }
+
     @Composable
     private fun Portrait(profile: UserProfile?) {
         Column(modifier = Modifier
@@ -413,27 +406,14 @@ class ScreenSettings : Screen() {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
         ) {
-            AccountSettings(profile = profile, modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue))
-            PreferencesSettings(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue))
-            ApplicationSettings(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue))
+            settingsPanel(profile, Modifier.fillMaxWidth().padding(Theme.padding.eValue))
         }
     }
 
     @Composable
     private fun Landscape(profile: UserProfile?) {
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(Theme.size.cell1),
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
-        ) {
-            item(key = ItemKey("AccountSettings")) {
-                AccountSettings(profile = profile, modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue))
-            }
-            item(key = ItemKey("PreferencesSettings")) {
-                PreferencesSettings(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue))
-            }
-            item(key = ItemKey("ApplicationSettings")) {
-                ApplicationSettings(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue))
-            }
+        FlowRow(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+            settingsPanel(profile, Modifier.width(Theme.size.cell1).padding(Theme.padding.eValue))
         }
     }
 

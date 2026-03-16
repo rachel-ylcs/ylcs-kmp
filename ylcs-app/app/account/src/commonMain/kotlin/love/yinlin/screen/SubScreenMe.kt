@@ -35,6 +35,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.NavigationScreen
@@ -82,8 +83,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
         DataSourceAccount.updateUserProfile()
     }
 
-    @Composable
-    private fun UserProfileCard(profile: UserProfile, modifier: Modifier = Modifier) {
+    private val userProfileCard = movableComposable { profile: UserProfile, modifier: Modifier ->
         Surface(
             modifier = modifier,
             contentAlignment = Alignment.TopCenter,
@@ -93,9 +93,9 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
             ) {
-                UserProfileInfoColumn(profile = remember(profile) { profile.publicProfile }, onLevelClick = { onLevelClick(profile) })
+                UserProfileInfoColumn(profile = profile.publicProfile, onLevelClick = { onLevelClick(profile) })
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
+                    modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -172,8 +172,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    @Composable
-    private fun ButtonContainer() {
+    private val buttonContainer = movableComposable { ->
         CommonButtonContainer("功能栏") {
             CommonButton("扫码", Icons.CropFree) {
                 scanSheet.open()
@@ -195,7 +194,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
                     signinSheet.open(it)
                 } ?: slot.tip.warning("请先登录")
             }
-            CommonButton("动态", Icons.Article) {
+            CommonButton("主题", Icons.Article) {
                 app.config.userProfile?.let {
                     navigate(::ScreenUserCard, it.uid)
                 } ?: slot.tip.warning("请先登录")
@@ -246,19 +245,17 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-            UserProfileCard(profile = profile, modifier = Modifier.fillMaxWidth())
-
-            ButtonContainer()
+            userProfileCard(profile, Modifier.fillMaxWidth())
+            buttonContainer()
         }
     }
 
     @Composable
     private fun Landscape(profile: UserProfile) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            UserProfileCard(profile = profile, modifier = Modifier.width(Theme.size.cell1).fillMaxHeight())
-
+            userProfileCard(profile, Modifier.width(Theme.size.cell1).fillMaxHeight())
             Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
-                ButtonContainer()
+                buttonContainer()
             }
         }
     }

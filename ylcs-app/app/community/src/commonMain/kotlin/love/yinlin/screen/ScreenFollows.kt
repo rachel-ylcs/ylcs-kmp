@@ -135,7 +135,7 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
         ) {
             WebImage(
                 uri = item.avatarPath,
-                key = remember { DateEx.TodayString },
+                key = DateEx.TodayLong,
                 contentScale = ContentScale.Crop,
                 circle = true,
                 modifier = Modifier.size(Theme.size.image9)

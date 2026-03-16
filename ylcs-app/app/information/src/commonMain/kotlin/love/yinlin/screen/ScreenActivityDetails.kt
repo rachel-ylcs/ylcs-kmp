@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -16,6 +17,7 @@ import love.yinlin.app
 import love.yinlin.app.information.resources.*
 import love.yinlin.common.DataSourceInformation
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TagView
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
@@ -26,7 +28,6 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -350,23 +351,28 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
         }
     }
 
+    private fun Modifier.buildScrollModifier(scrollable: Boolean): Modifier = if (!scrollable) this else composed { verticalScroll(rememberScrollState()) }
+
+    private val activityPanel = movableComposable { activity: Activity, modifier: Modifier, scrollable: Boolean ->
+        ActivityInfoLayout(activity = activity, modifier = modifier.buildScrollModifier(scrollable))
+        ActivityPhotoLayout(activity = activity, modifier = modifier.buildScrollModifier(scrollable))
+        ActivityPlaylistLayout(activity = activity, modifier = modifier.buildScrollModifier(scrollable))
+    }
+
     @Composable
     private fun Portrait(activity: Activity) {
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().verticalScroll(rememberScrollState())) {
-            ActivityInfoLayout(activity = activity, modifier = Modifier.fillMaxWidth())
-            ActivityPhotoLayout(activity = activity, modifier = Modifier.fillMaxWidth())
-            ActivityPlaylistLayout(activity = activity, modifier = Modifier.fillMaxWidth())
+            activityPanel(activity, Modifier.fillMaxWidth(), false)
         }
     }
 
     @Composable
     private fun Landscape(activity: Activity) {
-        Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            ActivityInfoLayout(activity = activity, modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()))
-            Divider()
-            ActivityPhotoLayout(activity = activity, modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()))
-            Divider()
-            ActivityPlaylistLayout(activity = activity, modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()))
+        Row(
+            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+        ) {
+            activityPanel(activity, Modifier.weight(1f).fillMaxHeight(), true)
         }
     }
 

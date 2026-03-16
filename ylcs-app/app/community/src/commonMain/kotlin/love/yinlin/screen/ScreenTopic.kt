@@ -24,6 +24,7 @@ import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.screen.Screen
@@ -265,7 +266,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                     ) {
                         WebImage(
                             uri = info.avatarPath,
-                            key = remember { DateEx.TodayString },
+                            key = DateEx.TodayLong,
                             contentScale = ContentScale.Crop,
                             circle = true,
                             modifier = Modifier.size(Theme.size.image10)
@@ -294,8 +295,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
         )
     }
 
-    @Composable
-    private fun TopicLayout(details: TopicDetails, modifier: Modifier = Modifier) {
+    private val topicLayout = movableComposable { details: TopicDetails, modifier: Modifier ->
         Surface(
             modifier = modifier,
             contentPadding = Theme.padding.eValue,
@@ -514,8 +514,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
         }
     }
 
-    @Composable
-    private fun Portrait(details: TopicDetails) {
+    private val commentListLayout = movableComposable { details: TopicDetails, isPortrait: Boolean, modifier: Modifier ->
         PaginationColumn(
             items = pageComments.items,
             key = { it.cid },
@@ -523,43 +522,33 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
             canRefresh = false,
             canLoading = pageComments.canLoading,
             onLoading = ::requestMoreComments,
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
-            header = { TopicLayout(details = details, modifier = Modifier.fillMaxWidth()) }
+            modifier = modifier,
+            verticalArrangement = if (isPortrait) Arrangement.spacedBy(Theme.padding.v9) else Arrangement.Top,
+            header = if (isPortrait) { { topicLayout(details, Modifier.fillMaxWidth()) } } else null
         ) {
-            CommentBar(
-                comment = it,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.e)
-            )
+            val padding = if (isPortrait) PaddingValues(horizontal = Theme.padding.e) else Theme.padding.value
+
+            CommentBar(comment = it, modifier = Modifier.fillMaxWidth().padding(padding))
         }
+    }
+
+    @Composable
+    private fun Portrait(details: TopicDetails) {
+        commentListLayout(details, true, Modifier.padding(LocalImmersivePadding.current).fillMaxSize())
     }
 
     @Composable
     private fun Landscape(details: TopicDetails) {
         Row(modifier = Modifier.fillMaxSize()) {
-            TopicLayout(
-                modifier = Modifier
-                    .padding(LocalImmersivePadding.current.withoutEnd)
-                    .width(Theme.size.cell1)
-                    .fillMaxHeight()
-                    .verticalScroll(rememberScrollState()),
-                details = details
-            )
-
-            PaginationColumn(
-                items = pageComments.items,
-                key = { it.cid },
-                state = listState,
-                canRefresh = false,
-                canLoading = pageComments.canLoading,
-                onLoading = ::requestMoreComments,
-                modifier = Modifier
-                    .padding(LocalImmersivePadding.current.withoutStart)
-                    .weight(1f)
-                    .fillMaxHeight()
-            ) {
-                CommentBar(comment = it, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value))
-            }
+            topicLayout(details, Modifier
+                .padding(LocalImmersivePadding.current.withoutEnd)
+                .width(Theme.size.cell1)
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()))
+            commentListLayout(details, false, Modifier
+                .padding(LocalImmersivePadding.current.withoutStart)
+                .weight(1f)
+                .fillMaxHeight())
         }
     }
 

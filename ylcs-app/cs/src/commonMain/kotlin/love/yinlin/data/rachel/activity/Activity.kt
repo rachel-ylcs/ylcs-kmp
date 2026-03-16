@@ -23,7 +23,7 @@ data class Activity(
 	val hide: Boolean = false, // [私密活动]
 ) : Comparable<Activity> {
 	override fun compareTo(other: Activity): Int {
-		val today = DateEx.Today.toEpochDays()
+		val today = DateEx.TodayLong
 		val day1 = (this.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Long.MAX_VALUE) - today
 		val day2 = (other.ts?.let { DateEx.Formatter.standardDate.parse(it) }?.toEpochDays() ?: Long.MAX_VALUE) - today
 		return if (day1 < 0L) {

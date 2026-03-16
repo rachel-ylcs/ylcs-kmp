@@ -100,7 +100,7 @@ class ScreenWeiboFollows : Screen() {
             else {
                 WebImage(
                     uri = user.avatar,
-                    key = remember { DateEx.TodayString },
+                    key = DateEx.TodayLong,
                     contentScale = ContentScale.Crop,
                     circle = true,
                     modifier = Modifier.size(Theme.size.image9)

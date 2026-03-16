@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -102,7 +101,7 @@ fun UserBar(
     ) {
         WebImage(
             uri = avatar,
-            key = remember { DateEx.TodayString },
+            key = DateEx.TodayLong,
             contentScale = ContentScale.Crop,
             circle = true,
             onClick = onAvatarClick,

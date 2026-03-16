@@ -99,7 +99,7 @@ class SubScreenDiscovery(parent: NavigationScreen) : SubScreen(parent) {
                 ) {
                     WebImage(
                         uri = topic.avatarPath.url,
-                        key = remember { DateEx.TodayString },
+                        key = DateEx.TodayLong,
                         contentScale = ContentScale.Crop,
                         circle = true,
                         modifier = Modifier.fillMaxHeight().aspectRatio(1f),

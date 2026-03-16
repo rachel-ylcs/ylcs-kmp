@@ -16,6 +16,7 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.BoxText
@@ -147,8 +148,7 @@ class ScreenUserCard(private val uid: Int) : Screen() {
         }
     }
 
-    @Composable
-    private fun UserProfileCard(profile: UserPublicProfile, modifier: Modifier = Modifier) {
+    private val userProfileCard = movableComposable { profile: UserPublicProfile, modifier: Modifier ->
         Surface(
             modifier = modifier,
             contentAlignment = Alignment.TopCenter,
@@ -199,49 +199,38 @@ class ScreenUserCard(private val uid: Int) : Screen() {
         }
     }
 
+    private val topicListLayout = movableComposable { profile: UserPublicProfile, isPortrait: Boolean, modifier: Modifier ->
+        PaginationStaggeredGrid(
+            items = page.items,
+            key = { it.tid },
+            columns = StaggeredGridCells.Adaptive(Theme.size.cell4),
+            state = listState,
+            canRefresh = false,
+            canLoading = page.canLoading,
+            onLoading = ::requestMoreTopics,
+            modifier = modifier,
+            contentPadding = if (isPortrait) PaddingValues.Zero else Theme.padding.eValue,
+            horizontalArrangement = if (isPortrait) Arrangement.Start else Arrangement.spacedBy(Theme.padding.e),
+            verticalItemSpacing = Theme.padding.e,
+            header = if (isPortrait) { { userProfileCard(profile, Modifier.fillMaxWidth()) } } else null,
+        ) { topic ->
+            val padding = if (isPortrait) PaddingValues(horizontal = Theme.padding.e / 2) else PaddingValues.Zero
+
+            TopicCard(topic = topic, modifier = Modifier.fillMaxWidth().padding(padding))
+        }
+    }
+
     @Composable
     private fun Portrait(profile: UserPublicProfile) {
-        if (profile.status.canShowTopics) {
-            PaginationStaggeredGrid(
-                items = page.items,
-                key = { it.tid },
-                columns = StaggeredGridCells.Adaptive(Theme.size.cell4),
-                state = listState,
-                canRefresh = false,
-                canLoading = page.canLoading,
-                onLoading = ::requestMoreTopics,
-                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
-                verticalItemSpacing = Theme.padding.e,
-                header = { UserProfileCard(profile = profile, modifier = Modifier.fillMaxWidth()) }
-            ) { topic ->
-                TopicCard(topic = topic, modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.e / 2))
-            }
-        }
-        else UserProfileCard(profile = profile, modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxWidth())
+        if (profile.status.canShowTopics) topicListLayout(profile, true, Modifier.padding(LocalImmersivePadding.current).fillMaxSize())
+        else userProfileCard(profile, Modifier.padding(LocalImmersivePadding.current).fillMaxWidth())
     }
 
     @Composable
     private fun Landscape(profile: UserPublicProfile) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            UserProfileCard(profile = profile, modifier = Modifier.width(Theme.size.cell1).fillMaxHeight())
-
-            if (profile.status.canShowTopics) {
-                PaginationStaggeredGrid(
-                    items = page.items,
-                    key = { it.tid },
-                    columns = StaggeredGridCells.Adaptive(Theme.size.cell4),
-                    state = listState,
-                    canRefresh = false,
-                    canLoading = page.canLoading,
-                    onLoading = ::requestMoreTopics,
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
-                    contentPadding = Theme.padding.eValue,
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
-                    verticalItemSpacing = Theme.padding.e
-                ) { topic ->
-                    TopicCard(topic = topic, modifier = Modifier.fillMaxWidth())
-                }
-            }
+            userProfileCard(profile, Modifier.width(Theme.size.cell1).fillMaxHeight())
+            if (profile.status.canShowTopics) topicListLayout(profile, false, Modifier.weight(1f).fillMaxHeight())
         }
     }
 

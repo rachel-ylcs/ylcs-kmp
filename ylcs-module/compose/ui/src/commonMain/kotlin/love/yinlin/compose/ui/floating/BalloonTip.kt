@@ -13,6 +13,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.coroutineScope
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.extension.rememberMovableContent
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.text.Text
 
@@ -57,6 +58,7 @@ private fun BalloonTip(text: String, content: @Composable () -> Unit) {
 @Composable
 @NonRestartableComposable
 fun BalloonTip(text: String, enabled: Boolean, content: @Composable () -> Unit) {
-    if (enabled && text.isNotEmpty()) BalloonTip(text, content)
-    else content()
+    val movableContent = rememberMovableContent(content)
+    if (enabled && text.isNotEmpty()) BalloonTip(text, movableContent)
+    else movableContent()
 }

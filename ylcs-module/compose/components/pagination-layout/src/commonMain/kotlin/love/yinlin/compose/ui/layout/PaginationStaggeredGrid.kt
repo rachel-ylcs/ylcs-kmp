@@ -23,7 +23,7 @@ fun <T> PaginationStaggeredGrid(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues.Zero,
     verticalItemSpacing: Dp = 0.dp,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
     itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {

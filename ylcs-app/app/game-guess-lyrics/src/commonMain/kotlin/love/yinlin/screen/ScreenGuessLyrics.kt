@@ -205,7 +205,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
             ) {
                 WebImage(
                     uri = info.userAvatar.url,
-                    key = remember { DateEx.TodayString },
+                    key = DateEx.TodayLong,
                     circle = true,
                     modifier = Modifier.fillMaxWidth().aspectRatio(1f)
                 )
@@ -228,7 +228,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
         ) {
             WebImage(
                 uri = result.userAvatar.url,
-                key = remember { DateEx.TodayString },
+                key = DateEx.TodayLong,
                 circle = true,
                 modifier = Modifier.size(Theme.size.image7)
             )

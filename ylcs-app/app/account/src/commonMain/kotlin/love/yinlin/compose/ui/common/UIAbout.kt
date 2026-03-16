@@ -69,7 +69,7 @@ internal fun ContributorLayout(
                                 ) {
                                     WebImage(
                                         uri = ServerRes.Users.User(contributor.uid).avatar.url,
-                                        key = remember { DateEx.TodayString },
+                                        key = DateEx.TodayLong,
                                         circle = true,
                                         modifier = Modifier.size(Theme.size.image8)
                                     )

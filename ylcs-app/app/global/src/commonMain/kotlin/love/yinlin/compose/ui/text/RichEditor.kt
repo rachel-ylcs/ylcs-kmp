@@ -21,6 +21,7 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.icon.Icons
@@ -250,13 +251,8 @@ open class RichEditorState(maxLength: Int) {
     @Composable
     protected open fun AtLayout(modifier: Modifier) {}
 
-    @Composable
-    private fun InputLayout(
-        hint: String?,
-        imeAction: ImeAction,
-        onImeClick: (KeyboardActionScope.() -> Unit)?,
-        modifier: Modifier = Modifier
-    ) {
+    private val inputLayout = movableComposable { pair: Pair<String?, ImeAction>, onImeClick: (KeyboardActionScope.() -> Unit)?, modifier: Modifier ->
+        val (hint, imeAction) = pair
         val iconColor by rememberUpdatedState(if (enablePreview) Theme.color.primary else LocalColor.current)
         Input(
             state = inputState,
@@ -274,8 +270,7 @@ open class RichEditorState(maxLength: Int) {
         )
     }
 
-    @Composable
-    private fun PreviewText(modifier: Modifier = Modifier) {
+    private val previewTextLayout = movableComposable { modifier: Modifier ->
         Box(modifier = modifier) {
             when (currentPage) {
                 RichEditorPage.CONTENT -> {
@@ -301,50 +296,6 @@ open class RichEditorState(maxLength: Int) {
     }
 
     @Composable
-    private fun PortraitPreviewLayout(
-        hint: String?,
-        imeAction: ImeAction,
-        onImeClick: (KeyboardActionScope.() -> Unit)?,
-        modifier: Modifier = Modifier
-    ) {
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
-        ) {
-            PreviewText(modifier = Modifier.fillMaxWidth().aspectRatio(2f))
-            InputLayout(
-                hint = hint,
-                imeAction = imeAction,
-                onImeClick = onImeClick,
-                modifier = Modifier.fillMaxWidth().aspectRatio(2f)
-            )
-        }
-    }
-
-    @Composable
-    private fun LandscapePreviewLayout(
-        hint: String?,
-        imeAction: ImeAction,
-        onImeClick: (KeyboardActionScope.() -> Unit)?,
-        modifier: Modifier = Modifier
-    ) {
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            InputLayout(
-                hint = hint,
-                imeAction = imeAction,
-                onImeClick = onImeClick,
-                modifier = Modifier.weight(1f).aspectRatio(2f)
-            )
-            PreviewText(modifier = Modifier.weight(1f).aspectRatio(2f))
-        }
-    }
-
-    @Composable
     private fun PreviewLayout(
         hint: String?,
         imeAction: ImeAction,
@@ -352,20 +303,24 @@ open class RichEditorState(maxLength: Int) {
         modifier: Modifier = Modifier
     ) {
         if (LocalDevice.current.type == Device.Type.PORTRAIT) {
-            PortraitPreviewLayout(
-                hint = hint,
-                imeAction = imeAction,
-                onImeClick = onImeClick,
-                modifier = modifier
-            )
+            Column(
+                modifier = modifier,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+            ) {
+                previewTextLayout(Modifier.fillMaxWidth().aspectRatio(2f))
+                inputLayout(hint to imeAction, onImeClick, Modifier.fillMaxWidth().aspectRatio(2f))
+            }
         }
         else {
-            LandscapePreviewLayout(
-                hint = hint,
-                imeAction = imeAction,
-                onImeClick = onImeClick,
-                modifier = modifier
-            )
+            Row(
+                modifier = modifier,
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                inputLayout(hint to imeAction, onImeClick, Modifier.weight(1f).aspectRatio(2f))
+                previewTextLayout(Modifier.weight(1f).aspectRatio(2f))
+            }
         }
     }
 
@@ -406,14 +361,7 @@ open class RichEditorState(maxLength: Int) {
                     )
                 }
             }
-            else {
-                InputLayout(
-                    hint = hint,
-                    imeAction = imeAction,
-                    onImeClick = onImeClick,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            else inputLayout(hint to imeAction, onImeClick, Modifier.fillMaxWidth())
         }
     }
 }

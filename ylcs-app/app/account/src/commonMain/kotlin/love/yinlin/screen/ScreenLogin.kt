@@ -12,6 +12,7 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.image.Image
@@ -22,11 +23,7 @@ import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputDecoration
 import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.PasswordInput
-import love.yinlin.cs.ApiAccountForgotPassword
-import love.yinlin.cs.ApiAccountGetInviters
-import love.yinlin.cs.ApiAccountLogin
-import love.yinlin.cs.ApiAccountRegister
-import love.yinlin.cs.request
+import love.yinlin.cs.*
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.DateEx
 import love.yinlin.platform.platform
@@ -265,8 +262,7 @@ class ScreenLogin : Screen() {
         }
     }
 
-    @Composable
-    private fun ContentBox(modifier: Modifier = Modifier) {
+    private val contentBox = movableComposable { modifier: Modifier ->
         AnimationContent(
             state = mode,
             modifier = modifier,
@@ -290,7 +286,7 @@ class ScreenLogin : Screen() {
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v8)
         ) {
             Image(res = Res.drawable.img_logo, modifier = Modifier.size(Theme.size.image4))
-            ContentBox(modifier = Modifier.fillMaxWidth())
+            contentBox(Modifier.fillMaxWidth())
         }
     }
 
@@ -310,7 +306,7 @@ class ScreenLogin : Screen() {
             ) {
                 Image(res = Res.drawable.img_logo, modifier = Modifier.size(Theme.size.image4))
             }
-            ContentBox(modifier = Modifier.weight(2f))
+            contentBox(Modifier.weight(2f))
         }
     }
 

@@ -19,6 +19,7 @@ import love.yinlin.app.portal.resources.*
 import love.yinlin.common.*
 import love.yinlin.isAppInitialized
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.screen.DataSource
 import love.yinlin.compose.screen.MultiDataSource
 import love.yinlin.compose.screen.NavigationScreen
@@ -56,66 +57,125 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
     }
 
     @Composable
+    private fun PortraitNavigator(index: Int, padding: PaddingValues, modifier: Modifier = Modifier) {
+        Surface(
+            modifier = modifier,
+            contentPadding = padding,
+            shadowElevation = Theme.shadow.v1,
+            tonalLevel = 5
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TabItem.entries.fastForEachIndexed { i, item ->
+                    val isCurrent = i == index
+                    val primaryColor = Theme.color.primary
+                    val indicatorRatio by animateFloatAsState(
+                        targetValue = if (isCurrent) 1f else 0f,
+                        animationSpec = tween(Theme.animation.duration.v5)
+                    )
+                    val weightRatio = indicatorRatio / 2 + 1
+                    val iconAngle = indicatorRatio * 360f
+
+                    TextIconBinder(
+                        modifier = Modifier
+                            .drawBehind {
+                                val (boxWidth, boxHeight) = this.size
+                                val indicatorHeight = boxHeight * 0.05f
+                                val startRatio = (1 - indicatorRatio) / 2
+                                drawRoundRect(
+                                    color = primaryColor,
+                                    topLeft = Offset(startRatio * boxWidth, 0f),
+                                    size = Size(indicatorRatio * boxWidth, indicatorHeight),
+                                    cornerRadius = CornerRadius(indicatorHeight)
+                                )
+                            }
+                            .clickable { navigateSubScreen(i) }
+                            .weight(weightRatio)
+                            .padding(vertical = Theme.padding.v),
+                        gapRatio = 0.25f
+                    ) { idIcon, idText ->
+                        Icon(
+                            icon = if (isCurrent) item.iconActive else item.iconNormal,
+                            modifier = Modifier.fastRotate { iconAngle }.idIcon()
+                        )
+                        SimpleClipText(
+                            text = item.title,
+                            color = if (isCurrent) primaryColor else LocalColor.current,
+                            style = Theme.typography.v7.bold,
+                            modifier = Modifier.idText()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun LandscapeNavigator(index: Int, padding: PaddingValues, modifier: Modifier = Modifier) {
+        Surface(
+            modifier = modifier,
+            contentPadding = padding,
+            shadowElevation = Theme.shadow.v1,
+            tonalLevel = 5
+        ) {
+            Column(modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState())) {
+                TabItem.entries.fastForEachIndexed { i, item ->
+                    val isCurrent = i == index
+                    val primaryColor = Theme.color.primary
+                    val indicatorRatio by animateFloatAsState(
+                        targetValue = if (isCurrent) 0.5f else 0f,
+                        animationSpec = tween(Theme.animation.duration.v5)
+                    )
+                    val iconAngle = indicatorRatio * 720f
+
+                    TextIconAdapter(
+                        modifier = Modifier.drawBehind {
+                            val (boxWidth, boxHeight) = this.size
+                            val indicatorWidth = boxWidth * 0.03f
+                            drawRoundRect(
+                                color = primaryColor,
+                                topLeft = Offset(indicatorWidth, (1 - indicatorRatio) / 2 * boxHeight),
+                                size = Size(indicatorWidth, indicatorRatio * boxHeight),
+                                cornerRadius = CornerRadius(indicatorWidth)
+                            )
+                        }.clickable {
+                            navigateSubScreen(i)
+                        }.padding(Theme.padding.value8),
+                        gapRatio = 1f
+                    ) { idIcon, idText ->
+                        Icon(
+                            icon = if (isCurrent) item.iconActive else item.iconNormal,
+                            modifier = Modifier.fastRotate { iconAngle }.idIcon()
+                        )
+                        SimpleClipText(
+                            text = item.title,
+                            color = if (isCurrent) primaryColor else LocalColor.current,
+                            style = Theme.typography.v6.bold,
+                            modifier = Modifier.idText()
+                        )
+                    }
+                }
+                Box(modifier = Modifier.weight(1f))
+            }
+        }
+    }
+
+    private val currentContent = movableComposable { padding: ImmersivePadding, modifier: Modifier, content: @Composable () -> Unit ->
+        Box(modifier = modifier) {
+            CompositionLocalProvider(LocalImmersivePadding provides padding, content = content)
+        }
+    }
+
+    @Composable
     private fun Portrait(index: Int, content: @Composable () -> Unit) {
         Column(modifier = Modifier.fillMaxSize()) {
             val immersivePadding = LocalImmersivePadding.current
 
-            Box(modifier = Modifier.fillMaxWidth().weight(1f).zIndex(1f)) {
-                CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutBottom, content = content)
-            }
-            Surface(
-                modifier = Modifier.fillMaxWidth().zIndex(2f),
-                contentPadding = immersivePadding.withoutTop,
-                shadowElevation = Theme.shadow.v1,
-                tonalLevel = 5
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TabItem.entries.fastForEachIndexed { i, item ->
-                        val isCurrent = i == index
-                        val primaryColor = Theme.color.primary
-                        val indicatorRatio by animateFloatAsState(
-                            targetValue = if (isCurrent) 1f else 0f,
-                            animationSpec = tween(Theme.animation.duration.v5)
-                        )
-                        val weightRatio = indicatorRatio / 2 + 1
-                        val iconAngle = indicatorRatio * 360f
-
-                        TextIconBinder(
-                            modifier = Modifier
-                                .drawBehind {
-                                    val (boxWidth, boxHeight) = this.size
-                                    val indicatorHeight = boxHeight * 0.05f
-                                    val startRatio = (1 - indicatorRatio) / 2
-                                    drawRoundRect(
-                                        color = primaryColor,
-                                        topLeft = Offset(startRatio * boxWidth, 0f),
-                                        size = Size(indicatorRatio * boxWidth, indicatorHeight),
-                                        cornerRadius = CornerRadius(indicatorHeight)
-                                    )
-                                }
-                                .clickable { navigateSubScreen(i) }
-                                .weight(weightRatio)
-                                .padding(vertical = Theme.padding.v),
-                            gapRatio = 0.25f
-                        ) { idIcon, idText ->
-                            Icon(
-                                icon = if (isCurrent) item.iconActive else item.iconNormal,
-                                modifier = Modifier.fastRotate { iconAngle }.idIcon()
-                            )
-                            SimpleClipText(
-                                text = item.title,
-                                color = if (isCurrent) primaryColor else LocalColor.current,
-                                style = Theme.typography.v7.bold,
-                                modifier = Modifier.idText()
-                            )
-                        }
-                    }
-                }
-            }
+            currentContent(immersivePadding.withoutBottom, Modifier.fillMaxWidth().weight(1f).zIndex(1f), content)
+            PortraitNavigator(index, immersivePadding.withoutTop, Modifier.fillMaxWidth().zIndex(2f))
         }
     }
 
@@ -124,57 +184,8 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
         Row(modifier = Modifier.fillMaxSize()) {
             val immersivePadding = LocalImmersivePadding.current
 
-            Surface(
-                modifier = Modifier.fillMaxHeight().zIndex(2f),
-                contentPadding = immersivePadding.withoutEnd,
-                shadowElevation = Theme.shadow.v1,
-                tonalLevel = 5
-            ) {
-                Column(modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState())) {
-                    TabItem.entries.fastForEachIndexed { i, item ->
-                        val isCurrent = i == index
-                        val primaryColor = Theme.color.primary
-                        val indicatorRatio by animateFloatAsState(
-                            targetValue = if (isCurrent) 0.5f else 0f,
-                            animationSpec = tween(Theme.animation.duration.v5)
-                        )
-                        val iconAngle = indicatorRatio * 720f
-
-                        TextIconAdapter(
-                            modifier = Modifier.drawBehind {
-                                val (boxWidth, boxHeight) = this.size
-                                val indicatorWidth = boxWidth * 0.03f
-                                drawRoundRect(
-                                    color = primaryColor,
-                                    topLeft = Offset(indicatorWidth, (1 - indicatorRatio) / 2 * boxHeight),
-                                    size = Size(indicatorWidth, indicatorRatio * boxHeight),
-                                    cornerRadius = CornerRadius(indicatorWidth)
-                                )
-                            }.clickable {
-                                navigateSubScreen(i)
-                            }.padding(Theme.padding.value8),
-                            gapRatio = 1f
-                        ) { idIcon, idText ->
-                            Icon(
-                                icon = if (isCurrent) item.iconActive else item.iconNormal,
-                                modifier = Modifier.fastRotate { iconAngle }.idIcon()
-                            )
-                            SimpleClipText(
-                                text = item.title,
-                                color = if (isCurrent) primaryColor else LocalColor.current,
-                                style = Theme.typography.v6.bold,
-                                modifier = Modifier.idText()
-                            )
-                        }
-                    }
-                    Box(modifier = Modifier.weight(1f))
-                }
-            }
-            Box(modifier = Modifier.weight(1f).fillMaxHeight().zIndex(1f)) {
-                CompositionLocalProvider(LocalImmersivePadding provides immersivePadding.withoutStart) {
-                    content()
-                }
-            }
+            LandscapeNavigator(index, immersivePadding.withoutEnd, Modifier.fillMaxHeight().zIndex(2f))
+            currentContent(immersivePadding.withoutStart, Modifier.weight(1f).fillMaxHeight().zIndex(1f), content)
         }
     }
 

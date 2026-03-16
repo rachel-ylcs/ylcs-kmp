@@ -3,7 +3,6 @@ package love.yinlin.compose.ui.common
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,7 +57,7 @@ fun UserProfileInfoColumn(profile: UserPublicProfile, onLevelClick: (() -> Unit)
     // 背景墙
     WebImage(
         uri = profile.wallPath.url,
-        key = if (isOwner) app.config.cacheUserWall else remember { DateEx.TodayString },
+        key = if (isOwner) app.config.cacheUserWall else DateEx.TodayLong,
         modifier = Modifier.fillMaxWidth().aspectRatio(1.77777f)
     )
     // 头像和信息
@@ -68,7 +67,7 @@ fun UserProfileInfoColumn(profile: UserPublicProfile, onLevelClick: (() -> Unit)
     ) {
         WebImage(
             uri = profile.avatarPath.url,
-            key = if (isOwner) app.config.cacheUserAvatar else remember { DateEx.TodayString },
+            key = if (isOwner) app.config.cacheUserAvatar else DateEx.TodayLong,
             contentScale = ContentScale.Crop,
             circle = true,
             modifier = Modifier.fillMaxHeight().aspectRatio(1f)

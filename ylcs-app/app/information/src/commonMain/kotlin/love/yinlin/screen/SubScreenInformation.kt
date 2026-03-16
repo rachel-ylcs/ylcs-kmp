@@ -4,12 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,14 +16,8 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.until
 import love.yinlin.app
 import love.yinlin.common.DataSourceInformation
-import love.yinlin.compose.Colors
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalColor
-import love.yinlin.compose.LocalColorVariant
-import love.yinlin.compose.LocalDevice
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
+import love.yinlin.compose.*
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
@@ -46,10 +35,7 @@ import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.widget.Calendar
 import love.yinlin.compose.ui.widget.CalendarState
-import love.yinlin.cs.ApiActivityAddActivity
-import love.yinlin.cs.ApiActivityGetActivities
-import love.yinlin.cs.request
-import love.yinlin.cs.url
+import love.yinlin.cs.*
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findSelf
@@ -83,20 +69,22 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
         requestActivity()
     }
 
-    @Composable
-    private fun ToolBarLayout(modifier: Modifier = Modifier) {
-        ActionScope.Right.Container(modifier = modifier) {
-            if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
-                LoadingIcon(icon = Icons.Add, tip = "添加", onClick = {
-                    when (addActivityDialog.open()) {
-                        0 -> addActivity(false)
-                        1 -> addActivity(true)
-                    }
-                })
-            }
-            LoadingIcon(icon = Icons.Refresh, tip = "刷新", onClick = {
-                requestActivity()
-            })
+    private val bannerLayout = movableComposable { modifier: Modifier ->
+        val pics by rememberDerivedState { activities.fastFilter { it.photo.coverPath != null } }
+
+        Banner(
+            size = pics.size,
+            modifier = modifier,
+            key = { pics[it].aid },
+            interval = 5000L
+        ) { index ->
+            val activity = pics[index]
+            WebImage(
+                uri = activity.photo.coverPath?.url ?: "",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+                onClick = { navigate(::ScreenActivityDetails, activity.aid) }
+            )
         }
     }
 
@@ -112,8 +100,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    @Composable
-    private fun SectionLayout(modifier: Modifier = Modifier) {
+    private val sectionLayout = movableComposable { modifier: Modifier ->
         Surface(
             modifier = modifier,
             contentPadding = Theme.padding.value,
@@ -137,8 +124,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    @Composable
-    private fun CalendarLayout(modifier: Modifier = Modifier, actions: @Composable (RowScope.() -> Unit)) {
+    private val calendarLayout = movableComposable { modifier: Modifier ->
         Surface(
             modifier = modifier,
             contentPadding = Theme.padding.eValue,
@@ -148,32 +134,26 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
             Calendar(
                 state = calendarState,
                 events = activityEvents,
-                actions = actions,
+                actions = {
+                    ActionScope.Right.Container {
+                        if (app.config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                            LoadingIcon(icon = Icons.Add, tip = "添加", onClick = {
+                                when (addActivityDialog.open()) {
+                                    0 -> addActivity(false)
+                                    1 -> addActivity(true)
+                                }
+                            })
+                        }
+                        LoadingIcon(icon = Icons.Refresh, tip = "刷新", onClick = {
+                            requestActivity()
+                        })
+                    }
+                },
                 onEventClick = { date ->
                     DateEx.Formatter.standardDate.format(date)
                         ?.findSelf(activities) { it.ts }
                         ?.let { navigate(::ScreenActivityDetails, it.aid) }
                 }
-            )
-        }
-    }
-
-    @Composable
-    private fun BannerLayout(modifier: Modifier = Modifier) {
-        val pics by rememberDerivedState { activities.fastFilter { it.photo.coverPath != null } }
-
-        Banner(
-            size = pics.size,
-            modifier = modifier,
-            key = { pics[it].aid },
-            interval = 5000L
-        ) { index ->
-            val activity = pics[index]
-            WebImage(
-                uri = activity.photo.coverPath?.url ?: "",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-                onClick = { navigate(::ScreenActivityDetails, activity.aid) }
             )
         }
     }
@@ -215,8 +195,9 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    @Composable
-    private fun CalendarBarItemLayout() {
+    private val calendarBarItemLayout = movableComposable { scope: ColumnScope ->
+        scope.Space(Theme.padding.v9)
+
         for (activity in activities) {
             key(activity.aid) {
                 CalendarBarItem(activity)
@@ -233,79 +214,37 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            BannerLayout(modifier = Modifier.fillMaxWidth().aspectRatio(1.77778f))
-            SectionLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value8))
-            CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) {
-                ToolBarLayout()
-            }
-            Space(Theme.padding.v9)
-            CalendarBarItemLayout()
-        }
-    }
-
-    @Composable
-    private fun Square() {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = LocalImmersivePadding.current.withoutBottom + Theme.padding.value,
-                shadowElevation = Theme.shadow.v3
-            ) {
-                ToolBarLayout(modifier = Modifier.fillMaxWidth())
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(LocalImmersivePadding.current.withoutTop)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                BannerLayout(modifier = Modifier.fillMaxWidth().aspectRatio(1.77778f))
-                SectionLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value8))
-                CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) { }
-                Space(Theme.padding.v9)
-                CalendarBarItemLayout()
-            }
+            bannerLayout(Modifier.fillMaxWidth().aspectRatio(1.77778f))
+            sectionLayout(Modifier.fillMaxWidth().padding(Theme.padding.value8))
+            calendarLayout(Modifier.padding(Theme.padding.value8))
+            calendarBarItemLayout(this)
         }
     }
 
     @Composable
     private fun Landscape() {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = LocalImmersivePadding.current.withoutBottom + Theme.padding.value,
-                shadowElevation = Theme.shadow.v3
-            ) {
-                ToolBarLayout(modifier = Modifier.fillMaxWidth())
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(LocalImmersivePadding.current.withoutTop)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.width(Theme.size.cell1 * 1.5f)) {
-                        BannerLayout(modifier = Modifier.padding(Theme.padding.value8).fillMaxWidth().aspectRatio(1.77778f))
-                        SectionLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value8))
-                    }
-                    CalendarLayout(modifier = Modifier.padding(Theme.padding.value8)) { }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(LocalImmersivePadding.current)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.width(Theme.size.cell1 * 1.5f)) {
+                    bannerLayout(Modifier.padding(Theme.padding.value8).fillMaxWidth().aspectRatio(1.77778f))
+                    sectionLayout(Modifier.fillMaxWidth().padding(Theme.padding.value8))
                 }
-                Space(Theme.padding.v9)
-                CalendarBarItemLayout()
+                calendarLayout(Modifier.padding(Theme.padding.value8))
             }
+            calendarBarItemLayout(this)
         }
     }
 
     @Composable
     override fun Content() {
         when (LocalDevice.current.type) {
-            Device.Type.PORTRAIT -> Portrait()
-            Device.Type.SQUARE -> Square()
+            Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait()
             Device.Type.LANDSCAPE -> Landscape()
         }
     }

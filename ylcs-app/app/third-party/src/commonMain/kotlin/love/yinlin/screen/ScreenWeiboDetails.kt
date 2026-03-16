@@ -14,6 +14,7 @@ import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
@@ -92,6 +93,22 @@ class ScreenWeiboDetails : Screen() {
         }
     }
 
+    private val weiboInfoLayout = movableComposable { weibo: Weibo, outerModifier: Modifier, innerModifier: Modifier ->
+        Surface(
+            modifier = outerModifier,
+            contentAlignment = Alignment.TopCenter,
+            contentPadding = Theme.padding.eValue,
+            shadowElevation = Theme.shadow.v3,
+        ) {
+            Column(
+                modifier = innerModifier,
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            ) {
+                WeiboLayout(weibo = weibo, downloadDialog = null)
+            }
+        }
+    }
+
     @Composable
     private fun Portrait(weibo: Weibo) {
         LazyColumn(
@@ -99,19 +116,7 @@ class ScreenWeiboDetails : Screen() {
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
             item(key = ItemKey("WeiboLayout")) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.TopCenter,
-                    contentPadding = Theme.padding.eValue,
-                    shadowElevation = Theme.shadow.v3,
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
-                    ) {
-                        WeiboLayout(weibo = weibo, downloadDialog = null)
-                    }
-                }
+                weiboInfoLayout(weibo, Modifier.fillMaxWidth(), Modifier.fillMaxWidth())
             }
             comments?.let { weiboComments ->
                 items(
@@ -127,20 +132,7 @@ class ScreenWeiboDetails : Screen() {
     @Composable
     private fun Landscape(weibo: Weibo) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            Surface(
-                modifier = Modifier.width(Theme.size.cell1).fillMaxHeight(),
-                contentAlignment = Alignment.TopCenter,
-                contentPadding = Theme.padding.eValue,
-                shadowElevation = Theme.shadow.v3,
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
-                ) {
-                    WeiboLayout(weibo = weibo, downloadDialog = null)
-                }
-            }
-
+            weiboInfoLayout(weibo, Modifier.width(Theme.size.cell1).fillMaxHeight(), Modifier.fillMaxSize().verticalScroll(rememberScrollState()))
             Box(
                 modifier = Modifier.weight(1f).fillMaxHeight().padding(Theme.padding.e),
                 contentAlignment = Alignment.Center

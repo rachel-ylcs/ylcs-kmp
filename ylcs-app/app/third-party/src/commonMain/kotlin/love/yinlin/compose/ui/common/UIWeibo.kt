@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -48,7 +47,7 @@ fun BasicScreen.WeiboUserBar(
     ) {
         WebImage(
             uri = info.avatar,
-            key = remember { DateEx.TodayString },
+            key = DateEx.TodayLong,
             contentScale = ContentScale.Crop,
             circle = true,
             modifier = Modifier.fillMaxHeight().aspectRatio(1f),

@@ -20,6 +20,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
@@ -31,7 +32,7 @@ import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.layout.Divider
+import love.yinlin.compose.ui.layout.HorizontalDivider
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.data.weibo.Weibo
@@ -94,7 +95,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
         ) {
             WebImage(
                 uri = user.info.avatar,
-                key = remember { DateEx.TodayString },
+                key = DateEx.TodayLong,
                 contentScale = ContentScale.Crop,
                 circle = true,
                 modifier = Modifier.size(Theme.size.image8)
@@ -132,11 +133,10 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
         }
     }
 
-    @Composable
-    private fun UserInfoLayout(user: WeiboUser) {
+    private val userInfoLayout = movableComposable { user: WeiboUser ->
         WebImage(
             uri = user.background,
-            key = remember { DateEx.TodayString },
+            key = DateEx.TodayLong,
             modifier = Modifier.fillMaxWidth().aspectRatio(2f),
             contentScale = ContentScale.Crop,
             alpha = 0.8f
@@ -147,6 +147,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
             onFollowClick = { onFollowClick(user, it) },
             modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9)
         )
+        HorizontalDivider(modifier = Modifier.padding(bottom = Theme.padding.v))
     }
 
     @Composable
@@ -182,8 +183,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
         LazyColumn(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             item(key = ItemKey("UserInfoCard")) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    UserInfoLayout(user = user)
-                    Divider(modifier = Modifier.padding(bottom = Theme.padding.v))
+                    userInfoLayout(user)
                 }
             }
             if (albums != null) {
@@ -222,8 +222,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     private fun Landscape(user: WeiboUser, albums: List<WeiboAlbum>?) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             Column(modifier = Modifier.width(Theme.size.cell1).fillMaxHeight()) {
-                UserInfoLayout(user = user)
-                Divider(modifier = Modifier.padding(bottom = Theme.padding.v))
+                userInfoLayout(user)
                 Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                     if (albums == null) CircleLoading.Content(modifier = Modifier.align(Alignment.Center))
                     else if (albums.isNotEmpty()) {
