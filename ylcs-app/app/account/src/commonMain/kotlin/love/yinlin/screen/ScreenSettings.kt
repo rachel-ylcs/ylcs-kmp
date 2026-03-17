@@ -412,8 +412,12 @@ class ScreenSettings : Screen() {
 
     @Composable
     private fun Landscape(profile: UserProfile?) {
-        FlowRow(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            settingsPanel(profile, Modifier.width(Theme.size.cell1).padding(Theme.padding.eValue))
+        Row(modifier = Modifier
+            .padding(LocalImmersivePadding.current)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+        ) {
+            settingsPanel(profile, Modifier.weight(1f).padding(Theme.padding.eValue))
         }
     }
 
