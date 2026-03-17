@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.extension.rememberDerivedState
 
 @Composable
 fun <T> PaginationStaggeredGrid(
@@ -27,16 +28,22 @@ fun <T> PaginationStaggeredGrid(
     header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
     itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
 ) {
+    val internalCanRefresh = rememberDerivedState(canRefresh) {
+        canRefresh && state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0
+    }
+    val internalCanLoading = rememberDerivedState(canLoading) {
+        canLoading && !state.canScrollForward
+    }
+
     PullLayout(
-        canContainerRefresh = { state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0 },
-        canContainerLoading = { !state.canScrollForward },
-        canRefresh = canRefresh,
-        canLoading = canLoading,
+        canRefresh = internalCanRefresh,
+        canLoading = internalCanLoading,
         onRefresh = onRefresh,
         onLoading = onLoading,
         modifier = modifier,
     ) {
         LazyVerticalStaggeredGrid(
+            modifier = Modifier.fillMaxSize(),
             columns = columns,
             state = state,
             contentPadding = contentPadding,

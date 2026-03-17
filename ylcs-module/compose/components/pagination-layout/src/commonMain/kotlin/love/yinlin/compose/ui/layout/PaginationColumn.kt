@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.data.ItemKey
+import love.yinlin.compose.extension.rememberDerivedState
 
 @Composable
 fun <T> PaginationColumn(
@@ -26,16 +27,22 @@ fun <T> PaginationColumn(
     itemDivider: (@Composable () -> Unit)? = null,
     itemContent: @Composable LazyItemScope.(T) -> Unit
 ) {
+    val internalCanRefresh = rememberDerivedState(canRefresh) {
+        canRefresh && state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0
+    }
+    val internalCanLoading = rememberDerivedState(canLoading) {
+        canLoading && !state.canScrollForward
+    }
+
     PullLayout(
-        canContainerRefresh = { state.firstVisibleItemIndex == 0 && state.firstVisibleItemScrollOffset == 0 },
-        canContainerLoading = { !state.canScrollForward },
-        canRefresh = canRefresh,
-        canLoading = canLoading,
+        canRefresh = internalCanRefresh,
+        canLoading = internalCanLoading,
         onRefresh = onRefresh,
         onLoading = onLoading,
         modifier = modifier,
     ) {
         LazyColumn(
+            modifier = Modifier.fillMaxSize(),
             state = state,
             contentPadding = contentPadding,
             verticalArrangement = verticalArrangement,

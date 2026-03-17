@@ -236,10 +236,8 @@ private fun PullIndicator(
 
 @Composable
 internal fun PullLayout(
-    canContainerRefresh: () -> Boolean,
-    canContainerLoading: () -> Boolean,
-    canRefresh: Boolean,
-    canLoading: Boolean,
+    canRefresh: State<Boolean>,
+    canLoading: State<Boolean>,
     onRefresh: (suspend () -> Unit)?,
     onLoading: (suspend () -> Unit)?,
     modifier: Modifier = Modifier,
@@ -249,17 +247,14 @@ internal fun PullLayout(
 ) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
-    val canContainerRefreshUpdate by rememberUpdatedState(canContainerRefresh)
-    val canContainerLoadingUpdate by rememberUpdatedState(canContainerLoading)
-    val canRefreshUpdate = rememberDerivedState { canRefresh && canContainerRefreshUpdate() }
-    val canLoadingUpdate = rememberDerivedState { canLoading && canContainerLoadingUpdate() }
+
     val onRefreshUpdate = rememberUpdatedState(onRefresh)
     val onLoadingUpdate = rememberUpdatedState(onLoading)
-    val pullState = remember(density, scope, indicatorPadding, thresholdRatio) {
+    val pullState = remember(density, scope, canRefresh, canLoading, indicatorPadding, thresholdRatio) {
         PullState(
             scope = scope,
-            canRefresh = canRefreshUpdate,
-            canLoading = canLoadingUpdate,
+            canRefresh = canRefresh,
+            canLoading = canLoading,
             onRefresh = onRefreshUpdate,
             onLoading = onLoadingUpdate,
             indicatorPadding = with(density) { indicatorPadding.toPx() },
@@ -275,7 +270,7 @@ internal fun PullLayout(
 
     Box(modifier = modifier then pullModifier) {
         Box(modifier = Modifier.zIndex(1f), content = content)
-        if (canRefresh) {
+        if (canRefresh.value) {
             PullIndicator(
                 pullState = pullState,
                 isTop = true,
@@ -283,7 +278,7 @@ internal fun PullLayout(
                 modifier = Modifier.align(Alignment.TopCenter).zIndex(2f)
             )
         }
-        if (canLoading) {
+        if (canLoading.value) {
             PullIndicator(
                 pullState = pullState,
                 isTop = false,
