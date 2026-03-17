@@ -1,7 +1,6 @@
 package love.yinlin.media.lyrics
 
 import androidx.annotation.CallSuper
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,12 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.mutableRefStateOf
@@ -45,10 +45,10 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     protected abstract fun LinePlaceholder()
 
     @Composable
-    protected abstract fun LineItem(item: E, isCurrent: Boolean)
+    protected abstract fun LineItem(item: E, isCurrent: Boolean, measurer: TextMeasurer)
 
     @Composable
-    protected abstract fun BoxScope.FloatingLine(modifier: Modifier = Modifier, config: LyricsEngineConfig, textStyle: TextStyle)
+    protected abstract fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle)
 
     @CallSuper
     override fun reset() {
@@ -94,7 +94,6 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
                 .clip(Theme.shape.v7)
                 .condition(onClick != null) { clickable(onClick = onClick) }
                 .padding(Theme.padding.value),
-            contentAlignment = Alignment.Center,
             content = content
         )
     }
@@ -102,6 +101,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     @Composable
     final override fun LyricsCanvas(config: LyricsEngineConfig, host: LyricsEngineHost) {
         val scope = rememberCoroutineScope()
+        val measurer = rememberTextMeasurer(16)
         var containerSize by rememberState { IntSize.Zero }
 
         LaunchedEffect(currentIndex) {
@@ -130,7 +130,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
                     LineItemWrapper(onClick = {
                         scope.launch { host.seekTo(item.position) }
                     }) {
-                        LineItem(item, index == currentIndex)
+                        LineItem(item, index == currentIndex, measurer)
                     }
                 }
             }
@@ -143,15 +143,8 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     @Composable
     final override fun FloatingLyricsCanvas(modifier: Modifier, config: LyricsEngineConfig, textStyle: TextStyle) {
         CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
-            Box(
-                modifier = modifier,
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                FloatingLine(
-                    modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(Theme.padding.value),
-                    config = config,
-                    textStyle = textStyle
-                )
+            Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
+                FloatingLine(config = config, textStyle = textStyle)
             }
         }
     }

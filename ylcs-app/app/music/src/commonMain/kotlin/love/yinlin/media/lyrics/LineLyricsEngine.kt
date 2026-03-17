@@ -3,15 +3,17 @@ package love.yinlin.media.lyrics
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.rememberTextMeasurer
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.ui.text.FastCenterText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.extension.catchingDefault
 import love.yinlin.fs.File
@@ -38,20 +40,35 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
     }
 
     @Composable
-    override fun LineItem(item: StaticLine, isCurrent: Boolean) {
-        val color by animateColorAsState(targetValue = if (isCurrent) Colors.Green5 else LocalColor.current, animationSpec = tween(durationMillis = Theme.animation.duration.v3))
-        SimpleEllipsisText(text = item.text, color = color, style = if (isCurrent) Theme.typography.v5.bold else Theme.typography.v6)
+    override fun LineItem(item: StaticLine, isCurrent: Boolean, measurer: TextMeasurer) {
+        val color = animateColorAsState(targetValue = if (isCurrent) Colors.Green5 else LocalColor.current, animationSpec = tween(durationMillis = Theme.animation.duration.v3))
+        val normalStyle = Theme.typography.v6
+        val currentStyle = Theme.typography.v5.bold
+
+        FastCenterText(
+            layoutAction = { layout(measurer, "T", if (isCurrent) currentStyle else normalStyle) },
+            drawAction = {
+                draw(measure(measurer, item.text, if (isCurrent) currentStyle else normalStyle)) {
+                    drawText(it, color.value)
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 
     @Composable
-    override fun BoxScope.FloatingLine(modifier: Modifier, config: LyricsEngineConfig, textStyle: TextStyle) {
-        val currentText by rememberDerivedState { lines?.getOrNull(currentIndex)?.text ?: "" }
-        SimpleEllipsisText(
-            text = currentText,
-            color = Colors(config.textColor),
-            style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize),
-            textAlign = TextAlign.Center,
-            modifier = modifier
+    override fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle) {
+        val measurer = rememberTextMeasurer(16)
+
+        FastCenterText(
+            layoutAction = { layout(measurer, "T", textStyle.copy(fontSize = textStyle.fontSize * config.textSize)) },
+            drawAction = {
+                draw(measure(measurer, lines?.getOrNull(currentIndex)?.text ?: "", textStyle.copy(fontSize = textStyle.fontSize * config.textSize))) {
+                    drawBackground(it, Colors(config.backgroundColor))
+                    drawText(it, Colors(config.textColor))
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

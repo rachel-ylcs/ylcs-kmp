@@ -50,7 +50,7 @@ import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.*
-import love.yinlin.compose.ui.text.FixedText
+import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
@@ -333,7 +333,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 }
             }
 
-            FixedText("00:00", { currentDebounceTime.timeString })
+            FastFixedText("00:00", { currentDebounceTime.timeString })
 
             Slider(
                 value = progress,
@@ -371,7 +371,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 }
             }
 
-            FixedText("00:00", { duration.timeString })
+            FastFixedText("00:00", { duration.timeString })
         }
     }
 

@@ -1,21 +1,20 @@
 package love.yinlin.media.lyrics
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.shape.GenericShape
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.util.fastJoinToString
-import androidx.compose.ui.zIndex
 import love.yinlin.compose.Colors
+import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.ui.node.fastClip
-import love.yinlin.compose.ui.node.semantics
+import love.yinlin.compose.ui.text.FastCenterText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.catchingDefault
@@ -84,59 +83,52 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
     }
 
     @Composable
-    override fun LineItem(item: DynamicLine, isCurrent: Boolean) {
-        SimpleEllipsisText(
-            text = item.text,
-            style = if (isCurrent) Theme.typography.v5.bold else Theme.typography.v6,
-            modifier = Modifier.fastClip {
+    override fun LineItem(item: DynamicLine, isCurrent: Boolean, measurer: TextMeasurer) {
+        val normalStyle = Theme.typography.v6
+        val currentStyle = Theme.typography.v5.bold
+        val normalColor = LocalColor.current
+
+        FastCenterText(
+            layoutAction = { layout(measurer, "T", if (isCurrent) currentStyle else normalStyle) },
+            drawAction = {
+                draw(measure(measurer, item.text, if (isCurrent) currentStyle else normalStyle)) {
+                    clipRect(if (isCurrent) it.width * progress else 0f, 0f, it.width, it.height) {
+                        drawText(it, normalColor)
+                    }
+                }
                 if (isCurrent) {
-                    GenericShape { size, _ ->
-                        addRect(Rect(size.width * progress, 0f, size.width, size.height))
+                    draw(result = measure(measurer, item.text, currentStyle)) {
+                        clipRect(0f, 0f, it.width * progress, it.height) {
+                            drawText(it, Colors.Green5)
+                        }
                     }
-                } else null
-            }.zIndex(1f)
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
         )
-        if (isCurrent) {
-            SimpleEllipsisText(
-                text = item.text,
-                color = Colors.Green5,
-                style = Theme.typography.v5.bold,
-                modifier = Modifier.fastClip {
-                    GenericShape { size, _ ->
-                        addRect(Rect(0f, 0f, size.width * progress, size.height))
-                    }
-                }.semantics().zIndex(2f)
-            )
-        }
     }
 
     @Composable
-    override fun BoxScope.FloatingLine(modifier: Modifier, config: LyricsEngineConfig, textStyle: TextStyle) {
-        val currentText by rememberDerivedState { lines?.getOrNull(currentIndex)?.text ?: "" }
-        val style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize)
+    override fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle) {
+        val measurer = rememberTextMeasurer(16)
 
-        Box(modifier = modifier) {
-            SimpleEllipsisText(
-                text = currentText,
-                color = Colors.White,
-                style = style,
-                modifier = Modifier.fastClip {
-                    GenericShape { size, _ ->
-                        addRect(Rect(size.width * progress, 0f, size.width, size.height))
+        FastCenterText(
+            layoutAction = { layout(measurer, "T", textStyle.copy(fontSize = textStyle.fontSize * config.textSize)) },
+            drawAction = {
+                val style = textStyle.copy(fontSize = textStyle.fontSize * config.textSize)
+                val result = measure(measurer, lines?.getOrNull(currentIndex)?.text ?: "", style)
+                draw(result) {
+                    val offset = it.width * progress
+                    drawBackground(result, Colors(config.backgroundColor))
+                    clipRect(offset, 0f, it.width, it.height) {
+                        drawText(it, Colors.White)
                     }
-                }.zIndex(1f)
-            )
-
-            SimpleEllipsisText(
-                text = currentText,
-                color = Colors(config.textColor),
-                style = style,
-                modifier = Modifier.fastClip {
-                    GenericShape { size, _ ->
-                        addRect(Rect(0f, 0f, size.width * progress, size.height))
+                    clipRect(0f, 0f, offset, it.height) {
+                        drawText(it, Colors(config.textColor))
                     }
-                }.semantics().zIndex(2f)
-            )
-        }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
