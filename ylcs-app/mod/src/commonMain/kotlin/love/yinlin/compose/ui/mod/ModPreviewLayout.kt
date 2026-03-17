@@ -14,8 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.extension.fileSizeString
@@ -24,7 +24,7 @@ import love.yinlin.mod.ModFactory.Preview.PreviewResult
 @Composable
 fun ModPreviewLayout(modifier: Modifier = Modifier, result: PreviewResult) {
     LazyColumn(modifier = modifier) {
-        item(ItemKey("Metadata")) {
+        itemKey("Metadata") {
             val metadata = result.metadata
             Surface(
                 modifier = Modifier.padding(vertical = Theme.padding.v9).fillMaxWidth(),

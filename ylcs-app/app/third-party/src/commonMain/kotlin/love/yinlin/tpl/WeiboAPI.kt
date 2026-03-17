@@ -303,7 +303,7 @@ object WeiboAPI {
 		// 阶段1
 		val callback1 = "geetest_${Random.nextInt(0, 10000) + DateEx.CurrentLong}"
 		val loadEncrypt = NetClient.request<ByteArray, String>({
-			val uuid = Uuid.generateV4()
+			val uuid = Uuid.generateV7()
 			url = "${Container.captchaLoad}?callback=$callback1&captcha_id=$captchaId&challenge=$uuid&client_type=web&risk_type=slide&lang=zh-cn"
 			headers {
 				append(HttpHeaders.Cookie, "captcha_v4_user=55b938fde8a447a6a689abfac9683fac")

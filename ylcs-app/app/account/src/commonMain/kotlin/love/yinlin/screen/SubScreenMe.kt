@@ -34,7 +34,6 @@ import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.DeepLink
@@ -45,6 +44,7 @@ import love.yinlin.compose.ui.common.UserLabel
 import love.yinlin.compose.ui.common.UserProfileInfoColumn
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
+import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.floating.Sheet
 import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.icon.Icons
@@ -437,7 +437,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
         @Composable
         override fun Content(args: UserProfile) {
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                item(key = ItemKey("Profile")) {
+                itemKey("Profile") {
                     Row(
                         modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(Theme.padding.value),
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
@@ -460,7 +460,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
                 }
                 itemsIndexed(
                     items = UserLevel.levelTable,
-                    key = { index, _ -> index }
+                    key = { _, v -> v }
                 ) { index, item ->
                     val level = index + 1
                     val isCurrentLevel = level == app.config.userProfile?.level

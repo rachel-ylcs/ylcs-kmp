@@ -81,7 +81,7 @@ abstract class FloatingView {
         else if (onPermissionFailed != null) {
             catching {
                 activity.activityResultRegistry.register(
-                    key = Uuid.generateV4().toString(),
+                    key = Uuid.generateV7().toString(),
                     contract = ActivityResultContracts.StartActivityForResult()
                 ) {
                     val result = canAttach(activity)

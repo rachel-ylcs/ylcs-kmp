@@ -13,7 +13,6 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
@@ -21,6 +20,7 @@ import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.common.WeiboLayout
 import love.yinlin.compose.ui.common.WeiboUserBar
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.text.RachelRichText
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
@@ -115,7 +115,7 @@ class ScreenWeiboDetails : Screen() {
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-            item(key = ItemKey("WeiboLayout")) {
+            itemKey("WeiboLayout") {
                 weiboInfoLayout(weibo, Modifier.fillMaxWidth(), Modifier.fillMaxWidth())
             }
             comments?.let { weiboComments ->

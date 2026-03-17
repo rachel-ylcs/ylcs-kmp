@@ -1,25 +1,18 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.data.UUIDKey
+import love.yinlin.compose.data.data
+import love.yinlin.compose.data.keyList
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
@@ -33,7 +26,7 @@ import love.yinlin.tpl.WeiboAPI
 @Stable
 class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: String) : Screen() {
     @Stable
-    private data class AlbumCache(val count: Int, val items: List<Picture>)
+    private data class AlbumCache(val count: Int, val items: List<UUIDKey<Picture>>)
 
     companion object {
         private const val PIC_LIMIT = 24
@@ -51,7 +44,7 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
         if (caches[page] == null) { // 无缓存
             provider.withLoading {
                 val (data, count) = WeiboAPI.getWeiboAlbumPics(containerId, page, PIC_LIMIT)!!
-                caches[page] = AlbumCache(count, data)
+                caches[page] = AlbumCache(count, data.keyList)
                 true
             }
         }
@@ -102,22 +95,24 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
                 provider = provider,
                 modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
-                if (data != null) LazyVerticalGrid(
-                    columns = GridCells.Adaptive(Theme.size.image5),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    itemsIndexed(
-                        items = data.items,
-                        key = { _, pic -> pic.image }
-                    ){ index, pic ->
-                        WebImage(
-                            uri = pic.image,
-                            modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                            contentScale = ContentScale.Crop,
-                            onClick = { navigate(::ScreenImagePreview, data.items, index) }
-                        )
+                if (data != null) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(Theme.size.image5),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        itemsIndexed(
+                            items = data.items,
+                            key = { _, item -> item.key }
+                        ){ index, (pic) ->
+                            WebImage(
+                                uri = pic.image,
+                                modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                                contentScale = ContentScale.Crop,
+                                onClick = { navigate(::ScreenImagePreview, data.items.data, index) }
+                            )
+                        }
                     }
                 }
             }

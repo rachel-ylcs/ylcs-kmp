@@ -37,7 +37,10 @@ abstract class DialogChoice : DialogTemplate<Int>() {
     final override fun Land() {
         LandDialogTemplate("") {
             LazyColumn(modifier = Modifier.widthIn(min = minContentWidth)) {
-                items(num) { index ->
+                items(
+                    count = num,
+                    key = { it }
+                ) { index ->
                     Row(
                         modifier = Modifier.widthIn(min = minContentWidth).clickable { future?.send(index) }.padding(Theme.padding.value),
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),

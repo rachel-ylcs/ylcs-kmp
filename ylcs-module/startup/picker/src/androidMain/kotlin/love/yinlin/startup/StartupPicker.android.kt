@@ -33,7 +33,7 @@ actual class StartupPicker : SyncStartup() {
     private lateinit var activityResultRegistry: ActivityResultRegistry
 
     @OptIn(ExperimentalUuidApi::class)
-    private val generateKey: String get() = Uuid.generateV4().toString()
+    private val generateKey: String get() = Uuid.generateV7().toString()
 
     actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) { }
 

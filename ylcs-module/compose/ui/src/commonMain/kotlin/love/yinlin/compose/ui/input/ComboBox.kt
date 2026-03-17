@@ -66,7 +66,10 @@ fun ComboBox(
                     .border(border, Theme.color.outline, shape),
                 state = rememberLazyListState(initialFirstVisibleItemIndex = index.coerceAtLeast(0))
             ) {
-                itemsIndexed(items) { i, title ->
+                itemsIndexed(
+                    items = items,
+                    key = { _, item -> item },
+                ) { i, title ->
                     val isCurrent = i == index
                     Text(
                         text = title,

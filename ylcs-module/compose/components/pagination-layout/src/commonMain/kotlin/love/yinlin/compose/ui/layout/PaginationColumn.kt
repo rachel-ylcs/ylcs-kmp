@@ -7,8 +7,8 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.ui.container.itemKey
 
 @Composable
 fun <T> PaginationColumn(
@@ -49,12 +49,15 @@ fun <T> PaginationColumn(
             horizontalAlignment = horizontalAlignment,
         ) {
             if (header != null) {
-                item(key = ItemKey("Header")) {
+                itemKey("Header") {
                     header()
                 }
             }
 
-            itemsIndexed(items = items, key = key?.let { { _, item -> it(item) } }) {index, item->
+            itemsIndexed(
+                items = items,
+                key = key?.let { { _, item -> it(item) } }
+            ) {index, item->
                 itemContent(item)
                 if (itemDivider != null && index != items.lastIndex) itemDivider()
             }

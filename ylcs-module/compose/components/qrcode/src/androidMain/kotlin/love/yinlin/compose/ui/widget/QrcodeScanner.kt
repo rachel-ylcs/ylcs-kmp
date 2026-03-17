@@ -60,7 +60,7 @@ private class QrCodeScannerWrapper : PlatformView<PreviewView>(), Releasable<Pre
                 scanResult = it.result.text
             }
             activityResultRegistry?.register(
-                key = Uuid.generateV4().toHexString(),
+                key = Uuid.generateV7().toHexString(),
                 contract = ActivityResultContracts.RequestPermission()
             ) {
                 if (it) startCamera()

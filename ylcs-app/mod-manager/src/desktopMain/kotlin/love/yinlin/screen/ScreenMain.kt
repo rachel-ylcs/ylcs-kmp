@@ -318,7 +318,10 @@ class ScreenMain : BasicScreen() {
                                 modifier = Modifier.fillMaxSize(),
                                 state = leftState
                             ) {
-                                items(items = unSelectedLibrary, key = { it.id }) {
+                                items(
+                                    items = unSelectedLibrary,
+                                    key = { it.id }
+                                ) {
                                     ModCard(modifier = Modifier.fillMaxWidth(), item = it)
                                 }
                             }
@@ -350,7 +353,10 @@ class ScreenMain : BasicScreen() {
                             modifier = Modifier.fillMaxSize(),
                             state = rightState
                         ) {
-                            items(items = selectedLibrary, key = { it.id }) {
+                            items(
+                                items = selectedLibrary,
+                                key = { it.id }
+                            ) {
                                 ModCard(modifier = Modifier.fillMaxWidth(), item = it)
                             }
                         }

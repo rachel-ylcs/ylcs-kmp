@@ -14,6 +14,8 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.data.getByData
+import love.yinlin.compose.data.keyList
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.floating.DialogDownload
@@ -29,12 +31,13 @@ import love.yinlin.coroutines.ioContext
 import love.yinlin.data.compose.Picture
 
 @Stable
-class ScreenImagePreview(private val images: List<Picture>, initIndex: Int) : Screen() {
+class ScreenImagePreview(rawImages: List<Picture>, initIndex: Int) : Screen() {
+    private val images = rawImages.keyList
     private var downloadSource: Boolean by mutableStateOf(false)
     private val pagerState = PagerState(initIndex) { images.size }
 
     private fun downloadPicture() {
-        val image = images[pagerState.settledPage]
+        val image = images.getByData(pagerState.settledPage)
         val url = if (downloadSource) image.source else image.image
         launch(ioContext) { downloadDialog.downloadPhoto(url) }
     }
@@ -52,14 +55,14 @@ class ScreenImagePreview(private val images: List<Picture>, initIndex: Int) : Sc
     }
 
     private val previewImageLayout = movableComposable { index: Int, modifier: Modifier ->
-        ZoomWebImage(uri = images[index].image, modifier = modifier)
+        ZoomWebImage(uri = images.getByData(index).image, modifier = modifier)
     }
 
     @Composable
     private fun Portrait() {
         HorizontalPager(
             state = pagerState,
-            key = { images[it].image },
+            key = { images[it].key },
             beyondViewportPageCount = 1,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
         ) {
@@ -76,7 +79,10 @@ class ScreenImagePreview(private val images: List<Picture>, initIndex: Int) : Sc
                 modifier = Modifier.width(Theme.size.image4).fillMaxHeight(),
                 state = state
             ) {
-                itemsIndexed(items = images) { index, item ->
+                itemsIndexed(
+                    items = images,
+                    key = { _, item -> item.key },
+                ) { index, (item) ->
                     WebImage(
                         uri = item.image,
                         contentScale = ContentScale.Crop,

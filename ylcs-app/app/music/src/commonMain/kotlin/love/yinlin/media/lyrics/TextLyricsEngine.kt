@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Theme
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.fadingEdge
@@ -116,10 +116,10 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
                 .onSizeChanged { containerSize = it }
                 .fadingEdge(padding = PaddingValues(top = 75.dp, bottom = 75.dp))
         ) {
-            item(key = "Placeholder1") {
+            itemKey("Placeholder1") {
                 LineItemWrapper { LinePlaceholder() }
             }
-            item(key = "Placeholder2") {
+            itemKey("Placeholder2") {
                 LineItemWrapper { LinePlaceholder() }
             }
             lines?.let { lines ->
@@ -134,7 +134,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
                     }
                 }
             }
-            item(key = ItemKey("Placeholder0")) {
+            itemKey("Placeholder0") {
                 Space(containerSize.width, containerSize.height)
             }
         }

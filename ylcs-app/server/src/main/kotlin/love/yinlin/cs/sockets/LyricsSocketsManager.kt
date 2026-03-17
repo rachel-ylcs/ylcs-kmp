@@ -61,7 +61,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
         }
 
         @OptIn(ExperimentalUuidApi::class)
-        val roomId: String = Uuid.generateV4().toString()
+        val roomId: String = Uuid.generateV7().toString()
         var createTime: Long = System.currentTimeMillis()
         var submitTime1: Long? = null
         var submitTime2: Long? = null

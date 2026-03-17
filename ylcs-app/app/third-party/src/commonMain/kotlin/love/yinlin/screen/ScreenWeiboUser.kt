@@ -19,7 +19,6 @@ import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
@@ -28,6 +27,7 @@ import love.yinlin.compose.ui.common.WeiboCard
 import love.yinlin.compose.ui.common.WeiboGrid
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
+import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -181,7 +181,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     @Composable
     private fun Portrait(user: WeiboUser, albums: List<WeiboAlbum>?) {
         LazyColumn(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            item(key = ItemKey("UserInfoCard")) {
+            itemKey("UserInfoCard") {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     userInfoLayout(user)
                 }
@@ -197,7 +197,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
                     )
                 }
             }
-            item(key = ItemKey("Text")) {
+            itemKey("Text") {
                 SimpleEllipsisText(
                     text = "最新微博",
                     textAlign = TextAlign.Center,

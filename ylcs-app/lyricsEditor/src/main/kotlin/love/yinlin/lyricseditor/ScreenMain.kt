@@ -22,6 +22,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.data.keyList
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.screen.BasicScreen
@@ -310,8 +311,13 @@ class ScreenMain : BasicScreen() {
 
     @Composable
     private fun LyricsEditor(modifier: Modifier = Modifier, config: RhymeLyricsConfig) {
-        LazyColumn(modifier) {
-            itemsIndexed(config.lyrics, key = { _, line -> line.start }) { index, line ->
+        val lyrics = remember(config) { config.lyrics.keyList }
+
+        LazyColumn(modifier = modifier) {
+            itemsIndexed(
+                items = lyrics,
+                key = { _, item -> item.key }
+            ) { index, (line) ->
                 LyricsLineEditor(
                     modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Colors.Black),
                     config = config,

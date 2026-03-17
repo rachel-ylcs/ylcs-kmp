@@ -19,6 +19,7 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.data.*
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.ThemeContainer
@@ -36,7 +37,6 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.replaceAll
 import love.yinlin.extension.timeString
 import love.yinlin.media.buildAudioPlayer
 import love.yinlin.tpl.lyrics.LrcLine
@@ -54,7 +54,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
     private var duration by mutableStateOf(0L)
     private val isPlayingFlow = MutableStateFlow(false)
 
-    private val lyrics = mutableStateListOf<LrcLine>()
+    private val lyrics = mutableStateListOf<UUIDKey<LrcLine>>()
     private var currentIndex by mutableIntStateOf(-1)
     private var lastPosition: Long = 0L
     private val canSave by derivedStateOf { lyrics.size >= 5 }
@@ -71,7 +71,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
             loadMusic(false)
 
             val parser = LrcParser(musicInfo.path(app.modPath, ModResourceType.LineLyrics).readText()!!)
-            lyrics.replaceAll(parser.lines!!)
+            lyrics.replaceAllByData(parser.lines!!)
 
             launch {
                 isPlayingFlow.collectLatest { value ->
@@ -101,8 +101,8 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
     private fun updatePosition(newPosition: Long) {
         // 先检查是否位于当前句和下一句之间, 此分支命中率最高
         if (newPosition >= lastPosition) {
-            val nextPosition1 = lyrics.getOrNull(currentIndex + 1)?.position ?: Long.MAX_VALUE
-            val nextPosition2 = lyrics.getOrNull(currentIndex + 2)?.position ?: Long.MAX_VALUE
+            val nextPosition1 = lyrics.getOrNullByData(currentIndex + 1)?.position ?: Long.MAX_VALUE
+            val nextPosition2 = lyrics.getOrNullByData(currentIndex + 2)?.position ?: Long.MAX_VALUE
             lastPosition = newPosition
             if (newPosition < nextPosition1) return // 不需要更新
             else if (newPosition < nextPosition2) { // 前移
@@ -111,7 +111,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
             }
         }
         else lastPosition = newPosition
-        val targetIndex = lyrics.indexOfFirst { it.position > newPosition }
+        val targetIndex = lyrics.indexOfFirstByData { it.position > newPosition }
         currentIndex = if (targetIndex == -1) {
             if (currentIndex != lyrics.lastIndex) lyrics.lastIndex
             else return // 到达最后一句不需要更新
@@ -123,7 +123,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
     private suspend fun saveLyrics() {
         catchingError {
             Coroutines.io {
-                val parser = LrcParser(lyrics)
+                val parser = LrcParser(lyrics.data)
                 musicInfo.path(app.modPath, ModResourceType.LineLyrics).writeText(parser.toString())
             }
             slot.tip.success("保存成功")
@@ -179,8 +179,8 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
         ) {
             itemsIndexed(
                 items = lyrics,
-                key = { _, item -> item.position to item.text }
-            ) { index, item ->
+                key = { _, item -> item.key }
+            ) { index, (item) ->
                 val isCurrent = currentIndex == index
                 val backgroundColor = if (isCurrent) Theme.color.primaryContainer.copy(alpha = 0.5f) else Theme.color.background
                 val contentColor = if (isCurrent) Theme.color.onContainer else Theme.color.onBackground
@@ -192,7 +192,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
                     ) {
                         Box(
                             modifier = Modifier.fillMaxHeight().aspectRatio(1f).clickable {
-                                lyrics[index] = item.copy(position = position)
+                                lyrics.setByData(index) { it.copy(position = position) }
                             },
                             contentAlignment = Alignment.Center
                         ) {
@@ -204,7 +204,9 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
                                 launch {
                                     val needPlay = player.isPlaying
                                     if (needPlay) player.pause()
-                                    inputDialog.open(initText = item.text)?.let { lyrics[index] = item.copy(text = it) }
+                                    inputDialog.open(initText = item.text)?.let { text ->
+                                        lyrics.setByData(index) { it.copy(text = text) }
+                                    }
                                     if (needPlay) player.play()
                                 }
                             }.padding(vertical = Theme.padding.v),
@@ -224,9 +226,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
                             padding = Theme.padding.e
                         ) {
                             Icon(icon = Icons.Add, onClick = {
-                                val frontPositon = lyrics.getOrNull(index - 1)?.position ?: 0L
-                                val newPosition = (frontPositon + item.position) / 2
-                                lyrics.add(index, LrcLine(newPosition, "点击输入歌词行 $newPosition"))
+                                lyrics.addByData(index, LrcLine(position, "点击输入歌词行"))
                             })
                             Icon(icon = Icons.Delete, onClick = {
                                 lyrics.removeAt(index)
@@ -260,7 +260,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
                 PrimaryLoadingButton(text = "全局偏移", onClick = {
                     val offset = catchingNull { offsetDialog.open("0")?.toLong() ?: 0L }
                     if (offset == null) slot.tip.warning("偏移不是整数")
-                    else lyrics.replaceAll(lyrics.map { it.copy(position = it.position + offset) })
+                    else lyrics.replaceAllByData(lyrics.mapByData { it.copy(position = it.position + offset) })
                 })
             }
             MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value))

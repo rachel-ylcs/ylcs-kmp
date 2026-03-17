@@ -558,7 +558,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     ) {
                         itemsIndexed(
                             items = musicList,
-                            key = { _, info -> info }
+                            key = { _, id -> id }
                         ) { index, id ->
                             val isCurrent = index == currentIndex
                             val musicInfo = library[id]
