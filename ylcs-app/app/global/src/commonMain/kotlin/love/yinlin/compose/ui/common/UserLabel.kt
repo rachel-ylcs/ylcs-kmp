@@ -11,22 +11,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import love.yinlin.app.global.resources.*
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.cs.ServerRes
+import love.yinlin.cs.url
 import love.yinlin.extension.DateEx
-import org.jetbrains.compose.resources.DrawableResource
 
 @Stable
 private object UserLabelMeta {
@@ -41,17 +39,18 @@ private object UserLabelMeta {
 
     fun label(level: Int): String = labelNameFromLevel.getOrNull(level) ?: labelNameFromLevel[0]
 
-    fun image(level: Int, darkMode: Boolean): DrawableResource = when (level) {
-        in 1..4 -> Res.drawable.img_label_fucaoweiying
-        in 5..8 -> Res.drawable.img_label_pifuduhai
-        in 9..12 -> Res.drawable.img_label_fenghuaxueyue
-        in 13..16 -> Res.drawable.img_label_liuli
-        in 17..20 -> if (darkMode) Res.drawable.img_label_lidishigongfen2 else Res.drawable.img_label_lidishigongfen1
-        in 21..99 -> Res.drawable.img_label_shanseyouwuzhong
-        else -> Res.drawable.img_label_fucaoweiying
+    @Suppress("SpellCheckingInspection")
+    fun image(level: Int, darkMode: Boolean): String = when (level) {
+        in 1..4 -> "fucaoweiying"
+        in 5..8 -> "pifuduhai"
+        in 9..12 -> "fenghuaxueyue"
+        in 13..16 -> "liuli"
+        in 17..20 -> if (darkMode) "lidishigongfen2" else "lidishigongfen1"
+        in 21..99 -> "shanseyouwuzhong"
+        else -> "fucaoweiying"
     }
 
-    fun image(name: String): DrawableResource = Res.drawable.img_label_special
+    fun image(name: String): String = "special"
 }
 
 @Composable
@@ -60,25 +59,23 @@ fun UserLabel(
     level: Int,
     onClick: (() -> Unit)? = null
 ) {
-    val isDarkMode = Theme.darkMode
-    val img = if (label.isEmpty()) UserLabelMeta.image(level, isDarkMode) else UserLabelMeta.image(label)
-    val text = label.ifEmpty { UserLabelMeta.label(level) }
-
-    val size = DpSize(92.4.dp, 35.2.dp)
-    val padding = PaddingValues(start = 12.3.dp, end = 12.3.dp, top = 15.2.dp, bottom = 5.3.dp)
-
     CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
         Box(
-            modifier = Modifier.size(size).condition(onClick != null) {
+            modifier = Modifier.size(92.4.dp, 35.2.dp).condition(onClick != null) {
                 silentClick(onClick = onClick).pointerIcon(PointerIcon.Hand)
             },
             contentAlignment = Alignment.Center
         ) {
-            Image(res = img, modifier = Modifier.fillMaxSize().zIndex(1f))
+            val labelName = if (label.isEmpty()) UserLabelMeta.image(level, Theme.darkMode) else UserLabelMeta.image(label)
+
+            WebImage(
+                uri = ServerRes.Assets.Label.pic(labelName).url,
+                modifier = Modifier.fillMaxSize().zIndex(1f)
+            )
             SimpleClipText(
-                text = text,
-                modifier = Modifier.fillMaxSize().padding(padding).zIndex(2f),
-                color = if (isDarkMode) Colors.White else Colors.Dark,
+                text = label.ifEmpty { UserLabelMeta.label(level) },
+                modifier = Modifier.fillMaxSize().padding(PaddingValues(start = 12.3.dp, end = 12.3.dp, top = 15.2.dp, bottom = 5.3.dp)).zIndex(2f),
+                color = if (Theme.darkMode) Colors.White else Colors.Dark,
                 style = Theme.typography.v8.bold,
                 textAlign = TextAlign.Center
             )
