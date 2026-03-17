@@ -1,11 +1,14 @@
 package love.yinlin.compose.ui.node
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -19,6 +22,7 @@ import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import love.yinlin.compose.Theme
 import love.yinlin.compose.platform.inspector
 import kotlin.jvm.JvmName
 
@@ -58,28 +62,30 @@ fun Modifier.fastRotate(animatable: Animatable<Float, AnimationVector1D>) =
 fun Modifier.fastRotate(state: State<Float>) =
     this then FastRotateElement { state.value }
 
+@Stable
+fun Modifier.fastAnimateRotate(degree: Float) = composed {
+    val state = animateFloatAsState(
+        targetValue = degree,
+        animationSpec = tween(Theme.animation.duration.default)
+    )
+    this then FastRotateElement { state.value }
+}
 
 // FastScale
 
-private class FastScaleNode(
-    var scaleXProvider: GraphicsLayerScope.() -> Float?,
-    var scaleYProvider: GraphicsLayerScope.() -> Float?,
-) : Modifier.Node(), LayoutModifierNode {
-    override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
-        val placeable = measurable.measure(constraints)
-        return layout(placeable.width, placeable.height) {
-            placeable.placeWithLayer(0, 0) {
-                scaleXProvider()?.let { scaleX = it }
-                scaleYProvider()?.let { scaleY = it }
-            }
+private class FastScaleNode(var scaleXProvider: () -> Float?, var scaleYProvider: () -> Float?) : Modifier.Node(), DrawModifierNode {
+    override fun ContentDrawScope.draw() {
+        withTransform({
+            val scaleX = scaleXProvider() ?: 1f
+            val scaleY = scaleYProvider() ?: 1f
+            if (scaleX != 1f || scaleY != 1f) scale(scaleX, scaleY)
+        }) {
+            this@draw.drawContent()
         }
     }
 }
 
-private data class FastScaleElement(
-    val scaleXProvider: GraphicsLayerScope.() -> Float?,
-    val scaleYProvider: GraphicsLayerScope.() -> Float? = scaleXProvider,
-) : ModifierNodeElement<FastScaleNode>() {
+private data class FastScaleElement(val scaleXProvider: () -> Float?, val scaleYProvider: () -> Float? = scaleXProvider) : ModifierNodeElement<FastScaleNode>() {
     override fun create(): FastScaleNode = FastScaleNode(scaleXProvider, scaleYProvider)
     override fun update(node: FastScaleNode) {
         node.scaleXProvider = scaleXProvider
@@ -92,11 +98,11 @@ private data class FastScaleElement(
 }
 
 @Stable
-fun Modifier.fastScale(scaleXProvider: GraphicsLayerScope.() -> Float?, scaleYProvider: GraphicsLayerScope.() -> Float?) =
+fun Modifier.fastScale(scaleXProvider: () -> Float?, scaleYProvider: () -> Float?) =
     this then FastScaleElement(scaleXProvider, scaleYProvider)
 
 @Stable
-fun Modifier.fastScale(scaleProvider: GraphicsLayerScope.() -> Float?) =
+fun Modifier.fastScale(scaleProvider: () -> Float?) =
     this then FastScaleElement(scaleProvider)
 
 @Stable
@@ -107,6 +113,51 @@ fun Modifier.fastScale(animatable: Animatable<Float, AnimationVector1D>) =
 fun Modifier.fastScale(state: State<Float>) =
     this then FastScaleElement({ state.value })
 
+@Stable
+fun Modifier.fastAnimateScale(scale: Float) = composed {
+    val state = animateFloatAsState(scale)
+    this then FastScaleElement({ state.value })
+}
+
+// FastRectBackground
+
+private class FastRectBackgroundNode(var backgroundProvider: ContentDrawScope.() -> Color?) : Modifier.Node(), DrawModifierNode {
+    override fun ContentDrawScope.draw() {
+        backgroundProvider()?.let { drawRect(it) }
+        drawContent()
+    }
+}
+
+private data class FastRectBackgroundElement(val backgroundProvider: ContentDrawScope.() -> Color?) : ModifierNodeElement<FastRectBackgroundNode>() {
+    override fun create(): FastRectBackgroundNode = FastRectBackgroundNode(backgroundProvider)
+    override fun update(node: FastRectBackgroundNode) {
+        node.backgroundProvider = backgroundProvider
+    }
+    override fun InspectorInfo.inspectableProperties() = inspector("fastRectBackground") {
+        "backgroundProvider" bind backgroundProvider
+    }
+}
+
+@Stable
+fun Modifier.fastRectBackground(backgroundProvider: ContentDrawScope.() -> Color?) =
+    this then FastRectBackgroundElement(backgroundProvider)
+
+@Stable
+fun Modifier.fastRectBackground(animatable: Animatable<Color, AnimationVector1D>) =
+    this then FastRectBackgroundElement { animatable.value }
+
+@Stable
+fun Modifier.fastRectBackground(state: State<Color>) =
+    this then FastRectBackgroundElement { state.value }
+
+@Stable
+fun Modifier.fastAnimateRectBackground(color: Color) = composed {
+    val state = animateColorAsState(
+        targetValue = color,
+        animationSpec = tween(durationMillis = Theme.animation.duration.default, easing = LinearOutSlowInEasing)
+    )
+    this then FastRectBackgroundElement { state.value }
+}
 
 // FastAlpha
 
@@ -142,6 +193,15 @@ fun Modifier.fastAlpha(animatable: Animatable<Float, AnimationVector1D>) =
 @Stable
 fun Modifier.fastAlpha(state: State<Float>) =
     this then FastAlphaElement { state.value }
+
+@Stable
+fun Modifier.fastAnimateAlpha(alpha: Float) = composed {
+    val state = animateFloatAsState(
+        targetValue = alpha,
+        animationSpec = spring(dampingRatio = 0.9f, stiffness = 500.0f)
+    )
+    this then FastAlphaElement { state.value }
+}
 
 // fastClip
 
@@ -249,6 +309,24 @@ fun Modifier.fastOffsetX(state: State<Dp>) =
     this then FastOffsetElement({ state.value.toPx() }, NullFloatProvider)
 
 @Stable
+fun Modifier.fastAnimateOffsetX(offset: Float) = composed {
+    val state = animateFloatAsState(targetValue = offset)
+    this then FastOffsetElement({ state.value }, NullFloatProvider)
+}
+
+@Stable
+fun Modifier.fastAnimateOffsetX(offset: Int) = composed {
+    val state = animateIntAsState(targetValue = offset)
+    this then FastOffsetElement({ state.value.toFloat() }, NullFloatProvider)
+}
+
+@Stable
+fun Modifier.fastAnimateOffsetX(offset: Dp) = composed {
+    val state = animateDpAsState(targetValue = offset)
+    this then FastOffsetElement({ state.value.toPx() }, NullFloatProvider)
+}
+
+@Stable
 fun Modifier.fastOffsetY(offsetProvider: GraphicsLayerScope.() -> Float?) =
     this then FastOffsetElement(NullFloatProvider, offsetProvider)
 
@@ -268,5 +346,33 @@ fun Modifier.fastOffsetY(state: State<Dp>) =
     this then FastOffsetElement(NullFloatProvider) { state.value.toPx() }
 
 @Stable
+fun Modifier.fastAnimateOffsetY(offset: Float) = composed {
+    val state = animateFloatAsState(targetValue = offset)
+    this then FastOffsetElement(NullFloatProvider) { state.value }
+}
+
+@Stable
+fun Modifier.fastAnimateOffsetY(offset: Int) = composed {
+    val state = animateIntAsState(targetValue = offset)
+    this then FastOffsetElement(NullFloatProvider) { state.value.toFloat() }
+}
+
+@Stable
+fun Modifier.fastAnimateOffsetY(offset: Dp) = composed {
+    val state = animateDpAsState(targetValue = offset)
+    this then FastOffsetElement(NullFloatProvider) { state.value.toPx() }
+}
+
+@Stable
+fun Modifier.fastOffset(offsetProvider: GraphicsLayerScope.() -> Offset?) =
+    this then FastOffsetElement({ offsetProvider()?.x }, { offsetProvider()?.y })
+
+@Stable
 fun Modifier.fastOffset(offsetXProvider: GraphicsLayerScope.() -> Float?, offsetYProvider: GraphicsLayerScope.() -> Float?) =
     this then FastOffsetElement(offsetXProvider, offsetYProvider)
+
+@Stable
+fun Modifier.fastAnimateOffset(offset: Offset) = composed {
+    val state = animateOffsetAsState(offset)
+    this then FastOffsetElement({ state.value.x }, { state.value.y })
+}

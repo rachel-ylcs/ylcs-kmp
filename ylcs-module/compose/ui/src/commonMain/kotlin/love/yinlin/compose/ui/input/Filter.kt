@@ -1,9 +1,6 @@
 package love.yinlin.compose.ui.input
 
 import androidx.compose.animation.animateBounds
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +8,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +25,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.node.fastAnimateRectBackground
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.TextIconAdapter
@@ -75,10 +72,11 @@ fun Filter(
                     val icon = iconProvider?.invoke(index)
                     val enabled = enabledProvider?.invoke(index) ?: true
 
-                    val backgroundColor by animateColorAsState(
-                        targetValue = if (selected) Theme.color.primaryContainer else Theme.color.backgroundVariant,
-                        animationSpec = tween(Theme.animation.duration.default)
-                    )
+                    val backgroundColor = when {
+                        !enabled -> Theme.color.disabledContainer
+                        selected -> Theme.color.primaryContainer
+                        else -> Theme.color.backgroundVariant
+                    }
 
                     val contentColor = when {
                         !enabled -> Theme.color.disabledContent
@@ -93,7 +91,7 @@ fun Filter(
                             .animateBounds(this@LookaheadScope)
                             .clip(shape)
                             .semantics(Role.RadioButton)
-                            .background(if (enabled) backgroundColor else Theme.color.disabledContainer)
+                            .fastAnimateRectBackground(backgroundColor)
                             .border(border, Theme.color.outline, shape)
                             .clickable(enabled = enabled) { onClick(index, !selected) }
                             .padding(padding),

@@ -1,12 +1,13 @@
 package love.yinlin.screen
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -15,6 +16,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,11 +37,7 @@ import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
 import love.yinlin.compose.*
 import love.yinlin.compose.data.media.MediaPlayMode
-import love.yinlin.compose.extension.movableComposable
-import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.extension.rememberRefState
-import love.yinlin.compose.extension.rememberValueState
+import love.yinlin.compose.extension.*
 import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
@@ -309,10 +314,75 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    @Stable
-    private class ChorusState(val hotpot: Long) {
-        var isArrived: Boolean by mutableStateOf(false)
-        override fun toString(): String = hotpot.toString()
+    @Composable
+    private fun MusicProgressSlider(modifier: Modifier) {
+        var isDragging by rememberFalse()
+        var displayTime by rememberValueState(0L)
+
+        LaunchedEffect(Unit) {
+            snapshotFlow { currentDebounceTime }.collectLatest { time ->
+                if (!isDragging && displayTime != time) displayTime = time
+            }
+        }
+
+        Box(modifier = modifier.pointerInput(Unit) {
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+
+                val width = size.width.toFloat()
+                val player = mp ?: return@awaitEachGesture
+                val duration = player.duration
+                if (duration == 0L || width < 0f) return@awaitEachGesture
+
+                isDragging = true
+
+                displayTime = (down.position.x / width * duration).toLong().coerceIn(0L, duration)
+                var dragChange = down
+                do {
+                    val event = awaitPointerEvent()
+                    val change = event.changes.firstOrNull() ?: break
+                    if (change.pressed != dragChange.pressed) break
+
+                    if (change.positionChange() != Offset.Zero) {
+                        displayTime = (change.position.x / width * duration).toLong().coerceIn(0L, duration)
+                        change.consume()
+                    }
+                    dragChange = change
+                } while (dragChange.pressed)
+                launch {
+                    // 检查是否在副歌点附近
+                    val seekTime = mp?.currentMusic?.chorus?.find { abs(it - displayTime) <= 3000L } ?: displayTime
+                    player.seekTo(seekTime)
+                }
+
+                isDragging = false
+            }
+        }.drawBehind {
+            val duration = mp?.duration ?: 0L
+            val progress = if (duration == 0L) 0f else displayTime / duration.toFloat()
+            val width = size.width
+            val height = size.height
+            val cornerRadius = CornerRadius(height / 2)
+            val hotpotRadius = height * 0.75f
+            val offsetProgress = width * progress
+
+            // 画底色
+            drawRoundRect(color = Colors.Gray4, cornerRadius = cornerRadius)
+            // 画进度
+            drawRoundRect(color = Colors.Green5, size = Size(offsetProgress, height), cornerRadius = cornerRadius)
+            // 画副歌点
+            mp?.currentMusic?.chorus?.fastForEach { hotpot ->
+                val offsetChorus = width * hotpot / duration.toFloat()
+                val leftBound = offsetChorus - hotpotRadius
+                val rightBound = offsetChorus + hotpotRadius
+                val color = when {
+                    offsetProgress <= leftBound -> Colors.White
+                    offsetProgress >= rightBound -> Colors.Green2
+                    else -> lerp(Colors.White, Colors.Green2, (offsetProgress - leftBound) / (rightBound - leftBound))
+                }
+                drawCircle(color = color, radius = hotpotRadius, center = Offset(offsetChorus, height / 2))
+            }
+        })
     }
 
     private val musicProgressLayout = movableComposable { modifier: Modifier ->
@@ -321,57 +391,9 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val duration = mp?.duration?: 0L
-            val progress = if (duration == 0L) 0f else currentDebounceTime / duration.toFloat()
-            val trackHeight = Theme.size.box4
-
-            val chorus by rememberDerivedState { mp?.currentMusic?.chorus?.map { ChorusState(it) } ?: emptyList() }
-
-            LaunchedEffect(Unit) {
-                snapshotFlow { currentDebounceTime }.collectLatest { value ->
-                    chorus.fastForEach { it.isArrived = value >= it.hotpot }
-                }
-            }
-
             FastFixedText("00:00", { currentDebounceTime.timeString })
-
-            Slider(
-                value = progress,
-                onValueChangeFinished = { newProgress ->
-                    launch { mp?.seekTo((newProgress * duration).toLong()) }
-                },
-                enabled = duration != 0L,
-                trackHeight = trackHeight,
-                trackColor = Colors.Gray3,
-                activeColor = Colors.Green5,
-                trackShape = Theme.shape.circle,
-                showThumb = false,
-                modifier = Modifier.weight(1f)
-            ) {
-                Box(modifier = Modifier.matchParentSize()) {
-                    chorus.fastForEach {
-                        val hotpot = it.hotpot
-                        key(hotpot) {
-                            val color by animateColorAsState(
-                                targetValue = if (it.isArrived) Colors.Green2 else LocalColor.current,
-                                animationSpec = tween(durationMillis = 1000)
-                            )
-
-                            Box(modifier = Modifier
-                                .align(xPercent = { if (duration == 0L) 0f else hotpot / duration.toFloat() })
-                                .size(trackHeight * 2)
-                                .silentClick {
-                                    launch { mp?.seekTo(hotpot) }
-                                }
-                                .fastClipCircle()
-                                .background(color)
-                            )
-                        }
-                    }
-                }
-            }
-
-            FastFixedText("00:00", { duration.timeString })
+            MusicProgressSlider(modifier = Modifier.weight(1f).height(6.dp).pointerIcon(PointerIcon.Hand))
+            FastFixedText("00:00", { (mp?.duration ?: 0L).timeString })
         }
     }
 

@@ -1,7 +1,5 @@
 package love.yinlin.compose.ui.floating
 
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -38,6 +36,7 @@ import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.compose.ui.node.fastAnimateRectBackground
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.tool.NavigationBack
@@ -113,11 +112,6 @@ open class FAB {
 
         val duration = Theme.animation.duration.default
 
-        val alpha by animateFloatAsState(
-            targetValue = if (expanded) 0.6f else 0f,
-            animationSpec = tween(durationMillis = duration, easing = LinearOutSlowInEasing)
-        )
-
         NavigationBack(enabled = expanded) {
             expanded = false
         }
@@ -130,7 +124,7 @@ open class FAB {
 
         Box(
             modifier = Modifier.fillMaxSize()
-                .background(Theme.color.scrim.copy(alpha = alpha))
+                .fastAnimateRectBackground(Theme.color.scrim.copy(alpha = if (expanded) 0.6f else 0f))
                 .condition(expanded) { silentClick { expanded = false } }
                 .padding(Theme.padding.eValue),
             contentAlignment = Alignment.BottomEnd

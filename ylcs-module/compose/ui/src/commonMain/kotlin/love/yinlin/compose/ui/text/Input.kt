@@ -1,8 +1,6 @@
 package love.yinlin.compose.ui.text
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,6 +27,7 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.interaction.collectState
+import love.yinlin.compose.ui.node.fastAnimateAlpha
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.shadow
 
@@ -78,15 +77,10 @@ internal fun DecorationBox(
             }
         }
         Box(modifier = Modifier.weight(1f).align(alignment).pointerIcon(PointerIcon.Text, enabled = enabled)) {
-            val alpha by animateFloatAsState(
-                targetValue = if (state.isEmpty && hint != null) 0.5f else 0f,
-                animationSpec = spring(dampingRatio = 0.9f, stiffness = 500.0f)
-            )
-
             Text(
                 text = hint ?: "",
-                color = LocalColorVariant.current.copy(alpha = alpha),
-                modifier = Modifier.zIndex(1f)
+                color = LocalColorVariant.current,
+                modifier = Modifier.fastAnimateAlpha(if (state.isEmpty && hint != null) 0.5f else 0f).zIndex(1f)
             )
 
             Box(modifier = Modifier.zIndex(2f)) {

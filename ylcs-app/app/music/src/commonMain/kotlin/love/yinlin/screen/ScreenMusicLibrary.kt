@@ -1,7 +1,5 @@
 package love.yinlin.screen
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -49,6 +47,7 @@ import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.dashBorder
+import love.yinlin.compose.ui.node.fastAnimateRotate
 import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -559,13 +558,11 @@ class ScreenMusicLibrary : Screen() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val expandDegree = animateFloatAsState(
-                        targetValue = if (expanded) 90f else 0f,
-                        animationSpec = tween(Theme.animation.duration.default)
-                    )
-
                     SimpleEllipsisText(title)
-                    Icon(icon = Icons.KeyboardArrowRight, modifier = Modifier.fastRotate(expandDegree))
+                    Icon(
+                        icon = Icons.KeyboardArrowRight,
+                        modifier = Modifier.fastAnimateRotate(if (expanded) 90f else 0f)
+                    )
                 }
 
                 ExpandableContent(expanded) {

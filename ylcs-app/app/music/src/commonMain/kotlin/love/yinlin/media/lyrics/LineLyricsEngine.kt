@@ -41,7 +41,7 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
 
     @Composable
     override fun LineItem(item: StaticLine, isCurrent: Boolean, measurer: TextMeasurer) {
-        val color = animateColorAsState(targetValue = if (isCurrent) Colors.Green5 else LocalColor.current, animationSpec = tween(durationMillis = Theme.animation.duration.v3))
+        val color by animateColorAsState(targetValue = if (isCurrent) Colors.Green5 else LocalColor.current, animationSpec = tween(durationMillis = Theme.animation.duration.v3))
         val normalStyle = Theme.typography.v6
         val currentStyle = Theme.typography.v5.bold
 
@@ -49,7 +49,7 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
             layoutAction = { layout(measurer, "T", if (isCurrent) currentStyle else normalStyle) },
             drawAction = {
                 draw(measure(measurer, item.text, if (isCurrent) currentStyle else normalStyle)) {
-                    drawText(it, color.value)
+                    drawText(it, color)
                 }
             },
             modifier = Modifier.fillMaxWidth()

@@ -1,7 +1,5 @@
 package love.yinlin.compose.ui.input
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -12,8 +10,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.semantics.Role
 import love.yinlin.compose.Theme
+import love.yinlin.compose.ui.node.fastAnimateOffsetX
 import love.yinlin.compose.ui.node.fastClipCircle
-import love.yinlin.compose.ui.node.fastOffsetX
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.node.shadow
@@ -24,8 +22,7 @@ fun Switch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit = {},
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    duration: Int = Theme.animation.duration.default,
+    enabled: Boolean = true
 ) {
     val width = Theme.size.input8
     val shape = Theme.shape.circle
@@ -53,11 +50,8 @@ fun Switch(
         .then(modifier),
         contentAlignment = Alignment.CenterStart
     ) {
-        val offsetX = animateDpAsState(
-            targetValue = if (checked) width / 2 else width / 24,
-            animationSpec = tween(durationMillis = duration),
-        )
-        Box(modifier = Modifier.fastOffsetX(offsetX)
+        Box(modifier = Modifier
+            .fastAnimateOffsetX(if (checked) width / 2 else width / 24)
             .size(width * 5 / 12)
             .fastClipCircle()
             .background(trackColor)

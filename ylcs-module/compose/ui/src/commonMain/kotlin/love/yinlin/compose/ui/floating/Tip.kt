@@ -1,27 +1,11 @@
 package love.yinlin.compose.ui.floating
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.plus
+import androidx.compose.animation.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +22,7 @@ import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.node.fastAnimateRectBackground
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.coroutines.mainContext
@@ -105,14 +90,6 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
         LandFloating { data ->
             val type = data.type
             val shape = Theme.shape.v4
-
-            val backgroundColor by animateColorAsState(when (type) {
-                Type.Info -> Theme.color.secondaryContainer
-                Type.Success -> Theme.color.primaryContainer
-                Type.Warning -> Theme.color.warning
-                Type.Error -> Theme.color.error
-            })
-
             val padding = LocalImmersivePadding.current + PaddingValues(horizontal = Theme.padding.h10, vertical = Theme.padding.v4)
 
             Box(modifier = Modifier
@@ -120,14 +97,18 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
                 .defaultMinSize(minWidth = Theme.size.cell1)
                 .shadow(shape, Theme.shadow.v7)
                 .clip(shape)
-                .background(backgroundColor)
+                .fastAnimateRectBackground(when (type) {
+                    Type.Info -> Theme.color.secondaryContainer
+                    Type.Success -> Theme.color.primaryContainer
+                    Type.Warning -> Theme.color.warning
+                    Type.Error -> Theme.color.error
+                })
             ) {
-                val contentColor by animateColorAsState(when (type) {
+                val contentColor = when (type) {
                     Type.Info, Type.Success -> Theme.color.onContainer
                     Type.Warning -> Theme.color.onWarning
                     Type.Error -> Theme.color.onError
-                })
-
+                }
                 val duration = Theme.animation.duration.v7
 
                 ThemeContainer(contentColor) {

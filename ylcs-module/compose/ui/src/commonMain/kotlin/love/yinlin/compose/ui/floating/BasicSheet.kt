@@ -3,7 +3,6 @@ package love.yinlin.compose.ui.floating
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -44,8 +43,8 @@ import love.yinlin.compose.ui.layout.find
 import love.yinlin.compose.ui.layout.measureId
 import love.yinlin.compose.ui.layout.require
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.compose.ui.node.fastOffsetX
-import love.yinlin.compose.ui.node.fastOffsetY
+import love.yinlin.compose.ui.node.fastAnimateOffsetX
+import love.yinlin.compose.ui.node.fastAnimateOffsetY
 import kotlin.math.roundToInt
 
 @Stable
@@ -149,7 +148,6 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
     @Composable
     private fun PortraitSheet(args: A) {
         val controller = remember { SheetController(true, ::close) }
-        val animatedOffset = animateIntAsState(targetValue = controller.offset)
         val shape = if (usePortraitRoundedCorner) Theme.shape.v1.copy(bottomStart = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
 
         // 顶部是外边距, 去掉状态栏, 因为竖屏 sheet 并不会铺满整个窗口; 底部是内边距, 把三键导航背景调整与 surface 一致
@@ -157,7 +155,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
 
         Surface(
             modifier = Modifier.padding(top = immersivePadding.top).fillMaxWidth()
-                .fastOffsetY(animatedOffset)
+                .fastAnimateOffsetY(controller.offset)
                 .onSizeChanged { controller.dimension = it.height }
                 .draggable(
                     state = rememberDraggableState { controller.updateDelta(it) },
@@ -216,13 +214,12 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
     @Composable
     private fun LandscapeSheet(args: A) {
         val controller = remember { SheetController(false, ::close) }
-        val animatedOffset = animateIntAsState(targetValue = controller.offset)
         val shape = if (useLandscapeRoundedCorner) Theme.shape.v1.copy(topEnd = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
         val sheetWidth = landscapeWidth ?: Theme.size.sheet
 
         Surface(
             modifier = Modifier.width(sheetWidth).fillMaxHeight()
-                .fastOffsetX(animatedOffset)
+                .fastAnimateOffsetX(controller.offset)
                 .onSizeChanged { controller.dimension = it.width }
                 .draggable(
                     state = rememberDraggableState { controller.updateDelta(it) },

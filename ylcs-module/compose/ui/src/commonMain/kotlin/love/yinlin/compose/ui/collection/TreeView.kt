@@ -1,14 +1,7 @@
 package love.yinlin.compose.ui.collection
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -34,7 +27,7 @@ import love.yinlin.compose.ui.layout.MeasureId
 import love.yinlin.compose.ui.layout.find
 import love.yinlin.compose.ui.layout.measureId
 import love.yinlin.compose.ui.layout.require
-import love.yinlin.compose.ui.node.fastRotate
+import love.yinlin.compose.ui.node.fastAnimateRotate
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import kotlin.math.max
 
@@ -130,11 +123,11 @@ object TreeViewScope {
                 )
 
                 if (expandable) {
-                    val expandDegree = animateFloatAsState(
-                        targetValue = if (expanded) 90f else 0f,
-                        animationSpec = tween(Theme.animation.duration.default)
+                    Icon(
+                        icon = Icons.KeyboardArrowRight,
+                        color = nodeColor,
+                        modifier = Modifier.fastAnimateRotate(if (expanded) 90f else 0f).measureId(TreeViewMeasureId.ExpandIcon)
                     )
-                    Icon(icon = Icons.KeyboardArrowRight, color = nodeColor, modifier = Modifier.fastRotate(expandDegree).measureId(TreeViewMeasureId.ExpandIcon))
                 }
 
                 if (icon != null) Icon(icon = icon, color = nodeColor, modifier = Modifier.measureId(TreeViewMeasureId.Icon))

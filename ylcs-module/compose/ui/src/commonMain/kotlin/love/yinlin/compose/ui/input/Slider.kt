@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -22,10 +21,6 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.MeasurePolicy
-import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
@@ -47,49 +42,6 @@ import kotlin.math.roundToLong
 @Stable
 private enum class SliderMeasureId : MeasureId {
     Track, ActiveTrack, Thumb, Content;
-}
-
-@Stable
-private class SliderMeasurePolicy(val percent: Float, val trackHeight: Dp, val minWidth: Dp) : MeasurePolicy {
-    override fun MeasureScope.measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult {
-        val trackHeightPx = trackHeight.roundToPx()
-        val desiredMinWidth = minWidth.roundToPx()
-        val layoutWidth = constraints.constrainWidth(desiredMinWidth)
-        val desiredHeight = trackHeightPx * 2
-        val layoutHeight = constraints.constrainHeight(desiredHeight)
-
-        val trackPlaceable = measurables.require(SliderMeasureId.Track).measure(
-            Constraints.fixed(layoutWidth, trackHeightPx)
-        )
-        val activeTrackWidth = (layoutWidth * percent).roundToInt()
-
-        val activeTrackPlaceable = measurables.require(SliderMeasureId.ActiveTrack).measure(
-            Constraints.fixed(activeTrackWidth, trackHeightPx)
-        )
-        val thumbPlaceable = measurables.find(SliderMeasureId.Thumb)?.measure(
-            Constraints.fixed(desiredHeight, desiredHeight)
-        )
-        val contentPlaceable = measurables.find(SliderMeasureId.Content)?.measure(
-            Constraints.fixed(layoutWidth, layoutHeight)
-        )
-
-        return layout(layoutWidth, layoutHeight) {
-            val centerY = layoutHeight / 2
-
-            contentPlaceable?.placeRelative(0, 0)
-
-            val trackY = centerY - (trackHeightPx / 2)
-            trackPlaceable.placeRelative(0, trackY)
-            activeTrackPlaceable.placeRelative(0, trackY)
-
-            if (thumbPlaceable != null) {
-                val thumbY = centerY - (desiredHeight / 2)
-                val thumbCenterX = layoutWidth * percent
-                val thumbX = (thumbCenterX - desiredHeight / 2).roundToInt()
-                thumbPlaceable.placeRelative(thumbX, thumbY)
-            }
-        }
-    }
 }
 
 /**
@@ -188,15 +140,46 @@ fun Slider(
                 isDragging = false
                 updatedOnValueChangeFinished(currentPercent)
             }
-        },
-        measurePolicy = remember(currentPercent, trackHeight, minWidth) {
-            SliderMeasurePolicy(
-                percent = currentPercent,
-                trackHeight = trackHeight,
-                minWidth = minWidth
-            )
         }
-    )
+    ) { measurables, constraints ->
+        val trackHeightPx = trackHeight.roundToPx()
+        val desiredMinWidth = minWidth.roundToPx()
+        val layoutWidth = constraints.constrainWidth(desiredMinWidth)
+        val desiredHeight = trackHeightPx * 2
+        val layoutHeight = constraints.constrainHeight(desiredHeight)
+
+        val trackPlaceable = measurables.require(SliderMeasureId.Track).measure(
+            Constraints.fixed(layoutWidth, trackHeightPx)
+        )
+        val activeTrackWidth = (layoutWidth * currentPercent).roundToInt()
+
+        val activeTrackPlaceable = measurables.require(SliderMeasureId.ActiveTrack).measure(
+            Constraints.fixed(activeTrackWidth, trackHeightPx)
+        )
+        val thumbPlaceable = measurables.find(SliderMeasureId.Thumb)?.measure(
+            Constraints.fixed(desiredHeight, desiredHeight)
+        )
+        val contentPlaceable = measurables.find(SliderMeasureId.Content)?.measure(
+            Constraints.fixed(layoutWidth, layoutHeight)
+        )
+
+        layout(layoutWidth, layoutHeight) {
+            val centerY = layoutHeight / 2
+
+            contentPlaceable?.placeRelative(0, 0)
+
+            val trackY = centerY - (trackHeightPx / 2)
+            trackPlaceable.placeRelative(0, trackY)
+            activeTrackPlaceable.placeRelative(0, trackY)
+
+            if (thumbPlaceable != null) {
+                val thumbY = centerY - (desiredHeight / 2)
+                val thumbCenterX = layoutWidth * currentPercent
+                val thumbX = (thumbCenterX - desiredHeight / 2).roundToInt()
+                thumbPlaceable.placeRelative(thumbX, thumbY)
+            }
+        }
+    }
 }
 
 @Stable

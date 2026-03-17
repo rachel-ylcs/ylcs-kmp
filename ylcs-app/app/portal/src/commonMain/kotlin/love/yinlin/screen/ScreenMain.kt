@@ -72,18 +72,17 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                 TabItem.entries.fastForEachIndexed { i, item ->
                     val isCurrent = i == index
                     val primaryColor = Theme.color.primary
-                    val indicatorRatio by animateFloatAsState(
-                        targetValue = if (isCurrent) 1f else 0f,
+                    val indicatorAngle = animateFloatAsState(
+                        targetValue = if (isCurrent) 360f else 0f,
                         animationSpec = tween(Theme.animation.duration.v5)
                     )
-                    val weightRatio = indicatorRatio / 2 + 1
-                    val iconAngle = indicatorRatio * 360f
 
                     TextIconBinder(
                         modifier = Modifier
                             .drawBehind {
                                 val (boxWidth, boxHeight) = this.size
                                 val indicatorHeight = boxHeight * 0.05f
+                                val indicatorRatio = indicatorAngle.value / 360
                                 val startRatio = (1 - indicatorRatio) / 2
                                 drawRoundRect(
                                     color = primaryColor,
@@ -93,13 +92,13 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                                 )
                             }
                             .clickable { navigateSubScreen(i) }
-                            .weight(weightRatio)
+                            .weight(indicatorAngle.value / 720 + 1)
                             .padding(vertical = Theme.padding.v),
                         gapRatio = 0.25f
                     ) { idIcon, idText ->
                         Icon(
                             icon = if (isCurrent) item.iconActive else item.iconNormal,
-                            modifier = Modifier.fastRotate { iconAngle }.idIcon()
+                            modifier = Modifier.fastRotate(indicatorAngle).idIcon()
                         )
                         SimpleClipText(
                             text = item.title,
@@ -125,15 +124,15 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                 TabItem.entries.fastForEachIndexed { i, item ->
                     val isCurrent = i == index
                     val primaryColor = Theme.color.primary
-                    val indicatorRatio by animateFloatAsState(
-                        targetValue = if (isCurrent) 0.5f else 0f,
+                    val indicatorAngle = animateFloatAsState(
+                        targetValue = if (isCurrent) 360f else 0f,
                         animationSpec = tween(Theme.animation.duration.v5)
                     )
-                    val iconAngle = indicatorRatio * 720f
 
                     TextIconAdapter(
                         modifier = Modifier.drawBehind {
                             val (boxWidth, boxHeight) = this.size
+                            val indicatorRatio = indicatorAngle.value / 720
                             val indicatorWidth = boxWidth * 0.03f
                             drawRoundRect(
                                 color = primaryColor,
@@ -148,7 +147,7 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                     ) { idIcon, idText ->
                         Icon(
                             icon = if (isCurrent) item.iconActive else item.iconNormal,
-                            modifier = Modifier.fastRotate { iconAngle }.idIcon()
+                            modifier = Modifier.fastRotate(indicatorAngle).idIcon()
                         )
                         SimpleClipText(
                             text = item.title,

@@ -1,7 +1,5 @@
 package love.yinlin.compose.ui.input
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,7 +29,7 @@ import love.yinlin.compose.ui.floating.FlyoutPosition
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.compose.ui.node.fastRotate
+import love.yinlin.compose.ui.node.fastAnimateRotate
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.Text
@@ -115,12 +113,11 @@ fun ComboBox(
                 modifier = Modifier.padding(end = Theme.padding.h / 2).width(maxTextWidth)
             )
 
-            val angle = animateFloatAsState(
-                targetValue = if (isOpen) 180f else 0f,
-                animationSpec = tween(Theme.animation.duration.default)
+            Icon(
+                icon = Icons.KeyboardArrowDown,
+                color = contentColor,
+                modifier = Modifier.fastAnimateRotate(if (isOpen) 180f else 0f)
             )
-
-            Icon(icon = Icons.KeyboardArrowDown, color = contentColor, modifier = Modifier.fastRotate(angle))
         }
     }
 }

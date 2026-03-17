@@ -26,6 +26,7 @@ import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.pointerIcon
@@ -71,17 +72,20 @@ fun Breadcrumb(
                         animationSpec = tween(Theme.animation.duration.default)
                     )
 
-                    TextIconAdapter(
-                        modifier = Modifier.clickable(
-                            enabled = !isLast,
-                            indication = null,
-                            interactionSource = interactionSource,
-                            onClick = { onNavigate(index) }
-                        ).pointerIcon(PointerIcon.Hand).padding(padding)
-                    ) { iconId, textId ->
-                        icon?.let { Icon(icon = it, color = contentColor, modifier = Modifier.iconId()) }
-                        SimpleClipText(text = title, modifier = Modifier.textId(), color = contentColor, style = LocalStyle.current.bold)
+                    ThemeContainer(contentColor) {
+                        TextIconAdapter(
+                            modifier = Modifier.clickable(
+                                enabled = !isLast,
+                                indication = null,
+                                interactionSource = interactionSource,
+                                onClick = { onNavigate(index) }
+                            ).pointerIcon(PointerIcon.Hand).padding(padding)
+                        ) { iconId, textId ->
+                            icon?.let { Icon(icon = it, modifier = Modifier.iconId()) }
+                            SimpleClipText(text = title, modifier = Modifier.textId(), style = LocalStyle.current.bold)
+                        }
                     }
+
                     if (!isLast) Icon(icon = Icons.KeyboardArrowRight)
                 }
             }
