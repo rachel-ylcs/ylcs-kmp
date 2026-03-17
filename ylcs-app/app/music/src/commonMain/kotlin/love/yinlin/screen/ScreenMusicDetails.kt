@@ -308,13 +308,22 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         mp?.library?.get(sid)?.let(configSheet::open)
     }
 
+    private val resActionLyricsEditor = ResourceAction("编辑", Icons.Edit) {
+        mp?.let { player ->
+            player.library[sid]?.let {
+                launch { player.pause() }
+                navigate(::ScreenLyricsEditor, it)
+            }
+        }
+    }
+
     private val resAction = ModResourceType.entries.associateWith {
         when (it) {
             ModResourceType.Config -> listOf(resActionConfigEditor)
             ModResourceType.Audio -> emptyList()
             ModResourceType.Record -> listOf(resActionReplaceImage(1f))
             ModResourceType.Background -> listOf(resActionReplaceImage(0.5625f))
-            ModResourceType.LineLyrics -> emptyList()
+            ModResourceType.LineLyrics -> listOf(resActionLyricsEditor)
             ModResourceType.Animation -> listOf(resActionDelete)
             ModResourceType.Video -> listOf(resActionDelete)
             ModResourceType.Rhyme -> listOf(resActionDelete)
@@ -681,12 +690,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    private val commentDialog = this land DialogInput(
-        hint = "留下你的足迹...",
-        maxLength = 1024,
-        maxLines = 5,
-        minLines = 1
-    )
+    private val commentDialog = this land DialogInput(hint = "留下你的足迹...", maxLength = 1024, maxLines = 5, minLines = 1)
 
     private val downloadDialog = this land DialogDownload()
 

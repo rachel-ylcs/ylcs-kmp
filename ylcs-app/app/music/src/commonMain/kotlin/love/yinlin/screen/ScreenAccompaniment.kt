@@ -38,6 +38,7 @@ import love.yinlin.compose.ui.node.blurTarget
 import love.yinlin.compose.ui.node.fastClipCircle
 import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
+import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
@@ -145,7 +146,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                     isPlayingFlow.value = !isPlaying
                 }
             )
-            SimpleClipText(text = position.timeString)
+            FastFixedText("00:00", { position.timeString })
             Slider(
                 value = if (duration == 0L) 0f else position / duration.toFloat(),
                 onValueChangeFinished = { newProgress ->
@@ -162,7 +163,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                 showThumb = false,
                 modifier = Modifier.weight(1f)
             )
-            SimpleClipText(text = duration.timeString)
+            FastFixedText("00:00", { duration.timeString })
         }
     }
 

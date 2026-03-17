@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.util.fastJoinToString
 import love.yinlin.app
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -36,6 +37,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.lazyProvider
+import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
 import love.yinlin.fs.*
 import love.yinlin.startup.StartupMusicPlayer
@@ -84,6 +86,25 @@ class ScreenCreateMusic : Screen() {
         }
     }
 
+    private fun prepareLyrics(lyrics: String): LrcParser {
+        // 首先尝试 lrc 解析
+        val lrcParser = LrcParser(lyrics)
+        if (lrcParser.ok) return lrcParser
+        // 手动添加lrc
+        val items = lyrics.splitToSequence("\\r?\\n".toRegex()).filter { it.isNotBlank() }.toList()
+        // 假定歌词至少有 5 行
+        require(items.size > 5) { "歌词至少包含 5 行" }
+        var currentTime = 1000L // 从第一秒开始
+        val step = (60000L / items.size).coerceAtLeast(100L) // 假定歌曲为 1 分钟
+        val newLyrics = items.fastJoinToString("\n") { text ->
+            currentTime += step
+            "[${currentTime.timeString}.00]$text"
+        }
+        val customParser = LrcParser(newLyrics)
+        require(customParser.ok) { "歌词文件非法" }
+        return customParser
+    }
+
     private suspend fun submit() {
         val player = mp ?: return
         slot.loading.open {
@@ -94,8 +115,7 @@ class ScreenCreateMusic : Screen() {
                 require(id !in player.library) { "ID已存在" }
                 require(id.all { it.isLetterOrDigit() }) { "ID仅能由字母或数字构成" }
                 // 2. 检查歌词
-                val lyrics = LrcParser(input.lyrics.text)
-                require(lyrics.ok) { "歌词格式非法" }
+                val lyrics = Coroutines.cpu { prepareLyrics(input.lyrics.text) }
                 // 3. 检查文件
                 val audioFile = input.audioUri
                 val recordFile = input.record

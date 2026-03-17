@@ -11,30 +11,32 @@ data class LrcLine(val position: Long, val text: String) : Comparable<LrcLine> {
     override fun compareTo(other: LrcLine) = position.compareTo(other.position)
 }
 
-class LrcParser(source: String) {
-    val lines: List<LrcLine>?
-
-    init {
-        val newLines = mutableListOf<LrcLine>()
-        val pattern = "\\[(\\d{2}):(\\d{2})\\.(\\d{2,3})](.*)".toRegex()
-        val items = source.split("\\r?\\n".toRegex())
-        for (item in items) {
-            val line = item.trim()
-            if (line.isEmpty()) continue
-            catching {
-                val result = pattern.find(line)!!.groups
-                val minutes = result[1]!!.value.toLong()
-                val seconds = result[2]!!.value.toLong()
-                val millisecondsString = result[3]!!.value
-                var milliseconds = millisecondsString.toLong()
-                if (millisecondsString.length == 2) milliseconds *= 10L
-                val position = (minutes * 60 + seconds) * 1000 + milliseconds
-                val text = result[4]!!.value.trim()
-                if (text.isNotEmpty()) newLines += LrcLine(position, text)
+class LrcParser(val lines: List<LrcLine>?) {
+    companion object {
+        private fun parse(source: String): List<LrcLine>? {
+            val newLines = mutableListOf<LrcLine>()
+            val pattern = "\\[(\\d{2}):(\\d{2})\\.(\\d{2,3})](.*)".toRegex()
+            val items = source.split("\\r?\\n".toRegex())
+            for (item in items) {
+                val line = item.trim()
+                if (line.isEmpty()) continue
+                catching {
+                    val result = pattern.find(line)!!.groups
+                    val minutes = result[1]!!.value.toLong()
+                    val seconds = result[2]!!.value.toLong()
+                    val millisecondsString = result[3]!!.value
+                    var milliseconds = millisecondsString.toLong()
+                    if (millisecondsString.length == 2) milliseconds *= 10L
+                    val position = (minutes * 60 + seconds) * 1000 + milliseconds
+                    val text = result[4]!!.value.trim()
+                    if (text.isNotEmpty()) newLines += LrcLine(position, text)
+                }
             }
+            return newLines.asSequence().filter { it.position > 100L }.distinctBy { it.position }.sorted().toList().ifEmpty { null }
         }
-        lines = newLines.asSequence().filter { it.position > 100L }.distinctBy { it.position }.sorted().toList().ifEmpty { null }
     }
+
+    constructor(source: String) : this(parse(source))
 
     val ok: Boolean get() = lines != null
 

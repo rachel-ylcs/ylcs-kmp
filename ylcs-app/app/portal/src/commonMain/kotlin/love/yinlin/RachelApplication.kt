@@ -33,6 +33,7 @@ abstract class RachelApplication(delegate: PlatformContextDelegate) : AbstractRa
             screen(::ScreenImportMusic)
             screen(::ScreenPlatformMusic)
             screen(::ScreenAccompaniment)
+            screen(::ScreenLyricsEditor)
 
             // information
             screen(::ScreenAlbum)
