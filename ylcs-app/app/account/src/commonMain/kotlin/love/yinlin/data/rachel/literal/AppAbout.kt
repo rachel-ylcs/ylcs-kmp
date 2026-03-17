@@ -8,14 +8,14 @@ import love.yinlin.compose.ui.icon.Icons
 @Stable
 internal object AppAbout {
      val updateInfo = AppUpdateInfo(
-        platform = "Android/Windows/Linux/macOS/Web 先行发布",
-        title = "银临茶舍 伴奏功能上线",
+        platform = "Android/iOS/Windows/Linux/macOS/Web 发布",
+        title = "银临茶舍 歌词编辑器上线",
         force = false,
         maintenance = false,
-        date = LocalDate(2026, 3, 10),
+        date = LocalDate(2026, 3, 17),
         groups = listOf(
             AppUpdateRecordGroup(
-                type = "新功能",
+                type = "特性",
                 icon = Icons.RocketLaunch,
                 color = Colors.Steel5,
                 background = Colors.Steel2,
@@ -32,11 +32,14 @@ internal object AppAbout {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = listOf(
-                    "1. 曲库和工坊新增MOD筛选查找",
-                    "2. 歌单与播放列表显示歌曲数量",
-                    "3. 歌单歌曲单击后立即从此位置播放该歌单",
-                    "4. 工坊迁移到音乐首页",
-                    "5. 优化安卓端性能",
+                    "1. MOD歌词编辑器支持",
+                    "2. 曲库和工坊支持筛选搜索",
+                    "3. 下拉刷新和下拉加载列表启用悬浮球设计, 移除部分FAB",
+                    "4. 电脑端横向滚动鼠标滑轮适配",
+                    "5. 安卓端悬浮歌词顶部偏移改为比例计算",
+                    "6. 增加部分专辑音游配置",
+                    "7. 减小安装包体积",
+                    "8. 优化安卓端歌词渲染引擎性能",
                 )
             ),
             AppUpdateRecordGroup(
@@ -45,12 +48,11 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复安卓端悬浮歌词崩溃的问题",
-                    "2. 修复电脑端表情显示崩溃的问题",
-                    "3. 修复对话框边距的问题",
-                    "4. 修复歌单顺序调整异常的问题",
-                    "5. 修复歌词引擎切换时歌词空置的问题",
-                    "6. 修复页面切换未防抖的问题",
+                    "1. 修复音乐页未初始化的问题",
+                    "2. 修复表情显示崩溃的问题",
+                    "3. 修复游戏页异常提示的问题",
+                    "4. 修复安卓端悬浮歌词关闭后无法再打开的问题",
+                    "5. 修复主题帖链接不显示的问题",
                 )
             )
         )
