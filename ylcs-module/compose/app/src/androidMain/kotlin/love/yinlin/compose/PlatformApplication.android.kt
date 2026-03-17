@@ -22,6 +22,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     open fun onIntent(intent: Intent) {}
 
+    actual fun backHome() {
+        val intent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_HOME)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        context.application.startActivity(intent)
+    }
+
     actual fun openUri(uri: Uri): Boolean = catchingDefault(false) {
         val intent = Intent(Intent.ACTION_VIEW, uri.toAndroidUri())
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

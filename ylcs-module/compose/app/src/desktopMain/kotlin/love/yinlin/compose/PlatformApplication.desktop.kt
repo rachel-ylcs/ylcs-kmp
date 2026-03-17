@@ -140,6 +140,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         exitProcess(0)
     }
 
+    actual fun backHome() { controller.minimize = true }
+
     actual fun openUri(uri: Uri): Boolean {
         val desktop = Desktop.getDesktop()
         return if (desktop.isSupported(Desktop.Action.BROWSE)) {

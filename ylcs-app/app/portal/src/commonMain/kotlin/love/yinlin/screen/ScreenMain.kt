@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
+import love.yinlin.app
 import love.yinlin.app.portal.resources.*
 import love.yinlin.common.*
 import love.yinlin.isAppInitialized
@@ -50,6 +51,10 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
 
     private fun navigateSubScreen(index: Int) {
         if (isAppInitialized) pageIndex = index
+    }
+
+    override fun onBack() {
+        if (isAppInitialized) app.backHome()
     }
 
     override suspend fun initialize() {

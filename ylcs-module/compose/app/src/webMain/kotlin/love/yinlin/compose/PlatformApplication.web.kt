@@ -50,6 +50,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         }
     }
 
+    actual fun backHome() { }
+
     actual fun openUri(uri: Uri): Boolean {
         window.open(uri.toString(), "_blank")
         return true

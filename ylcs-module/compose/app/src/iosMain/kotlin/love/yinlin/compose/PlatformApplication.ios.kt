@@ -46,6 +46,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     fun run() = openService(scope = scope)
 
+    actual fun backHome() { }
+
     actual fun openUri(uri: Uri): Boolean = catchingDefault(false) {
         val application = UIApplication.sharedApplication
         uri.toNSUrl()?.let { url ->

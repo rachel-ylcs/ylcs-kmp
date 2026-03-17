@@ -10,6 +10,7 @@ expect abstract class PlatformApplication<out A : PlatformApplication<A>>(
     self: BaseLazyReference<A>,
     delegate: PlatformContextDelegate,
 ) : Application<A> {
+    fun backHome()
     fun openUri(uri: Uri): Boolean
     fun copyText(text: String): Boolean
 }
