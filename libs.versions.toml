@@ -3,14 +3,14 @@
 # Plugins #
 kotlin = "2.3.20"
 agp = "9.0.0-alpha06"
-cmp = "1.11.0-alpha03" # 1.11.0-alpha04的shader二进制不兼容, 要等第三方库适配
+cmp = "1.11.0-alpha03" # 1.11.0-alpha04的shader二进制不兼容, 要等上游适配
 mavenPublish = "0.36.0"
 dokka = "2.2.0-Beta"
 
 # Libs #
 
 # Common
-skiko = "0.9.47"
+skiko = "0.9.47" # 0.144.4的skiko-uiview在web上二进制不兼容，要等上游适配
 lifecycle = "2.10.0-beta01"
 coroutines = "1.10.2"
 ktor = "3.4.1"
@@ -21,7 +21,7 @@ pag = "4.5.36"
 
 # Android
 androidx-activity = "1.13.0"
-media3 = "1.10.0-rc01"
+media3 = "1.10.0-rc02"
 
 # iOS
 sgQrcode = "4.1.0"
