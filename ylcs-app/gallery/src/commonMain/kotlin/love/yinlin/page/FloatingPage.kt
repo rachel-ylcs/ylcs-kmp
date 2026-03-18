@@ -5,12 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.delay
@@ -39,6 +34,8 @@ object FloatingPage : Page() {
     val dialogConfirm = DialogConfirm()
 
     val dialogInput = DialogInput(hint = "Input something here", trailing = InputDecoration.Icon.Clear)
+
+    val dialogChoiceSingle = DialogChoice.fromItems(listOf("Single"))
 
     val dialogChoice = DialogChoice.fromItems(List(10) { "Item $it" })
 
@@ -133,6 +130,12 @@ object FloatingPage : Page() {
                     Example("Input") {
                         PrimaryLoadingButton("open", onClick = {
                             dialogInput.open("Floating Dialog Input!")
+                        })
+                    }
+
+                    Example("List Choice Single") {
+                        PrimaryLoadingButton("open", onClick = {
+                            dialogChoiceSingle.open()
                         })
                     }
 
@@ -291,6 +294,7 @@ object FloatingPage : Page() {
         dialogInfo.Land()
         dialogConfirm.Land()
         dialogInput.Land()
+        dialogChoiceSingle.Land()
         dialogChoice.Land()
         dialogLoading.Land()
         dialogProgress.Land()

@@ -3,7 +3,9 @@ package love.yinlin.compose
 import androidx.compose.runtime.Stable
 
 @Stable
-data class ValueTheme(
+class ValueTheme(
+    val key: String,
+
     val lightThemeText: String,
     val darkThemeText: String,
     val systemThemeText: String,
@@ -19,6 +21,7 @@ data class ValueTheme(
     val dialogInfoTitle: String,
     val dialogConfirmTitle: String,
     val dialogInputTitle: String,
+    val dialogChoiceTitle: String,
     val dialogLoadingText: String,
 
     val noContent404Text: String,
@@ -38,6 +41,8 @@ data class ValueTheme(
         inline fun <reified T> runtime(): T? = null
 
         val Default = ValueTheme(
+            key = "Default",
+
             lightThemeText = "浅色",
             darkThemeText = "深色",
             systemThemeText = "系统",
@@ -53,6 +58,7 @@ data class ValueTheme(
             dialogInfoTitle = "提示",
             dialogConfirmTitle = "注意",
             dialogInputTitle = "输入",
+            dialogChoiceTitle = "选择",
             dialogLoadingText = "请耐心等待",
 
             noContent404Text = "404",
@@ -66,4 +72,7 @@ data class ValueTheme(
             windowAlwaysTopDisableText = "取消窗口置顶",
         )
     }
+
+    override fun equals(other: Any?): Boolean = (other as? ValueTheme)?.key == key
+    override fun hashCode(): Int = key.hashCode()
 }

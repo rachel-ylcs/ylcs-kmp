@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -59,12 +60,14 @@ abstract class DialogTemplate<R : Any> : Dialog<R>() {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v6)
             ) {
                 if (showTitle) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        icon?.let { Icon(icon = it, color = Theme.color.primary) }
-                        SimpleEllipsisText(text = title, color = Theme.color.primary, style = Theme.typography.v6.bold)
+                    ThemeContainer(Theme.color.primary) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            icon?.let { Icon(icon = it) }
+                            SimpleEllipsisText(text = title, style = Theme.typography.v6.bold)
+                        }
                     }
                 }
 
