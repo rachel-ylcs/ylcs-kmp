@@ -1,36 +1,24 @@
 package love.yinlin.compose.ui.text
 
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.indication
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.input.VisualTransformation
-import kotlinx.coroutines.CancellationException
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
-import love.yinlin.compose.Ripple
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.layout.MeasurePolicies
-import love.yinlin.extension.catchingError
 
 /**
  * 输入框装饰
@@ -70,9 +58,8 @@ interface InputDecoration {
                     enabled = enabled(state),
                     onClick = onClick?.let { { it(state) } }
                 )
-            } else {
-                Layout(modifier = Modifier.size(Theme.size.icon), MeasurePolicies.Empty)
             }
+            else Layout(modifier = Modifier.size(Theme.size.icon), MeasurePolicies.Empty)
         }
 
         companion object {
@@ -110,17 +97,12 @@ interface InputDecoration {
     object PasswordViewer : InputDecoration {
         override val alignment: Alignment.Vertical = Alignment.CenterVertically
 
+        // 不采用长按显示密码而是点击切换的原因在于部分Input并不是固定宽度的
+        // 文字显然比*更宽，长按时如果Input宽度增大会导致密码Icon从鼠标所在位置移开从而又触发收缩
         @Composable
         override fun Content(state: InputState) {
             if (!state.isEmpty) {
-                val interactionSource = remember { MutableInteractionSource() }
-
-                var isPressed by rememberFalse()
                 val oldTransformation = remember { state.visualTransformation }
-
-                LaunchedEffect(isPressed) {
-                    state.visualTransformation = if (isPressed) VisualTransformation.None else oldTransformation
-                }
 
                 DisposableEffect(Unit) {
                     onDispose {
@@ -129,24 +111,14 @@ interface InputDecoration {
                 }
 
                 love.yinlin.compose.ui.image.Icon(
-                    modifier = Modifier.hoverable(interactionSource)
-                        .indication(interactionSource, Ripple)
-                        .pointerInput(Unit) {
-                            detectTapGestures(onPress = { offset ->
-                                val press = PressInteraction.Press(offset)
-                                interactionSource.emit(press)
-                                isPressed = true
-                                val err = catchingError { awaitRelease() }
-                                isPressed = false
-                                interactionSource.emit(if (err is CancellationException) PressInteraction.Cancel(press) else PressInteraction.Release(press))
-                            })
-                        },
-                    icon = if (isPressed) Icons.VisibilityOff else Icons.Visibility,
+                    color = if (state.visualTransformation == VisualTransformation.None) Theme.color.primary else LocalColor.current,
+                    icon = if (state.visualTransformation == VisualTransformation.None) Icons.VisibilityOff else Icons.Visibility,
+                    onClick = {
+                        state.visualTransformation = if (state.visualTransformation == VisualTransformation.None) oldTransformation else VisualTransformation.None
+                    }
                 )
             }
-            else {
-                Layout(modifier = Modifier.size(Theme.size.icon), MeasurePolicies.Empty)
-            }
+            else Layout(modifier = Modifier.size(Theme.size.icon), MeasurePolicies.Empty)
         }
     }
 }
