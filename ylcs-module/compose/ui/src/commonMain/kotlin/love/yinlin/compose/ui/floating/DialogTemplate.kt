@@ -33,12 +33,16 @@ abstract class DialogTemplate<R : Any> : Dialog<R>() {
     protected open val scrollable: Boolean = true
     /**
      * 底部功能组
+     *
+     * 默认 null
      */
     protected open val actions: @Composable (RowScope.() -> Unit)? = null
     /**
      * 内容边距
+     *
+     * 默认 Theme.padding.value7
      */
-    protected open val contentPadding: PaddingValues @Composable get() = Theme.padding.value7
+    protected open val contentPadding: PaddingValues? = null
     /**
      * 内容对齐方式
      */
@@ -56,7 +60,7 @@ abstract class DialogTemplate<R : Any> : Dialog<R>() {
     protected fun LandDialogTemplate(title: String, block: @Composable () -> Unit) {
         LandDialog {
             Column(
-                modifier = Modifier.padding(contentPadding),
+                modifier = Modifier.padding(contentPadding ?: Theme.padding.value7),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v6)
             ) {
                 if (showTitle) {
