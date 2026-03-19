@@ -21,6 +21,7 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsApp.app.thirdParty,
                 projects.ylcsApp.app.viewer,
 
+                projects.ylcsModule.compose.components.dragDrop,
                 projects.ylcsModule.compose.components.paginationLayout,
                 projects.ylcsModule.compose.components.media,
             )

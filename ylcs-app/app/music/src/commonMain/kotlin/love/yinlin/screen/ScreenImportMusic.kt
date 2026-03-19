@@ -18,7 +18,7 @@ import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.mod.ModPreviewLayout
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
-import love.yinlin.compose.ui.node.dragAndDrop
+import love.yinlin.compose.ui.node.dragDrop
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.data.MimeType
 import love.yinlin.extension.catchingError
@@ -136,7 +136,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
             .padding(LocalImmersivePadding.current)
             .fillMaxSize()
             .padding(Theme.padding.eValue9)
-            .dragAndDrop(
+            .dragDrop(
                 enabled = step is Step.Initial || step is Step.Prepare,
                 flag = DragFlag.File,
                 onDrop = {

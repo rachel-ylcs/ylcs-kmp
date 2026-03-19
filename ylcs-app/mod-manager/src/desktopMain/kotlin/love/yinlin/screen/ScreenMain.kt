@@ -41,7 +41,7 @@ import love.yinlin.compose.ui.mod.ModPreviewLayout
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
 import love.yinlin.compose.ui.node.dashBorder
-import love.yinlin.compose.ui.node.dragAndDrop
+import love.yinlin.compose.ui.node.dragDrop
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.window.ContextMenu
@@ -391,7 +391,7 @@ class ScreenMain : BasicScreen() {
 
         @Composable
         override fun Content() {
-            Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragAndDrop(!isRunning, DragFlag.File) { dropResult ->
+            Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragDrop(!isRunning, DragFlag.File) { dropResult ->
                 if (dropResult is DropResult.File) {
                     val paths = dropResult.path
                     if (paths.size == 1) {
@@ -461,7 +461,7 @@ class ScreenMain : BasicScreen() {
 
         @Composable
         override fun Content() {
-            Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragAndDrop(!isRunning, DragFlag.File) { dropResult ->
+            Box(modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9).dragDrop(!isRunning, DragFlag.File) { dropResult ->
                 if (dropResult is DropResult.File) {
                     val paths = dropResult.path
                     if (paths.isNotEmpty()) {

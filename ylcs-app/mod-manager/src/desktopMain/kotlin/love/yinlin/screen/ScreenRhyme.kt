@@ -49,7 +49,7 @@ import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.DragFlag
 import love.yinlin.compose.ui.node.DropResult
 import love.yinlin.compose.ui.node.dashBorder
-import love.yinlin.compose.ui.node.dragAndDrop
+import love.yinlin.compose.ui.node.dragDrop
 import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.window.ContextMenuProvider
@@ -508,7 +508,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                 Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                     when (selectedTab) {
                         0 -> {
-                            Box(modifier = Modifier.fillMaxSize().dragAndDrop(true, DragFlag.File) { dropResult ->
+                            Box(modifier = Modifier.fillMaxSize().dragDrop(true, DragFlag.File) { dropResult ->
                                 catchingError {
                                     launch {
                                         parseQrc(QrcDecrypter.decrypt((dropResult as DropResult.File).path.first().readByteArray()!!)!!)
@@ -535,7 +535,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                             }
                         }
                         1 -> {
-                            Box(modifier = Modifier.fillMaxSize().dragAndDrop(true, DragFlag.File) { dropResult ->
+                            Box(modifier = Modifier.fillMaxSize().dragDrop(true, DragFlag.File) { dropResult ->
                                 catching { notationImage = (dropResult as DropResult.File).path.first().path }
                             }) {
                                 val showImage = notationImage
