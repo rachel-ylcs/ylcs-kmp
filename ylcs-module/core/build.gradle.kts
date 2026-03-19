@@ -19,6 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.kotlinx.atomicfu,
                 ExportLib,
+                libs.androidx.annotation,
                 libs.kotlinx.coroutines,
                 libs.kotlinx.io,
                 libs.kotlinx.datetime,
@@ -30,15 +31,23 @@ template(object : KotlinMultiplatformTemplate() {
 
         nativeMain.configure(clientMain)
 
-        val jvmMain by create(clientMain)
+        val jvmMain by create(clientMain) {
+            lib(
+                ExportLib,
+                libs.androidx.collection,
+            )
+        }
 
-        appleMain.configure(nativeMain)
+        appleMain.configure(nativeMain) {
+            lib(
+                ExportLib,
+                libs.androidx.collection,
+            )
+        }
 
         androidMain.configure(jvmMain) {
             lib(
                 ExportLib,
-                libs.androidx.annotation,
-                libs.androidx.collection,
                 libs.kotlinx.coroutines.android,
             )
         }
@@ -58,6 +67,7 @@ template(object : KotlinMultiplatformTemplate() {
         webMain.configure(commonMain) {
             lib(
                 ExportLib,
+                libs.androidx.collection,
                 libs.kotlinx.broswer
             )
         }
@@ -82,9 +92,19 @@ template(object : KotlinMultiplatformTemplate() {
 
         androidNativeMain.configure(nativeMain)
 
-        windowsMain.configure(nativeMain)
+        windowsMain.configure(nativeMain) {
+            lib(
+                ExportLib,
+                libs.androidx.collection,
+            )
+        }
 
-        linuxMain.configure(nativeMain)
+        linuxMain.configure(nativeMain) {
+            lib(
+                ExportLib,
+                libs.androidx.collection,
+            )
+        }
 
         macosMain.configure(appleMain)
     }
