@@ -21,8 +21,8 @@ template(object : KotlinMultiplatformTemplate() {
 
                 projects.ylcsModule.cs.clientEngine,
 
-                projects.ylcsModule.startup.picker,
-                projects.ylcsModule.startup.exception,
+                projects.ylcsModule.compose.startup.picker,
+                projects.ylcsModule.compose.startup.exception,
                 projects.ylcsModule.compose.startup.config,
 
                 projects.ylcsModule.compose.app,
