@@ -8,7 +8,6 @@ import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
 import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.compatible.ByteArrayCompatible
@@ -17,6 +16,7 @@ import love.yinlin.data.MimeType
 import love.yinlin.extension.cast
 import love.yinlin.extension.createElement
 import love.yinlin.extension.jsArrayOf
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.io.ArrayBufferSource
 import love.yinlin.io.ScriptWorker
 import love.yinlin.io.Sources
@@ -34,8 +34,8 @@ import kotlin.js.JsArray
 import kotlin.js.get
 import kotlin.js.toList
 
-actual class StartupPicker : SyncStartup() {
-    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) { }
+actual class StartupPicker actual constructor(context: PlatformContextProvider) : SyncStartup(context) {
+    actual override fun init(scope: CoroutineScope, args: StartupArgs) { }
 
     private fun htmlFileInput(multiple: Boolean, filter: String, block: (FileList?) -> Unit) {
         createElement<HTMLInputElement> {

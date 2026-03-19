@@ -8,13 +8,13 @@ import love.yinlin.compose.ui.PlatformView
 import love.yinlin.data.MimeType
 import love.yinlin.extension.createElement
 import love.yinlin.extension.raw
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
 import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
-actual abstract class VideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
+actual abstract class VideoController(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
     abstract val view: PlatformView<HTMLVideoElement>
 
     actual override fun release() { }
@@ -22,7 +22,7 @@ actual abstract class VideoController(context: Context, topBar: VideoActionBar?,
 
 @Stable
 @OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
-internal class WebVideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
+internal class WebVideoController(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
     override val view = object : PlatformView<HTMLVideoElement>() {
         override fun build(): HTMLVideoElement = createElement {
             autoplay = true

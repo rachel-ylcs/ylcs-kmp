@@ -14,17 +14,17 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import love.yinlin.coroutines.mainContext
 import love.yinlin.media.FfmpegRenderersFactory
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-actual abstract class VideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
+actual abstract class VideoController(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
     internal abstract val exoPlayer: ExoPlayer
 
     actual override fun release() { }
 }
 
-internal class AndroidVideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
+internal class AndroidVideoController(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
 
     private val listener = object : Player.Listener {
@@ -37,7 +37,7 @@ internal class AndroidVideoController(context: Context, topBar: VideoActionBar?,
         }
     }
 
-    override val exoPlayer: ExoPlayer = FfmpegRenderersFactory.build(context.activity, true).apply {
+    override val exoPlayer: ExoPlayer = FfmpegRenderersFactory.build(context.raw, true).apply {
         repeatMode = Player.REPEAT_MODE_ONE
         addListener(listener)
     }

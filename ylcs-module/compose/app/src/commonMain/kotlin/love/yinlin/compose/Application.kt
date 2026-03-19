@@ -9,15 +9,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.extension.BaseLazyReference
-import love.yinlin.foundation.Context
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.foundation.Service
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
 abstract class Application<out A : Application<A>>(
     private val self: BaseLazyReference<A>,
-    delegate: PlatformContextDelegate,
+    override val raw: PlatformContext,
 ) : Service() {
     protected open val themeMode: ThemeMode = ThemeMode.SYSTEM
     protected open val fontScale: Float = 1f
@@ -39,8 +38,6 @@ abstract class Application<out A : Application<A>>(
 
     @Composable
     abstract fun Content()
-
-    val context: Context = Context(delegate)
 
     @Composable
     fun ComposedLayout(
@@ -69,22 +66,22 @@ abstract class Application<out A : Application<A>>(
     internal fun openService(scope: CoroutineScope) {
         @Suppress("UNCHECKED_CAST")
         self.init(this as A)
-        initService(scope, context)
+        initService(scope)
         onCreate()
     }
 
     internal suspend fun CoroutineScope.openServiceLater() {
-        initServiceLater(context)
+        initServiceLater()
         onCreateLater()
     }
 
     internal fun closeServiceBefore() {
-        destroyServiceBefore(context)
+        destroyServiceBefore()
         onDestroyBefore()
     }
 
     internal fun closeService() {
-        destroyService(context)
+        destroyService()
         onDestroy()
     }
 }

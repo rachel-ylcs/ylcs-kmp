@@ -1,6 +1,7 @@
 package love.yinlin.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -47,6 +48,7 @@ import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.compose.window.OrientationController
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
 import love.yinlin.cs.NetClient
@@ -55,8 +57,6 @@ import love.yinlin.cs.url
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
-import love.yinlin.foundation.Orientation
-import love.yinlin.foundation.OrientationController
 import love.yinlin.fs.File
 import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.seconds
@@ -69,7 +69,7 @@ class ScreenRhyme : Screen() {
     private var library = emptyList<RhymeMusic>()
     private var showEnabled by mutableStateOf(false)
 
-    private val orientationController = OrientationController(app.context)
+    private val orientationController = OrientationController(app)
 
     private val rhymeManager = RhymeManager(
         context = app.context,
@@ -420,7 +420,7 @@ class ScreenRhyme : Screen() {
 
     override suspend fun initialize() {
         // 首次打开切换横屏
-        orientationController.orientation = Orientation.Landscape
+        orientationController.orientation = Orientation.Horizontal
 
         rhymeManager.init()
         if (rhymeManager.isInit) {

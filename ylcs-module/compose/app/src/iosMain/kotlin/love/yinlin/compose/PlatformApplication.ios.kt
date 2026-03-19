@@ -8,7 +8,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toNSUrl
 import platform.UIKit.UIApplication
@@ -19,12 +19,15 @@ import platform.UIKit.UIViewController
 @Suppress("unused")
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
     self: BaseLazyReference<A>,
-    delegate: PlatformContextDelegate,
-) : Application<A>(self, delegate) {
+    context: PlatformContext,
+) : Application<A>(self, context) {
     @Composable
     protected open fun BeginContent() {}
 
     private val scope = MainScope()
+
+    private var internalController: UIViewController? = null
+    override val controller get() = internalController
 
     fun buildUIViewController(): UIViewController {
         val uiViewController = ComposeUIViewController({
@@ -40,7 +43,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 Content()
             }
         }
-        context.controller = uiViewController
+        internalController = uiViewController
         return uiViewController
     }
 

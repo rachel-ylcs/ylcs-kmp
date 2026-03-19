@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.coroutines.mainContext
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
@@ -32,7 +32,7 @@ internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMus
 
     private var shouldImmediatePlay: Boolean = false
 
-    override suspend fun init(context: Context) {
+    override suspend fun init(context: PlatformContext) {
         nativeHandle = nativeCreate()
         scope.launch {
             isPlayingFlow.collectLatest { value ->

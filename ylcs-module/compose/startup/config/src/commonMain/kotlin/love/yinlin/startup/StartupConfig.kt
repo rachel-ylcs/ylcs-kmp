@@ -15,13 +15,13 @@ import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupFetcher
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.extension.lazyName
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 
 @StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
 @StartupArg(index = 1, name = "version", type = Int::class)
 @StartupArg(index = 2, name = "patches", type = Patches::class)
 @Stable
-open class StartupConfig : SyncStartup() {
+open class StartupConfig(context: PlatformContextProvider) : SyncStartup(context) {
     lateinit var kv: StartupKV
         private set
     var version: Int = 0
@@ -29,7 +29,7 @@ open class StartupConfig : SyncStartup() {
     lateinit var patches: Patches
         private set
 
-    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
+    override fun init(scope: CoroutineScope, args: StartupArgs) {
         kv = args.fetch(0)
         version = args[1]
         patches = args[2]

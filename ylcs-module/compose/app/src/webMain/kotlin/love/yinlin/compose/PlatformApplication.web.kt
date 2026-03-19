@@ -10,15 +10,15 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import love.yinlin.extension.BaseLazyReference
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.Uri
 import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
     self: BaseLazyReference<A>,
-    delegate: PlatformContextDelegate,
-) : Application<A>(self, delegate) {
+    context: PlatformContext,
+) : Application<A>(self, context) {
     @Composable
     protected open fun BeginContent() {}
 

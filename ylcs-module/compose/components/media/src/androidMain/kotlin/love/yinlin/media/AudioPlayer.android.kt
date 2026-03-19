@@ -6,11 +6,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
 @Stable
-internal class AndroidAudioPlayer(context: Context, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
+internal class AndroidAudioPlayer(context: PlatformContext, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
     private var player: ExoPlayer? = null
 
     private val listener: Player.Listener = object : Player.Listener {
@@ -35,7 +35,7 @@ internal class AndroidAudioPlayer(context: Context, onEndListener: () -> Unit) :
     override val duration: Long get() = player?.duration.let { if (it == null || it == C.TIME_UNSET) 0L else it }
 
     override suspend fun init() {
-        player = FfmpegRenderersFactory.build(context.application, false).apply {
+        player = FfmpegRenderersFactory.build(context, false).apply {
             repeatMode = Player.REPEAT_MODE_OFF
             shuffleModeEnabled = false
             addListener(listener)
@@ -76,4 +76,4 @@ internal class AndroidAudioPlayer(context: Context, onEndListener: () -> Unit) :
     }
 }
 
-actual fun buildAudioPlayer(context: Context, onEndListener: () -> Unit): AudioPlayer = AndroidAudioPlayer(context, onEndListener)
+actual fun buildAudioPlayer(context: PlatformContext, onEndListener: () -> Unit): AudioPlayer = AndroidAudioPlayer(context, onEndListener)

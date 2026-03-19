@@ -2,12 +2,12 @@ package love.yinlin.media
 
 import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
 @Stable
 @NativeLibApi
-internal class MacOSAudioController(context: Context, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
+internal class MacOSAudioController(context: PlatformContext, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
     override val isInit: Boolean = false
     override val isPlaying: Boolean = false
     override val position: Long = 0L

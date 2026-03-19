@@ -7,18 +7,10 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.Timeline
+import androidx.media3.common.*
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DataSourceBitmapLoader
-import androidx.media3.session.MediaController
-import androidx.media3.session.SessionCommand
-import androidx.media3.session.SessionResult
-import androidx.media3.session.SessionToken
+import androidx.media3.session.*
 import com.google.common.util.concurrent.MoreExecutors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -37,7 +29,7 @@ import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.replaceAll
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(UnstableApi::class)
@@ -116,9 +108,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
     }
 
     @kotlin.OptIn(LooseTyped::class)
-    override suspend fun init(context: Context) {
-        val ctx = context.application
-
+    override suspend fun init(context: PlatformContext) {
         scope.launch {
             isPlayingFlow.collectLatest { value ->
                 isPlaying = value
@@ -133,9 +123,9 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
 
         catchingNull {
             val mediaController: MediaController? = Coroutines.sync { future ->
-                val token = SessionToken(ctx, ComponentName(ctx, fetcher.androidMusicServiceClassName))
-                val bitmapLoader = DataSourceBitmapLoader.Builder(ctx).setMakeShared(true).build()
-                val callback = MediaController.Builder(ctx, token).setBitmapLoader(bitmapLoader).buildAsync()
+                val token = SessionToken(context, ComponentName(context, fetcher.androidMusicServiceClassName))
+                val bitmapLoader = DataSourceBitmapLoader.Builder(context).setMakeShared(true).build()
+                val callback = MediaController.Builder(context, token).setBitmapLoader(bitmapLoader).buildAsync()
                 callback.addListener({
                     future.send { callback.get() }
                 }, MoreExecutors.directExecutor())

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.ui.media.VideoActionBar
 import love.yinlin.compose.ui.media.VideoController
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType
@@ -13,7 +13,7 @@ import javax.swing.SwingUtilities
 
 @Stable
 @NativeLibApi
-internal class WindowsVideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
+internal class WindowsVideoController(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
     @Stable
     private enum class PlaybackState { None, Opening, Buffering, Playing, Paused; }
 

@@ -16,7 +16,7 @@ abstract class ComposeActivity : ComponentActivity() {
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        instance.context.bindActivity(this)
+        instance.activity = this
 
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false

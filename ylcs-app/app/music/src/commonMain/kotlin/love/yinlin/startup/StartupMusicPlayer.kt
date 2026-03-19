@@ -184,5 +184,5 @@ class StartupMusicPlayer : AsyncStartup() {
         controller.release()
     }
 
-    override val isSafeAccess: Boolean get() = isInit
+    override val canSafeAccess: Boolean get() = isInit
 }

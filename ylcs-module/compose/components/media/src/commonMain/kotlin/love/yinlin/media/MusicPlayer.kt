@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import love.yinlin.compose.data.media.MediaPlayMode
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 
 @Stable
 abstract class MusicPlayer(protected val fetcher: MediaMetadataFetcher) {
@@ -72,7 +72,7 @@ abstract class MusicPlayer(protected val fetcher: MediaMetadataFetcher) {
     /**
      * 初始化
      */
-    abstract suspend fun init(context: Context)
+    abstract suspend fun init(context: PlatformContext)
 
     /**
      * 释放

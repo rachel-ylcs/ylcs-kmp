@@ -10,7 +10,7 @@ class StartupDelegate<S : Startup>(
     type: StartupType,
     val priority: Int,
     name: String? = null,
-    private val factory: () -> S,
+    private val factory: (PlatformContextProvider) -> S,
     args: Array<Any?>,
 ) : ReadOnlyProperty<Any?, Startup> {
     companion object {
@@ -62,25 +62,27 @@ class StartupDelegate<S : Startup>(
         return "$serviceClassName-${serviceName ?: "unnamed"}"
     }
 
-    fun createStartup() { startup = factory() }
-
-    fun initStartup(scope: CoroutineScope, context: Context) {
-        startup.init(scope, context, startupArgs)
+    fun createStartup(context: PlatformContextProvider) {
+        startup = factory(context)
     }
 
-    suspend fun CoroutineScope.initStartup(context: Context) {
-        with(startup) { init(context, startupArgs) }
+    fun initStartup(scope: CoroutineScope) {
+        startup.init(scope, startupArgs)
     }
 
-    suspend fun CoroutineScope.initStartupLater(context: Context) {
-        with(startup) { initLater(context, startupArgs) }
+    suspend fun CoroutineScope.initStartup() {
+        with(startup) { init(startupArgs) }
     }
 
-    fun destroyStartup(context: Context) {
-        startup.destroyBefore(context, startupArgs)
+    suspend fun CoroutineScope.initStartupLater() {
+        with(startup) { initLater(startupArgs) }
     }
 
-    fun destroyStartupBefore(context: Context) {
-        startup.destroy(context, startupArgs)
+    fun destroyStartup() {
+        startup.destroyBefore(startupArgs)
+    }
+
+    fun destroyStartupBefore() {
+        startup.destroy(startupArgs)
     }
 }

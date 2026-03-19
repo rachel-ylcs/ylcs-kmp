@@ -4,11 +4,11 @@ import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.ui.media.VideoActionBar
 import love.yinlin.compose.ui.media.VideoController
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 
 @Stable
 @NativeLibApi
-internal class LinuxVideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
+internal class LinuxVideoController(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
     override fun nativeCreate(): Long = 0L
     override fun nativeRelease(handle: Long) { }
     override fun load(path: String) { }

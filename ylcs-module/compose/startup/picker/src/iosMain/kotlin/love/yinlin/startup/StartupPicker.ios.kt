@@ -5,9 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.*
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.toNSData
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.io.SandboxSource
 import love.yinlin.io.Sources
-import love.yinlin.foundation.Context
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.*
@@ -22,13 +22,13 @@ import platform.UIKit.*
 import platform.UniformTypeIdentifiers.*
 import platform.darwin.NSObject
 
-actual class StartupPicker : SyncStartup() {
+actual class StartupPicker actual constructor(context: PlatformContextProvider) : SyncStartup(context) {
     // 全局引用, 避免被gc
     lateinit var phPickerDelegate: PHPickerViewControllerDelegateProtocol
     lateinit var phPickerDismissDelegate: UIAdaptivePresentationControllerDelegateProtocol
     lateinit var documentPickerDelegate: UIDocumentPickerDelegateProtocol
 
-    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {}
+    actual override fun init(scope: CoroutineScope, args: StartupArgs) { }
 
     @OptIn(ExperimentalForeignApi::class)
     private fun copyToTempDir(url: NSURL?): NSURL? {

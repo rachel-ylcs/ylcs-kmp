@@ -1,7 +1,7 @@
 package love.yinlin.startup
 
 import kotlinx.coroutines.CoroutineScope
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupHandler
@@ -15,12 +15,12 @@ import love.yinlin.foundation.SyncStartup
     returnType = Unit::class,
     String::class, Throwable::class, String::class
 )
-expect class StartupExceptionHandler() : SyncStartup {
+expect class StartupExceptionHandler(context: PlatformContextProvider) : SyncStartup {
     fun interface Handler {
         fun handle(key: String, e: Throwable, error: String)
     }
 
     val crashKey: String
 
-    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs)
+    override fun init(scope: CoroutineScope, args: StartupArgs)
 }

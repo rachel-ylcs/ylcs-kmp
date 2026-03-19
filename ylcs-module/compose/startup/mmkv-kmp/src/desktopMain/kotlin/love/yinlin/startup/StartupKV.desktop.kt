@@ -3,7 +3,7 @@ package love.yinlin.startup
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.StartupNative
@@ -13,10 +13,11 @@ import love.yinlin.fs.File
 @StartupArg(index = 0, name = "initPath", type = File::class)
 @StartupNative
 @NativeLibApi
-actual class StartupKV : SyncStartup() {
+actual class StartupKV actual constructor(context: PlatformContextProvider): SyncStartup(context) {
     lateinit var kv: MMKV
+        private set
 
-    actual override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
+    actual override fun init(scope: CoroutineScope, args: StartupArgs) {
         val initPath: File = args[0]
         kv = MMKV(initPath.path)
     }

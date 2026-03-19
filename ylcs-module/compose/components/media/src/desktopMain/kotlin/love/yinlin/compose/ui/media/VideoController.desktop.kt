@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.platform.NativeLibLoader
 import love.yinlin.platform.Platform
 import love.yinlin.media.LinuxVideoController
@@ -17,13 +17,13 @@ import org.jetbrains.skia.Paint
 
 @Stable
 @NativeLibApi
-actual abstract class VideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
+actual abstract class VideoController(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
     internal companion object {
         init {
             NativeLibLoader.resource("media")
         }
 
-        fun build(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?): VideoController = when (platform) {
+        fun build(context: PlatformContextProvider, topBar: VideoActionBar?, bottomBar: VideoActionBar?): VideoController = when (platform) {
             Platform.Windows -> WindowsVideoController(context, topBar, bottomBar)
             Platform.MacOS -> MacOSVideoController(context, topBar, bottomBar)
             else -> LinuxVideoController(context, topBar, bottomBar)

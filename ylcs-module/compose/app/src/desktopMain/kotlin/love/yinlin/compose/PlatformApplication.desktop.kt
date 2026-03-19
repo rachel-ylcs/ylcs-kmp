@@ -20,7 +20,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toJvmUri
 import org.jetbrains.compose.resources.DrawableResource
@@ -32,8 +32,8 @@ import kotlin.system.exitProcess
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
     self: BaseLazyReference<A>,
-    delegate: PlatformContextDelegate,
-) : Application<A>(self, delegate) {
+    context: PlatformContext,
+) : Application<A>(self, context) {
     @Composable
     protected open fun BeginContent() {}
 
@@ -67,6 +67,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     val mainScope = MainScope()
 
+    final override var windowHandle: Long? = null
+        private set
+
     fun run() {
         openService(scope = mainScope)
 
@@ -90,7 +93,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             ) {
                 LaunchedEffect(Unit) {
                     Fixup.swingWindowMaximizeBounds(window)
-                    context.bindWindow(window.windowHandle)
+                    this@PlatformApplication.windowHandle = window.windowHandle
 
                     windowStarter { openServiceLater() }
                 }

@@ -17,12 +17,12 @@ import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.node.silentClick
-import love.yinlin.foundation.Context
-import love.yinlin.foundation.OrientationController
+import love.yinlin.compose.window.OrientationController
+import love.yinlin.foundation.PlatformContextProvider
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-abstract class VideoState(context: Context, val topBar: VideoActionBar?, val bottomBar: VideoActionBar?) {
+abstract class VideoState internal constructor(context: PlatformContextProvider, val topBar: VideoActionBar?, val bottomBar: VideoActionBar?) {
     var url: String? by mutableStateOf(null)
         protected set
 

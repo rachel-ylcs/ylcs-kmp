@@ -1,11 +1,11 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
 @Stable
-internal class IOSAudioPlayer(context: Context, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
+internal class IOSAudioPlayer(context: PlatformContext, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
     override val isInit: Boolean = false
     override val isPlaying: Boolean = false
     override val position: Long = 0L
@@ -19,4 +19,4 @@ internal class IOSAudioPlayer(context: Context, onEndListener: () -> Unit) : Aud
     override fun seekTo(position: Long) { }
 }
 
-actual fun buildAudioPlayer(context: Context, onEndListener: () -> Unit): AudioPlayer = IOSAudioPlayer(context, onEndListener)
+actual fun buildAudioPlayer(context: PlatformContext, onEndListener: () -> Unit): AudioPlayer = IOSAudioPlayer(context, onEndListener)
