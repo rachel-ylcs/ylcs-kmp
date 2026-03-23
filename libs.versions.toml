@@ -11,13 +11,13 @@ dokka = "2.2.0-Beta"
 
 # Common
 skiko = "0.9.47" # 0.144.4的skiko-uiview在web上二进制不兼容，要等上游适配
-lifecycle = "2.10.0-beta01"
+lifecycle = "2.10.0"
 coroutines = "1.10.2"
 ktor = "3.4.1"
 sketch = "4.4.0-beta02"
-mmkv = "2.3.0"
+mmkv = "2.4.0"
 cryptography = "0.5.0"
-pag = "4.5.36"
+pag = "4.5.41"
 
 # Android
 androidx-activity = "1.13.0"
@@ -72,7 +72,7 @@ compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", 
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
-kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.31.0" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.32.0" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
@@ -116,7 +116,7 @@ media3-session = { module = "androidx.media3:media3-session", version.ref = "med
 media3-player = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 
 mmkv-android = { module = "com.tencent:mmkv", version.ref = "mmkv" }
-scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.4.0" }
+scan-android = { module = "com.github.jenly1314:zxing-lite", version = "3.4.1" }
 scan-camera-android = { module = "com.github.jenly1314:camera-scan", version = "1.4.1" }
 
 lottie-android = { module = "com.airbnb.android:lottie-compose", version = "6.7.1" }
