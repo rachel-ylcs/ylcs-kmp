@@ -16,7 +16,7 @@ import love.yinlin.fs.File
 actual class StartupKV actual constructor(context: PlatformContextProvider): SyncStartup(context) {
     // MMKV initialized in swift code
     val mmkv: MMKV = run {
-        MMKV.initializeMMKV(null, MMKVLogLevelNone)
+        MMKV.initializeMMKV(null, MMKVLogLevelMMKVLogNone)
         MMKV.defaultMMKV()!!
     }
 
