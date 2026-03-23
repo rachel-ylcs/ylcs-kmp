@@ -9,6 +9,8 @@ import kotlinx.coroutines.launch
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
 import love.yinlin.foundation.PlatformContext
+import love.yinlin.uri.ImplicitUri
+import love.yinlin.uri.SandboxUri
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toNSUrl
 import platform.UIKit.UIApplication
@@ -21,20 +23,19 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     self: BaseLazyReference<A>,
     context: PlatformContext,
 ) : Application<A>(self, context) {
+    constructor(self: BaseLazyReference<A>): this(self, PlatformContext.Instance)
+
     @Composable
     protected open fun BeginContent() {}
 
     private val scope = MainScope()
-
-    private var internalController: UIViewController? = null
-    override val controller get() = internalController
 
     fun buildUIViewController(): UIViewController {
         val uiViewController = ComposeUIViewController({
             delegate = object : ComposeUIViewControllerDelegate {
                 override fun viewDidLoad() {
                     super.viewDidLoad()
-                    scope.launch { openServiceLater() }
+                    scope.launch { initServiceLater() }
                 }
             }
         }) {
@@ -43,11 +44,11 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 Content()
             }
         }
-        internalController = uiViewController
+        controller = uiViewController
         return uiViewController
     }
 
-    fun run() = openService(scope = scope)
+    fun run() = initApplicationService(scope = scope)
 
     actual fun backHome() { }
 
@@ -63,4 +64,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         UIPasteboard.generalPasteboard.setString(text)
         return true
     }
+
+    actual fun implicitFileUri(uri: Uri): ImplicitUri = SandboxUri(uri.toNSUrl()!!)
 }

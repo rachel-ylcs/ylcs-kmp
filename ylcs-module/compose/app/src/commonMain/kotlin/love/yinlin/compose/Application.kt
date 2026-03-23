@@ -16,8 +16,8 @@ import org.jetbrains.compose.resources.FontResource
 @Stable
 abstract class Application<out A : Application<A>>(
     private val self: BaseLazyReference<A>,
-    override val raw: PlatformContext,
-) : Service() {
+    rawContext: PlatformContext,
+) : Service(rawContext) {
     protected open val themeMode: ThemeMode = ThemeMode.SYSTEM
     protected open val fontScale: Float = 1f
     protected open val mainFontResource: FontResource? = null
@@ -30,11 +30,6 @@ abstract class Application<out A : Application<A>>(
     protected open val toolingTheme: ToolingTheme = ToolingTheme.Default
     protected open val valueTheme: ValueTheme = ValueTheme.Default
     protected open val localProvider: Array<ProvidedValue<*>> = emptyArray()
-
-    protected open fun onCreate() { }
-    protected open suspend fun onCreateLater() { }
-    protected open fun onDestroyBefore() { }
-    protected open fun onDestroy() { }
 
     @Composable
     abstract fun Content()
@@ -59,29 +54,17 @@ abstract class Application<out A : Application<A>>(
             valueTheme = valueTheme,
             modifier = modifier
         ) {
-            CompositionLocalProvider(*localProvider, content = content)
+            CompositionLocalProvider(
+                LocalPlatformContext provides this,
+                *localProvider,
+                content = content
+            )
         }
     }
 
-    internal fun openService(scope: CoroutineScope) {
+    internal fun initApplicationService(scope: CoroutineScope) {
         @Suppress("UNCHECKED_CAST")
         self.init(this as A)
         initService(scope)
-        onCreate()
-    }
-
-    internal suspend fun CoroutineScope.openServiceLater() {
-        initServiceLater()
-        onCreateLater()
-    }
-
-    internal fun closeServiceBefore() {
-        destroyServiceBefore()
-        onDestroyBefore()
-    }
-
-    internal fun closeService() {
-        destroyService()
-        onDestroy()
     }
 }

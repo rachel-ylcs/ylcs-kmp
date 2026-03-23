@@ -41,7 +41,7 @@ class StartupUrlImage(context: PlatformContextProvider) : SyncStartup(context) {
         val cachePath: File = args[0]
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
-        sketch = buildSketch(context.raw).apply {
+        sketch = buildSketch(context.rawContext).apply {
             logger(level = Logger.Level.Error)
             componentLoaderEnabled(false)
             components {

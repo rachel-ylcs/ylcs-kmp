@@ -14,6 +14,7 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.window.rememberOrientationController
 import love.yinlin.extension.timeString
 
 @Stable
@@ -25,9 +26,11 @@ interface VideoActionBar {
         fun topDefault(onBack: () -> Unit) = object : VideoActionBar {
             @Composable
             override fun RowScope.Content(controller: VideoController) {
+                val orientationController = rememberOrientationController()
+
                 Icon(icon = Icons.ArrowBack, onClick = onBack)
                 Box(modifier = Modifier.weight(1f))
-                Icon(icon = Icons.FullScreen, onClick = controller.orientationController::rotate)
+                Icon(icon = Icons.FullScreen, onClick = orientationController::rotate)
             }
         }
 

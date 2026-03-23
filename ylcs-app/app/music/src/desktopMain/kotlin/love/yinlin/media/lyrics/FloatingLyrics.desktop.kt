@@ -21,7 +21,6 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
-import love.yinlin.foundation.Context
 import love.yinlin.platform.NativeWindow
 import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.milliseconds
@@ -47,7 +46,7 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
 
     actual fun detach() { isAttached = false }
 
-    actual suspend fun initDelay(context: Context) {
+    actual suspend fun initDelay() {
         if (app.config.enabledFloatingLyrics && !isAttached) attach()
     }
 

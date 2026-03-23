@@ -13,7 +13,7 @@ import androidx.media3.ui.compose.SURFACE_TYPE_SURFACE_VIEW
 import androidx.media3.ui.compose.modifiers.resizeWithContentScale
 import androidx.media3.ui.compose.state.rememberPresentationState
 import love.yinlin.compose.Colors
-import love.yinlin.foundation.PlatformContextProvider
+import love.yinlin.foundation.PlatformContext
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -35,7 +35,7 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
 }
 
 actual fun buildVideoController(
-    context: PlatformContextProvider,
+    context: PlatformContext,
     topBar: VideoActionBar?,
     bottomBar: VideoActionBar?
 ): VideoController = AndroidVideoController(context, topBar, bottomBar)

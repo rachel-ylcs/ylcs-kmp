@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.zIndex
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.Colors
-import love.yinlin.foundation.PlatformContextProvider
+import love.yinlin.foundation.PlatformContext
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
@@ -56,7 +56,7 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
 }
 
 actual fun buildVideoController(
-    context: PlatformContextProvider,
+    context: PlatformContext,
     topBar: VideoActionBar?,
     bottomBar: VideoActionBar?
-): VideoController = VideoController.build(context, topBar, bottomBar)
+): VideoController = VideoController.build(topBar, bottomBar)

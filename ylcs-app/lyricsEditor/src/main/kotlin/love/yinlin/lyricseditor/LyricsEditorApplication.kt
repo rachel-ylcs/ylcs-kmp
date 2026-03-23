@@ -7,10 +7,10 @@ import androidx.compose.ui.Modifier
 import love.yinlin.compose.PlatformApplication
 import love.yinlin.compose.extension.LazyStateReference
 import love.yinlin.compose.screen.ScreenManager
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 
 @Stable
-class LyricsEditorApplication(delegate: PlatformContextDelegate) :  PlatformApplication<LyricsEditorApplication>(mApp, delegate) {
+class LyricsEditorApplication(context: PlatformContext) :  PlatformApplication<LyricsEditorApplication>(mApp, context) {
     @Composable
     override fun Content() {
         ScreenManager.Navigation<ScreenMain>(modifier = Modifier.fillMaxSize()) {

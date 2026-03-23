@@ -18,6 +18,7 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.compose.resources,
                 ExportLib,
                 projects.ylcsModule.foundation.startup,
+                projects.ylcsModule.foundation.filesystem,
                 projects.ylcsModule.compose.ui,
             )
         }

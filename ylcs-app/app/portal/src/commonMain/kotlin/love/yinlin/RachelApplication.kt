@@ -4,14 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.music.PlatformMusicType
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.screen.*
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 
 @Stable
-abstract class RachelApplication(delegate: PlatformContextDelegate) : AbstractRachelApplication(delegate) {
+abstract class RachelApplication(context: PlatformContext) : AbstractRachelApplication(context) {
     private val mp by service(
         name = "MusicPlayer",
         factory = ::StartupMusicPlayer

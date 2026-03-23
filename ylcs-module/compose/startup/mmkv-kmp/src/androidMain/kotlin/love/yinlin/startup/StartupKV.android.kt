@@ -12,7 +12,7 @@ import love.yinlin.fs.File
 @StartupArg(index = 0, name = "initPath", type = File::class)
 actual class StartupKV actual constructor(context: PlatformContextProvider): SyncStartup(context) {
     val mmkv: MMKV = run {
-        MMKV.initialize(context.raw, MMKVLogLevel.LevelNone)
+        MMKV.initialize(context.rawContext, MMKVLogLevel.LevelNone)
         MMKV.defaultMMKV()
     }
 

@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.reflect.metaClassName
 
-abstract class Startup(protected val context: PlatformContextProvider) {
+abstract class Startup(val context: PlatformContextProvider) {
     @OptIn(CompatibleRachelApi::class)
     override fun toString(): String = "(${this.metaClassName})"
 

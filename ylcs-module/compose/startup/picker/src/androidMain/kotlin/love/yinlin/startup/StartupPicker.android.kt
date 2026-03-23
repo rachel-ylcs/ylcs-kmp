@@ -69,7 +69,7 @@ actual class StartupPicker actual constructor(context: PlatformContextProvider) 
                 key = generateKey,
                 contract = ActivityResultContracts.OpenDocument()
             ) { uri ->
-                future.send { ContentUri(context.raw, uri!!.toString()) }
+                future.send { ContentUri(context.rawContext, uri!!.toString()) }
             }.launch(mimeType.toTypedArray())
         }
     }
@@ -81,7 +81,7 @@ actual class StartupPicker actual constructor(context: PlatformContextProvider) 
                 key = generateKey,
                 contract = ActivityResultContracts.CreateDocument(mimeType)
             ) { uri ->
-                future.send { ContentUri(context.raw, uri!!.toString()) }
+                future.send { ContentUri(context.rawContext, uri!!.toString()) }
             }.launch(filename)
         }
     }

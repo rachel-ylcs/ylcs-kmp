@@ -28,7 +28,6 @@ import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
-import love.yinlin.uri.asFileImplicitUri
 
 @Stable
 class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
@@ -92,7 +91,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
     override suspend fun initialize() {
         deeplink?.let { uri ->
             catchingError {
-                step = Step.Prepare(uri.asFileImplicitUri(app.context))
+                step = Step.Prepare(app.implicitFileUri(uri))
             }?.let {
                 step = Step.Initial(it.message ?: "未知错误", isError = true)
             }

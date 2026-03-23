@@ -1,6 +1,5 @@
 package love.yinlin.media.lyrics
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -10,13 +9,10 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.window.FloatingView
-import love.yinlin.foundation.Context
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
 actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) {
-    private lateinit var activity: ComponentActivity
-
     actual var isAttached: Boolean by mutableStateOf(false)
         private set
 
@@ -63,15 +59,18 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
     }
 
     actual fun attach() {
-        view.attach(activity) { app.config.enabledFloatingLyrics = false }
+        startup.context.activity?.let { activity ->
+            view.attach(activity) { app.config.enabledFloatingLyrics = false }
+        }
     }
 
     actual fun detach() {
-        view.detach(activity)
+        startup.context.activity?.let { activity ->
+            view.detach(activity)
+        }
     }
 
-    actual suspend fun initDelay(context: Context) {
-        activity = context.activity
+    actual suspend fun initDelay() {
         if (app.config.enabledFloatingLyrics && !isAttached) attach()
     }
 }

@@ -6,7 +6,7 @@ import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catchingError
 import kotlin.jvm.JvmName
 
-abstract class Service : PlatformContextProvider {
+abstract class Service(rawContext: PlatformContext) : PlatformContextProvider(rawContext) {
     @PublishedApi internal val startupList = mutableListOf<StartupDelegate<out Startup>>()
 
     inline fun <reified T : Startup> startup(): T? {
@@ -39,7 +39,7 @@ abstract class Service : PlatformContextProvider {
     protected inline fun async(vararg args: Any?, priority: Int = StartupDelegate.DEFAULT, name: String? = null, crossinline factory: suspend CoroutineScope.(StartupArgs) -> Unit) =
         service<AsyncStartup>(*args, priority = priority, name = name) { AsyncStartup.build(this, factory) }
 
-    protected fun initService(scope: CoroutineScope) {
+    fun initService(scope: CoroutineScope) {
         val (sync, async) = startupList.partition { it.isSync }
 
         for (delegate in sync.sortedByDescending { it.priority }) {
@@ -60,7 +60,7 @@ abstract class Service : PlatformContextProvider {
         }
     }
 
-    protected suspend fun CoroutineScope.initServiceLater() {
+    suspend fun CoroutineScope.initServiceLater() {
         val (sync, async) = startupList.partition { it.isSync }
 
         for (delegate in sync.sortedByDescending { it.priority }) {
@@ -76,7 +76,7 @@ abstract class Service : PlatformContextProvider {
         }
     }
 
-    protected fun destroyServiceBefore() {
+    fun destroyServiceBefore() {
         val (sync, async) = startupList.partition { it.isSync }
         // 这里必须先倒序排列再反向才能提供正确的析构顺序, 因为 sortedByDescending 排序是稳定的
         for (delegate in async.sortedByDescending { it.priority }.asReversed()) {
@@ -91,7 +91,7 @@ abstract class Service : PlatformContextProvider {
         }
     }
 
-    protected fun destroyService() {
+    fun destroyService() {
         val (sync, async) = startupList.partition { it.isSync }
         for (delegate in async.sortedByDescending { it.priority }.asReversed()) {
             catchingError {

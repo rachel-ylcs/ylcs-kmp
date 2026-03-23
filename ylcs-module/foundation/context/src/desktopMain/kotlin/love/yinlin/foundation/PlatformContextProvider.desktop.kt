@@ -1,6 +1,6 @@
 package love.yinlin.foundation
 
-actual interface PlatformContextProvider {
-    actual val raw: PlatformContext
-    val windowHandle: Long?
+actual open class PlatformContextProvider actual constructor(actual val rawContext: PlatformContext) {
+    var windowHandle: Long? = null
+        protected set
 }

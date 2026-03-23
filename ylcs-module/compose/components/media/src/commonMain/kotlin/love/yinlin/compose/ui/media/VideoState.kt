@@ -17,12 +17,10 @@ import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.node.silentClick
-import love.yinlin.compose.window.OrientationController
-import love.yinlin.foundation.PlatformContextProvider
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-abstract class VideoState internal constructor(context: PlatformContextProvider, val topBar: VideoActionBar?, val bottomBar: VideoActionBar?) {
+abstract class VideoState internal constructor(val topBar: VideoActionBar?, val bottomBar: VideoActionBar?) {
     var url: String? by mutableStateOf(null)
         protected set
 
@@ -37,8 +35,6 @@ abstract class VideoState internal constructor(context: PlatformContextProvider,
 
     var error: Throwable? by mutableStateOf(null)
         protected set
-
-    val orientationController = OrientationController(context)
 
     abstract fun release()
     abstract fun load(path: String)

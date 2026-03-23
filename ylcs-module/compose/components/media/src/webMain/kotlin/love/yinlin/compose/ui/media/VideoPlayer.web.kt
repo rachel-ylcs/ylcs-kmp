@@ -2,7 +2,7 @@ package love.yinlin.compose.ui.media
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import love.yinlin.foundation.PlatformContextProvider
+import love.yinlin.foundation.PlatformContext
 
 @Composable
 actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
@@ -10,7 +10,7 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
 }
 
 actual fun buildVideoController(
-    context: PlatformContextProvider,
+    context: PlatformContext,
     topBar: VideoActionBar?,
     bottomBar: VideoActionBar?
-): VideoController = WebVideoController(context, topBar, bottomBar)
+): VideoController = WebVideoController(topBar, bottomBar)
