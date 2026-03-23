@@ -1,13 +1,7 @@
 package love.yinlin.compose
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,7 +14,9 @@ import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
+import love.yinlin.uri.ImplicitUri
+import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toJvmUri
 import org.jetbrains.compose.resources.DrawableResource
@@ -32,8 +28,10 @@ import kotlin.system.exitProcess
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
     self: BaseLazyReference<A>,
-    delegate: PlatformContextDelegate,
-) : Application<A>(self, delegate) {
+    context: PlatformContext,
+) : Application<A>(self, context) {
+    constructor(self: BaseLazyReference<A>) : this(self, PlatformContext.Instance)
+
     @Composable
     protected open fun BeginContent() {}
 
@@ -68,11 +66,11 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     val mainScope = MainScope()
 
     fun run() {
-        openService(scope = mainScope)
+        initApplicationService(scope = mainScope)
 
         application(exitProcessOnExit = false) {
             val onMainWindowClose = {
-                closeServiceBefore()
+                destroyServiceBefore()
                 exitApplication()
             }
 
@@ -90,9 +88,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             ) {
                 LaunchedEffect(Unit) {
                     Fixup.swingWindowMaximizeBounds(window)
-                    context.bindWindow(window.windowHandle)
+                    this@PlatformApplication.windowHandle = window.windowHandle
 
-                    windowStarter { openServiceLater() }
+                    windowStarter { initServiceLater() }
                 }
 
                 Fixup.swingWindowMinimize(this, minSize)
@@ -133,7 +131,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             MultipleWindow()
         }
 
-        closeService()
+        destroyService()
 
         mainScope.cancel()
 
@@ -156,4 +154,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         clipboard.setContents(selection, null)
         return true
     }
+
+    actual fun implicitFileUri(uri: Uri): ImplicitUri = RegularUri(uri.toString())
 }

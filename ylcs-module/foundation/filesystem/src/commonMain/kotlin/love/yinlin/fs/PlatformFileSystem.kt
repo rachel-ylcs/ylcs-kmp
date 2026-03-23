@@ -1,6 +1,6 @@
 package love.yinlin.fs
 
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 
 expect object PlatformFileSystem {
     /**
@@ -16,15 +16,15 @@ expect object PlatformFileSystem {
     /**
      * App目录
      */
-    fun appPath(context: PlatformContextDelegate, appName: String): File
+    fun appPath(context: PlatformContext, appName: String): File
 
     /**
      * 数据目录
      */
-    fun dataPath(context: PlatformContextDelegate, appName: String): File
+    fun dataPath(context: PlatformContext, appName: String): File
 
     /**
      * 缓存目录
      */
-    fun cachePath(context: PlatformContextDelegate, appName: String): File
+    fun cachePath(context: PlatformContext, appName: String): File
 }

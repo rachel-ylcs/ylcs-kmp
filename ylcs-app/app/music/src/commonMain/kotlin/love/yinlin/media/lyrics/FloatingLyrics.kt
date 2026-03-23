@@ -1,7 +1,7 @@
 package love.yinlin.media.lyrics
 
 import androidx.compose.runtime.Stable
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
@@ -13,5 +13,5 @@ expect class FloatingLyrics(startup: StartupMusicPlayer) {
 
     fun detach()
 
-    suspend fun initDelay(context: Context)
+    suspend fun initDelay()
 }

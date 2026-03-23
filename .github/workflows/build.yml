@@ -46,7 +46,7 @@ jobs:
             common: &common
               - 'gradle/**'
               - 'buildSrc/**'
-              - 'ylcs-module/**'
+              - 'ylcs-module/**/commonMain/**'
               - 'ylcs-app/cs/**'
               - 'ylcs-app/mod/**'
               - 'gradle.properties'
@@ -59,28 +59,35 @@ jobs:
               - 'ylcs-app/app/**/build.gradle.kts'
             android:
               - *client
-              - 'ylcs-app/app/**/src/jvmMain/**'
-              - 'ylcs-app/app/**/src/androidMain/**'
-              - 'ylcs-app/androidApp/src/main/**'
+              - 'ylcs-module/**/jvmMain/**'
+              - 'ylcs-module/**/androidMain/**'
+              - 'ylcs-app/app/**/jvmMain/**'
+              - 'ylcs-app/app/**/androidMain/**'
+              - 'ylcs-app/androidApp/**'
             ios:
               - *client
-              - 'ylcs-app/app/**/src/nativeInterop/**'
-              - 'ylcs-app/app/**/src/appleMain/**'
-              - 'ylcs-app/app/**/src/iosMain/**'
+              - 'ylcs-module/**/appleMain/**'
+              - 'ylcs-module/**/iosMain/**'
+              - 'ylcs-app/app/**/nativeInterop/**'
+              - 'ylcs-app/app/**/appleMain/**'
+              - 'ylcs-app/app/**/iosMain/**'
               - 'ylcs-app/iosApp/**'
             desktop:
               - *client
-              - 'ylcs-app/app/**/src/jvmMain/**'
-              - 'ylcs-app/app/**/src/desktopMain/**'
-              - 'ylcs-app/desktopApp/src/desktopMain/**'
+              - 'ylcs-module/**/jvmMain/**'
+              - 'ylcs-module/**/desktopMain/**'
+              - 'ylcs-app/app/**/jvmMain/**'
+              - 'ylcs-app/app/**/desktopMain/**'
+              - 'ylcs-app/desktopApp/**'
             web:
               - *client
-              - 'ylcs-app/app/**/src/jsMain/**'
-              - 'ylcs-app/app/**/src/wasmJsMain/**'
-              - 'ylcs-app/app/**/src/webMain/**'
-              - 'ylcs-app/webApp/src/jsMain/**'
-              - 'ylcs-app/webApp/src/wasmJsMain/**'
-              - 'ylcs-app/webApp/src/webMain/**'
+              - 'ylcs-module/**/webMain/**'
+              - 'ylcs-module/**/jsMain/**'
+              - 'ylcs-module/**/wasmJsMain/**'
+              - 'ylcs-app/app/**/webMain/**'
+              - 'ylcs-app/app/**/jsMain/**'
+              - 'ylcs-app/app/**/wasmJsMain/**'
+              - 'ylcs-app/webApp/**'
             server:
               - *common
               - 'ylcs-app/server/**'

@@ -14,7 +14,7 @@ import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
@@ -26,7 +26,7 @@ import okio.Path.Companion.toPath
 @StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
 @StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 @Stable
-class StartupUrlImage : SyncStartup() {
+class StartupUrlImage(context: PlatformContextProvider) : SyncStartup(context) {
     private lateinit var sketch: Sketch
 
     private fun ComponentRegistry.Builder.registerComponent() {
@@ -37,11 +37,11 @@ class StartupUrlImage : SyncStartup() {
         addDecoder(AnimatedWebpDecoder.Factory())
     }
 
-    override fun init(scope: CoroutineScope, context: Context, args: StartupArgs) {
+    override fun init(scope: CoroutineScope, args: StartupArgs) {
         val cachePath: File = args[0]
         val maxCacheSize: Int = args[1]
         val imageQuality: ImageQuality = args[2]
-        sketch = buildSketch(context).apply {
+        sketch = buildSketch(context.rawContext).apply {
             logger(level = Logger.Level.Error)
             componentLoaderEnabled(false)
             components {

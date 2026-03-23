@@ -13,18 +13,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import love.yinlin.coroutines.mainContext
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.FfmpegRenderersFactory
-import love.yinlin.foundation.Context
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-actual abstract class VideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
+actual abstract class VideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(topBar, bottomBar) {
     internal abstract val exoPlayer: ExoPlayer
 
     actual override fun release() { }
 }
 
-internal class AndroidVideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
+internal class AndroidVideoController(context: PlatformContext, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(topBar, bottomBar) {
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
 
     private val listener = object : Player.Listener {
@@ -37,7 +37,7 @@ internal class AndroidVideoController(context: Context, topBar: VideoActionBar?,
         }
     }
 
-    override val exoPlayer: ExoPlayer = FfmpegRenderersFactory.build(context.activity, true).apply {
+    override val exoPlayer: ExoPlayer = FfmpegRenderersFactory.build(context, true).apply {
         repeatMode = Player.REPEAT_MODE_ONE
         addListener(listener)
     }
@@ -62,7 +62,6 @@ internal class AndroidVideoController(context: Context, topBar: VideoActionBar?,
         scope.cancel()
         exoPlayer.removeListener(listener)
         exoPlayer.release()
-        orientationController.restore()
     }
 
     override fun load(path: String) {

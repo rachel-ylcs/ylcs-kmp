@@ -49,6 +49,9 @@ include(
     "ylcs-module:compose:plugin:game",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:startup:config",
+    "ylcs-module:compose:startup:exception",
+    "ylcs-module:compose:startup:mmkv-kmp",
+    "ylcs-module:compose:startup:picker",
     "ylcs-module:compose:theme",
     "ylcs-module:compose:ui",
     "ylcs-module:core",
@@ -57,7 +60,6 @@ include(
     "ylcs-module:cs:server-engine",
     "ylcs-module:foundation:context",
     "ylcs-module:foundation:filesystem",
-    "ylcs-module:foundation:orientation",
     "ylcs-module:foundation:startup",
     "ylcs-module:native:win32:core",
     "ylcs-module:platform:ffi:core",
@@ -68,9 +70,6 @@ include(
     "ylcs-module:platform:os:single-instance",
     "ylcs-module:platform:os:window",
     "ylcs-module:plugin:pag-kmp",
-    "ylcs-module:startup:exception",
-    "ylcs-module:startup:mmkv-kmp",
-    "ylcs-module:startup:picker",
 
     /* -----------------  应用模块  ----------------- */
 

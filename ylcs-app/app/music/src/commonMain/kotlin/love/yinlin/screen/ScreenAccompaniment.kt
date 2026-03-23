@@ -53,7 +53,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngineType) : BasicScreen() {
-    private val player = buildAudioPlayer(app.context) { pop() }
+    private val player = buildAudioPlayer(app.rawContext) { pop() }
     private val engine = LyricsEngine.clone(engineType)
     private val engineHost = LyricsEngineHost {
         player.seekTo(it)

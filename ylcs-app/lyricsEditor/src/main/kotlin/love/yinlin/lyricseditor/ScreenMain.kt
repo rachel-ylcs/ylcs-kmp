@@ -1,8 +1,6 @@
 package love.yinlin.lyricseditor
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
+import android.content.res.AssetManager
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -54,7 +52,7 @@ import love.yinlin.extension.parseJsonValue
 
 @Stable
 class ScreenMain : BasicScreen() {
-    val assetManager = app.context.activity.assets!!
+    val assetManager: AssetManager get()= app.activity!!.assets!!
 
     @Stable
     @Serializable
@@ -343,9 +341,7 @@ class ScreenMain : BasicScreen() {
                     searchSong(state.text)
                 })
                 SecondaryButton(text = "导出", icon = Icons.Upload, onClick = {
-                    val clipboard = app.context.activity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    val clip = ClipData.newPlainText("", rhymeConfigText)
-                    clipboard.setPrimaryClip(clip)
+                    app.copyText(rhymeConfigText)
                     slot.tip.success("已复制到剪贴板")
                 })
             }

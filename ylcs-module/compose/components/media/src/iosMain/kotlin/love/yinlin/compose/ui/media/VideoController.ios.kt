@@ -1,14 +1,13 @@
 package love.yinlin.compose.ui.media
 
 import androidx.compose.runtime.Stable
-import love.yinlin.foundation.Context
 
 @Stable
-actual abstract class VideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(context, topBar, bottomBar) {
+actual abstract class VideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(topBar, bottomBar) {
     actual override fun release() { }
 }
 
-internal class IOSVideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
+internal class IOSVideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(topBar, bottomBar) {
     override fun load(path: String) { }
     override fun play() { }
     override fun pause() { }

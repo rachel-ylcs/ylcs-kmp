@@ -11,12 +11,12 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Stable
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 
 @Stable
-actual abstract class HeadlessWebView actual constructor(context: Context) {
+actual abstract class HeadlessWebView actual constructor(context: PlatformContext) {
     @SuppressLint("SetJavaScriptEnabled")
-    private val webview = WebView(context.activity).apply {
+    private val webview = WebView(context).apply {
         visibility = View.GONE
         layoutParams = ViewGroup.LayoutParams(1, 1)
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)

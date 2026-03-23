@@ -2,12 +2,12 @@ package love.yinlin.media
 
 import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
 @Stable
 @NativeLibApi
-internal class WindowsAudioController(context: Context, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
+internal class WindowsAudioController(context: PlatformContext, onEndListener: () -> Unit) : AudioPlayer(context, onEndListener) {
     @Stable
     private enum class PlaybackState { None, Opening, Buffering, Playing, Paused; }
 

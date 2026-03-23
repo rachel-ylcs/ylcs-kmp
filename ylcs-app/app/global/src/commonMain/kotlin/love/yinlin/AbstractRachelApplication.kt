@@ -15,7 +15,7 @@ import love.yinlin.compose.screen.DeepLink
 import love.yinlin.cs.ClientEngine
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.foundation.StartupDelegate
 import love.yinlin.foundation.StartupLazyFetcher
 import love.yinlin.foundation.StartupNative
@@ -29,9 +29,9 @@ import love.yinlin.startup.StartupUrlImage
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
-abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : PlatformApplication<AbstractRachelApplication>(mApp, delegate), DeepLink {
-    val dataPath: File = PlatformFileSystem.dataPath(delegate, Local.info.appName)
-    val cachePath: File = PlatformFileSystem.cachePath(delegate, Local.info.appName)
+abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApplication<AbstractRachelApplication>(mApp, context), DeepLink {
+    val dataPath: File = PlatformFileSystem.dataPath(rawContext, Local.info.appName)
+    val cachePath: File = PlatformFileSystem.cachePath(rawContext, Local.info.appName)
     val configPath: File = File(dataPath, "config")
     val modPath: File = File(dataPath, "mod")
 
@@ -96,14 +96,17 @@ abstract class AbstractRachelApplication(delegate: PlatformContextDelegate) : Pl
      * 目录操作
      */
     suspend fun calcCacheSize(): Long = cachePath.parent?.size() ?: 0L
+
     suspend fun clearCache() {
         cachePath.deleteRecursively()
         cachePath.mkdir()
     }
+
     suspend inline fun createTempFile(filename: String? = null, crossinline block: suspend (Sink) -> Boolean): File? = catchingNull {
         val name = filename ?: DateEx.CurrentLong.toString()
         File(cachePath, name).apply { write { require(block(it)) } }
     }
+
     suspend fun createTempFolder(filename: String? = null): File? = catchingNull {
         val name = filename ?: DateEx.CurrentLong.toString()
         File(cachePath, name).apply { mkdir() }

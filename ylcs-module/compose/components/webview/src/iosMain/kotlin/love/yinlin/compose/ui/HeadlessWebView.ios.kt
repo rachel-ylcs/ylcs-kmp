@@ -1,10 +1,10 @@
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Stable
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 
 @Stable
-actual abstract class HeadlessWebView actual constructor(context: Context) {
+actual abstract class HeadlessWebView actual constructor(context: PlatformContext) {
     actual fun load(url: String) {}
 
     actual fun destroy() {}

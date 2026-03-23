@@ -10,6 +10,7 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupFetcher
 import love.yinlin.media.lyrics.LyricsEngineConfig
@@ -21,7 +22,7 @@ import love.yinlin.startup.StartupKV
 @StartupArg(index = 1, name = "version", type = Int::class)
 @StartupArg(index = 2, name = "patches", type = Patches::class)
 @Stable
-class StartupAppConfig : StartupConfig() {
+class StartupAppConfig(context: PlatformContextProvider) : StartupConfig(context) {
     /* ------------------  系统  ------------------ */
 
     // 主题模式

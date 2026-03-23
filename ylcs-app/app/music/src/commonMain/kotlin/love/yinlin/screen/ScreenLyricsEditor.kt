@@ -45,7 +45,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
-    private val player = buildAudioPlayer(app.context) {
+    private val player = buildAudioPlayer(app.rawContext) {
         launch { loadMusic(true) }
     }
 

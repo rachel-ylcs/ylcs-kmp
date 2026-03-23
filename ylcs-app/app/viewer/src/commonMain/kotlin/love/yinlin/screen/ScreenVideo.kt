@@ -16,7 +16,7 @@ import love.yinlin.compose.ui.media.buildVideoController
 class ScreenVideo(val url: String) : Screen() {
     override val title: String? = null
 
-    private val controller = buildVideoController(app.context, VideoActionBar.topDefault(::onBack))
+    private val controller = buildVideoController(app.rawContext, VideoActionBar.topDefault(::onBack))
 
     override suspend fun initialize() {
         controller.load(url)

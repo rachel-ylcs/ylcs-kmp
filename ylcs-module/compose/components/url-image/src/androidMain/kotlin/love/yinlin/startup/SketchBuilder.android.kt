@@ -1,6 +1,6 @@
 package love.yinlin.startup
 
 import com.github.panpf.sketch.Sketch
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 
-actual fun buildSketch(context: Context): Sketch.Builder = Sketch.Builder(context.application)
+actual fun buildSketch(context: PlatformContext): Sketch.Builder = Sketch.Builder(context)

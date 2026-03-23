@@ -1,5 +1,6 @@
 package love.yinlin.media
 
+import android.content.Context
 import android.os.Handler
 import androidx.annotation.OptIn
 import androidx.compose.runtime.Stable
@@ -13,14 +14,13 @@ import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
-import love.yinlin.foundation.AndroidContext
 import java.util.ArrayList
 
 @OptIn(UnstableApi::class)
 @Stable
-class FfmpegRenderersFactory(context: AndroidContext) : DefaultRenderersFactory(context) {
+class FfmpegRenderersFactory(context: Context) : DefaultRenderersFactory(context) {
     companion object {
-        fun build(context: AndroidContext, keepFocus: Boolean): ExoPlayer = ExoPlayer.Builder(context)
+        fun build(context: Context, keepFocus: Boolean): ExoPlayer = ExoPlayer.Builder(context)
             .setAudioAttributes(AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)
                 .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
@@ -35,7 +35,7 @@ class FfmpegRenderersFactory(context: AndroidContext) : DefaultRenderersFactory(
     }
 
     override fun buildAudioRenderers(
-        context: AndroidContext,
+        context: Context,
         extensionRendererMode: Int,
         mediaCodecSelector: MediaCodecSelector,
         enableDecoderFallback: Boolean,

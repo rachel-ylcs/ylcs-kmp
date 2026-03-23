@@ -1,7 +1,6 @@
 package love.yinlin.media.lyrics
 
 import androidx.compose.runtime.Stable
-import love.yinlin.foundation.Context
 import love.yinlin.startup.StartupMusicPlayer
 
 // TODO: ios部分需要重新实现, 把 platform 相关的代码全部移入 swift
@@ -14,5 +13,5 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
 
     actual fun detach() { }
 
-    actual suspend fun initDelay(context: Context) { }
+    actual suspend fun initDelay() { }
 }

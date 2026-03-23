@@ -16,13 +16,13 @@ abstract class ComposeActivity : ComponentActivity() {
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        instance.context.bindActivity(this)
+        instance.activity = this
 
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
 
         lifecycleScope.launch {
-            with(instance) { openServiceLater() }
+            with(instance) { initServiceLater() }
         }
 
         intent?.let {
@@ -40,8 +40,7 @@ abstract class ComposeActivity : ComponentActivity() {
     }
 
     final override fun onDestroy() {
-        instance.closeServiceBefore()
-
+        instance.destroyServiceBefore()
         super.onDestroy()
     }
 

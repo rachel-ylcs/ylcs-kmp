@@ -10,15 +10,19 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import love.yinlin.extension.BaseLazyReference
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
+import love.yinlin.uri.ImplicitUri
+import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
 import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
     self: BaseLazyReference<A>,
-    delegate: PlatformContextDelegate,
-) : Application<A>(self, delegate) {
+    context: PlatformContext,
+) : Application<A>(self, context) {
+    constructor(self: BaseLazyReference<A>): this(self, PlatformContext.Instance)
+
     @Composable
     protected open fun BeginContent() {}
 
@@ -27,13 +31,13 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
         val mainScope = MainScope()
-        openService(scope = mainScope)
-        mainScope.launch { openServiceLater() }
+        initApplicationService(scope = mainScope)
+        mainScope.launch { initServiceLater() }
 
         // 有待考证
         window.onclose = {
-            closeServiceBefore()
-            closeService()
+            destroyServiceBefore()
+            destroyService()
             mainScope.cancel()
         }
 
@@ -62,4 +66,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         window.navigator.clipboard.writeText(text)
         return true
     }
+
+    actual fun implicitFileUri(uri: Uri): ImplicitUri = RegularUri(uri.toString())
 }

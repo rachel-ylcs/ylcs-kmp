@@ -7,7 +7,6 @@ struct RachelApp: App {
     let instance: IOSDelegateApplication
 
     init() {
-        MMKV.initialize(rootDir: nil, logLevel: MMKVLogLevel.none)
         let appInstance = IOSDelegateApplication()
         self.instance = appInstance
         appInstance.run()

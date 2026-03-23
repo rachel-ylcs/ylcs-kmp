@@ -2,11 +2,11 @@ package love.yinlin.media
 
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.data.media.MediaPlayMode
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContext
 
 @Stable
 class WebMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
-    override suspend fun init(context: Context) { }
+    override suspend fun init(context: PlatformContext) { }
     override fun release() { }
     override suspend fun updatePlayMode(mode: MediaPlayMode) { }
     override suspend fun play() { }

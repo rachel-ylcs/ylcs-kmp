@@ -4,11 +4,10 @@ import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.ui.media.VideoActionBar
 import love.yinlin.compose.ui.media.VideoController
-import love.yinlin.foundation.Context
 
 @Stable
 @NativeLibApi
-internal class MacOSVideoController(context: Context, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(context, topBar, bottomBar) {
+internal class MacOSVideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(topBar, bottomBar) {
     override fun nativeCreate(): Long = 0L
     override fun nativeRelease(handle: Long) { }
     override fun load(path: String) { }

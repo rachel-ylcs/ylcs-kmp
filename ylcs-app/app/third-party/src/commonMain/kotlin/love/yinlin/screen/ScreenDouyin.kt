@@ -59,7 +59,7 @@ class ScreenDouyin : Screen() {
         if (platform == Platform.Android) {
             provider.withLoading {
                 val json = Coroutines.sync<JsonObject> { future ->
-                    val browser = object : HeadlessWebView(app.context) {
+                    val browser = object : HeadlessWebView(app.rawContext) {
                         override fun onUrlIntercepted(url: String): Boolean = url.contains("aweme/v1/web/aweme/post/")
                         override fun onRequestIntercepted(url: String, response: String): Boolean {
                             future.send { response.parseJson.Object }

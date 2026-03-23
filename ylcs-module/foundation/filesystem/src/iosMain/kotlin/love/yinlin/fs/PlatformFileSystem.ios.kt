@@ -1,6 +1,6 @@
 package love.yinlin.fs
 
-import love.yinlin.foundation.PlatformContextDelegate
+import love.yinlin.foundation.PlatformContext
 import platform.Foundation.*
 
 actual object PlatformFileSystem {
@@ -12,9 +12,9 @@ actual object PlatformFileSystem {
         return File((paths.getOrNull(0) as? String) ?: "")
     }
 
-    actual fun appPath(context: PlatformContextDelegate, appName: String): File = File(NSHomeDirectory())
+    actual fun appPath(context: PlatformContext, appName: String): File = File(NSHomeDirectory())
 
-    actual fun dataPath(context: PlatformContextDelegate, appName: String): File = searchPath(NSDocumentDirectory)
+    actual fun dataPath(context: PlatformContext, appName: String): File = searchPath(NSDocumentDirectory)
 
-    actual fun cachePath(context: PlatformContextDelegate, appName: String): File = File(searchPath(NSCachesDirectory), "temp")
+    actual fun cachePath(context: PlatformContext, appName: String): File = File(searchPath(NSCachesDirectory), "temp")
 }

@@ -21,7 +21,7 @@ import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.foundation.AsyncStartup
-import love.yinlin.foundation.Context
+import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.fs.File
 import love.yinlin.media.MediaMetadataFetcher
@@ -32,7 +32,7 @@ import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.media.lyrics.LyricsEngineHost
 
 @Stable
-class StartupMusicPlayer : AsyncStartup() {
+class StartupMusicPlayer(context: PlatformContextProvider) : AsyncStartup(context) {
     private fun MusicInfo.path(type: ModResourceType) = this.path(app.modPath, type)
 
     // 外部数据提取器
@@ -162,11 +162,11 @@ class StartupMusicPlayer : AsyncStartup() {
         if (controller.isInit) controller.updatePlayMode(controller.playMode.next)
     }
 
-    override suspend fun CoroutineScope.init(context: Context, args: StartupArgs) {
+    override suspend fun CoroutineScope.init(args: StartupArgs) {
         launch {
             awaitAll(
                 async { initLibrary() },
-                async { controller.init(context) }
+                async { controller.init(context.rawContext) }
             )
             if (controller.isInit) {
                 controller.listener = listener
@@ -175,14 +175,14 @@ class StartupMusicPlayer : AsyncStartup() {
         }
     }
 
-    override suspend fun CoroutineScope.initLater(context: Context, args: StartupArgs) {
-        launch { floatingLyrics.initDelay(context) }
+    override suspend fun CoroutineScope.initLater(args: StartupArgs) {
+        launch { floatingLyrics.initDelay() }
     }
 
-    override fun destroy(context: Context, args: StartupArgs) {
+    override fun destroy(args: StartupArgs) {
         controller.listener = null
         controller.release()
     }
 
-    override val isSafeAccess: Boolean get() = isInit
+    override val canSafeAccess: Boolean get() = isInit
 }

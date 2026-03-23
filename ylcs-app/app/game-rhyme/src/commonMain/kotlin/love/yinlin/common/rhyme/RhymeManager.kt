@@ -6,15 +6,15 @@ import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.game.Manager
 import love.yinlin.compose.game.asset.ImageAsset
 import love.yinlin.data.music.RhymeLyricsConfig
-import love.yinlin.foundation.Context
 import love.yinlin.common.rhyme.spirit.Scene
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.media.SoundPlayer
 import love.yinlin.media.buildAudioPlayer
 
 @Stable
 class RhymeManager(
-    context: Context,
+    context: PlatformContext,
     onComplete: (RhymePlayResult) -> Unit,
     val onPause: () -> Unit
 ) : Manager() {
