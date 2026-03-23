@@ -2,16 +2,16 @@ package love.yinlin.compose.ui.floating
 
 import kotlinx.io.Sink
 import love.yinlin.app
-import love.yinlin.cs.NetClient
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.filenameOrRandom
+import love.yinlin.foundation.NetClient
 
 typealias DialogDownload = DialogProgress<Boolean>
 
 suspend fun DialogDownload.download(url: String, sink: Sink, onSave: suspend (Boolean) -> Unit): Boolean {
     return open("下载中...") {
         sink.use {
-            NetClient.download(
+            NetClient.File.download(
                 url = url,
                 sink = it,
                 isCancel = { !this.isOpen },
@@ -57,7 +57,7 @@ suspend fun DialogDownload.downloadPhotos(pics: List<String>) {
             val filename = pic.filenameOrRandom(".webp")
             picker.prepareSavePicture(filename)?.let { (origin, sink) ->
                 sink.use {
-                    NetClient.download(
+                    NetClient.File.download(
                         url = pic,
                         sink = it,
                         isCancel = { !this.isOpen },

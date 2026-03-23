@@ -41,7 +41,7 @@ template(object : KotlinMultiplatformTemplate() {
     override val desktopProguard: List<DelegatingProjectDependency> = listOf(
         projects.ylcsModule.core,
         projects.ylcsModule.cs.core,
-        projects.ylcsModule.cs.clientEngine,
+        projects.ylcsModule.foundation.network,
         projects.ylcsModule.compose.core,
         projects.ylcsModule.compose.components.urlImage,
     )

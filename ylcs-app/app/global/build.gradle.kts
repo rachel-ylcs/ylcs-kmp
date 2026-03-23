@@ -26,8 +26,9 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.startup.config,
 
                 projects.ylcsModule.compose.app,
-                projects.ylcsModule.compose.screen,
+                projects.ylcsModule.compose.cache,
                 projects.ylcsModule.compose.icons,
+                projects.ylcsModule.compose.screen,
 
                 projects.ylcsModule.compose.components.urlImage,
                 projects.ylcsModule.compose.components.lottie,

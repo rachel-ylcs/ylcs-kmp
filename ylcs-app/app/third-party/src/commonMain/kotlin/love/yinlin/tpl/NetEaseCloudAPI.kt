@@ -3,9 +3,9 @@ package love.yinlin.tpl
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.cs.NetClient
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
+import love.yinlin.foundation.NetClient
 import love.yinlin.tpl.lyrics.LrcParser
 import love.yinlin.uri.Uri
 
@@ -19,7 +19,9 @@ object NetEaseCloudAPI : PlatformMusicParser {
         fun mp3(id: String) = "song/media/outer/url?id=${id}"
     }
 
-    suspend fun requestMusicId(url: String): String? = NetClient.request(url) { text: String ->
+    suspend fun requestMusicId(url: String): String? = NetClient.Common.request({
+        this.url = url
+    }) { text: String ->
         "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(text)!!.groupValues[1]
     }
 
@@ -33,18 +35,24 @@ object NetEaseCloudAPI : PlatformMusicParser {
         lyrics = ""
     )
 
-    private suspend fun requestLyrics(id: String): String? = NetClient.request("https://$NETEASECLOUD_HOST/${Container.lyrics(id)}") { json: JsonObject ->
+    private suspend fun requestLyrics(id: String): String? = NetClient.Common.request({
+        url = "https://$NETEASECLOUD_HOST/${Container.lyrics(id)}"
+    }) { json: JsonObject ->
         val text = json.obj("lrc")["lyric"].String
         LrcParser(text).toString()
     }
 
-    suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.request("https://$NETEASECLOUD_HOST/${Container.detail(id)}") { json: JsonObject ->
+    suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.Common.request({
+        url = "https://$NETEASECLOUD_HOST/${Container.detail(id)}"
+    }) { json: JsonObject ->
         getCloudMusic(json.arr("songs")[0].Object)
     }?.let { musicInfo ->
         requestLyrics(id)?.let { musicInfo.copy(lyrics = it) }
     }
 
-    suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.request("https://$NETEASECLOUD_HOST/${Container.playlist(id)}") { json: JsonObject ->
+    suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
+        url = "https://$NETEASECLOUD_HOST/${Container.playlist(id)}"
+    }) { json: JsonObject ->
         json.obj("result").arr("tracks").map {
             getCloudMusic(it.Object)
         }.toMutableList()

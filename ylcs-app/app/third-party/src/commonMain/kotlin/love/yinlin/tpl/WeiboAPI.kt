@@ -11,8 +11,10 @@ import dev.whyoleg.cryptography.algorithms.*
 import dev.whyoleg.cryptography.bigint.decodeToBigInt
 import dev.whyoleg.cryptography.serialization.asn1.Der
 import dev.whyoleg.cryptography.serialization.asn1.modules.RsaPublicKey
+import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.headers
 import io.ktor.util.appendAll
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.json.JsonArray
@@ -23,8 +25,8 @@ import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
 import love.yinlin.platform.Platform
 import love.yinlin.cs.ClientEngine
-import love.yinlin.cs.NetClient
 import love.yinlin.data.compose.Picture
+import love.yinlin.foundation.NetClient
 import kotlin.io.encoding.Base64
 import kotlin.random.Random
 import kotlin.uuid.ExperimentalUuidApi
@@ -281,12 +283,14 @@ object WeiboAPI {
 	}
 
 	suspend fun generateWeiboCookie(): WeiboCookie {
-		val xsrfToken = NetClient.request<ByteArray, String>({
+		val xsrfToken = NetClient.Common.request<ByteArray, String>({
 			url = Container.xsrfConfig
 		}) {
 			cookies.filter { it.name.equals("XSRF-TOKEN", ignoreCase = true) }.first { !it.value.equals("deleted", ignoreCase = true) }.value
-		} ?: "fukyou"
-		val sub = NetClient.request(Container.genvisitor2, {
+		} ?: "fku"
+
+		val sub = NetClient.Common.request({
+            url = Container.genvisitor2
 			method = HttpMethod.Post
 			form = mapOf("cb" to "visitor_gray_callback")
 		}) { text: String ->
@@ -294,6 +298,7 @@ object WeiboAPI {
 			val data = json.obj("data")
 			data["sub"].String to data["subp"].String
 		} ?: ("_2AkMeSKrwf8NxqwJRmvwUymjlZIh3zw_EieKoFFsrJRM3HRl-yT9yqhAgtRB6NciEEb-f-w8Zld8pGpTn4blqg02DqNuH" to "0033WrSXqPxfM72-Ws9jqgMF55529P9D9WhjLXMq867aPUPiUkd8wq4Y")
+
 		return WeiboCookie(sub.first, sub.second, xsrfToken)
 	}
 
@@ -302,12 +307,10 @@ object WeiboAPI {
 		val captchaId = Container.CAPTCHAID
 		// 阶段1
 		val callback1 = "geetest_${Random.nextInt(0, 10000) + DateEx.CurrentLong}"
-		val loadEncrypt = NetClient.request<ByteArray, String>({
+		val loadEncrypt = NetClient.Common.request<ByteArray, String>({
 			val uuid = Uuid.generateV7()
 			url = "${Container.captchaLoad}?callback=$callback1&captcha_id=$captchaId&challenge=$uuid&client_type=web&risk_type=slide&lang=zh-cn"
-			headers {
-				append(HttpHeaders.Cookie, "captcha_v4_user=55b938fde8a447a6a689abfac9683fac")
-			}
+            cookies = listOf(Cookie("captcha_v4_user", "55b938fde8a447a6a689abfac9683fac"))
 		}) { bodyString }!!
 		val result1 = loadEncrypt.removePrefix("$callback1(").removeSuffix(")").parseJson.Object
 		require(result1["status"].String == "success")
@@ -351,11 +354,9 @@ object WeiboAPI {
 		val rsaH = WeiboEncrypt.rsaEncrypt(h)
 		val input = encryptInfo + rsaH
 		val callback2 = "geetest_${Random.nextInt(0, 10000) + DateEx.CurrentLong}"
-		val verifyEncrypt = NetClient.request<ByteArray, String>({
-			url = "${Container.captchaVerify}?callback=$callback2&captcha_id=$captchaId&client_type=web&lot_number=$lotNumber&risk_type=slide&payload=$payload&process_token=$processToken&payload_protocol=$payloadProtocol&pt=$pt&w=$input"
-			headers {
-				append(HttpHeaders.Cookie, "captcha_v4_user=55b938fde8a447a6a689abfac9683fac")
-			}
+		val verifyEncrypt = NetClient.Common.request<ByteArray, String>({
+            url = "${Container.captchaVerify}?callback=$callback2&captcha_id=$captchaId&client_type=web&lot_number=$lotNumber&risk_type=slide&payload=$payload&process_token=$processToken&payload_protocol=$payloadProtocol&pt=$pt&w=$input"
+            cookies = listOf(Cookie("captcha_v4_user", "55b938fde8a447a6a689abfac9683fac"))
 		}) { bodyString }!!
 		val result2 = verifyEncrypt.removePrefix("$callback2(").removeSuffix(")").parseJson.Object
 		require(result2["status"].String == "success")
@@ -382,13 +383,14 @@ object WeiboAPI {
             map["gen_time"] = info.genTime
             map["captcha_output"] = info.captchaOutput
         }
-		return map
+        return map
 	}
 
 	private suspend inline fun <reified R : Any> weiboRequest(url: String, crossinline onRequest: () -> Unit = {}, crossinline onResponse: suspend (JsonObject) -> R): R? {
 		val extraHeaders = prepareWeiboHeaders() ?: return null
-		return NetClient.request(url, {
-			headers {
+		return NetClient.Common.request({
+            this.url = url
+			headers = headers {
 				Platform.use(*Platform.Web,
 					ifTrue = { append("VHeaders", Base64.encode(extraHeaders.toJsonString().encodeToByteArray())) },
 					ifFalse = { appendAll(extraHeaders) }

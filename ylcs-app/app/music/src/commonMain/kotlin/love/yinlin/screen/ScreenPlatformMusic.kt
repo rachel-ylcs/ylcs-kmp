@@ -27,7 +27,6 @@ import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.cs.NetClient
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicInfo
@@ -35,6 +34,7 @@ import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.toJsonString
+import love.yinlin.foundation.NetClient
 import love.yinlin.fs.*
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.tpl.PlatformMusicParser
@@ -57,9 +57,9 @@ class ScreenPlatformMusic(deeplink: Uri?, type: PlatformMusicType) : Screen() {
                 Coroutines.io {
                     for (item in items) {
                         // 1. 下载音频
-                        val audioFile = app.createTempFile { NetClient.simpleDownload(item.audioUrl, it) }
+                        val audioFile = app.createTempFile { NetClient.File.download(item.audioUrl, it) }
                         // 2. 下载封面
-                        val recordFile = app.createTempFile { NetClient.simpleDownload(item.pic, it) }
+                        val recordFile = app.createTempFile { NetClient.File.download(item.pic, it) }
                         if (audioFile == null || recordFile == null) continue
                         if (audioFile.fileSize() <= 1024 * 1024L) continue
                         if (recordFile.fileSize() <= 1024 * 10L) continue

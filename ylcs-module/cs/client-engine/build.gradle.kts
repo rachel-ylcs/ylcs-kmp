@@ -17,52 +17,10 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                libs.ktor.json,
-                libs.ktor.client.negotiation,
-                libs.ktor.client.websockets,
                 ExportLib,
-                libs.ktor.client,
-                projects.ylcsModule.foundation.filesystem,
+                projects.ylcsModule.foundation.network,
                 projects.ylcsModule.cs.core,
             )
         }
-
-        androidMain.configure(commonMain) {
-            lib(libs.ktor.okhttp)
-        }
-
-        val appleMain by create(commonMain) {
-            lib(libs.ktor.apple)
-        }
-
-        iosMain.configure(appleMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(commonMain) {
-            lib(libs.ktor.okhttp)
-        }
-
-        webMain.configure(commonMain) {
-            lib(libs.ktor.js)
-        }
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
-
-        androidNativeMain.configure(commonMain) {
-            lib(libs.ktor.cio)
-        }
-
-        windowsMain.configure(commonMain) {
-            lib(libs.ktor.windows)
-        }
-
-        linuxMain.configure(commonMain) {
-            lib(libs.ktor.cio)
-        }
-
-        macosMain.configure(appleMain)
     }
 })

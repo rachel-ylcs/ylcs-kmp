@@ -39,8 +39,7 @@ import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.TextIconAdapter
-import love.yinlin.coroutines.Coroutines
-import love.yinlin.cs.SocketsConnection
+import love.yinlin.cs.openConnection
 import love.yinlin.cs.sockets.LyricsSockets
 import love.yinlin.cs.url
 import love.yinlin.data.rachel.game.Game
@@ -50,6 +49,7 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
+import love.yinlin.foundation.WebSocketClient
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
@@ -57,7 +57,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
     private var currentStatus: GLStatus by mutableRefStateOf(GLStatus.Hall)
 
     private var isConnected by mutableStateOf(false)
-    private val connection = object : SocketsConnection() {
+    private val connection = object : WebSocketClient.Connection() {
         suspend fun send(data: LyricsSockets.CM) {
             if (!super.send(data.toJsonString())) slot.tip.error("无法连接到服务器")
         }
@@ -104,9 +104,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
 
     private val players = mutableStateListOf<LyricsSockets.PlayerInfo>()
 
-    private suspend fun openSockets() {
-        Coroutines.io { connection.connect(LyricsSockets) }
-    }
+    private suspend fun openSockets() = LyricsSockets.openConnection(connection)
 
     private suspend fun sendInvite(info: LyricsSockets.PlayerInfo) {
         if (currentStatus == GLStatus.Hall && slot.confirm.open(content = "邀请${info.name}对战")) {

@@ -13,11 +13,11 @@ class Mutex(locked: Boolean = false) {
     fun unlock() = delegate.unlock()
 
     @OptIn(ExperimentalContracts::class)
-    suspend inline fun with(block: () -> Unit) {
+    suspend inline fun <R> with(block: () -> R): R {
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         }
         lock()
-        try { block() } finally { unlock() }
+        return try { block() } finally { unlock() }
     }
 }

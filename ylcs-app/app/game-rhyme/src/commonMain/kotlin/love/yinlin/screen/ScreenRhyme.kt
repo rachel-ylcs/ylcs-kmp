@@ -24,7 +24,6 @@ import kotlinx.coroutines.delay
 import love.yinlin.app
 import love.yinlin.app.game_rhyme.resources.Res
 import love.yinlin.app.game_rhyme.resources.rhyme
-import love.yinlin.common.downloadCacheWithPath
 import love.yinlin.common.rhyme.*
 import love.yinlin.common.rhyme.data.ActionResult
 import love.yinlin.compose.*
@@ -51,7 +50,6 @@ import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.window.rememberOrientationController
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
-import love.yinlin.cs.NetClient
 import love.yinlin.cs.ServerRes
 import love.yinlin.cs.url
 import love.yinlin.data.mod.ModResourceType
@@ -425,7 +423,7 @@ class ScreenRhyme : Screen() {
                 coroutineScope {
                     listOf(
                         async { // 下载开屏背景图
-                            prologueBackground = NetClient.downloadCacheWithPath(ServerRes.Game.Rhyme.res("prologue.webp").url)
+                            prologueBackground = app.cache.store(ServerRes.Game.Rhyme.res("prologue.webp").url)
                         },
                         async(ioContext) { // 从服务器下载资源文件
                             rhymeManager.run { downloadAssets() }

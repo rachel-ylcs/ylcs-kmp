@@ -22,10 +22,7 @@ import love.yinlin.foundation.StartupNative
 import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
 import love.yinlin.platform.Platform
-import love.yinlin.startup.StartupExceptionHandler
-import love.yinlin.startup.StartupKV
-import love.yinlin.startup.StartupPicker
-import love.yinlin.startup.StartupUrlImage
+import love.yinlin.startup.*
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
@@ -46,6 +43,12 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
             ClientEngine.init(Local.API_BASE_URL)
         }
     }
+
+    val cache by service(
+        cachePath,
+        name = "cache",
+        factory = ::StartupCache
+    )
 
     @StartupNative
     val picker by service(

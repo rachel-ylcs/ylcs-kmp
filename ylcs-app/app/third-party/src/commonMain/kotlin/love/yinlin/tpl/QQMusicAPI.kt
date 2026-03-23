@@ -3,10 +3,10 @@ package love.yinlin.tpl
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.cs.NetClient
 import love.yinlin.uri.Uri
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
+import love.yinlin.foundation.NetClient
 import love.yinlin.tpl.lyrics.LrcParser
 import kotlin.io.encoding.Base64
 
@@ -22,29 +22,33 @@ object QQMusicAPI : PlatformMusicParser {
         return arr
     }
 
-    suspend fun requestMusicId(url: String): String? = NetClient.request(url) { text: String ->
+    suspend fun requestMusicId(url: String): String? = NetClient.Common.request({
+        this.url = url
+    }) { text: String ->
         "\"mid\":\\s*\"([^\"]*)".toRegex().find(text)!!.groupValues[1]
     }
 
-    suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.request(buildUrl {
-        obj("req_0") {
-            "module" with "music.pf_song_detail_svr"
-            "method" with "get_song_detail_yqq"
-            obj("param") { "song_mid" with id }
-        }
-        obj("req_1") {
-            "module" with "music.musichallSong.PlayLyricInfo"
-            "method" with "GetPlayLyricInfo"
-            obj("param") { "songMID" with id }
-        }
-        obj("req_2") {
-            "module" with "vkey.GetVkeyServer"
-            "method" with "CgiGetVkey"
-            obj("param") {
-                arr("filename") { add("C400$id$id.m4a") }
-                arr("songmid") { add(id) }
-                arr("songtype") { add(0) }
-                "guid" with "19911211"
+    suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.Common.request({
+        url = buildUrl {
+            obj("req_0") {
+                "module" with "music.pf_song_detail_svr"
+                "method" with "get_song_detail_yqq"
+                obj("param") { "song_mid" with id }
+            }
+            obj("req_1") {
+                "module" with "music.musichallSong.PlayLyricInfo"
+                "method" with "GetPlayLyricInfo"
+                obj("param") { "songMID" with id }
+            }
+            obj("req_2") {
+                "module" with "vkey.GetVkeyServer"
+                "method" with "CgiGetVkey"
+                obj("param") {
+                    arr("filename") { add("C400$id$id.m4a") }
+                    arr("songmid") { add(id) }
+                    arr("songtype") { add(0) }
+                    "guid" with "19911211"
+                }
             }
         }
     }) { body: JsonObject ->
@@ -63,15 +67,17 @@ object QQMusicAPI : PlatformMusicParser {
         )
     }
 
-    suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.request(buildUrl {
-        obj("req_0") {
-            "module" with "music.srfDissInfo.aiDissInfo"
-            "method" with "uniform_get_Dissinfo"
-            obj("param") {
-                "disstid" with (id.toLongOrNull() ?: 0L)
-                "orderlist" with 1
-                "song_begin" with 0
-                "song_num" with 1000
+    suspend fun requestPlaylist(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
+        url = buildUrl {
+            obj("req_0") {
+                "module" with "music.srfDissInfo.aiDissInfo"
+                "method" with "uniform_get_Dissinfo"
+                obj("param") {
+                    "disstid" with (id.toLongOrNull() ?: 0L)
+                    "orderlist" with 1
+                    "song_begin" with 0
+                    "song_num" with 1000
+                }
             }
         }
     }) { body: JsonObject ->

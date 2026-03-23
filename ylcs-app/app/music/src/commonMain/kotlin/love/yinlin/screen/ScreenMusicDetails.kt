@@ -65,6 +65,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.*
+import love.yinlin.foundation.NetClient
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
@@ -226,7 +227,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 lyrics = catchingNull {
                     Coroutines.io {
                         val lyricsText = if (currentClientSong == null) {
-                            NetClient.simpleDownload(ServerRes.Mod.Song(sid).res(ModResourceType.LineLyrics.filename).url)!!.decodeToString()
+                            NetClient.File.download(ServerRes.Mod.Song(sid).res(ModResourceType.LineLyrics.filename).url)!!.decodeToString()
                         }
                         else {
                             currentClientSong.clientPath(ModResourceType.LineLyrics).readText()!!

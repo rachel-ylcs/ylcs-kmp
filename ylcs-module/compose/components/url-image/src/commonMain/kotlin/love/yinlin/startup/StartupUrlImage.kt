@@ -10,6 +10,7 @@ import com.github.panpf.sketch.decode.AnimatedWebpDecoder
 import com.github.panpf.sketch.decode.GifDecoder
 import com.github.panpf.sketch.fetch.ComposeResourceUriFetcher
 import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
+import com.github.panpf.sketch.http.KtorStack
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +19,7 @@ import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.foundation.StartupArg
 import love.yinlin.foundation.StartupArgs
 import love.yinlin.foundation.SyncStartup
+import love.yinlin.foundation.buildFileClient
 import love.yinlin.fs.File
 import love.yinlin.platform.Platform
 import okio.Path.Companion.toPath
@@ -31,7 +33,7 @@ class StartupUrlImage(context: PlatformContextProvider) : SyncStartup(context) {
 
     private fun ComponentRegistry.Builder.registerComponent() {
         addFetcher(ComposeResourceUriFetcher.Factory())
-        addFetcher(KtorHttpUriFetcher.Factory())
+        addFetcher(KtorHttpUriFetcher.Factory(KtorStack(client = buildFileClient().delegate)))
 
         addDecoder(GifDecoder.Factory())
         addDecoder(AnimatedWebpDecoder.Factory())

@@ -33,6 +33,7 @@ include(
     /* -----------------  库模块  ----------------- */
 
     "ylcs-module:compose:app",
+    "ylcs-module:compose:cache",
     "ylcs-module:compose:components:drag-drop",
     "ylcs-module:compose:components:lottie",
     "ylcs-module:compose:components:media",
@@ -60,6 +61,7 @@ include(
     "ylcs-module:cs:server-engine",
     "ylcs-module:foundation:context",
     "ylcs-module:foundation:filesystem",
+    "ylcs-module:foundation:network",
     "ylcs-module:foundation:startup",
     "ylcs-module:native:win32:core",
     "ylcs-module:platform:ffi:core",

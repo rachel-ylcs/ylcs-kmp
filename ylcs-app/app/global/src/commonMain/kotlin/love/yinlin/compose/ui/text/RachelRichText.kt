@@ -13,9 +13,9 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.lottie.LottieManager
-import love.yinlin.cs.NetClient
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
+import love.yinlin.foundation.NetClient
 
 @Stable
 data object RichEmojiDrawer : RichDrawer {
@@ -33,7 +33,7 @@ data object RichEmojiDrawer : RichDrawer {
             if (emojiType == EmojiType.Lottie) {
                 val lottieId = emojiId.toString()
                 LaunchedEffect(lottieId) {
-                    if (manager[lottieId] == null) NetClient.simpleDownload(emojiPath)?.decodeToString()?.let { manager[lottieId] = it }
+                    if (manager[lottieId] == null) NetClient.File.download(emojiPath)?.decodeToString()?.let { manager[lottieId] = it }
                 }
 
                 manager.Content(lottieId, modifier = Modifier.fillMaxSize())
