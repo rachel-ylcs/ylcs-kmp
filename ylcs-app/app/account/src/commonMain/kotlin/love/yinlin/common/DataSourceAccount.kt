@@ -14,11 +14,13 @@ object DataSourceAccount : DataSource {
     private val isUpdateToken = atomic(false)
 
     fun cleanUserToken() {
-        app.config.userShortToken = 0L
-        app.config.userToken = ""
-        app.config.userProfile = null
-        app.config.cacheUserAvatar = CacheState.UPDATE
-        app.config.cacheUserWall = CacheState.UPDATE
+        app.config.apply {
+            userShortToken = 0L
+            userToken = ""
+            userProfile = null
+            cacheUserAvatar = CacheState.UPDATE
+            cacheUserWall = CacheState.UPDATE
+        }
     }
 
     suspend fun updateUserToken(): Boolean {
