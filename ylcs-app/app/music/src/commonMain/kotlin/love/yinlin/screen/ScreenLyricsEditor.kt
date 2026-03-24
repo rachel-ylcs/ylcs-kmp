@@ -20,8 +20,11 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.*
+import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.OverlayAction
+import love.yinlin.compose.ui.container.OverlayTopBar
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.icon.Icons
@@ -44,7 +47,7 @@ import love.yinlin.tpl.lyrics.LrcParser
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
+class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
     private val player = buildAudioPlayer(app.rawContext) {
         launch { loadMusic(true) }
     }
@@ -60,8 +63,6 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
     private val canSave by derivedStateOf { lyrics.size >= 5 }
 
     private val listState = LazyListState()
-
-    override val title: String = "歌词编辑"
 
     override suspend fun initialize() {
         player.init()
@@ -128,11 +129,6 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
             }
             slot.tip.success("保存成功")
         }.errorTip
-    }
-
-    @Composable
-    override fun RowScope.RightActions() {
-        LoadingIcon(icon = Icons.Check, tip = "保存", enabled = canSave, onClick = ::saveLyrics)
     }
 
     @Composable
@@ -239,8 +235,14 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : Screen() {
     }
 
     @Composable
-    override fun Content() {
+    override fun BasicContent() {
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+            OverlayTopBar(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                left = OverlayAction.Sync("返回", Icons.ArrowBack, onClick = ::onBack),
+                right = OverlayAction.Async("保存", Icons.Check, canSave, onClick = ::saveLyrics)
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h7),

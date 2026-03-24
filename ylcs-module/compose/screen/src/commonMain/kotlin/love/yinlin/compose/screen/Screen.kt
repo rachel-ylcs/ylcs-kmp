@@ -10,7 +10,6 @@ import androidx.compose.ui.zIndex
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.Floating
@@ -39,7 +38,7 @@ abstract class Screen : BasicScreen() {
 
     @Composable
     final override fun BasicContent() {
-        val immersivePadding = rememberImmersivePadding()
+        val immersivePadding = LocalImmersivePadding.current
 
         Column(modifier = Modifier.fillMaxSize()) {
             title?.let { titleString ->

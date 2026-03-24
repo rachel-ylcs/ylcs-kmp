@@ -98,6 +98,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
             // 标题
             Text(
                 text = activity.title ?: activity.shortTitle ?: "未知活动",
+                color = Theme.color.primary,
                 style = Theme.typography.v6.bold,
                 modifier = Modifier.padding(Theme.padding.value)
             )

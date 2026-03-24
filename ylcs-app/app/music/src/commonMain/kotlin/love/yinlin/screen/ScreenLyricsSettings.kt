@@ -13,10 +13,11 @@ import androidx.compose.ui.unit.Density
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.compose.screen.Screen
+import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.ui.container.OverlayAction
+import love.yinlin.compose.ui.container.OverlayTopBar
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.input.ColorPicker
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.Switch
@@ -35,7 +36,7 @@ expect fun ScreenLyricsSettings.PlatformContent()
 expect fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfig)
 
 @Stable
-class ScreenLyricsSettings : Screen() {
+class ScreenLyricsSettings : BasicScreen() {
     internal val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
 
     internal var config by mutableRefStateOf(app.config.lyricsEngineConfig)
@@ -50,8 +51,6 @@ class ScreenLyricsSettings : Screen() {
             if (isAttached) detach()
         }
     }
-
-    override val title: String = "歌词设置"
 
     @Composable
     fun LyricsSwitch(modifier: Modifier = Modifier, onCheckedChange: (Boolean) -> Unit) {
@@ -167,7 +166,7 @@ class ScreenLyricsSettings : Screen() {
     }
 
     @Composable
-    override fun Content() {
+    override fun BasicContent() {
         Column(
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
@@ -177,6 +176,18 @@ class ScreenLyricsSettings : Screen() {
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v5)
         ) {
+            OverlayTopBar(
+                modifier = Modifier.fillMaxWidth(),
+                left = OverlayAction.Sync("返回", Icons.ArrowBack, onClick = ::onBack),
+                right = OverlayAction.Async("重置配置", Icons.ResetSettings) {
+                    if (slot.confirm.open("是否重置歌词默认配置")) {
+                        val newConfig = LyricsEngineConfig()
+                        config = newConfig
+                        resetLyricsSettings(newConfig)
+                    }
+                }
+            )
+
             SimpleEllipsisText("歌词引擎优先级", color = Theme.color.primary, style = Theme.typography.v6.bold)
 
             ReorderableColumn(
@@ -201,20 +212,8 @@ class ScreenLyricsSettings : Screen() {
                 }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SimpleEllipsisText("悬浮歌词", color = Theme.color.primary, style = Theme.typography.v6.bold)
-                LoadingIcon(icon = Icons.Refresh, tip = "重置", onClick = {
-                    if (slot.confirm.open("是否重置歌词默认配置")) {
-                        val newConfig = LyricsEngineConfig()
-                        config = newConfig
-                        resetLyricsSettings(newConfig)
-                    }
-                })
-            }
+            SimpleEllipsisText("悬浮歌词", color = Theme.color.primary, style = Theme.typography.v6.bold)
+
             PlatformContent()
         }
     }

@@ -32,7 +32,6 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * @param painter 绘制
  * @param color 颜色
- * @param size 大小
  * @param tip 悬浮提示
  * @param enabled 启用点击
  * @param indication 点击指示器
@@ -76,7 +75,6 @@ fun Icon(
 /**
  * @param icon 图标
  * @param color 颜色
- * @param size 大小
  * @param tip 悬浮提示
  * @param enabled 启用点击
  * @param indication 点击指示器
@@ -97,7 +95,6 @@ fun Icon(
 
 /**
  * @param icon 图标资源
- * @param size 大小
  * @param tip 悬浮提示
  * @param enabled 启用点击
  * @param indication 点击指示器

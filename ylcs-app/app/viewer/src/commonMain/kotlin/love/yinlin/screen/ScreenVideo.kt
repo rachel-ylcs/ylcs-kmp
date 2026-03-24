@@ -7,15 +7,13 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import love.yinlin.app
 import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.screen.Screen
+import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.media.VideoActionBar
 import love.yinlin.compose.ui.media.VideoPlayer
 import love.yinlin.compose.ui.media.buildVideoController
 
 @Stable
-class ScreenVideo(val url: String) : Screen() {
-    override val title: String? = null
-
+class ScreenVideo(val url: String) : BasicScreen() {
     private val controller = buildVideoController(app.rawContext, VideoActionBar.topDefault(::onBack))
 
     override suspend fun initialize() {
@@ -27,7 +25,7 @@ class ScreenVideo(val url: String) : Screen() {
     }
 
     @Composable
-    override fun Content() {
+    override fun BasicContent() {
         VideoPlayer(
             controller = controller,
             modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()

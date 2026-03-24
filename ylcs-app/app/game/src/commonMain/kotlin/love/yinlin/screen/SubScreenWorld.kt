@@ -30,6 +30,8 @@ import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.OverlayAction
+import love.yinlin.compose.ui.container.OverlayTopBar
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.Flyout
@@ -189,14 +191,11 @@ class SubScreenWorld(parent: NavigationScreen) : SubScreen(parent) {
     @Composable
     override fun Content() {
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().verticalScroll(rememberScrollState())) {
-            ActionScope.Right.Container(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value)) {
-                PrimaryButton(text = "历史", icon = Icons.History, onClick = {
-                    navigate(::ScreenGameRecordHistory)
-                })
-                PrimaryButton(text = "对局", icon = Icons.Castle, onClick = {
-                    navigate(::ScreenGameHistory)
-                })
-            }
+            OverlayTopBar(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                left = OverlayAction.Sync("对局", Icons.Castle) { navigate(::ScreenGameHistory) },
+                right = OverlayAction.Sync("历史", Icons.History) { navigate(::ScreenGameRecordHistory) }
+            )
 
             for ((type, group) in GameMapper.Groups) {
                 key(type) {

@@ -9,17 +9,19 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.screen.Screen
+import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.container.OverlayAction
+import love.yinlin.compose.ui.container.OverlayTopBar
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.HorizontalDivider
 import love.yinlin.compose.ui.layout.PaginationArgs
@@ -35,7 +37,7 @@ import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.photo.PhotoAlbum
 
 @Stable
-class ScreenAlbum : Screen() {
+class ScreenAlbum : BasicScreen() {
     private val provider = RachelStatefulProvider(
         networkErrorHandler = {
             launch { requestNewPhotos() }
@@ -71,24 +73,8 @@ class ScreenAlbum : Screen() {
         }
     }
 
-    override val title: String = "美图"
-
     override suspend fun initialize() {
         requestNewPhotos()
-    }
-
-    @Composable
-    override fun RowScope.RightActions() {
-        LoadingIcon(icon = Icons.Search, tip = "搜索", onClick = {
-            searchDialog.open()?.let { requestNewPhotos(it) }
-        })
-
-        LoadingIcon(icon = Icons.EmojiObjects, tip = "分享", onClick = {
-            slot.info.open(
-                title = "图集分享",
-                content = "欢迎大家分享相机线下拍摄的超清原图给其他小银子, 有贡献图集意愿的小银子可联系我们收录, 我们也会为您赠予银币奖励!"
-            )
-        })
     }
 
     @Composable
@@ -150,23 +136,32 @@ class ScreenAlbum : Screen() {
     }
 
     @Composable
-    override fun Content() {
-        StatefulBox(
-            provider = provider,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            PaginationColumn(
-                items = page.items,
-                key = { it.aid },
-                state = listState,
-                canRefresh = true,
-                canLoading = page.canLoading,
-                onRefresh = ::requestNewPhotos,
-                onLoading = ::requestMorePhotos,
-                itemDivider = { HorizontalDivider(Theme.border.v3, Theme.color.secondary) },
-                modifier = Modifier.fillMaxSize()
+    override fun BasicContent() {
+        Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
+            OverlayTopBar(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                left = OverlayAction.Sync("返回", Icons.ArrowBack, onClick = ::onBack),
+                right = OverlayAction.Async("搜索", Icons.Search) {
+                    searchDialog.open()?.let { requestNewPhotos(it) }
+                }
+            )
+            StatefulBox(
+                provider = provider,
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
-                PhotoAlbumLayout(album = it, modifier = Modifier.fillMaxWidth())
+                PaginationColumn(
+                    items = page.items,
+                    key = { it.aid },
+                    state = listState,
+                    canRefresh = true,
+                    canLoading = page.canLoading,
+                    onRefresh = ::requestNewPhotos,
+                    onLoading = ::requestMorePhotos,
+                    itemDivider = { HorizontalDivider(Theme.border.v3, Theme.color.secondary) },
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    PhotoAlbumLayout(album = it, modifier = Modifier.fillMaxWidth())
+                }
             }
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -29,9 +30,10 @@ import love.yinlin.compose.ui.text.TextIconAdapter
 
 @Composable
 @NonRestartableComposable
-internal fun Button(
+fun Button(
     onClick: () -> Unit,
     color: Color,
+    padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
@@ -48,7 +50,7 @@ internal fun Button(
                 .pointerIcon(PointerIcon.Hand, enabled = enabled)
                 .semantics(Role.Button)
                 .clickable(enabled = enabled, onClick = onClick)
-                .padding(Theme.padding.value)
+                .padding(padding)
                 .animateContentSize(),
             contentAlignment = Alignment.Center,
         ) {
@@ -58,16 +60,17 @@ internal fun Button(
 }
 
 @Composable
-private fun Button(
+fun Button(
     onClick: () -> Unit,
     text: String,
     icon: ImageVector?,
     color: Color,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
-    Button(onClick = onClick, color = color, enabled = enabled, modifier = modifier) {
+    Button(onClick = onClick, color = color, padding = padding, enabled = enabled, modifier = modifier) {
         TextIconAdapter { iconId, textId ->
             if (icon != null) Icon(icon = icon, modifier = Modifier.iconId())
             Text(text = text, style = style, modifier = Modifier.textId())
@@ -80,11 +83,12 @@ fun PrimaryButton(
     text: String,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Button(onClick = onClick, text = text, icon = icon, color = Theme.color.primaryContainer, style = style, enabled = enabled, modifier = modifier)
+    Button(onClick = onClick, text = text, icon = icon, color = Theme.color.primaryContainer, style = style, padding = padding, enabled = enabled, modifier = modifier)
 }
 
 @Composable
@@ -92,11 +96,12 @@ fun SecondaryButton(
     text: String,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Button(onClick = onClick, text = text, icon = icon, color = Theme.color.secondaryContainer, style = style, enabled = enabled, modifier = modifier)
+    Button(onClick = onClick, text = text, icon = icon, color = Theme.color.secondaryContainer, style = style, padding = padding, enabled = enabled, modifier = modifier)
 }
 
 @Composable
@@ -104,9 +109,10 @@ fun TertiaryButton(
     text: String,
     icon: ImageVector? = null,
     style: TextStyle = LocalStyle.current.bold,
+    padding: PaddingValues = Theme.padding.value,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Button(onClick = onClick, text = text, icon = icon, color = Theme.color.tertiaryContainer, style = style, enabled = enabled, modifier = modifier)
+    Button(onClick = onClick, text = text, icon = icon, color = Theme.color.tertiaryContainer, style = style, padding = padding, enabled = enabled, modifier = modifier)
 }

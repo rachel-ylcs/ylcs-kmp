@@ -29,7 +29,7 @@ import love.yinlin.common.rhyme.data.ActionResult
 import love.yinlin.compose.*
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberState
-import love.yinlin.compose.screen.Screen
+import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.common.*
@@ -60,7 +60,7 @@ import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-class ScreenRhyme : Screen() {
+class ScreenRhyme : BasicScreen() {
     private var state: GameState by mutableRefStateOf(GameState.Loading)
     private var lockState: GameLockState by mutableRefStateOf(GameLockState.Normal)
 
@@ -414,8 +414,6 @@ class ScreenRhyme : Screen() {
         }
     }
 
-    override val title: String? = null
-
     override suspend fun initialize() {
         rhymeManager.init()
         if (rhymeManager.isInit) {
@@ -463,7 +461,7 @@ class ScreenRhyme : Screen() {
     }
 
     @Composable
-    override fun Content() {
+    override fun BasicContent() {
         val orientationController = rememberOrientationController()
 
         orientationStarter {
@@ -485,7 +483,7 @@ class ScreenRhyme : Screen() {
         }
 
         Layout(
-            modifier = Modifier.background(Colors.Black).fillMaxSize().background(Theme.color.background),
+            modifier = Modifier.padding(LocalImmersivePadding.current).background(Colors.Black).fillMaxSize().background(Theme.color.background),
             content = {
                 // 状态层
                 AnimationContent(state = state, modifier = Modifier.fillMaxSize()) {

@@ -49,8 +49,8 @@ fun TextIconAdapter(
                 textPlaceable.placeRelative(iconWidth + gap, 0)
             }
             else {
-                iconPlaceable?.placeRelative(textWidth + gap, 0)
                 textPlaceable.placeRelative(0, 0)
+                iconPlaceable?.placeRelative(textWidth + gap, 0)
             }
         }
     }
