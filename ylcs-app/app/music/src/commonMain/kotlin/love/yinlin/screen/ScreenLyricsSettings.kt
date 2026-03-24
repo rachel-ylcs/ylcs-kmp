@@ -16,6 +16,7 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.input.ColorPicker
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.Switch
@@ -24,6 +25,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.moveItem
 import love.yinlin.media.lyrics.FloatingLyrics
+import love.yinlin.media.lyrics.LyricsEngineConfig
 import love.yinlin.startup.StartupMusicPlayer
 import sh.calvin.reorderable.ReorderableColumn
 
@@ -103,36 +105,61 @@ class ScreenLyricsSettings : Screen() {
 
     @Composable
     fun LyricsColorLayout(modifier: Modifier = Modifier) {
-        Row(
+        Column(
             modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-            verticalAlignment = Alignment.CenterVertically
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v7),
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                SimpleEllipsisText("字体颜色", style = Theme.typography.v7.bold)
-                ColorPicker(
-                    initColor = Colors(app.config.lyricsEngineConfig.textColor),
-                    onColorChanged = { config = config.copy(textColor = it.value) },
-                    onColorChangeFinished = { app.config.lyricsEngineConfig = config },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                ) {
+                    SimpleEllipsisText("歌词前景色", style = Theme.typography.v7.bold)
+                    ColorPicker(
+                        initColor = Colors(app.config.lyricsEngineConfig.textColor),
+                        onColorChanged = { config = config.copy(textColor = it.value) },
+                        onColorChangeFinished = { app.config.lyricsEngineConfig = config },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                ) {
+                    SimpleEllipsisText("歌词背景色", style = Theme.typography.v7.bold)
+                    ColorPicker(
+                        initColor = Colors(app.config.lyricsEngineConfig.textBackgroundColor),
+                        onColorChanged = { config = config.copy(textBackgroundColor = it.value) },
+                        onColorChangeFinished = { app.config.lyricsEngineConfig = config },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                SimpleEllipsisText("背景颜色", style = Theme.typography.v7.bold)
-                ColorPicker(
-                    initColor = Colors(app.config.lyricsEngineConfig.backgroundColor),
-                    onColorChanged = { config = config.copy(backgroundColor = it.value) },
-                    onColorChangeFinished = { app.config.lyricsEngineConfig = config },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                ) {
+                    SimpleEllipsisText("浮窗背景色", style = Theme.typography.v7.bold)
+                    ColorPicker(
+                        initColor = Colors(app.config.lyricsEngineConfig.backgroundColor),
+                        onColorChanged = { config = config.copy(backgroundColor = it.value) },
+                        onColorChangeFinished = { app.config.lyricsEngineConfig = config },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Box(modifier = Modifier.weight(1f))
             }
         }
     }
@@ -172,7 +199,20 @@ class ScreenLyricsSettings : Screen() {
                 }
             }
 
-            SimpleEllipsisText("悬浮歌词", color = Theme.color.primary, style = Theme.typography.v6.bold)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SimpleEllipsisText("悬浮歌词", color = Theme.color.primary, style = Theme.typography.v6.bold)
+                LoadingIcon(icon = Icons.Refresh, tip = "重置", onClick = {
+                    if (slot.confirm.open("是否重置歌词默认配置")) {
+                        val newConfig = LyricsEngineConfig()
+                        config = newConfig
+                        app.config.lyricsEngineConfig = newConfig
+                    }
+                })
+            }
             PlatformContent()
         }
     }

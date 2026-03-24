@@ -9,9 +9,11 @@ import love.yinlin.compose.Colors
 data class LyricsEngineConfig(
     // 字体大小 0.75 ~ 1.5
     val textSize: Float = 1f,
-    // 字体颜色
-    val textColor: ULong = Colors.Steel4.value,
-    // 背景颜色
+    // 歌词前景色
+    val textColor: ULong = Colors.Green5.value,
+    // 歌词背景色
+    val textBackgroundColor: ULong = Colors.White.value,
+    // 浮窗背景色
     val backgroundColor: ULong = Colors.Transparent.value,
     // Android配置
     val android: Android = Android(),
