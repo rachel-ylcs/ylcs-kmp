@@ -11,6 +11,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.media.lyrics.LyricsEngineConfig
 
 @Composable
 actual fun ScreenLyricsSettings.PlatformContent() {
@@ -89,4 +90,8 @@ actual fun ScreenLyricsSettings.PlatformContent() {
         LyricsFontSizeLayout(modifier = Modifier.fillMaxWidth())
         LyricsColorLayout(modifier = Modifier.fillMaxWidth())
     }
+}
+
+actual fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfig) {
+    app.config.lyricsEngineConfig = newConfig
 }

@@ -32,6 +32,8 @@ import sh.calvin.reorderable.ReorderableColumn
 @Composable
 expect fun ScreenLyricsSettings.PlatformContent()
 
+expect fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfig)
+
 @Stable
 class ScreenLyricsSettings : Screen() {
     internal val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
@@ -209,7 +211,7 @@ class ScreenLyricsSettings : Screen() {
                     if (slot.confirm.open("是否重置歌词默认配置")) {
                         val newConfig = LyricsEngineConfig()
                         config = newConfig
-                        app.config.lyricsEngineConfig = newConfig
+                        resetLyricsSettings(newConfig)
                     }
                 })
             }
