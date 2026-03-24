@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
@@ -31,6 +32,7 @@ import love.yinlin.compose.ui.floating.Sheet
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
+import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.PrimaryLoadingButton
 import love.yinlin.compose.ui.input.SecondaryLoadingButton
 import love.yinlin.compose.ui.layout.Divider
@@ -43,6 +45,7 @@ import love.yinlin.cs.ApiBackupDownloadPlaylist
 import love.yinlin.cs.ApiBackupUploadPlaylist
 import love.yinlin.cs.request
 import love.yinlin.data.Data
+import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.Object
@@ -55,6 +58,7 @@ import love.yinlin.extension.replaceAll
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
+import love.yinlin.fs.File
 import love.yinlin.startup.StartupMusicPlayer
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
@@ -70,6 +74,8 @@ class ScreenPlaylistLibrary : Screen() {
     ) {
         constructor(musicInfo: MusicInfo) : this(musicInfo.id, musicInfo.name, musicInfo.singer, false)
         constructor(id: String): this(id, "[$id]", "", true)
+
+        fun path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
     }
 
     private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
@@ -194,6 +200,8 @@ class ScreenPlaylistLibrary : Screen() {
                 val playlist = tabs[it]
                 "${playlist}(${playlistLibrary[playlist]?.items?.size ?: 0})"
             },
+            iconProvider = { Icons.Playlist },
+            padding = Theme.padding.eValue9,
             onLongClick = { launch { processPlaylist(it) } },
             modifier = modifier
         )
@@ -250,8 +258,8 @@ class ScreenPlaylistLibrary : Screen() {
                     ReorderableItem(state = reorderState, key = item.id) {
                         val canDrag = mp?.isReady != true
 
-                        Column(
-                            modifier = Modifier.fillMaxWidth().combinedClickable(
+                        Row(
+                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).combinedClickable(
                                 onClick = {
                                     launch {
                                         if (item.isDeleted) slot.tip.warning("此歌曲已不在曲库中")
@@ -262,37 +270,43 @@ class ScreenPlaylistLibrary : Screen() {
                                     if (!canDrag) slot.tip.warning("调整歌曲顺序需要停止播放器")
                                 }
                             ).padding(Theme.padding.value),
-                            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                         ) {
-                            SimpleEllipsisText(
-                                text = item.name,
-                                style = Theme.typography.v7.bold,
-                                color = if (item.isDeleted) Theme.color.error else LocalColor.current,
-                                textDecoration = if (item.isDeleted) TextDecoration.LineThrough else null
+                            LocalFileImage(
+                                uri = item.path(ModResourceType.Record).path,
+                                modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v8)
                             )
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                SimpleEllipsisText(text = item.singer, style = Theme.typography.v8, color = LocalColorVariant.current)
+                            Column(modifier = Modifier.weight(1f)) {
+                                SimpleEllipsisText(
+                                    text = item.name,
+                                    style = Theme.typography.v7.bold,
+                                    color = if (item.isDeleted) Theme.color.error else LocalColor.current,
+                                    textDecoration = if (item.isDeleted) TextDecoration.LineThrough else null
+                                )
                                 Row(
-                                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.Bottom
                                 ) {
-                                    LoadingIcon(icon = Icons.Delete, tip = "删除", onClick = { deleteMusicFromPlaylist(index) })
-                                    Icon(icon = Icons.DragHandle, modifier = Modifier.draggableHandle(
-                                        enabled = canDrag,
-                                        onDragStarted = {
-                                            dragStartIndex = -1
-                                            dragEndIndex = -1
-                                        },
-                                        onDragStopped = {
-                                            if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
-                                                moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
+                                    SimpleEllipsisText(text = item.singer, style = Theme.typography.v8, color = LocalColorVariant.current)
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        LoadingIcon(icon = Icons.Delete, tip = "删除", onClick = { deleteMusicFromPlaylist(index) })
+                                        Icon(icon = Icons.DragHandle, modifier = Modifier.draggableHandle(
+                                            enabled = canDrag,
+                                            onDragStarted = {
+                                                dragStartIndex = -1
+                                                dragEndIndex = -1
+                                            },
+                                            onDragStopped = {
+                                                if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
+                                                    moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
+                                                }
                                             }
-                                        }
-                                    ))
+                                        ))
+                                    }
                                 }
                             }
                         }

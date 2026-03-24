@@ -26,6 +26,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
@@ -42,6 +43,7 @@ import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.animation.AnimationContent
+import love.yinlin.compose.ui.animation.WaveLoading
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.Sheet
@@ -524,6 +526,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
     private val currentPlaylistSheet = this land object : Sheet() {
         override val scrollable: Boolean = false
+        override val maxPortraitRatio: Float = 0.85f
 
         @Composable
         override fun Content() {
@@ -564,27 +567,37 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             val musicInfo = library[id]
 
                             Row(
-                                modifier = Modifier.fillMaxWidth().clickable {
+                                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).clickable {
                                     launch { mp?.gotoIndex(index) }
                                     close()
-                                }.padding(Theme.padding.value9),
-                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                                verticalAlignment = Alignment.CenterVertically
+                                }.padding(Theme.padding.value),
+                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                             ) {
-                                SimpleEllipsisText(
-                                    text = musicInfo?.name ?: "未知歌曲",
-                                    color = if (isCurrent) Theme.color.primary else LocalColor.current,
-                                    style = if (isCurrent) Theme.typography.v7.bold else Theme.typography.v7,
-                                    modifier = Modifier.weight(2f),
-                                    textAlign = TextAlign.Start
+                                LocalFileImage(
+                                    uri = musicInfo?.path(app.modPath, ModResourceType.Record)?.path ?: "",
+                                    modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v8)
                                 )
-                                SimpleEllipsisText(
-                                    text = musicInfo?.singer ?: "未知歌手",
-                                    style = if (isCurrent) Theme.typography.v8.bold else Theme.typography.v8,
-                                    color = if (isCurrent) Theme.color.primary else LocalColorVariant.current,
+                                Column(
                                     modifier = Modifier.weight(1f),
-                                    textAlign = TextAlign.End
-                                )
+                                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+                                ) {
+                                    SimpleEllipsisText(
+                                        text = musicInfo?.name ?: "未知歌曲",
+                                        color = if (isCurrent) Theme.color.primary else LocalColor.current,
+                                        style = if (isCurrent) Theme.typography.v7.bold else Theme.typography.v7
+                                    )
+                                    SimpleEllipsisText(
+                                        text = musicInfo?.singer ?: "未知歌手",
+                                        style = if (isCurrent) Theme.typography.v8.bold else Theme.typography.v8,
+                                        color = if (isCurrent) Theme.color.primary else LocalColorVariant.current
+                                    )
+                                }
+                                Box(
+                                    modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (isCurrent) WaveLoading.Content(Theme.color.primary, modifier = Modifier.fillMaxSize(fraction = 0.5f))
+                                }
                             }
                         }
                     }
