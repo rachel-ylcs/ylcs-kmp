@@ -23,6 +23,7 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.floating.BalloonTip
 import love.yinlin.compose.ui.layout.MeasurePolicies
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
 import org.jetbrains.compose.resources.DrawableResource
@@ -52,20 +53,20 @@ fun Icon(
     val colorFilter = remember(actualColor) {
         if (actualColor == Colors.Unspecified) null else ColorFilter.tint(actualColor)
     }
-    val clickableModifier = if (onClick != null) Modifier.clickable(
-        interactionSource = remember { MutableInteractionSource() },
-        indication = indication,
-        enabled = enabled,
-        onClick = onClick
-    ) else Modifier
 
     BalloonTip(enabled = Theme.tool.enableBallonTip, text = tip) {
         Layout(
-            modifier = Modifier.defaultMinSize(minSize, minSize)
+            modifier = modifier.defaultMinSize(minSize, minSize)
                 .semantics(role = Role.Image, description = tip.ifEmpty { null })
-                .then(modifier)
                 .paint(painter = painter, colorFilter = colorFilter, contentScale = ContentScale.Fit)
-                .then(clickableModifier)
+                .condition(onClick != null) {
+                    clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = indication,
+                        enabled = enabled,
+                        onClick = onClick
+                    )
+                }
                 .pointerIcon(PointerIcon.Hand, enabled && onClick != null),
             measurePolicy = MeasurePolicies.Empty
         )

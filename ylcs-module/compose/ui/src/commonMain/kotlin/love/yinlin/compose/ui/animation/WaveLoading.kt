@@ -1,17 +1,8 @@
 package love.yinlin.compose.ui.animation
 
-import androidx.compose.animation.core.InfiniteTransition
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -39,8 +30,7 @@ object WaveLoading : IndeterminateLoadingAnimation {
     }
 
     @Composable
-    fun InfiniteTransition.animateValue(index: Int): State<Float> {
-        val duration = Theme.animation.duration.v4
+    private fun InfiniteTransition.animateValue(duration: Int, index: Int): State<Float> {
         return animateFloat(0.3f, 1f, infiniteRepeatable(
             animation = tween(duration, index * duration / 3, LinearEasing),
             repeatMode = RepeatMode.Reverse
@@ -51,11 +41,12 @@ object WaveLoading : IndeterminateLoadingAnimation {
     override fun Content(color: Color, modifier: Modifier) {
         val minSize = Theme.size.icon
         val transition = rememberInfiniteTransition()
-        val value1 by transition.animateValue(0)
-        val value2 by transition.animateValue(1)
-        val value3 by transition.animateValue(2)
+        val duration = Theme.animation.duration.v4
+        val value1 by transition.animateValue(duration, 0)
+        val value2 by transition.animateValue(duration, 1)
+        val value3 by transition.animateValue(duration, 2)
 
-        Layout(modifier = Modifier.defaultMinSize(minSize, minSize).then(modifier).drawBehind {
+        Layout(modifier = modifier.defaultMinSize(minSize, minSize).drawBehind {
             drawItem(0, value1, color)
             drawItem(1, value2, color)
             drawItem(2, value3, color)

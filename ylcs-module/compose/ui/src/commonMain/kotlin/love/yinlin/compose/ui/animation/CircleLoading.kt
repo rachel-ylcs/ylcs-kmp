@@ -37,7 +37,7 @@ object CircleLoading : IndeterminateLoadingAnimation {
             animation = tween(easing = LinearEasing, durationMillis = duration)
         ))
 
-        Layout(Modifier.defaultMinSize(minSize, minSize).then(modifier).drawBehind {
+        Layout(modifier = modifier.defaultMinSize(minSize, minSize).drawBehind {
             val width = this.size.width
             drawArc(
                 color = color,

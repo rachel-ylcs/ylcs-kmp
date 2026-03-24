@@ -57,8 +57,8 @@ internal fun DecorationBox(
 
     Row(
         modifier = Modifier
-            .defaultMinSize(minWidth = minWidth, minHeight = minWidth * 0.28f)
             .width(IntrinsicSize.Max)
+            .defaultMinSize(minWidth = minWidth, minHeight = minWidth * 0.28f)
             .shadow(shape, Theme.shadow.v7)
             .clip(shape)
             .background(backgroundColor)
