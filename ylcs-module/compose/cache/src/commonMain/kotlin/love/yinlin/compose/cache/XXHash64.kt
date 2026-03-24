@@ -1,6 +1,6 @@
 package love.yinlin.compose.cache
 
-internal object XXHash64 {
+object XXHash64 {
     private const val ALPHABET = "abcdefghijklmnopqrstuvwxyz"
     private val SEEDS = longArrayOf(
         0x395b586ca42e1612UL.toLong(),

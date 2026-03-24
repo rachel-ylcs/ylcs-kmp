@@ -8,9 +8,11 @@ import love.yinlin.concurrent.Mutex
 import love.yinlin.extension.catchingNull
 import love.yinlin.fs.File
 
-abstract class DiskCache<S : CacheSource>(private val cachePath: File) {
-    abstract suspend fun fetch(source: S, sink: Sink)
-
+class DiskCache<S : Any>(
+    private val cachePath: File,
+    private val key: (S) -> Any =  { it },
+    private val fetcher: suspend (source: S, sink: Sink) -> Unit
+) {
     private val mutex = Mutex()
 
     private suspend fun check(target: File): File? {
@@ -23,8 +25,8 @@ abstract class DiskCache<S : CacheSource>(private val cachePath: File) {
      * 存储指定数据源，如果本地存在缓存则直接返回对应路径，否则提取后再返回
      */
     suspend fun store(source: S): File? {
-        val key = source.key
-        val target = File(cachePath, key)
+        val sourceKey = key(source).toString()
+        val target = File(cachePath, sourceKey)
         // 检查缓存是否存在
         if (check(target) != null) return target
 
@@ -32,10 +34,10 @@ abstract class DiskCache<S : CacheSource>(private val cachePath: File) {
         return mutex.with {
             if (check(target) != null) target
             else {
-                val temp = File(cachePath, "$key.tmp")
+                val temp = File(cachePath, "$sourceKey.tmp")
                 try {
                     cachePath.mkdir()
-                    temp.write { sink -> fetch(source, sink) }
+                    temp.write { sink -> fetcher(source, sink) }
                     if (check(temp) != null) {
                         temp.move(target)
                         target

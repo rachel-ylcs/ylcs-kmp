@@ -10,16 +10,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
+import love.yinlin.compose.cache.StateCache
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.lottie.LottieManager
+import love.yinlin.compose.ui.lottie.Lottie
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.foundation.NetClient
 
 @Stable
 data object RichEmojiDrawer : RichDrawer {
-    private val manager: LottieManager = LottieManager()
+    private val cache = StateCache<String, String> { source ->
+        NetClient.File.download(source)!!.decodeToString()
+    }
 
     override val type: String = RichType.Emoji.value
 
@@ -27,17 +30,10 @@ data object RichEmojiDrawer : RichDrawer {
         val emojiId = item.id
         val emoji = Emoji.fromId(emojiId) ?: return@cast
         val emojiType = emoji.type
+        val emojiPath = emoji.showPath
         val size = if (emojiType == EmojiType.Lottie) 1.5f else 3f
         renderCompose(size, size) {
-            val emojiPath = emoji.showPath
-            if (emojiType == EmojiType.Lottie) {
-                val lottieId = emojiId.toString()
-                LaunchedEffect(lottieId) {
-                    if (manager[lottieId] == null) NetClient.File.download(emojiPath)?.decodeToString()?.let { manager[lottieId] = it }
-                }
-
-                manager.Content(lottieId, modifier = Modifier.fillMaxSize())
-            }
+            if (emojiType == EmojiType.Lottie) cache[emojiPath]?.let { Lottie(it, modifier = Modifier.fillMaxSize()) }
             else WebImage(uri = emojiPath, modifier = Modifier.fillMaxSize())
         }
     }
