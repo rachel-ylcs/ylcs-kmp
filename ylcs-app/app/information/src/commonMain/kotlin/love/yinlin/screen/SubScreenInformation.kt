@@ -118,7 +118,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                     navigate(::ScreenChaohua)
                 })
                 SectionIcon(icon = Icons2.Douyin, text = "抖音", onClick = {
-
+                    navigate(::ScreenDouyin)
                 })
             }
         }
