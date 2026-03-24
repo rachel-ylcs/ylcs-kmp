@@ -26,7 +26,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
@@ -85,6 +84,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
     private var sleepJob: Job? by mutableRefStateOf(null)
 
+    private fun MusicInfo.path(type: ModResourceType? = null) = this.path(app.modPath, type)
+
     override suspend fun initialize() {
         monitor(state = { mp?.position }) { position ->
             mp?.let { player ->
@@ -105,10 +106,9 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 if (music != null) {
                     catching {
                         // 更新引擎
-                        val modPath = app.modPath
                         engine = Coroutines.io {
                             // 按引擎顺序依次检查是否成功加载
-                            val rootPath = music.path(modPath)
+                            val rootPath = music.path()
                             var currentEngine = engine
                             for (engineType in app.config.lyricsEngineOrder) {
                                 val newEngine = LyricsEngine[engineType]
@@ -121,9 +121,9 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         }
 
                         // 更新状态标志
-                        hasAnimation = music.path(modPath, ModResourceType.Animation).isFile()
-                        hasVideo = music.path(modPath, ModResourceType.Video).isFile()
-                        hasAccompaniment = music.path(modPath, ModResourceType.Accompaniment).isFile()
+                        hasAnimation = music.path(ModResourceType.Animation).isFile()
+                        hasVideo = music.path(ModResourceType.Video).isFile()
+                        hasAccompaniment = music.path(ModResourceType.Accompaniment).isFile()
                     }
                 }
                 else {
@@ -148,7 +148,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         val music = mp?.currentMusic
         if (music != null) {
             LocalFileImage(
-                uri = music.path(app.modPath, if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).path,
+                uri = music.path(if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).path,
                 music, isAnimationBackground,
                 contentScale = ContentScale.Crop,
                 alpha = 0.85f,
@@ -237,7 +237,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 mp?.let {
                                     launch {
                                         it.pause()
-                                        it.currentMusic?.path(app.modPath, ModResourceType.Video)?.let { file ->
+                                        it.currentMusic?.path(ModResourceType.Video)?.let { file ->
                                             navigate(::ScreenVideo, file.path)
                                         }
                                     }
@@ -281,7 +281,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
 
         LocalFileImage(
-            uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
+            uri = musicInfo.path(ModResourceType.Record).path,
             musicInfo,
             contentScale = ContentScale.Crop,
             modifier = modifier.fastRotate(animationRecord),
@@ -574,7 +574,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                             ) {
                                 LocalFileImage(
-                                    uri = musicInfo?.path(app.modPath, ModResourceType.Record)?.path ?: "",
+                                    uri = musicInfo?.path(ModResourceType.Record)?.path ?: "",
                                     modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v8)
                                 )
                                 Column(
