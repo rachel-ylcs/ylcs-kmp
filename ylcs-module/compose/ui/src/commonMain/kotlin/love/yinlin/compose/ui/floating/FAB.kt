@@ -1,33 +1,22 @@
 package love.yinlin.compose.ui.floating
 
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import love.yinlin.compose.Colors
+import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberDerivedState
@@ -37,7 +26,6 @@ import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.fastAnimateRectBackground
-import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.tool.NavigationBack
 
@@ -82,6 +70,14 @@ open class FAB {
         val backgroundColor = if (enabled) {
             action.backgroundColorProvider?.invoke() ?: Theme.color.primaryContainer
         } else Theme.color.disabledContainer
+        val backgroundBrush = remember(backgroundColor) {
+            Brush.radialGradient(
+                0f to backgroundColor.compositeOver(Colors.White.copy(alpha = 0.2f)),
+                0.4f to backgroundColor.copy(alpha = 0.9f),
+                1f to backgroundColor.copy(alpha = 0.85f).compositeOver(Colors.Black.copy(alpha = 0.15f))
+            )
+        }
+
         val contentColor = if (enabled) {
             action.contentColorProvider?.invoke() ?: Theme.color.onContainer
         } else Theme.color.disabledContent
@@ -91,17 +87,17 @@ open class FAB {
             Box(
                 modifier = Modifier.padding(horizontal = buttonSize / 4, vertical = buttonSize / 8)
                     .size(buttonSize)
-                    .shadow(shape, Theme.shadow.v7)
+                    .border(Theme.border.v9, LocalColor.current.copy(alpha = 0.5f), shape)
                     .clip(shape)
-                    .background(backgroundColor.copy(alpha = 0.75f))
+                    .background(backgroundBrush)
                     .clickable(enabled = enabled) {
                         if (overrideClick?.invoke() != true && action.onClick != null) {
                             scope.launch { action.onClick() }
                         }
-                    }.padding(buttonSize / 5),
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon = action.iconProvider(), tip = action.tipProvider(), modifier = Modifier.fillMaxSize())
+                Icon(icon = action.iconProvider(), tip = action.tipProvider(), modifier = Modifier.fillMaxSize(fraction = 0.6f))
             }
         }
     }
