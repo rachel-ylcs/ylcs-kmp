@@ -83,23 +83,22 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
     }
 
     @Composable
-    override fun LineItem(item: DynamicLine, isCurrent: Boolean, measurer: TextMeasurer) {
+    override fun LineItem(item: DynamicLine, config: LyricsEngineConfig, isCurrent: Boolean, measurer: TextMeasurer) {
         val normalStyle = Theme.typography.v6
         val currentStyle = Theme.typography.v5.bold
-        val normalColor = LocalColor.current
 
         FastCenterText(
             layoutAction = { layout(measurer, "T", if (isCurrent) currentStyle else normalStyle) },
             drawAction = {
                 draw(measure(measurer, item.text, if (isCurrent) currentStyle else normalStyle)) {
                     clipRect(if (isCurrent) it.width * progress else 0f, 0f, it.width, it.height) {
-                        drawText(it, normalColor)
+                        drawText(it, Colors(config.textBackgroundColor))
                     }
                 }
                 if (isCurrent) {
                     draw(result = measure(measurer, item.text, currentStyle)) {
                         clipRect(0f, 0f, it.width * progress, it.height) {
-                            drawText(it, Colors.Green5)
+                            drawText(it, Colors(config.textColor))
                         }
                     }
                 }
@@ -121,7 +120,7 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
                     val offset = it.width * progress
                     drawBackground(result, Colors(config.backgroundColor))
                     clipRect(offset, 0f, it.width, it.height) {
-                        drawText(it, Colors.White)
+                        drawText(it, Colors(config.textBackgroundColor))
                     }
                     clipRect(0f, 0f, offset, it.height) {
                         drawText(it, Colors(config.textColor))

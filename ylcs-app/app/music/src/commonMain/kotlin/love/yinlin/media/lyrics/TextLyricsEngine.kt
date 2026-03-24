@@ -45,7 +45,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     protected abstract fun LinePlaceholder()
 
     @Composable
-    protected abstract fun LineItem(item: E, isCurrent: Boolean, measurer: TextMeasurer)
+    protected abstract fun LineItem(item: E, config: LyricsEngineConfig, isCurrent: Boolean, measurer: TextMeasurer)
 
     @Composable
     protected abstract fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle)
@@ -130,7 +130,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
                     LineItemWrapper(onClick = {
                         scope.launch { host.seekTo(item.position) }
                     }) {
-                        LineItem(item, index == currentIndex, measurer)
+                        LineItem(item, config, index == currentIndex, measurer)
                     }
                 }
             }

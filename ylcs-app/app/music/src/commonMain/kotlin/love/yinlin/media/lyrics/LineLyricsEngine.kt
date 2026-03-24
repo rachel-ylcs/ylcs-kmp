@@ -40,8 +40,11 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
     }
 
     @Composable
-    override fun LineItem(item: StaticLine, isCurrent: Boolean, measurer: TextMeasurer) {
-        val color by animateColorAsState(targetValue = if (isCurrent) Colors.Green5 else LocalColor.current, animationSpec = tween(durationMillis = Theme.animation.duration.v3))
+    override fun LineItem(item: StaticLine, config: LyricsEngineConfig, isCurrent: Boolean, measurer: TextMeasurer) {
+        val color by animateColorAsState(
+            targetValue = if (isCurrent) Colors(config.textColor) else Colors(config.textBackgroundColor),
+            animationSpec = tween(durationMillis = Theme.animation.duration.v3)
+        )
         val normalStyle = Theme.typography.v6
         val currentStyle = Theme.typography.v5.bold
 
