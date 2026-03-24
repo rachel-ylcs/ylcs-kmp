@@ -80,4 +80,3 @@ class StartupUrlImage(context: PlatformContextProvider) : SyncStartup(context) {
         }
     }
 }
-
