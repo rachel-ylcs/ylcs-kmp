@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import love.yinlin.compose.data.media.MediaPlayMode
+import love.yinlin.extension.moveItem
 import love.yinlin.extension.replaceAll
 import kotlin.random.Random
 
@@ -132,6 +133,29 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
                         reshuffled(size = size - 1)
                     }
                 }
+            }
+        }
+    }
+
+    final override suspend fun moveMedia(fromIndex: Int, toIndex: Int) {
+        if (isReady) {
+            // 移动媒体只需要移动媒体列表后并更新当前索引即可
+            musicList.moveItem(fromIndex, toIndex)
+            currentIndex = toIndex
+            // 如果是随机播放模式还需要调整索引表
+            if (playMode == MediaPlayMode.Random) {
+                // 确定移动的两个媒体在随机索引表的位置
+                val indices = shuffledList.indices
+                val fromRandomIndex = indices.indexOf(fromIndex)
+                val toRandomIndex = indices.indexOf(toIndex)
+                // 交换两个媒体在索引表中的位置
+                val newIndices = indices.toMutableList()
+                val tmp = newIndices[fromRandomIndex]
+                newIndices[fromRandomIndex] = newIndices[toRandomIndex]
+                newIndices[toRandomIndex] = tmp
+                // 检查当前移走的媒体是否是随机播放的起点并更新
+                val start = if (shuffledList.begin == fromIndex) toIndex else null
+                shuffledList.internalSet(newIndices, start)
             }
         }
     }

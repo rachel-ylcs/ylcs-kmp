@@ -232,6 +232,10 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
     override suspend fun removeMedia(index: Int) = withMainPlayer {
         it.removeMediaItem(index)
     } ?: Unit
+
+    override suspend fun moveMedia(fromIndex: Int, toIndex: Int) = withMainPlayer {
+        it.moveMediaItem(fromIndex, toIndex)
+    } ?: Unit
 }
 
 actual fun buildMusicPlayer(fetcher: MediaMetadataFetcher): MusicPlayer = AndroidMusicPlayer(fetcher)

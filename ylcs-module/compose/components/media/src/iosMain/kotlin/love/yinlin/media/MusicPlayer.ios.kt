@@ -20,6 +20,7 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
     override suspend fun prepareMedias(medias: List<String>, startIndex: Int?, playing: Boolean) { }
     override suspend fun addMedias(medias: List<String>) { }
     override suspend fun removeMedia(index: Int) { }
+    override suspend fun moveMedia(fromIndex: Int, toIndex: Int) { }
 }
 
 actual fun buildMusicPlayer(fetcher: MediaMetadataFetcher): MusicPlayer = IOSMusicPlayer(fetcher)

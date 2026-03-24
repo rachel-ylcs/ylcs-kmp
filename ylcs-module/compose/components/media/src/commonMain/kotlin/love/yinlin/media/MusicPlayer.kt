@@ -133,6 +133,11 @@ abstract class MusicPlayer(protected val fetcher: MediaMetadataFetcher) {
      * 移除媒体
      */
     abstract suspend fun removeMedia(index: Int)
+
+    /**
+     * 移动媒体(应当是不影响当前播放的实现)
+     */
+    abstract suspend fun moveMedia(fromIndex: Int, toIndex: Int)
 }
 
 expect fun buildMusicPlayer(fetcher: MediaMetadataFetcher): MusicPlayer

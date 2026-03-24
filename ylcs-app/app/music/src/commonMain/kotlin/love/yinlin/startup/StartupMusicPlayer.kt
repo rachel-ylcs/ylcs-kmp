@@ -95,6 +95,7 @@ class StartupMusicPlayer(context: PlatformContextProvider) : AsyncStartup(contex
     suspend fun seekTo(position: Long) = controller.seekTo(position)
     suspend fun addMedias(medias: List<String>) = controller.addMedias(medias)
     suspend fun removeMedia(index: Int) = controller.removeMedia(index)
+    suspend fun moveMedia(fromIndex: Int, toIndex: Int) = controller.moveMedia(fromIndex, toIndex)
 
     // 歌词引擎
     val engineHost = LyricsEngineHost { controller.seekTo(it) }

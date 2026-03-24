@@ -1,6 +1,6 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -114,8 +114,8 @@ class ScreenPlaylistLibrary : Screen() {
                 val name = tabs[index]
                 if (slot.confirm.open(content = "删除歌单\"$name\"")) {
                     // 若正在播放则停止播放器
-                    mp?.let {
-                        if (it.playlist?.name == name) it.stop()
+                    mp?.let { player ->
+                        if (player.playlist?.name == name) player.stop()
                     }
 
                     playlistLibrary -= name
@@ -144,9 +144,11 @@ class ScreenPlaylistLibrary : Screen() {
             val playlist = playlistLibrary[name]
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
-                mp?.let {
-                    val playingIndex = it.musicList.indexOf(musicInfo.id)
-                    if (it.playlist?.name == name && playingIndex != -1) it.removeMedia(playingIndex)
+                mp?.let { player ->
+                    if (player.playlist?.name == name) {
+                        val playingIndex = player.musicList.indexOf(musicInfo.id)
+                        if (playingIndex != -1) player.removeMedia(playingIndex)
+                    }
                 }
 
                 val newItems = playlist.items.toMutableList()
@@ -164,6 +166,12 @@ class ScreenPlaylistLibrary : Screen() {
             val newItems = playlist.items.toMutableList()
             newItems.moveItem(fromIndex, toIndex)
             playlistLibrary[name] = playlist.copy(items = newItems)
+            mp?.let { player ->
+                // 检查是否当前正在播放此歌单并移动相应媒体
+                if (player.playlist?.name == name) {
+                    launch { player.moveMedia(fromIndex, toIndex) }
+                }
+            }
         }
     }
 
@@ -256,20 +264,23 @@ class ScreenPlaylistLibrary : Screen() {
                     key = { _, item -> item.id }
                 ) { index, item ->
                     ReorderableItem(state = reorderState, key = item.id) {
-                        val canDrag = mp?.isReady != true
-
                         Row(
-                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).combinedClickable(
-                                onClick = {
-                                    launch {
-                                        if (item.isDeleted) slot.tip.warning("此歌曲已不在曲库中")
-                                        else playPlaylist(item.id)
-                                    }
+                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).longPressDraggableHandle(
+                                onDragStarted = {
+                                    dragStartIndex = -1
+                                    dragEndIndex = -1
                                 },
-                                onLongClick = {
-                                    if (!canDrag) slot.tip.warning("调整歌曲顺序需要停止播放器")
+                                onDragStopped = {
+                                    if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
+                                        moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
+                                    }
                                 }
-                            ).padding(Theme.padding.value),
+                            ).clickable {
+                                launch {
+                                    if (item.isDeleted) slot.tip.warning("此歌曲已不在曲库中")
+                                    else playPlaylist(item.id)
+                                }
+                            }.padding(Theme.padding.value),
                             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                         ) {
                             LocalFileImage(
@@ -294,18 +305,6 @@ class ScreenPlaylistLibrary : Screen() {
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         LoadingIcon(icon = Icons.Delete, tip = "删除", onClick = { deleteMusicFromPlaylist(index) })
-                                        Icon(icon = Icons.DragHandle, modifier = Modifier.draggableHandle(
-                                            enabled = canDrag,
-                                            onDragStarted = {
-                                                dragStartIndex = -1
-                                                dragEndIndex = -1
-                                            },
-                                            onDragStopped = {
-                                                if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
-                                                    moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
-                                                }
-                                            }
-                                        ))
                                     }
                                 }
                             }
