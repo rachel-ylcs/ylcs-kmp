@@ -77,26 +77,18 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
     internal val backStack = savedBackStack.toMutableStateList()
 
     @PublishedApi
-    internal fun registerScreen(map: ScreenMap, route: String): NavEntry<String> {
-        val (screenName, uniqueId, argsText) = Route.parse(route)
-        val args = argsText.parseJson.Array
-        val factory = map.screens[screenName]
-        val actualRoute = if (factory != null) route else Route.SCREEN_404
-        return NavEntry(key = actualRoute, contentKey = actualRoute) {
-            Box {
-                if (factory != null) {
-                    val screen = viewModel(key = uniqueId) {
-                        factory(args).also {
-                            ScreenGlobal.VMMap[uniqueId] = it
-                            it.uniqueId = uniqueId
-                            it.manager = this@ScreenManager
-                            it.launch { it.initialize() }
-                        }
-                    }
-                    screen.ComposedUI()
-                }
-                else map.screen404(this@ScreenManager)
-            }
+    internal fun registerScreen(map: ScreenMap, route: String): NavEntry<String> = NavEntry(key = route, contentKey = route) { navRoute ->
+        Box {
+            viewModel {
+                val (screenName, uniqueId, argsText) = Route.parse(navRoute)
+                val factory = map.screens[screenName]
+                val screen = if (factory == null) map.screen404Factory() else factory(argsText.parseJson.Array)
+                ScreenGlobal.VMMap[uniqueId] = screen
+                screen.uniqueId = uniqueId
+                screen.manager = this@ScreenManager
+                screen.launch { screen.initialize() }
+                screen
+            }.ComposedUI()
         }
     }
 

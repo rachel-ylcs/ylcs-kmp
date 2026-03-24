@@ -1,6 +1,5 @@
 package love.yinlin.compose.screen
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonArray
 import kotlin.jvm.JvmName
@@ -10,7 +9,10 @@ class ScreenMap @PublishedApi internal constructor() {
     @PublishedApi
     internal val screens = mutableMapOf<String, (JsonArray) -> BasicScreen>()
 
-    var screen404: @Composable (ScreenManager) -> Unit = ::DefaultScreen404
+    @PublishedApi
+    internal var screen404Factory: () -> BasicScreen = ::Screen404
+
+    inline fun <reified S : BasicScreen> screen404(noinline factory: () -> S) { screen404Factory = factory }
 
     @PublishedApi
     internal inline fun <reified S : BasicScreen> screen(noinline handler: (JsonArray) -> BasicScreen) { screens[Route.key<S>()] = handler }
