@@ -10,6 +10,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
@@ -39,12 +40,14 @@ abstract class FloatingView {
         override fun onViewDetachedFromWindow(v: View) { onDetached() }
     }
 
-    private fun canAttach(activity: ComponentActivity): Boolean = Settings.canDrawOverlays(activity)
+    private fun canAttach(context: Context): Boolean = Settings.canDrawOverlays(context)
+
+    private val Context.windowManager get() = this.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
 
     @OptIn(ExperimentalUuidApi::class)
     fun attach(activity: ComponentActivity, onPermissionFailed: (() -> Unit)? = null) {
         if (canAttach(activity)) {
-            val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
+            val manager = activity.windowManager
 
             if (manager != null) {
                 val composeView = ComposeView(activity)
@@ -73,7 +76,9 @@ abstract class FloatingView {
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                     flags,
                     PixelFormat.TRANSLUCENT
-                ).apply { gravity = Gravity.TOP }
+                ).apply {
+                    gravity = Gravity.TOP or Gravity.START
+                }
 
                 manager.addView(composeView, params)
             }
@@ -94,12 +99,23 @@ abstract class FloatingView {
         }
     }
 
-    fun detach(activity: ComponentActivity) {
+    fun detach() {
         view?.let { composeView ->
-            val manager = activity.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
-            manager?.removeViewImmediate(composeView)
+            composeView.context.windowManager?.removeViewImmediate(composeView)
             composeView.removeOnAttachStateChangeListener(listener)
         }
         view = null
+    }
+
+    fun updateLayoutParams(gravity: Int, offset: Offset) {
+        view?.let { composeView ->
+            composeView.context.windowManager?.let { manager ->
+                val params = composeView.layoutParams as WindowManager.LayoutParams
+                params.gravity = gravity
+                params.x = offset.x.toInt()
+                params.y = offset.y.toInt()
+                manager.updateViewLayout(composeView, params)
+            }
+        }
     }
 }

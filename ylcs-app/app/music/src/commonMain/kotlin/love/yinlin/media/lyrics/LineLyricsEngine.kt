@@ -58,7 +58,7 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
 
     @Composable
     override fun BoxScope.FloatingLine(config: LyricsEngineConfig, textStyle: TextStyle) {
-        val measurer = rememberTextMeasurer(16)
+        val measurer = rememberTextMeasurer(32)
 
         FastCenterText(
             layoutAction = { layout(measurer, "T", textStyle.copy(fontSize = textStyle.fontSize * config.textSize)) },

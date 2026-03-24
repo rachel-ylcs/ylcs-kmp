@@ -1,13 +1,17 @@
 package love.yinlin.media.lyrics
 
+import android.view.Gravity
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalWindowInfo
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.window.FloatingView
 import love.yinlin.startup.StartupMusicPlayer
 
@@ -20,16 +24,30 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
         override val touchable: Boolean = false
 
         override fun onAttached() { isAttached = true }
+
         override fun onDetached() { isAttached = false }
+
         @Composable
         override fun Content() {
             if (isAttached && startup.isInit) {
+                val screenHeight = LocalWindowInfo.current.containerSize.height
+                val lyricsTopOffset by rememberDerivedState {
+                    val config = app.config.lyricsEngineConfig
+                    config.android.placeTop to config.android.top
+                }
+
+                LaunchedEffect(screenHeight, lyricsTopOffset) {
+                    val topOffset = screenHeight * 0.2f * lyricsTopOffset.second.coerceIn(0f, 1f)
+                    val gravity = (if (lyricsTopOffset.first) Gravity.TOP else Gravity.BOTTOM) or Gravity.START
+                    updateLayoutParams(gravity, Offset(0f, topOffset))
+                }
+
                 app.ComposedLayout(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth(),
                     bgColor = Colors.Transparent
                 ) {
                     Layout(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxWidth(),
                         content = {
                             if (startup.isPlaying) {
                                 startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxWidth(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v6.bold)
@@ -38,19 +56,17 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
                     ) { measurables, constraints ->
                         val config = app.config.lyricsEngineConfig
                         val maxWidth = constraints.maxWidth
-                        val maxHeight = constraints.maxHeight
                         val start = (maxWidth * config.android.left.coerceIn(0f, 1f)).toInt()
                         val end = (maxWidth * (1 - config.android.right).coerceIn(0f, 1f)).toInt()
-                        val top = (maxHeight * 0.2f * config.android.top.coerceIn(0f, 1f)).toInt()
+
                         val childWidth = (maxWidth - start - end).coerceAtLeast(0)
                         val placeable = measurables.firstOrNull()?.measure(constraints.copy(
                             minWidth = childWidth,
                             maxWidth = childWidth,
                             minHeight = 0
                         ))
-                        val childHeight = placeable?.height ?: 0
-                        layout(maxWidth, maxHeight) {
-                            placeable?.placeRelative(start, if (config.android.placeTop) top else maxHeight - top - childHeight)
+                        layout(maxWidth, placeable?.height ?: 0) {
+                            placeable?.placeRelative(start, 0)
                         }
                     }
                 }
@@ -64,11 +80,7 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
         }
     }
 
-    actual fun detach() {
-        startup.context.activity?.let { activity ->
-            view.detach(activity)
-        }
-    }
+    actual fun detach() = view.detach()
 
     actual suspend fun initDelay() {
         if (app.config.enabledFloatingLyrics && !isAttached) attach()
