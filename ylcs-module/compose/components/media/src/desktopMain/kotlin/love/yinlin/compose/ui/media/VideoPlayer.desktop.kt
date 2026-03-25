@@ -19,7 +19,7 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
     Box(modifier = modifier) {
         Canvas(modifier = Modifier.matchParentSize().zIndex(1f)) {
             // 利用 updateCount 重组
-            val image = if (controller.updateCount > 0L) controller.image else null
+            val image = if (controller.position >= 0L) controller.image else null
             val canvasWidth = this.size.width
             val canvasHeight = this.size.height
             if (image != null && canvasHeight > 0f) {

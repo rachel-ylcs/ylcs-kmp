@@ -1,9 +1,6 @@
 package love.yinlin.compose.ui.media
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.setValue
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.platform.NativeLibLoader
 import love.yinlin.platform.Platform
@@ -31,7 +28,6 @@ actual abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar:
 
     internal val paint = Paint().apply { this.isAntiAlias = true }
 
-    internal var updateCount by mutableLongStateOf(0L)
     var image: Bitmap? = null
         protected set
 

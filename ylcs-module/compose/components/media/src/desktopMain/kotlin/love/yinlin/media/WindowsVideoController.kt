@@ -81,7 +81,6 @@ internal class WindowsVideoController(topBar: VideoActionBar.Factory, bottomBar:
                         // https://github.com/coil-kt/coil/pull/2594
                         setImmutable()
                     }
-                    updateCount = 0L
                 }
             }
         }
@@ -95,7 +94,6 @@ internal class WindowsVideoController(topBar: VideoActionBar.Factory, bottomBar:
                 currentBitmap.installPixels(data)
                 currentBitmap.notifyPixelsChanged()
                 position = nativeGetPosition(nativeHandle)
-                ++updateCount
             }
         }
     }
