@@ -1,11 +1,13 @@
 package love.yinlin.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import love.yinlin.app
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.media.VideoActionBar
@@ -28,7 +30,7 @@ class ScreenVideo(val url: String) : BasicScreen() {
     override fun BasicContent() {
         VideoPlayer(
             controller = controller,
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
+            modifier = Modifier.fillMaxSize().background(Colors.Black).padding(LocalImmersivePadding.current)
         )
     }
 }

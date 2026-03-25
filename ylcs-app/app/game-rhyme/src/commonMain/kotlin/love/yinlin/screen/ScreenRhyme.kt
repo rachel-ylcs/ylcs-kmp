@@ -227,7 +227,7 @@ class ScreenRhyme : BasicScreen() {
     @Composable
     private fun GameOverlayLoading() {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v5, Alignment.CenterVertically)
         ) {
@@ -245,7 +245,7 @@ class ScreenRhyme : BasicScreen() {
                 modifier = Modifier.fillMaxSize().zIndex(1f)
             )
             Row(
-                modifier = Modifier.fillMaxWidth().zIndex(2f),
+                modifier = Modifier.fillMaxWidth().padding(LocalImmersivePadding.current).zIndex(2f),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -272,6 +272,7 @@ class ScreenRhyme : BasicScreen() {
         RhymeOverlayLayout(
             title = "曲库",
             onBack = ::onBack,
+            modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current),
             action = {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
@@ -296,10 +297,10 @@ class ScreenRhyme : BasicScreen() {
             }
             else {
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(Theme.size.image5),
-                    contentPadding = Theme.padding.eValue9,
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.e9),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e9),
+                    columns = GridCells.Adaptive(Theme.size.image6),
+                    contentPadding = Theme.padding.eValue10,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.e10),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e10),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(
@@ -325,6 +326,7 @@ class ScreenRhyme : BasicScreen() {
         RhymeOverlayLayout(
             title = entry.musicInfo.name,
             onBack = ::onBack,
+            modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current),
             action = {
                 RhymeButton(
                     icon = Icons.PlayArrow,
@@ -396,6 +398,7 @@ class ScreenRhyme : BasicScreen() {
         RhymeOverlayLayout(
             title = "结算",
             onBack = ::onBack,
+            modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current),
             action = {
                 RhymeButton(
                     icon = Icons.CloudUpload,
@@ -483,7 +486,7 @@ class ScreenRhyme : BasicScreen() {
         }
 
         Layout(
-            modifier = Modifier.padding(LocalImmersivePadding.current).background(Colors.Black).fillMaxSize().background(Theme.color.background),
+            modifier = Modifier.background(Colors.Black).fillMaxSize().background(Theme.color.background),
             content = {
                 // 状态层
                 AnimationContent(state = state, modifier = Modifier.fillMaxSize()) {

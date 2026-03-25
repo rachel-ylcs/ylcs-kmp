@@ -99,10 +99,11 @@ internal fun RhymeButton(
 internal fun RhymeOverlayLayout(
     title: String,
     onBack: () -> Unit,
+    modifier: Modifier = Modifier,
     action: @Composable BoxScope.() -> Unit = {},
     content: @Composable () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
@@ -147,8 +148,8 @@ internal fun RhymeMusicCard(
                 text = entry.musicInfo.name,
                 color = if (entry.enabled) Colors.Steel4 else LocalColor.current,
                 textAlign = TextAlign.Center,
-                style = Theme.typography.v6.bold,
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9)
+                style = Theme.typography.v8.bold,
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value)
             )
         }
     }
