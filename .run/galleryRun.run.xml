@@ -2,7 +2,7 @@
   <configuration default="false" name="galleryRun" type="GradleRunConfiguration" factoryName="Gradle" folderName="Desktop">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/ylcs-app/gallery" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="-DmainClass=love.yinlin.MainKt --quiet" />
       <option name="taskDescriptions">
@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="desktopRun" />
+          <option value="ylcs-app:gallery:desktopRun" />
         </list>
       </option>
       <option name="vmOptions" />

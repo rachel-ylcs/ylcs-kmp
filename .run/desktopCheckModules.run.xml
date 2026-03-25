@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="ylcs-app:desktopApp:desktopCheckModules" />
+          <option value="ylcs-app:desktop-app:desktopCheckModules" />
         </list>
       </option>
       <option name="vmOptions" />

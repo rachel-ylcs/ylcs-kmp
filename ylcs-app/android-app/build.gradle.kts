@@ -11,17 +11,12 @@ plugins {
 }
 
 template(object : KotlinAndroidTemplate() {
-    override val packageName: String = "${C.app.packageName}.lyricseditor"
-    override val packageVersion: Int = 100
-    override val packageVersionName: String = "1.0.0"
+    override val packageName: String = C.app.packageName
+    override val packageVersion: Int = C.app.version
+    override val packageVersionName: String = C.app.versionName
 
     override fun KotlinAndroidSourceSetsScope.source() {
-        lib(
-            projects.ylcsModule.compose.app,
-            projects.ylcsModule.compose.screen,
-
-            projects.ylcsApp.mod,
-        )
+        lib(projects.ylcsApp.app.portal)
     }
 
     override fun ApplicationExtension.sign(): ApkSigningConfig? = try {
@@ -34,7 +29,7 @@ template(object : KotlinAndroidTemplate() {
             register(androidKeyName) {
                 keyAlias = androidKeyName
                 keyPassword = androidKeyPassword
-                storeFile = C.root.config.androidKey.asFile
+                storeFile = C.root.app.config.androidKey.asFile
                 storePassword = androidKeyPassword
             }
         }
@@ -45,6 +40,24 @@ template(object : KotlinAndroidTemplate() {
     }
 
     override fun Project.actions() {
+        // 安卓打包
+        val androidPackage by tasks.registering {
+            dependsOn(tasks.named("assembleDebug"))
+        }
+
+        val androidArtifact by tasks.registering {
+            dependsOn(tasks.named("assembleRelease"))
+
+            doLast {
+                copy {
+                    from(originOutput)
+                    into(C.root.outputs)
+                    rename { _ -> "ylcs-android.apk" }
+                }
+            }
+        }
+
+        // 发布安卓安装包
         val androidPublish by tasks.registering {
             dependsOn(tasks.named("assembleRelease"))
 
@@ -52,7 +65,7 @@ template(object : KotlinAndroidTemplate() {
                 copy {
                     from(originOutput)
                     into(C.root.outputs)
-                    rename { _ -> "RachelModLyricsEditor.APK" }
+                    rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.APK" }
                 }
             }
         }

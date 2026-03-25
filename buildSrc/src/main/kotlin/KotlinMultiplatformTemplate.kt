@@ -221,7 +221,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 extensions.findByType<CocoapodsExtension>()?.apply {
                     version = C.app.versionName
                     ios.deploymentTarget = C.ios.target
-                    podfile = C.root.iosApp.podfile.asFile
+                    podfile = C.root.app.iosApp.podfile.asFile
 
                     xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
                     xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE

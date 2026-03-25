@@ -35,7 +35,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="ylcs-app:androidApp:androidPublish" />
+          <option value="ylcs-app:android-app:androidPublish" />
         </list>
       </option>
       <option name="vmOptions" />

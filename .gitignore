@@ -36,7 +36,7 @@ artifacts/**/*.dylib
 **/outputs/
 
 # 本地配置
-config/secret/
+ylcs-app/config/secret/
 **/config.json
 *.properties
 !**/gradle-wrapper.properties

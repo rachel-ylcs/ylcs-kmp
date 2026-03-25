@@ -24,4 +24,4 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: ./gradlew ylcs-app:desktop-app:desktopPublish

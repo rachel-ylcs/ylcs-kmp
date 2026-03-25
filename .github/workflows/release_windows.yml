@@ -30,4 +30,4 @@ jobs:
           export-path-to-vs: VS_PATH
 
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopPublish
+        run: ./gradlew ylcs-app:desktop-app:desktopPublish

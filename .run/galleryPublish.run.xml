@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":ylcs-app:gallery:galleryPublish" />
+          <option value="ylcs-app:gallery:galleryPublish" />
         </list>
       </option>
       <option name="vmOptions" />

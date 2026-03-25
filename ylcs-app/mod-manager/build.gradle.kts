@@ -59,7 +59,7 @@ template(object : KotlinMultiplatformTemplate() {
             doLast {
                 delete(C.root.outputs.dir(desktopPackageName))
                 copy {
-                    from(C.root.modManager.originOutput)
+                    from(C.root.app.modManager.originOutput)
                     into(C.root.outputs)
                 }
                 zip(C.root.outputs.dir(desktopPackageName), C.root.outputs.file("$desktopPackageName.zip"))

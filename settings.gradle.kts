@@ -75,8 +75,6 @@ include(
 
     /* -----------------  应用模块  ----------------- */
 
-    "ylcs-app:lyricsEditor",
-
     "ylcs-app:app:account",
     "ylcs-app:app:community",
     "ylcs-app:app:game",
@@ -89,13 +87,15 @@ include(
     "ylcs-app:app:third-party",
     "ylcs-app:app:viewer",
 
-    "ylcs-app:androidApp",
+    "ylcs-app:android-app",
     "ylcs-app:cs",
-    "ylcs-app:desktopApp",
+    "ylcs-app:desktop-app",
     "ylcs-app:gallery",
     "ylcs-app:landpage",
     "ylcs-app:mod",
     "ylcs-app:mod-manager",
     "ylcs-app:server",
-    "ylcs-app:webApp",
+    "ylcs-app:web-app",
+
+    "ylcs-app:lyrics-editor",
 )

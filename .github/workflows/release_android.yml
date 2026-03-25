@@ -27,4 +27,4 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build
-        run: ./gradlew ylcs-app:androidApp:androidPublish
+        run: ./gradlew ylcs-app:android-app:androidPublish

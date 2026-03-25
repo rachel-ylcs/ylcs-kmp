@@ -24,4 +24,4 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:webApp:webPublish
+        run: ./gradlew ylcs-app:web-app:webPublish

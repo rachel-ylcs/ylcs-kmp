@@ -44,7 +44,7 @@ template(object : KotlinJvmTemplate() {
             doLast {
                 delete(C.root.outputs.file(C.server.outputName))
                 copy {
-                    from(C.root.server.originOutput)
+                    from(C.root.app.server.originOutput)
                     into(C.root.outputs)
                     rename { _ -> "ylcs-server.jar" }
                 }
@@ -58,7 +58,7 @@ template(object : KotlinJvmTemplate() {
             doLast {
                 delete(C.root.outputs.file(C.server.outputName))
                 copy {
-                    from(C.root.server.originOutput)
+                    from(C.root.app.server.originOutput)
                     into(C.root.outputs)
                 }
             }

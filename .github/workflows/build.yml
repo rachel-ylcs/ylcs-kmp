@@ -63,7 +63,7 @@ jobs:
               - 'ylcs-module/**/androidMain/**'
               - 'ylcs-app/app/**/jvmMain/**'
               - 'ylcs-app/app/**/androidMain/**'
-              - 'ylcs-app/androidApp/**'
+              - 'ylcs-app/android-app/**'
             ios:
               - *client
               - 'ylcs-module/**/appleMain/**'
@@ -78,7 +78,7 @@ jobs:
               - 'ylcs-module/**/desktopMain/**'
               - 'ylcs-app/app/**/jvmMain/**'
               - 'ylcs-app/app/**/desktopMain/**'
-              - 'ylcs-app/desktopApp/**'
+              - 'ylcs-app/desktop-app/**'
             web:
               - *client
               - 'ylcs-module/**/webMain/**'
@@ -87,7 +87,7 @@ jobs:
               - 'ylcs-app/app/**/webMain/**'
               - 'ylcs-app/app/**/jsMain/**'
               - 'ylcs-app/app/**/wasmJsMain/**'
-              - 'ylcs-app/webApp/**'
+              - 'ylcs-app/web-app/**'
             server:
               - *common
               - 'ylcs-app/server/**'
@@ -126,7 +126,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Build
-        run: ./gradlew ylcs-app:androidApp:androidPackage
+        run: ./gradlew ylcs-app:android-app:androidPackage
 
   build-ios:
     name: Build iOS
@@ -194,7 +194,7 @@ jobs:
           export-path-to-vs: VS_PATH
 
       - name: Build
-        run: ./gradlew ylcs-app:desktopApp:desktopJar
+        run: ./gradlew ylcs-app:desktop-app:desktopJar
 
   build-web:
     name: Build Web
@@ -218,7 +218,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:webApp:wasmJsJar
+        run: ./gradlew ylcs-app:web-app:wasmJsJar
 
   build-server:
     name: Build Server

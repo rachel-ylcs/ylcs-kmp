@@ -57,13 +57,13 @@ template(object : KotlinMultiplatformTemplate() {
         projects.ylcsModule.compose.components.media,
     )
     override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = {
-        iconFile.set(C.root.config.icon)
+        iconFile.set(C.root.app.config.icon)
     }
     override val linuxDistributions: (LinuxPlatformSettings.() -> Unit) = {
-        iconFile.set(C.root.config.icon)
+        iconFile.set(C.root.app.config.icon)
     }
     override val macOSDistributions: (JvmMacOSPlatformSettings.() -> Unit) = {
-        iconFile.set(C.root.config.icon)
+        iconFile.set(C.root.app.config.icon)
     }
 
     override fun Project.actions() {
@@ -101,7 +101,7 @@ template(object : KotlinMultiplatformTemplate() {
                 val outputDir = C.root.outputs
                 delete(packageResourcesDir)
                 copy {
-                    from(C.root.desktopApp.originOutput)
+                    from(C.root.app.desktopApp.originOutput)
                     into(outputDir)
                 }
 
@@ -129,7 +129,7 @@ template(object : KotlinMultiplatformTemplate() {
                 val outputDir = C.root.outputs
                 delete(packageResourcesDir)
                 copy {
-                    from(C.root.desktopApp.originOutput)
+                    from(C.root.app.desktopApp.originOutput)
                     into(outputDir)
                 }
 

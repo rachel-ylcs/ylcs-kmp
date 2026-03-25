@@ -60,7 +60,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="ylcs-app:webApp:webRun" />
+          <option value="ylcs-app:web-app:webRun" />
         </list>
       </option>
       <option name="vmOptions" />

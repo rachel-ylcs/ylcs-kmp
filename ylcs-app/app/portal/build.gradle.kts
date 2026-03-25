@@ -54,7 +54,7 @@ template(object : KotlinMultiplatformTemplate() {
                 BUNDLE_SHORT_VERSION_STRING=${C.app.versionName}
             """.trimIndent()
 
-            val configFile = C.root.iosApp.configurationFile.asFile
+            val configFile = C.root.app.iosApp.configurationFile.asFile
             outputs.file(configFile)
             outputs.upToDateWhen {
                 configFile.takeIf { it.exists() }?.readText() == content

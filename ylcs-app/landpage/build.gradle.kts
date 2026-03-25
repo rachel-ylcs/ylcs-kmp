@@ -37,12 +37,12 @@ template(object : KotlinJsTemplate() {
 
             doLast {
                 copy {
-                    from(C.root.landpage.originOutput)
-                    into(C.root.landpage.output)
+                    from(C.root.app.landpage.originOutput)
+                    into(C.root.app.landpage.output)
                 }
-                delete(*C.root.landpage.output.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                zip(C.root.landpage.output, C.root.outputs.file("landpage.zip"))
-                delete(C.root.landpage.output)
+                delete(*C.root.app.landpage.output.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(C.root.app.landpage.output, C.root.outputs.file("landpage.zip"))
+                delete(C.root.app.landpage.output)
             }
         }
     }

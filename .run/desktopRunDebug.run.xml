@@ -35,7 +35,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="ylcs-app:desktopApp:desktopRunDebug" />
+          <option value="ylcs-app:desktop-app:desktopRunDebug" />
         </list>
       </option>
       <option name="vmOptions" />

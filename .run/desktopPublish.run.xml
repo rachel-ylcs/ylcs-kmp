@@ -60,7 +60,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="ylcs-app:desktopApp:desktopPublish" />
+          <option value="ylcs-app:desktop-app:desktopPublish" />
         </list>
       </option>
       <option name="vmOptions" />

@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="ylcs-app:androidApp:androidPackage" />
+          <option value="ylcs-app:android-app:androidPackage" />
         </list>
       </option>
       <option name="vmOptions" />

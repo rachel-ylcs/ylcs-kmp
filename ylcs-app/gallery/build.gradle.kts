@@ -54,8 +54,8 @@ template(object : KotlinMultiplatformTemplate() {
 
             doLast {
                 copy {
-                    from(C.root.gallery.originOutput)
-                    into(C.root.gallery.output)
+                    from(C.root.app.gallery.originOutput)
+                    into(C.root.app.gallery.output)
                 }
             }
         }
