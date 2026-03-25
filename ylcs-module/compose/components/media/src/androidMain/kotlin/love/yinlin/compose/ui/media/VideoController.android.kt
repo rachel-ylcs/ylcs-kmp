@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.milliseconds
 actual abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoState(topBar, bottomBar) {
     internal abstract val exoPlayer: ExoPlayer
 
-    actual override fun release() { }
+    actual override fun releaseController() { }
 }
 
 internal class AndroidVideoController(context: PlatformContext, topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
@@ -58,7 +58,7 @@ internal class AndroidVideoController(context: PlatformContext, topBar: VideoAct
         }
     }
 
-    override fun release() {
+    override fun releaseController() {
         scope.cancel()
         exoPlayer.removeListener(listener)
         exoPlayer.release()

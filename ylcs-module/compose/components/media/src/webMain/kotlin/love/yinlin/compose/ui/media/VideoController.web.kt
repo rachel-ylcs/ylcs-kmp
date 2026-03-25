@@ -16,7 +16,7 @@ import kotlin.js.ExperimentalWasmJsInterop
 actual abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoState(topBar, bottomBar) {
     abstract val view: PlatformView<HTMLVideoElement>
 
-    actual override fun release() { }
+    actual override fun releaseController() { }
 }
 
 @Stable
@@ -67,7 +67,7 @@ internal class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vid
         view.host?.currentTime = position / 1000.0
     }
 
-    override fun release() {
+    override fun releaseController() {
         view.host?.let { document.removeChild(it) }
     }
 }

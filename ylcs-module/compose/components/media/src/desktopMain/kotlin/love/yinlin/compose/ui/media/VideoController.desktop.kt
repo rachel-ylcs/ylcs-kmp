@@ -43,7 +43,7 @@ actual abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar:
     protected abstract fun nativeCreate(): Long
     protected abstract fun nativeRelease(handle: Long)
 
-    actual override fun release() {
+    actual override fun releaseController() {
         if (!isRelease) {
             isRelease = true
             nativeRelease(nativeHandle)

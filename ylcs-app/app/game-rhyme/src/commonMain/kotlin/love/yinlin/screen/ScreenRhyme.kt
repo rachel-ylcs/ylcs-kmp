@@ -47,7 +47,7 @@ import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.StrokeText
 import love.yinlin.compose.ui.text.Text
-import love.yinlin.compose.window.rememberOrientationController
+import love.yinlin.compose.window.OrientationController
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
 import love.yinlin.cs.ServerRes
@@ -67,7 +67,7 @@ class ScreenRhyme : BasicScreen() {
     private var library = emptyList<RhymeMusic>()
     private var showEnabled by mutableStateOf(false)
 
-    private val orientationStarter = LaunchFlag()
+    private val orientationController = OrientationController()
 
     private val rhymeManager = RhymeManager(
         context = app.rawContext,
@@ -418,6 +418,9 @@ class ScreenRhyme : BasicScreen() {
     }
 
     override suspend fun initialize() {
+        // 首次打开切换横屏
+        orientationController.setOrientation(app, Orientation.Horizontal)
+
         rhymeManager.init()
         if (rhymeManager.isInit) {
             catchingError {
@@ -449,6 +452,7 @@ class ScreenRhyme : BasicScreen() {
 
     override fun finalize() {
         rhymeManager.release()
+        orientationController.store(app)
     }
 
     override fun onBack() {
@@ -465,13 +469,6 @@ class ScreenRhyme : BasicScreen() {
 
     @Composable
     override fun BasicContent() {
-        val orientationController = rememberOrientationController()
-
-        orientationStarter {
-            // 首次打开切换横屏
-            orientationController.orientation = Orientation.Horizontal
-        }
-
         val deviceType = LocalDevice.current.type
         LaunchedEffect(deviceType) {
             // 监听屏幕朝向变化

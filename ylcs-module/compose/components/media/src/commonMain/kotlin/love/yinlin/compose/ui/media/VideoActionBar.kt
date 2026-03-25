@@ -14,12 +14,15 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.text.SimpleEllipsisText
-import love.yinlin.compose.window.rememberOrientationController
+import love.yinlin.compose.window.OrientationController
 import love.yinlin.extension.timeString
+import love.yinlin.foundation.PlatformContextProvider
 
 @Stable
 interface VideoActionBar {
     typealias Factory = (VideoState) -> VideoActionBar?
+
+    fun release()
 
     @Composable
     fun RowScope.Content()
@@ -30,6 +33,8 @@ interface VideoActionBar {
             val duration = state.duration
             if (duration == 0L) 0f else state.position / duration.toFloat()
         }
+
+        override fun release() { }
 
         @Composable
         override fun RowScope.Content() {
@@ -53,20 +58,24 @@ interface VideoActionBar {
     }
 
     @Stable
-    private class TopDefaultActionBar(private val onBack: () -> Unit) : VideoActionBar {
+    private class TopDefaultActionBar(private val context: PlatformContextProvider, private val onBack: () -> Unit) : VideoActionBar {
+        val orientationController = OrientationController()
+
+        override fun release() {
+            orientationController.store(context)
+        }
+
         @Composable
         override fun RowScope.Content() {
-            val orientationController = rememberOrientationController()
-
             Icon(icon = Icons.ArrowBack, onClick = onBack)
             Box(modifier = Modifier.weight(1f))
-            Icon(icon = Icons.FullScreen, onClick = orientationController::rotate)
+            Icon(icon = Icons.FullScreen, onClick = { orientationController.rotate(context) })
         }
     }
 
     companion object {
         val None: Factory = { null }
         val Progress: Factory = ::ProgressActionBar
-        fun topDefault(onBack: () -> Unit): Factory = { TopDefaultActionBar(onBack) }
+        fun topDefault(context: PlatformContextProvider, onBack: () -> Unit): Factory = { TopDefaultActionBar(context, onBack) }
     }
 }

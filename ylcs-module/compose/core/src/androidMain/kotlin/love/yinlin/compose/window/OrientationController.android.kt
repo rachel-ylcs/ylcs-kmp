@@ -1,34 +1,26 @@
 package love.yinlin.compose.window
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.Stable
+import love.yinlin.foundation.PlatformContextProvider
 
-@Composable
-actual fun rememberOrientationController(): OrientationController {
-    val activity = LocalContext.current as? Activity
+@Stable
+actual class OrientationController {
+    actual fun getOrientation(context: PlatformContextProvider): Orientation =
+        if (context.activity?.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) Orientation.Horizontal else Orientation.Vertical
 
-    DisposableEffect(activity) {
-        onDispose {
-            if (activity != null) activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    actual fun setOrientation(context: PlatformContextProvider, orientation: Orientation) {
+        context.activity?.requestedOrientation = if (orientation == Orientation.Horizontal) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
+
+    actual fun rotate(context: PlatformContextProvider) {
+        context.activity?.let { activity ->
+            activity.requestedOrientation = if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
     }
 
-    return remember(activity) {
-        object : OrientationController {
-            override var orientation: Orientation
-                get() = if (activity?.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) Orientation.Horizontal else Orientation.Vertical
-                set(value) {
-                    activity?.requestedOrientation = if (value == Orientation.Horizontal) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                }
-
-            override fun rotate() {
-                activity?.requestedOrientation = if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            }
-        }
+    actual fun store(context: PlatformContextProvider) {
+        context.activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 }

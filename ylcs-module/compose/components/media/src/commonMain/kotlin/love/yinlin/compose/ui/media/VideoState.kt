@@ -39,12 +39,18 @@ abstract class VideoState internal constructor(topBar: VideoActionBar.Factory, b
     var error: Throwable? by mutableStateOf(null)
         protected set
 
-    abstract fun release()
+    protected abstract fun releaseController()
     abstract fun load(path: String)
     abstract fun play()
     abstract fun pause()
     abstract fun stop()
     abstract fun seek(position: Long)
+
+    fun release() {
+        videoTopBar?.release()
+        videoBottomBar?.release()
+        releaseController()
+    }
 
     @Composable
     private fun VideoPlayerControlBar(
