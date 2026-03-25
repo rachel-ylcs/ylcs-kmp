@@ -117,7 +117,6 @@ implementation("love.yinlin.compose:app:x.x.x")
 | Library | brettwooldridge |                                                      [HikariCP](https://github.com/brettwooldridge/HikariCP)                                                       |
 | Library |    Calvin-LL    |                                                      [reorderable](https://github.com/Calvin-LL/Reorderable)                                                       |
 | Library |   chrisbanes    |                                                             [haze](https://github.com/chrisbanes/haze)                                                             |
-| Library |    fleeksoft    |                                                            [ksoup](https://github.com/fleeksoft/ksoup)                                                             |
 | Library |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
 | Library |    jenly1314    |                            [zxing-lite](https://github.com/jenly1314/ZXingLite), [camera-scan](https://github.com/jenly1314/CameraScan)                            |
 | Library |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |

@@ -20,7 +20,6 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.tool.cryptography,
                 libs.tool.cryptography.provider,
                 libs.tool.cryptography.asn1,
-                libs.tool.html,
             )
         }
 

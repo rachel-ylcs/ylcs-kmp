@@ -1,10 +1,6 @@
 package love.yinlin.tpl
 
 import androidx.compose.runtime.Stable
-import com.fleeksoft.ksoup.Ksoup
-import com.fleeksoft.ksoup.nodes.Element
-import com.fleeksoft.ksoup.nodes.Node
-import com.fleeksoft.ksoup.nodes.TextNode
 import dev.whyoleg.cryptography.CryptographyProvider
 import dev.whyoleg.cryptography.DelicateCryptographyApi
 import dev.whyoleg.cryptography.algorithms.*
@@ -19,7 +15,6 @@ import io.ktor.util.appendAll
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.compose.ui.text.*
 import love.yinlin.uri.Uri
 import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
@@ -109,7 +104,7 @@ object WeiboAPI {
 
 	var weiboCookie: WeiboCookie? = null
 
-	private object Container {
+	internal object Container {
 		fun searchUser(key: String): String = proxy("https://m.weibo.cn/api/container/getIndex?containerid=100103type%3D3%26q=${Uri.encodeUri(key)}&page_type=searchall")
 		fun searchTopic(name: String): String = proxy("https://m.weibo.cn/search?containerid=231522type=1&q=$name")
 		fun userDetails(uid: String): String = proxy("https://m.weibo.cn/api/container/getIndex?type=uid&value=$uid&containerid=107603$uid")
@@ -124,46 +119,6 @@ object WeiboAPI {
 		const val CAPTCHAID: String = "71c4f580e096c1cb471a83b941680596"
 		val captchaLoad: String get() = proxy("https://gcaptcha4.geetest.com/load")
 		val captchaVerify: String get() = proxy("https://gcaptcha4.geetest.com/verify")
-	}
-
-	private fun weiboHtmlNodeTransform(node: Node, container: RichList) {
-		if (node is TextNode) {
-			val text = node.text()
-			if (text.startsWith('#') && text.endsWith('#')) { // # 话题
-				val topic = text.removePrefix("#").removeSuffix("#")
-				container.topic(Container.searchTopic(topic), text)
-			}
-			else container.text(text) // 普通文本
-		}
-		else if (node is Element) {
-			val childNodes = node.childNodes()
-			when (node.tagName()) {
-				"br" -> container.br()
-				"a" -> {
-					val href = node.attribute("href")?.value
-					val text = (childNodes.firstOrNull() as? TextNode?)?.text()
-					if (childNodes.size == 1 && href != null && text != null) {
-						if (href.startsWith("/n/")) container.at(Container.href(href), text) // @ 标签
-						else if (href.startsWith("/status/")) container.link(Container.href(href), text)
-						else container.link(href, text)
-					}
-					else weiboHtmlNodesTransform(childNodes, container)
-				}
-				"span" -> weiboHtmlNodesTransform(childNodes, container)
-				"img" -> node.attribute("src")?.value?.let { container.image(it) }
-			}
-		}
-	}
-
-	private fun weiboHtmlNodesTransform(nodes: List<Node>, container: RichList) {
-		for (node in nodes) weiboHtmlNodeTransform(node, container)
-	}
-
-	private fun weiboHtmlToRichString(text: String): RichString {
-		val html = Ksoup.parse(text).body()
-		return buildRichString {
-			weiboHtmlNodesTransform(html.childNodes(), this)
-		}
 	}
 
 	private fun weiboTime(time: String) = DateEx.Formatter.weiboDateTime.parse(time)!!.toLocalDateTime()
