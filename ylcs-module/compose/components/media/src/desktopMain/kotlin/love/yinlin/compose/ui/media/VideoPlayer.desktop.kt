@@ -1,7 +1,6 @@
 package love.yinlin.compose.ui.media
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,7 +8,6 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.zIndex
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.compose.Colors
 import love.yinlin.foundation.PlatformContext
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.Rect
@@ -57,6 +55,6 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
 
 actual fun buildVideoController(
     context: PlatformContext,
-    topBar: VideoActionBar?,
-    bottomBar: VideoActionBar?
+    topBar: VideoActionBar.Factory,
+    bottomBar: VideoActionBar.Factory
 ): VideoController = VideoController.build(topBar, bottomBar)

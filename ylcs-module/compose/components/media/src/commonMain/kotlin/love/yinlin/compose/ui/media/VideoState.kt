@@ -20,7 +20,10 @@ import love.yinlin.compose.ui.node.silentClick
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-abstract class VideoState internal constructor(val topBar: VideoActionBar?, val bottomBar: VideoActionBar?) {
+abstract class VideoState internal constructor(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) {
+    private val videoTopBar = topBar(this)
+    private val videoBottomBar = bottomBar(this)
+
     var url: String? by mutableStateOf(null)
         protected set
 
@@ -92,26 +95,25 @@ abstract class VideoState internal constructor(val topBar: VideoActionBar?, val 
             }
 
             ThemeContainer(Colors.White) {
-                val controller = this@VideoState as VideoController
-                topBar?.apply {
+                videoTopBar?.let { bar ->
                     VideoPlayerControlBar(
                         visible = isShowControls,
                         animateOffset = { -it },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Content(controller)
+                        with(bar) { Content() }
                     }
                 }
 
                 Box(modifier = Modifier.fillMaxWidth().weight(1f).silentClick { isShowControls = !isShowControls })
 
-                bottomBar?.apply {
+                videoBottomBar?.let { bar ->
                     VideoPlayerControlBar(
                         visible = isShowControls,
                         animateOffset = { it },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Content(controller)
+                        with(bar) { Content() }
                     }
                 }
             }

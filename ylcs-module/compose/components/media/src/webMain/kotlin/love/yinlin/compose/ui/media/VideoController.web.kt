@@ -13,7 +13,7 @@ import org.w3c.dom.HTMLVideoElement
 import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
-actual abstract class VideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(topBar, bottomBar) {
+actual abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoState(topBar, bottomBar) {
     abstract val view: PlatformView<HTMLVideoElement>
 
     actual override fun release() { }
@@ -21,7 +21,7 @@ actual abstract class VideoController(topBar: VideoActionBar?, bottomBar: VideoA
 
 @Stable
 @OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
-internal class WebVideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(topBar, bottomBar) {
+internal class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     override val view = object : PlatformView<HTMLVideoElement>() {
         override fun build(): HTMLVideoElement = createElement {
             autoplay = true

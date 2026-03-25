@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities
 
 @Stable
 @NativeLibApi
-internal class WindowsVideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(topBar, bottomBar) {
+internal class WindowsVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     @Stable
     private enum class PlaybackState { None, Opening, Buffering, Playing, Paused; }
 

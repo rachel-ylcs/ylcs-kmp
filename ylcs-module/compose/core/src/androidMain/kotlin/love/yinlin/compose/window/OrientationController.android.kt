@@ -13,7 +13,6 @@ actual fun rememberOrientationController(): OrientationController {
     val activity = LocalContext.current as? Activity
 
     DisposableEffect(activity) {
-        println(activity)
         onDispose {
             if (activity != null) activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }

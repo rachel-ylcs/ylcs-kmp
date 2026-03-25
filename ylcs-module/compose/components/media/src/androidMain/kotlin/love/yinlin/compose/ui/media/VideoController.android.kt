@@ -18,13 +18,13 @@ import love.yinlin.media.FfmpegRenderersFactory
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-actual abstract class VideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(topBar, bottomBar) {
+actual abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoState(topBar, bottomBar) {
     internal abstract val exoPlayer: ExoPlayer
 
     actual override fun release() { }
 }
 
-internal class AndroidVideoController(context: PlatformContext, topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoController(topBar, bottomBar) {
+internal class AndroidVideoController(context: PlatformContext, topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     private val scope = CoroutineScope(SupervisorJob() + mainContext)
 
     private val listener = object : Player.Listener {

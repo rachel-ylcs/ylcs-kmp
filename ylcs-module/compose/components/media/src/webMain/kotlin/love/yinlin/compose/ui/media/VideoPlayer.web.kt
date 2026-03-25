@@ -11,6 +11,6 @@ actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
 
 actual fun buildVideoController(
     context: PlatformContext,
-    topBar: VideoActionBar?,
-    bottomBar: VideoActionBar?
+    topBar: VideoActionBar.Factory,
+    bottomBar: VideoActionBar.Factory
 ): VideoController = WebVideoController(topBar, bottomBar)

@@ -16,13 +16,13 @@ import org.jetbrains.skia.Paint
 
 @Stable
 @NativeLibApi
-actual abstract class VideoController(topBar: VideoActionBar?, bottomBar: VideoActionBar?) : VideoState(topBar, bottomBar) {
+actual abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoState(topBar, bottomBar) {
     internal companion object {
         init {
             NativeLibLoader.resource("media")
         }
 
-        fun build(topBar: VideoActionBar?, bottomBar: VideoActionBar?): VideoController = when (platform) {
+        fun build(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory): VideoController = when (platform) {
             Platform.Windows -> WindowsVideoController(topBar, bottomBar)
             Platform.MacOS -> MacOSVideoController(topBar, bottomBar)
             else -> LinuxVideoController(topBar, bottomBar)

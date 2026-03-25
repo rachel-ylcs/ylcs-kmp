@@ -9,6 +9,6 @@ expect fun VideoPlayer(controller: VideoController, modifier: Modifier = Modifie
 
 expect fun buildVideoController(
     context: PlatformContext,
-    topBar: VideoActionBar? = null,
-    bottomBar: VideoActionBar? = VideoActionBar.Progress
+    topBar: VideoActionBar.Factory = VideoActionBar.None,
+    bottomBar: VideoActionBar.Factory = VideoActionBar.Progress
 ): VideoController
