@@ -76,7 +76,7 @@ class Constants(project: Project) {
         minVersionName = "3.4.1",
         description = "银临茶舍KMP跨平台APP",
         vendor = "银临茶舍",
-        copyright = "© 2024-2025 银临茶舍 版权所有",
+        copyright = "© 2024-2026 银临茶舍 版权所有",
         homepage = "https://github.com/rachel-ylcs/ylcs-kmp",
         packageName = namespace
     )
@@ -85,8 +85,8 @@ class Constants(project: Project) {
     val jvm = JvmConfig(
         version = 25,
         target = JvmTarget.JVM_25,
-        androidTarget = JvmTarget.JVM_22,
-        compatibility = JavaVersion.VERSION_22
+        androidTarget = JvmTarget.JVM_25,
+        compatibility = JavaVersion.VERSION_25
     )
 
     // Android 配置
