@@ -1,3 +1,4 @@
+import com.vanniktech.maven.publish.DeploymentValidation
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import love.yinlin.task.GenerateCodeTask
 import org.gradle.api.NamedDomainObjectContainer
@@ -165,7 +166,7 @@ inline fun <reified T : KotlinBaseExtension> Project.template(t: KotlinTemplate<
 
         // Maven
         extensions.findByType<MavenPublishBaseExtension>()?.apply {
-            publishToMavenCentral()
+            publishToMavenCentral(automaticRelease = true, validateDeployment = DeploymentValidation.NONE)
             signAllPublications()
             coordinates(uniqueGroupName, uniqueName, C.app.versionName)
 
