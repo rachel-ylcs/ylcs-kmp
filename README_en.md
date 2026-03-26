@@ -117,7 +117,7 @@ Sort by first letter.
 
 |  Type   |     Author      |                                                                                Name                                                                                |
 |:-------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| Library | alexzhirkevich  |                             [compottie](https://github.com/alexzhirkevich/compottie), [qrose](https://github.com/alexzhirkevich/qrose)                             |
+| Library | alexzhirkevich  |                                                          [qrose](https://github.com/alexzhirkevich/qrose)                                                          |
 | Library | brettwooldridge |                                                      [HikariCP](https://github.com/brettwooldridge/HikariCP)                                                       |
 | Library |    Calvin-LL    |                                                      [reorderable](https://github.com/Calvin-LL/Reorderable)                                                       |
 | Library |   chrisbanes    |                                                             [haze](https://github.com/chrisbanes/haze)                                                             |
