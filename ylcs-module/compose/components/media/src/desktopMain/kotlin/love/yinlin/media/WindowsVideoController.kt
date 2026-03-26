@@ -3,7 +3,7 @@ package love.yinlin.media
 import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.ui.media.VideoActionBar
-import love.yinlin.compose.ui.media.VideoController
+import love.yinlin.compose.ui.media.DesktopVideoController
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType
@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities
 
 @Stable
 @NativeLibApi
-internal class WindowsVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
+internal class WindowsVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : DesktopVideoController(topBar, bottomBar) {
     @Stable
     private enum class PlaybackState { None, Opening, Buffering, Playing, Paused; }
 
