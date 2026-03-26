@@ -18,7 +18,7 @@ import org.jetbrains.skia.SamplingMode
 actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
     Box(modifier = modifier) {
         Canvas(modifier = Modifier.matchParentSize().zIndex(1f)) {
-            // 利用 updateCount 重组
+            // 利用 position 重组
             val image = if (controller.position >= 0L) controller.image else null
             val canvasWidth = this.size.width
             val canvasHeight = this.size.height
