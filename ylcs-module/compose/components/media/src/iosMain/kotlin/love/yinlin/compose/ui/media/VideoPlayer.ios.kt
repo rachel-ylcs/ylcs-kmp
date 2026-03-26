@@ -5,13 +5,13 @@ import androidx.compose.ui.Modifier
 import love.yinlin.compose.ui.tool.UnsupportedPlatformComponent
 import love.yinlin.foundation.PlatformContext
 
-@Composable
-actual fun VideoPlayer(controller: VideoController, modifier: Modifier) {
-    UnsupportedPlatformComponent(modifier = modifier)
-}
-
 actual fun buildVideoController(
     context: PlatformContext,
     topBar: VideoActionBar.Factory,
     bottomBar: VideoActionBar.Factory
 ): VideoController = IOSVideoController(topBar, bottomBar)
+
+@Composable
+actual fun VideoSurface(controller: VideoController, modifier: Modifier) {
+    UnsupportedPlatformComponent(modifier = modifier)
+}
