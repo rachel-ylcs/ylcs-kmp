@@ -4,7 +4,7 @@ import androidx.annotation.CallSuper
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
@@ -18,7 +18,7 @@ import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 @Stable
-class Layer(
+open class Layer(
     vararg visibles: Visible,
     val zIndex: Int = 0, // 层级
     override val id: String = Uuid.generateV7().toString(),
@@ -28,9 +28,8 @@ class Layer(
         private fun requireCulling(bounds: Rect, visible: Visible): Boolean {
             if (!visible.culling) return false
             val (x, y) = visible.position
-            val size = visible.size * visible.scale
-            // alpha max plus beta min
-            val radius = size.maxDimension * 0.5f + size.minDimension * 0.1875f
+            val (w, h) = visible.size
+            val radius = (w + h) * visible.scale / 2
             if (x + radius < bounds.left) return true
             if (x - radius > bounds.right) return true
             if (y + radius < bounds.top) return true
@@ -40,7 +39,6 @@ class Layer(
     }
 
     private var engine: Engine? = null
-    private val drawer = Drawer()
 
     private val items = mutableStateListOf(*visibles)
 
@@ -79,12 +77,11 @@ class Layer(
         this.engine = null
     }
 
-    internal fun drawLayer(rawScope: DrawScope, bounds: Rect) {
-        drawer.scope = rawScope
+    internal fun Drawer.drawVisibleLayer(viewportSize: Size, bounds: Rect) {
         visibleItems.fastForEach { item ->
             // 视口剔除
             if (!requireCulling(bounds, item)) {
-                rawScope.withTransform({
+                scope?.withTransform({
                     // 偏移
                     translate(offset = item.position)
                     // 旋转
@@ -96,10 +93,9 @@ class Layer(
                     // 裁切
                     if (item.clip) item.shape.onClip(this, item.size)
                 }) {
-                    with(item) { drawer.onDraw() }
+                    with(item) { onDraw(viewportSize) }
                 }
             }
         }
-        drawer.scope = null
     }
 }

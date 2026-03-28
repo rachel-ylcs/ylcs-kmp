@@ -12,8 +12,6 @@ import love.yinlin.compose.extension.translate
 class Drawer internal constructor() {
     @PublishedApi internal var scope: DrawScope? = null
 
-    // Shape
-
     fun line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
         scope?.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
     }

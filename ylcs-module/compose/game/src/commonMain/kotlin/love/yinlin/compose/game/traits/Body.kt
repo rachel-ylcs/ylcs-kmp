@@ -10,16 +10,42 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 
 @Stable
-abstract class Body(
+open class Body(
     position: Offset = Offset.Zero,
     size: Size = Size.Zero,
 ) : Entity() {
-    var position: Offset by mutableStateOf(position)
-    var size: Size by mutableStateOf(size)
-    var scale: Float by mutableFloatStateOf(1f)
-    var rotate: Float by mutableFloatStateOf(0f)
-    var clip: Boolean by mutableStateOf(true)
-    var shape: Shape by mutableStateOf(Shape.Box)
+    /**
+     * 是否裁切溢出
+     */
+    open val clip: Boolean = true
 
+    /**
+     * 形状
+     */
+    open val shape: Shape = Shape.Box
+
+    /**
+     * 位置
+     */
+    var position: Offset by mutableStateOf(position)
+
+    /**
+     * 大小
+     */
+    var size: Size by mutableStateOf(size)
+
+    /**
+     * 缩放
+     */
+    var scale: Float by mutableFloatStateOf(1f)
+
+    /**
+     * 旋转
+     */
+    var rotate: Float by mutableFloatStateOf(0f)
+
+    /**
+     * 中心点
+     */
     val center: Offset get() = size.center
 }

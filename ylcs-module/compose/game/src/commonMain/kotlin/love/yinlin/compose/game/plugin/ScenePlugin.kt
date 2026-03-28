@@ -7,7 +7,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.toSize
@@ -17,6 +16,7 @@ import androidx.compose.ui.util.fastMapNotNull
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Camera
+import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
@@ -45,22 +45,26 @@ class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
 
     operator fun plusAssign(entity: Entity) {
         entities += entity
-        entity.onAttached(engine)
+        if (isInitialized) entity.onAttached(engine)
     }
 
     operator fun minusAssign(entity: Entity) {
         entities -= entity
-        entity.onDetached(engine)
+        if (isInitialized) entity.onDetached(engine)
     }
 
     fun clear() {
-        entities.clear()
-        entities.fastForEachReversed { it.onDetached(engine) }
+        if (isInitialized) {
+            entities.clear()
+            entities.fastForEachReversed { it.onDetached(engine) }
+        }
     }
 
     override suspend fun onInitialize() {
-        entities.fastForEach { it.onAttached(engine) }
-        isInitialized = true
+        if (!isInitialized) {
+            entities.fastForEach { it.onAttached(engine) }
+            isInitialized = true
+        }
     }
 
     override fun onRelease() {
@@ -77,22 +81,21 @@ class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
         Box(modifier = Modifier.fillMaxSize().onSizeChanged {
             camera.updateViewport(it.toSize(), engine.viewport)
         }.clipToBounds().graphicsLayer {
-            val totalScale = camera.rawViewportScale * camera.scale
-            val (centerX, centerY) = size / 2f
-            val (cameraX, cameraY) = camera.position * totalScale
-
-            transformOrigin = TransformOrigin(0f, 0f)
-            scaleX = totalScale
-            scaleY = totalScale
-            translationX = centerX - cameraX
-            translationY = centerY - cameraY
+            camera.transformLayer(this, size)
         }) {
             layerEntities.fastForEach { layer ->
                 key(layer.id) {
+                    val drawer = remember { Drawer() }
+
                     Box(modifier = Modifier.fillMaxSize().drawWithCache {
                         val bounds = camera.viewportBounds
+                        val viewportSize = camera.viewportSize
                         onDrawBehind {
-                            layer.drawLayer(this, bounds)
+                            drawer.scope = this
+                            with(layer) {
+                                drawer.drawVisibleLayer(viewportSize, bounds)
+                            }
+                            drawer.scope = null
                         }
                     }.zIndex(layer.zIndex.toFloat()))
                 }
