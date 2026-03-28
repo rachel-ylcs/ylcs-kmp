@@ -17,6 +17,7 @@ import love.yinlin.compose.OffScreenEffect
 import love.yinlin.compose.game.plugin.FontPlugin
 import love.yinlin.compose.game.plugin.Plugin
 import love.yinlin.compose.game.plugin.ScenePlugin
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
 import love.yinlin.extension.catchingDefault
 import love.yinlin.reflect.metaClassName
@@ -133,37 +134,35 @@ class Engine(
     /**
      * 初始化
      */
-    fun initialize(onInitialize: suspend () -> Unit) {
-        if (!isInitialized) {
-            scope.launch {
-                isInitialized = catchingDefault(false) {
-                    coroutineScope {
-                        // 依赖表
-                        val taskMap = mutableMapOf<String, Deferred<Boolean>>()
-                        // 先拓扑排序
-                        topologicInfo.fastMap { (plugin, dependencies) ->
-                            // 并行加载
-                            val task = async {
-                                // 等待依赖插件完成
-                                for (dependentId in dependencies) {
-                                    val dependencyTask = taskMap[dependentId]
-                                    require(dependencyTask != null) { "dependent plugins $dependentId is not initialized" }
-                                    dependencyTask.await()
-                                }
-                                plugin.onInitialize()
-                                plugin.isInitialized
+    suspend fun initialize(): Boolean = if (isInitialized) true else Coroutines.sync { future ->
+        scope.launch {
+            isInitialized = catchingDefault(false) {
+                coroutineScope {
+                    // 依赖表
+                    val taskMap = mutableMapOf<String, Deferred<Boolean>>()
+                    // 先拓扑排序
+                    topologicInfo.fastMap { (plugin, dependencies) ->
+                        // 并行加载
+                        val task = async {
+                            // 等待依赖插件完成
+                            for (dependentId in dependencies) {
+                                val dependencyTask = taskMap[dependentId]
+                                require(dependencyTask != null) { "dependent plugins $dependentId is not initialized" }
+                                dependencyTask.await()
                             }
-                            taskMap[plugin.id] = task
-                            task
-                        }.awaitAll()
-                        plugins.fastAll { it.isInitialized }
-                    }
+                            plugin.onInitialize()
+                            plugin.isInitialized
+                        }
+                        taskMap[plugin.id] = task
+                        task
+                    }.awaitAll()
+                    plugins.fastAll { it.isInitialized }
                 }
-
-                if (isInitialized) onInitialize()
             }
+
+            future.send(isInitialized)
         }
-    }
+    } ?: false
 
     /**
      * 销毁

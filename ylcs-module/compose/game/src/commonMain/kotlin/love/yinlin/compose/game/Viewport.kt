@@ -11,12 +11,12 @@ import kotlin.math.min
  * 视口
  */
 @Stable
-sealed class Viewport {
-    abstract fun applyWindowBounds(windowSize: IntSize): IntRect
-    abstract fun applyCanvasBounds(canvasSize: Size): Pair<Size, Float>
+sealed interface Viewport {
+    fun applyWindowBounds(windowSize: IntSize): IntRect
+    fun applyCanvasBounds(canvasSize: Size): Pair<Size, Float>
 
     @Stable
-    data class Fixed(val width: Int, val height: Int): Viewport() {
+    data class Fixed(val width: Int, val height: Int): Viewport {
         override fun applyWindowBounds(windowSize: IntSize): IntRect {
             require(width > 0 && height > 0)
             val scaleX = windowSize.width / width.toFloat()
@@ -36,7 +36,7 @@ sealed class Viewport {
     }
 
     @Stable
-    data class MatchWidth(val width: Int): Viewport() {
+    data class MatchWidth(val width: Int): Viewport {
         override fun applyWindowBounds(windowSize: IntSize): IntRect {
             require(width > 0)
             return IntRect(IntOffset.Zero, windowSize)
@@ -50,7 +50,7 @@ sealed class Viewport {
     }
 
     @Stable
-    data class MatchHeight(val height: Int) : Viewport() {
+    data class MatchHeight(val height: Int) : Viewport {
         override fun applyWindowBounds(windowSize: IntSize): IntRect {
             require(height > 0)
             return IntRect(IntOffset.Zero, windowSize)

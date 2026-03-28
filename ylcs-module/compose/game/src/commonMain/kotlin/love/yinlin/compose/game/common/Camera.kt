@@ -24,7 +24,7 @@ class Camera {
         private set
 
     /**
-     * 相机偏移
+     * 相机位置
      */
     var position: Offset by mutableStateOf(Offset.Zero)
 
