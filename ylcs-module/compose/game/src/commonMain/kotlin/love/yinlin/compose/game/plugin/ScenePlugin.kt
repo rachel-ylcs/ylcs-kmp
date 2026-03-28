@@ -17,11 +17,14 @@ import love.yinlin.compose.game.traits.Visible
 
 @Stable
 class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
-    private val camera = Camera()
+    val camera = Camera()
 
     private val entities = mutableStateListOf<Entity>()
     private val dynamicEntities by derivedStateOf {
-        entities.fastMapNotNull { it as? Dynamic }
+        entities.fastMapNotNull {
+            val dynamic = it as? Dynamic
+            if (dynamic?.active == true) dynamic else null
+        }
     }
     private val visibleEntities by derivedStateOf {
         entities.fastMapNotNull {
@@ -47,13 +50,13 @@ class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
     @Composable
     override fun BoxScope.Content() {
         Box(modifier = Modifier.fillMaxSize().drawWithCache {
-            camera.updateViewport(size, engine.viewport)
-            val drawer = Drawer(camera)
+            val drawer = Drawer(camera.updateViewport(size, engine.viewport))
+
             onDrawBehind {
-                drawer.draw(this) {
-                    visibleEntities.fastForEach {
-                        with(it) { onDraw() }
-                    }
+                val rawScope = this
+                val bounds = camera.viewportBounds
+                drawer.draw(rawScope) {
+                    visibleEntities.fastForEach { drawer.drawVisible(rawScope, bounds, it) }
                 }
             }
         })

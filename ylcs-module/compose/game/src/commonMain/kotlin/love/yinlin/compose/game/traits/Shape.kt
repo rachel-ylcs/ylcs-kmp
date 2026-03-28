@@ -2,13 +2,15 @@ package love.yinlin.compose.game.traits
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import love.yinlin.compose.game.common.Drawer
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawTransform
 
 @Stable
 interface Shape {
     fun contains(size: Size, point: Offset): Boolean
-    fun Drawer.onClip(size: Size)
+    fun onClip(transform: DrawTransform, size: Size)
 
     @Stable
     object Box : Shape {
@@ -16,8 +18,8 @@ interface Shape {
             return (point.x >= 0f) && (point.x < size.width) && (point.y >= 0f) && (point.y < size.height)
         }
 
-        override fun Drawer.onClip(size: Size) {
-
+        override fun onClip(transform: DrawTransform, size: Size) {
+            transform.clipRect(0f, 0f, size.width, size.height)
         }
     }
 
@@ -31,8 +33,8 @@ interface Shape {
             return (dx * dx) / (a * a) + (dy * dy) / (b * b) <= 1f
         }
 
-        override fun Drawer.onClip(size: Size) {
-
+        override fun onClip(transform: DrawTransform, size: Size) {
+            transform.clipPath(Path().apply { addOval(Rect(Offset.Zero, size)) })
         }
     }
 }

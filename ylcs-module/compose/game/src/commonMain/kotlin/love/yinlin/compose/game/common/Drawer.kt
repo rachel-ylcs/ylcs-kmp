@@ -6,25 +6,65 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.extension.roundToIntOffset
+import love.yinlin.compose.extension.scale
 import love.yinlin.compose.extension.translate
+import love.yinlin.compose.game.traits.Visible
+import kotlin.math.hypot
 
 @Stable
 class Drawer internal constructor(private val camera: Camera) {
-    @PublishedApi internal var scope: DrawScope? = null
+    companion object {
+        // 视口剔除
+        private fun requireCulling(bounds: Rect, visible: Visible): Boolean {
+            val (x, y) = visible.position
+            val size = visible.size
+            val radius = hypot(size.width, size.height) / 2 * visible.scale
+            if (x + radius < bounds.left) return true
+            if (x - radius > bounds.right) return true
+            if (y + radius < bounds.top) return true
+            if (y - radius > bounds.bottom) return true
+            return false
+        }
+    }
 
-    val viewportSize: Size get() = camera.viewportSize
+    @PublishedApi internal var scope: DrawScope? = null
 
     internal inline fun draw(rawScope: DrawScope, block: Drawer.() -> Unit) {
         scope = rawScope
         rawScope.withTransform({
-            // 裁剪画布边界
+            // 裁剪视口边界
             clipRect()
-            // 缩放到视口
-            scale(camera.viewportScale, Offset.Zero)
+            // Canvas偏移
+            translate(size.width / 2f, size.height / 2f)
+            // 合并视口缩放和相机缩放
+            scale(camera.rawViewportScale * camera.scale, Offset.Zero)
+            // 相机偏移
+            translate(-camera.position)
         }) {
             block()
         }
         scope = null
+    }
+
+    internal fun drawVisible(rawScope: DrawScope, bounds: Rect, visible: Visible) {
+        // 视口剔除
+        if (requireCulling(bounds, visible)) return
+
+        // 绘制
+        rawScope.withTransform({
+            // 偏移
+            translate(offset = visible.position)
+            // 旋转
+            if (visible.rotate != 0f) rotate(degrees = visible.rotate, pivot = Offset.Zero)
+            // 缩放
+            if (visible.scale != 1f) scale(ratio = visible.scale, pivot = Offset.Zero)
+            // Canvas偏移
+            translate(-visible.center)
+            // 裁切
+            if (visible.clip) visible.shape.onClip(this, visible.size)
+        }) {
+            with(visible) { onDraw() }
+        }
     }
 
     // Shape
@@ -146,54 +186,4 @@ class Drawer internal constructor(private val camera: Camera) {
             filterQuality = FilterQuality.High,
         )
     }
-
-    // Transform
-
-    inline fun translate(x: Float, y: Float, block: Drawer.() -> Unit) {
-        scope?.translate(x, y) { block()}
-    }
-
-    inline fun translate(offset: Offset, block: Drawer.() -> Unit) {
-        scope?.translate(offset.x, offset.y) { block() }
-    }
-
-    inline fun scale(ratio: Float, pivot: Offset = viewportSize.center, block: Drawer.() -> Unit) {
-        scope?.scale(ratio, ratio, pivot) { block() }
-    }
-
-    inline fun scale(x: Float, y: Float, pivot: Offset = viewportSize.center, block: Drawer.() -> Unit) {
-        scope?.scale(x, y, pivot) { block() }
-    }
-
-    inline fun rotate(degrees: Float, pivot: Offset = viewportSize.center, block: Drawer.() -> Unit) {
-        scope?.rotate(degrees, pivot) { block() }
-    }
-
-    inline fun clip(position: Offset, size: Size, block: Drawer.() -> Unit) {
-        scope?.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height)) { block() }
-    }
-
-    inline fun clip(rect: Rect, block: Drawer.() -> Unit) {
-        clip(rect.topLeft, rect.size, block)
-    }
-
-    inline fun clip(path: Path, block: Drawer.() -> Unit) {
-        scope?.clipPath(path) { block() }
-    }
-
-    inline fun transform(matrix: Matrix, block: Drawer.() -> Unit) {
-        scope?.withTransform({ transform(matrix) }) { block() }
-    }
-
-    inline fun transform(transformBlock: DrawTransform.() -> Unit, block: Drawer.() -> Unit) {
-        scope?.withTransform(transformBlock) { block() }
-    }
-
-    fun DrawTransform.translate(offset: Offset) = translate(offset.x, offset.y)
-
-    fun DrawTransform.scale(ratio: Float, pivot: Offset = center) = scale(ratio, ratio, pivot)
-
-    fun DrawTransform.flipX(pivot: Offset = center) = scale(-1f, 1f, pivot)
-
-    fun DrawTransform.flipY(pivot: Offset = center) = scale(1f, -1f, pivot)
 }
