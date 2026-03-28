@@ -16,7 +16,19 @@ abstract class Visible(
     zIndex: Int = 0,
     visible: Boolean = true
 ) : Body(position, size) {
+    /**
+     * 参与视口剔除
+     */
+    open val culling: Boolean = true
+
+    /**
+     * 层级
+     */
     var zIndex by mutableIntStateOf(zIndex)
+
+    /**
+     * 可见
+     */
     var visible by mutableStateOf(visible)
 
     abstract fun Drawer.onDraw()

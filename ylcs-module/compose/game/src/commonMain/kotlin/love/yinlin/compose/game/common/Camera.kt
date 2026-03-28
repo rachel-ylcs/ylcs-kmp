@@ -54,10 +54,9 @@ class Camera {
 
     inline fun updatePosition(block: (Offset) -> Offset) { position = block(position) }
 
-    internal fun updateViewport(size: Size, viewport: Viewport): Camera {
+    internal fun updateViewport(size: Size, viewport: Viewport) {
         val (newSize, newScale) = viewport.applyCanvasBounds(size)
         rawViewportSize = newSize
         rawViewportScale = newScale
-        return this
     }
 }

@@ -6,66 +6,11 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.extension.roundToIntOffset
-import love.yinlin.compose.extension.scale
 import love.yinlin.compose.extension.translate
-import love.yinlin.compose.game.traits.Visible
-import kotlin.math.hypot
 
 @Stable
-class Drawer internal constructor(private val camera: Camera) {
-    companion object {
-        // 视口剔除
-        private fun requireCulling(bounds: Rect, visible: Visible): Boolean {
-            val (x, y) = visible.position
-            val size = visible.size
-            val radius = hypot(size.width, size.height) / 2 * visible.scale
-            if (x + radius < bounds.left) return true
-            if (x - radius > bounds.right) return true
-            if (y + radius < bounds.top) return true
-            if (y - radius > bounds.bottom) return true
-            return false
-        }
-    }
-
+class Drawer internal constructor() {
     @PublishedApi internal var scope: DrawScope? = null
-
-    internal inline fun draw(rawScope: DrawScope, block: Drawer.() -> Unit) {
-        scope = rawScope
-        rawScope.withTransform({
-            // 裁剪视口边界
-            clipRect()
-            // Canvas偏移
-            translate(size.width / 2f, size.height / 2f)
-            // 合并视口缩放和相机缩放
-            scale(camera.rawViewportScale * camera.scale, Offset.Zero)
-            // 相机偏移
-            translate(-camera.position)
-        }) {
-            block()
-        }
-        scope = null
-    }
-
-    internal fun drawVisible(rawScope: DrawScope, bounds: Rect, visible: Visible) {
-        // 视口剔除
-        if (requireCulling(bounds, visible)) return
-
-        // 绘制
-        rawScope.withTransform({
-            // 偏移
-            translate(offset = visible.position)
-            // 旋转
-            if (visible.rotate != 0f) rotate(degrees = visible.rotate, pivot = Offset.Zero)
-            // 缩放
-            if (visible.scale != 1f) scale(ratio = visible.scale, pivot = Offset.Zero)
-            // Canvas偏移
-            translate(-visible.center)
-            // 裁切
-            if (visible.clip) visible.shape.onClip(this, visible.size)
-        }) {
-            with(visible) { onDraw() }
-        }
-    }
 
     // Shape
 
