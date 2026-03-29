@@ -3,6 +3,7 @@ package love.yinlin.compose.game.traits
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
@@ -40,8 +41,13 @@ abstract class Visible(
     open val culling: Boolean = true
 
     /**
-     * 位置
+     * 绘制
      */
+    abstract fun Drawer.onDraw()
+
+    // 脏区标记
+    @PublishedApi internal var dirtyValue: Long by mutableLongStateOf(0L)
+
     var position: Offset by mutableOffsetStateOf(position)
 
     /**
@@ -63,11 +69,6 @@ abstract class Visible(
      * 可见
      */
     var visible by mutableStateOf(visible)
-
-    /**
-     * 绘制
-     */
-    abstract fun Drawer.onDraw()
 
     /**
      * 中心点

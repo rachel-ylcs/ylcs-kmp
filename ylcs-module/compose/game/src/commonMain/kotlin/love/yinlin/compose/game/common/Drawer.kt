@@ -15,92 +15,92 @@ class Drawer internal constructor(
     fontFamilyResolver: FontFamily.Resolver,
     fontProvider: FontProvider
 ) : PrepareDrawer(textCacheCapacity, fontFamilyResolver, fontProvider) {
-    @PublishedApi internal var scope: DrawScope? = null
+    @PublishedApi internal var rawScope: DrawScope? = null
 
     // 拓展函数 - Draw
 
     fun line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
+        rawScope?.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
     }
 
     fun line(brush: Brush, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
+        rawScope?.drawLine(brush = brush, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
     }
 
     fun circle(color: Color, position: Offset, radius: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawCircle(color = color, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawCircle(color = color, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun circle(brush: Brush, position: Offset, radius: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawCircle(brush = brush, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawCircle(brush = brush, radius = radius, center = position, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun oval(color: Color, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawOval(color = color, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawOval(color = color, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun oval(brush: Brush, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawOval(brush = brush, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawOval(brush = brush, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun rect(color: Color, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRect(color = color, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRect(color = color, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun rect(brush: Brush, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRect(brush = brush, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun rect(color: Color, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRect(color = color, topLeft = rect.topLeft, size = rect.size, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRect(color = color, topLeft = rect.topLeft, size = rect.size, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun rect(brush: Brush, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRect(brush = brush, topLeft = rect.topLeft, size = rect.size, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRect(brush = brush, topLeft = rect.topLeft, size = rect.size, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(color: Color, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(brush: Brush, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(color: Color, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRoundRect(color = color, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(color = color, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(brush: Brush, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawRoundRect(brush = brush, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(brush = brush, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun arc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawArc(color = color, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawArc(color = color, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun arc(brush: Brush, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawArc(brush = brush, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawArc(brush = brush, startAngle = startAngle, sweepAngle = sweepAngle, useCenter = false, topLeft = position, size = size, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawPath(path = love.yinlin.compose.extension.Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawPath(path = love.yinlin.compose.extension.Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawPath(path = love.yinlin.compose.extension.Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawPath(path = love.yinlin.compose.extension.Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawPath(path = path, color = color, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawPath(path = path, color = color, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun path(brush: Brush, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawPath(path = path, brush = brush, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawPath(path = path, brush = brush, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun image(image: ImageBitmap, position: Offset, size: Size, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawImage(
+        rawScope?.drawImage(
             image = image,
             dstOffset = position.roundToIntOffset(),
             dstSize = size.roundToIntSize(),
@@ -112,7 +112,7 @@ class Drawer internal constructor(
     }
 
     fun image(image: ImageBitmap, rect: Rect, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawImage(
+        rawScope?.drawImage(
             image = image,
             dstOffset = rect.topLeft.roundToIntOffset(),
             dstSize = rect.size.roundToIntSize(),
@@ -124,7 +124,7 @@ class Drawer internal constructor(
     }
 
     fun image(image: ImageBitmap, src: Rect, dst: Rect, alpha: Float = 1f, colorFilter: ColorFilter? = null, blendMode: BlendMode = BlendMode.SrcOver) {
-        scope?.drawImage(
+        rawScope?.drawImage(
             image = image,
             srcOffset = src.topLeft.roundToIntOffset(),
             srcSize = src.size.roundToIntSize(),
@@ -140,27 +140,27 @@ class Drawer internal constructor(
     // 拓展函数 - Transform
 
     inline fun translate(x: Float, y: Float, block: Drawer.() -> Unit) {
-        scope?.translate(x, y) { block()}
+        rawScope?.translate(x, y) { block()}
     }
 
     inline fun translate(offset: Offset, block: Drawer.() -> Unit) {
-        scope?.translate(offset.x, offset.y) { block() }
+        rawScope?.translate(offset.x, offset.y) { block() }
     }
 
     inline fun scale(ratio: Float, pivot: Offset, block: Drawer.() -> Unit) {
-        scope?.scale(ratio, ratio, pivot) { block() }
+        rawScope?.scale(ratio, ratio, pivot) { block() }
     }
 
     inline fun scale(x: Float, y: Float, pivot: Offset, block: Drawer.() -> Unit) {
-        scope?.scale(x, y, pivot) { block() }
+        rawScope?.scale(x, y, pivot) { block() }
     }
 
     inline fun rotate(degrees: Float, pivot: Offset, block: Drawer.() -> Unit) {
-        scope?.rotate(degrees, pivot) { block() }
+        rawScope?.rotate(degrees, pivot) { block() }
     }
 
     inline fun clip(position: Offset, size: Size, block: Drawer.() -> Unit) {
-        scope?.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height)) { block() }
+        rawScope?.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height)) { block() }
     }
 
     inline fun clip(rect: Rect, block: Drawer.() -> Unit) {
@@ -168,14 +168,14 @@ class Drawer internal constructor(
     }
 
     inline fun clip(path: Path, block: Drawer.() -> Unit) {
-        scope?.clipPath(path) { block() }
+        rawScope?.clipPath(path) { block() }
     }
 
     inline fun transform(matrix: Matrix, block: Drawer.() -> Unit) {
-        scope?.withTransform({ transform(matrix) }) { block() }
+        rawScope?.withTransform({ transform(matrix) }) { block() }
     }
 
     inline fun transform(transformBlock: DrawTransform.() -> Unit, block: Drawer.() -> Unit) {
-        scope?.withTransform(transformBlock) { block() }
+        rawScope?.withTransform(transformBlock) { block() }
     }
 }

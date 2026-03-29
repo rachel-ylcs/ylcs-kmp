@@ -88,7 +88,7 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
                         )
                     }
 
-                    Box(modifier = Modifier.fillMaxSize().drawWithCache {
+                    Box(modifier = Modifier.fillMaxSize().graphicsLayer().drawWithCache {
                         val bounds = camera.viewportBounds
                         val viewportSize = camera.viewportSize
 
@@ -97,11 +97,12 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
 
                         // 实际绘制
                         onDrawBehind {
-                            drawer.scope = this
+                            val rawScope = this
+                            drawer.rawScope = rawScope
                             with(layer) {
-                                drawer.drawVisibleLayer(bounds)
+                                drawer.drawVisibleLayer(rawScope, bounds)
                             }
-                            drawer.scope = null
+                            drawer.rawScope = null
                         }
                     }.zIndex(layer.layerOrder.toFloat()))
                 }

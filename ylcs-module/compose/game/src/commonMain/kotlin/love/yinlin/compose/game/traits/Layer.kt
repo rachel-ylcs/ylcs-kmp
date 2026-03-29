@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
@@ -26,21 +27,6 @@ open class Layer(
     val textCacheCapacity: Int = 8, // 文本绘制缓存容量
     override val id: String = Uuid.generateV7().toString(),
 ): Entity() {
-    companion object {
-        // 视口剔除
-        private fun requireCulling(bounds: Rect, visible: Visible): Boolean {
-            if (!visible.culling) return false
-            val (x, y) = visible.position
-            val (w, h) = visible.size
-            val radius = (w + h) * visible.scale / 2
-            if (x + radius < bounds.left) return true
-            if (x - radius > bounds.right) return true
-            if (y + radius < bounds.top) return true
-            if (y - radius > bounds.bottom) return true
-            return false
-        }
-    }
-
     private var engine: Engine? = null
 
     private val items = mutableStateListOf(*visibles)
@@ -92,21 +78,34 @@ open class Layer(
      */
     open fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) { }
 
-    internal fun Drawer.drawVisibleLayer(bounds: Rect) {
+    internal fun Drawer.drawVisibleLayer(rawScope: DrawScope, bounds: Rect) {
         visibleItems.fastForEach { item ->
             // 视口剔除
-            if (!requireCulling(bounds, item)) {
-                scope?.withTransform({
+            val (x, y) = item.position
+            val s = item.scale
+            val size = item.size
+            val culling = if (!item.culling) false else {
+                val radius = (size.width + size.height) * s / 2
+                when {
+                    x + radius < bounds.left -> true
+                    x - radius > bounds.right -> true
+                    y + radius < bounds.top -> true
+                    y - radius > bounds.bottom -> true
+                    else -> false
+                }
+            }
+            if (!culling) {
+                rawScope.withTransform({
                     // 偏移
-                    translate(offset = item.position)
+                    translate(x, y)
                     // 旋转
                     if (item.rotate != 0f) rotate(degrees = item.rotate, pivot = Offset.Zero)
                     // 缩放
-                    if (item.scale != 1f) scale(ratio = item.scale, pivot = Offset.Zero)
+                    if (item.scale != 1f) scale(ratio = s, pivot = Offset.Zero)
                     // Canvas偏移
                     translate(-item.center)
                     // 裁切
-                    if (item.clip) item.shape.onClip(this, item.size)
+                    if (item.clip) item.shape.onClip(this, size)
                 }) {
                     with(item) { onDraw() }
                 }
