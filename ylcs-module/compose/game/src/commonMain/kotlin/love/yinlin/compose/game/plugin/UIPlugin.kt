@@ -6,5 +6,5 @@ import love.yinlin.compose.game.common.LayerOrder
 
 @Stable
 abstract class UIPlugin(engine: Engine) : Plugin(engine) {
-    override val layerOrder: LayerOrder = LayerOrder.UI
+    override val layerOrder: Int = LayerOrder.UI
 }

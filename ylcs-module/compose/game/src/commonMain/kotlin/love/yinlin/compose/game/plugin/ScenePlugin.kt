@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
@@ -37,7 +38,7 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
         entities.fastMapNotNull {
             val layer = it as? Layer
             if (layer?.visible == true) layer else null
-        }.sortedBy(Layer::zIndex)
+        }.sortedBy(Layer::layerOrder)
     }
 
     val isEmpty: Boolean get() = entities.isEmpty()
@@ -67,7 +68,7 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
         dynamicEntities.fastForEach { it.onUpdate(tick) }
     }
 
-    override val layerOrder: LayerOrder = LayerOrder.GameSurface
+    override val layerOrder: Int = LayerOrder.GameSurface
 
     @Composable
     override fun BoxScope.Content() {
@@ -76,22 +77,34 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
         }.graphicsLayer {
             camera.transformLayer(this, size)
         }) {
+            val fontFamilyResolver = LocalFontFamilyResolver.current
+
             layerEntities.fastForEach { layer ->
                 key(layer.id) {
-                    val drawer = remember { Drawer(engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default) }
+                    val drawer = remember(fontFamilyResolver) {
+                        Drawer(
+                            textCacheCapacity = layer.textCacheCapacity,
+                            fontFamilyResolver = fontFamilyResolver,
+                            fontProvider = engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default
+                        )
+                    }
 
                     Box(modifier = Modifier.fillMaxSize().drawWithCache {
                         val bounds = camera.viewportBounds
                         val viewportSize = camera.viewportSize
 
+                        // 预绘制处理
+                        with(layer) { drawer.prepareDraw(viewportSize, bounds) }
+
+                        // 实际绘制
                         onDrawBehind {
                             drawer.scope = this
                             with(layer) {
-                                drawer.drawVisibleLayer(viewportSize, bounds)
+                                drawer.drawVisibleLayer(bounds)
                             }
                             drawer.scope = null
                         }
-                    }.zIndex(layer.zIndex.toFloat()))
+                    }.zIndex(layer.layerOrder.toFloat()))
                 }
             }
         }

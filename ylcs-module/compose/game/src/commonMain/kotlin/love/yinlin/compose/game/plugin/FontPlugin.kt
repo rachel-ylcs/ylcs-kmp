@@ -20,7 +20,7 @@ class FontPlugin private constructor(
     private val fontResources: List<FontResource>
 ) : Plugin(engine) {
     override val dynamic: Boolean = false
-    override val layerOrder: LayerOrder = LayerOrder.Low
+    override val layerOrder: Int = LayerOrder.Low
 
     private val fontMap = mutableStateMapOf<FontResource, FontFamily>()
 

@@ -35,7 +35,7 @@ class ScreenRhyme : BasicScreen() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
             val rect = object : Visible(Offset.Zero, Size(300f, 300f)) {
-                override fun Drawer.onDraw(viewportSize: Size) {
+                override fun Drawer.onDraw() {
                     rect(Colors.Green4, position = Offset.Zero, size = size)
                 }
             }

@@ -41,7 +41,7 @@ abstract class Plugin(val engine: Engine) {
     /**
      * 层级
      */
-    open val layerOrder: LayerOrder = LayerOrder.Default
+    open val layerOrder: Int = LayerOrder.Default
 
     /**
      * 内容

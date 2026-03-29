@@ -16,7 +16,7 @@ abstract class Visible(
     /**
      * 层级
      */
-    val layerOrder: LayerOrder = LayerOrder.Default,
+    val layerOrder: Int = LayerOrder.Default,
     visible: Boolean = true
 ) : Body(position, size) {
     /**
@@ -32,5 +32,5 @@ abstract class Visible(
     /**
      * 绘制
      */
-    abstract fun Drawer.onDraw(viewportSize: Size)
+    abstract fun Drawer.onDraw()
 }

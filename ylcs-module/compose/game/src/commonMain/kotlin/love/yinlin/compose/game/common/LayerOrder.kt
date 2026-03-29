@@ -1,20 +1,13 @@
 package love.yinlin.compose.game.common
 
 import androidx.compose.runtime.Stable
-import kotlin.jvm.JvmInline
 
+@Suppress("ConstPropertyName")
 @Stable
-@JvmInline
-value class LayerOrder(val value: Int) : Comparable<LayerOrder> {
-    val zIndex: Float get() = value.toFloat()
-
-    override fun compareTo(other: LayerOrder): Int = this.value.compareTo(other.value)
-
-    companion object {
-        val UI = LayerOrder(10)
-        val Default = LayerOrder(0)
-        val GameSurface = LayerOrder(-10)
-        val Low = LayerOrder(-20)
-        val Invisible = LayerOrder(Int.MIN_VALUE)
-    }
+object LayerOrder {
+    const val UI = 10
+    const val Default = 0
+    const val GameSurface = -10
+    const val Low = -20
+    const val Invisible = Int.MIN_VALUE
 }

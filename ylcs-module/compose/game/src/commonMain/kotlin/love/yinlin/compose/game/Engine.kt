@@ -215,7 +215,7 @@ class Engine(
                 Box(modifier = Modifier.background(Color.Black).clipToBounds()) {
                     visiblePlugins.fastForEach { plugin ->
                         key(plugin.id) {
-                            Box(modifier = Modifier.fillMaxSize().zIndex(plugin.layerOrder.zIndex)) {
+                            Box(modifier = Modifier.fillMaxSize().zIndex(plugin.layerOrder.toFloat())) {
                                 with(plugin) { Content() }
                             }
                         }

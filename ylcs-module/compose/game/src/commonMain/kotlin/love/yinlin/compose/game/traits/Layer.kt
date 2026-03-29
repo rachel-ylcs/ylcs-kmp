@@ -13,6 +13,7 @@ import love.yinlin.compose.extension.scale
 import love.yinlin.compose.extension.translate
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.common.LayerOrder
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -20,7 +21,8 @@ import kotlin.uuid.Uuid
 @Stable
 open class Layer(
     vararg visibles: Visible,
-    val zIndex: Int = 0, // 层级
+    val layerOrder: Int = LayerOrder.Default, // 层级
+    val textCacheCapacity: Int = 8, // 文本绘制缓存容量
     override val id: String = Uuid.generateV7().toString(),
 ): Entity() {
     companion object {
@@ -77,7 +79,17 @@ open class Layer(
         this.engine = null
     }
 
-    internal fun Drawer.drawVisibleLayer(viewportSize: Size, bounds: Rect) {
+    /**
+     * 预绘制处理
+     *
+     * 此处不允许使用Drawer绘制内容，只能测量与更新状态
+     * @param viewportSize 视口大小 (等价于设计稿, 不包括相机缩放)
+     * @param viewportBounds 视口边界 (实际上屏幕能看到的视口范围)
+     *
+     */
+    open fun Drawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) { }
+
+    internal fun Drawer.drawVisibleLayer(bounds: Rect) {
         visibleItems.fastForEach { item ->
             // 视口剔除
             if (!requireCulling(bounds, item)) {
@@ -93,7 +105,7 @@ open class Layer(
                     // 裁切
                     if (item.clip) item.shape.onClip(this, item.size)
                 }) {
-                    with(item) { onDraw(viewportSize) }
+                    with(item) { onDraw() }
                 }
             }
         }
