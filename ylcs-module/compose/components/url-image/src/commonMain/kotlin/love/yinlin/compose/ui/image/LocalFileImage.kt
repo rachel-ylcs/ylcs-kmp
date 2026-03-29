@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.ContentScale
 import com.github.panpf.sketch.AsyncImage
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.fs.File
 
@@ -26,7 +26,7 @@ fun LocalFileImage(
     animated: Boolean = true,
     onClick: (() -> Unit)? = null
 ) {
-    var actualUri: String? by rememberState { null }
+    var actualUri: String? by rememberNull()
 
     LaunchedEffect(uri, *key) {
         actualUri = buildWebImageKeyUrl(uri, File(uri).fileSize())

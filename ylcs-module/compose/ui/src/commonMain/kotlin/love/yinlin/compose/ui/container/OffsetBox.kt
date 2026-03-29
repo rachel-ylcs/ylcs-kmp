@@ -5,14 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlin.math.abs
 
 @Composable
 fun OffsetBox(
-    x: Dp = 0.dp,
-    y: Dp = 0.dp,
+    x: Dp = Dp.Hairline,
+    y: Dp = Dp.Hairline,
     zIndex: Float = 2f,
     content: @Composable () -> Unit
 ) {

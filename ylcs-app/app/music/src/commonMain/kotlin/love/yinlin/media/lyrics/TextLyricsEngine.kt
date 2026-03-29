@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.condition
@@ -102,7 +102,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     final override fun LyricsCanvas(config: LyricsEngineConfig, host: LyricsEngineHost) {
         val scope = rememberCoroutineScope()
         val measurer = rememberTextMeasurer(16)
-        var containerSize by rememberState { IntSize.Zero }
+        var containerSize by rememberValueState(IntSize.Zero)
 
         LaunchedEffect(currentIndex) {
             if (!listState.isScrollInProgress && lines != null) {

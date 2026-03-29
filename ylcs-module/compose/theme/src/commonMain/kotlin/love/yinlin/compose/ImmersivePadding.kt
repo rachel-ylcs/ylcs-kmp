@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.extension.staticLocalComposition
 
@@ -35,12 +34,12 @@ data class ImmersivePadding(
     override fun calculateTopPadding(): Dp = top
     override fun calculateBottomPadding(): Dp = bottom
 
-    val withoutStart: ImmersivePadding get() = this.copy(start = 0.dp)
-    val withoutEnd: ImmersivePadding get() = this.copy(end = 0.dp)
-    val withoutTop: ImmersivePadding get() = this.copy(top = 0.dp)
-    val withoutBottom: ImmersivePadding get() = this.copy(bottom = 0.dp)
-    val withoutHorizontal: ImmersivePadding get() = this.copy(start = 0.dp, end = 0.dp)
-    val withoutVertical: ImmersivePadding get() = this.copy(top = 0.dp, bottom = 0.dp)
+    val withoutStart: ImmersivePadding get() = this.copy(start = Dp.Hairline)
+    val withoutEnd: ImmersivePadding get() = this.copy(end = Dp.Hairline)
+    val withoutTop: ImmersivePadding get() = this.copy(top = Dp.Hairline)
+    val withoutBottom: ImmersivePadding get() = this.copy(bottom = Dp.Hairline)
+    val withoutHorizontal: ImmersivePadding get() = this.copy(start = Dp.Hairline, end = Dp.Hairline)
+    val withoutVertical: ImmersivePadding get() = this.copy(top = Dp.Hairline, bottom = Dp.Hairline)
 
     companion object {
         val Zero = ImmersivePadding(PaddingValues.Zero)

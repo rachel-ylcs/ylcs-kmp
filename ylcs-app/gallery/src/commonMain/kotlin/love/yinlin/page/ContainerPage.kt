@@ -16,10 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import love.yinlin.Page
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.graphics.HSV
@@ -40,11 +42,11 @@ object ContainerPage : Page() {
     override fun Content() {
         ComponentColumn {
             Component("Surface") {
-                var padding by rememberState { 0.dp }
-                var shape by rememberState { 0.dp }
-                var shadow by rememberState { 0.dp }
-                var tonal by rememberState { 0 }
-                var border by rememberState { 0.dp }
+                var padding by rememberValueState(0.dp)
+                var shape by rememberValueState(0.dp)
+                var shadow by rememberValueState(0.dp)
+                var tonal by rememberValueState(0)
+                var border by rememberValueState(0.dp)
 
                 ExampleRow {
                     Text(text = "边距")
@@ -126,7 +128,7 @@ object ContainerPage : Page() {
                     Theme.color.secondaryContainer,
                     Theme.color.tertiaryContainer
                 )
-                var index: Int? by rememberState { null }
+                var index: Int? by rememberNull()
 
                 ReplaceableBox(
                     value = index,

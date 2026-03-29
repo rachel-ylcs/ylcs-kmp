@@ -85,8 +85,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private val clientResources = mutableStateListOf<ResourceItem>()
     private val remoteResources = mutableStateListOf<ResourceItem>()
 
-    private var clientSong: Song? by mutableStateOf(null)
-    private var remoteSong: Song? by mutableStateOf(null)
+    private var clientSong: Song? by mutableRefStateOf(null)
+    private var remoteSong: Song? by mutableRefStateOf(null)
     private var lyrics: String? by mutableRefStateOf(null)
 
     private var modifyFlag by mutableLongStateOf(0L)

@@ -3,11 +3,12 @@ package love.yinlin.compose.game.traits
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
+import love.yinlin.compose.extension.mutableOffsetStateOf
+import love.yinlin.compose.extension.mutableSizeStateOf
 
 @Stable
 open class Body(
@@ -27,12 +28,12 @@ open class Body(
     /**
      * 位置
      */
-    var position: Offset by mutableStateOf(position)
+    var position: Offset by mutableOffsetStateOf(position)
 
     /**
      * 大小
      */
-    var size: Size by mutableStateOf(size)
+    var size: Size by mutableSizeStateOf(size)
 
     /**
      * 缩放

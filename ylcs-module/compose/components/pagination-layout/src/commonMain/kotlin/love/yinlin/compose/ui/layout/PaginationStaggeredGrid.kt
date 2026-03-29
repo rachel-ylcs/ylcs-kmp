@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.rememberDerivedState
 
@@ -23,7 +22,7 @@ fun <T> PaginationStaggeredGrid(
     onLoading: (suspend () -> Unit)? = null,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues.Zero,
-    verticalItemSpacing: Dp = 0.dp,
+    verticalItemSpacing: Dp = Dp.Hairline,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     header: (@Composable LazyStaggeredGridItemScope.() -> Unit)? = null,
     itemContent: @Composable LazyStaggeredGridItemScope.(T) -> Unit
