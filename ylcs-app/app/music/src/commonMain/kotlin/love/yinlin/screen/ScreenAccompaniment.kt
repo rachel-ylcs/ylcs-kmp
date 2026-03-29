@@ -24,7 +24,6 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.extension.rememberValueState
-import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
@@ -40,6 +39,7 @@ import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleClipText
+import love.yinlin.compose.window.rememberFocusWindowState
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
@@ -104,10 +104,10 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
     private fun MusicCover(modifier: Modifier = Modifier) {
         var animationRecord by rememberRefState { Animatable(0f) }
         var lastDegree by rememberValueState(0f)
-        val isForeground = rememberOffScreenState()
+        val isFocus by rememberFocusWindowState()
 
-        LaunchedEffect(isPlaying, isForeground) {
-            if (isPlaying && isForeground) {
+        LaunchedEffect(isPlaying, isFocus) {
+            if (isPlaying && isFocus) {
                 animationRecord.animateTo(
                     targetValue = 360f + lastDegree,
                     animationSpec = infiniteRepeatable(

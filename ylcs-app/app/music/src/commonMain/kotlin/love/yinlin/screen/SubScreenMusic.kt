@@ -38,7 +38,6 @@ import love.yinlin.app.music.resources.img_music_record
 import love.yinlin.compose.*
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.compose.extension.*
-import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.animation.AnimationContent
@@ -58,6 +57,7 @@ import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.*
 import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.window.rememberFocusWindowState
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
@@ -258,12 +258,12 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     private fun MusicCover(musicInfo: MusicInfo, modifier: Modifier = Modifier) {
         var animationRecord by rememberRefState { Animatable(0f) }
         var lastDegree by rememberValueState(0f)
-        val isForeground = rememberOffScreenState()
+        val isFocus by rememberFocusWindowState()
 
         val isPlaying = mp?.isPlaying ?: false
 
-        LaunchedEffect(isPlaying, isForeground) {
-            if (isPlaying && isForeground) {
+        LaunchedEffect(isPlaying, isFocus) {
+            if (isPlaying && isFocus) {
                 animationRecord.animateTo(
                     targetValue = 360f + lastDegree,
                     animationSpec = infiniteRepeatable(

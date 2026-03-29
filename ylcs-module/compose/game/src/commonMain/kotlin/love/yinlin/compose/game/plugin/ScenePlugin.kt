@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
@@ -17,6 +16,7 @@ import androidx.compose.ui.zIndex
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Camera
 import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
@@ -76,11 +76,13 @@ class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
         dynamicEntities.fastForEach { it.onUpdate(tick) }
     }
 
+    override val layerOrder: LayerOrder = LayerOrder.GameSurface
+
     @Composable
     override fun BoxScope.Content() {
         Box(modifier = Modifier.fillMaxSize().onSizeChanged {
             camera.updateViewport(it.toSize(), engine.viewport)
-        }.clipToBounds().graphicsLayer {
+        }.graphicsLayer {
             camera.transformLayer(this, size)
         }) {
             layerEntities.fastForEach { layer ->

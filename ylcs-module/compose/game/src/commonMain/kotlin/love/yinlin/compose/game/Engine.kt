@@ -11,15 +11,16 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.*
+import androidx.compose.ui.zIndex
 import kotlinx.coroutines.*
 import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compose.OffScreenEffect
+import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.plugin.FontPlugin
 import love.yinlin.compose.game.plugin.Plugin
 import love.yinlin.compose.game.plugin.ScenePlugin
+import love.yinlin.compose.window.FocusWindowEffect
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
-import love.yinlin.extension.catchingDefault
 import love.yinlin.reflect.metaClassName
 import love.yinlin.reflect.metaRawClassName
 
@@ -27,7 +28,7 @@ import love.yinlin.reflect.metaRawClassName
 @Stable
 class Engine(
     val viewport: Viewport, // 视口类型
-    vararg plugins: (Engine) -> Plugin, // 插件集
+    vararg userPlugins: (Engine) -> Plugin, // 插件集
 ) {
     /**
      * 是否加载
@@ -42,16 +43,10 @@ class Engine(
         private set
 
     /**
-     * 启动时间
+     * 引擎时间刻
      */
-    var engineTime: Long by mutableLongStateOf(0L)
-        private set
-
-    /**
-     * 运行时间
-     */
-    var runningTime: Long by mutableLongStateOf(0L)
-        private set
+    private var engineTime: Long = 0L
+    private var lastRunningTime: Long = 0L
 
     /**
      * FPS
@@ -65,13 +60,17 @@ class Engine(
         FontPlugin(this),
         ScenePlugin(this),
     )
-    @PublishedApi internal val plugins = (defaultPlugins + plugins.map { it.invoke(this) }).fastDistinctBy(Plugin::id)
+
+    @PublishedApi internal val plugins = (defaultPlugins + userPlugins.map { it.invoke(this) }).fastDistinctBy(Plugin::id)
+
+    private val dynamicPlugins = plugins.fastFilter { it.dynamic }
+
+    private val visiblePlugins = plugins.fastFilter { it.layerOrder != LayerOrder.Invisible }
 
     inline fun <reified T : Plugin> plugin(): T = plugins.fastFirst { it.id == metaClassName<T>() } as T
     inline fun <reified T : Plugin> pluginOrNull(): T? = plugins.fastFirstOrNull { it.id == metaClassName<T>() } as? T
 
     // 拓扑排序
-
     private val topologicInfo: List<Pair<Plugin, List<String>>> get() {
         // 默认依赖
         val defaultDependencies = defaultPlugins.fastMap { it::class }
@@ -134,35 +133,37 @@ class Engine(
     /**
      * 初始化
      */
-    suspend fun initialize(): Boolean = if (isInitialized) true else Coroutines.sync { future ->
-        scope.launch {
-            isInitialized = catchingDefault(false) {
-                coroutineScope {
-                    // 依赖表
-                    val taskMap = mutableMapOf<String, Deferred<Boolean>>()
-                    // 先拓扑排序
-                    topologicInfo.fastMap { (plugin, dependencies) ->
-                        // 并行加载
-                        val task = async {
-                            // 等待依赖插件完成
-                            for (dependentId in dependencies) {
-                                val dependencyTask = taskMap[dependentId]
-                                require(dependencyTask != null) { "dependent plugins $dependentId is not initialized" }
-                                dependencyTask.await()
+    suspend fun initialize(): Boolean {
+        if (isInitialized) return true
+        val result = Coroutines.sync { future ->
+            scope.launch {
+                future.send {
+                    coroutineScope {
+                        // 依赖表
+                        val taskMap = mutableMapOf<String, Deferred<Boolean>>()
+                        // 先拓扑排序
+                        topologicInfo.fastMap { (plugin, dependencies) ->
+                            // 并行加载
+                            val task = async {
+                                // 等待依赖插件完成
+                                for (dependentId in dependencies) {
+                                    val dependencyTask = taskMap[dependentId]
+                                    require(dependencyTask != null) { "dependent plugins $dependentId is not initialized" }
+                                    dependencyTask.await()
+                                }
+                                plugin.onInitialize()
+                                plugin.isInitialized
                             }
-                            plugin.onInitialize()
-                            plugin.isInitialized
-                        }
-                        taskMap[plugin.id] = task
-                        task
-                    }.awaitAll()
-                    plugins.fastAll { it.isInitialized }
+                            taskMap[plugin.id] = task
+                            task
+                        }.awaitAll().fastAll { it }
+                    }
                 }
             }
-
-            future.send(isInitialized)
-        }
-    } ?: false
+        } ?: false
+        isInitialized = result
+        return result
+    }
 
     /**
      * 销毁
@@ -175,48 +176,58 @@ class Engine(
 
     @Composable
     fun ViewportContent(modifier: Modifier = Modifier.fillMaxSize()) {
-        LaunchedEffect(isInitialized) {
-            if (isInitialized) {
+        LaunchedEffect(isInitialized, isRunning) {
+            if (isInitialized && isRunning) {
+                var lastTime = withFrameMillis { it }
+                engineTime = lastTime - lastRunningTime
+
                 var frameCount = 0L
-                var lastTime = 0L
+                var lastFpsTime = lastTime
 
-                while (isActive) {
-                    withFrameMillis { frameTime ->
-                        if (engineTime == 0L) {
-                            engineTime = frameTime
-                            runningTime = frameTime
-                        }
-
-                        // 每秒更新一次 FPS
-                        val deltaFPSTime = frameTime - lastTime
-                        if (deltaFPSTime > 1000L) {
-                            fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
+                try {
+                    while (isActive) {
+                        withFrameMillis { frameTime ->
+                            // 每秒更新一次 FPS
                             lastTime = frameTime
-                            frameCount = 0L
-                        }
-                        ++frameCount
+                            val deltaFPSTime = frameTime - lastFpsTime
+                            if (deltaFPSTime > 1000L) {
+                                fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
+                                lastFpsTime = frameTime
+                                frameCount = 0L
+                            }
+                            ++frameCount
 
-                        val deltaTime = frameTime - engineTime
-                        plugins.fastForEach { it.onUpdate(deltaTime) }
+                            val deltaTime = frameTime - engineTime
+                            dynamicPlugins.fastForEach { it.onUpdate(deltaTime) }
+                        }
                     }
+                } finally {
+                    lastRunningTime = lastTime - engineTime
                 }
             }
         }
 
-        OffScreenEffect { isForeground ->
-            isRunning = isForeground
+        FocusWindowEffect { isFocus ->
+            isRunning = isFocus
         }
 
         Layout(
             modifier = modifier,
             content = {
                 Box(modifier = Modifier.background(Color.Black).clipToBounds()) {
-                    plugins.fastForEach { with(it) { Content() } }
+                    if (isInitialized) {
+                        visiblePlugins.fastForEach { plugin ->
+                            Box(modifier = Modifier.fillMaxSize().zIndex(plugin.layerOrder.zIndex)) {
+                                with(plugin) { Content() }
+                            }
+                        }
+                    }
                 }
             }
         ) { measurables, constraints ->
             val maxWidth = constraints.maxWidth
             val maxHeight = constraints.maxHeight
+
             val bounds = viewport.applyWindowBounds(IntSize(maxWidth, maxHeight))
             val placeable = measurables.first().measure(Constraints.fixed(bounds.width, bounds.height))
 

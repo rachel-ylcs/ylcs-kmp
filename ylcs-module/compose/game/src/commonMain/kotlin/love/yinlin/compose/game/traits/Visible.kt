@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.common.LayerOrder
 
 @Stable
 abstract class Visible(
@@ -15,7 +16,7 @@ abstract class Visible(
     /**
      * 层级
      */
-    val zIndex: Int = 0,
+    val layerOrder: LayerOrder = LayerOrder.Default,
     visible: Boolean = true
 ) : Body(position, size) {
     /**

@@ -3,6 +3,7 @@ package love.yinlin.compose.screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -112,7 +113,7 @@ abstract class BasicScreen : ViewModel() {
     internal fun ComposedUI() {
         NavigationBack(onBack = ::onBack)
 
-        val immersivePadding = rememberImmersivePadding()
+        val immersivePadding by rememberImmersivePadding()
 
         CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
             BasicContent()

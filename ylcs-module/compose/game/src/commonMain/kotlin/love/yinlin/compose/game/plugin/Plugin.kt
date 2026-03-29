@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.*
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compose.game.Engine
+import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.reflect.metaClassName
 import kotlin.reflect.KClass
 
@@ -17,10 +18,34 @@ abstract class Plugin(val engine: Engine) {
      */
     open val dependencies: List<KClass<out Plugin>> = emptyList()
 
+    /**
+     * 初始化
+     */
     open suspend fun onInitialize() { isInitialized = true }
+
+    /**
+     * 销毁
+     */
     open fun onRelease() { isInitialized = false }
+
+    /**
+     * 动态
+     */
+    open val dynamic: Boolean = true
+
+    /**
+     * 更新
+     */
     open fun onUpdate(tick: Long) { }
 
+    /**
+     * 层级
+     */
+    open val layerOrder: LayerOrder = LayerOrder.Default
+
+    /**
+     * 内容
+     */
     @Composable
     open fun BoxScope.Content() { }
 

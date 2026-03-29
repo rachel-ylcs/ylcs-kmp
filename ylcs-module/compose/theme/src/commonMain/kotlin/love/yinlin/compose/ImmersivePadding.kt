@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.State
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import love.yinlin.compose.extension.rememberRefState
@@ -49,11 +48,13 @@ data class ImmersivePadding(
 val LocalImmersivePadding = staticLocalComposition { ImmersivePadding.Zero }
 
 @Composable
-fun rememberImmersivePadding(): ImmersivePadding {
+fun rememberImmersivePadding(): State<ImmersivePadding> {
     val inset = WindowInsets.systemBars.asPaddingValues()
-    var padding by rememberRefState { ImmersivePadding(inset) }
+    val padding = rememberRefState { ImmersivePadding(inset) }
+
     LaunchedEffect(inset, LocalDevice.current) {
-        padding = ImmersivePadding(inset)
+        padding.value = ImmersivePadding(inset)
     }
+
     return padding
 }

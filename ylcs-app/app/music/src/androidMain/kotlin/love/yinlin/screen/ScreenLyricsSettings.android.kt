@@ -5,18 +5,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.app
-import love.yinlin.compose.OffScreenEffect
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.window.OffScreenWindowEffect
 import love.yinlin.media.lyrics.LyricsEngineConfig
 
 @Composable
 actual fun ScreenLyricsSettings.PlatformContent() {
     mp?.floatingLyrics?.let { floatingLyrics ->
-        OffScreenEffect { isForeground ->
+        OffScreenWindowEffect { isForeground ->
             if (isForeground) floatingLyrics.check()
         }
 

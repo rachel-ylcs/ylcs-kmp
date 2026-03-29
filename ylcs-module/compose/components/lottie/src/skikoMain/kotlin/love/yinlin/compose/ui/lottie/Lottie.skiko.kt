@@ -10,7 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import love.yinlin.compose.extension.rememberRefNull
 import love.yinlin.compose.extension.rememberValueState
-import love.yinlin.compose.rememberOffScreenState
+import love.yinlin.compose.window.rememberOffScreenWindowState
 import love.yinlin.extension.catchingNull
 import org.jetbrains.skia.skottie.Animation
 import org.jetbrains.skia.sksg.InvalidationController
@@ -22,7 +22,7 @@ actual fun Lottie(data: String, modifier: Modifier) {
     var currentTime: Float by rememberValueState(0f)
     val invalidationController = remember { InvalidationController() }
 
-    val isForeground = rememberOffScreenState()
+    val isForeground by rememberOffScreenWindowState()
 
     LaunchedEffect(data) {
         animation = if (data.isEmpty()) null else catchingNull { Animation.makeFromString(data) }

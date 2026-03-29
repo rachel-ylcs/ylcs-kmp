@@ -43,7 +43,7 @@ open class Layer(
     private val items = mutableStateListOf(*visibles)
 
     private val visibleItems by derivedStateOf {
-        items.fastFilter { it.visible }.sortedBy(Visible::zIndex)
+        items.fastFilter { it.visible }.sortedBy(Visible::layerOrder)
     }
 
     /**
