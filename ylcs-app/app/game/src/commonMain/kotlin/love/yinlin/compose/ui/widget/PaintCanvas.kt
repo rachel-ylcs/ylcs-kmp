@@ -4,7 +4,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -21,13 +20,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.packFloats
-import androidx.compose.ui.util.unpackFloat1
-import androidx.compose.ui.util.unpackFloat2
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.BackgroundContainer
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
@@ -40,13 +36,11 @@ import love.yinlin.data.rachel.game.info.PaintPath
 private fun DrawScope.drawPaintPath(paths: List<Long>, ratio: Float, width: Float, color: Color) {
     val path = Path().apply {
         paths.firstOrNull()?.let { first ->
-            var x = unpackFloat1(first)
-            var y = unpackFloat2(first)
-            moveTo(x * ratio, y * ratio)
+            val (x, y) = Offset(first) * ratio
+            moveTo(x, y)
             for (i in 1 ..< paths.size - 1) {
-                x = unpackFloat1(paths[i])
-                y = unpackFloat2(paths[i])
-                lineTo(x * ratio, y * ratio)
+                val (nx, ny) = Offset(paths[i]) * ratio
+                lineTo(nx, ny)
             }
         }
     }
@@ -108,7 +102,7 @@ private fun PaintCanvasView(
 ) {
     Box(modifier = modifier) {
         val currentPath = remember { mutableStateListOf<Long>() }
-        var currentOffset: Offset? by rememberState { null }
+        var currentOffset: Offset by rememberValueState(Offset.Zero)
 
         Canvas(modifier = Modifier
             .matchParentSize()
@@ -119,7 +113,7 @@ private fun PaintCanvasView(
                     detectDragGestures(
                         onDragStart = {
                             val ratio = size.width / 360f * density
-                            currentPath += packFloats(it.x / ratio, it.y / ratio)
+                            currentPath += (it / ratio).packedValue
                         },
                         onDragEnd = {
                             val distinctPath = when (currentPath.size) {
@@ -138,31 +132,15 @@ private fun PaintCanvasView(
                         onDrag = { v, _ -> currentOffset = v.position }
                     )
                 }
-            }.pointerInput(enabled, state) {
-                if (enabled) {
-                    detectTapGestures(
-                        onTap = {
-                            val ratio = size.width / 360f * density
-                            state.paths += PaintPath(listOf(
-                                packFloats(it.x / ratio, it.y / ratio),
-                                packFloats(it.x / ratio, it.y / ratio)
-                            ), state.width, state.color.toArgb())
-                        }
-                    )
-                }
             }
         ) {
             val ratio = size.width / 360f * density
             state.paths.fastForEach { (paths, width, color) ->
                 drawPaintPath(paths, ratio, width, Color(color))
             }
-            if (enabled) {
-                currentOffset?.let { offset ->
-                    if (currentPath.isNotEmpty()) {
-                        currentPath += packFloats(offset.x / ratio, offset.y / ratio)
-                        drawPaintPath(currentPath, ratio, state.width, state.color)
-                    }
-                }
+            if (enabled && currentPath.isNotEmpty()) {
+                currentPath += (currentOffset / ratio).packedValue
+                drawPaintPath(currentPath, ratio, state.width, state.color)
             }
         }
     }

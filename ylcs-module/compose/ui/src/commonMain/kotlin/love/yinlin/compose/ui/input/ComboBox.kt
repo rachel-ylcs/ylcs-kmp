@@ -19,11 +19,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberFalse
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.floating.Flyout
 import love.yinlin.compose.ui.floating.FlyoutPosition
 import love.yinlin.compose.ui.icon.Icons
@@ -50,7 +49,7 @@ fun ComboBox(
     maxFlyoutHeight: Dp = Theme.size.cell1,
 ) {
     var isOpen by rememberFalse()
-    var layoutWidth by rememberState { 0.dp }
+    var layoutWidth by rememberValueState(Dp.Hairline)
 
     Flyout(
         visible = isOpen,

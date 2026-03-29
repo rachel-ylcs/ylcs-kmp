@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -75,7 +74,7 @@ private fun BannerIndicator(
     modifier: Modifier,
     onClick: (Int) -> Unit
 ) {
-    if (indicatorSize != Dp.Unspecified && indicatorSize != 0.dp) {
+    if (indicatorSize != Dp.Unspecified && indicatorSize != Dp.Hairline) {
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.g4),

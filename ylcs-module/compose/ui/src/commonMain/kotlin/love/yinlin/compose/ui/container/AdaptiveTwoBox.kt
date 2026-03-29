@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.IntOffset
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberValueState
 
 @Composable
 fun AdaptiveTwoBox(
@@ -20,8 +20,8 @@ fun AdaptiveTwoBox(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable () -> Unit
 ) {
-    var targetOffset1 by rememberState { IntOffset.Zero }
-    var targetOffset2 by rememberState { IntOffset.Zero }
+    var targetOffset1 by rememberValueState(IntOffset.Zero)
+    var targetOffset2 by rememberValueState(IntOffset.Zero)
     val animatedOffset1 by animateIntOffsetAsState(targetOffset1)
     val animatedOffset2 by animateIntOffsetAsState(targetOffset2)
 

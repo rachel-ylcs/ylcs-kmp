@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberRefNull
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.extension.catchingNull
@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 actual fun Lottie(data: String, modifier: Modifier) {
-    var animation: Animation? by rememberState { null }
+    var animation: Animation? by rememberRefNull()
     var currentTime: Float by rememberValueState(0f)
     val invalidationController = remember { InvalidationController() }
 

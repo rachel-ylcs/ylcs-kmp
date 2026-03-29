@@ -5,19 +5,15 @@ plugins {
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
+        libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 
 template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
-            lib(
-                libs.compose.resources,
-                projects.ylcsApp.app.global,
-                projects.ylcsApp.app.music,
-                projects.ylcsModule.compose.components.media,
-                projects.ylcsModule.compose.game,
-            )
+            lib(projects.ylcsModule.compose.core)
         }
     }
 })

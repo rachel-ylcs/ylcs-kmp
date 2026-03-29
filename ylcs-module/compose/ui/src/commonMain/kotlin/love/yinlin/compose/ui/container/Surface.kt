@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
@@ -34,7 +33,7 @@ fun Surface(
     contentPadding: PaddingValues = PaddingValues.Zero,
     contentAlignment: Alignment = Alignment.Center,
     shape: Shape = Theme.shape.rectangle,
-    shadowElevation: Dp = 0.dp,
+    shadowElevation: Dp = Dp.Hairline,
     tonalLevel: Int = 0,
     border: BorderStroke? = null,
     onClick: (() -> Unit)? = null,

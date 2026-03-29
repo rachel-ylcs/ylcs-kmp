@@ -37,21 +37,20 @@ interface InputStatusColorProvider {
     @Composable
     fun color(state: InputState, interactionState: InteractionState): Color
 
-    companion object {
-        val Default = object : InputStatusColorProvider {
-            override val useFocused: Boolean = true
-            override val useHovered: Boolean = true
-            override val usePressed: Boolean = false
-            override val useDragged: Boolean = false
+    @Stable
+    object Default : InputStatusColorProvider {
+        override val useFocused: Boolean = true
+        override val useHovered: Boolean = true
+        override val usePressed: Boolean = false
+        override val useDragged: Boolean = false
 
-            @Composable
-            override fun color(state: InputState, interactionState: InteractionState): Color {
-                return when {
-                    state.isFull -> Theme.color.warning
-                    interactionState.isFocused -> Theme.color.primary
-                    interactionState.isHovered -> Theme.color.primaryContainer.copy(alpha = 0.4f)
-                    else -> Color.Transparent
-                }
+        @Composable
+        override fun color(state: InputState, interactionState: InteractionState): Color {
+            return when {
+                state.isFull -> Theme.color.warning
+                interactionState.isFocused -> Theme.color.primary
+                interactionState.isHovered -> Theme.color.primaryContainer.copy(alpha = 0.4f)
+                else -> Color.Transparent
             }
         }
     }

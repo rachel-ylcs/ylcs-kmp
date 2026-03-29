@@ -61,8 +61,8 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
     }
 
     private var isPlaying by mutableStateOf(false)
-    private var position by mutableStateOf(0L)
-    private var duration by mutableStateOf(0L)
+    private var position by mutableLongStateOf(0L)
+    private var duration by mutableLongStateOf(0L)
 
     private val isPlayingFlow = MutableStateFlow(false)
 

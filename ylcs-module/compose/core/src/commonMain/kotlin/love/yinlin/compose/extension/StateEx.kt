@@ -63,6 +63,12 @@ fun rememberFalse(vararg keys: Any?) = remember(*keys) { mutableStateOf(false) }
 fun rememberTrue(vararg keys: Any?) = remember(*keys) { mutableStateOf(true) }
 
 @Composable
+inline fun <reified T> rememberNull(vararg keys: Any?) = remember(*keys) { mutableStateOf<T?>(null) }
+
+@Composable
+inline fun <reified T> rememberRefNull(vararg keys: Any?) = remember(*keys) { mutableStateOf<T?>(null, referentialEqualityPolicy()) }
+
+@Composable
 fun rememberValueState(value: Int, vararg keys: Any?) = remember(*keys) { mutableIntStateOf(value) }
 
 @Composable
