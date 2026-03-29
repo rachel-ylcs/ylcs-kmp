@@ -16,13 +16,14 @@ import androidx.compose.ui.zIndex
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Camera
 import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.common.FontProvider
 import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
 
 @Stable
-class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
+class ScenePlugin(engine: Engine) : Plugin(engine) {
     val camera = Camera()
 
     private val entities = mutableStateListOf<Entity>()
@@ -60,17 +61,7 @@ class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
         }
     }
 
-    override suspend fun onInitialize() {
-        if (!isInitialized) {
-            entities.fastForEach { it.onAttached(engine) }
-            isInitialized = true
-        }
-    }
-
-    override fun onRelease() {
-        clear()
-        isInitialized = false
-    }
+    override fun onRelease() = clear()
 
     override fun onUpdate(tick: Long) {
         dynamicEntities.fastForEach { it.onUpdate(tick) }
@@ -87,11 +78,12 @@ class ScenePlugin internal constructor(engine: Engine) : Plugin(engine) {
         }) {
             layerEntities.fastForEach { layer ->
                 key(layer.id) {
-                    val drawer = remember { Drawer() }
+                    val drawer = remember { Drawer(engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default) }
 
                     Box(modifier = Modifier.fillMaxSize().drawWithCache {
                         val bounds = camera.viewportBounds
                         val viewportSize = camera.viewportSize
+
                         onDrawBehind {
                             drawer.scope = this
                             with(layer) {

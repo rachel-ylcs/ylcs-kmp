@@ -13,7 +13,10 @@ plugins {
 template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
-            lib(projects.ylcsModule.compose.core)
+            lib(
+                libs.compose.resources,
+                projects.ylcsModule.compose.core
+            )
         }
     }
 })

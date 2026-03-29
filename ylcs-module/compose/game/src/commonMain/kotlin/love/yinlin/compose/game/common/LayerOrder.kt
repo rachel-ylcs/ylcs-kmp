@@ -14,6 +14,7 @@ value class LayerOrder(val value: Int) : Comparable<LayerOrder> {
         val UI = LayerOrder(10)
         val Default = LayerOrder(0)
         val GameSurface = LayerOrder(-10)
-        val Invisible = LayerOrder(-20)
+        val Low = LayerOrder(-20)
+        val Invisible = LayerOrder(Int.MIN_VALUE)
     }
 }

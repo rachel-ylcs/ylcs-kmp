@@ -10,8 +10,8 @@ import kotlin.reflect.KClass
 
 @Stable
 abstract class Plugin(val engine: Engine) {
-    var isInitialized: Boolean by mutableStateOf(false)
-        protected set
+    @PublishedApi
+    internal var isInitialized: Boolean by mutableStateOf(false)
 
     /**
      * 前置依赖插件
@@ -21,12 +21,12 @@ abstract class Plugin(val engine: Engine) {
     /**
      * 初始化
      */
-    open suspend fun onInitialize() { isInitialized = true }
+    open suspend fun onInitialize(): Boolean = true
 
     /**
      * 销毁
      */
-    open fun onRelease() { isInitialized = false }
+    open fun onRelease() { }
 
     /**
      * 动态

@@ -9,8 +9,10 @@ import love.yinlin.compose.extension.roundToIntOffset
 import love.yinlin.compose.extension.translate
 
 @Stable
-class Drawer internal constructor() {
+class Drawer internal constructor(fontProvider: FontProvider) {
     @PublishedApi internal var scope: DrawScope? = null
+
+    // Draw
 
     fun line(color: Color, start: Offset, end: Offset, style: Stroke, alpha: Float = 1f, blendMode: BlendMode = BlendMode.SrcOver) {
         scope?.drawLine(color = color, start = start, end = end, strokeWidth = style.width, cap = style.cap, pathEffect = style.pathEffect, alpha = alpha, blendMode = blendMode)
@@ -128,5 +130,47 @@ class Drawer internal constructor() {
             blendMode = blendMode,
             filterQuality = FilterQuality.High,
         )
+    }
+
+    // Transform
+
+    inline fun translate(x: Float, y: Float, block: Drawer.() -> Unit) {
+        scope?.translate(x, y) { block()}
+    }
+
+    inline fun translate(offset: Offset, block: Drawer.() -> Unit) {
+        scope?.translate(offset.x, offset.y) { block() }
+    }
+
+    inline fun scale(ratio: Float, pivot: Offset, block: Drawer.() -> Unit) {
+        scope?.scale(ratio, ratio, pivot) { block() }
+    }
+
+    inline fun scale(x: Float, y: Float, pivot: Offset, block: Drawer.() -> Unit) {
+        scope?.scale(x, y, pivot) { block() }
+    }
+
+    inline fun rotate(degrees: Float, pivot: Offset, block: Drawer.() -> Unit) {
+        scope?.rotate(degrees, pivot) { block() }
+    }
+
+    inline fun clip(position: Offset, size: Size, block: Drawer.() -> Unit) {
+        scope?.clipRect(left = position.x, top = position.y, right = (position.x + size.width), bottom = (position.y + size.height)) { block() }
+    }
+
+    inline fun clip(rect: Rect, block: Drawer.() -> Unit) {
+        clip(rect.topLeft, rect.size, block)
+    }
+
+    inline fun clip(path: Path, block: Drawer.() -> Unit) {
+        scope?.clipPath(path) { block() }
+    }
+
+    inline fun transform(matrix: Matrix, block: Drawer.() -> Unit) {
+        scope?.withTransform({ transform(matrix) }) { block() }
+    }
+
+    inline fun transform(transformBlock: DrawTransform.() -> Unit, block: Drawer.() -> Unit) {
+        scope?.withTransform(transformBlock) { block() }
     }
 }

@@ -15,9 +15,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.*
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compose.game.common.LayerOrder
-import love.yinlin.compose.game.plugin.FontPlugin
 import love.yinlin.compose.game.plugin.Plugin
-import love.yinlin.compose.game.plugin.ScenePlugin
 import love.yinlin.compose.window.FocusWindowEffect
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
@@ -56,12 +54,7 @@ class Engine(
 
     private val scope = CoroutineScope(SupervisorJob() + cpuContext)
 
-    private val defaultPlugins = listOf(
-        FontPlugin(this),
-        ScenePlugin(this),
-    )
-
-    @PublishedApi internal val plugins = (defaultPlugins + userPlugins.map { it.invoke(this) }).fastDistinctBy(Plugin::id)
+    @PublishedApi internal val plugins = userPlugins.map { it.invoke(this) }.fastDistinctBy(Plugin::id)
 
     private val dynamicPlugins = plugins.fastFilter { it.dynamic }
 
@@ -72,9 +65,6 @@ class Engine(
 
     // 拓扑排序
     private val topologicInfo: List<Pair<Plugin, List<String>>> get() {
-        // 默认依赖
-        val defaultDependencies = defaultPlugins.fastMap { it::class }
-
         val ids = plugins.associateBy(Plugin::id)
         val dependenciesMap = mutableMapOf<String, List<String>>()
 
@@ -85,9 +75,7 @@ class Engine(
         // 初始化入度表
         plugins.fastForEach { plugin ->
             val id = plugin.id
-            // 为非默认插件添加默认依赖
-            val actualDependencies = if (plugin in defaultPlugins) plugin.dependencies else defaultDependencies + plugin.dependencies
-            val validDeps = actualDependencies.fastMapNotNull { clz ->
+            val validDeps = plugin.dependencies.fastMapNotNull { clz ->
                 val dependentId = clz.metaRawClassName
                 require(dependentId in ids) { "plugin $dependentId is not installed" }
                 // 排除自身依赖
@@ -151,8 +139,11 @@ class Engine(
                                     require(dependencyTask != null) { "dependent plugins $dependentId is not initialized" }
                                     dependencyTask.await()
                                 }
-                                plugin.onInitialize()
-                                plugin.isInitialized
+                                if (!plugin.isInitialized) {
+                                    val pluginResult = plugin.onInitialize()
+                                    plugin.isInitialized = pluginResult
+                                    pluginResult
+                                } else true
                             }
                             taskMap[plugin.id] = task
                             task
@@ -169,7 +160,12 @@ class Engine(
      * 销毁
      */
     fun release() {
-        if (isInitialized) plugins.fastForEachReversed { it.onRelease() }
+        if (isInitialized) {
+            plugins.fastForEachReversed { plugin ->
+                plugin.onRelease()
+                plugin.isInitialized = false
+            }
+        }
         scope.cancel()
         isInitialized = false
     }
@@ -198,7 +194,9 @@ class Engine(
                             ++frameCount
 
                             val deltaTime = frameTime - engineTime
-                            dynamicPlugins.fastForEach { it.onUpdate(deltaTime) }
+                            dynamicPlugins.fastForEach { plugin ->
+                                plugin.onUpdate(deltaTime)
+                            }
                         }
                     }
                 } finally {
@@ -215,8 +213,8 @@ class Engine(
             modifier = modifier,
             content = {
                 Box(modifier = Modifier.background(Color.Black).clipToBounds()) {
-                    if (isInitialized) {
-                        visiblePlugins.fastForEach { plugin ->
+                    visiblePlugins.fastForEach { plugin ->
+                        key(plugin.id) {
                             Box(modifier = Modifier.fillMaxSize().zIndex(plugin.layerOrder.zIndex)) {
                                 with(plugin) { Content() }
                             }
