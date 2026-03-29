@@ -226,7 +226,7 @@ class Engine(
             val maxWidth = constraints.maxWidth
             val maxHeight = constraints.maxHeight
 
-            val bounds = viewport.applyWindowBounds(IntSize(maxWidth, maxHeight))
+            val bounds = viewport.applyWindowBounds(maxWidth, maxHeight)
             val placeable = measurables.first().measure(Constraints.fixed(bounds.width, bounds.height))
 
             layout(maxWidth, maxHeight) {

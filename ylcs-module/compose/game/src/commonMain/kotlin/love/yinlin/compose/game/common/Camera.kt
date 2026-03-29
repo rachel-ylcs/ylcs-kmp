@@ -9,6 +9,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.unit.IntSize
 import love.yinlin.compose.extension.mutableOffsetStateOf
 import love.yinlin.compose.extension.mutableSizeStateOf
 import love.yinlin.compose.game.Viewport
@@ -56,7 +57,7 @@ class Camera {
 
     inline fun updatePosition(block: (Offset) -> Offset) { position = block(position) }
 
-    internal fun updateViewport(size: Size, viewport: Viewport) {
+    internal fun updateViewport(size: IntSize, viewport: Viewport) {
         val (newSize, newScale) = viewport.applyCanvasBounds(size)
         viewportSize = newSize
         rawViewportScale = newScale

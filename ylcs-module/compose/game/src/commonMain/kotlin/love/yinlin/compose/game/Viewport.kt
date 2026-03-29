@@ -12,54 +12,58 @@ import kotlin.math.min
  */
 @Stable
 sealed interface Viewport {
-    fun applyWindowBounds(windowSize: IntSize): IntRect
-    fun applyCanvasBounds(canvasSize: Size): Pair<Size, Float>
+    fun applyWindowBounds(outerWidth: Int, outerHeight: Int): IntRect
+    fun applyCanvasBounds(canvasSize: IntSize): Pair<Size, Float>
 
     @Stable
     data class Fixed(val width: Int, val height: Int): Viewport {
-        override fun applyWindowBounds(windowSize: IntSize): IntRect {
+        override fun applyWindowBounds(outerWidth: Int, outerHeight: Int): IntRect {
             require(width > 0 && height > 0)
-            val scaleX = windowSize.width / width.toFloat()
-            val scaleY = windowSize.height / height.toFloat()
+            val scaleX = outerWidth / width.toFloat()
+            val scaleY = outerHeight / height.toFloat()
             val minScale = min(scaleX, scaleY)
             val windowWidth = (width * minScale).toInt()
             val windowHeight = (height * minScale).toInt()
-            val offsetX = (windowSize.width - windowWidth) / 2
-            val offsetY = (windowSize.height - windowHeight) / 2
+            val offsetX = (outerWidth - windowWidth) / 2
+            val offsetY = (outerHeight - windowHeight) / 2
             return IntRect(IntOffset(offsetX, offsetY), IntSize(windowWidth, windowHeight))
         }
 
-        override fun applyCanvasBounds(canvasSize: Size): Pair<Size, Float> {
+        override fun applyCanvasBounds(canvasSize: IntSize): Pair<Size, Float> {
             require(width > 0)
-            return Size(width.toFloat(), height.toFloat()) to canvasSize.width / width
+            val bound = width.toFloat()
+            val scale = canvasSize.width / bound
+            return Size(bound, height.toFloat()) to scale
         }
     }
 
     @Stable
     data class MatchWidth(val width: Int): Viewport {
-        override fun applyWindowBounds(windowSize: IntSize): IntRect {
+        override fun applyWindowBounds(outerWidth: Int, outerHeight: Int): IntRect {
             require(width > 0)
-            return IntRect(IntOffset.Zero, windowSize)
+            return IntRect(0, 0, outerWidth, outerHeight)
         }
 
-        override fun applyCanvasBounds(canvasSize: Size): Pair<Size, Float> {
+        override fun applyCanvasBounds(canvasSize: IntSize): Pair<Size, Float> {
             require(width > 0)
-            val scale = canvasSize.width / width
-            return Size(width.toFloat(), canvasSize.height / scale) to scale
+            val bound = width.toFloat()
+            val scale = canvasSize.width / bound
+            return Size(bound, canvasSize.height / scale) to scale
         }
     }
 
     @Stable
     data class MatchHeight(val height: Int) : Viewport {
-        override fun applyWindowBounds(windowSize: IntSize): IntRect {
+        override fun applyWindowBounds(outerWidth: Int, outerHeight: Int): IntRect {
             require(height > 0)
-            return IntRect(IntOffset.Zero, windowSize)
+            return IntRect(0, 0, outerWidth, outerHeight)
         }
 
-        override fun applyCanvasBounds(canvasSize: Size): Pair<Size, Float> {
+        override fun applyCanvasBounds(canvasSize: IntSize): Pair<Size, Float> {
             require(height > 0)
-            val scale = canvasSize.height / height
-            return Size(canvasSize.width / scale, height.toFloat()) to scale
+            val bound = height.toFloat()
+            val scale = canvasSize.height / bound
+            return Size(canvasSize.width / scale, bound) to scale
         }
     }
 }

@@ -34,12 +34,17 @@ class ScreenRhyme : BasicScreen() {
     override suspend fun initialize() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
-            val rect = object : Visible(Offset.Zero, Size(300f, 300f)) {
+            val rect = object : Visible(Offset.Zero, Size(400f, 100f)) {
                 override fun Drawer.onDraw() {
                     rect(Colors.Green4, position = Offset.Zero, size = size)
                 }
             }
-            val layer = Layer(rect)
+            val text = object : Visible(Offset.Zero, Size(400f, 100f)) {
+                override fun Drawer.onDraw() {
+
+                }
+            }
+            val layer = Layer(rect, text)
             scene += layer
         }
     }

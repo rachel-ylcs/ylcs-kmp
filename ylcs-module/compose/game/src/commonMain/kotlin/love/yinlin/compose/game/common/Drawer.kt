@@ -1,11 +1,9 @@
 package love.yinlin.compose.game.common
 
-import androidx.collection.lruCache
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.roundToIntSize
 import love.yinlin.compose.extension.roundToIntOffset
@@ -14,13 +12,10 @@ import love.yinlin.compose.extension.translate
 @Stable
 class Drawer internal constructor(
     textCacheCapacity: Int,
-    private val fontFamilyResolver: FontFamily.Resolver,
-    private val fontProvider: FontProvider
-) {
+    fontFamilyResolver: FontFamily.Resolver,
+    fontProvider: FontProvider
+) : PrepareDrawer(textCacheCapacity, fontFamilyResolver, fontProvider) {
     @PublishedApi internal var scope: DrawScope? = null
-
-    // 文本绘制
-    private val textCache = lruCache<TextDrawCacheKey, Paragraph>(textCacheCapacity)
 
     // 拓展函数 - Draw
 

@@ -14,6 +14,7 @@ import love.yinlin.compose.extension.translate
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.common.LayerOrder
+import love.yinlin.compose.game.common.PrepareDrawer
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -82,12 +83,14 @@ open class Layer(
     /**
      * 预绘制处理
      *
-     * 此处不允许使用Drawer绘制内容，只能测量与更新状态
+     * 此处不允许使用Drawer绘制内容，只能测量与更新。
+     * 注意预处理和绘制只需要使用普通变量即可，它们位于同一个作用域下不需要状态监听。
+     *
      * @param viewportSize 视口大小 (等价于设计稿, 不包括相机缩放)
      * @param viewportBounds 视口边界 (实际上屏幕能看到的视口范围)
      *
      */
-    open fun Drawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) { }
+    open fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) { }
 
     internal fun Drawer.drawVisibleLayer(bounds: Rect) {
         visibleItems.fastForEach { item ->

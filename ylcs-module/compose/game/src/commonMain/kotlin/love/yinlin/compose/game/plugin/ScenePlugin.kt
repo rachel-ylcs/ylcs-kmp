@@ -9,7 +9,6 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFontFamilyResolver
-import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.compose.ui.util.fastMapNotNull
@@ -73,7 +72,7 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
     @Composable
     override fun BoxScope.Content() {
         Box(modifier = Modifier.fillMaxSize().onSizeChanged {
-            camera.updateViewport(it.toSize(), engine.viewport)
+            camera.updateViewport(it, engine.viewport)
         }.graphicsLayer {
             camera.transformLayer(this, size)
         }) {
