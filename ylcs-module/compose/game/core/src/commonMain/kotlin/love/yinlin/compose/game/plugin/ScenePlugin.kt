@@ -15,6 +15,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.compose.ui.util.fastMapNotNull
@@ -99,6 +100,13 @@ class ScenePlugin private constructor(
     // 事件
     private val eventChannel = Channel<Event>(Channel.UNLIMITED)
 
+    // 清除事件
+    private fun clearEventChannel() {
+        while (true) {
+            if (!eventChannel.tryReceive().isSuccess) break
+        }
+    }
+
     // 指针事件监听
     private suspend fun PointerInputScope.pointerInputLoop() {
         awaitEachGesture {
@@ -106,7 +114,7 @@ class ScenePlugin private constructor(
             val trackedId = firstDown.id
 
             // 指针按下
-            val originPosition = firstDown.position
+            val originPosition = camera.transformPointer(firstDown.position, size.toSize())
             eventChannel.trySend(Event.Pointer.Down(originPosition))
 
             // 持续跟踪指针
@@ -115,22 +123,18 @@ class ScenePlugin private constructor(
 
                 val change = event.changes.find { it.id == trackedId }
                 if (change == null || !change.pressed) { // 指针丢失或抬起
-                    eventChannel.trySend(Event.Pointer.Up(change?.position ?: Offset.Zero, originPosition))
+                    val upPosition = change?.position?.let { camera.transformPointer(it, size.toSize()) } ?: Offset.Zero
+                    eventChannel.trySend(Event.Pointer.Up(upPosition, originPosition))
                     break
                 }
                 else { // 移动
                     if (change.positionChange() != Offset.Zero) {
-                        eventChannel.trySend(Event.Pointer.Move(change.position, originPosition))
+                        val movePosition = camera.transformPointer(change.position, size.toSize())
+                        eventChannel.trySend(Event.Pointer.Move(movePosition, originPosition))
                     }
                     change.consume()
                 }
             }
-        }
-    }
-
-    private fun clearEventChannel() {
-        while (true) {
-            if (!eventChannel.tryReceive().isSuccess) break
         }
     }
 
@@ -160,6 +164,7 @@ class ScenePlugin private constructor(
 
                     // 处理事件
                     while (true) {
+                        // 事件转换
                         val event = eventChannel.tryReceive().getOrNull() ?: break
                         // 事件处理层级是逆向的，与渲染顺序相反
                         for (index in layerEntities.indices.reversed()) {

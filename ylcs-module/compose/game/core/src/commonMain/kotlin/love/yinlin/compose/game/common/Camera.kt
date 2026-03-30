@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntSize
@@ -82,6 +83,11 @@ class Camera {
         viewportSize = newSize
         updateBounds()
         ++requireDirty
+    }
+
+    internal fun transformPointer(pointer: Offset, size: Size): Offset {
+        val totalScale = rawViewportScale * scale
+        return (pointer - size.center) / totalScale + position
     }
 
     internal fun transformLayer(scope: GraphicsLayerScope, size: Size) {
