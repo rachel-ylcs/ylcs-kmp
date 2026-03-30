@@ -11,6 +11,7 @@ import love.yinlin.compose.extension.translate
 import love.yinlin.compose.extension.scale
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.common.Event
 import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.common.PrepareDrawer
 import kotlin.uuid.ExperimentalUuidApi
@@ -74,12 +75,31 @@ open class Layer(
         this.engine = null
     }
 
+    /**
+     * 动态激活
+     */
     override var active: Boolean = true
 
     override fun onUpdate(tick: Long) {
         items.fastForEach { item ->
             if (item is Dynamic && item.active && item.needReDraw) item.onUpdate(tick)
         }
+    }
+
+    /**
+     * 可交互触发事件
+     */
+    open val interactive: Boolean = true
+
+    internal fun triggerVisibleLayer(tick: Long, event: Event): Boolean {
+        // 事件处理层级逆向
+        for (index in items.indices.reversed()) {
+            val item = items[index]
+            if (item is Trigger && item.interactive && item.needReDraw) {
+                if (item.onEvent(tick, event)) return true // 消费完成
+            }
+        }
+        return false
     }
 
     internal fun PrepareDrawer.prepareDrawVisibleLayer(viewportSize: Size, bounds: Rect) {

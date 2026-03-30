@@ -153,8 +153,10 @@ class Engine(
     fun release() {
         if (isInitialized) {
             plugins.fastForEachReversed { plugin ->
-                plugin.onRelease()
-                plugin.isInitialized = false
+                if (plugin.isInitialized) {
+                    plugin.onRelease()
+                    plugin.isInitialized = false
+                }
             }
         }
         scope.cancel()

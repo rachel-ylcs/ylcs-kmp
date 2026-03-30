@@ -15,11 +15,13 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Viewport
 import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.common.Event
 import love.yinlin.compose.game.common.PrepareDrawer
 import love.yinlin.compose.game.common.TextGraph
 import love.yinlin.compose.game.plugin.FontPlugin
 import love.yinlin.compose.game.plugin.ScenePlugin
 import love.yinlin.compose.game.traits.Layer
+import love.yinlin.compose.game.traits.Trigger
 import love.yinlin.compose.game.traits.Visible
 import love.yinlin.compose.screen.BasicScreen
 
@@ -31,13 +33,18 @@ class ScreenRhyme : BasicScreen() {
             GlobalRes.font.xwwk,
             RhymeRes.font.rhyme,
         ),
-        ::ScenePlugin
+        ScenePlugin.build()
     )
 
     override suspend fun initialize() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
-            val rect = object : Visible(Offset.Zero, Size(800f, 100f)) {
+            val rect = object : Visible(Offset.Zero, Size(800f, 100f)), Trigger {
+                override fun onEvent(tick: Long, event: Event): Boolean {
+                    println((event as? Event.Pointer)?.position)
+                    return true
+                }
+
                 override fun Drawer.onDraw() {
                     rect(Colors.Green4, position = Offset.Zero, size = size)
                 }
