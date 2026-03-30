@@ -19,13 +19,12 @@ class FontPlugin private constructor(
     engine: Engine,
     private val fontResources: List<FontResource>
 ) : Plugin(engine) {
-    override val dynamic: Boolean = false
     override val layerOrder: Int = LayerOrder.Low
 
     private val fontMap = mutableStateMapOf<FontResource, FontFamily>()
 
     @Stable
-    val fontProvider = FontProvider { resource ->
+    internal val fontProvider = FontProvider { resource ->
         resource?.let { fontMap[it] } ?: FontFamily.Default
     }
 

@@ -1,4 +1,4 @@
-package love.yinlin.compose.game
+package love.yinlin.compose.game.common
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Size

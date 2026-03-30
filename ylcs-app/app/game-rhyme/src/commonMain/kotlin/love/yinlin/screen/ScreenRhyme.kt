@@ -13,7 +13,7 @@ import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
 import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Engine
-import love.yinlin.compose.game.Viewport
+import love.yinlin.compose.game.common.Viewport
 import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.common.PrepareDrawer
 import love.yinlin.compose.game.common.TextGraph

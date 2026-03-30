@@ -29,16 +29,6 @@ abstract class Plugin(val engine: Engine) {
     open fun onRelease() { }
 
     /**
-     * 动态
-     */
-    open val dynamic: Boolean = true
-
-    /**
-     * 更新
-     */
-    open fun onUpdate(tick: Long) { }
-
-    /**
      * 层级
      */
     open val layerOrder: Int = LayerOrder.Default

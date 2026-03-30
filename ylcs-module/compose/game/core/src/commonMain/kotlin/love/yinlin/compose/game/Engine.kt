@@ -14,6 +14,7 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.*
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compose.game.common.LayerOrder
+import love.yinlin.compose.game.common.Viewport
 import love.yinlin.compose.game.plugin.Plugin
 import love.yinlin.compose.window.FocusWindowEffect
 import love.yinlin.coroutines.Coroutines
@@ -39,32 +40,17 @@ class Engine(
     var isRunning: Boolean by mutableStateOf(false)
         private set
 
-    /**
-     * 引擎时间刻
-     */
-    private var engineTime: Long = 0L
-    private var lastRunningTime: Long = 0L
-
-    /**
-     * FPS
-     */
-    var fps: Int by mutableIntStateOf(0)
-        private set
-
     private val scope = CoroutineScope(SupervisorJob() + cpuContext)
 
-    @PublishedApi internal val plugins = userPlugins.map { it.invoke(this) }.fastDistinctBy(Plugin::id)
+    // 插件依赖图
+    @PublishedApi
+    internal val pluginMap = userPlugins.map { it.invoke(this) }.associateBy(Plugin::id)
+    private val pluginDependencyMap: Map<String, List<String>>
+    private val plugins: List<Plugin>
+    private val visiblePlugins: List<Plugin>
 
-    private val dynamicPlugins = plugins.fastFilter { it.dynamic }
-
-    private val visiblePlugins = plugins.fastFilter { it.layerOrder != LayerOrder.Invisible }
-
-    inline fun <reified T : Plugin> plugin(): T = plugins.fastFirst { it.id == metaClassName<T>() } as T
-    inline fun <reified T : Plugin> pluginOrNull(): T? = plugins.fastFirstOrNull { it.id == metaClassName<T>() } as? T
-
-    // 拓扑排序
-    private val topologicInfo: List<Pair<Plugin, List<String>>> get() {
-        val ids = plugins.associateBy(Plugin::id)
+    init {
+        // 依赖图
         val dependenciesMap = mutableMapOf<String, List<String>>()
 
         // 入度表 + 邻接表
@@ -72,11 +58,10 @@ class Engine(
         val adjacencyList = mutableMapOf<String, MutableList<String>>()
 
         // 初始化入度表
-        plugins.fastForEach { plugin ->
-            val id = plugin.id
+        for ((id, plugin) in pluginMap) {
             val validDeps = plugin.dependencies.fastMapNotNull { clz ->
                 val dependentId = clz.metaRawClassName
-                require(dependentId in ids) { "plugin $dependentId is not installed" }
+                require(dependentId in pluginMap) { "plugin $dependentId is not installed" }
                 // 排除自身依赖
                 if (dependentId != id) dependentId else null
             }
@@ -97,12 +82,12 @@ class Engine(
             if (degree == 0) queue += id
         }
 
-        val result = mutableListOf<Pair<Plugin, List<String>>>()
+        val result = mutableListOf<Plugin>()
 
         // BFS
         while (queue.isNotEmpty()) {
             val currentId = queue.removeAt(0)
-            result += ids[currentId]!! to dependenciesMap[currentId]!!
+            result += pluginMap[currentId]!!
 
             adjacencyList[currentId]?.forEach { dependentId ->
                 val updatedDegree = (inDegree[dependentId] ?: 0) - 1
@@ -112,10 +97,15 @@ class Engine(
         }
 
         // 循环依赖
-        require(result.size == plugins.size) { "plugin loop dependencies" }
+        require(result.size == pluginMap.size) { "plugin loop dependencies" }
 
-        return result
+        pluginDependencyMap = dependenciesMap
+        plugins = result
+        visiblePlugins = result.fastFilter { it.layerOrder != LayerOrder.Invisible }
     }
+
+    inline fun <reified T : Plugin> plugin(): T = pluginMap[metaClassName<T>()] as T
+    inline fun <reified T : Plugin> pluginOrNull(): T? = pluginMap[metaClassName<T>()] as? T
 
     /**
      * 初始化
@@ -129,13 +119,15 @@ class Engine(
                         // 依赖表
                         val taskMap = mutableMapOf<String, Deferred<Boolean>>()
                         // 先拓扑排序
-                        topologicInfo.fastMap { (plugin, dependencies) ->
+                        plugins.fastMap { plugin ->
+                            val id = plugin.id
                             // 并行加载
                             val task = async {
+                                val dependencies = pluginDependencyMap[id] ?: emptyList()
                                 // 等待依赖插件完成
                                 for (dependentId in dependencies) {
                                     val dependencyTask = taskMap[dependentId]
-                                    require(dependencyTask != null) { "dependent plugins $dependentId is not initialized" }
+                                    require(dependencyTask != null) { "dependent plugin $dependentId is not initialized" }
                                     dependencyTask.await()
                                 }
                                 if (!plugin.isInitialized) {
@@ -144,7 +136,7 @@ class Engine(
                                     pluginResult
                                 } else true
                             }
-                            taskMap[plugin.id] = task
+                            taskMap[id] = task
                             task
                         }.awaitAll().fastAll { it }
                     }
@@ -171,39 +163,6 @@ class Engine(
 
     @Composable
     fun ViewportContent(modifier: Modifier = Modifier.fillMaxSize()) {
-        LaunchedEffect(isInitialized, isRunning) {
-            if (isInitialized && isRunning) {
-                var lastTime = withFrameMillis { it }
-                engineTime = lastTime - lastRunningTime
-
-                var frameCount = 0L
-                var lastFpsTime = lastTime
-
-                try {
-                    while (isActive) {
-                        withFrameMillis { frameTime ->
-                            // 每秒更新一次 FPS
-                            lastTime = frameTime
-                            val deltaFPSTime = frameTime - lastFpsTime
-                            if (deltaFPSTime > 1000L) {
-                                fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
-                                lastFpsTime = frameTime
-                                frameCount = 0L
-                            }
-                            ++frameCount
-
-                            val deltaTime = frameTime - engineTime
-                            dynamicPlugins.fastForEach { plugin ->
-                                plugin.onUpdate(deltaTime)
-                            }
-                        }
-                    }
-                } finally {
-                    lastRunningTime = lastTime - engineTime
-                }
-            }
-        }
-
         FocusWindowEffect { isFocus ->
             isRunning = isFocus
         }

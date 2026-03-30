@@ -13,6 +13,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.compose.ui.util.fastMapNotNull
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.isActive
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Camera
@@ -25,14 +26,30 @@ import love.yinlin.compose.game.traits.Layer
 
 @Stable
 class ScenePlugin(engine: Engine) : Plugin(engine) {
+    /**
+     * 引擎时间刻
+     */
+    private var engineTime: Long = 0L
+    private var lastRunningTime: Long = 0L
+
+    /**
+     * FPS
+     */
+    var fps: Int by mutableIntStateOf(0)
+        private set
+
+    // 相机
     val camera = Camera()
 
+    // 实体
     private val entities = mutableStateListOf<Entity>()
 
+    // 动态实体 - 更新
     private val dynamicEntities by derivedStateOf {
         entities.fastMapNotNull { it as? Dynamic }
     }
 
+    // 绘制层实体 - 渲染
     private val layerEntities by derivedStateOf {
         entities.fastMapNotNull { it as? Layer }.sortedBy(Layer::layerOrder)
     }
@@ -60,16 +77,49 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
 
     override fun onRelease() = clear()
 
-    override fun onUpdate(tick: Long) {
-        dynamicEntities.fastForEach {
-            if (it.active) it.onUpdate(tick)
-        }
-    }
+    // 事件
+
+    // 渲染
 
     override val layerOrder: Int = LayerOrder.GameSurface
 
     @Composable
     override fun BoxScope.Content() {
+        // 引擎更新
+        LaunchedEffect(isInitialized, engine.isRunning) {
+            if (isInitialized && engine.isRunning) {
+                var lastTime = withFrameMillis { it }
+                engineTime = lastTime - lastRunningTime
+
+                var frameCount = 0L
+                var lastFpsTime = lastTime
+
+                try {
+                    while (isActive) {
+                        withFrameMillis { frameTime ->
+                            // 每秒更新一次 FPS
+                            lastTime = frameTime
+                            val deltaFPSTime = frameTime - lastFpsTime
+                            if (deltaFPSTime > 1000L) {
+                                fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
+                                lastFpsTime = frameTime
+                                frameCount = 0L
+                            }
+                            ++frameCount
+
+                            val deltaTime = frameTime - engineTime
+                            dynamicEntities.fastForEach { dynamic ->
+                                if (dynamic.active) dynamic.onUpdate(deltaTime)
+                            }
+                        }
+                    }
+                } finally {
+                    lastRunningTime = lastTime - engineTime
+                }
+            }
+        }
+
+        // 游戏画布
         Box(modifier = Modifier.fillMaxSize().onSizeChanged {
             camera.updateViewport(it, engine.viewport)
         }.graphicsLayer {
