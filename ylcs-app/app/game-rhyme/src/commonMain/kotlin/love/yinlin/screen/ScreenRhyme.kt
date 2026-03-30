@@ -16,6 +16,7 @@ import love.yinlin.compose.game.Viewport
 import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.plugin.FontPlugin
 import love.yinlin.compose.game.plugin.ScenePlugin
+import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.traits.Visible
 import love.yinlin.compose.screen.BasicScreen
@@ -34,7 +35,11 @@ class ScreenRhyme : BasicScreen() {
     override suspend fun initialize() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
-            val rect = object : Visible(Offset.Zero, Size(400f, 100f)) {
+            val rect = object : Visible(Offset.Zero, Size(400f, 100f)), Dynamic {
+                override fun onUpdate(tick: Long) {
+                    position = position.copy(y = position.y - 10f)
+                }
+
                 override fun Drawer.onDraw() {
                     rect(Colors.Green4, position = Offset.Zero, size = size)
                 }
@@ -44,7 +49,7 @@ class ScreenRhyme : BasicScreen() {
 
                 }
             }
-            val layer = Layer(rect, text)
+            val layer = Layer(scene, rect, text)
             scene += layer
         }
     }

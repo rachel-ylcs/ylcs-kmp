@@ -2,7 +2,7 @@ package love.yinlin.compose.game.common
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -10,57 +10,79 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntSize
-import love.yinlin.compose.extension.mutableOffsetStateOf
-import love.yinlin.compose.extension.mutableSizeStateOf
 import love.yinlin.compose.game.Viewport
 
 @Stable
 class Camera {
+    // 脏区标记
+    internal var requireDirty: Long by mutableLongStateOf(0L)
+        private set
+
     /**
      * 视口大小
      */
-    internal var viewportSize: Size by mutableSizeStateOf(Size.Zero)
+    internal var viewportSize: Size = Size.Zero
         private set
 
     /**
      * 原始视口缩放
      */
-    private var rawViewportScale: Float by mutableFloatStateOf(1f)
+    private var rawViewportScale: Float = 1f
 
     /**
      * 相机位置
      *
      * 相机的位置是以视口中心点为锚点
      */
-    var position: Offset by mutableOffsetStateOf(Offset.Zero)
+    var position: Offset = Offset.Zero
+        set(value) {
+            if (field != value) {
+                field = value
+                updateBounds()
+                ++requireDirty
+            }
+        }
 
     /**
      * 相机缩放
      *
      * 相机的缩放是以视口中心点为锚点
      */
-    var scale: Float by mutableFloatStateOf(1f)
+    var scale: Float = 1f
+        set(value) {
+            if (field != value) {
+                field = value
+                updateBounds()
+                ++requireDirty
+            }
+        }
 
     /**
      * 视口边界大小
      */
-    val viewportBoundSize: Size get() = viewportSize / scale
+    var viewportBoundSize: Size = Size.Zero
+        private set
 
     /**
      * 视口边界
      */
-    val viewportBounds: Rect get() {
-        val (x, y) = position
-        val (w, h) = viewportBoundSize
-        return Rect(left = x - w / 2, top = y - h / 2, right = x + w / 2, bottom = y + h / 2)
-    }
+    var viewportBounds: Rect = Rect.Zero
+        private set
 
-    inline fun updatePosition(block: (Offset) -> Offset) { position = block(position) }
+    private fun updateBounds() {
+        val boundSize = viewportSize / scale
+        val (x, y) = position
+        val (w, h) = boundSize
+        viewportBoundSize = boundSize
+        viewportBounds = Rect(left = x - w / 2, top = y - h / 2, right = x + w / 2, bottom = y + h / 2)
+    }
 
     internal fun updateViewport(size: IntSize, viewport: Viewport) {
         val (newSize, newScale) = viewport.applyCanvasBounds(size)
-        viewportSize = newSize
         rawViewportScale = newScale
+        viewportSize = newSize
+        ++requireDirty
+        updateBounds()
     }
 
     internal fun transformLayer(scope: GraphicsLayerScope, size: Size) {

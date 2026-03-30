@@ -2,15 +2,11 @@ package love.yinlin.compose.game.traits
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
-import love.yinlin.compose.extension.mutableOffsetStateOf
-import love.yinlin.compose.extension.mutableSizeStateOf
 import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.common.LayerOrder
 
@@ -46,29 +42,63 @@ abstract class Visible(
     abstract fun Drawer.onDraw()
 
     // 脏区标记
-    @PublishedApi internal var dirtyValue: Long by mutableLongStateOf(0L)
+    internal var requireDirty: Long by mutableLongStateOf(0L)
+        private set
 
-    var position: Offset by mutableOffsetStateOf(position)
+    /**
+     * 位置
+     */
+    var position: Offset = position
+        set(value) {
+            if (value != field) {
+                field = value
+                ++requireDirty
+            }
+        }
 
     /**
      * 大小
      */
-    var size: Size by mutableSizeStateOf(size)
+    var size: Size = size
+        set(value) {
+            if (value != field) {
+                field = value
+                ++requireDirty
+            }
+        }
 
     /**
      * 缩放
      */
-    var scale: Float by mutableFloatStateOf(1f)
+    var scale: Float = 1f
+        set(value) {
+            if (value != field) {
+                field = value
+                ++requireDirty
+            }
+        }
 
     /**
      * 旋转
      */
-    var rotate: Float by mutableFloatStateOf(0f)
+    var rotate: Float = 0f
+        set(value) {
+            if (value != field) {
+                field = value
+                ++requireDirty
+            }
+        }
 
     /**
      * 可见
      */
-    var visible by mutableStateOf(visible)
+    var visible: Boolean = visible
+        set(value) {
+            if (field != value) {
+                field = value
+                ++requireDirty
+            }
+        }
 
     /**
      * 中心点

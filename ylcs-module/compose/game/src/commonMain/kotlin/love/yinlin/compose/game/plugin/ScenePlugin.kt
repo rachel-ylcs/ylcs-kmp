@@ -27,12 +27,7 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
     val camera = Camera()
 
     private val entities = mutableStateListOf<Entity>()
-    private val dynamicEntities by derivedStateOf {
-        entities.fastMapNotNull {
-            val dynamic = it as? Dynamic
-            if (dynamic?.active == true) dynamic else null
-        }
-    }
+
     private val layerEntities by derivedStateOf {
         entities.fastMapNotNull {
             val layer = it as? Layer
@@ -64,7 +59,9 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
     override fun onRelease() = clear()
 
     override fun onUpdate(tick: Long) {
-        dynamicEntities.fastForEach { it.onUpdate(tick) }
+        entities.fastForEach {
+            if (it is Dynamic && it.active) it.onUpdate(tick)
+        }
     }
 
     override val layerOrder: Int = LayerOrder.GameSurface
@@ -74,6 +71,7 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
         Box(modifier = Modifier.fillMaxSize().onSizeChanged {
             camera.updateViewport(it, engine.viewport)
         }.graphicsLayer {
+            val _ = camera.requireDirty
             camera.transformLayer(this, size)
         }) {
             val fontFamilyResolver = LocalFontFamilyResolver.current
@@ -89,6 +87,7 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer().drawWithCache {
+                        val _ = camera.requireDirty
                         val bounds = camera.viewportBounds
                         val viewportSize = camera.viewportSize
 
