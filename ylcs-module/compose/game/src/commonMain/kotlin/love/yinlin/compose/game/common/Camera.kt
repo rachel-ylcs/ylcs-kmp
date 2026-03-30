@@ -81,8 +81,8 @@ class Camera {
         val (newSize, newScale) = viewport.applyCanvasBounds(size)
         rawViewportScale = newScale
         viewportSize = newSize
-        ++requireDirty
         updateBounds()
+        ++requireDirty
     }
 
     internal fun transformLayer(scope: GraphicsLayerScope, size: Size) {

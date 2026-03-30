@@ -28,16 +28,17 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
 
     private val entities = mutableStateListOf<Entity>()
 
+    private val dynamicEntities by derivedStateOf {
+        entities.fastMapNotNull { it as? Dynamic }
+    }
+
     private val layerEntities by derivedStateOf {
-        entities.fastMapNotNull {
-            val layer = it as? Layer
-            if (layer?.visible == true) layer else null
-        }.sortedBy(Layer::layerOrder)
+        entities.fastMapNotNull { it as? Layer }.sortedBy(Layer::layerOrder)
     }
 
     val isEmpty: Boolean get() = entities.isEmpty()
     val isNotEmpty: Boolean get() = entities.isNotEmpty()
-    val size: Int get() = entities.size
+    val entityCount: Int get() = entities.size
 
     operator fun plusAssign(entity: Entity) {
         entities += entity
@@ -59,8 +60,8 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
     override fun onRelease() = clear()
 
     override fun onUpdate(tick: Long) {
-        entities.fastForEach {
-            if (it is Dynamic && it.active) it.onUpdate(tick)
+        dynamicEntities.fastForEach {
+            if (it.active) it.onUpdate(tick)
         }
     }
 
@@ -92,15 +93,21 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
                         val viewportSize = camera.viewportSize
 
                         // 预绘制处理
-                        with(layer) { drawer.prepareDraw(viewportSize, bounds) }
+                        val _ = layer.requireDirty
+                        val layerVisible = layer.visible
+                        with(layer) {
+                            if (layerVisible) drawer.prepareDraw(viewportSize, bounds)
+                        }
 
-                        // 实际绘制
+                        // 绘制
                         onDrawBehind {
                             val rawScope = this
                             drawer.rawScope = rawScope
+
                             with(layer) {
-                                drawer.drawVisibleLayer(rawScope, bounds)
+                                if (layerVisible) drawer.drawVisibleLayer(rawScope, bounds)
                             }
+
                             drawer.rawScope = null
                         }
                     }.zIndex(layer.layerOrder.toFloat()))

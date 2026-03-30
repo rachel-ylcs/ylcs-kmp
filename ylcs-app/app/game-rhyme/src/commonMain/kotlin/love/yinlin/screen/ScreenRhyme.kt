@@ -49,7 +49,7 @@ class ScreenRhyme : BasicScreen() {
 
                 }
             }
-            val layer = Layer(scene, rect, text)
+            val layer = Layer(rect, text)
             scene += layer
         }
     }

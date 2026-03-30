@@ -22,45 +22,66 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 @Stable
 open class Layer(
-    private val scene: ScenePlugin,
     vararg visibles: Visible,
     val layerOrder: Int = LayerOrder.Default, // 层级
     val textCacheCapacity: Int = 8, // 文本绘制缓存容量
     override val id: String = Uuid.generateV7().toString(),
 ): Entity(), Dynamic {
+    private var scene: ScenePlugin? = null
+
     private val items = visibles.sortedBy(Visible::layerOrder).toMutableStateList()
+
+    val isEmpty: Boolean get() = items.isEmpty()
+    val isNotEmpty: Boolean get() = items.isNotEmpty()
+    val visibleCount: Int get() = items.size
+
+    // 脏区标记
+    internal var requireDirty: Long by mutableLongStateOf(0L)
+        private set
 
     /**
      * 可见
      */
-    var visible by mutableStateOf(true)
+    var visible: Boolean = true
+        set(value) {
+            if (field != value) {
+                field = value
+                ++requireDirty
+            }
+        }
 
-    operator fun plusAssign(visible: Visible) {
-        // 根据 layerOrder 二分查找
-        val index = items.binarySearchBy(visible.layerOrder, selector = Visible::layerOrder)
-        items.add(-index - 1, visible)
-        visible.onAttached(scene.engine)
+    operator fun plusAssign(item: Visible) {
+        scene?.engine?.let { engine ->
+            // 根据 layerOrder 二分查找
+            val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
+            items.add(-index - 1, item)
+            item.onAttached(engine)
+        }
     }
 
-    operator fun minusAssign(visible: Visible) {
-        items -= visible
-        visible.onDetached(scene.engine)
+    operator fun minusAssign(item: Visible) {
+        scene?.engine?.let { engine ->
+            items -= item
+            item.onDetached(engine)
+        }
     }
 
     @CallSuper
     override fun onAttached(engine: Engine) {
+        scene = engine.pluginOrNull()
         items.fastForEach { it.onAttached(engine) }
     }
 
     @CallSuper
     override fun onDetached(engine: Engine) {
         items.fastForEachReversed { it.onDetached(engine) }
+        scene = null
     }
 
     override var active: Boolean = true
 
     override fun onUpdate(tick: Long) {
-        val bounds = scene.camera.viewportBounds
+        val bounds = scene?.camera?.viewportBounds ?: return
         items.fastForEach { item ->
             if (item is Dynamic && item.active) {
                 // 视口剔除
