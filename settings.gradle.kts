@@ -43,7 +43,7 @@ include(
     "ylcs-module:compose:components:url-image",
     "ylcs-module:compose:components:webview",
     "ylcs-module:compose:core",
-    "ylcs-module:compose:game",
+    "ylcs-module:compose:game:core",
     "ylcs-module:compose:icons",
     "ylcs-module:compose:platform-view",
     "ylcs-module:compose:plugin:animated-webp-decoder",
