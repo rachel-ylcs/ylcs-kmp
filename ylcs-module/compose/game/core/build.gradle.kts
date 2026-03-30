@@ -18,5 +18,17 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.core
             )
         }
+
+        val skikoMain by create(commonMain)
+
+        iosMainList.configure(skikoMain)
+
+        desktopMain.configure(skikoMain)
+
+        webMain.configure(skikoMain)
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
     }
 })

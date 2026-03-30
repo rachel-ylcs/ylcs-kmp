@@ -25,7 +25,9 @@ class FontPlugin private constructor(
     private val fontMap = mutableStateMapOf<FontResource, FontFamily>()
 
     @Stable
-    val fontProvider: FontProvider get() = FontProvider { resource -> fontMap[resource] ?: FontFamily.Default }
+    val fontProvider = FontProvider { resource ->
+        resource?.let { fontMap[it] } ?: FontFamily.Default
+    }
 
     override fun onRelease() {
         fontMap.clear()

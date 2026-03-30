@@ -13,6 +13,7 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.compose.ui.util.fastMapNotNull
 import androidx.compose.ui.zIndex
+import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Camera
 import love.yinlin.compose.game.common.Drawer
@@ -75,40 +76,42 @@ class ScenePlugin(engine: Engine) : Plugin(engine) {
             val _ = camera.requireDirty
             camera.transformLayer(this, size)
         }) {
+            val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
             val fontFamilyResolver = LocalFontFamilyResolver.current
+
+            val cameraState by rememberDerivedState {
+                val _ = camera.requireDirty
+                camera.viewportSize to camera.viewportBounds
+            }
 
             layerEntities.fastForEach { layer ->
                 key(layer.id) {
                     val drawer = remember(fontFamilyResolver) {
                         Drawer(
-                            textCacheCapacity = layer.textCacheCapacity,
                             fontFamilyResolver = fontFamilyResolver,
-                            fontProvider = engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default
+                            fontProvider = fontProvider
                         )
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer().drawWithCache {
-                        val _ = camera.requireDirty
-                        val bounds = camera.viewportBounds
-                        val viewportSize = camera.viewportSize
-
-                        // 预绘制处理
+                        val (viewportSize, bounds) = cameraState
                         val _ = layer.requireDirty
                         val layerVisible = layer.visible
-                        with(layer) {
-                            if (layerVisible) drawer.prepareDraw(viewportSize, bounds)
+
+                        // 预绘制处理
+                        drawer.withRawCacheScope(this) {
+                            with(layer) {
+                                if (layerVisible) drawer.prepareDrawVisibleLayer(viewportSize, bounds)
+                            }
                         }
 
                         // 绘制
                         onDrawBehind {
-                            val rawScope = this
-                            drawer.rawScope = rawScope
-
-                            with(layer) {
-                                if (layerVisible) drawer.drawVisibleLayer(rawScope, bounds)
+                            drawer.withRawScope(this) {
+                                with(layer) {
+                                    if (layerVisible) drawer.drawVisibleLayer()
+                                }
                             }
-
-                            drawer.rawScope = null
                         }
                     }.zIndex(layer.layerOrder.toFloat()))
                 }

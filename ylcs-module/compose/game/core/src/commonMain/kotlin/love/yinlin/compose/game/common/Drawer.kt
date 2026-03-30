@@ -4,18 +4,28 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
+import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
+import androidx.compose.ui.util.unpackFloat1
+import androidx.compose.ui.util.unpackFloat2
 import love.yinlin.compose.extension.roundToIntOffset
 import love.yinlin.compose.extension.translate
 
 @Stable
 class Drawer internal constructor(
-    textCacheCapacity: Int,
     fontFamilyResolver: FontFamily.Resolver,
     fontProvider: FontProvider
-) : PrepareDrawer(textCacheCapacity, fontFamilyResolver, fontProvider) {
+) : PrepareDrawer(fontFamilyResolver, fontProvider) {
     @PublishedApi internal var rawScope: DrawScope? = null
+
+    internal inline fun withRawScope(scope: DrawScope, block: Drawer.() -> Unit) {
+        rawScope = scope
+        block()
+        rawScope = null
+    }
 
     // 拓展函数 - Draw
 
@@ -135,6 +145,87 @@ class Drawer internal constructor(
             blendMode = blendMode,
             filterQuality = FilterQuality.High,
         )
+    }
+
+    // 文本绘制
+
+    internal inline fun text(
+        content: TextGraph?,
+        textPosition: Offset,
+        textSize: Size,
+        textAlign: TextAlign,
+        block: (Canvas, Paragraph) -> Unit,
+    ) {
+        rawScope?.apply {
+            content?.let { textGraph ->
+                withTransform({
+                    // 计算文本实际宽度和缩放
+                    val widthScale = textGraph.widthScale(textSize.height)
+                    val textWidth = unpackFloat1(widthScale)
+                    val scale = unpackFloat2(widthScale)
+                    val actualWidth = textSize.width
+                    // 计算对齐方式偏移
+                    val offsetX = when (textAlign) {
+                        TextAlign.Start, TextAlign.Unspecified, TextAlign.Left -> 0f
+                        TextAlign.Center -> (actualWidth - textWidth) / 2
+                        TextAlign.End, TextAlign.Right -> actualWidth - textWidth
+                        else -> 0f
+                    }
+                    // 偏移
+                    translate(textPosition.x + offsetX, textPosition.y)
+                    // 光栅缩放
+                    scale(scale, scale, Offset.Zero)
+                }) {
+                    block(drawContext.canvas, textGraph.paragraph)
+                }
+            }
+        }
+    }
+
+    fun text(
+        content: TextGraph?,
+        position: Offset,
+        size: Size,
+        color: Color,
+        textAlign: TextAlign = TextAlign.Start,
+        shadow: Shadow? = null,
+        decoration: TextDecoration? = null,
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
+    ) {
+        text(content, position, size, textAlign) { canvas, paragraph ->
+            paragraph.paint(
+                canvas = canvas,
+                color = color,
+                shadow = shadow,
+                textDecoration = decoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        }
+    }
+
+    fun text(
+        content: TextGraph?,
+        position: Offset,
+        size: Size,
+        brush: Brush,
+        textAlign: TextAlign = TextAlign.Start,
+        shadow: Shadow? = null,
+        decoration: TextDecoration? = null,
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
+    ) {
+        text(content, position, size, textAlign) { canvas, paragraph ->
+            paragraph.paint(
+                canvas = canvas,
+                brush = brush,
+                shadow = shadow,
+                textDecoration = decoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        }
     }
 
     // 拓展函数 - Transform

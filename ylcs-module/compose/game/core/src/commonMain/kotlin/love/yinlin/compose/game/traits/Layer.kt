@@ -5,8 +5,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
 import love.yinlin.compose.extension.translate
@@ -15,7 +13,6 @@ import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.common.PrepareDrawer
-import love.yinlin.compose.game.plugin.ScenePlugin
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -24,10 +21,9 @@ import kotlin.uuid.Uuid
 open class Layer(
     vararg visibles: Visible,
     val layerOrder: Int = LayerOrder.Default, // 层级
-    val textCacheCapacity: Int = 8, // 文本绘制缓存容量
     override val id: String = Uuid.generateV7().toString(),
 ): Entity(), Dynamic {
-    private var scene: ScenePlugin? = null
+    private var engine: Engine? = null
 
     private val items = visibles.sortedBy(Visible::layerOrder).toMutableStateList()
 
@@ -51,101 +47,84 @@ open class Layer(
         }
 
     operator fun plusAssign(item: Visible) {
-        scene?.engine?.let { engine ->
+        engine?.let {
             // 根据 layerOrder 二分查找
             val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
             items.add(-index - 1, item)
-            item.onAttached(engine)
+            item.onAttached(it)
         }
     }
 
     operator fun minusAssign(item: Visible) {
-        scene?.engine?.let { engine ->
+        engine?.let {
             items -= item
-            item.onDetached(engine)
+            item.onDetached(it)
         }
     }
 
     @CallSuper
     override fun onAttached(engine: Engine) {
-        scene = engine.pluginOrNull()
+        this.engine = engine
         items.fastForEach { it.onAttached(engine) }
     }
 
     @CallSuper
     override fun onDetached(engine: Engine) {
         items.fastForEachReversed { it.onDetached(engine) }
-        scene = null
+        this.engine = null
     }
 
     override var active: Boolean = true
 
     override fun onUpdate(tick: Long) {
-        val bounds = scene?.camera?.viewportBounds ?: return
         items.fastForEach { item ->
-            if (item is Dynamic && item.active) {
-                // 视口剔除
-                val culling = if (item.culling) {
-                    val (x, y) = item.position
-                    val s = item.size
-                    val radius = (s.width + s.height) * item.scale / 2
-                    when {
-                        x + radius < bounds.left -> true
-                        x - radius > bounds.right -> true
-                        y + radius < bounds.top -> true
-                        y - radius > bounds.bottom -> true
-                        else -> false
-                    }
-                } else false
-                if (!culling) item.onUpdate(tick)
-            }
+            if (item is Dynamic && item.active && item.needReDraw) item.onUpdate(tick)
         }
     }
 
-    /**
-     * 预绘制处理
-     *
-     * 此处不允许使用Drawer绘制内容，只能测量并更新非脏区值。
-     * 注意预处理和绘制只需要使用普通变量即可，它们位于同一个作用域下不需要状态监听。
-     *
-     * @param viewportSize 视口大小 (等价于设计稿, 不包括相机缩放)
-     * @param viewportBounds 视口边界 (实际上屏幕能看到的视口范围)
-     *
-     */
-    open fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) { }
-
-    internal fun Drawer.drawVisibleLayer(rawScope: DrawScope, bounds: Rect) {
+    internal fun PrepareDrawer.prepareDrawVisibleLayer(viewportSize: Size, bounds: Rect) {
         items.fastForEach { item ->
             val _ = item.requireDirty
 
             // 视口剔除
             val (x, y) = item.position
-            val sc = item.scale
             val s = item.size
-            val culling = if (!item.visible) true else if (!item.culling) false else {
-                val radius = (s.width + s.height) * sc / 2
+            val needReDraw = if (!item.visible) false else if (!item.culling) true else {
+                val radius = (s.width + s.height) * item.scale / 2
                 when {
-                    x + radius < bounds.left -> true
-                    x - radius > bounds.right -> true
-                    y + radius < bounds.top -> true
-                    y - radius > bounds.bottom -> true
-                    else -> false
+                    x + radius < bounds.left -> false
+                    x - radius > bounds.right -> false
+                    y + radius < bounds.top -> false
+                    y - radius > bounds.bottom -> false
+                    else -> true
                 }
             }
-            val rt = item.rotate
 
-            if (!culling) {
-                rawScope.withTransform({
+            item.needReDraw = needReDraw
+
+            // 需要重绘
+            if (needReDraw) {
+                with(item) {
+                    prepareDraw(viewportSize, bounds)
+                }
+            }
+        }
+    }
+
+    internal fun Drawer.drawVisibleLayer() {
+        items.fastForEach { item ->
+            if (item.needReDraw) {
+                transform({
                     // 偏移
-                    translate(x, y)
+                    translate(item.position)
                     // 旋转
-                    if (rt != 0f) rotate(degrees = rt, pivot = Offset.Zero)
+                    item.rotate.let { if (it != 0f) rotate(degrees = it, pivot = Offset.Zero) }
                     // 缩放
-                    if (sc != 1f) scale(ratio = sc, pivot = Offset.Zero)
+                    item.scale.let { if (it != 1f) scale(ratio = it, pivot = Offset.Zero) }
                     // Canvas偏移
                     translate(-item.center)
                     // 裁切
-                    if (item.clip) item.shape.onClip(this, s)
+                    if (item.clip) item.shape.onClip(this, item.size)
                 }) {
                     with(item) { onDraw() }
                 }

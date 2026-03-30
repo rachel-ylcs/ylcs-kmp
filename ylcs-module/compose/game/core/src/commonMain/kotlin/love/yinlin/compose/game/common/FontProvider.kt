@@ -6,10 +6,10 @@ import org.jetbrains.compose.resources.FontResource
 
 @Stable
 fun interface FontProvider {
-    operator fun get(resource: FontResource): FontFamily
+    operator fun get(resource: FontResource?): FontFamily
 
     @Stable
     data object Default : FontProvider {
-        override fun get(resource: FontResource): FontFamily = FontFamily.Default
+        override fun get(resource: FontResource?): FontFamily = FontFamily.Default
     }
 }

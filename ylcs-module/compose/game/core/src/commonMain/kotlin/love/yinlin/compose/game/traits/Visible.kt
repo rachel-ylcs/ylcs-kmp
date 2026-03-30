@@ -5,10 +5,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.common.LayerOrder
+import love.yinlin.compose.game.common.PrepareDrawer
 
 @Stable
 abstract class Visible(
@@ -35,6 +37,20 @@ abstract class Visible(
      * 参与视口剔除
      */
     open val culling: Boolean = true
+
+    /**
+     * 预绘制处理
+     *
+     * 此处不允许使用Drawer绘制内容，只能测量并更新非脏区值。
+     * 注意预处理和绘制只需要使用普通变量即可，它们位于同一个作用域下不需要状态监听。
+     *
+     * @param viewportSize 视口大小 (等价于设计稿, 不包括相机缩放)
+     * @param viewportBounds 视口边界 (实际上屏幕能看到的视口范围)
+     *
+     */
+    open fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) { }
+
+    internal var needReDraw: Boolean = true
 
     /**
      * 绘制
@@ -104,4 +120,27 @@ abstract class Visible(
      * 中心点
      */
     val center: Offset get() = size.center
+
+    /**
+     * 半径
+     */
+    val minDimension: Float get() = size.minDimension
+    val maxDimension: Float get() = size.maxDimension
+
+    /**
+     * 边界
+     */
+    val bounds: Rect get() = Rect(Offset.Zero, size)
+
+    /**
+     * 角点
+     */
+    val topLeft: Offset get() = Offset.Zero
+    val topCenter: Offset get() = Offset(size.width / 2, 0f)
+    val topRight: Offset get() = Offset(size.width, 0f)
+    val bottomLeft: Offset get() = Offset(0f, size.height)
+    val bottomCenter: Offset get() = Offset(size.width / 2, size.height)
+    val bottomRight: Offset get() = Offset(size.width, size.height)
+    val centerLeft: Offset get() = Offset(0f, size.height / 2)
+    val centerRight: Offset get() = Offset(size.width, size.height / 2)
 }
