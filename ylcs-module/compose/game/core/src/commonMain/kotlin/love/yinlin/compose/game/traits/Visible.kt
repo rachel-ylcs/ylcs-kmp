@@ -39,6 +39,11 @@ abstract class Visible(
     open val culling: Boolean = true
 
     /**
+     * 触发器
+     */
+    open val trigger: Trigger? = null
+
+    /**
      * 预绘制处理
      *
      * 此处不允许使用Drawer绘制内容，只能测量并更新非脏区值。

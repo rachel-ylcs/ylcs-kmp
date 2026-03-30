@@ -27,7 +27,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Camera
 import love.yinlin.compose.game.common.Drawer
-import love.yinlin.compose.game.common.Event
+import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.common.FontProvider
 import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.traits.Dynamic

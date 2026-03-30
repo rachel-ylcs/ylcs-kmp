@@ -1,17 +1,25 @@
 package love.yinlin.compose.game.traits
 
 import androidx.compose.runtime.Stable
-import love.yinlin.compose.game.common.Event
+import love.yinlin.compose.game.event.Event
+import love.yinlin.compose.game.event.EventListener
+import kotlin.reflect.KClass
 
 @Stable
-interface Trigger {
-    /**
-     * 可交互
-     */
-    val interactive: Boolean get() = true
+class Trigger(vararg userListeners: EventListener) {
+    @PublishedApi internal val listeners = mutableMapOf<KClass<out Event>, EventListener>()
 
-    /**
-     * 事件处理
-     */
-    fun onEvent(tick: Long, event: Event): Boolean
+    init {
+        for (listener in userListeners) listener.target.forEach { listeners[it] = listener }
+    }
+
+    inline operator fun <reified T : EventListener> plusAssign(listener: T) {
+        listener.target.forEach { listeners[it] = listener }
+    }
+
+    inline operator fun <reified T : EventListener> minusAssign(listener: T) {
+        listener.target.forEach { listeners.remove(it) }
+    }
+
+    internal fun onEvent(tick: Long, event: Event): Boolean = listeners[event::class]?.onEvent(tick, event) ?: false
 }

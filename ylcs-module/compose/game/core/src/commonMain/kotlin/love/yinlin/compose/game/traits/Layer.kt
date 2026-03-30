@@ -11,7 +11,7 @@ import love.yinlin.compose.extension.translate
 import love.yinlin.compose.extension.scale
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Drawer
-import love.yinlin.compose.game.common.Event
+import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.common.PrepareDrawer
 import kotlin.uuid.ExperimentalUuidApi
@@ -95,9 +95,8 @@ open class Layer(
         // 事件处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]
-            if (item is Trigger && item.interactive && item.needReDraw) {
-                if (item.onEvent(tick, event)) return true // 消费完成
-            }
+            val trigger = item.trigger ?: continue
+            if (trigger.onEvent(tick, event)) return true // 消费完成
         }
         return false
     }

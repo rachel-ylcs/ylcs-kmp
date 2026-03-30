@@ -1,4 +1,4 @@
-package love.yinlin.compose.game.common
+package love.yinlin.compose.game.event
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset

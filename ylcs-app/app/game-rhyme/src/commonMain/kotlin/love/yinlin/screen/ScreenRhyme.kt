@@ -15,9 +15,10 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Viewport
 import love.yinlin.compose.game.common.Drawer
-import love.yinlin.compose.game.common.Event
 import love.yinlin.compose.game.common.PrepareDrawer
 import love.yinlin.compose.game.common.TextGraph
+import love.yinlin.compose.game.event.Event
+import love.yinlin.compose.game.event.PointerEventListener
 import love.yinlin.compose.game.plugin.FontPlugin
 import love.yinlin.compose.game.plugin.ScenePlugin
 import love.yinlin.compose.game.traits.Layer
@@ -39,11 +40,15 @@ class ScreenRhyme : BasicScreen() {
     override suspend fun initialize() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
-            val rect = object : Visible(Offset.Zero, Size(800f, 100f)), Trigger {
-                override fun onEvent(tick: Long, event: Event): Boolean {
-                    println((event as? Event.Pointer)?.position)
-                    return true
-                }
+            val rect = object : Visible(Offset.Zero, Size(800f, 100f)) {
+                override val trigger: Trigger = Trigger(
+                    object : PointerEventListener() {
+                        override fun onPointerDown(tick: Long, event: Event.Pointer.Down): Boolean {
+                            println("${event}")
+                            return true
+                        }
+                    }
+                )
 
                 override fun Drawer.onDraw() {
                     rect(Colors.Green4, position = Offset.Zero, size = size)
