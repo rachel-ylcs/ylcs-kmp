@@ -21,5 +21,5 @@ class Trigger(vararg userListeners: EventListener) {
         listener.target.forEach { listeners.remove(it) }
     }
 
-    internal fun onEvent(tick: Long, event: Event): Boolean = listeners[event::class]?.onEvent(tick, event) ?: false
+    internal fun onEvent(tick: Long, event: Event, source: Visible): Boolean = listeners[event::class]?.onEvent(tick, event, source) ?: false
 }

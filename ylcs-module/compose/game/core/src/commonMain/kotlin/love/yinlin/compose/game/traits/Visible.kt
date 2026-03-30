@@ -16,17 +16,13 @@ import love.yinlin.compose.game.common.PrepareDrawer
 abstract class Visible(
     position: Offset = Offset.Zero,
     size: Size = Size.Zero,
+    aabb: AABB = AABB.Box,
     visible: Boolean = true
 ) : Entity() {
     /**
      * 是否裁切溢出
      */
     open val clip: Boolean = true
-
-    /**
-     * 形状
-     */
-    open val shape: Shape = Shape.Box
 
     /**
      * 层级
@@ -65,6 +61,17 @@ abstract class Visible(
     // 脏区标记
     internal var requireDirty: Long by mutableLongStateOf(0L)
         private set
+
+    /**
+     * 碰撞箱
+     */
+    var aabb: AABB = aabb
+        set(value) {
+            if (value != field) {
+                field = value
+                ++requireDirty
+            }
+        }
 
     /**
      * 位置

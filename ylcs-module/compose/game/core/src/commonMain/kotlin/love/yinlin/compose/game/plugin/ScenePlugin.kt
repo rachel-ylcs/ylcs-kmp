@@ -152,7 +152,7 @@ class ScenePlugin private constructor(
                     // 每秒更新一次 FPS
                     lastTime = frameTime
                     val deltaFPSTime = frameTime - lastFpsTime
-                    if (deltaFPSTime > fpsRate) {
+                    if (fpsRate in 1 ..< deltaFPSTime) {
                         fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
                         lastFpsTime = frameTime
                         frameCount = 0L

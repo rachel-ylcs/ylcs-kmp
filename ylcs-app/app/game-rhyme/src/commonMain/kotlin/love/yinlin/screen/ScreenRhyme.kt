@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.app.game_rhyme.resources.rhyme
 import love.yinlin.app.global.resources.xwwk
 import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
@@ -40,11 +41,21 @@ class ScreenRhyme : BasicScreen() {
     override suspend fun initialize() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
-            val rect = object : Visible(Offset.Zero, Size(800f, 100f)) {
+            val bound = object : Visible(Offset.Zero, Size.Zero) {
+                override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
+                    size = viewportSize
+                }
+
+                override fun Drawer.onDraw() {
+                    line(Colors.Red4, topCenter, bottomCenter, Stroke(1f))
+                    line(Colors.Red4, centerLeft, centerRight, Stroke(1f))
+                }
+            }
+            val rect = object : Visible(Offset(-100f, -200f), Size(800f, 100f)) {
                 override val trigger: Trigger = Trigger(
                     object : PointerEventListener() {
                         override fun onPointerDown(tick: Long, event: Event.Pointer.Down): Boolean {
-                            println("${event}")
+                            println(event)
                             return true
                         }
                     }
@@ -54,7 +65,7 @@ class ScreenRhyme : BasicScreen() {
                     rect(Colors.Green4, position = Offset.Zero, size = size)
                 }
             }
-            val text = object : Visible(Offset.Zero, Size(800f, 100f)) {
+            val text = object : Visible(Offset(-100f, -200f), Size(800f, 100f)) {
                 var textGraph: TextGraph? = null
 
                 override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
@@ -65,7 +76,7 @@ class ScreenRhyme : BasicScreen() {
                     text(textGraph, Offset.Zero, size, Colors.White)
                 }
             }
-            scene += Layer(rect, text)
+            scene += Layer(bound, rect, text)
         }
     }
 

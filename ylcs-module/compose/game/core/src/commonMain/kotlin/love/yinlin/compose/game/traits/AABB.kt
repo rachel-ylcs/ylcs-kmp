@@ -8,12 +8,12 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawTransform
 
 @Stable
-interface Shape {
+interface AABB {
     fun contains(size: Size, point: Offset): Boolean
     fun onClip(transform: DrawTransform, size: Size)
 
     @Stable
-    object Box : Shape {
+    object Box : AABB {
         override fun contains(size: Size, point: Offset): Boolean {
             return (point.x >= 0f) && (point.x < size.width) && (point.y >= 0f) && (point.y < size.height)
         }
@@ -24,7 +24,7 @@ interface Shape {
     }
 
     @Stable
-    object Circle : Shape {
+    object Circle : AABB {
         override fun contains(size: Size, point: Offset): Boolean {
             val a = size.width / 2
             val b = size.height / 2
@@ -34,7 +34,7 @@ interface Shape {
         }
 
         override fun onClip(transform: DrawTransform, size: Size) {
-            transform.clipPath(Path().apply { addOval(Rect(Offset.Zero, size)) })
+            transform.clipPath(Path().apply { addOval(Rect(0f, 0f, size.width, size.height)) })
         }
     }
 }

@@ -96,7 +96,7 @@ open class Layer(
         for (index in items.indices.reversed()) {
             val item = items[index]
             val trigger = item.trigger ?: continue
-            if (trigger.onEvent(tick, event)) return true // 消费完成
+            if (trigger.onEvent(tick, event, item)) return true // 消费完成
         }
         return false
     }
@@ -143,7 +143,7 @@ open class Layer(
                     // Canvas偏移
                     translate(-item.center)
                     // 裁切
-                    if (item.clip) item.shape.onClip(this, item.size)
+                    if (item.clip) item.aabb.onClip(this, item.size)
                 }) {
                     with(item) { onDraw() }
                 }
