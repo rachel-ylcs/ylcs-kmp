@@ -1,6 +1,5 @@
 package love.yinlin.compose.game.traits
 
-import androidx.annotation.CallSuper
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -9,32 +8,22 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
 import love.yinlin.compose.extension.translate
 import love.yinlin.compose.extension.scale
-import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Drawer
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.common.PrepareDrawer
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
+import love.yinlin.compose.game.plugin.ScenePlugin
 
-@OptIn(ExperimentalUuidApi::class)
 @Stable
 open class Layer(
     vararg visibles: Visible,
     val layerOrder: Int = LayerOrder.Default, // 层级
-    override val id: String = Uuid.generateV7().toString(),
 ): Entity(), Dynamic {
-    private var engine: Engine? = null
-
-    private val items = visibles.sortedBy(Visible::layerOrder).toMutableStateList()
+    private val items = visibles.sortedBy(Visible::layerOrder).toMutableList()
 
     val isEmpty: Boolean get() = items.isEmpty()
     val isNotEmpty: Boolean get() = items.isNotEmpty()
     val visibleCount: Int get() = items.size
-
-    // 脏区标记
-    internal var requireDirty: Long by mutableLongStateOf(0L)
-        private set
 
     /**
      * 可见
@@ -43,36 +32,37 @@ open class Layer(
         set(value) {
             if (field != value) {
                 field = value
-                ++requireDirty
+                updateDirty()
             }
         }
 
     operator fun plusAssign(item: Visible) {
-        engine?.let {
-            // 根据 layerOrder 二分查找
-            val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
-            items.add(-index - 1, item)
-            item.onAttached(it)
-        }
+        // 根据 layerOrder 二分查找
+        val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
+        items.add(-index - 1, item)
+        item.onVisibleAttached(this)
+        updateDirty()
     }
 
     operator fun minusAssign(item: Visible) {
-        engine?.let {
-            items -= item
-            item.onDetached(it)
-        }
+        items -= item
+        item.onVisibleDetached(this)
+        updateDirty()
     }
 
-    @CallSuper
-    override fun onAttached(engine: Engine) {
-        this.engine = engine
-        items.fastForEach { it.onAttached(engine) }
+    protected open fun onLayerAttached(scene: ScenePlugin) { }
+
+    protected open fun onLayerDetached(sender: ScenePlugin) { }
+
+    final override fun onAttached(scene: ScenePlugin) {
+        items.fastForEach { it.onVisibleAttached(this) }
+        onLayerAttached(scene)
     }
 
-    @CallSuper
-    override fun onDetached(engine: Engine) {
-        items.fastForEachReversed { it.onDetached(engine) }
-        this.engine = null
+    final override fun onDetached(scene: ScenePlugin) {
+        onLayerDetached(scene)
+        items.clear()
+        items.fastForEachReversed { it.onVisibleDetached(this) }
     }
 
     /**
@@ -82,7 +72,7 @@ open class Layer(
 
     override fun onUpdate(tick: Long) {
         items.fastForEach { item ->
-            if (item is Dynamic && item.active && item.needReDraw) item.onUpdate(tick)
+            if (item is Dynamic && item.active && item.alive) item.onUpdate(tick)
         }
     }
 
@@ -101,39 +91,25 @@ open class Layer(
         return false
     }
 
-    internal fun PrepareDrawer.prepareDrawVisibleLayer(viewportSize: Size, bounds: Rect) {
+    // 绘制预处理
+    internal fun prepareDrawVisibleLayer(drawer: PrepareDrawer, viewportSize: Size, bounds: Rect) {
         items.fastForEach { item ->
-            val _ = item.requireDirty
-
-            // 视口剔除
-            val (x, y) = item.position
-            val s = item.size
-            val needReDraw = if (!item.visible) false else if (!item.culling) true else {
-                val radius = (s.width + s.height) * item.scale / 2
-                when {
-                    x + radius < bounds.left -> false
-                    x - radius > bounds.right -> false
-                    y + radius < bounds.top -> false
-                    y - radius > bounds.bottom -> false
-                    else -> true
-                }
-            }
-
-            item.needReDraw = needReDraw
-
-            // 需要重绘
-            if (needReDraw) {
+            // 更新视口剔除
+            item.updateCulling(bounds)
+            // 检查视口剔除
+            if (item.alive) {
                 with(item) {
-                    prepareDraw(viewportSize, bounds)
+                    drawer.prepareDraw(viewportSize, bounds)
                 }
             }
         }
     }
 
-    internal fun Drawer.drawVisibleLayer() {
+    internal fun drawVisibleLayer(drawer: Drawer) {
         items.fastForEach { item ->
-            if (item.needReDraw) {
-                transform({
+            // 检查视口剔除
+            if (item.alive) {
+                drawer.transform({
                     // 偏移
                     translate(item.position)
                     // 旋转
@@ -149,5 +125,17 @@ open class Layer(
                 }
             }
         }
+    }
+
+    // 脏区标记
+    private var dirtyValue: Long by mutableLongStateOf(0L)
+
+    internal inline fun <R> whenDirty(block: () -> R): R {
+        val _ = dirtyValue
+        return block()
+    }
+
+    internal fun updateDirty() {
+        ++dirtyValue
     }
 }

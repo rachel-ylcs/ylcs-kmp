@@ -16,7 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
@@ -54,6 +55,7 @@ import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.layout.Divider
+import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.node.*
 import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -327,7 +329,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             }
         }
 
-        Box(modifier = modifier.pointerInput(Unit) {
+        Layout(modifier = modifier.pointerInput(Unit) {
             awaitEachGesture {
                 val down = awaitFirstDown(requireUnconsumed = false)
 
@@ -359,7 +361,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
                 isDragging = false
             }
-        }.drawBehind {
+        }.drawWithContent {
             val duration = mp?.duration ?: 0L
             val progress = if (duration == 0L) 0f else displayTime / duration.toFloat()
             val width = size.width
@@ -384,7 +386,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 }
                 drawCircle(color = color, radius = hotpotRadius, center = Offset(offsetChorus, height / 2))
             }
-        })
+        }, MeasurePolicies.Empty)
     }
 
     private val musicProgressLayout = movableComposable { modifier: Modifier ->

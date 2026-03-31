@@ -14,14 +14,10 @@ import androidx.compose.ui.unit.IntSize
 
 @Stable
 class Camera {
-    // 脏区标记
-    internal var requireDirty: Long by mutableLongStateOf(0L)
-        private set
-
     /**
      * 视口大小
      */
-    internal var viewportSize: Size = Size.Zero
+    var viewportSize: Size = Size.Zero
         private set
 
     /**
@@ -38,8 +34,7 @@ class Camera {
         set(value) {
             if (field != value) {
                 field = value
-                updateBounds()
-                ++requireDirty
+                updateDirty()
             }
         }
 
@@ -52,8 +47,7 @@ class Camera {
         set(value) {
             if (field != value) {
                 field = value
-                updateBounds()
-                ++requireDirty
+                updateDirty()
             }
         }
 
@@ -69,20 +63,11 @@ class Camera {
     var viewportBounds: Rect = Rect.Zero
         private set
 
-    private fun updateBounds() {
-        val boundSize = viewportSize / scale
-        val (x, y) = position
-        val (w, h) = boundSize
-        viewportBoundSize = boundSize
-        viewportBounds = Rect(left = x - w / 2, top = y - h / 2, right = x + w / 2, bottom = y + h / 2)
-    }
-
     internal fun updateViewport(size: IntSize, viewport: Viewport) {
         val (newSize, newScale) = viewport.applyCanvasBounds(size)
         rawViewportScale = newScale
         viewportSize = newSize
-        updateBounds()
-        ++requireDirty
+        updateDirty()
     }
 
     internal fun transformPointer(pointer: Offset, size: Size): Offset {
@@ -90,7 +75,8 @@ class Camera {
         return (pointer - size.center) / totalScale + position
     }
 
-    internal fun transformLayer(scope: GraphicsLayerScope, size: Size) {
+    internal fun whenDirtyTransformLayer(scope: GraphicsLayerScope, size: Size) {
+        val _ = dirtyValue
         val totalScale = rawViewportScale * scale
         val (centerX, centerY) = size / 2f
         val (cameraX, cameraY) = position * totalScale
@@ -100,5 +86,22 @@ class Camera {
         scope.scaleY = totalScale
         scope.translationX = centerX - cameraX
         scope.translationY = centerY - cameraY
+    }
+
+    // 脏区标记
+    private var dirtyValue: Long by mutableLongStateOf(0L)
+
+    internal inline fun <R> whenDirty(block: (Size, Rect) -> R): R {
+        val _ = dirtyValue
+        return block(viewportSize, viewportBounds)
+    }
+
+    private fun updateDirty() {
+        val boundSize = viewportSize / scale
+        val (x, y) = position
+        val (w, h) = boundSize
+        viewportBoundSize = boundSize
+        viewportBounds = Rect(left = x - w / 2, top = y - h / 2, right = x + w / 2, bottom = y + h / 2)
+        ++dirtyValue
     }
 }

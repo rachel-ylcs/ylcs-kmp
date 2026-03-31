@@ -31,11 +31,11 @@ import love.yinlin.compose.screen.BasicScreen
 class ScreenRhyme : BasicScreen() {
     private val engine = Engine(
         Viewport.MatchHeight(1000),
-        FontPlugin.resources(
+        FontPlugin.ResourceFactory(
             GlobalRes.font.xwwk,
             RhymeRes.font.rhyme,
         ),
-        ScenePlugin.build()
+        ScenePlugin.DefaultFactory()
     )
 
     override suspend fun initialize() {
@@ -55,7 +55,7 @@ class ScreenRhyme : BasicScreen() {
                 override val trigger: Trigger = Trigger(
                     object : PointerEventListener() {
                         override fun onPointerDown(tick: Long, event: Event.Pointer.Down): Boolean {
-                            println(event)
+                            size = size.copy(width = size.width - 100f)
                             return true
                         }
                     }

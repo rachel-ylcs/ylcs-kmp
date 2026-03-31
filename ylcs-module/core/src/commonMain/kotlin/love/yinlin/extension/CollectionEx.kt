@@ -1,5 +1,19 @@
 package love.yinlin.extension
 
+//  ----------  MutableMap  ----------
+
+inline fun <K, V> MutableMap<K, V>.forMutableEach(action: (MutableMap.MutableEntry<K, V>) -> Unit) {
+    for (iter in this) action(iter)
+}
+
+inline fun <K, V> MutableMap<K, V>.setAll(action: (V) -> V) {
+    for (iter in this) iter.setValue(action(iter.value))
+}
+
+fun <K, V> MutableMap<K, V>.setAll(value: V) {
+    for (iter in this) iter.setValue(value)
+}
+
 //  ----------  Data Change  ----------
 
 fun <T> MutableList<T>.moveItem(fromIndex: Int, toIndex: Int) {

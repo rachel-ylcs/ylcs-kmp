@@ -9,7 +9,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -58,7 +58,7 @@ fun Radio(
 
         val onClick = { group.index = if (index == group.index) -1 else index }
 
-        Layout(modifier = Modifier.size(radius * 2).fastClipCircle().drawBehind {
+        Layout(modifier = Modifier.size(radius * 2).fastClipCircle().drawWithContent {
             val radiusPx = radius.toPx()
             drawCircle(backgroundColor, radiusPx, center, style = Fill)
             drawCircle(contentColor, dotRadius.toPx(), center, style = Fill)

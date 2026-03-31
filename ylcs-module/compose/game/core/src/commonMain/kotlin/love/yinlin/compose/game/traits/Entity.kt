@@ -1,22 +1,21 @@
 package love.yinlin.compose.game.traits
 
 import androidx.compose.runtime.Stable
-import love.yinlin.compose.game.Engine
+import love.yinlin.compose.game.plugin.ScenePlugin
 
+/**
+ * 加入场景的实体
+ */
 @Stable
-open class Entity {
-    /**
-     * 唯一标识
-     */
-    open val id: String? = null
+open class Entity : Unique() {
 
     /**
-     * 附加
+     * 附加场景
      */
-    open fun onAttached(engine: Engine) { }
+    open fun onAttached(scene: ScenePlugin) { }
 
     /**
-     * 离开
+     * 离开场景
      */
-    open fun onDetached(engine: Engine) { }
+    open fun onDetached(scene: ScenePlugin) { }
 }

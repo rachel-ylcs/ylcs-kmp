@@ -19,6 +19,14 @@ class FontPlugin private constructor(
     engine: Engine,
     private val fontResources: List<FontResource>
 ) : Plugin(engine) {
+    /**
+     * @param font 字体资源
+     */
+    @Stable
+    class ResourceFactory(vararg val font: FontResource) : PluginFactory {
+        override fun build(engine: Engine): Plugin = FontPlugin(engine, font.toList())
+    }
+
     override val layerOrder: Int = LayerOrder.Low
 
     private val fontMap = mutableStateMapOf<FontResource, FontFamily>()
@@ -43,9 +51,5 @@ class FontPlugin private constructor(
                 }
             }
         }
-    }
-
-    companion object {
-        fun resources(vararg font: FontResource): (Engine) -> FontPlugin = { engine -> FontPlugin(engine, font.toList()) }
     }
 }

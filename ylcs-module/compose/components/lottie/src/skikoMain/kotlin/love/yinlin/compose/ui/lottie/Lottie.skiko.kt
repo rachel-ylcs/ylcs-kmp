@@ -3,7 +3,7 @@ package love.yinlin.compose.ui.lottie
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import kotlinx.coroutines.delay
@@ -40,7 +40,7 @@ actual fun Lottie(data: String, modifier: Modifier) {
         }
     }
 
-    Box(modifier = modifier.drawBehind {
+    Box(modifier = modifier.drawWithContent {
         if (isForeground) {
             animation?.let { anim ->
                 drawIntoCanvas { canvas ->

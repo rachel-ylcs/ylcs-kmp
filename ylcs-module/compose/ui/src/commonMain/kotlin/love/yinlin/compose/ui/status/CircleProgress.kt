@@ -2,7 +2,7 @@ package love.yinlin.compose.ui.status
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -21,7 +21,7 @@ fun CircleProgress(
 ) {
     val minRadius = Theme.size.input7
 
-    Layout(modifier = modifier.drawBehind {
+    Layout(modifier = modifier.drawWithContent {
         val minEdge = min(size.width, size.height)
         val radius = minEdge / 2
         val actualStrokeWidth = radius / 4

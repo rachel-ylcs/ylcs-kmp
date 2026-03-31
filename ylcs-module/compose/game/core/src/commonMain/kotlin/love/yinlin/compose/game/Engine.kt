@@ -16,6 +16,7 @@ import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.common.Viewport
 import love.yinlin.compose.game.plugin.Plugin
+import love.yinlin.compose.game.plugin.PluginFactory
 import love.yinlin.compose.window.FocusWindowEffect
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
@@ -26,12 +27,12 @@ import love.yinlin.reflect.metaRawClassName
 @Stable
 class Engine(
     val viewport: Viewport, // 视口类型
-    vararg userPlugins: (Engine) -> Plugin, // 插件集
+    vararg userPlugins: PluginFactory, // 插件集
 ) {
     /**
      * 是否加载
      */
-    var isInitialized: Boolean by mutableStateOf(false)
+    var isInitialized: Boolean = false
         private set
 
     /**
@@ -44,7 +45,7 @@ class Engine(
 
     // 插件依赖图
     @PublishedApi
-    internal val pluginMap = userPlugins.map { it.invoke(this) }.associateBy(Plugin::id)
+    internal val pluginMap = userPlugins.map { it.build(this) }.associateBy(Plugin::id)
     private val pluginDependencyMap: Map<String, List<String>>
     private val plugins: List<Plugin>
     private val visiblePlugins: List<Plugin>

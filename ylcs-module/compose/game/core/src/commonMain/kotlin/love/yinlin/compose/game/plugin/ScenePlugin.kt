@@ -23,7 +23,6 @@ import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
-import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.common.Camera
 import love.yinlin.compose.game.common.Drawer
@@ -33,21 +32,19 @@ import love.yinlin.compose.game.common.LayerOrder
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
+import kotlin.uuid.ExperimentalUuidApi
 
 @Stable
 class ScenePlugin private constructor(
     private val fpsRate: Long,
     engine: Engine
 ) : Plugin(engine) {
-    companion object {
-        /**
-         * @param fpsRate FPS统计频率(毫秒)
-         */
-        fun build(
-            fpsRate: Long = 1000L
-        ): (Engine) -> ScenePlugin = { engine ->
-            ScenePlugin(fpsRate, engine)
-        }
+    /**
+     * @param fpsRate FPS统计频率(毫秒)
+     */
+    @Stable
+    class DefaultFactory(val fpsRate: Long = 1000L) : PluginFactory {
+        override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, engine)
     }
 
     /**
@@ -84,17 +81,17 @@ class ScenePlugin private constructor(
 
     operator fun plusAssign(entity: Entity) {
         entities += entity
-        if (isInitialized) entity.onAttached(engine)
+        if (isInitialized) entity.onAttached(this)
     }
 
     operator fun minusAssign(entity: Entity) {
         entities -= entity
-        if (isInitialized) entity.onDetached(engine)
+        if (isInitialized) entity.onDetached(this)
     }
 
     fun clear() {
         entities.clear()
-        entities.fastForEachReversed { it.onDetached(engine) }
+        entities.fastForEachReversed { it.onDetached(this) }
     }
 
     // 事件
@@ -211,19 +208,14 @@ class ScenePlugin private constructor(
         }.pointerInput(Unit) { // 事件监听
             pointerInputLoop()
         }.graphicsLayer { // 窗口坐标转换
-            val _ = camera.requireDirty
-            camera.transformLayer(this, size)
+            camera.whenDirtyTransformLayer(this, size)
         }) {
             // 画布渲染
             val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
             val fontFamilyResolver = LocalFontFamilyResolver.current
 
-            val cameraState by rememberDerivedState {
-                val _ = camera.requireDirty
-                camera.viewportSize to camera.viewportBounds
-            }
-
             layerEntities.fastForEach { layer ->
+                @OptIn(ExperimentalUuidApi::class)
                 key(layer.id) {
                     val drawer = remember(fontFamilyResolver) {
                         Drawer(
@@ -233,22 +225,24 @@ class ScenePlugin private constructor(
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer().drawWithCache {
-                        val (viewportSize, bounds) = cameraState
-                        val _ = layer.requireDirty
-                        val layerVisible = layer.visible
+                        camera.whenDirty { viewportSize, bounds ->
+                            layer.whenDirty {
+                                val layerVisible = layer.visible
 
-                        // 预绘制处理
-                        drawer.withRawCacheScope(this) {
-                            with(layer) {
-                                if (layerVisible) drawer.prepareDrawVisibleLayer(viewportSize, bounds)
-                            }
-                        }
+                                // 绘制预处理
+                                if (layerVisible) {
+                                    drawer.withRawCacheScope(this) {
+                                        layer.prepareDrawVisibleLayer(this, viewportSize, bounds)
+                                    }
+                                }
 
-                        // 绘制
-                        onDrawBehind {
-                            drawer.withRawScope(this) {
-                                with(layer) {
-                                    if (layerVisible) drawer.drawVisibleLayer()
+                                // 绘制
+                                onDrawWithContent {
+                                    if (layerVisible) {
+                                        drawer.withRawScope(this) {
+                                            layer.drawVisibleLayer(this)
+                                        }
+                                    }
                                 }
                             }
                         }

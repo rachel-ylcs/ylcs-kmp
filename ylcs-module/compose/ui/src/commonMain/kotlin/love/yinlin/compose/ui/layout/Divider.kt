@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
@@ -23,7 +23,7 @@ fun VerticalDivider(
     color: Color = Theme.color.outline.copy(alpha = 0.5f),
     modifier: Modifier = Modifier,
 ) {
-    Layout(modifier = modifier.fillMaxHeight().width(thickness).drawBehind {
+    Layout(modifier = modifier.fillMaxHeight().width(thickness).drawWithContent {
         val thicknessPx = thickness.toPx()
         drawLine(
             color = color,
@@ -52,7 +52,7 @@ fun HorizontalDivider(
     color: Color = Theme.color.outline.copy(alpha = 0.5f),
     modifier: Modifier = Modifier,
 ) {
-    Layout(modifier = modifier.fillMaxWidth().height(thickness).drawBehind {
+    Layout(modifier = modifier.fillMaxWidth().height(thickness).drawWithContent {
         val thicknessPx = thickness.toPx()
         drawLine(
             color = color,
