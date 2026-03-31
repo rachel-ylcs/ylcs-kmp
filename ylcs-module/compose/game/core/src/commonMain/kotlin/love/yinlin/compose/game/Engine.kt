@@ -32,8 +32,7 @@ class Engine(
     /**
      * 是否加载
      */
-    var isInitialized: Boolean = false
-        private set
+    private var isInitialized: Boolean = false
 
     /**
      * 是否运行

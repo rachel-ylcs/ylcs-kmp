@@ -20,7 +20,7 @@ abstract class Visible(
     aabb: AABB = AABB.Box,
     visible: Boolean = true,
     useCulling: Boolean = true, // 参与视口剔除
-) : Unique() {
+) {
     /**
      * 是否裁切溢出
      */

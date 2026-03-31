@@ -8,7 +8,6 @@ import love.yinlin.compose.game.plugin.ScenePlugin
  */
 @Stable
 open class Entity : Unique() {
-
     /**
      * 附加场景
      */
