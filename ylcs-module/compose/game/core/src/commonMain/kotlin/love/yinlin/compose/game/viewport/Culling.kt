@@ -1,4 +1,4 @@
-package love.yinlin.compose.game.common
+package love.yinlin.compose.game.viewport
 
 import androidx.compose.ui.geometry.Rect
 

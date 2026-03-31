@@ -7,19 +7,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import love.yinlin.app.game_rhyme.resources.rhyme
+import love.yinlin.app.global.resources.img_logo
 import love.yinlin.app.global.resources.xwwk
 import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
 import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.Engine
-import love.yinlin.compose.game.common.Viewport
-import love.yinlin.compose.game.common.Drawer
-import love.yinlin.compose.game.common.PrepareDrawer
-import love.yinlin.compose.game.common.TextGraph
+import love.yinlin.compose.game.asset.ResourceImageLoader
+import love.yinlin.compose.game.viewport.Viewport
+import love.yinlin.compose.game.drawer.Drawer
+import love.yinlin.compose.game.drawer.PrepareDrawer
+import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.event.PointerEventListener
+import love.yinlin.compose.game.plugin.AssetPlugin
 import love.yinlin.compose.game.plugin.FontPlugin
 import love.yinlin.compose.game.plugin.ScenePlugin
 import love.yinlin.compose.game.traits.Layer
@@ -35,12 +40,18 @@ class ScreenRhyme : BasicScreen() {
             GlobalRes.font.xwwk,
             RhymeRes.font.rhyme,
         ),
+        AssetPlugin.DefaultFactory(
+            ResourceImageLoader(
+                GlobalRes.drawable.img_logo
+            )
+        ),
         ScenePlugin.DefaultFactory()
     )
 
     override suspend fun initialize() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
+
             val bound = object : Visible(Offset.Zero, Size.Zero) {
                 override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
                     size = viewportSize
@@ -51,7 +62,8 @@ class ScreenRhyme : BasicScreen() {
                     line(Colors.Red4, centerLeft, centerRight, Stroke(1f))
                 }
             }
-            val rect = object : Visible(Offset(-100f, -200f), Size(800f, 100f)) {
+
+            val rect = object : Visible(Offset.Zero, Size(800f, 100f)) {
                 override val trigger: Trigger = Trigger(
                     object : PointerEventListener() {
                         override fun onPointerDown(tick: Long, event: Event.Pointer.Down): Boolean {
@@ -65,18 +77,32 @@ class ScreenRhyme : BasicScreen() {
                     rect(Colors.Green4, position = Offset.Zero, size = size)
                 }
             }
-            val text = object : Visible(Offset(-100f, -200f), Size(800f, 100f)) {
+
+            val text = object : Visible(Offset.Zero, Size(800f, 100f)) {
                 var textGraph: TextGraph? = null
 
                 override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
-                    textGraph = measureText("Hello 你好", GlobalRes.font.xwwk)
+                    if (textGraph == null) textGraph = measureText("Hello 你好", GlobalRes.font.xwwk)
                 }
 
                 override fun Drawer.onDraw() {
-                    text(textGraph, Offset.Zero, size, Colors.White)
+                    text(textGraph, Offset.Zero, size, Colors.White, textAlign = TextAlign.Center)
                 }
             }
-            scene += Layer(bound, rect, text)
+
+            val image = object : Visible(Offset(200f, 200f), Size(400f, 400f)) {
+                var bitmap: ImageBitmap? = null
+
+                override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
+                    if (bitmap == null) bitmap = assetProvider[GlobalRes.drawable.img_logo]
+                }
+
+                override fun Drawer.onDraw() {
+                    bitmap?.let { image(it, Offset.Zero, size) }
+                }
+            }
+
+            scene += Layer(bound, rect, text, image)
         }
     }
 

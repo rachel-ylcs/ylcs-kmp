@@ -5,10 +5,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
-import love.yinlin.compose.game.common.Culling
-import love.yinlin.compose.game.common.Drawer
-import love.yinlin.compose.game.common.LayerOrder
-import love.yinlin.compose.game.common.PrepareDrawer
+import love.yinlin.compose.game.viewport.Culling
+import love.yinlin.compose.game.drawer.Drawer
+import love.yinlin.compose.game.drawer.LayerOrder
+import love.yinlin.compose.game.drawer.PrepareDrawer
 
 /**
  * 可视实体
@@ -46,7 +46,8 @@ abstract class Visible(
      */
     protected open fun onDetached(layer: Layer) { }
 
-    private var layer: Layer? = null
+    var layer: Layer? = null
+        private set
 
     internal fun onVisibleAttached(layer: Layer) {
         this.layer = layer

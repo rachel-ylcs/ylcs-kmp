@@ -13,8 +13,8 @@ import androidx.compose.ui.util.*
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.*
 import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compose.game.common.LayerOrder
-import love.yinlin.compose.game.common.Viewport
+import love.yinlin.compose.game.drawer.LayerOrder
+import love.yinlin.compose.game.viewport.Viewport
 import love.yinlin.compose.game.plugin.Plugin
 import love.yinlin.compose.game.plugin.PluginFactory
 import love.yinlin.compose.window.FocusWindowEffect
@@ -39,8 +39,6 @@ class Engine(
      */
     var isRunning: Boolean by mutableStateOf(false)
         private set
-
-    private val scope = CoroutineScope(SupervisorJob() + cpuContext)
 
     // 插件依赖图
     @PublishedApi
@@ -107,6 +105,8 @@ class Engine(
     inline fun <reified T : Plugin> plugin(): T = pluginMap[metaClassName<T>()] as T
     inline fun <reified T : Plugin> pluginOrNull(): T? = pluginMap[metaClassName<T>()] as? T
 
+    internal val scope = CoroutineScope(SupervisorJob() + cpuContext)
+
     /**
      * 初始化
      */
@@ -132,7 +132,7 @@ class Engine(
                                 }
                                 if (!plugin.isInitialized) {
                                     val pluginResult = plugin.onInitialize()
-                                    plugin.isInitialized = pluginResult
+                                    Coroutines.main { plugin.isInitialized = pluginResult }
                                     pluginResult
                                 } else true
                             }

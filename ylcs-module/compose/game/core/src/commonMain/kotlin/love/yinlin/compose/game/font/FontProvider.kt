@@ -1,4 +1,4 @@
-package love.yinlin.compose.game.common
+package love.yinlin.compose.game.font
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.font.FontFamily

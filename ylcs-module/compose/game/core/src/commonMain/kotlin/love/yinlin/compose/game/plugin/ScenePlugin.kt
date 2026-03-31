@@ -24,11 +24,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.isActive
 import love.yinlin.compose.game.Engine
-import love.yinlin.compose.game.common.Camera
-import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.asset.AssetProvider
+import love.yinlin.compose.game.viewport.Camera
+import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.event.Event
-import love.yinlin.compose.game.common.FontProvider
-import love.yinlin.compose.game.common.LayerOrder
+import love.yinlin.compose.game.font.FontProvider
+import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
@@ -210,9 +211,11 @@ class ScenePlugin private constructor(
         }.graphicsLayer { // 窗口坐标转换
             camera.whenDirtyTransformLayer(this, size)
         }) {
-            // 画布渲染
-            val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
             val fontFamilyResolver = LocalFontFamilyResolver.current
+            // 字体转接器
+            val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
+            // 资源转接器
+            val assetProvider = remember { engine.pluginOrNull<AssetPlugin>()?.assetProvider ?: AssetProvider.Default }
 
             layerEntities.fastForEach { layer ->
                 @OptIn(ExperimentalUuidApi::class)
@@ -220,7 +223,8 @@ class ScenePlugin private constructor(
                     val drawer = remember(fontFamilyResolver) {
                         Drawer(
                             fontFamilyResolver = fontFamilyResolver,
-                            fontProvider = fontProvider
+                            fontProvider = fontProvider,
+                            assetProvider = assetProvider
                         )
                     }
 

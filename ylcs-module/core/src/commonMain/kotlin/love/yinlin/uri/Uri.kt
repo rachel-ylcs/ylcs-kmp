@@ -95,9 +95,8 @@ data class Uri(
                     val portNum = portStr.toIntOrNull() ?: return null
                     host = hostCandidate
                     port = portNum
-                } else {
-                    host = authorityPart
                 }
+                else host = authorityPart
             }
             var query: String? = null
             val queryIndex = afterAuthority.indexOf('?')

@@ -51,7 +51,8 @@ private fun parseWeiboHtml(html: String): List<Node>? {
                 pos = closeEnd + 1
 
                 return if (tagName == endTagName) nodes else null
-            } else {
+            }
+            else {
                 val tagNameStart = pos
                 while (pos < length && !html[pos].isWhitespace() && html[pos] != '>' && html[pos] != '/') pos++
                 val tagName = html.substring(tagNameStart, pos).lowercase()
@@ -68,10 +69,12 @@ private fun parseWeiboHtml(html: String): List<Node>? {
                     if (c == '/') {
                         isSelfClosing = true
                         pos++
-                    } else if (c == '>') {
+                    }
+                    else if (c == '>') {
                         pos++
                         break
-                    } else {
+                    }
+                    else {
                         val attrStart = pos
                         while (pos < length && !html[pos].isWhitespace() && html[pos] != '=' && html[pos] != '>' && html[pos] != '/') pos++
                         val attrName = html.substring(attrStart, pos).lowercase()
@@ -90,7 +93,8 @@ private fun parseWeiboHtml(html: String): List<Node>? {
                                     if (valEnd == -1) return null
                                     attrValue = html.substring(valStart, valEnd).trim()
                                     pos = valEnd + 1
-                                } else {
+                                }
+                                else {
                                     val valStart = pos
                                     while (pos < length && !html[pos].isWhitespace() && html[pos] != '>' && html[pos] != '/') pos++
                                     attrValue = html.substring(valStart, pos).trim()

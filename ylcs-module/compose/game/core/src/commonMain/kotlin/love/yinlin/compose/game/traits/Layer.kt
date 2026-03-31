@@ -8,10 +8,10 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
 import love.yinlin.compose.extension.translate
 import love.yinlin.compose.extension.scale
-import love.yinlin.compose.game.common.Drawer
+import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.event.Event
-import love.yinlin.compose.game.common.LayerOrder
-import love.yinlin.compose.game.common.PrepareDrawer
+import love.yinlin.compose.game.drawer.LayerOrder
+import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.plugin.ScenePlugin
 
 @Stable
@@ -24,6 +24,9 @@ open class Layer(
     val isEmpty: Boolean get() = items.isEmpty()
     val isNotEmpty: Boolean get() = items.isNotEmpty()
     val visibleCount: Int get() = items.size
+
+    var scene: ScenePlugin? = null
+        private set
 
     /**
      * 可见
@@ -55,6 +58,7 @@ open class Layer(
     protected open fun onLayerDetached(sender: ScenePlugin) { }
 
     final override fun onAttached(scene: ScenePlugin) {
+        this.scene = scene
         items.fastForEach { it.onVisibleAttached(this) }
         onLayerAttached(scene)
     }
@@ -63,6 +67,7 @@ open class Layer(
         onLayerDetached(scene)
         items.clear()
         items.fastForEachReversed { it.onVisibleDetached(this) }
+        this.scene = null
     }
 
     /**

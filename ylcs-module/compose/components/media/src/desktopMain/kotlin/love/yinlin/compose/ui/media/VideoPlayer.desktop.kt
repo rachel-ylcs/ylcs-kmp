@@ -71,7 +71,8 @@ abstract class DesktopVideoController(topBar: VideoActionBar.Factory, bottomBar:
                     val dst = if (imageRatio > canvasRatio) {
                         val dstHeight = canvasWidth / imageRatio
                         Rect.makeXYWH(0f, (canvasHeight - dstHeight) / 2, canvasWidth, dstHeight)
-                    } else {
+                    }
+                    else {
                         val dstWidth = canvasHeight * imageRatio
                         Rect.makeXYWH((canvasWidth - dstWidth) / 2, 0f, dstWidth, canvasHeight)
                     }

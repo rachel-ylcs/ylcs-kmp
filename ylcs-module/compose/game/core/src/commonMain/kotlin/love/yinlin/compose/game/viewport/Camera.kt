@@ -1,4 +1,4 @@
-package love.yinlin.compose.game.common
+package love.yinlin.compose.game.viewport
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntSize
 
 @Stable
-class Camera {
+class Camera internal constructor() {
     /**
      * 视口大小
      */

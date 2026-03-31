@@ -308,7 +308,8 @@ fun CropImage(
                 state.imageRect = imageRect
                 val frameSize = if (aspectRatio == 0f) {
                     Size(imageRect.width * 0.8f, imageRect.height * 0.8f)
-                } else {
+                }
+                else {
                     val scale = min(imageRect.width, imageRect.height) / max(imageRect.width, imageRect.width / aspectRatio)
                     Size(imageRect.width * scale * 0.8f, imageRect.width * scale / aspectRatio * 0.8f)
                 }

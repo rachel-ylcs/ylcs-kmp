@@ -1,4 +1,4 @@
-package love.yinlin.compose.game.common
+package love.yinlin.compose.game.drawer
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.*
@@ -11,14 +11,18 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
+import love.yinlin.compose.extension.Path
 import love.yinlin.compose.extension.roundToIntOffset
 import love.yinlin.compose.extension.translate
+import love.yinlin.compose.game.asset.AssetProvider
+import love.yinlin.compose.game.font.FontProvider
 
 @Stable
 class Drawer internal constructor(
     fontFamilyResolver: FontFamily.Resolver,
-    fontProvider: FontProvider
-) : PrepareDrawer(fontFamilyResolver, fontProvider) {
+    fontProvider: FontProvider,
+    assetProvider: AssetProvider
+) : PrepareDrawer(fontFamilyResolver, fontProvider, assetProvider) {
     @PublishedApi internal var rawScope: DrawScope? = null
 
     internal inline fun withRawScope(scope: DrawScope, block: Drawer.() -> Unit) {
@@ -46,11 +50,17 @@ class Drawer internal constructor(
     }
 
     fun oval(color: Color, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawOval(color = color, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawOval(color = color, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(
+            radiusX * 2,
+            radiusY * 2
+        ), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun oval(brush: Brush, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawOval(brush = brush, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawOval(brush = brush, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(
+            radiusX * 2,
+            radiusY * 2
+        ), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun rect(color: Color, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
@@ -70,19 +80,31 @@ class Drawer internal constructor(
     }
 
     fun roundRect(color: Color, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(
+            radius,
+            radius
+        ), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(brush: Brush, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(
+            radius,
+            radius
+        ), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(color: Color, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(color = color, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(color = color, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(
+            radius,
+            radius
+        ), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(brush: Brush, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(brush = brush, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(brush = brush, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(
+            radius,
+            radius
+        ), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun arc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
@@ -94,11 +116,11 @@ class Drawer internal constructor(
     }
 
     fun quadrilateral(color: Color, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawPath(path = love.yinlin.compose.extension.Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawPath(path = Path(area), color = color, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun quadrilateral(brush: Brush, area: Array<Offset>, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawPath(path = love.yinlin.compose.extension.Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawPath(path = Path(area), brush = brush, alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun path(color: Color, path: Path, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {

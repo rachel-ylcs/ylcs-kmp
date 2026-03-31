@@ -1,4 +1,4 @@
-package love.yinlin.compose.game.common
+package love.yinlin.compose.game.drawer
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.draw.CacheDrawScope
@@ -13,12 +13,15 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import love.yinlin.compose.game.asset.AssetProvider
+import love.yinlin.compose.game.font.FontProvider
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
 open class PrepareDrawer internal constructor(
     protected val fontFamilyResolver: FontFamily.Resolver,
-    protected val fontProvider: FontProvider
+    private val fontProvider: FontProvider,
+    val assetProvider: AssetProvider
 ) {
     companion object {
         val BaselineTextFontSize = 32.sp
