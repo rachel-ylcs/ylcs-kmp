@@ -6,6 +6,7 @@ import love.yinlin.extension.makeObject
 import love.yinlin.extension.toJsonString
 
 @Stable
+@RichStringDsl
 abstract class RichList : RichValue() {
     @PublishedApi
     internal val items = mutableListOf<RichObject>()

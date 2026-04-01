@@ -10,7 +10,7 @@ import love.yinlin.extension.JsonObjectScope
 class RichString @PublishedApi internal constructor(): RichList() {
     override val type: String = RichType.Root.value
 
-    override fun JsonObjectScope.children() {}
+    override fun JsonObjectScope.children() { }
 
     @Stable
     data object Converter : RichConverter {
@@ -24,7 +24,7 @@ class RichString @PublishedApi internal constructor(): RichList() {
     }
 }
 
-inline fun buildRichString(content: RichList.() -> Unit): RichString {
+inline fun buildRichString(content: @RichStringDsl RichList.() -> Unit): RichString {
     val richString = RichString()
     richString.content()
     return richString

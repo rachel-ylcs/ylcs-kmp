@@ -30,6 +30,9 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 val Json = kotlinx.serialization.json.Json {
     prettyPrint = false
@@ -94,6 +97,11 @@ object JsonConverter {
 
 // Json DSL
 
+@DslMarker
+@Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPEALIAS)
+annotation class JsonBuildDsl
+
+@JsonBuildDsl
 data class JsonArrayScope(@PublishedApi internal val builder: JsonArrayBuilder) {
     fun add(value: Nothing?) = builder.add(JsonNull)
     fun add(value: Boolean) = builder.add(value.json)
@@ -109,6 +117,7 @@ data class JsonArrayScope(@PublishedApi internal val builder: JsonArrayBuilder) 
     }
 }
 
+@JsonBuildDsl
 data class JsonObjectScope(@PublishedApi internal val builder: JsonObjectBuilder) {
     infix fun String.with(value: Nothing?) = builder.put(this, JsonNull)
     infix fun String.with(value: Boolean) = builder.put(this, value.json)
@@ -124,6 +133,18 @@ data class JsonObjectScope(@PublishedApi internal val builder: JsonObjectBuilder
     }
 }
 
-inline fun makeArray(init: JsonArrayScope.() -> Unit) = buildJsonArray { JsonArrayScope(this).init() }
+@OptIn(ExperimentalContracts::class)
+inline fun makeArray(init: @JsonBuildDsl JsonArrayScope.() -> Unit): JsonArray {
+    contract {
+        callsInPlace(init, InvocationKind.EXACTLY_ONCE)
+    }
+    return buildJsonArray { JsonArrayScope(this).init() }
+}
 
-inline fun makeObject(init: JsonObjectScope.() -> Unit) = buildJsonObject { JsonObjectScope(this).init() }
+@OptIn(ExperimentalContracts::class)
+inline fun makeObject(init: @JsonBuildDsl JsonObjectScope.() -> Unit): JsonObject {
+    contract {
+        callsInPlace(init, InvocationKind.EXACTLY_ONCE)
+    }
+    return buildJsonObject { JsonObjectScope(this).init() }
+}
