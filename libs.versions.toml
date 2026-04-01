@@ -1,11 +1,11 @@
 [versions]
 
 # Plugins #
-kotlin = "2.3.20"
+kotlin = "2.4.0-Beta1"
 agp = "9.0.0-alpha06"
 cmp = "1.11.0-alpha03" # 1.11.0-alpha04的shader二进制不兼容, 要等上游适配
 mavenPublish = "0.36.0"
-dokka = "2.2.0-Beta"
+dokka = "2.2.0"
 
 # Libs #
 
@@ -13,15 +13,15 @@ dokka = "2.2.0-Beta"
 skiko = "0.9.47" # 0.144.4的skiko-uiview在web上二进制不兼容，要等上游适配
 lifecycle = "2.10.0"
 coroutines = "1.10.2"
-ktor = "3.4.1"
+ktor = "3.4.2"
 sketch = "4.4.0-beta02"
 mmkv = "2.4.0"
 cryptography = "0.5.0"
-pag = "4.5.41"
+pag = "4.5.46"
 
 # Android
 androidx-activity = "1.13.0"
-media3 = "1.10.0-rc02"
+media3 = "1.10.0"
 
 # iOS
 sgQrcode = "4.1.0"
@@ -66,13 +66,13 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
 compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.1" }
-compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.0-alpha04" }
+compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.0-beta01" }
 compose-navigation3-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
-kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.32.0" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.32.1" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
