@@ -35,17 +35,54 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun BeginContent() {}
 
+    // compose渲染相关配置
+
+    /**
+     * 离屏渲染
+     */
+    protected open val composeSwingRenderOnGraphics: Boolean = true
+
+    /**
+     * 原生View互作层
+     */
+    protected open val composeInteropBlending: Boolean = true
+
     // 这些配置都是非状态变量作为初始值表达, 需要监听变化请使用 controller
 
+    /**
+     * 标题
+     */
     protected open val title: String = ""
+
+    /**
+     * 图标
+     */
     protected open val icon: DrawableResource? = null
+
+    /**
+     * 初始尺寸
+     */
     protected open val initSize: DpSize = DpSize(1200.dp, 700.dp)
+
+    /**
+     * 最小尺寸
+     */
     protected open val minSize: DpSize = DpSize(360.dp, 640.dp)
+
+    /**
+     * 圆角窗口
+     */
     protected open val roundedCorner: Boolean = true
 
+    /**
+     * 标题栏
+     */
     @Composable
     protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
 
+    /**
+     * 多窗口
+     */
     @Composable
     protected open fun ApplicationScope.MultipleWindow() {}
 
@@ -66,11 +103,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     val mainScope = MainScope()
 
     fun run() {
-        initApplicationService(scope = mainScope)
+        if (composeSwingRenderOnGraphics) System.setProperty("compose.swing.render.on.graphics", "true")
+        if (composeInteropBlending) System.setProperty("compose.interop.blending", "true")
+
+        initApplication(scope = mainScope)
 
         application(exitProcessOnExit = false) {
             val onMainWindowClose = {
-                destroyServiceBefore()
+                destroyPoolBefore()
                 exitApplication()
             }
 
@@ -90,7 +130,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     Fixup.swingWindowMaximizeBounds(window)
                     this@PlatformApplication.windowHandle = window.windowHandle
 
-                    windowStarter { initServiceLater() }
+                    windowStarter { initPoolLater(this) }
                 }
 
                 Fixup.swingWindowMinimize(this, minSize)
@@ -131,7 +171,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             MultipleWindow()
         }
 
-        destroyService()
+        destroyPool()
 
         mainScope.cancel()
 

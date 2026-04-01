@@ -1,22 +1,20 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.startup
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Buffer
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
 import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.SyncStartup
 import love.yinlin.compatible.ByteArrayCompatible
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.MimeType
 import love.yinlin.extension.cast
 import love.yinlin.extension.createElement
 import love.yinlin.extension.jsArrayOf
-import love.yinlin.foundation.PlatformContextProvider
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupPool
 import love.yinlin.io.ArrayBufferSource
 import love.yinlin.io.ScriptWorker
 import love.yinlin.io.Sources
@@ -34,8 +32,8 @@ import kotlin.js.JsArray
 import kotlin.js.get
 import kotlin.js.toList
 
-actual class StartupPicker actual constructor(context: PlatformContextProvider) : SyncStartup(context) {
-    actual override fun init(scope: CoroutineScope, args: StartupArgs) { }
+actual class StartupPicker actual constructor(pool: StartupPool) : Startup(pool) {
+    actual override suspend fun init() { }
 
     private fun htmlFileInput(multiple: Boolean, filter: String, block: (FileList?) -> Unit) {
         createElement<HTMLInputElement> {

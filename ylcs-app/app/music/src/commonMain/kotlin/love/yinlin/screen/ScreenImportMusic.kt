@@ -31,7 +31,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     @Stable
     private sealed interface Step {

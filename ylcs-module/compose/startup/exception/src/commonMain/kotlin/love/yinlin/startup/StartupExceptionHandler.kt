@@ -1,26 +1,25 @@
 package love.yinlin.startup
 
-import kotlinx.coroutines.CoroutineScope
-import love.yinlin.foundation.PlatformContextProvider
-import love.yinlin.foundation.StartupArg
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupHandler
-import love.yinlin.foundation.SyncStartup
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupFactory
+import love.yinlin.foundation.StartupID
+import love.yinlin.foundation.StartupPool
 
-@StartupArg(index = 0, name = "crashKey", type = String::class)
-@StartupHandler(
-    index = 1,
-    name = "onError",
-    handlerType = StartupExceptionHandler.Handler::class,
-    returnType = Unit::class,
-    String::class, Throwable::class, String::class
-)
-expect class StartupExceptionHandler(context: PlatformContextProvider) : SyncStartup {
-    fun interface Handler {
-        fun handle(key: String, e: Throwable, error: String)
+class StartupExceptionHandler(
+    pool: StartupPool,
+    val crashKey: String,
+    private val handler: ExceptionHandler
+) : Startup(pool) {
+    class Factory(
+        private val crashKey: String,
+        private val handler: ExceptionHandler
+    ) : StartupFactory<StartupExceptionHandler> {
+        override val id: String = StartupID<StartupExceptionHandler>()
+        override val dependencies: List<String> = emptyList()
+        override fun build(pool: StartupPool): StartupExceptionHandler = StartupExceptionHandler(pool, crashKey, handler)
     }
 
-    val crashKey: String
-
-    override fun init(scope: CoroutineScope, args: StartupArgs)
+    override suspend fun init() {
+        setupPlatformExceptionHandler(crashKey, handler)
+    }
 }

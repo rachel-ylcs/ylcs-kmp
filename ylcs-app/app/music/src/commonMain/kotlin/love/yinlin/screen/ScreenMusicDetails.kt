@@ -80,7 +80,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private fun Song.remotePath(type: ModResourceType): String = ServerRes.Mod.Song(sid).res(type.filename).url
     private val remoteModPath: String get() = ServerRes.Mod.Song(sid).res(ModResourceType.BASE_RES).url
 
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val clientResources = mutableStateListOf<ResourceItem>()
     private val remoteResources = mutableStateListOf<ResourceItem>()

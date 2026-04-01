@@ -23,9 +23,10 @@ class MainApplication : PlatformApplication<MainApplication>(appReference) {
     val modPath = File(rootPath, "mod")
 
     init {
-        async(name = "createDirectories") {
+        startup {
             libraryPath.mkdir()
             outputPath.mkdir()
+            println("ok")
         }
     }
 

@@ -78,7 +78,7 @@ class ScreenPlaylistLibrary : Screen() {
         fun path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
     }
 
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.keys }

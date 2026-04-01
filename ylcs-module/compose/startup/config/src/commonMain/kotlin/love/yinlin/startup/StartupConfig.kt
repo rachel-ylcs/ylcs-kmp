@@ -1,7 +1,6 @@
 package love.yinlin.startup
 
 import androidx.compose.runtime.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.serializer
 import love.yinlin.compose.config.CacheState
 import love.yinlin.compose.config.ListState
@@ -10,29 +9,34 @@ import love.yinlin.compose.config.Patches
 import love.yinlin.compose.config.ValueState
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
-import love.yinlin.foundation.StartupArg
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupFetcher
-import love.yinlin.foundation.SyncStartup
 import love.yinlin.extension.lazyName
-import love.yinlin.foundation.PlatformContextProvider
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupFactory
+import love.yinlin.foundation.StartupID
+import love.yinlin.foundation.StartupPool
 
-@StartupFetcher(index = 0, name = "kv", returnType = StartupKV::class)
-@StartupArg(index = 1, name = "version", type = Int::class)
-@StartupArg(index = 2, name = "patches", type = Patches::class)
 @Stable
-open class StartupConfig(context: PlatformContextProvider) : SyncStartup(context) {
-    lateinit var kv: StartupKV
-        private set
-    var version: Int = 0
-        private set
-    lateinit var patches: Patches
-        private set
+open class StartupConfig(
+    pool: StartupPool,
+    private val version: Int,
+    private val patches: Patches
+) : Startup(pool) {
+    companion object {
+        inline fun <reified S : StartupConfig> custom(
+            version: Int,
+            patches: Patches,
+            crossinline factory: (StartupPool, Int, Patches) -> S
+        ): StartupFactory<S> = object : StartupFactory<S> {
+            override val id: String = StartupID<S>()
+            override val dependencies: List<String> = listOf(StartupID<StartupKV>())
+            override fun build(pool: StartupPool): S = factory(pool, version, patches)
+        }
+    }
 
-    override fun init(scope: CoroutineScope, args: StartupArgs) {
-        kv = args.fetch(0)
-        version = args[1]
-        patches = args[2]
+    @PublishedApi
+    internal val kv: StartupKV = pool.requireClass()
+
+    override suspend fun init() {
         for (patch in patches) {
             val key = "#patch#${patch.name}"
             if (!kv.get(key, false) && (patch.version == null || patch.version >= version) && patch.enabled) {

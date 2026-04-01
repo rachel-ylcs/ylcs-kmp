@@ -10,7 +10,7 @@ import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.foundation.PlatformContext
 
 @Stable
-class LyricsEditorApplication(context: PlatformContext) :  PlatformApplication<LyricsEditorApplication>(mApp, context) {
+class LyricsEditorApplication(context: PlatformContext) : PlatformApplication<LyricsEditorApplication>(mApp, context) {
     @Composable
     override fun Content() {
         ScreenManager.Navigation<ScreenMain>(modifier = Modifier.fillMaxSize()) {

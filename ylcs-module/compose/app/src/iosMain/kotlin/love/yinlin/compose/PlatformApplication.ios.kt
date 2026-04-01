@@ -5,7 +5,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
 import love.yinlin.foundation.PlatformContext
@@ -35,7 +34,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             delegate = object : ComposeUIViewControllerDelegate {
                 override fun viewDidLoad() {
                     super.viewDidLoad()
-                    scope.launch { initServiceLater() }
+                    initPoolLater(scope)
                 }
             }
         }) {
@@ -48,7 +47,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         return uiViewController
     }
 
-    fun run() = initApplicationService(scope = scope)
+    fun run() = initApplication(scope = scope)
 
     actual fun backHome() { }
 

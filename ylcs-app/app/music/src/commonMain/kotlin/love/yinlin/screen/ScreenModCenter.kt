@@ -53,7 +53,7 @@ class ScreenModCenter : Screen() {
         )
     }
 
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val provider = RachelStatefulProvider()
 

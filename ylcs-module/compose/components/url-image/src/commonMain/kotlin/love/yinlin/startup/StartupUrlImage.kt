@@ -13,23 +13,34 @@ import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
 import com.github.panpf.sketch.http.KtorStack
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
-import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.foundation.PlatformContextProvider
-import love.yinlin.foundation.StartupArg
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.SyncStartup
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupFactory
+import love.yinlin.foundation.StartupID
+import love.yinlin.foundation.StartupPool
 import love.yinlin.foundation.buildFileClient
 import love.yinlin.fs.File
 import love.yinlin.platform.Platform
 import okio.Path.Companion.toPath
 
-@StartupArg(index = 0, name = "cachePath", type = File::class)
-@StartupArg(index = 1, name = "maxCacheSize/MB", type = Int::class)
-@StartupArg(index = 2, name = "imageQuality", type = ImageQuality::class)
 @Stable
-class StartupUrlImage(context: PlatformContextProvider) : SyncStartup(context) {
-    private lateinit var sketch: Sketch
+class StartupUrlImage(
+    pool: StartupPool,
+    private val cachePath: File,
+    private val maxCacheSize: Int,
+    private val imageQuality: ImageQuality
+) : Startup(pool) {
+    class Factory(
+        private val cachePath: File,
+        private val maxCacheSize: Int,
+        private val imageQuality: ImageQuality
+    ) : StartupFactory<StartupUrlImage> {
+        override val id: String = StartupID<StartupUrlImage>()
+        override val dependencies: List<String> = emptyList()
+        override fun build(pool: StartupPool): StartupUrlImage = StartupUrlImage(pool, cachePath, maxCacheSize, imageQuality)
+    }
+
+    private var sketch: Sketch? = null
 
     private fun ComponentRegistry.Builder.registerComponent() {
         addFetcher(ComposeResourceUriFetcher.Factory())
@@ -39,11 +50,8 @@ class StartupUrlImage(context: PlatformContextProvider) : SyncStartup(context) {
         addDecoder(AnimatedWebpDecoder.Factory())
     }
 
-    override fun init(scope: CoroutineScope, args: StartupArgs) {
-        val cachePath: File = args[0]
-        val maxCacheSize: Int = args[1]
-        val imageQuality: ImageQuality = args[2]
-        sketch = buildSketch(context.rawContext).apply {
+    override suspend fun init() {
+        val newSketch = buildSketch(pool.rawContext).apply {
             logger(level = Logger.Level.Error)
             componentLoaderEnabled(false)
             components {
@@ -70,13 +78,16 @@ class StartupUrlImage(context: PlatformContextProvider) : SyncStartup(context) {
                 sizeMultiplier(imageQuality.sizeMultiplier)
             })
         }.build()
-        SingletonSketch.setSafe { sketch }
+        sketch = newSketch
+        SingletonSketch.setSafe { newSketch }
     }
 
     fun clearCache() {
         Platform.useNot(*Platform.Web) {
-            sketch.downloadCache.clear()
-            sketch.resultCache.clear()
+            sketch?.let {
+                it.downloadCache.clear()
+                it.resultCache.clear()
+            }
         }
     }
 }

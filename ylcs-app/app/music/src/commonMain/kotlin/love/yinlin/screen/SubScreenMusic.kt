@@ -73,7 +73,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private var currentDebounceTime by mutableLongStateOf(0L)
 
