@@ -33,15 +33,11 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
 
     inline fun <reified S : Startup> require(id: String): S = startupMap[id] as S
 
-    inline fun <reified S : Startup> requireOrNull(id: String): S? = startupMap[id]?.let { startup ->
-        if (startup.canSafeAccess) startup as? S else null
-    }
+    inline fun <reified S : Startup> requireOrNull(id: String): S? = startupMap[id] as? S
 
     inline fun <reified S : Startup> requireClass(): S = startupMap[StartupID<S>()] as S
 
-    inline fun <reified S : Startup> requireClassOrNull(): S? = startupMap[StartupID<S>()]?.let { startup ->
-        if (startup.canSafeAccess) startup as? S else null
-    }
+    inline fun <reified S : Startup> requireClassOrNull(): S? = startupMap[StartupID<S>()] as? S
 
     inline fun <reified S : Startup, F : StartupFactory<S>> startup(factory: F): StartupDelegate<S> {
         if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
@@ -52,11 +48,7 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
     inline fun <reified S : Startup, F : StartupFactory<S>> startupOrNull(factory: F): StartupNullableDelegate<S> {
         if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
         factoryList += factory
-        return StartupNullableDelegate { _, _ ->
-            startupMap[factory.id]?.let { startup ->
-                if (startup.canSafeAccess) startup as? S else null
-            }
-        }
+        return StartupNullableDelegate { _, _ -> startupMap[factory.id] as? S }
     }
 
     @OptIn(ExperimentalUuidApi::class)

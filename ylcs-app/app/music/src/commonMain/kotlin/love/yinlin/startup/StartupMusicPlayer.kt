@@ -193,6 +193,4 @@ class StartupMusicPlayer(pool: StartupPool) : Startup(pool) {
         controller.listener = null
         controller.release()
     }
-
-    override val canSafeAccess: Boolean get() = isInit
 }

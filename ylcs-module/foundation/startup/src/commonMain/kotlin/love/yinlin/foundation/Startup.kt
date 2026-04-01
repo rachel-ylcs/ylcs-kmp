@@ -5,6 +5,4 @@ abstract class Startup(val pool: StartupPool) {
     open suspend fun initLater() { }
     open fun destroy() { }
     open fun destroyBefore() { }
-
-    open val canSafeAccess: Boolean = true
 }

@@ -121,8 +121,8 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
             }
         }
 
-        catchingNull {
-            val mediaController: MediaController? = Coroutines.sync { future ->
+        val mediaController: MediaController? = catchingNull {
+            Coroutines.sync { future ->
                 val token = SessionToken(context, ComponentName(context, fetcher.androidMusicServiceClassName))
                 val bitmapLoader = DataSourceBitmapLoader.Builder(context).setMakeShared(true).build()
                 val callback = MediaController.Builder(context, token).setBitmapLoader(bitmapLoader).buildAsync()
@@ -130,13 +130,13 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
                     future.send { callback.get() }
                 }, MoreExecutors.directExecutor())
             }
-            if (mediaController != null) {
-                mediaController.removeListener(androidListener)
-                mediaController.addListener(androidListener)
-                controller = mediaController
-            }
-            isInit = controller != null
         }
+        if (mediaController != null) {
+            mediaController.removeListener(androidListener)
+            mediaController.addListener(androidListener)
+            controller = mediaController
+        }
+        isInit = controller != null
     }
 
     override fun release() {
