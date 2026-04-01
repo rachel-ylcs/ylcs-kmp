@@ -312,7 +312,8 @@ class ScreenMain : BasicScreen() {
                                 style = Theme.typography.v6.bold,
                                 modifier = Modifier.align(Alignment.Center)
                             )
-                        } else {
+                        }
+                        else {
                             LazyVerticalGrid(
                                 columns = GridCells.Adaptive(Theme.size.cell5),
                                 modifier = Modifier.fillMaxSize(),
@@ -347,7 +348,8 @@ class ScreenMain : BasicScreen() {
                             style = Theme.typography.v6.bold,
                             modifier = Modifier.align(Alignment.Center)
                         )
-                    } else {
+                    }
+                    else {
                         LazyVerticalGrid(
                             columns = GridCells.Adaptive(Theme.size.cell5),
                             modifier = Modifier.fillMaxSize(),
@@ -416,7 +418,8 @@ class ScreenMain : BasicScreen() {
                         CircleLoading.Content()
                         Text("正在解析中...")
                     }
-                } else {
+                }
+                else {
                     val previewResult = result
                     if (previewResult == null) {
                         Box(
@@ -429,7 +432,8 @@ class ScreenMain : BasicScreen() {
                                 style = Theme.typography.v6.bold
                             )
                         }
-                    } else {
+                    }
+                    else {
                         ModPreviewLayout(
                             modifier = Modifier.fillMaxWidth(),
                             result = previewResult
@@ -492,7 +496,8 @@ class ScreenMain : BasicScreen() {
                         CircleLoading.Content()
                         Text(statusText)
                     }
-                } else {
+                }
+                else {
                     Box(
                         modifier = Modifier.fillMaxWidth().aspectRatio(2f).dashBorder(Theme.border.v6, Theme.color.primary),
                         contentAlignment = Alignment.Center
@@ -626,7 +631,8 @@ class ScreenMain : BasicScreen() {
                         CircleLoading.Content()
                         Text(statusText)
                     }
-                } else {
+                }
+                else {
                     SimpleEllipsisText("过滤器", color = Theme.color.onSurface)
                     FlowRow(
                         modifier = Modifier.fillMaxWidth().padding(vertical = Theme.padding.v9),

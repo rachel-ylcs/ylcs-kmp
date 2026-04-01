@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -57,7 +57,7 @@ fun CheckBox(
         val cornerRadius = size / 5
         val borderColor = Theme.color.outline
 
-        Layout(modifier = Modifier.size(size).clip(RoundedCornerShape(cornerRadius)).drawBehind {
+        Layout(modifier = Modifier.size(size).clip(RoundedCornerShape(cornerRadius)).drawWithContent {
             val boxSize = this.size
             val corner = CornerRadius(cornerRadius.toPx())
             drawRoundRect(backgroundColor, Offset.Zero, boxSize, corner, style = Fill)

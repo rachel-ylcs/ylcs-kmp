@@ -16,7 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -25,6 +25,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
@@ -38,7 +39,6 @@ import love.yinlin.app.music.resources.img_music_record
 import love.yinlin.compose.*
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.compose.extension.*
-import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.animation.AnimationContent
@@ -55,9 +55,11 @@ import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.layout.Divider
+import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.node.*
 import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.window.rememberFocusWindowState
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
@@ -258,12 +260,12 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     private fun MusicCover(musicInfo: MusicInfo, modifier: Modifier = Modifier) {
         var animationRecord by rememberRefState { Animatable(0f) }
         var lastDegree by rememberValueState(0f)
-        val isForeground = rememberOffScreenState()
+        val isFocus by rememberFocusWindowState()
 
         val isPlaying = mp?.isPlaying ?: false
 
-        LaunchedEffect(isPlaying, isForeground) {
-            if (isPlaying && isForeground) {
+        LaunchedEffect(isPlaying, isFocus) {
+            if (isPlaying && isFocus) {
                 animationRecord.animateTo(
                     targetValue = 360f + lastDegree,
                     animationSpec = infiniteRepeatable(
@@ -327,7 +329,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             }
         }
 
-        Box(modifier = modifier.pointerInput(Unit) {
+        Layout(modifier = modifier.pointerInput(Unit) {
             awaitEachGesture {
                 val down = awaitFirstDown(requireUnconsumed = false)
 
@@ -359,7 +361,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
                 isDragging = false
             }
-        }.drawBehind {
+        }.drawWithContent {
             val duration = mp?.duration ?: 0L
             val progress = if (duration == 0L) 0f else displayTime / duration.toFloat()
             val width = size.width
@@ -384,7 +386,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 }
                 drawCircle(color = color, radius = hotpotRadius, center = Offset(offsetChorus, height / 2))
             }
-        })
+        }, MeasurePolicies.Empty)
     }
 
     private val musicProgressLayout = movableComposable { modifier: Modifier ->

@@ -503,9 +503,7 @@ fun APIScope.prizeAPI() {
 
         val message = if (participants.size < drawNum) {
             "开奖成功，参与人数(${participants.size})少于奖品总数($drawNum)，已分配${totalWinners}个奖品，剩余${drawNum - totalWinners}个奖品空缺"
-        } else {
-            "开奖成功，共分配${totalWinners}个奖品给${totalWinners}位中奖者"
-        }
+        } else "开奖成功，共分配${totalWinners}个奖品给${totalWinners}位中奖者"
         result(message)
     }
 

@@ -18,7 +18,7 @@ import love.yinlin.compose.config.CacheState
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.crop
 import love.yinlin.compose.graphics.decode
@@ -331,7 +331,7 @@ class ScreenSettings : Screen() {
             icon = Icons.Info,
             color = Theme.color.tertiaryContainer
         ) {
-            var cacheSizeText: String? by rememberState { null }
+            var cacheSizeText: String? by rememberNull()
 
             LaunchedEffect(Unit) {
                 cacheSizeText = Coroutines.io { app.calcCacheSize().fileSizeString }

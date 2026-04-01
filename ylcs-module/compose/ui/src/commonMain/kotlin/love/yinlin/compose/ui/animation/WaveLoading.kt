@@ -4,7 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -46,7 +46,7 @@ object WaveLoading : IndeterminateLoadingAnimation {
         val value2 by transition.animateValue(duration, 1)
         val value3 by transition.animateValue(duration, 2)
 
-        Layout(modifier = modifier.defaultMinSize(minSize, minSize).drawBehind {
+        Layout(modifier = modifier.defaultMinSize(minSize, minSize).drawWithContent {
             drawItem(0, value1, color)
             drawItem(1, value2, color)
             drawItem(2, value3, color)

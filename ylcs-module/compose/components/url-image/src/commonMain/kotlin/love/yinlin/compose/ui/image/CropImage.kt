@@ -26,7 +26,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.extension.rememberRefState
+import love.yinlin.compose.extension.rememberRefNull
 import love.yinlin.compose.extension.translate
 import kotlin.math.max
 import kotlin.math.min
@@ -185,7 +185,7 @@ fun CropImage(
     val tolerance = with(LocalDensity.current) { 24.dp.toPx() }
     val imageState = rememberWebImageState(quality = ImageQuality.High)
     val imageSize by rememberDerivedState { imageState.result?.image?.size }
-    var touchRegion: TouchRegion? by rememberRefState { null }
+    var touchRegion: TouchRegion? by rememberRefNull()
 
     BoxWithConstraints(
         modifier = modifier.pointerInput(aspectRatio, imageSize) {
@@ -308,7 +308,8 @@ fun CropImage(
                 state.imageRect = imageRect
                 val frameSize = if (aspectRatio == 0f) {
                     Size(imageRect.width * 0.8f, imageRect.height * 0.8f)
-                } else {
+                }
+                else {
                     val scale = min(imageRect.width, imageRect.height) / max(imageRect.width, imageRect.width / aspectRatio)
                     Size(imageRect.width * scale * 0.8f, imageRect.width * scale / aspectRatio * 0.8f)
                 }

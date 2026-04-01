@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -37,7 +37,7 @@ object CircleLoading : IndeterminateLoadingAnimation {
             animation = tween(easing = LinearEasing, durationMillis = duration)
         ))
 
-        Layout(modifier = modifier.defaultMinSize(minSize, minSize).drawBehind {
+        Layout(modifier = modifier.defaultMinSize(minSize, minSize).drawWithContent {
             val width = this.size.width
             drawArc(
                 color = color,

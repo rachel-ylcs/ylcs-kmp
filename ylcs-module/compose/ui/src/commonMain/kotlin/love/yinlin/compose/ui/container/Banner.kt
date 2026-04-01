@@ -26,18 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.rememberOffScreenState
 import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.keepSize
+import love.yinlin.compose.window.rememberFocusWindowState
 import love.yinlin.extension.catching
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -75,7 +74,7 @@ private fun BannerIndicator(
     modifier: Modifier,
     onClick: (Int) -> Unit
 ) {
-    if (indicatorSize != Dp.Unspecified && indicatorSize != 0.dp) {
+    if (indicatorSize != Dp.Unspecified && indicatorSize != Dp.Hairline) {
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.g4),
@@ -120,7 +119,7 @@ fun Banner(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isDragged by interactionSource.collectIsDraggedAsState()
-    val isForeground = rememberOffScreenState()
+    val isFocus by rememberFocusWindowState()
 
     Box(modifier = modifier.hoverable(interactionSource)) {
         if (size > 0) {
@@ -171,8 +170,8 @@ fun Banner(
         }
     }
 
-    val autoPlay by rememberDerivedState(size, interval, isForeground) {
-        size > 1 && interval > 0 && !isDragged && !isHovered && isForeground
+    val autoPlay by rememberDerivedState(size, interval, isFocus) {
+        size > 1 && interval > 0 && !isDragged && !isHovered && isFocus
     }
 
     LaunchedEffect(state, interval, autoPlay) {

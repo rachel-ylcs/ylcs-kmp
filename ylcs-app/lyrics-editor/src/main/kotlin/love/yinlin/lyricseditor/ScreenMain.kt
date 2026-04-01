@@ -58,8 +58,8 @@ class ScreenMain : BasicScreen() {
     @Serializable
     data class Song(val sid: String, val name: String, val duration: Long)
 
-    var songs by mutableStateOf(emptyList<Song>())
-    var currentSong: Song? by mutableStateOf(null)
+    var songs by mutableRefStateOf(emptyList<Song>())
+    var currentSong: Song? by mutableRefStateOf(null)
 
     val prettyJson = Json { prettyPrint = true }
     val defaultConfig = RhymeLyricsConfig(id = "", duration = 0L, chorus = emptyList(), lyrics = emptyList(), offset = 0)

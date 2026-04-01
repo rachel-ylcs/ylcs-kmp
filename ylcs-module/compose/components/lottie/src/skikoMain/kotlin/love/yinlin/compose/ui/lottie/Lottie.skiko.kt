@@ -3,14 +3,14 @@ package love.yinlin.compose.ui.lottie
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberRefNull
 import love.yinlin.compose.extension.rememberValueState
-import love.yinlin.compose.rememberOffScreenState
+import love.yinlin.compose.window.rememberOffScreenWindowState
 import love.yinlin.extension.catchingNull
 import org.jetbrains.skia.skottie.Animation
 import org.jetbrains.skia.sksg.InvalidationController
@@ -18,11 +18,11 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 actual fun Lottie(data: String, modifier: Modifier) {
-    var animation: Animation? by rememberState { null }
+    var animation: Animation? by rememberRefNull()
     var currentTime: Float by rememberValueState(0f)
     val invalidationController = remember { InvalidationController() }
 
-    val isForeground = rememberOffScreenState()
+    val isForeground by rememberOffScreenWindowState()
 
     LaunchedEffect(data) {
         animation = if (data.isEmpty()) null else catchingNull { Animation.makeFromString(data) }
@@ -40,7 +40,7 @@ actual fun Lottie(data: String, modifier: Modifier) {
         }
     }
 
-    Box(modifier = modifier.drawBehind {
+    Box(modifier = modifier.drawWithContent {
         if (isForeground) {
             animation?.let { anim ->
                 drawIntoCanvas { canvas ->

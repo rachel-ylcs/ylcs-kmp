@@ -13,7 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -99,7 +99,7 @@ fun Slider(
             if (showThumb) {
                 val dotRatio by animateFloatAsState(if (isDragging) 0.6f else 0.33333f)
 
-                Layout(modifier = Modifier.measureId(SliderMeasureId.Thumb).shadow(Theme.shape.circle, Theme.shadow.v9).drawBehind {
+                Layout(modifier = Modifier.measureId(SliderMeasureId.Thumb).shadow(Theme.shape.circle, Theme.shadow.v9).drawWithContent {
                     val radius = this.size.width / 2
                     drawCircle(actualThumbColor, radius)
                     drawCircle(actualActiveColor, radius * dotRatio)

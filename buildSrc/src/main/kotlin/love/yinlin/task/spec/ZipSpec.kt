@@ -17,7 +17,8 @@ private fun addDirectory(directory: File, basePath: String, zos: ZipOutputStream
             zos.putNextEntry(zipEntry)
             zos.closeEntry()
             addDirectory(file, entryPath, zos)
-        } else {
+        }
+        else {
             val zipEntry = ZipEntry(entryPath)
             zos.putNextEntry(zipEntry)
             FileInputStream(file).use { it.copyTo(zos) }

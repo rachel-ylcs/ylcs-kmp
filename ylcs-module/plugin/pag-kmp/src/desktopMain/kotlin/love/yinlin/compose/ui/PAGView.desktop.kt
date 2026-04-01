@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import kotlinx.coroutines.isActive
-import love.yinlin.compose.extension.rememberRefState
+import love.yinlin.compose.extension.rememberRefNull
 
 @Composable
 actual fun PAGView(
@@ -25,8 +25,7 @@ actual fun PAGView(
     config: PAGConfig,
 ) {
     val player: PAGPlayer = remember { PAGPlayer() }
-    //var surface: PAGSurface? by rememberRefState { null }
-    var painter: BitmapPainter? by rememberRefState { null }
+    var painter: BitmapPainter? by rememberRefNull()
 
     val (contentScale, alignment) = remember(config) {
         when (config.scaleMode) {

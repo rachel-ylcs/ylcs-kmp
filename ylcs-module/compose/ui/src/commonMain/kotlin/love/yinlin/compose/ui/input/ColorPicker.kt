@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -47,7 +47,7 @@ private fun ValueSlider(
             onValueChange(1 - (offset.y / size.height).coerceIn(0f, 1f))
             onFinished()
         }
-    }.drawBehind {
+    }.drawWithContent {
         val (w, h) = size
         val height = h * 0.05f
 
@@ -89,7 +89,7 @@ private fun SpectrumArea(
             onHsvChange(h, s)
             onFinished()
         }
-    }.drawBehind {
+    }.drawWithContent {
         clipRect {
             drawRect(brush = hueBrush)
             drawRect(brush = saturationBrush)
@@ -131,7 +131,7 @@ private fun AlphaSlider(
                 onFinished()
             }
         }
-    }.drawBehind {
+    }.drawWithContent {
         val (w, h) = size
         val height = h * 0.05f
         val tipSize = height / 2

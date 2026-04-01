@@ -9,7 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.IntOffset
-import love.yinlin.compose.extension.rememberState
+import love.yinlin.compose.extension.rememberValueState
+import kotlin.math.max
 
 @Composable
 fun AdaptiveTwoBox(
@@ -20,8 +21,8 @@ fun AdaptiveTwoBox(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable () -> Unit
 ) {
-    var targetOffset1 by rememberState { IntOffset.Zero }
-    var targetOffset2 by rememberState { IntOffset.Zero }
+    var targetOffset1 by rememberValueState(IntOffset.Zero)
+    var targetOffset2 by rememberValueState(IntOffset.Zero)
     val animatedOffset1 by animateIntOffsetAsState(targetOffset1)
     val animatedOffset2 by animateIntOffsetAsState(targetOffset2)
 
@@ -50,14 +51,15 @@ fun AdaptiveTwoBox(
 
         if (isHorizontal) {
             layoutWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else (w1 + w2)
-            layoutHeight = maxOf(h1, h2).coerceIn(constraints.minHeight, constraints.maxHeight)
+            layoutHeight = max(h1, h2).coerceIn(constraints.minHeight, constraints.maxHeight)
             with(horizontalArrangement) {
                 arrange(layoutWidth, intArrayOf(w1, w2), layoutDirection, outX)
             }
             outY[0] = verticalAlignment.align(h1, layoutHeight)
             outY[1] = verticalAlignment.align(h2, layoutHeight)
-        } else {
-            layoutWidth = maxOf(w1, w2).coerceIn(constraints.minWidth, constraints.maxWidth)
+        }
+        else {
+            layoutWidth = max(w1, w2).coerceIn(constraints.minWidth, constraints.maxWidth)
             layoutHeight = if (constraints.hasBoundedHeight) constraints.maxHeight else (h1 + h2)
             with(verticalArrangement) {
                 arrange(layoutHeight, intArrayOf(h1, h2), outY)

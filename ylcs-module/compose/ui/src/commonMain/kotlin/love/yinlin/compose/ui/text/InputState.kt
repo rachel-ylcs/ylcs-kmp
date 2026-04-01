@@ -3,15 +3,11 @@ package love.yinlin.compose.ui.text
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import love.yinlin.compose.extension.mutableRefStateOf
 
 /**
  * @param initText 初始文本
@@ -21,7 +17,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 class InputState(initText: String = "", val maxLength: Int = Int.MAX_VALUE) {
     internal val interactionSource = MutableInteractionSource()
 
-    internal var value by mutableStateOf(initText.safe.initValue)
+    internal var value by mutableRefStateOf(initText.safe.initValue)
         private set
 
     internal var keyboardOptions: KeyboardOptions? by mutableStateOf(null)

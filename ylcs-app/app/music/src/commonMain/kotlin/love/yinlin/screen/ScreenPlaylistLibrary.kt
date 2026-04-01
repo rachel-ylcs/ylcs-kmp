@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import love.yinlin.app
 import love.yinlin.compose.LocalColor
@@ -434,7 +434,7 @@ class ScreenPlaylistLibrary : Screen() {
                 if (playlists.isNotEmpty()) {
                     TreeView(
                         modifier = Modifier.fillMaxWidth().weight(1f).horizontalScroll(rememberScrollState()).verticalScroll(rememberScrollState()),
-                        indent = 0.dp
+                        indent = Dp.Hairline
                     ) {
                         for ((name, playlist) in playlists) {
                             key(name) {

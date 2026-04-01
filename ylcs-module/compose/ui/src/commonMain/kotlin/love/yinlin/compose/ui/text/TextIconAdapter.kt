@@ -94,7 +94,8 @@ fun TextIconBinder(
             if (ttb) {
                 iconPlaceable?.placeRelative(iconX, 0)
                 textPlaceable.placeRelative(textX, iconHeight + gap)
-            } else {
+            }
+            else {
                 textPlaceable.placeRelative(textX, 0)
                 iconPlaceable?.placeRelative(iconX, textHeight + gap)
             }

@@ -23,7 +23,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.zIndex
@@ -130,7 +129,7 @@ internal fun rememberWebImageIndicator(): WebImageIndicator {
 }
 
 private fun calcHitBox(size: DpSize, rawSize: DpSize): Modifier {
-    if (size.width <= 0.dp || size.height <= 0.dp || rawSize.width <= 0.dp || rawSize.height <= 0.dp) return Modifier
+    if (size.width <= Dp.Hairline || size.height <= Dp.Hairline || rawSize.width <= Dp.Hairline || rawSize.height <= Dp.Hairline) return Modifier
     val scale = minOf(size.width / rawSize.width, size.height / rawSize.height, 1f)
     val contentWidth = rawSize.width * scale
     val contentHeight = rawSize.height * scale

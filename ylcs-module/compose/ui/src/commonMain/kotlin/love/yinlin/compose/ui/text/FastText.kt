@@ -3,7 +3,7 @@ package love.yinlin.compose.ui.text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -39,7 +39,7 @@ fun FastFixedText(
 ) {
     val style = style.merge(color = color.takeOrElse { style.color.takeOrElse { LocalColor.current } })
 
-    Layout(modifier = modifier.drawBehind {
+    Layout(modifier = modifier.drawWithContent {
         textProvider()?.let { drawText(measurer, it, style = style, maxLines = 1) }
     }) { _, _ ->
         val result = measurer.measure(text = placeholder, style = style, maxLines = 1)
@@ -95,7 +95,7 @@ fun FastCenterText(
     drawAction: FastTextDrawScope.() -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Layout(modifier = modifier.drawBehind {
+    Layout(modifier = modifier.drawWithContent {
         FastTextDrawScope(Constraints(maxWidth = size.width.toInt()), this).drawAction()
     }) { _, constraints ->
         require(constraints.hasFixedWidth) { "FastCenterText should have fixed width" }

@@ -68,7 +68,8 @@ data object Ripple : IndicationNodeFactory {
                         else -> defaultTweenSpec
                     }
                     scope.launch { animatedAlpha.animateTo(targetAlpha, incomingAnimationSpec) }
-                } else {
+                }
+                else {
                     val outgoingAnimationSpec = when (currentInteraction) {
                         is HoverInteraction.Enter -> defaultTweenSpec
                         is FocusInteraction.Focus -> defaultTweenSpec

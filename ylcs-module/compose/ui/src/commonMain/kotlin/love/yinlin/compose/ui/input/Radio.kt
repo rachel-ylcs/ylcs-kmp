@@ -6,22 +6,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.node.fastClipCircle
@@ -30,12 +25,12 @@ import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.Text
 
 @Stable
-class RadioGroup(initIndex: Int? = null) {
-    var index: Int? by mutableStateOf(initIndex)
+class RadioGroup(initIndex: Int = -1) {
+    var index: Int by mutableIntStateOf(initIndex)
 }
 
 @Composable
-fun rememberRadioGroup(initIndex: Int? = null): RadioGroup = remember(initIndex) { RadioGroup(initIndex) }
+fun rememberRadioGroup(initIndex: Int = -1): RadioGroup = remember(initIndex) { RadioGroup(initIndex) }
 
 @Composable
 fun Radio(
@@ -54,16 +49,16 @@ fun Radio(
         val checked = index == group.index
         val radius = Theme.size.input10 / 2
         val dotRadius by animateDpAsState(
-            targetValue = if (checked) radius * 0.75f else 0.dp,
+            targetValue = if (checked) radius * 0.75f else Dp.Hairline,
             animationSpec = spring(dampingRatio = 0.9f, stiffness = 1400.0f)
         )
         val backgroundColor = if (enabled) Theme.color.backgroundVariant else Theme.color.disabledContainer
         val contentColor = if (enabled) color else Theme.color.disabledContent
         val borderColor = Theme.color.outline
 
-        val onClick = { group.index = if (index == group.index) null else index }
+        val onClick = { group.index = if (index == group.index) -1 else index }
 
-        Layout(modifier = Modifier.size(radius * 2).fastClipCircle().drawBehind {
+        Layout(modifier = Modifier.size(radius * 2).fastClipCircle().drawWithContent {
             val radiusPx = radius.toPx()
             drawCircle(backgroundColor, radiusPx, center, style = Fill)
             drawCircle(contentColor, dotRadius.toPx(), center, style = Fill)
