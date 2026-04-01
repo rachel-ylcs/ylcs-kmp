@@ -29,6 +29,7 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
 
     private var dependenciesMap = emptyMap<String, List<String>>()
     private var dependenciesList = emptyList<StartupFactory<*>>()
+    private val taskMap = mutableMapOf<String, Deferred<Unit>>()
 
     inline fun <reified S : Startup> require(id: String): S = startupMap[id] as S
 
@@ -83,7 +84,6 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
             coroutineScope {
                 // 依赖表
                 val mutex = Mutex()
-                val taskMap = mutableMapOf<String, Deferred<Unit>>()
                 dependenciesList.map { factory ->
                     val id = factory.id
                     // 并行加载
@@ -102,6 +102,7 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
                     taskMap[id] = task
                     task
                 }.awaitAll()
+                taskMap.clear()
             }
         }
     }
@@ -113,6 +114,9 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
                     val id = factory.id
                     // 并行加载
                     async(factory.dispatcher) {
+                        // 等待init完成
+                        taskMap[id]?.await()
+                        // 继续initLater
                         val startup = startupMap[id]
                         if (startup != null) Coroutines.catchingNull { startup.initLater() } ?: throw StartupError(id, "initLater")
                     }
