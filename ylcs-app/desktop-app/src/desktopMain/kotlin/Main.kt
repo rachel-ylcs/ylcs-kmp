@@ -16,71 +16,59 @@ import love.yinlin.coroutines.ioContext
 import love.yinlin.data.MimeType
 import love.yinlin.extension.lazyProvider
 import love.yinlin.foundation.PlatformContext
-import love.yinlin.foundation.StartupDelegate
 import love.yinlin.platform.AutoUpdate
 import love.yinlin.platform.SingleInstance
-import love.yinlin.startup.StartupComposeSwingRender
 import love.yinlin.startup.StartupMacOSDeepLink
 import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.compose.resources.DrawableResource
 
-fun main() = object : RachelApplication(PlatformContext.Instance) {
-    init {
-        sync(
-            priority = StartupDelegate.HIGH10,
-            name = "setupSingleInstance"
-        ) {
-            SingleInstance.run("${Local.info.appName}.lock")
+fun main() {
+    SingleInstance.run("${Local.info.appName}.lock")
+
+    object : RachelApplication(PlatformContext.Instance) {
+        init {
+            startup(StartupMacOSDeepLink.Factory { DeepLink.openUri(it) })
         }
-        service(
-            name = "setComposeRender",
-            factory = ::StartupComposeSwingRender
-        )
-        service(
-            StartupMacOSDeepLink.Handler { DeepLink.openUri(it) },
-            name = "setupMacOSDeepLink",
-            factory = ::StartupMacOSDeepLink
-        )
-    }
 
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+        private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
-    override val title: String = "银临茶舍"
-    override val icon: DrawableResource = Res.drawable.img_logo
+        override val title: String = "银临茶舍"
+        override val icon: DrawableResource = Res.drawable.img_logo
 
-    @Composable
-    override fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit) {
-        if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+        @Composable
+        override fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit) {
+            if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
+                Icon(
+                    icon = Icons.CleaningServices,
+                    tip = "GC",
+                    onClick = System::gc
+                )
+            }
+
             Icon(
-                icon = Icons.CleaningServices,
-                tip = "GC",
-                onClick = System::gc
-            )
-        }
-
-        Icon(
-            icon = Icons.RocketLaunch,
-            tip = "加载更新包",
-            onClick = {
-                mainScope.launch(ioContext) {
-                    picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
-                        AutoUpdate.start(path.path)
+                icon = Icons.RocketLaunch,
+                tip = "加载更新包",
+                onClick = {
+                    mainScope.launch(ioContext) {
+                        picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.let { path ->
+                            AutoUpdate.start(path.path)
+                        }
                     }
                 }
-            }
-        )
+            )
 
-        Icon(
-            icon = if (controller.alwaysOnTop) Icons.MobiledataOff else Icons.VerticalAlignTop,
-            tip = if (controller.alwaysOnTop) Theme.value.windowAlwaysTopDisableText else Theme.value.windowAlwaysTopEnableText,
-            onClick = { controller.alwaysOnTop = !controller.alwaysOnTop }
-        )
+            Icon(
+                icon = if (controller.alwaysOnTop) Icons.MobiledataOff else Icons.VerticalAlignTop,
+                tip = if (controller.alwaysOnTop) Theme.value.windowAlwaysTopDisableText else Theme.value.windowAlwaysTopEnableText,
+                onClick = { controller.alwaysOnTop = !controller.alwaysOnTop }
+            )
 
-        DefaultTopBarActions(controller, onExit)
-    }
+            DefaultTopBarActions(controller, onExit)
+        }
 
-    @Composable
-    override fun ApplicationScope.MultipleWindow() {
-        mp?.floatingLyrics?.Content()
-    }
-}.run()
+        @Composable
+        override fun ApplicationScope.MultipleWindow() {
+            mp?.floatingLyrics?.Content()
+        }
+    }.run()
+}

@@ -12,10 +12,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 abstract class RachelApplication(context: PlatformContext) : AbstractRachelApplication(context) {
-    private val mp by service(
-        name = "MusicPlayer",
-        factory = ::StartupMusicPlayer
-    )
+    private val mp by startupOrNull(StartupMusicPlayer.Factory())
 
     @Composable
     override fun Content() {
@@ -83,7 +80,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
     override fun onDeepLink(manager: ScreenManager, uri: Uri) {
         when (uri.scheme) {
             Scheme.File, Scheme.Content -> {
-                if (!mp.isReady) manager.navigate(::ScreenImportMusic, uri)
+                if (mp?.isReady != true) manager.navigate(::ScreenImportMusic, uri)
                 else manager.topScreen.slot.tip.warning("请先停止播放器")
             }
             Scheme.Rachel -> {
@@ -101,11 +98,11 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
                 }
             }
             Scheme.QQMusic -> {
-                if (mp.isReady) manager.topScreen.slot.tip.warning("请先停止播放器")
+                if (mp?.isReady == true) manager.topScreen.slot.tip.warning("请先停止播放器")
                 else manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.QQMusic)
             }
             Scheme.NetEaseCloud -> {
-                if (mp.isReady) manager.topScreen.slot.tip.warning("请先停止播放器")
+                if (mp?.isReady == true) manager.topScreen.slot.tip.warning("请先停止播放器")
                 else manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.NetEaseCloud)
             }
         }

@@ -2,21 +2,20 @@ package love.yinlin.startup
 
 import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVLogLevel
-import kotlinx.coroutines.CoroutineScope
-import love.yinlin.foundation.PlatformContextProvider
-import love.yinlin.foundation.StartupArg
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.SyncStartup
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupPool
 import love.yinlin.fs.File
 
-@StartupArg(index = 0, name = "initPath", type = File::class)
-actual class StartupKV actual constructor(context: PlatformContextProvider): SyncStartup(context) {
+actual class StartupKV actual constructor(
+    pool: StartupPool,
+    initPath: File
+): Startup(pool) {
     val mmkv: MMKV = run {
-        MMKV.initialize(context.rawContext, MMKVLogLevel.LevelNone)
+        MMKV.initialize(pool.rawContext, MMKVLogLevel.LevelNone)
         MMKV.defaultMMKV()
     }
 
-    actual override fun init(scope: CoroutineScope, args: StartupArgs) { }
+    actual override suspend fun init() { }
 
     actual fun set(key: String, value: Boolean, expire: Int) { mmkv.encode(key, value, expire) }
     actual fun set(key: String, value: Int, expire: Int) { mmkv.encode(key, value, expire) }

@@ -80,7 +80,7 @@ class ScreenMusicLibrary : Screen() {
 
     private fun MusicInfoPreview.path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
 
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()

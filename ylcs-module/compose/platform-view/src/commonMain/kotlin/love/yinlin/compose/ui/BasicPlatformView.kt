@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.concurrent.Lock
 
 /**
  * 对于 PlatformView 目前有两类模式
@@ -47,11 +46,8 @@ abstract class BasicPlatformView<T : Any> {
     abstract fun HostView(modifier: Modifier = Modifier)
 
     private var hostView: T? by mutableRefStateOf(null)
-    private val hostLock = Lock()
 
-    protected fun hostFactory(builder: () -> T): T = hostLock.synchronized {
-        hostView ?: builder().also { hostView = it }
-    }
+    protected fun hostFactory(builder: () -> T): T = hostView ?: builder().also { hostView = it }
 
     @Suppress("UNCHECKED_CAST")
     protected val hostUpdate: (T) -> Unit = (this as? Updatable<*>)?.let { ::update as (T) -> Unit } ?: {}
@@ -60,7 +56,7 @@ abstract class BasicPlatformView<T : Any> {
     protected val hostReset: ((T) -> Unit)? = (this as? Resettable<*>)?.let { ::reset as (T) -> Unit }
 
     @Suppress("UNCHECKED_CAST")
-    protected fun hostRelease(view: T) = hostLock.synchronized {
+    protected fun hostRelease(view: T) {
         (this as? Releasable<*>)?.let { ::release as (T) -> Unit }?.invoke(view)
         hostView = null
     }

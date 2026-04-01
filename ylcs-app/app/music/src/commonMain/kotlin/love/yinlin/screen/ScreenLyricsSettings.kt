@@ -37,7 +37,7 @@ expect fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfi
 
 @Stable
 class ScreenLyricsSettings : BasicScreen() {
-    internal val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    internal val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     internal var config by mutableRefStateOf(app.config.lyricsEngineConfig)
 

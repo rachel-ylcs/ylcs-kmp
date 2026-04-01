@@ -1,17 +1,16 @@
 package love.yinlin.startup
 
 import kotlinx.browser.localStorage
-import kotlinx.coroutines.CoroutineScope
 import love.yinlin.extension.*
-import love.yinlin.foundation.PlatformContextProvider
-import love.yinlin.foundation.StartupArg
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.SyncStartup
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupPool
 import love.yinlin.fs.File
 
-@StartupArg(index = 0, name = "initPath", type = File::class)
-actual class StartupKV actual constructor(context: PlatformContextProvider): SyncStartup(context) {
-    actual override fun init(scope: CoroutineScope, args: StartupArgs) { }
+actual class StartupKV actual constructor(
+    pool: StartupPool,
+    initPath: File
+): Startup(pool) {
+    actual override suspend fun init() { }
 
     private fun setItem(key: String, value: String, expire: Int) {
         val time = if (expire == KVExpire.NEVER) expire else (DateEx.CurrentLong / 1000L).toInt() + expire

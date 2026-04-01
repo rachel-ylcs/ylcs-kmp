@@ -42,7 +42,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 class ScreenPlatformMusic(deeplink: Uri?, type: PlatformMusicType) : Screen() {
-    private val mp by lazyProvider { app.startup<StartupMusicPlayer>() }
+    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private var platformType by mutableStateOf(type)
     private var linkState = InputState(deeplink?.toString() ?: "")

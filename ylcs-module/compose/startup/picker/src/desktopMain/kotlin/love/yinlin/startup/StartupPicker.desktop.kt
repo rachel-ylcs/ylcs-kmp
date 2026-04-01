@@ -1,27 +1,23 @@
 package love.yinlin.startup
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingNull
-import love.yinlin.foundation.PlatformContextProvider
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupPool
 import love.yinlin.io.Sources
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.StartupNative
-import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.File
 import love.yinlin.fs.safeSources
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 
-@StartupNative
 @NativeLibApi
-actual class StartupPicker actual constructor(context: PlatformContextProvider) : SyncStartup(context) {
-    private val handle: Long get() = context.windowHandle ?: 0L
+actual class StartupPicker actual constructor(pool: StartupPool) : Startup(pool) {
+    private val handle: Long get() = pool.windowHandle ?: 0L
 
-    actual override fun init(scope: CoroutineScope, args: StartupArgs) { }
+    actual override suspend fun init() { }
 
     actual suspend fun pickPicture(): Source? = catchingNull {
         Coroutines.io {

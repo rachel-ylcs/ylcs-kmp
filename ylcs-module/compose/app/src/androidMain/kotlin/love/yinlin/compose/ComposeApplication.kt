@@ -16,12 +16,12 @@ abstract class ComposeApplication : Application() {
         super.onCreate()
         if (!::instance.isInitialized) {
             instance = buildInstance()
-            instance.initApplicationService(scope = applicationScope)
+            instance.initApplication(scope = applicationScope)
         }
     }
 
     final override fun onTerminate() {
-        if (::instance.isInitialized) instance.destroyService()
+        if (::instance.isInitialized) instance.destroyPool()
         applicationScope.cancel()
         super.onTerminate()
     }

@@ -1,21 +1,17 @@
 package love.yinlin.startup
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerializationStrategy
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
-import love.yinlin.foundation.PlatformContextProvider
-import love.yinlin.foundation.StartupArg
-import love.yinlin.foundation.StartupArgs
-import love.yinlin.foundation.SyncStartup
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupPool
 import love.yinlin.fs.File
 
-@StartupArg(index = 0, name = "initPath", type = File::class)
-expect class StartupKV(context: PlatformContextProvider) : SyncStartup {
-    override fun init(scope: CoroutineScope, args: StartupArgs)
+expect class StartupKV(pool: StartupPool, initPath: File) : Startup {
+    override suspend fun init()
 
     fun set(key: String, value: Boolean, expire: Int = KVExpire.NEVER)
     fun set(key: String, value: Int, expire: Int = KVExpire.NEVER)

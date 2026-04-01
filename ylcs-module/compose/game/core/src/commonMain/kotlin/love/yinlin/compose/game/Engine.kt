@@ -13,6 +13,7 @@ import androidx.compose.ui.util.*
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.*
 import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.collection.DependencyAnalyzer
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.viewport.Viewport
 import love.yinlin.compose.game.plugin.Plugin
@@ -48,58 +49,15 @@ class Engine(
     private val visiblePlugins: List<Plugin>
 
     init {
-        // 依赖图
-        val dependenciesMap = mutableMapOf<String, List<String>>()
+        val analyzer = DependencyAnalyzer(
+            items = pluginMap.values,
+            keyProvider = Plugin::id,
+            dependenciesProvider = { plugin -> plugin.dependencies.map { it.metaRawClassName } }
+        )
 
-        // 入度表 + 邻接表
-        val inDegree = mutableMapOf<String, Int>()
-        val adjacencyList = mutableMapOf<String, MutableList<String>>()
-
-        // 初始化入度表
-        for ((id, plugin) in pluginMap) {
-            val validDeps = plugin.dependencies.fastMapNotNull { clz ->
-                val dependentId = clz.metaRawClassName
-                require(dependentId in pluginMap) { "plugin $dependentId is not installed" }
-                // 排除自身依赖
-                if (dependentId != id) dependentId else null
-            }
-
-            dependenciesMap[id] = validDeps
-            inDegree[id] = validDeps.size
-
-            validDeps.fastForEach { dependentId ->
-                adjacencyList.getOrPut(dependentId) { mutableListOf() }.add(id)
-            }
-
-            if (validDeps.isEmpty()) inDegree[id] = 0
-        }
-
-        // 初始化队列
-        val queue = ArrayDeque<String>()
-        inDegree.forEach { (id, degree) ->
-            if (degree == 0) queue += id
-        }
-
-        val result = mutableListOf<Plugin>()
-
-        // BFS
-        while (queue.isNotEmpty()) {
-            val currentId = queue.removeAt(0)
-            result += pluginMap[currentId]!!
-
-            adjacencyList[currentId]?.forEach { dependentId ->
-                val updatedDegree = (inDegree[dependentId] ?: 0) - 1
-                inDegree[dependentId] = updatedDegree
-                if (updatedDegree == 0) queue += dependentId
-            }
-        }
-
-        // 循环依赖
-        require(result.size == pluginMap.size) { "plugin loop dependencies" }
-
-        pluginDependencyMap = dependenciesMap
-        plugins = result
-        visiblePlugins = result.fastFilter { it.layerOrder != LayerOrder.Invisible }
+        pluginDependencyMap = analyzer.dependenciesMap
+        plugins = analyzer.result
+        visiblePlugins = plugins.fastFilter { it.layerOrder != LayerOrder.Invisible }
     }
 
     inline fun <reified T : Plugin> plugin(): T = pluginMap[metaClassName<T>()] as T
@@ -118,7 +76,6 @@ class Engine(
                     coroutineScope {
                         // 依赖表
                         val taskMap = mutableMapOf<String, Deferred<Boolean>>()
-                        // 先拓扑排序
                         plugins.fastMap { plugin ->
                             val id = plugin.id
                             // 并行加载
@@ -127,7 +84,7 @@ class Engine(
                                 // 等待依赖插件完成
                                 for (dependentId in dependencies) {
                                     val dependencyTask = taskMap[dependentId]
-                                    require(dependencyTask != null) { "dependent plugin $dependentId is not initialized" }
+                                    require(dependencyTask != null) { "Dependent plugin $dependentId is not created" }
                                     dependencyTask.await()
                                 }
                                 if (!plugin.isInitialized) {

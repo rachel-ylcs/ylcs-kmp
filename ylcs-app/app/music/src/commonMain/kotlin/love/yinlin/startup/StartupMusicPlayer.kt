@@ -4,10 +4,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.coroutineScope
 import love.yinlin.annotation.LooseTyped
 import love.yinlin.app
 import love.yinlin.compose.data.media.MediaInfo
@@ -20,9 +19,10 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.foundation.AsyncStartup
-import love.yinlin.foundation.PlatformContextProvider
-import love.yinlin.foundation.StartupArgs
+import love.yinlin.foundation.Startup
+import love.yinlin.foundation.StartupFactory
+import love.yinlin.foundation.StartupID
+import love.yinlin.foundation.StartupPool
 import love.yinlin.fs.File
 import love.yinlin.media.MediaMetadataFetcher
 import love.yinlin.media.MusicPlayerListener
@@ -32,7 +32,13 @@ import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.media.lyrics.LyricsEngineHost
 
 @Stable
-class StartupMusicPlayer(context: PlatformContextProvider) : AsyncStartup(context) {
+class StartupMusicPlayer(pool: StartupPool) : Startup(pool) {
+    class Factory : StartupFactory<StartupMusicPlayer> {
+        override val id: String = StartupID<StartupMusicPlayer>()
+        override val dependencies: List<String> = listOf(StartupID<StartupAppConfig>())
+        override fun build(pool: StartupPool): StartupMusicPlayer = StartupMusicPlayer(pool)
+    }
+
     private fun MusicInfo.path(type: ModResourceType) = this.path(app.modPath, type)
 
     // 外部数据提取器
@@ -163,11 +169,11 @@ class StartupMusicPlayer(context: PlatformContextProvider) : AsyncStartup(contex
         if (controller.isInit) controller.updatePlayMode(controller.playMode.next)
     }
 
-    override suspend fun CoroutineScope.init(args: StartupArgs) {
-        launch {
+    override suspend fun init() {
+        coroutineScope {
             awaitAll(
                 async { initLibrary() },
-                async { controller.init(context.rawContext) }
+                async { controller.init(pool.rawContext) }
             )
             if (controller.isInit) {
                 controller.listener = listener
@@ -176,11 +182,11 @@ class StartupMusicPlayer(context: PlatformContextProvider) : AsyncStartup(contex
         }
     }
 
-    override suspend fun CoroutineScope.initLater(args: StartupArgs) {
-        launch { floatingLyrics.initDelay() }
+    override suspend fun initLater() {
+        floatingLyrics.initDelay()
     }
 
-    override fun destroy(args: StartupArgs) {
+    override fun destroy() {
         controller.listener = null
         controller.release()
     }

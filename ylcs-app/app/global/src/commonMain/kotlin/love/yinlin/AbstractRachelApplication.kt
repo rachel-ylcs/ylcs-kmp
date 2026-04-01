@@ -16,9 +16,6 @@ import love.yinlin.cs.ClientEngine
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
 import love.yinlin.foundation.PlatformContext
-import love.yinlin.foundation.StartupDelegate
-import love.yinlin.foundation.StartupLazyFetcher
-import love.yinlin.foundation.StartupNative
 import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
 import love.yinlin.platform.Platform
@@ -33,61 +30,35 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     val modPath: File = File(dataPath, "mod")
 
     init {
-        async(priority = StartupDelegate.HIGH9, name = "createDirectories") {
+        ClientEngine.init(Local.API_BASE_URL)
+
+        startup {
             dataPath.mkdir()
             cachePath.mkdir()
             modPath.mkdir()
         }
-
-        sync(name = "initClientBaseUrl") {
-            ClientEngine.init(Local.API_BASE_URL)
-        }
     }
 
-    val cache by service(
-        cachePath,
-        name = "cache",
-        factory = ::StartupCache
+    val cache by startup(StartupCache.Factory(cachePath))
+
+    val picker by startup(StartupPickerFactory())
+
+    val urlImage by startup(StartupUrlImage.Factory(
+        cachePath = cachePath,
+        maxCacheSize = Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
+        imageQuality = ImageQuality.Medium)
     )
 
-    @StartupNative
-    val picker by service(
-        name = "picker",
-        factory = ::StartupPicker
-    )
+    val kv by startup(StartupKVFactory(configPath))
 
-    val urlImage by service(
-        cachePath,
-        Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
-        ImageQuality.Medium,
-        name = "urlImage",
-        factory = ::StartupUrlImage
-    )
+    val config by startup(StartupConfig.custom(Local.info.version, patches(), ::StartupAppConfig))
 
-    @StartupNative
-    val kv by service(
-        configPath,
-        name = "kv",
-        factory = ::StartupKV
-    )
-
-    val config by service(
-        StartupLazyFetcher { kv },
-        Local.info.version,
-        patches(),
-        name = "config",
-        factory = ::StartupAppConfig,
-    )
-
-    val exceptionHandler by service(
-        "crash_key",
-        StartupExceptionHandler.Handler { key, e, error ->
-            kv.set(key, "${DateEx.CurrentString}\n$error")
+    val exceptionHandler by startup(StartupExceptionHandler.Factory("crash_key") { key, e, error ->
+        requireClassOrNull<StartupKV>()?.let {
+            it.set(key, "${DateEx.CurrentString}\n${error}")
             println(e.stackTraceToString())
-        },
-        name = "exceptionHandler",
-        factory = ::StartupExceptionHandler
-    )
+        }
+    })
 
     override val themeMode: ThemeMode get() = config.themeMode
     override val fontScale: Float get() = config.fontScale.value

@@ -22,7 +22,7 @@ abstract class ComposeActivity : ComponentActivity() {
         window.isNavigationBarContrastEnforced = false
 
         lifecycleScope.launch {
-            with(instance) { initServiceLater() }
+            instance.initPoolLater(this)
         }
 
         intent?.let {
@@ -40,7 +40,7 @@ abstract class ComposeActivity : ComponentActivity() {
     }
 
     final override fun onDestroy() {
-        instance.destroyServiceBefore()
+        instance.destroyPoolBefore()
         super.onDestroy()
     }
 

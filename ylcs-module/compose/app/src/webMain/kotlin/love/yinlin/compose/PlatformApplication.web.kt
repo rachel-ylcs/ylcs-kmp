@@ -8,7 +8,6 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
@@ -31,13 +30,16 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
         val mainScope = MainScope()
-        initApplicationService(scope = mainScope)
-        mainScope.launch { initServiceLater() }
+        initApplication(scope = mainScope)
 
         // 有待考证
+        window.onload = {
+            initPoolLater(mainScope)
+        }
+        // 有待考证
         window.onclose = {
-            destroyServiceBefore()
-            destroyService()
+            destroyPoolBefore()
+            destroyPool()
             mainScope.cancel()
         }
 
