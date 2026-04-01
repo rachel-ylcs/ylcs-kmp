@@ -87,7 +87,7 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
                 dependenciesList.map { factory ->
                     val id = factory.id
                     // 并行加载
-                    val task = async {
+                    val task = async(factory.dispatcher) {
                         val dependencies = dependenciesMap[id] ?: emptyList()
                         // 等待依赖服务完成
                         for (dependentId in dependencies) {
@@ -112,9 +112,8 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
                 dependenciesList.map { factory ->
                     val id = factory.id
                     // 并行加载
-                    async {
+                    async(factory.dispatcher) {
                         val startup = startupMap[id]
-                        println(startup)
                         if (startup != null) Coroutines.catchingNull { startup.initLater() } ?: throw StartupError(id, "initLater")
                     }
                 }.awaitAll()

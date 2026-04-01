@@ -13,6 +13,7 @@ import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.mainContext
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
@@ -30,12 +31,14 @@ import love.yinlin.media.buildMusicPlayer
 import love.yinlin.media.lyrics.FloatingLyrics
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.media.lyrics.LyricsEngineHost
+import kotlin.coroutines.CoroutineContext
 
 @Stable
 class StartupMusicPlayer(pool: StartupPool) : Startup(pool) {
     class Factory : StartupFactory<StartupMusicPlayer> {
         override val id: String = StartupID<StartupMusicPlayer>()
         override val dependencies: List<String> = listOf(StartupID<StartupAppConfig>())
+        override val dispatcher: CoroutineContext = mainContext
         override fun build(pool: StartupPool): StartupMusicPlayer = StartupMusicPlayer(pool)
     }
 

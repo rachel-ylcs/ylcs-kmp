@@ -14,6 +14,7 @@ import com.github.panpf.sketch.http.KtorStack
 import com.github.panpf.sketch.request.ImageOptions
 import com.github.panpf.sketch.util.Logger
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.coroutines.cpuContext
 import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupFactory
 import love.yinlin.foundation.StartupID
@@ -22,6 +23,7 @@ import love.yinlin.foundation.buildFileClient
 import love.yinlin.fs.File
 import love.yinlin.platform.Platform
 import okio.Path.Companion.toPath
+import kotlin.coroutines.CoroutineContext
 
 @Stable
 class StartupUrlImage(
@@ -37,6 +39,7 @@ class StartupUrlImage(
     ) : StartupFactory<StartupUrlImage> {
         override val id: String = StartupID<StartupUrlImage>()
         override val dependencies: List<String> = emptyList()
+        override val dispatcher: CoroutineContext = cpuContext
         override fun build(pool: StartupPool): StartupUrlImage = StartupUrlImage(pool, cachePath, maxCacheSize, imageQuality)
     }
 

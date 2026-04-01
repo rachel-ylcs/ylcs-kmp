@@ -4,18 +4,21 @@ import androidx.compose.runtime.Stable
 import love.yinlin.compose.cache.DiskCache
 import love.yinlin.compose.cache.XXHash64
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.cpuContext
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupFactory
 import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
 import love.yinlin.fs.File
+import kotlin.coroutines.CoroutineContext
 
 @Stable
 class StartupCache(pool: StartupPool, private val cachePath: File) : Startup(pool) {
     class Factory(private val cachePath: File) : StartupFactory<StartupCache> {
         override val id: String = StartupID<StartupCache>()
         override val dependencies: List<String> = emptyList()
+        override val dispatcher: CoroutineContext = cpuContext
         override fun build(pool: StartupPool): StartupCache = StartupCache(pool, cachePath)
     }
 

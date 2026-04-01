@@ -1,5 +1,8 @@
 package love.yinlin.foundation
 
+import love.yinlin.coroutines.cpuContext
+import kotlin.coroutines.CoroutineContext
+
 /**
  * 服务工厂
  */
@@ -13,6 +16,11 @@ interface StartupFactory<S : Startup> {
      * 依赖
      */
     val dependencies: List<String>
+
+    /**
+     * 协程调度器
+     */
+    val dispatcher: CoroutineContext
 
     /**
      * 构建服务
@@ -29,6 +37,7 @@ interface StartupFactory<S : Startup> {
         ): StartupFactory<Startup> = object : StartupFactory<Startup> {
             override val id: String = id
             override val dependencies: List<String> = dependencies
+            override val dispatcher: CoroutineContext = cpuContext
             override fun build(pool: StartupPool): Startup = object : Startup(pool) {
                 override suspend fun init() = block()
             }

@@ -7,6 +7,7 @@ import love.yinlin.compose.config.ListState
 import love.yinlin.compose.config.MapState
 import love.yinlin.compose.config.Patches
 import love.yinlin.compose.config.ValueState
+import love.yinlin.coroutines.cpuContext
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.extension.lazyName
@@ -14,6 +15,7 @@ import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupFactory
 import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
+import kotlin.coroutines.CoroutineContext
 
 @Stable
 open class StartupConfig(
@@ -29,6 +31,7 @@ open class StartupConfig(
         ): StartupFactory<S> = object : StartupFactory<S> {
             override val id: String = StartupID<S>()
             override val dependencies: List<String> = listOf(StartupID<StartupKV>())
+            override val dispatcher: CoroutineContext = cpuContext
             override fun build(pool: StartupPool): S = factory(pool, version, patches)
         }
     }
