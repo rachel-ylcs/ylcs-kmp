@@ -16,7 +16,7 @@ import love.yinlin.compose.window.FloatingView
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
-actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) {
+actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
     actual var isAttached: Boolean by mutableStateOf(false)
         private set
 
@@ -29,7 +29,7 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
 
         @Composable
         override fun Content() {
-            if (isAttached && startup.isInit) {
+            if (isAttached && mp.isInit) {
                 val screenHeight = LocalWindowInfo.current.containerSize.height
                 val lyricsTopOffset by rememberDerivedState {
                     val config = app.config.lyricsEngineConfig
@@ -49,8 +49,8 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
                     Layout(
                         modifier = Modifier.fillMaxWidth(),
                         content = {
-                            if (startup.isPlaying) {
-                                startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxWidth(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v6.bold)
+                            if (mp.isPlaying) {
+                                mp.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxWidth(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v6.bold)
                             }
                         }
                     ) { measurables, constraints ->
@@ -75,7 +75,7 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
     }
 
     actual fun attach() {
-        startup.context.activity?.let { activity ->
+        mp.pool.activity?.let { activity ->
             view.attach(activity) { app.config.enabledFloatingLyrics = false }
         }
     }

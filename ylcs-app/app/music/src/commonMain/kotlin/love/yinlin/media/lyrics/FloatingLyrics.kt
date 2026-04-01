@@ -5,7 +5,7 @@ import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
-expect class FloatingLyrics(startup: StartupMusicPlayer) {
+expect class FloatingLyrics(mp: StartupMusicPlayer) {
     var isAttached: Boolean
         private set
 

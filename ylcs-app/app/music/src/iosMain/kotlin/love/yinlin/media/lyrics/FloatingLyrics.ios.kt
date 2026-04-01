@@ -6,7 +6,7 @@ import love.yinlin.startup.StartupMusicPlayer
 // TODO: ios部分需要重新实现, 把 platform 相关的代码全部移入 swift
 // 涉及到 view、初始化、布局、attach 等等都放在原生上
 @Stable
-actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) {
+actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
     actual var isAttached: Boolean = false
 
     actual fun attach() { }

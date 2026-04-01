@@ -21,7 +21,7 @@ import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) {
+actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
     actual var isAttached: Boolean by mutableStateOf(false)
         private set
 
@@ -77,14 +77,14 @@ actual class FloatingLyrics actual constructor(val startup: StartupMusicPlayer) 
                     }.launchIn(this)
                 }
 
-                if (startup.isInit) {
+                if (mp.isInit) {
                     DragArea(enabled = canMove) {
                         app.ComposedLayout(
                             modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
                             bgColor = Colors.Transparent
                         ) {
-                            if (startup.isPlaying) {
-                                startup.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
+                            if (mp.isPlaying) {
+                                mp.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
                             }
                         }
                     }

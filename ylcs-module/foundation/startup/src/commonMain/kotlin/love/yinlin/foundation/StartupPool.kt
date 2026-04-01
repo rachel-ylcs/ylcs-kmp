@@ -114,6 +114,7 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
                     // 并行加载
                     async {
                         val startup = startupMap[id]
+                        println(startup)
                         if (startup != null) Coroutines.catchingNull { startup.initLater() } ?: throw StartupError(id, "initLater")
                     }
                 }.awaitAll()

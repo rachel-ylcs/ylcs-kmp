@@ -8,7 +8,6 @@ import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
 import love.yinlin.fs.File
 
-@StartupArg(index = 0, name = "initPath", type = File::class)
 @OptIn(ExperimentalForeignApi::class)
 actual class StartupKV actual constructor(
     pool: StartupPool,
