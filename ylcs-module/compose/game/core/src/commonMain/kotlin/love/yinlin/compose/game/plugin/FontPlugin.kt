@@ -25,7 +25,7 @@ class FontPlugin private constructor(
 
     override val layerOrder: Int = LayerOrder.Low
 
-    private val fontMap = mutableStateMapOf<FontResource, FontFamily>()
+    private val fontMap = mutableMapOf<FontResource, FontFamily>()
 
     @Stable
     internal val fontProvider = FontProvider { resource ->

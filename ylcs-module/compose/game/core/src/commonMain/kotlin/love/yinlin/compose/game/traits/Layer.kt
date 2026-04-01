@@ -9,6 +9,7 @@ import androidx.compose.ui.util.fastForEachReversed
 import love.yinlin.compose.extension.translate
 import love.yinlin.compose.extension.scale
 import love.yinlin.compose.game.drawer.Drawer
+import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.drawer.PrepareDrawer
@@ -96,6 +97,20 @@ open class Layer(
         return false
     }
 
+    private var isInitializeDraw: Boolean = false
+
+    // 初始化绘制
+    internal fun initializeDrawVisibleLayer(drawer: InitialDrawer, viewportSize: Size, viewportBounds: Rect) {
+        if (!isInitializeDraw) {
+            isInitializeDraw = true
+            items.fastForEach { item ->
+                with(item) {
+                    drawer.initializeDraw(viewportSize, viewportBounds)
+                }
+            }
+        }
+    }
+
     // 绘制预处理
     internal fun prepareDrawVisibleLayer(drawer: PrepareDrawer, viewportSize: Size, bounds: Rect) {
         items.fastForEach { item ->
@@ -110,6 +125,7 @@ open class Layer(
         }
     }
 
+    // 绘制
     internal fun drawVisibleLayer(drawer: Drawer) {
         items.fastForEach { item ->
             // 检查视口剔除

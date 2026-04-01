@@ -7,6 +7,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import love.yinlin.compose.game.viewport.Culling
 import love.yinlin.compose.game.drawer.Drawer
+import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.drawer.PrepareDrawer
 
@@ -60,10 +61,18 @@ abstract class Visible(
     }
 
     /**
+     * 初始化绘制
+     *
+     * 只在首次渲染前调用一次，可以保存资源、测量或更新。
+     * 注意：此处可以初始化或更新相关变量以及自身属性。
+     */
+    open fun InitialDrawer.initializeDraw(viewportSize: Size, viewportBounds: Rect) { }
+
+    /**
      * 绘制预处理
      *
-     * 此处不允许使用Drawer绘制内容，只能测量并更新非脏区值。
-     * 注意预处理和绘制只需要使用普通变量即可，它们位于同一个作用域下不需要状态监听。
+     * 脏区更新时触发，不允许使用Drawer绘制内容，只能测量并更新。
+     * 注意：此处只需要使用普通变量即可，不可以更新自身属性。
      *
      * @param viewportSize 视口大小 (等价于设计稿, 不包括相机缩放)
      * @param viewportBounds 视口边界 (实际上屏幕能看到的视口范围)
@@ -73,6 +82,9 @@ abstract class Visible(
 
     /**
      * 绘制
+     *
+     * 脏区更新时触发，只能绘制内容。
+     * 注意：绘制可以直接使用预处理保存的普通变量，不可以更新自身属性。
      */
     abstract fun Drawer.onDraw()
 

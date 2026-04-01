@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
@@ -20,6 +21,7 @@ import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.asset.ResourceImageLoader
 import love.yinlin.compose.game.viewport.Viewport
 import love.yinlin.compose.game.drawer.Drawer
+import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.event.Event
@@ -52,14 +54,18 @@ class ScreenRhyme : BasicScreen() {
         if (engine.initialize()) {
             val scene = engine.plugin<ScenePlugin>()
 
-            val bound = object : Visible(Offset.Zero, Size.Zero) {
+            val bound = object : Visible(Offset.Zero, Size.Zero, useCulling = false) {
+                var dynamicBound: Rect = Rect.Zero
+
+                override val clip: Boolean = false
+
                 override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
-                    size = viewportSize
+                    dynamicBound = Rect(-viewportSize.center, viewportSize)
                 }
 
                 override fun Drawer.onDraw() {
-                    line(Colors.Red4, topCenter, bottomCenter, Stroke(1f))
-                    line(Colors.Red4, centerLeft, centerRight, Stroke(1f))
+                    line(Colors.Red4, dynamicBound.topCenter, dynamicBound.bottomCenter, Stroke(3f))
+                    line(Colors.Red4, dynamicBound.centerLeft, dynamicBound.centerRight, Stroke(3f))
                 }
             }
 
@@ -81,20 +87,20 @@ class ScreenRhyme : BasicScreen() {
             val text = object : Visible(Offset.Zero, Size(800f, 100f)) {
                 var textGraph: TextGraph? = null
 
-                override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
-                    if (textGraph == null) textGraph = measureText("Hello 你好", GlobalRes.font.xwwk)
+                override fun InitialDrawer.initializeDraw(viewportSize: Size, viewportBounds: Rect) {
+                    textGraph = measureText("Hello 你好", GlobalRes.font.xwwk)
                 }
 
                 override fun Drawer.onDraw() {
-                    text(textGraph, Offset.Zero, size, Colors.White, textAlign = TextAlign.Center)
+                    textGraph?.let { text(it, Offset.Zero, size, Colors.White, textAlign = TextAlign.Center) }
                 }
             }
 
             val image = object : Visible(Offset(200f, 200f), Size(400f, 400f)) {
                 var bitmap: ImageBitmap? = null
 
-                override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
-                    if (bitmap == null) bitmap = assetProvider[GlobalRes.drawable.img_logo]
+                override fun InitialDrawer.initializeDraw(viewportSize: Size, viewportBounds: Rect) {
+                    bitmap = assetProvider[GlobalRes.drawable.img_logo]
                 }
 
                 override fun Drawer.onDraw() {

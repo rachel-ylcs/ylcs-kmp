@@ -206,7 +206,9 @@ class ScenePlugin private constructor(
         // 游戏画布
         Box(modifier = Modifier.fillMaxSize().onSizeChanged { // 相机坐标转换
             camera.updateViewport(it, engine.viewport)
-        }.pointerInput(Unit) { // 事件监听
+        }.pointerInput(Unit) { // 指针事件监听
+            // 注意指针监听必须放在layer前面，然后手动坐标转换
+            // 如果放后面看起来坐标经layer自动转换了，但是原点在中心后非第四象限外的坐标将不接受指针事件了
             pointerInputLoop()
         }.graphicsLayer { // 窗口坐标转换
             camera.whenDirtyTransformLayer(this, size)
@@ -220,12 +222,18 @@ class ScenePlugin private constructor(
             layerEntities.fastForEach { layer ->
                 @OptIn(ExperimentalUuidApi::class)
                 key(layer.id) {
-                    val drawer = remember(fontFamilyResolver) {
+                    val drawer = remember {
                         Drawer(
                             fontFamilyResolver = fontFamilyResolver,
                             fontProvider = fontProvider,
                             assetProvider = assetProvider
                         )
+                    }
+
+                    // 初始化绘制
+                    LaunchedEffect(Unit) {
+                        layer.initializeDrawVisibleLayer(drawer, camera.viewportSize, camera.viewportBounds)
+                        layer.updateDirty()
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer().drawWithCache {

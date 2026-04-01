@@ -172,40 +172,38 @@ class Drawer internal constructor(
     // 文本绘制
 
     internal inline fun text(
-        content: TextGraph?,
+        content: TextGraph,
         textPosition: Offset,
         textSize: Size,
         textAlign: TextAlign,
         block: (Canvas, Paragraph) -> Unit,
     ) {
         rawScope?.apply {
-            content?.let { textGraph ->
-                withTransform({
-                    // 计算文本实际宽度和缩放
-                    val widthScale = textGraph.widthScale(textSize.height)
-                    val textWidth = unpackFloat1(widthScale)
-                    val scale = unpackFloat2(widthScale)
-                    val actualWidth = textSize.width
-                    // 计算对齐方式偏移
-                    val offsetX = when (textAlign) {
-                        TextAlign.Start, TextAlign.Unspecified, TextAlign.Left -> 0f
-                        TextAlign.Center -> (actualWidth - textWidth) / 2
-                        TextAlign.End, TextAlign.Right -> actualWidth - textWidth
-                        else -> 0f
-                    }
-                    // 偏移
-                    translate(textPosition.x + offsetX, textPosition.y)
-                    // 光栅缩放
-                    scale(scale, scale, Offset.Zero)
-                }) {
-                    block(drawContext.canvas, textGraph.paragraph)
+            withTransform({
+                // 计算文本实际宽度和缩放
+                val widthScale = content.widthScale(textSize.height)
+                val textWidth = unpackFloat1(widthScale)
+                val scale = unpackFloat2(widthScale)
+                val actualWidth = textSize.width
+                // 计算对齐方式偏移
+                val offsetX = when (textAlign) {
+                    TextAlign.Start, TextAlign.Unspecified, TextAlign.Left -> 0f
+                    TextAlign.Center -> (actualWidth - textWidth) / 2
+                    TextAlign.End, TextAlign.Right -> actualWidth - textWidth
+                    else -> 0f
                 }
+                // 偏移
+                translate(textPosition.x + offsetX, textPosition.y)
+                // 光栅缩放
+                scale(scale, scale, Offset.Zero)
+            }) {
+                block(drawContext.canvas, content.paragraph)
             }
         }
     }
 
     fun text(
-        content: TextGraph?,
+        content: TextGraph,
         position: Offset,
         size: Size,
         color: Color,
@@ -228,7 +226,7 @@ class Drawer internal constructor(
     }
 
     fun text(
-        content: TextGraph?,
+        content: TextGraph,
         position: Offset,
         size: Size,
         brush: Brush,
