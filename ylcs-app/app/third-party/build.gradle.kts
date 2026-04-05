@@ -16,10 +16,6 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsApp.app.viewer,
 
                 projects.ylcsModule.compose.components.paginationLayout,
-
-                libs.tool.cryptography,
-                libs.tool.cryptography.provider,
-                libs.tool.cryptography.asn1,
             )
         }
 

@@ -1,18 +1,10 @@
 package love.yinlin.tpl
 
 import androidx.compose.runtime.Stable
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.*
-import dev.whyoleg.cryptography.bigint.decodeToBigInt
-import dev.whyoleg.cryptography.serialization.asn1.Der
-import dev.whyoleg.cryptography.serialization.asn1.modules.RsaPublicKey
-import io.ktor.http.Cookie
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.headers
 import io.ktor.util.appendAll
-import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.uri.Uri
@@ -23,54 +15,6 @@ import love.yinlin.cs.ClientEngine
 import love.yinlin.data.compose.Picture
 import love.yinlin.foundation.NetClient
 import kotlin.io.encoding.Base64
-import kotlin.random.Random
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
-
-object WeiboEncrypt {
-    const val ENABLED = false
-
-	fun setupH(): String = buildString {
-		repeat(4) {
-			append(Random.nextInt(65536, 131072).toString(16).substring(1))
-		}
-	}
-
-	@OptIn(DelicateCryptographyApi::class)
-	suspend fun aesCbcEncrypt(text: String, h: String): String {
-		val aes = CryptographyProvider.Default.get(AES.CBC)
-		val secretKey = aes.keyDecoder().decodeFromByteArray(AES.Key.Format.RAW, h.encodeToByteArray())
-		val cipher = secretKey.cipher()
-		val cipherText = cipher.encryptWithIv("0000000000000000".encodeToByteArray(), text.encodeToByteArray())
-		return cipherText.toHexString()
-	}
-
-	@OptIn(DelicateCryptographyApi::class)
-    suspend fun rsaEncrypt(text: String): String {
-		val modulus = "00C1E3934D1614465B33053E7F48EE4EC87B14B95EF88947713D25EECBFF7E74C7977D02DC1D9451F79DD5D1C10C29ACB6A9B4D6FB7D0A0279B6719E1772565F09AF627715919221AEF91899CAE08C0D686D748B20A3603BE2318CA6BC2B59706592A9219D0BF05C9F65023A21D2330807252AE0066D59CEEFA5F2748EA80BAB81".hexToByteArray()
-		val exponent = "010001".hexToByteArray()
-		val rsa = CryptographyProvider.Default.get(RSA.PKCS1)
-		val rsaPublicKey = RsaPublicKey(modulus = modulus.decodeToBigInt(), publicExponent = exponent.decodeToBigInt())
-		val publicKey = rsa.publicKeyDecoder(SHA256).decodeFromByteArray(
-			format = RSA.PublicKey.Format.DER.PKCS1,
-			bytes = Der.encodeToByteArray(rsaPublicKey)
-		)
-		val encryptData = publicKey.encryptor().encrypt(text.encodeToByteArray())
-		return encryptData.toHexString()
-	}
-
-	@OptIn(DelicateCryptographyApi::class)
-	suspend fun hash(text: String, type: String): String {
-		val provider = CryptographyProvider.Default
-		val data = text.encodeToByteArray()
-		return when (type) {
-			"sha256" -> provider.get(SHA256).hasher().hash(data).toHexString()
-			"md5" -> provider.get(MD5).hasher().hash(data).toHexString()
-			"sha1" -> provider.get(SHA1).hasher().hash(data).toHexString()
-			else -> text
-		}
-	}
-}
 
 object WeiboAPI {
 	private fun proxy(url: String) = Platform.use(*Platform.Web,
@@ -94,14 +38,6 @@ object WeiboAPI {
 		val xsrfToken: String
 	)
 
-	@Stable
-	data class WeiboEncryptInfo(
-		val lotNumber: String,
-		val passToken: String,
-		val genTime: String,
-		val captchaOutput: String
-	)
-
 	var weiboCookie: WeiboCookie? = null
 
 	internal object Container {
@@ -116,9 +52,6 @@ object WeiboAPI {
         fun href(route: String) = proxy("https://m.weibo.cn$route")
         val xsrfConfig: String get() = proxy("https://m.weibo.cn/api/config")
         val genvisitor2: String get() = proxy("https://visitor.passport.weibo.cn/visitor/genvisitor2")
-        const val CAPTCHAID: String = "71c4f580e096c1cb471a83b941680596"
-        val captchaLoad: String get() = proxy("https://gcaptcha4.geetest.com/load")
-        val captchaVerify: String get() = proxy("https://gcaptcha4.geetest.com/verify")
 	}
 
 	private fun weiboTime(time: String) = DateEx.Formatter.weiboDateTime.parse(time)!!.toLocalDateTime()
@@ -257,87 +190,12 @@ object WeiboAPI {
 		return WeiboCookie(sub.first, sub.second, xsrfToken)
 	}
 
-	@OptIn(ExperimentalUuidApi::class)
-    suspend fun generateWeiboEncryptInfo(): WeiboEncryptInfo? = catchingNull {
-		val captchaId = Container.CAPTCHAID
-		// 阶段1
-		val callback1 = "geetest_${Random.nextInt(0, 10000) + DateEx.CurrentLong}"
-		val loadEncrypt = NetClient.Common.request<ByteArray, String>({
-			val uuid = Uuid.generateV7()
-			url = "${Container.captchaLoad}?callback=$callback1&captcha_id=$captchaId&challenge=$uuid&client_type=web&risk_type=slide&lang=zh-cn"
-            cookies = listOf(Cookie("captcha_v4_user", "55b938fde8a447a6a689abfac9683fac"))
-		}) { bodyString }!!
-		val result1 = loadEncrypt.removePrefix("$callback1(").removeSuffix(")").parseJson.Object
-		require(result1["status"].String == "success")
-		val data1 = result1.obj("data")
-		val lotNumber = data1["lot_number"].String
-		val payload = data1["payload"].String
-		val processToken = data1["process_token"].String
-		val payloadProtocol = data1["payload_protocol"].Int
-		val pt = data1["pt"].String
-		val powDetail = data1.obj("pow_detail")
-		val version = powDetail["version"].String
-		val bits = powDetail["bits"].Int
-		val datetime = powDetail["datetime"].String
-		val hashfunc = powDetail["hashfunc"].String
-		// 阶段2
-		val h = WeiboEncrypt.setupH()
-		val powMsg = "$version|$bits|$hashfunc|$datetime|$captchaId|$lotNumber|$h"
-		val powSign = WeiboEncrypt.hash(powMsg, hashfunc)
-		val info = makeObject {
-			"device_id" with ""
-			"lot_number" with lotNumber
-			"pow_msg" with powMsg
-			"pow_sign" with powSign
-			"geetest" with "captcha"
-			"lang" with "zh-cn"
-			"ep" with "123"
-			"biht" with "1426265548"
-			"YciC" with "P3Vn"
-			"1a72df83" with "edf83342"
-			obj("em") {
-				"ph" with 0
-				"cp" with 0
-				"ek" with "11"
-				"wd" with 1
-				"nt" with 0
-				"si" with 0
-				"sc" with 0
-			}
-		}.toJsonString()
-		val encryptInfo = WeiboEncrypt.aesCbcEncrypt(info, h)
-		val rsaH = WeiboEncrypt.rsaEncrypt(h)
-		val input = encryptInfo + rsaH
-		val callback2 = "geetest_${Random.nextInt(0, 10000) + DateEx.CurrentLong}"
-		val verifyEncrypt = NetClient.Common.request<ByteArray, String>({
-            url = "${Container.captchaVerify}?callback=$callback2&captcha_id=$captchaId&client_type=web&lot_number=$lotNumber&risk_type=slide&payload=$payload&process_token=$processToken&payload_protocol=$payloadProtocol&pt=$pt&w=$input"
-            cookies = listOf(Cookie("captcha_v4_user", "55b938fde8a447a6a689abfac9683fac"))
-		}) { bodyString }!!
-		val result2 = verifyEncrypt.removePrefix("$callback2(").removeSuffix(")").parseJson.Object
-		require(result2["status"].String == "success")
-		val seccode = result2.obj("data").obj("seccode")
-		WeiboEncryptInfo(
-			lotNumber = seccode["lot_number"].String,
-			passToken = seccode["pass_token"].String,
-			genTime = seccode["gen_time"].String,
-			captchaOutput = seccode["captcha_output"].String,
-		)
-	}
-
-	private suspend fun prepareWeiboHeaders(): Map<String, String>? {
+	private fun prepareWeiboHeaders(): Map<String, String>? {
 		val cookie = weiboCookie ?: return null
         val map = mutableMapOf(
             HttpHeaders.Cookie to "SUB=${cookie.sub};SUBP=${cookie.subp};XSRF-TOKEN=${cookie.xsrfToken}",
             HttpHeaders.Referrer to "https://m.weibo.cn",
         )
-        if (WeiboEncrypt.ENABLED) {
-            val info = generateWeiboEncryptInfo() ?: return null
-            map["captcha_id"] = Container.CAPTCHAID
-            map["lot_number"] = info.lotNumber
-            map["pass_token"] = info.passToken
-            map["gen_time"] = info.genTime
-            map["captcha_output"] = info.captchaOutput
-        }
         return map
 	}
 
