@@ -7,7 +7,9 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,6 +20,8 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import love.yinlin.compose.LocalImmersivePadding
+import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.extension.Array
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJson
@@ -56,20 +60,23 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         ) {
             val manager = rememberBuild<Main>()
             val map = remember { ScreenMap().also(builder) }
+            val immersivePadding by rememberImmersivePadding()
 
             DeepLink.Register(deeplink, manager)
 
-            NavDisplay(
-                backStack = manager.backStack,
-                modifier = modifier,
-                transitionSpec = transitionSpecProvider,
-                popTransitionSpec = transitionSpecProvider,
-                entryDecorators = listOf(
-                    rememberSaveableStateHolderNavEntryDecorator(),
-                    rememberViewModelStoreNavEntryDecorator(),
-                ),
-                entryProvider = { manager.registerScreen(map, it) }
-            )
+            CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
+                NavDisplay(
+                    backStack = manager.backStack,
+                    modifier = modifier,
+                    transitionSpec = transitionSpecProvider,
+                    popTransitionSpec = transitionSpecProvider,
+                    entryDecorators = listOf(
+                        rememberSaveableStateHolderNavEntryDecorator(),
+                        rememberViewModelStoreNavEntryDecorator(),
+                    ),
+                    entryProvider = { manager.registerScreen(map, it) }
+                )
+            }
         }
     }
 
@@ -77,7 +84,10 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
     internal val backStack = savedBackStack.toMutableStateList()
 
     @PublishedApi
-    internal fun registerScreen(map: ScreenMap, route: String): NavEntry<String> = NavEntry(key = route, contentKey = route) { navRoute ->
+    internal fun registerScreen(
+        map: ScreenMap,
+        route: String
+    ): NavEntry<String> = NavEntry(key = route, contentKey = route) { navRoute ->
         Box {
             viewModel {
                 val (screenName, uniqueId, argsText) = Route.parse(navRoute)

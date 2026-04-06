@@ -1,9 +1,7 @@
 package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,8 +10,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonArray
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.ui.floating.BasicSheet
 import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.floating.FAB
@@ -113,30 +109,26 @@ abstract class BasicScreen : ViewModel() {
     internal fun ComposedUI() {
         NavigationBack(onBack = ::onBack)
 
-        val immersivePadding by rememberImmersivePadding()
+        BasicContent()
 
-        CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
-            BasicContent()
+        // FAB Layout
+        fab.Land()
 
-            // FAB Layout
-            fab.Land()
+        // Sheet Land
+        for (instance in sheetList) instance.Land()
 
-            // Sheet Land
-            for (instance in sheetList) instance.Land()
+        // Dialog Land
+        for (instance in dialogList) instance.Land()
 
-            // Dialog Land
-            for (instance in dialogList) instance.Land()
+        // Custom Floating Land
+        Floating()
 
-            // Custom Floating Land
-            Floating()
-
-            // Default Dialog Land
-            with(slot) {
-                info.Land()
-                confirm.Land()
-                loading.Land()
-                tip.Land()
-            }
+        // Default Dialog Land
+        with(slot) {
+            info.Land()
+            confirm.Land()
+            loading.Land()
+            tip.Land()
         }
     }
 
