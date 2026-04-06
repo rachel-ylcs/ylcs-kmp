@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.collection.DependencyAnalyzer
 import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.cpuContext
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catchingNull
 import kotlin.reflect.KProperty
@@ -93,28 +94,34 @@ open class StartupPool(
 
         // 初始化
         val pool = this
+
+        // 同步服务
+        val syncStartupList = dependenciesList.filter { it.dispatcher == null }
+        val syncStartupSet = syncStartupList.mapTo(mutableSetOf()) { it.id } // 同步服务集合
+
+        for (syncStartup in syncStartupList) {
+            val id = syncStartup.id
+            val dependencies = dependenciesMap[id] ?: emptyList()
+            // 确保同步服务不依赖异步服务
+            dependencies.find { it !in syncStartupSet }?.let { dependentId ->
+                throw IllegalStateException("sync startup $id is dependent on async startup $dependentId")
+            }
+            // 初始化同步服务
+            val startup = catchingNull { syncStartup.build(pool) } ?: throw StartupError(id, "init")
+            startupMap[id] = startup
+        }
+
+        // 异步服务
         scope.launch(mainContext) {
             coroutineScope {
-                val syncStartupSet = mutableSetOf<String>() // 同步服务集合
                 val mutex = Mutex()
                 // 遍历依赖表
                 dependenciesList.mapNotNull { factory ->
                     val id = factory.id
-                    val dispatcher = factory.dispatcher
                     val dependencies = dependenciesMap[id] ?: emptyList()
+                    val dispatcher = factory.dispatcher
 
-                    if (dispatcher == null) { // 同步服务
-                        // 确保同步服务不依赖异步服务
-                        dependencies.find { it in taskMap }?.let { dependentId ->
-                            throw IllegalStateException("sync startup $id is dependent on async startup $dependentId")
-                        }
-                        // 初始化同步服务
-                        val startup = catchingNull { factory.build(pool) } ?: throw StartupError(id, "init")
-                        syncStartupSet += id
-                        mutex.with { startupMap[id] = startup }
-                        null
-                    }
-                    else { // 异步服务
+                    if (dispatcher != null) {
                         // 并行加载
                         val task = async(dispatcher) {
                             // 等待依赖服务完成
@@ -135,6 +142,7 @@ open class StartupPool(
                         taskMap[id] = task
                         task
                     }
+                    else null
                 }.awaitAll()
                 dependenciesMap = emptyMap()
                 taskMap.clear()
@@ -148,7 +156,7 @@ open class StartupPool(
                 dependenciesList.map { factory ->
                     val id = factory.id
                     // 并行加载
-                    async(factory.dispatcher ?: mainContext) {
+                    async(factory.dispatcher ?: cpuContext) {
                         // 等待init完成，同步任务不影响
                         taskMap[id]?.await()
                         // 继续initLater
