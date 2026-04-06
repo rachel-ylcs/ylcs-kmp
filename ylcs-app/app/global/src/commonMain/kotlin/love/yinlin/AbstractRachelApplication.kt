@@ -16,6 +16,7 @@ import love.yinlin.cs.ClientEngine
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
 import love.yinlin.foundation.PlatformContext
+import love.yinlin.foundation.StartupID
 import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
 import love.yinlin.platform.Platform
@@ -54,11 +55,9 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     val config by startup(StartupConfig.custom(Local.info.version, patches(), ::StartupAppConfig))
 
     val exceptionHandler by startup(StartupExceptionHandler.Factory("crash_key") { key, e, error ->
-        requireClassOrNull<StartupKV>()?.let {
-            it.set(key, "${DateEx.CurrentString}\n${error}")
-            println(e.stackTraceToString())
-        }
-    })
+        kv.set(key, "${DateEx.CurrentString}\n${error}")
+        println(e.stackTraceToString())
+    }, dependencies = listOf(StartupID<StartupKV>()))
 
     override val themeMode: ThemeMode get() = config.themeMode
     override val fontScale: Float get() = config.fontScale.value

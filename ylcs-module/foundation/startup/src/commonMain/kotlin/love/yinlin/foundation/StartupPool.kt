@@ -42,6 +42,16 @@ open class StartupPool(
         }
     }
 
+    inline fun <reified S : Startup, F : StartupFactory<S>> startup(factory: F, dependencies: List<String>): StartupDelegate<S> =
+        startup(StartupFactoryWithDependency(factory, dependencies))
+
+    @OptIn(ExperimentalUuidApi::class)
+    inline fun startup(
+        id: String = Uuid.generateV7().toString(),
+        dependencies: List<String> = emptyList(),
+        crossinline block: suspend () -> Unit
+    ): StartupDelegate<Startup> = startup(StartupFactory.anonymous(id, dependencies, block))
+
     inline fun <reified S : Startup, F : StartupFactory<S>> startupLazy(factory: F): StartupDelegate<S?> {
         if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
         factoryList += factory
@@ -51,6 +61,9 @@ open class StartupPool(
         }
     }
 
+    inline fun <reified S : Startup, F : StartupFactory<S>> startupLazy(factory: F, dependencies: List<String>): StartupDelegate<S?> =
+        startupLazy(StartupFactoryWithDependency(factory, dependencies))
+
     inline fun <reified S : Startup> require(id: String): S = startupMap[id] as S
 
     inline fun <reified S : Startup> requireOrNull(id: String): S? = startupMap[id] as? S
@@ -58,13 +71,6 @@ open class StartupPool(
     inline fun <reified S : Startup> requireClass(): S = startupMap[StartupID<S>()] as S
 
     inline fun <reified S : Startup> requireClassOrNull(): S? = startupMap[StartupID<S>()] as? S
-
-    @OptIn(ExperimentalUuidApi::class)
-    inline fun startup(
-        id: String = Uuid.generateV7().toString(),
-        dependencies: List<String> = emptyList(),
-        crossinline block: suspend () -> Unit
-    ): StartupDelegate<Startup> = startup(StartupFactory.anonymous(id, dependencies, block))
 
     fun initPool(scope: CoroutineScope) {
         // 先对服务拓扑排序

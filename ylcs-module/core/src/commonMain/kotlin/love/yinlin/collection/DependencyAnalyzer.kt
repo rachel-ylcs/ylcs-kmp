@@ -40,11 +40,15 @@ class DependencyAnalyzer<K : Any, V>(
 
         // 初始化入度表
         for ((key, value) in keyMap) {
-            val filterDependencies = dependenciesProvider(value).mapNotNull { dependentKey ->
-                // 未知依赖
-                if (dependentKey !in keyMap) throw UnknownDependencyError(key.toString(), dependentKey.toString())
-                // 排除自身依赖
-                if (dependentKey != key) dependentKey else null
+            // 过滤依赖
+            val filterDependencies = dependenciesProvider(value).asSequence()
+                .distinct() // 去重
+                .filter { it != key } // 排除自身依赖
+                .toList()
+
+            // 判断是否存在未知依赖
+            filterDependencies.find { it !in keyMap }?.let { dependentKey ->
+                throw UnknownDependencyError(key.toString(), dependentKey.toString())
             }
 
             rawDependenciesMap[key] = filterDependencies
