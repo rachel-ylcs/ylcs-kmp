@@ -4,15 +4,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import love.yinlin.app
 import love.yinlin.common.GameMapper
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
@@ -165,7 +166,8 @@ class ScreenCreateGame(private val game: Game) : Screen() {
 
     @Composable
     override fun Content() {
-        when (LocalDevice.current.type) {
+        val deviceType by rememberDeviceType()
+        when (deviceType) {
             Device.Type.PORTRAIT -> Portrait()
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
         }

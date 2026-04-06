@@ -166,10 +166,12 @@ class ScreenLyricsSettings : BasicScreen() {
 
     @Composable
     override fun BasicContent() {
+        val deviceType by rememberDeviceType()
+
         Column(
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
-                .condition(LocalDevice.current.type == Device.Type.PORTRAIT, ifTrue = { fillMaxWidth() }, ifFalse = { width(Theme.size.cell1 * 1.5f) })
+                .condition(deviceType == Device.Type.PORTRAIT, ifTrue = { fillMaxWidth() }, ifFalse = { width(Theme.size.cell1 * 1.5f) })
                 .fillMaxHeight()
                 .padding(Theme.padding.eValue9)
                 .verticalScroll(rememberScrollState()),

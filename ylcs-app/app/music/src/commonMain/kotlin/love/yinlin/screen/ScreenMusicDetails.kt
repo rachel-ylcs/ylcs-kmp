@@ -623,7 +623,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
 
     @Composable
     override fun Content() {
-        when (LocalDevice.current.type) {
+        val deviceType by rememberDeviceType()
+        when (deviceType) {
             Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait()
             Device.Type.LANDSCAPE -> Landscape()
         }

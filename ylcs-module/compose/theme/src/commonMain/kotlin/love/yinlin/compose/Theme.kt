@@ -11,15 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Density
 import love.yinlin.compose.extension.localComposition
-import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.staticLocalComposition
 import org.jetbrains.compose.resources.FontResource
 
@@ -63,12 +60,6 @@ fun Theme(
             ThemeMode.DARK -> true
         }
 
-        val windowInfo = LocalWindowInfo.current
-        val device by rememberDerivedState {
-            val containerSize = windowInfo.containerDpSize
-            Device(containerSize.width, containerSize.height)
-        }
-
         val densityInfo = LocalDensity.current
         val density = remember(densityInfo, fontScale) { Density(densityInfo.density, fontScale) }
 
@@ -76,7 +67,6 @@ fun Theme(
 
         CompositionLocalProvider(
             LocalDarkMode provides isDarkMode,
-            LocalDevice provides device,
             LocalMainFontResource provides mainFontResource,
             LocalColorTheme provides colorTheme,
             LocalDensity provides density,

@@ -1,10 +1,13 @@
 package love.yinlin.compose
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
-import love.yinlin.compose.extension.staticLocalComposition
+import love.yinlin.compose.extension.rememberDerivedState
 
 @Stable
 @Serializable
@@ -48,4 +51,32 @@ data class Device(val size: Size, val type: Type) {
     )
 }
 
-val LocalDevice = staticLocalComposition<Device>()
+@Composable
+fun rememberDevice(): State<Device> {
+    val windowInfo = LocalWindowInfo.current
+    val device = rememberDerivedState {
+        val containerSize = windowInfo.containerDpSize
+        Device(containerSize.width, containerSize.height)
+    }
+    return device
+}
+
+@Composable
+fun rememberDeviceSize(): State<Device.Size> {
+    val windowInfo = LocalWindowInfo.current
+    val deviceSize = rememberDerivedState {
+        val containerSize = windowInfo.containerDpSize
+        Device(containerSize.width, containerSize.height).size
+    }
+    return deviceSize
+}
+
+@Composable
+fun rememberDeviceType(): State<Device.Type> {
+    val windowInfo = LocalWindowInfo.current
+    val deviceType = rememberDerivedState {
+        val containerSize = windowInfo.containerDpSize
+        Device(containerSize.width, containerSize.height).type
+    }
+    return deviceType
+}

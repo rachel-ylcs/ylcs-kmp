@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -13,11 +14,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import love.yinlin.app
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.BoxText
 import love.yinlin.compose.ui.common.PortraitValue
@@ -238,7 +239,8 @@ class ScreenUserCard(private val uid: Int) : Screen() {
     override fun Content() {
         val profile = currentProfile
         if (profile != null) {
-            when (LocalDevice.current.type) {
+            val deviceType by rememberDeviceType()
+            when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait(profile)
                 Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(profile)
             }

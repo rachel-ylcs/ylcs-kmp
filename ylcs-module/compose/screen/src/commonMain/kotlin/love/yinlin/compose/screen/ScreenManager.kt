@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -60,11 +59,10 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         ) {
             val manager = rememberBuild<Main>()
             val map = remember { ScreenMap().also(builder) }
-            val immersivePadding by rememberImmersivePadding()
 
             DeepLink.Register(deeplink, manager)
 
-            CompositionLocalProvider(LocalImmersivePadding provides immersivePadding) {
+            CompositionLocalProvider(LocalImmersivePadding provides rememberImmersivePadding()) {
                 NavDisplay(
                     backStack = manager.backStack,
                     modifier = modifier,

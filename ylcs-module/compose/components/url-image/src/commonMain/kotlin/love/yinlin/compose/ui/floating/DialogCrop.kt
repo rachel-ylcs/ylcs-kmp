@@ -28,7 +28,7 @@ class DialogCrop : Dialog<CropRegion>() {
 
     @Composable
     override fun Land() {
-        LandFloating {
+        LandFloating { _, _ ->
             Column(modifier = Modifier.fillMaxSize().background(Colors.Black).padding(LocalImmersivePadding.current)) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),

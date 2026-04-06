@@ -49,17 +49,17 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
 
     override fun alignment(device: Device): Alignment = Alignment.TopCenter
 
-    override fun enter(device: Device, animationSpeed: Int): EnterTransition = scaleIn(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
+    override fun enter(device: Device, animationDuration: Int): EnterTransition = scaleIn(
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing),
         initialScale = 0.0001f
     ) + fadeIn(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
     )
 
-    override fun exit(device: Device, animationSpeed: Int): ExitTransition = scaleOut(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+    override fun exit(device: Device, animationDuration: Int): ExitTransition = scaleOut(
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
     ) + fadeOut(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
     )
 
     override val zIndex: Float = Z_INDEX_TIP
@@ -87,7 +87,7 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
 
     @Composable
     fun Land() {
-        LandFloating { data ->
+        LandFloating { _, data ->
             val type = data.type
             val shape = Theme.shape.v4
             val padding = LocalImmersivePadding.current + PaddingValues(horizontal = Theme.padding.h10, vertical = Theme.padding.v4)

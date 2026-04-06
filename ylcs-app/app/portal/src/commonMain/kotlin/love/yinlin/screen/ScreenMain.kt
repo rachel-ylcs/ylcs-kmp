@@ -195,7 +195,8 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
 
     @Composable
     override fun DecorateContent(index: Int, content: @Composable () -> Unit) {
-        when (LocalDevice.current.type) {
+        val deviceType by rememberDeviceType()
+        when (deviceType) {
             Device.Type.PORTRAIT -> Portrait(index, content)
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(index, content)
         }

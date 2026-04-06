@@ -392,7 +392,8 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
     @Composable
     override fun Content() {
         targetActivity?.let {
-            when (LocalDevice.current.type) {
+            val deviceType by rememberDeviceType()
+            when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait(it)
                 Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(it)
             }

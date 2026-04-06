@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -15,12 +16,12 @@ import kotlinx.coroutines.supervisorScope
 import love.yinlin.app
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColorVariant
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.common.WeiboCard
@@ -259,7 +260,8 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     override fun Content() {
         val user = currentUser
         if (user != null) {
-            when (LocalDevice.current.type) {
+            val deviceType by rememberDeviceType()
+            when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait(user = user, albums = albums)
                 Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(user = user, albums = albums)
             }

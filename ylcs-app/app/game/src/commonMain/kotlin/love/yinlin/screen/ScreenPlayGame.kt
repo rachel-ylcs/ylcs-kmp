@@ -190,7 +190,8 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
     @Composable
     override fun Content() {
         Box(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            when (LocalDevice.current.type) {
+            val deviceType by rememberDeviceType()
+            when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait()
                 Device.Type.SQUARE, Device.Type.LANDSCAPE -> Landscape()
             }

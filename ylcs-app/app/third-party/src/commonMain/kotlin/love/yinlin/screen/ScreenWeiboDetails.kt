@@ -6,15 +6,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import love.yinlin.common.DataSourceWeibo
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.common.WeiboLayout
@@ -165,7 +166,8 @@ class ScreenWeiboDetails : Screen() {
     @Composable
     override fun Content() {
         currentWeibo?.let {
-            when (LocalDevice.current.type) {
+            val deviceType by rememberDeviceType()
+            when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait(weibo = it)
                 Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(weibo = it)
             }

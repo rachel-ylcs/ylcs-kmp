@@ -8,15 +8,16 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.getByData
 import love.yinlin.compose.data.keyList
 import love.yinlin.compose.extension.movableComposable
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.downloadPhoto
@@ -100,7 +101,8 @@ class ScreenImagePreview(rawImages: List<Picture>, initIndex: Int) : Screen() {
 
     @Composable
     override fun Content() {
-        when (LocalDevice.current.type) {
+        val deviceType by rememberDeviceType()
+        when (deviceType) {
             Device.Type.PORTRAIT -> Portrait()
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape()
         }

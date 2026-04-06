@@ -11,20 +11,14 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.rememberDevice
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.tool.NavigationBack
 
@@ -42,14 +36,16 @@ abstract class Floating<A : Any> {
      * 对齐方式
      */
     protected abstract fun alignment(device: Device): Alignment
+
     /**
      * 开始动画
      */
-    protected abstract fun enter(device: Device, animationSpeed: Int): EnterTransition
+    protected abstract fun enter(device: Device, animationDuration: Int): EnterTransition
+
     /**
      * 结束动画
      */
-    protected abstract fun exit(device: Device, animationSpeed: Int): ExitTransition
+    protected abstract fun exit(device: Device, animationDuration: Int): ExitTransition
 
     /**
      * 遮罩透明度
@@ -86,7 +82,7 @@ abstract class Floating<A : Any> {
      *
      * 仅在打开时执行一次
      */
-    protected open suspend fun initialize(args: A) {}
+    protected open suspend fun initialize(args: A) { }
 
     private var currentArgs: A? by mutableRefStateOf(null)
 
@@ -111,16 +107,16 @@ abstract class Floating<A : Any> {
     open fun close() { isOpen = false }
 
     @Composable
-    protected fun LandFloating(block: @Composable (args: A) -> Unit) {
-        val animationSpeed = Theme.animation.duration.default
-        val device = LocalDevice.current
+    protected fun LandFloating(block: @Composable (device: Device, args: A) -> Unit) {
+        val animationDuration = Theme.animation.duration.default
+        val device by rememberDevice()
 
         val transition = updateTransition(targetState = isOpen)
         if (transition.currentState || transition.targetState) {
             Box(modifier = Modifier.fillMaxSize().zIndex(zIndex)) {
                 if (showScrim) {
                     val alpha by transition.animateFloat(
-                        transitionSpec = { tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing) },
+                        transitionSpec = { tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing) },
                         targetValueByState = { if (it) scrimAlpha else 0f }
                     )
 
@@ -131,12 +127,12 @@ abstract class Floating<A : Any> {
 
                 transition.AnimatedVisibility(
                     visible = { it },
-                    enter = enter(device, animationSpeed),
-                    exit = exit(device, animationSpeed),
+                    enter = enter(device, animationDuration),
+                    exit = exit(device, animationDuration),
                     modifier = Modifier.align(alignment(device)).zIndex(2f)
                 ) {
                     currentArgs?.let { args ->
-                        block(args)
+                        block(device, args)
 
                         LaunchedEffect(Unit) {
                             initialize(args)

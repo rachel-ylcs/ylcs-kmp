@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -19,10 +20,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColor
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -302,7 +303,8 @@ open class RichEditorState(maxLength: Int) {
         onImeClick: (KeyboardActionScope.() -> Unit)?,
         modifier: Modifier = Modifier
     ) {
-        if (LocalDevice.current.type == Device.Type.PORTRAIT) {
+        val deviceType by rememberDeviceType()
+        if (deviceType == Device.Type.PORTRAIT) {
             Column(
                 modifier = modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,

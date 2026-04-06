@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -20,13 +21,13 @@ import love.yinlin.app
 import love.yinlin.common.DataSourceDiscovery
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColorVariant
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.BoxText
 import love.yinlin.compose.ui.common.UserBar
@@ -586,7 +587,8 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
     override fun Content() {
         val details = currentDetails
         if (details != null) {
-            when (LocalDevice.current.type) {
+            val deviceType by rememberDeviceType()
+            when (deviceType) {
                 Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(details = details)
                 Device.Type.LANDSCAPE -> Landscape(details = details)
             }

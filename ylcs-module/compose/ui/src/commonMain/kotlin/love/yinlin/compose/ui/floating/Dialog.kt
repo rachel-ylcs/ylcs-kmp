@@ -30,17 +30,17 @@ import love.yinlin.extension.catchingNull
 abstract class Dialog<R : Any> : Floating<Unit>() {
     override fun alignment(device: Device): Alignment = Alignment.Center
 
-    override fun enter(device: Device, animationSpeed: Int): EnterTransition = scaleIn(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
+    override fun enter(device: Device, animationDuration: Int): EnterTransition = scaleIn(
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing),
         initialScale = 0.0001f // 什么鬼bug, 反正不能为0, 否则对话框弹出时静止移动会失去焦点无法点击
     ) + fadeIn(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
     )
 
-    override fun exit(device: Device, animationSpeed: Int): ExitTransition = scaleOut(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+    override fun exit(device: Device, animationDuration: Int): ExitTransition = scaleOut(
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
     ) + fadeOut(
-        animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing)
+        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
     )
 
     override val zIndex: Float = Z_INDEX_DIALOG
@@ -105,7 +105,7 @@ abstract class Dialog<R : Any> : Floating<Unit>() {
 
     @Composable
     protected fun LandDialog(block: @Composable () -> Unit) {
-        LandFloating {
+        LandFloating { _, _ ->
             Surface(
                 modifier = Modifier.padding(LocalImmersivePadding.current + Theme.padding.eValue9),
                 shadowElevation = Theme.shadow.v1,

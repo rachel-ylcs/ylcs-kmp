@@ -424,8 +424,8 @@ class ScreenSettings : Screen() {
     @Composable
     override fun Content() {
         val profile = app.config.userProfile
-
-        when (LocalDevice.current.type) {
+        val deviceType by rememberDeviceType()
+        when (deviceType) {
             Device.Type.PORTRAIT, Device.Type.SQUARE -> Portrait(profile)
             Device.Type.LANDSCAPE -> Landscape(profile)
         }

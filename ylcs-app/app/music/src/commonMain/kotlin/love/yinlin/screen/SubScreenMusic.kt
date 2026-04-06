@@ -445,7 +445,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     override fun Content() {
         Box(modifier = Modifier.fillMaxSize().background(ColorSystem.Default.dark.background)) {
             ThemeContainer(ColorSystem.Default.dark.onBackground, ColorSystem.Default.dark.onBackgroundVariant) {
-                val device = LocalDevice.current.type
+                val deviceType by rememberDeviceType()
                 val immersivePadding = LocalImmersivePadding.current
 
                 MusicBackground(modifier = Modifier.fillMaxSize().blurSource(blurState).zIndex(1f))
@@ -468,7 +468,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     val player = mp
                     val isReady = player != null && player.isReady
 
-                    if (device == Device.Type.PORTRAIT) {
+                    if (deviceType == Device.Type.PORTRAIT) {
                         if (isReady) {
                             musicCoverLayout(Modifier
                                 .weight(1f, fill = false)
@@ -492,7 +492,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                     .shadow(Theme.shape.circle, Theme.shadow.v3)
                                 )
 
-                                val width = if (device == Device.Type.LANDSCAPE) Theme.size.cell1 else Theme.size.cell2
+                                val width = if (deviceType == Device.Type.LANDSCAPE) Theme.size.cell1 else Theme.size.cell2
                                 lyricsLayout(player, Modifier.width(width).fillMaxHeight().clip(Theme.shape.v5).blurTarget(blurState))
                             }
                         }
@@ -503,9 +503,9 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                         .fillMaxWidth()
                         .blurTarget(blurState)
                     ) {
-                        if (device == Device.Type.PORTRAIT && isReady) lyricsLayout(player, Modifier.fillMaxWidth().height(Theme.size.cell4))
+                        if (deviceType == Device.Type.PORTRAIT && isReady) lyricsLayout(player, Modifier.fillMaxWidth().height(Theme.size.cell4))
 
-                        if (device == Device.Type.LANDSCAPE) {
+                        if (deviceType == Device.Type.LANDSCAPE) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
                                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),

@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,12 +31,12 @@ import love.yinlin.app.global.resources.img_logo
 import love.yinlin.common.DataSourceAccount
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColor
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
@@ -264,7 +265,8 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
     override fun Content() {
         val profile = app.config.userProfile
         if (profile != null) {
-            when (LocalDevice.current.type) {
+            val deviceType by rememberDeviceType()
+            when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait(profile = profile)
                 Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(profile = profile)
             }

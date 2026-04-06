@@ -7,7 +7,7 @@ import kotlin.reflect.KProperty
 
 class LazyStateReference<T : Any> : BaseLazyReference<T> {
     private var mValue: T? by mutableStateOf(null)
-    override val isInit: Boolean by derivedStateOf { mValue != null }
+    override val isInit: Boolean get() = mValue != null
     override fun init(value: T) {
         if (mValue == null) mValue = value
     }

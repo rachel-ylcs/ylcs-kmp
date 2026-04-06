@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import love.yinlin.compose.Device
-import love.yinlin.compose.LocalDevice
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.container.Surface
@@ -54,23 +53,23 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd
     }
 
-    override fun enter(device: Device, animationSpeed: Int): EnterTransition = when (device.type) {
+    override fun enter(device: Device, animationDuration: Int): EnterTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideInVertically(
-            animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing),
             initialOffsetY = { it }
         )
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideInHorizontally(
-            animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing),
             initialOffsetX = { it }
         )
     }
 
-    override fun exit(device: Device, animationSpeed: Int): ExitTransition = when (device.type) {
+    override fun exit(device: Device, animationDuration: Int): ExitTransition = when (device.type) {
         Device.Type.PORTRAIT -> slideOutVertically(
             targetOffsetY = { it }
         )
         Device.Type.LANDSCAPE, Device.Type.SQUARE -> slideOutHorizontally(
-            animationSpec = tween(durationMillis = animationSpeed, easing = LinearOutSlowInEasing),
+            animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing),
             targetOffsetX = { it }
         )
     }
@@ -242,8 +241,8 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
 
     @Composable
     fun Land() {
-        LandFloating { args ->
-            when (LocalDevice.current.type) {
+        LandFloating { device, args ->
+            when (device.type) {
                 Device.Type.PORTRAIT -> PortraitSheet(args)
                 Device.Type.LANDSCAPE, Device.Type.SQUARE -> LandscapeSheet(args)
             }
