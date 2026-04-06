@@ -11,6 +11,7 @@ import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catchingNull
+import kotlin.reflect.KProperty
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -19,17 +20,36 @@ import kotlin.uuid.Uuid
  *
  * 负责管理启动服务的构建、异步初始化、读取、依赖解析
  */
-open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(rawContext) {
+open class StartupPool(
+    rawContext: PlatformContext,
+    @PublishedApi internal val startupMap: StartupMap,
+) : PlatformContextProvider(rawContext) {
     @PublishedApi
     internal var isClean = false
     @PublishedApi
     internal val factoryList = mutableListOf<StartupFactory<*>>()
-    @PublishedApi
-    internal val startupMap = mutableMapOf<String, Startup>()
 
     private var dependenciesMap = emptyMap<String, List<String>>()
     private var dependenciesList = emptyList<StartupFactory<*>>()
     private val taskMap = mutableMapOf<String, Deferred<Unit>>()
+
+    inline fun <reified S : Startup, F : StartupFactory<S>> startup(factory: F): StartupDelegate<S> {
+        if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
+        factoryList += factory
+        return object : StartupDelegate<S> {
+            val delegate by startupMap.delegate(factory.id)
+            override fun getValue(thisRef: Any?, property: KProperty<*>): S = delegate as S
+        }
+    }
+
+    inline fun <reified S : Startup, F : StartupFactory<S>> startupLazy(factory: F): StartupDelegate<S?> {
+        if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
+        factoryList += factory
+        return object : StartupDelegate<S?> {
+            val delegate by startupMap.delegate(factory.id)
+            override fun getValue(thisRef: Any?, property: KProperty<*>): S? = delegate as? S
+        }
+    }
 
     inline fun <reified S : Startup> require(id: String): S = startupMap[id] as S
 
@@ -38,18 +58,6 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
     inline fun <reified S : Startup> requireClass(): S = startupMap[StartupID<S>()] as S
 
     inline fun <reified S : Startup> requireClassOrNull(): S? = startupMap[StartupID<S>()] as? S
-
-    inline fun <reified S : Startup, F : StartupFactory<S>> startup(factory: F): StartupDelegate<S> {
-        if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
-        factoryList += factory
-        return StartupDelegate { _, _ -> startupMap[factory.id] as S }
-    }
-
-    inline fun <reified S : Startup, F : StartupFactory<S>> startupOrNull(factory: F): StartupNullableDelegate<S> {
-        if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
-        factoryList += factory
-        return StartupNullableDelegate { _, _ -> startupMap[factory.id] as? S }
-    }
 
     @OptIn(ExperimentalUuidApi::class)
     inline fun startup(
@@ -89,11 +97,14 @@ open class StartupPool(rawContext: PlatformContext) : PlatformContextProvider(ra
                         }
                         val startup = factory.build(pool)
                         Coroutines.catchingNull { startup.init() } ?: throw StartupError(id, "init")
-                        mutex.with { startupMap[id] = startup } // LinkedHashMap线程不安全
+                        Coroutines.main {
+                            mutex.with { startupMap[id] = startup } // LinkedHashMap线程不安全
+                        }
                     }
                     taskMap[id] = task
                     task
                 }.awaitAll()
+                dependenciesMap = emptyMap()
                 taskMap.clear()
             }
         }

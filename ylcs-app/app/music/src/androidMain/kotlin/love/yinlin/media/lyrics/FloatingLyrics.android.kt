@@ -75,7 +75,7 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
     }
 
     actual fun attach() {
-        mp.pool.activity?.let { activity ->
+        app.activity?.let { activity ->
             view.attach(activity) { app.config.enabledFloatingLyrics = false }
         }
     }

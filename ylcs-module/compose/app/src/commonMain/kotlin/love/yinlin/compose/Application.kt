@@ -16,8 +16,8 @@ import org.jetbrains.compose.resources.FontResource
 @Stable
 abstract class Application<out A : Application<A>>(
     private val self: BaseLazyReference<A>,
-    rawContext: PlatformContext,
-) : StartupPool(rawContext) {
+    rawContext: PlatformContext
+) : StartupPool(rawContext, StateStartupMap()) {
     protected open val themeMode: ThemeMode = ThemeMode.SYSTEM
     protected open val fontScale: Float = 1f
     protected open val mainFontResource: FontResource? = null

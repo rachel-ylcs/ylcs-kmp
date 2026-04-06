@@ -12,7 +12,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 abstract class RachelApplication(context: PlatformContext) : AbstractRachelApplication(context) {
-    private val mp by startupOrNull(StartupMusicPlayer.Factory())
+    val mp by startupLazy(StartupMusicPlayer.Factory())
 
     @Composable
     override fun Content() {

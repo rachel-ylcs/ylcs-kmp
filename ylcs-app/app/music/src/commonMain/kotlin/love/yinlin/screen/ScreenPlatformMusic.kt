@@ -32,7 +32,6 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.toJsonString
 import love.yinlin.foundation.NetClient
 import love.yinlin.fs.*
@@ -42,7 +41,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 class ScreenPlatformMusic(deeplink: Uri?, type: PlatformMusicType) : Screen() {
-    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private var platformType by mutableStateOf(type)
     private var linkState = InputState(deeplink?.toString() ?: "")

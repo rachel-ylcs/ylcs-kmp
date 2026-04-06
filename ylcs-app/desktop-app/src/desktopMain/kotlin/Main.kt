@@ -14,12 +14,10 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.coroutines.ioContext
 import love.yinlin.data.MimeType
-import love.yinlin.extension.lazyProvider
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.platform.AutoUpdate
 import love.yinlin.platform.SingleInstance
 import love.yinlin.startup.StartupMacOSDeepLink
-import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.compose.resources.DrawableResource
 
 fun main() {
@@ -29,8 +27,6 @@ fun main() {
         init {
             startup(StartupMacOSDeepLink.Factory { DeepLink.openUri(it) })
         }
-
-        private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
 
         override val title: String = "银临茶舍"
         override val icon: DrawableResource = Res.drawable.img_logo

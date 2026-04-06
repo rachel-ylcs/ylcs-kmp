@@ -64,7 +64,6 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catching
-import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.timeString
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.startup.StartupMusicPlayer
@@ -73,7 +72,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
-    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private var currentDebounceTime by mutableLongStateOf(0L)
 

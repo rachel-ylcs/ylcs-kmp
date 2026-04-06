@@ -51,7 +51,6 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.moveItem
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
@@ -78,7 +77,7 @@ class ScreenPlaylistLibrary : Screen() {
         fun path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
     }
 
-    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.keys }

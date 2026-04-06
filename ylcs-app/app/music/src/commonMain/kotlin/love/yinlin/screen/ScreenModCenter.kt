@@ -31,7 +31,6 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.SongPreview
-import love.yinlin.extension.lazyProvider
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
@@ -53,7 +52,7 @@ class ScreenModCenter : Screen() {
         )
     }
 
-    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val provider = RachelStatefulProvider()
 

@@ -36,7 +36,6 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
 import love.yinlin.fs.*
@@ -66,7 +65,7 @@ class ScreenCreateMusic : Screen() {
         }
     }
 
-    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val input = MusicInfoState()
 

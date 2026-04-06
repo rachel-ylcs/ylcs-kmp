@@ -48,7 +48,6 @@ import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.node.fastAnimateRotate
-import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.coroutines.Coroutines
@@ -59,7 +58,6 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.replaceAll
 import love.yinlin.fs.File
 import love.yinlin.mod.ModFactory
@@ -80,7 +78,7 @@ class ScreenMusicLibrary : Screen() {
 
     private fun MusicInfoPreview.path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
 
-    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()

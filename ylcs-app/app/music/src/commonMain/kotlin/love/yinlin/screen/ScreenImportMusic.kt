@@ -22,7 +22,6 @@ import love.yinlin.compose.ui.node.dragDrop
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.data.MimeType
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.lazyProvider
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.ImplicitUri
@@ -31,7 +30,7 @@ import love.yinlin.uri.Uri
 
 @Stable
 class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
-    private val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     @Stable
     private sealed interface Step {

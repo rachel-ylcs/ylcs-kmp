@@ -23,7 +23,6 @@ import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.SimpleEllipsisText
-import love.yinlin.extension.lazyProvider
 import love.yinlin.extension.moveItem
 import love.yinlin.media.lyrics.FloatingLyrics
 import love.yinlin.media.lyrics.LyricsEngineConfig
@@ -37,7 +36,7 @@ expect fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfi
 
 @Stable
 class ScreenLyricsSettings : BasicScreen() {
-    internal val mp by lazyProvider { app.requireClassOrNull<StartupMusicPlayer>() }
+    internal val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     internal var config by mutableRefStateOf(app.config.lyricsEngineConfig)
 
