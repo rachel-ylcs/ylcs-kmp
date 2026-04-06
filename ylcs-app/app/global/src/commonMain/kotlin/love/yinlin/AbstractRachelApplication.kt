@@ -33,7 +33,7 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     init {
         ClientEngine.init(Local.API_BASE_URL)
 
-        startup {
+        async {
             dataPath.mkdir()
             cachePath.mkdir()
             modPath.mkdir()

@@ -2,16 +2,11 @@ package love.yinlin.startup
 
 import kotlinx.browser.localStorage
 import love.yinlin.extension.*
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.File
 
-actual class StartupKV actual constructor(
-    pool: StartupPool,
-    initPath: File
-): Startup(pool) {
-    actual override suspend fun init() { }
-
+actual class StartupKV actual constructor(pool: StartupPool, initPath: File): SyncStartup(pool) {
     private fun setItem(key: String, value: String, expire: Int) {
         val time = if (expire == KVExpire.NEVER) expire else (DateEx.CurrentLong / 1000L).toInt() + expire
         localStorage.setItem(key, makeArray {

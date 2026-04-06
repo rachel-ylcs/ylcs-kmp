@@ -5,8 +5,8 @@ import kotlinx.io.Source
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingNull
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.io.Sources
 import love.yinlin.fs.File
 import love.yinlin.fs.safeSources
@@ -14,10 +14,8 @@ import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 
 @NativeLibApi
-actual class StartupPicker actual constructor(pool: StartupPool) : Startup(pool) {
+actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(pool) {
     private val handle: Long get() = pool.windowHandle ?: 0L
-
-    actual override suspend fun init() { }
 
     actual suspend fun pickPicture(): Source? = catchingNull {
         Coroutines.io {

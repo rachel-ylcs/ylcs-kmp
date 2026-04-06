@@ -1,6 +1,6 @@
 package love.yinlin.foundation
 
-abstract class Startup(val pool: StartupPool) {
+sealed class Startup(val pool: StartupPool) {
     abstract suspend fun init()
     open suspend fun initLater() { }
     open fun destroy() { }

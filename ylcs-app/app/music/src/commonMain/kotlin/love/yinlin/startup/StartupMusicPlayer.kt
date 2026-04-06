@@ -20,8 +20,8 @@ import love.yinlin.data.music.MusicPlaylist
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.foundation.Startup
-import love.yinlin.foundation.StartupFactory
+import love.yinlin.foundation.AsyncStartup
+import love.yinlin.foundation.AsyncStartupFactory
 import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
 import love.yinlin.fs.File
@@ -34,8 +34,8 @@ import love.yinlin.media.lyrics.LyricsEngineHost
 import kotlin.coroutines.CoroutineContext
 
 @Stable
-class StartupMusicPlayer(pool: StartupPool) : Startup(pool) {
-    class Factory : StartupFactory<StartupMusicPlayer> {
+class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
+    class Factory : AsyncStartupFactory<StartupMusicPlayer>() {
         override val id: String = StartupID<StartupMusicPlayer>()
         override val dependencies: List<String> = listOf(StartupID<StartupAppConfig>())
         override val dispatcher: CoroutineContext = mainContext

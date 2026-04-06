@@ -1,12 +1,11 @@
 package love.yinlin.foundation
 
-import love.yinlin.coroutines.cpuContext
 import kotlin.coroutines.CoroutineContext
 
 /**
  * 服务工厂
  */
-interface StartupFactory<S : Startup> {
+sealed interface StartupFactory<S : Startup> {
     /**
      * 唯一ID
      */
@@ -19,26 +18,39 @@ interface StartupFactory<S : Startup> {
 
     /**
      * 协程调度器
+     *
+     * 为空表示同步服务
      */
-    val dispatcher: CoroutineContext
+    val dispatcher: CoroutineContext?
 
     /**
      * 构建服务
      */
     fun build(pool: StartupPool): S
 
-
     companion object {
         @PublishedApi
-        internal inline fun anonymous(
+        internal inline fun sync(
+            id: String,
+            dependencies: List<String>,
+            crossinline block: () -> Unit
+        ): StartupFactory<Startup> = object : SyncStartupFactory<Startup>() {
+            override val id: String = id
+            override val dependencies: List<String> = dependencies
+            override fun build(pool: StartupPool): Startup = object : SyncStartup(pool) {
+                init { block() }
+            }
+        }
+
+        @PublishedApi
+        internal inline fun async(
             id: String,
             dependencies: List<String>,
             crossinline block: suspend () -> Unit
-        ): StartupFactory<Startup> = object : StartupFactory<Startup> {
+        ): StartupFactory<Startup> = object : AsyncStartupFactory<Startup>() {
             override val id: String = id
             override val dependencies: List<String> = dependencies
-            override val dispatcher: CoroutineContext = cpuContext
-            override fun build(pool: StartupPool): Startup = object : Startup(pool) {
+            override fun build(pool: StartupPool): Startup = object : AsyncStartup(pool) {
                 override suspend fun init() = block()
             }
         }

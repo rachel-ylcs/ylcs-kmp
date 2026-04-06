@@ -6,13 +6,11 @@ import love.yinlin.extension.catching
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.File
 
-expect class StartupKV(pool: StartupPool, initPath: File) : Startup {
-    override suspend fun init()
-
+expect class StartupKV(pool: StartupPool, initPath: File) : SyncStartup {
     fun set(key: String, value: Boolean, expire: Int = KVExpire.NEVER)
     fun set(key: String, value: Int, expire: Int = KVExpire.NEVER)
     fun set(key: String, value: Long, expire: Int = KVExpire.NEVER)

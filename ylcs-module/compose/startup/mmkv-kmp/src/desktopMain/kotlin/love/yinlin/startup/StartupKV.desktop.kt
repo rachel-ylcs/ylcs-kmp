@@ -2,18 +2,13 @@ package love.yinlin.startup
 
 import com.tencent.mmkv.MMKV
 import love.yinlin.annotation.NativeLibApi
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.File
 
 @NativeLibApi
-actual class StartupKV actual constructor(
-    pool: StartupPool,
-    initPath: File,
-): Startup(pool) {
+actual class StartupKV actual constructor(pool: StartupPool, initPath: File): SyncStartup(pool) {
     val kv: MMKV = MMKV(initPath.path)
-
-    actual override suspend fun init() { }
 
     actual fun set(key: String, value: Boolean, expire: Int) = kv.set(key, value, expire)
     actual fun set(key: String, value: Int, expire: Int) = kv.set(key, value, expire)

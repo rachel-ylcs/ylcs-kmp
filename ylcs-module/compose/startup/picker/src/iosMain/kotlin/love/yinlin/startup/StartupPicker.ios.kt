@@ -4,10 +4,10 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.*
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.toNSData
-import love.yinlin.foundation.Startup
 import love.yinlin.io.SandboxSource
 import love.yinlin.io.Sources
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.*
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
@@ -20,13 +20,11 @@ import platform.UIKit.*
 import platform.UniformTypeIdentifiers.*
 import platform.darwin.NSObject
 
-actual class StartupPicker actual constructor(pool: StartupPool) : Startup(pool) {
+actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(pool) {
     // 全局引用, 避免被gc
     lateinit var phPickerDelegate: PHPickerViewControllerDelegateProtocol
     lateinit var phPickerDismissDelegate: UIAdaptivePresentationControllerDelegateProtocol
     lateinit var documentPickerDelegate: UIDocumentPickerDelegateProtocol
-
-    actual override suspend fun init() { }
 
     @OptIn(ExperimentalForeignApi::class)
     private fun copyToTempDir(url: NSURL?): NSURL? {

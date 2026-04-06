@@ -46,11 +46,18 @@ open class StartupPool(
         startup(StartupFactoryWithDependency(factory, dependencies))
 
     @OptIn(ExperimentalUuidApi::class)
-    inline fun startup(
+    inline fun sync(
+        id: String = Uuid.generateV7().toString(),
+        dependencies: List<String> = emptyList(),
+        crossinline block: () -> Unit
+    ): StartupDelegate<Startup> = startup(StartupFactory.sync(id, dependencies, block))
+
+    @OptIn(ExperimentalUuidApi::class)
+    inline fun async(
         id: String = Uuid.generateV7().toString(),
         dependencies: List<String> = emptyList(),
         crossinline block: suspend () -> Unit
-    ): StartupDelegate<Startup> = startup(StartupFactory.anonymous(id, dependencies, block))
+    ): StartupDelegate<Startup> = startup(StartupFactory.async(id, dependencies, block))
 
     inline fun <reified S : Startup, F : StartupFactory<S>> startupLazy(factory: F): StartupDelegate<S?> {
         if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
@@ -88,27 +95,46 @@ open class StartupPool(
         val pool = this
         scope.launch(mainContext) {
             coroutineScope {
-                // 依赖表
+                val syncStartupSet = mutableSetOf<String>() // 同步服务集合
                 val mutex = Mutex()
-                dependenciesList.map { factory ->
+                // 遍历依赖表
+                dependenciesList.mapNotNull { factory ->
                     val id = factory.id
-                    // 并行加载
-                    val task = async(factory.dispatcher) {
-                        val dependencies = dependenciesMap[id] ?: emptyList()
-                        // 等待依赖服务完成
-                        for (dependentId in dependencies) {
-                            val dependencyTask = taskMap[dependentId]
-                            require(dependencyTask != null) { "Dependent startup $dependentId is not created"}
-                            dependencyTask.await()
+                    val dispatcher = factory.dispatcher
+                    val dependencies = dependenciesMap[id] ?: emptyList()
+
+                    if (dispatcher == null) { // 同步服务
+                        // 确保同步服务不依赖异步服务
+                        dependencies.find { it in taskMap }?.let { dependentId ->
+                            throw IllegalStateException("sync startup $id is dependent on async startup $dependentId")
                         }
-                        val startup = factory.build(pool)
-                        Coroutines.catchingNull { startup.init() } ?: throw StartupError(id, "init")
-                        Coroutines.main {
-                            mutex.with { startupMap[id] = startup } // LinkedHashMap线程不安全
-                        }
+                        // 初始化同步服务
+                        val startup = catchingNull { factory.build(pool) } ?: throw StartupError(id, "init")
+                        syncStartupSet += id
+                        mutex.with { startupMap[id] = startup }
+                        null
                     }
-                    taskMap[id] = task
-                    task
+                    else { // 异步服务
+                        // 并行加载
+                        val task = async(dispatcher) {
+                            // 等待依赖服务完成
+                            for (dependentId in dependencies) {
+                                val dependencyTask = taskMap[dependentId]
+                                // 依赖服务已经启动或依赖服务为同步服务
+                                if (dependencyTask == null) require(dependentId in syncStartupSet) { "Dependent startup $dependentId is not created"}
+                                else dependencyTask.await()
+                            }
+                            // 初始化异步服务
+                            val startup = Coroutines.catchingNull {
+                                factory.build(pool).also { it.init() }
+                            } ?: throw StartupError(id, "init")
+                            Coroutines.main {
+                                mutex.with { startupMap[id] = startup } // LinkedHashMap线程不安全
+                            }
+                        }
+                        taskMap[id] = task
+                        task
+                    }
                 }.awaitAll()
                 dependenciesMap = emptyMap()
                 taskMap.clear()
@@ -122,8 +148,8 @@ open class StartupPool(
                 dependenciesList.map { factory ->
                     val id = factory.id
                     // 并行加载
-                    async(factory.dispatcher) {
-                        // 等待init完成
+                    async(factory.dispatcher ?: mainContext) {
+                        // 等待init完成，同步任务不影响
                         taskMap[id]?.await()
                         // 继续initLater
                         val startup = startupMap[id]

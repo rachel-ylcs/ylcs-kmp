@@ -15,18 +15,16 @@ import love.yinlin.data.MimeType
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-actual class StartupPicker actual constructor(pool: StartupPool) : Startup(pool) {
+actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(pool) {
     @OptIn(ExperimentalUuidApi::class)
     private val generateKey: String get() = Uuid.generateV7().toString()
-
-    actual override suspend fun init() { }
 
     actual suspend fun pickPicture(): Source? = Coroutines.sync { future ->
         future.catching {

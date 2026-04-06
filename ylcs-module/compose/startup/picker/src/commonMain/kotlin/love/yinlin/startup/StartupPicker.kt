@@ -3,14 +3,12 @@ package love.yinlin.startup
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.data.MimeType
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.io.Sources
 import love.yinlin.uri.ImplicitUri
 
-expect class StartupPicker(pool: StartupPool) : Startup {
-    override suspend fun init()
-
+expect class StartupPicker(pool: StartupPool) : SyncStartup {
     suspend fun pickPicture(): Source?
     suspend fun pickPicture(maxNum: Int): Sources<Source>?
     suspend fun pickFile(mimeType: List<String> = emptyList(), filter: List<String> = emptyList()): Source?

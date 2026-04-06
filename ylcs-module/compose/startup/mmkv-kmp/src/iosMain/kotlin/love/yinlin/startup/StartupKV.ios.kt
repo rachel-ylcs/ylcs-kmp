@@ -4,22 +4,17 @@ import cocoapods.MMKV.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.extension.toNSData
 import love.yinlin.extension.toByteArray
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.File
 
 @OptIn(ExperimentalForeignApi::class)
-actual class StartupKV actual constructor(
-    pool: StartupPool,
-    initPath: File
-): Startup(pool) {
+actual class StartupKV actual constructor(pool: StartupPool, initPath: File): SyncStartup(pool) {
     // MMKV initialized in swift code
     val mmkv: MMKV = run {
         MMKV.initializeMMKV(null, 4UL) // MMKVLogLevel.LevelNone
         MMKV.defaultMMKV()!!
     }
-
-    actual override suspend fun init() { }
 
     actual fun set(key: String, value: Boolean, expire: Int)  { mmkv.setBool(value, key, expire.toUInt()) }
     actual fun set(key: String, value: Int, expire: Int) { mmkv.setInt32(value, key, expire.toUInt()) }

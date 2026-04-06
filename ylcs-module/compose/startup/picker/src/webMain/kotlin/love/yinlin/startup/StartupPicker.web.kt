@@ -13,8 +13,8 @@ import love.yinlin.data.MimeType
 import love.yinlin.extension.cast
 import love.yinlin.extension.createElement
 import love.yinlin.extension.jsArrayOf
-import love.yinlin.foundation.Startup
 import love.yinlin.foundation.StartupPool
+import love.yinlin.foundation.SyncStartup
 import love.yinlin.io.ArrayBufferSource
 import love.yinlin.io.ScriptWorker
 import love.yinlin.io.Sources
@@ -32,9 +32,7 @@ import kotlin.js.JsArray
 import kotlin.js.get
 import kotlin.js.toList
 
-actual class StartupPicker actual constructor(pool: StartupPool) : Startup(pool) {
-    actual override suspend fun init() { }
-
+actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(pool) {
     private fun htmlFileInput(multiple: Boolean, filter: String, block: (FileList?) -> Unit) {
         createElement<HTMLInputElement> {
             type = "file"
