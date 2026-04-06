@@ -45,7 +45,7 @@ enum class ModResourceType(
     ),
     Rhyme(
         type = "rhyme",
-        description = "音游配置"
+        description = "动态歌词"
     ),
     Accompaniment(
         type = "accompaniment",
