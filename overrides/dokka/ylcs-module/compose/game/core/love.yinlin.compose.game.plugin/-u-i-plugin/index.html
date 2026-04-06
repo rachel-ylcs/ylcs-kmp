@@ -1,0 +1,329 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>UIPlugin</title>
+<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.5
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:game:core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:game:core/commonMain" data-filter=":ylcs-module:compose:game:core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.game.core::love.yinlin.compose.game.plugin/UIPlugin///PointingToDeclaration//-2085504332">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.game.core</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose.game.plugin</a><span class="delimiter">/</span><span class="current">UIPlugin</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>UIPlugin</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">UIPlugin</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">engine<span class="token operator">: </span><a href="../../love.yinlin.compose.game/-engine/index.html">Engine</a></span></span><span class="token punctuation">)</span> : <a href="../-plugin/index.html">Plugin</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1158732822%2FConstructors%2F-2085504332" anchor-label="UIPlugin" id="1158732822%2FConstructors%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-u-i-plugin.html"><span><span>UIPlugin</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1158732822%2FConstructors%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">engine<span class="token operator">: </span><a href="../../love.yinlin.compose.game/-engine/index.html">Engine</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-838091565%2FProperties%2F-2085504332" anchor-label="dependencies" id="-838091565%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/dependencies.html"><span><span>dependencies</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-838091565%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="../-plugin/dependencies.html">dependencies</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.reflect/-k-class/index.html">KClass</a><span class="token operator">&lt;</span><span class="token keyword">out </span><a href="../-plugin/index.html">Plugin</a><span class="token operator">&gt;</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">前置依赖插件</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1048755942%2FProperties%2F-2085504332" anchor-label="engine" id="-1048755942%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/engine.html"><span><span>engine</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1048755942%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="../-plugin/engine.html">engine</a><span class="token operator">: </span><a href="../../love.yinlin.compose.game/-engine/index.html">Engine</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-661230623%2FProperties%2F-2085504332" anchor-label="id" id="-661230623%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/id.html"><span><span>id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-661230623%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">val </span><a href="../-plugin/id.html">id</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">唯一标识符</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1091362256%2FProperties%2F-2085504332" anchor-label="idString" id="1091362256%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/id-string.html"><span>id</span><wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1091362256%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">val </span><a href="../-plugin/id-string.html">idString</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">可读ID</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-440088941%2FProperties%2F-2085504332" anchor-label="layerOrder" id="-440088941%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="layer-order.html"><span>layer</span><wbr><span><span>Order</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-440088941%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="layer-order.html">layerOrder</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">层级</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="1253269800%2FFunctions%2F-2085504332" anchor-label="compareTo" id="1253269800%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/compare-to.html"><span>compare</span><wbr><span><span>To</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1253269800%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-plugin/compare-to.html"><span class="token function">compareTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="../../love.yinlin.compose.game.traits/-identifiable/index.html">Identifiable</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1597717462%2FFunctions%2F-2085504332" anchor-label="Content" id="-1597717462%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/-content.html"><span><span>Content</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1597717462%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Composable///PointingToDeclaration/"><span class="token annotation builtin">Composable</span></span></div></div><span class="token keyword">open </span><span class="token keyword">fun </span><span data-unresolved-link="androidx.compose.foundation.layout/BoxScope///PointingToDeclaration/">BoxScope</span><span class="token punctuation">.</span><a href="../-plugin/-content.html"><span class="token function">Content</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">内容</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-520453723%2FFunctions%2F-2085504332" anchor-label="equals" id="-520453723%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/equals.html"><span><span>equals</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-520453723%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">operator override </span><span class="token keyword">fun </span><a href="../-plugin/equals.html"><span class="token function">equals</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">other<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1912387167%2FFunctions%2F-2085504332" anchor-label="hashCode" id="-1912387167%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/hash-code.html"><span>hash</span><wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1912387167%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-plugin/hash-code.html"><span class="token function">hashCode</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1647176211%2FFunctions%2F-2085504332" anchor-label="onInitialize" id="-1647176211%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/on-initialize.html"><span>on</span><wbr><span><span>Initialize</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1647176211%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="../-plugin/on-initialize.html"><span class="token function">onInitialize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">初始化</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2025636394%2FFunctions%2F-2085504332" anchor-label="onRelease" id="-2025636394%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/on-release.html"><span>on</span><wbr><span><span>Release</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2025636394%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../-plugin/on-release.html"><span class="token function">onRelease</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">销毁</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2090553232%2FFunctions%2F-2085504332" anchor-label="toString" id="-2090553232%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../-plugin/to-string.html"><span>to</span><wbr><span><span>String</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2090553232%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">override </span><span class="token keyword">fun </span><a href="../-plugin/to-string.html"><span class="token function">toString</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

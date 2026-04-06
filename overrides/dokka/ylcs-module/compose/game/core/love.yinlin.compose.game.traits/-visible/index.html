@@ -1,0 +1,524 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Visible</title>
+<link href="../../../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.5.5
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector common-like" data-active="" aria-pressed="true" data-filter=":ylcs-module:compose:game:core/commonMain">common</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option common-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":ylcs-module:compose:game:core/commonMain" data-filter=":ylcs-module:compose:game:core/commonMain">
+                                <span class="checkbox--icon"></span>
+                                common
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="love.yinlin.compose.game.core::love.yinlin.compose.game.traits/Visible///PointingToDeclaration//-2085504332">
+  <div class="breadcrumbs"><a href="../../index.html">love.yinlin.compose.game.core</a><span class="delimiter">/</span><a href="../index.html">love.yinlin.compose.game.traits</a><span class="delimiter">/</span><span class="current">Visible</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Visible</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="androidx.compose.runtime/Stable///PointingToDeclaration/"><span class="token annotation builtin">Stable</span></span></div></div><span class="token keyword">abstract </span><span class="token keyword">class </span><a href="index.html">Visible</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">position<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token operator"> = </span>Offset.Zero<span class="token punctuation">, </span></span><span class="parameter ">size<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Size///PointingToDeclaration/">Size</span><span class="token operator"> = </span>Size.Zero<span class="token punctuation">, </span></span><span class="parameter ">aabb<span class="token operator">: </span><a href="../-a-a-b-b/index.html">AABB</a><span class="token operator"> = </span>AABB.Box<span class="token punctuation">, </span></span><span class="parameter ">visible<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">useCulling<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div><p class="paragraph">可视实体</p></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1953475901%2FConstructors%2F-2085504332" anchor-label="Visible" id="1953475901%2FConstructors%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-visible.html"><span><span>Visible</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1953475901%2FConstructors%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">position<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span><span class="token operator"> = </span>Offset.Zero<span class="token punctuation">, </span></span><span class="parameter ">size<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Size///PointingToDeclaration/">Size</span><span class="token operator"> = </span>Size.Zero<span class="token punctuation">, </span></span><span class="parameter ">aabb<span class="token operator">: </span><a href="../-a-a-b-b/index.html">AABB</a><span class="token operator"> = </span>AABB.Box<span class="token punctuation">, </span></span><span class="parameter ">visible<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">useCulling<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1898396247%2FProperties%2F-2085504332" anchor-label="aabb" id="1898396247%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="aabb.html"><span><span>aabb</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1898396247%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="aabb.html">aabb</a><span class="token operator">: </span><a href="../-a-a-b-b/index.html">AABB</a></div><div class="brief "><p class="paragraph">碰撞箱</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1948112297%2FProperties%2F-2085504332" anchor-label="bottomCenter" id="-1948112297%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bottom-center.html"><span>bottom</span><wbr><span><span>Center</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1948112297%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="bottom-center.html">bottomCenter</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1414690139%2FProperties%2F-2085504332" anchor-label="bottomLeft" id="-1414690139%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bottom-left.html"><span>bottom</span><wbr><span><span>Left</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1414690139%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="bottom-left.html">bottomLeft</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="327686642%2FProperties%2F-2085504332" anchor-label="bottomRight" id="327686642%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bottom-right.html"><span>bottom</span><wbr><span><span>Right</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="327686642%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="bottom-right.html">bottomRight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1929685214%2FProperties%2F-2085504332" anchor-label="bounds" id="-1929685214%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="bounds.html"><span><span>bounds</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1929685214%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="bounds.html">bounds</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Rect///PointingToDeclaration/">Rect</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1448351106%2FProperties%2F-2085504332" anchor-label="center" id="1448351106%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="center.html"><span><span>center</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1448351106%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="center.html">center</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div><div class="brief "><p class="paragraph">中心点</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-293486405%2FProperties%2F-2085504332" anchor-label="centerLeft" id="-293486405%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="center-left.html"><span>center</span><wbr><span><span>Left</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-293486405%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="center-left.html">centerLeft</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="725264028%2FProperties%2F-2085504332" anchor-label="centerRight" id="725264028%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="center-right.html"><span>center</span><wbr><span><span>Right</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="725264028%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="center-right.html">centerRight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-941861529%2FProperties%2F-2085504332" anchor-label="clip" id="-941861529%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="clip.html"><span><span>clip</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-941861529%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="clip.html">clip</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></div><div class="brief "><p class="paragraph">是否裁切溢出</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1701322706%2FProperties%2F-2085504332" anchor-label="layer" id="1701322706%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="layer.html"><span><span>layer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1701322706%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="layer.html">layer</a><span class="token operator">: </span><a href="../-layer/index.html">Layer</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-246373030%2FProperties%2F-2085504332" anchor-label="layerOrder" id="-246373030%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="layer-order.html"><span>layer</span><wbr><span><span>Order</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-246373030%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="layer-order.html">layerOrder</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">层级</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1286005099%2FProperties%2F-2085504332" anchor-label="maxDimension" id="-1286005099%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="max-dimension.html"><span>max</span><wbr><span><span>Dimension</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1286005099%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="max-dimension.html">maxDimension</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1356555267%2FProperties%2F-2085504332" anchor-label="minDimension" id="1356555267%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="min-dimension.html"><span>min</span><wbr><span><span>Dimension</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1356555267%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="min-dimension.html">minDimension</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-640456530%2FProperties%2F-2085504332" anchor-label="position" id="-640456530%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="position.html"><span><span>position</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-640456530%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="position.html">position</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div><div class="brief "><p class="paragraph">位置</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-221702340%2FProperties%2F-2085504332" anchor-label="rotate" id="-221702340%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="rotate.html"><span><span>rotate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-221702340%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="rotate.html">rotate</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">旋转</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1571412487%2FProperties%2F-2085504332" anchor-label="scale" id="-1571412487%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="scale.html"><span><span>scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1571412487%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="scale.html">scale</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">缩放</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1148391894%2FProperties%2F-2085504332" anchor-label="size" id="1148391894%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="size.html"><span><span>size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1148391894%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="size.html">size</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Size///PointingToDeclaration/">Size</span></div><div class="brief "><p class="paragraph">大小</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1915293241%2FProperties%2F-2085504332" anchor-label="topCenter" id="1915293241%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="top-center.html"><span>top</span><wbr><span><span>Center</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1915293241%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="top-center.html">topCenter</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1933574393%2FProperties%2F-2085504332" anchor-label="topLeft" id="-1933574393%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="top-left.html"><span>top</span><wbr><span><span>Left</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1933574393%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="top-left.html">topLeft</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1422143952%2FProperties%2F-2085504332" anchor-label="topRight" id="1422143952%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="top-right.html"><span>top</span><wbr><span><span>Right</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1422143952%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="top-right.html">topRight</a><span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Offset///PointingToDeclaration/">Offset</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-959637557%2FProperties%2F-2085504332" anchor-label="trigger" id="-959637557%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="trigger.html"><span><span>trigger</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-959637557%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="trigger.html">trigger</a><span class="token operator">: </span><a href="../-trigger/index.html">Trigger</a><span class="token operator">?</span><span class="token operator"> = </span>null</div><div class="brief "><p class="paragraph">触发器</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="964043345%2FProperties%2F-2085504332" anchor-label="visible" id="964043345%2FProperties%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="visible.html"><span><span>visible</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="964043345%2FProperties%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="visible.html">visible</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">可见</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="308245128%2FFunctions%2F-2085504332" anchor-label="initializeDraw" id="308245128%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="initialize-draw.html"><span>initialize</span><wbr><span><span>Draw</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="308245128%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../love.yinlin.compose.game.drawer/-initial-drawer/index.html">InitialDrawer</a><span class="token punctuation">.</span><a href="initialize-draw.html"><span class="token function">initializeDraw</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">viewportSize<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Size///PointingToDeclaration/">Size</span><span class="token punctuation">, </span></span><span class="parameter ">viewportBounds<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Rect///PointingToDeclaration/">Rect</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">初始化绘制</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="81875137%2FFunctions%2F-2085504332" anchor-label="onDraw" id="81875137%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="on-draw.html"><span>on</span><wbr><span><span>Draw</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="81875137%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="../../love.yinlin.compose.game.drawer/-drawer/index.html">Drawer</a><span class="token punctuation">.</span><a href="on-draw.html"><span class="token function">onDraw</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">绘制</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="7521882%2FFunctions%2F-2085504332" anchor-label="prepareDraw" id="7521882%2FFunctions%2F-2085504332" data-filterable-set=":ylcs-module:compose:game:core/commonMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":ylcs-module:compose:game:core/commonMain" data-filterable-set=":ylcs-module:compose:game:core/commonMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="prepare-draw.html"><span>prepare</span><wbr><span><span>Draw</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="7521882%2FFunctions%2F-2085504332"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":ylcs-module:compose:game:core/commonMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../love.yinlin.compose.game.drawer/-prepare-drawer/index.html">PrepareDrawer</a><span class="token punctuation">.</span><a href="prepare-draw.html"><span class="token function">prepareDraw</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">viewportSize<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Size///PointingToDeclaration/">Size</span><span class="token punctuation">, </span></span><span class="parameter ">viewportBounds<span class="token operator">: </span><span data-unresolved-link="androidx.compose.ui.geometry/Rect///PointingToDeclaration/">Rect</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">绘制预处理</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
