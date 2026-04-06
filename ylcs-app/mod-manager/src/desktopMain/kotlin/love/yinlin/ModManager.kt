@@ -23,10 +23,9 @@ class MainApplication : PlatformApplication<MainApplication>(appReference) {
     val modPath = File(rootPath, "mod")
 
     init {
-        startup {
+        async {
             libraryPath.mkdir()
             outputPath.mkdir()
-            println("ok")
         }
     }
 

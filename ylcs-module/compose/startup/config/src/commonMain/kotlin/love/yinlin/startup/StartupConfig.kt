@@ -19,8 +19,8 @@ import love.yinlin.foundation.SyncStartupFactory
 @Stable
 open class StartupConfig(
     pool: StartupPool,
-    private val version: Int,
-    private val patches: Patches
+    version: Int,
+    patches: Patches
 ) : SyncStartup(pool) {
     companion object {
         inline fun <reified S : StartupConfig> custom(

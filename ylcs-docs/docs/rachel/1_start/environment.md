@@ -10,20 +10,20 @@
 `IDEA`的版本建议使用最新版本，因为框架使用到的`Kotlin`或`AGP`版本可能依赖于最新的`IDEA`版本，
 在开发前请在插件市场中安装以下插件来完善你的开发体验：
 
-|                      插件                       |                插件                 |
-|:---------------------------------------------:|:---------------------------------:|
-|                    Android                    |               Ktor                |
-|             Compose Multiplatform             | Kotlin Multiplatform (Only macOS) |
-| Compose Multiplatform for Desktop IDE Support |                                   |
+|                      插件                       |          插件          |
+|:---------------------------------------------:|:--------------------:|
+|                    Android                    |         Ktor         |
+|             Compose Multiplatform             | Kotlin Multiplatform |
+| Compose Multiplatform for Desktop IDE Support |                      |
 
-然后你需要为构建系统准备`Gradle`，参考版本：`9.2.1`。
+然后你需要为构建系统准备`Gradle`，参考版本：`9.4.0`。
 
 !!! Tip
-    `Gradle`下载链接: [https://services.gradle.org/distributions/gradle-9.2.1-all.zip](https://services.gradle.org/distributions/gradle-9.1.0-all.zip)
+    `Gradle`下载链接: [https://services.gradle.org/distributions/gradle-9.4.0-all.zip](https://services.gradle.org/distributions/gradle-9.1.0-all.zip)
     
     如果你的网络状态较差可以单独下载或从其他镜像源下载然后手动拷贝到`.gradle`目录。
 
-除此之外，你还需要准备`Java SDK`，其中桌面开发最低版本为`JDK 25`，Android开发最低版本为`JDK 21`。
+除此之外，你还需要准备`Java SDK`，其中桌面开发最低版本为`JDK 25`，Android开发最低版本为`JDK 25`。
 然后设置好JDK的环境变量，并将你项目结构中使用的SDK设置为此JDK。
 
 !!! Tip

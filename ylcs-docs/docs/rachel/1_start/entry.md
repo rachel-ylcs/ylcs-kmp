@@ -13,10 +13,10 @@
 简单起见，从CMP项目中创建一个target为desktop的项目，然后在Main.kt中填写如下代码，这便是一个最简单的Rachel框架客户端程序。
 
 ```kotlin
-private val mApp = LazyReference<RachelApplication>()
-val app: RachelApplication by mApp
+private val mApp = LazyStateReference<MyApplication>()
+val app: MyApplication by mApp
 
-class MyApplication : PlatformApplication<MyApplication>(mApp, PlatformContextDelegate) {
+class MyApplication : PlatformApplication<MyApplication>(mApp, PlatformContext.Instance) {
     @Composable
     override fun Content() {
         Text("hello world!")

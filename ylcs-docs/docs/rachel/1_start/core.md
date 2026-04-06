@@ -1,10 +1,6 @@
-`Rachel`框架的核心主要包括三个，分别位于`core`、`compose-core`、`cs-core`三个模块，主要提供了更底层的类型设置、数据结构和语法糖形式。
-
-其中`core`是最底层的核心模块，`compose-core`是UI层模块，`cs-core`是C/S交互层模块。
-
 ## Core 模块
 
-核心模块封装了大部分工具函数与操作，对一些特定情景提供了`DSL`方便编写代码，如无特殊说明，大部分函数均是异常安全的，发生错误时仅返回空值。
+核心模块封装了大部分工具函数与操作，对一些特定情景提供了`DSL`范式方便编写代码，如无特殊说明，大部分函数均是异常安全的，发生错误时仅返回空值。
 
 ### (1) 平台 love.yinlin.platform.Platform
 
@@ -46,15 +42,11 @@ Platform.use(Platform.Android) {
 
     `mainContext`, `cpuContext`, `ioContext`, `waitContext`
 
-2. 非协程作用域启动
-    
-    `startMain`, `startCPU`, `startIO`, `startWait`
-
-3. 协程作用域启动新协程
+2. 协程作用域启动新协程
 
     `main`, `cpu`, `io`, `wait`
 
-4. 协程上下文切换
+3. 协程上下文切换
 
     `with`
 

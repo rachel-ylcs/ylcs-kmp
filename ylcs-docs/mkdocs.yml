@@ -9,14 +9,13 @@ nav:
     - 跨平台UI:
         - 1. 程序入口: rachel/2_ui/entry.md
         - 2. 上下文环境: rachel/2_ui/context.md
-        - 3. 设备: rachel/2_ui/device.md
-        - 4. 主题: rachel/2_ui/theme.md
-        - 5. 导航: rachel/2_ui/navigation.md
-        - 6. 服务: rachel/2_ui/service.md
-        - 7. 网络: rachel/2_ui/network.md
-        - 8. 组件: rachel/2_ui/component.md
-        - 9. 浮窗: rachel/2_ui/floating.md
-        - 10. 平台组件: rachel/2_ui/platform_component.md
+        - 3. 主题: rachel/2_ui/theme.md
+        - 4. 导航: rachel/2_ui/navigation.md
+        - 5. 服务: rachel/2_ui/service.md
+        - 6. 网络: rachel/2_ui/network.md
+        - 7. 组件: rachel/2_ui/component.md
+        - 8. 浮窗: rachel/2_ui/floating.md
+        - 9. 平台组件: rachel/2_ui/platform_component.md
     - 客户端引擎:
         - 1. 配置入口: rachel/3_client/entry.md
         - 2. HTTP请求: rachel/3_client/request.md

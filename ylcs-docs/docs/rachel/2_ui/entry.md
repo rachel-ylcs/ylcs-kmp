@@ -6,10 +6,10 @@
 下面是快速开始中的示例:
 
 ```kotlin
-private val mApp = LazyReference<RachelApplication>()
-val app: RachelApplication by mApp
+private val mApp = LazyStateReference<MyApplication>()
+val app: MyApplication by mApp
 
-class MyApplication(delegate: PlatformContextDelegate) : PlatformApplication<MyApplication>(mApp, delegate) {
+class MyApplication : PlatformApplication<MyApplication>(mApp, PlatformContext.Instance) {
     @Composable
     override fun Content() {
         Text("hello world!")
@@ -32,7 +32,7 @@ fun main() = MyApplicaiton().run()
 
 #### 自引用实例：
 ```kotlin
-private val mApp = LazyReference<RachelApplication>()
+private val mApp = LazyStateReference<RachelApplication>()
 val app: RachelApplication by mApp
 ```
 
@@ -58,12 +58,12 @@ val app: RachelApplication by mApp
 class MainActivity : ComposeActivity()
 ```
 
-而在`MainApplication`中是真正的入口，你只需要将你的`MyApplication`重写instance便交给框架托管，你也不需要写任何其他代码。
+而在`MainApplication`中是真正的入口，你只需要将你的`MyApplication`重写instance便交给框架托管，不需要写任何其他代码。
 
 ```kotlin
 // MainApplication.kt
 class MainApplication : ComposeApplication() {
-    override val instance = MyApplication(this)
+    override fun buildInstance() = object : MyApplication(this) { }
 }
 ```
 
@@ -80,7 +80,7 @@ class MainApplication : ComposeApplication() {
 
 ```kotlin
 // MainViewController.kt
-fun MainViewController() = MyApplication(PlatformContextDelegate).run()
+fun MainViewController() = MyApplication(PlatformContext.Instance).run()
 ```
 
 ### Desktop
@@ -89,7 +89,7 @@ fun MainViewController() = MyApplication(PlatformContextDelegate).run()
 
 ```kotlin
 // main.kt
-fun main() = MyApplication(PlatformContextDelegate).run()
+fun main() = MyApplication(PlatformContext.Instance).run()
 ```
 
 ### Web
@@ -98,7 +98,7 @@ fun main() = MyApplication(PlatformContextDelegate).run()
 
 ```kotlin
 // main.kt
-fun main() = MyApplication(PlatformContextDelegate).run()
+fun main() = MyApplication(PlatformContext.Instance).run()
 ```
 
 ## 平台侧代码
@@ -109,7 +109,7 @@ fun main() = MyApplication(PlatformContextDelegate).run()
 
 ```kotlin
 // main.kt
-fun main() = object : MyApplication(PlatformContextDelegate) {
+fun main() = object : MyApplication(PlatformContext.Instance) {
     // 重写后便可以设置平台特定的配置
     override val title: String = "MyApplication"
     override val icon: DrawableResource = Res.drawable.img_logo
