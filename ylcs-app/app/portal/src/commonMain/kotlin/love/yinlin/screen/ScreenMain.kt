@@ -25,9 +25,11 @@ import love.yinlin.compose.screen.DataSource
 import love.yinlin.compose.screen.MultiDataSource
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.text.SimpleClipText
+import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.compose.ui.text.TextIconBinder
 import org.jetbrains.compose.resources.DrawableResource
@@ -125,7 +127,7 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
             shadowElevation = Theme.shadow.v1,
             tonalLevel = 5
         ) {
-            Column(modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState())) {
+            Column(modifier = Modifier.width(Theme.size.cell4).fillMaxHeight().verticalScroll(rememberScrollState())) {
                 TabItem.entries.fastForEachIndexed { i, item ->
                     val isCurrent = i == index
                     val primaryColor = Theme.color.primary
@@ -134,8 +136,10 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                         animationSpec = tween(Theme.animation.duration.v5)
                     )
 
-                    TextIconAdapter(
-                        modifier = Modifier.drawBehind {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            navigateSubScreen(i)
+                        }.drawBehind {
                             val (boxWidth, boxHeight) = this.size
                             val indicatorRatio = indicatorAngle.value / 720
                             val indicatorWidth = boxWidth * 0.03f
@@ -145,24 +149,33 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
                                 size = Size(indicatorWidth, indicatorRatio * boxHeight),
                                 cornerRadius = CornerRadius(indicatorWidth)
                             )
-                        }.clickable {
-                            navigateSubScreen(i)
-                        }.padding(Theme.padding.value8),
-                        gapRatio = 1f
-                    ) { idIcon, idText ->
+                        }.padding(Theme.padding.value9),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
                             icon = if (isCurrent) item.iconActive else item.iconNormal,
-                            modifier = Modifier.fastRotate(indicatorAngle).idIcon()
+                            modifier = Modifier.size(Theme.size.smallIcon).fastRotate(indicatorAngle)
                         )
                         SimpleClipText(
                             text = item.title,
                             color = if (isCurrent) primaryColor else LocalColor.current,
-                            style = Theme.typography.v6.bold,
-                            modifier = Modifier.idText()
+                            style = Theme.typography.v7.bold,
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
                 Box(modifier = Modifier.weight(1f))
+                Row(
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        navigate(::ScreenSettings)
+                    }.padding(Theme.padding.value9),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(icon = Icons.Settings, modifier = Modifier.size(Theme.size.smallIcon))
+                    SimpleClipText(text = "设置", style = Theme.typography.v7.bold, modifier = Modifier.weight(1f))
+                }
             }
         }
     }

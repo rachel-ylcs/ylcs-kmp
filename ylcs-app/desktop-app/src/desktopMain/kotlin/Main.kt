@@ -1,6 +1,8 @@
 package love.yinlin
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ApplicationScope
 import kotlinx.coroutines.launch
 import love.yinlin.app.global.resources.Res
@@ -37,7 +39,8 @@ fun main() {
                 Icon(
                     icon = Icons.CleaningServices,
                     tip = "GC",
-                    onClick = System::gc
+                    onClick = System::gc,
+                    modifier = Modifier.size(Theme.size.smallIcon)
                 )
             }
 
@@ -50,13 +53,15 @@ fun main() {
                             AutoUpdate.start(path.path)
                         }
                     }
-                }
+                },
+                modifier = Modifier.size(Theme.size.smallIcon)
             )
 
             Icon(
                 icon = if (controller.alwaysOnTop) Icons.MobiledataOff else Icons.VerticalAlignTop,
                 tip = if (controller.alwaysOnTop) Theme.value.windowAlwaysTopDisableText else Theme.value.windowAlwaysTopEnableText,
-                onClick = { controller.alwaysOnTop = !controller.alwaysOnTop }
+                onClick = { controller.alwaysOnTop = !controller.alwaysOnTop },
+                modifier = Modifier.size(Theme.size.smallIcon)
             )
 
             DefaultTopBarActions(controller, onExit)

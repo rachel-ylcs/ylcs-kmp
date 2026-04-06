@@ -23,17 +23,20 @@ fun DefaultTopBarActions(controller: WindowController, onExit: () -> Unit) {
     Icon(
         icon = Icons.Remove,
         tip = Theme.value.windowMinimizeText,
-        onClick = { controller.minimize = true }
+        onClick = { controller.minimize = true },
+        modifier = Modifier.size(Theme.size.smallIcon)
     )
     Icon(
         icon = Icons.CropSquare,
         tip = if (controller.maximize) Theme.value.windowMaximizeBackText else Theme.value.windowMaximizeText,
-        onClick = controller::toggleMaximize
+        onClick = controller::toggleMaximize,
+        modifier = Modifier.size(Theme.size.smallIcon)
     )
     Icon(
         icon = Icons.Clear,
         tip = Theme.value.windowCloseText,
-        onClick = onExit
+        onClick = onExit,
+        modifier = Modifier.size(Theme.size.smallIcon)
     )
 }
 
@@ -48,26 +51,23 @@ fun DefaultTopBar(
         Brush.verticalGradient(colors = listOf(backgroundColor.copy(alpha = 0.75f), backgroundColor))
     }
 
-    Row(
-        modifier = Modifier.fillMaxWidth().background(bgBrush).padding(Theme.padding.value9),
-        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        ThemeContainer {
+    ThemeContainer {
+        Row(
+            modifier = Modifier.fillMaxWidth().background(bgBrush).padding(Theme.padding.value9),
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painter = controller.iconPainter,
                     color = Colors.Unspecified,
-                    modifier = Modifier.size(Theme.size.icon)
+                    modifier = Modifier.size(Theme.size.smallIcon)
                 )
 
-                SimpleEllipsisText(
-                    text = controller.title,
-                    style = Theme.typography.v6.bold
-                )
+                SimpleEllipsisText(text = controller.title, style = Theme.typography.v7.bold)
             }
 
             ActionScope.Right.Container(modifier = Modifier.weight(1f), content = actions)

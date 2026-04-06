@@ -7,11 +7,12 @@ import androidx.compose.ui.unit.dp
 
 @Stable
 data class SizeTheme(
+    val smallIcon: Dp,
+    val icon: Dp,
     val box1: Dp,
     val box2: Dp,
     val box3: Dp,
     val box4: Dp,
-    val icon: Dp,
     val image1: Dp,
     val image2: Dp,
     val image3: Dp,
@@ -164,6 +165,7 @@ data class GeometryTheme(
     companion object {
         val Default = GeometryTheme(
             size = SizeTheme(
+                smallIcon = 18.dp,
                 icon = 24.dp,
                 box1 = 16.dp,
                 box2 = 12.dp,
