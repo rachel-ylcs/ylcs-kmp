@@ -13,12 +13,15 @@ import kotlinx.coroutines.cancel
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
+import love.yinlin.compose.window.DeepLink
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.foundation.PlatformContext
+import love.yinlin.platform.Platform
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toJvmUri
+import love.yinlin.uri.toUri
 import org.jetbrains.compose.resources.DrawableResource
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -103,8 +106,16 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     val mainScope = MainScope()
 
     fun run() {
+        // 配置 compose 渲染
         if (composeSwingRenderOnGraphics) System.setProperty("compose.swing.render.on.graphics", "true")
         if (composeInteropBlending) System.setProperty("compose.interop.blending", "true")
+
+        // 配置 macOS 超链接
+        Platform.use(Platform.MacOS) {
+            Desktop.getDesktop().setOpenURIHandler { event ->
+                DeepLink.openUri(event.uri.toUri())
+            }
+        }
 
         initApplication(scope = mainScope)
 

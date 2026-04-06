@@ -21,6 +21,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberImmersivePadding
+import love.yinlin.compose.window.DeepLink
 import love.yinlin.extension.Array
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.parseJson
@@ -45,7 +46,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         @Composable
         inline fun <reified Main : BasicScreen> Navigation(
             modifier: Modifier = Modifier.fillMaxSize(),
-            deeplink: DeepLink = DeepLink.Default,
+            deeplink: DeepLink<ScreenManager> = DeepLink.default(),
             noinline transitionSpecProvider: AnimatedContentTransitionScope<*>.() -> ContentTransform = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Start,

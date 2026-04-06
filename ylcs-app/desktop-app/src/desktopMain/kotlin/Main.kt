@@ -11,7 +11,6 @@ import love.yinlin.compose.DefaultTopBar
 import love.yinlin.compose.DefaultTopBarActions
 import love.yinlin.compose.Theme
 import love.yinlin.compose.WindowController
-import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.coroutines.ioContext
@@ -19,17 +18,12 @@ import love.yinlin.data.MimeType
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.platform.AutoUpdate
 import love.yinlin.platform.SingleInstance
-import love.yinlin.startup.StartupMacOSDeepLink
 import org.jetbrains.compose.resources.DrawableResource
 
 fun main() {
     SingleInstance.run("${Local.info.appName}.lock")
 
     object : RachelApplication(PlatformContext.Instance) {
-        init {
-            startup(StartupMacOSDeepLink.Factory { DeepLink.openUri(it) })
-        }
-
         override val title: String = "银临茶舍"
         override val icon: DrawableResource = Res.drawable.img_logo
 

@@ -1,4 +1,4 @@
-package love.yinlin.compose.screen
+package love.yinlin.compose.window
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -6,12 +6,12 @@ import androidx.compose.runtime.Stable
 import love.yinlin.uri.Uri
 
 @Stable
-fun interface DeepLink {
-    fun onDeepLink(manager: ScreenManager, uri: Uri)
+fun interface DeepLink<M : Any> {
+    fun onDeepLink(manager: M, uri: Uri)
 
     @Stable
     companion object {
-        val Default = DeepLink { manager, uri -> }
+        fun <M : Any> default() = DeepLink<M> { _, _ -> }
 
         private var cached: Uri? = null
         private var listener: ((uri: Uri) -> Unit)? = null
@@ -24,7 +24,7 @@ fun interface DeepLink {
             }
 
         @Composable
-        fun Register(deeplink: DeepLink, manager: ScreenManager) {
+        fun <M : Any> Register(deeplink: DeepLink<M>, manager: M) {
             DisposableEffect(deeplink, manager) {
                 listener = { deeplink.onDeepLink(manager, it) }
                 onDispose { listener = null }

@@ -11,7 +11,8 @@ import love.yinlin.compose.ThemeMode
 import love.yinlin.compose.ToolingTheme
 import love.yinlin.compose.config.patches
 import love.yinlin.compose.data.ImageQuality
-import love.yinlin.compose.screen.DeepLink
+import love.yinlin.compose.screen.ScreenManager
+import love.yinlin.compose.window.DeepLink
 import love.yinlin.cs.ClientEngine
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
@@ -24,7 +25,7 @@ import love.yinlin.startup.*
 import org.jetbrains.compose.resources.FontResource
 
 @Stable
-abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApplication<AbstractRachelApplication>(mApp, context), DeepLink {
+abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApplication<AbstractRachelApplication>(mApp, context), DeepLink<ScreenManager> {
     val dataPath: File = PlatformFileSystem.dataPath(rawContext, Local.info.appName)
     val cachePath: File = PlatformFileSystem.cachePath(rawContext, Local.info.appName)
     val configPath: File = File(dataPath, "config")

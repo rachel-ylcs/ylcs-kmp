@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +36,6 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.rememberDeviceType
-import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.common.PortraitValue
@@ -63,6 +61,7 @@ import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.compose.ui.text.TextIconBinder
 import love.yinlin.compose.ui.widget.QrcodeBox
 import love.yinlin.compose.ui.widget.QrcodeScanner
+import love.yinlin.compose.window.DeepLink
 import love.yinlin.cs.*
 import love.yinlin.data.rachel.follows.FollowTabItem
 import love.yinlin.data.rachel.profile.UserLevel
