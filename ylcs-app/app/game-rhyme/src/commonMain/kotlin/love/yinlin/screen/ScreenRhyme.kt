@@ -22,7 +22,6 @@ import love.yinlin.app.game_rhyme.resources.rhyme
 import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.app.global.resources.img_logo
 import love.yinlin.app.global.resources.xwwk
-import love.yinlin.compose.ColorSystem
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -41,7 +40,6 @@ import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LocalFileImage
@@ -224,8 +222,8 @@ class ScreenRhyme : BasicScreen() {
 
     @Composable
     override fun BasicContent() {
-        ThemeContainer(ColorSystem.Default.dark.onBackground, ColorSystem.Default.dark.onBackgroundVariant) {
-            AnimationContent(gameState, modifier = Modifier.fillMaxSize().background(ColorSystem.Default.dark.background)) { state ->
+        Theme.ThemeModeWrapper(true) {
+            AnimationContent(gameState, modifier = Modifier.fillMaxSize().background(Theme.color.background)) { state ->
                 when (state) {
                     is GameState.Start -> GameStartLayout()
                     is GameState.MusicLibrary -> GameMusicLibraryLayout()

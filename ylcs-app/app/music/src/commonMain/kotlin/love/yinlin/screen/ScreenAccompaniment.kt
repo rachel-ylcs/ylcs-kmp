@@ -17,7 +17,6 @@ import kotlinx.coroutines.isActive
 import love.yinlin.app
 import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
-import love.yinlin.compose.ColorSystem
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -25,7 +24,6 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
@@ -169,11 +167,11 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
 
     @Composable
     override fun BasicContent() {
-        Box(
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().background(ColorSystem.Default.dark.background),
-            contentAlignment = Alignment.Center
-        ) {
-            ThemeContainer(ColorSystem.Default.dark.onBackground, ColorSystem.Default.dark.onBackgroundVariant) {
+        Theme.ThemeModeWrapper(true) {
+            Box(
+                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().background(Theme.color.background),
+                contentAlignment = Alignment.Center
+            ) {
                 val maxWidth = Theme.size.cell1 * 1.25f
 
                 LocalFileImage(

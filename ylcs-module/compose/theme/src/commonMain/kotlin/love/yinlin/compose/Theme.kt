@@ -7,11 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -19,6 +15,8 @@ import androidx.compose.ui.unit.Density
 import love.yinlin.compose.extension.localComposition
 import love.yinlin.compose.extension.staticLocalComposition
 import org.jetbrains.compose.resources.FontResource
+
+private val LocalColorSystem = staticLocalComposition { ColorSystem.Default }
 
 internal val LocalAnimationTheme = staticLocalComposition { AnimationTheme.Default }
 internal val LocalBorderTheme = staticLocalComposition { GeometryTheme.Default.border }
@@ -68,6 +66,7 @@ fun Theme(
         CompositionLocalProvider(
             LocalDarkMode provides isDarkMode,
             LocalMainFontResource provides mainFontResource,
+            LocalColorSystem provides colorSystem,
             LocalColorTheme provides colorTheme,
             LocalDensity provides density,
             LocalIndication provides Ripple,
@@ -118,4 +117,23 @@ object Theme {
     val tool: ToolingTheme @Composable @ReadOnlyComposable get() = LocalToolingTheme.current
     val typography: TypographyTheme @Composable @ReadOnlyComposable get() = LocalTypographyTheme.current
     val value: ValueTheme @Composable @ReadOnlyComposable get() = LocalValueTheme.current
+
+    @Composable
+    fun ThemeModeWrapper(isDarkMode: Boolean, content: @Composable () -> Unit) {
+        val colorSystem = LocalColorSystem.current
+        val colorTheme = if (isDarkMode) colorSystem.dark else colorSystem.light
+        val primaryColor = colorTheme.primary
+        val selectionColors = remember(primaryColor) {
+            TextSelectionColors(primaryColor, primaryColor.copy(alpha = 0.4f))
+        }
+
+        CompositionLocalProvider(
+            LocalDarkMode provides isDarkMode,
+            LocalColorTheme provides colorTheme,
+            LocalColor provides colorTheme.onBackground,
+            LocalColorVariant provides colorTheme.onBackgroundVariant,
+            LocalTextSelectionColors provides selectionColors,
+            content = content
+        )
+    }
 }

@@ -44,7 +44,6 @@ import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
 import love.yinlin.compose.ui.container.ActionScope
-import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.Sheet
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -443,8 +442,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
     @Composable
     override fun Content() {
-        Box(modifier = Modifier.fillMaxSize().background(ColorSystem.Default.dark.background)) {
-            ThemeContainer(ColorSystem.Default.dark.onBackground, ColorSystem.Default.dark.onBackgroundVariant) {
+        Theme.ThemeModeWrapper(true) {
+            Box(modifier = Modifier.fillMaxSize().background(Theme.color.background)) {
                 val deviceType by rememberDeviceType()
                 val immersivePadding = LocalImmersivePadding.current
 
