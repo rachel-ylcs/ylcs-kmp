@@ -21,7 +21,7 @@ class AssetPlugin private constructor(
      * @param loaders 资源加载器
      */
     @Stable
-    class DefaultFactory(vararg val loaders: AssetLoader<*>) : PluginFactory {
+    class Factory(vararg val loaders: AssetLoader<*>) : PluginFactory {
         override fun build(engine: Engine): Plugin = AssetPlugin(engine, loaders.toList())
     }
 

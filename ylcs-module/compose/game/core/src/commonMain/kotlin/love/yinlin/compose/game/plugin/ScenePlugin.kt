@@ -44,7 +44,7 @@ class ScenePlugin private constructor(
      * @param fpsRate FPS统计频率(毫秒)
      */
     @Stable
-    class DefaultFactory(val fpsRate: Long = 1000L) : PluginFactory {
+    class Factory(val fpsRate: Long = 1000L) : PluginFactory {
         override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, engine)
     }
 

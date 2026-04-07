@@ -18,7 +18,6 @@ import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.viewport.Viewport
 import love.yinlin.compose.game.plugin.Plugin
 import love.yinlin.compose.game.plugin.PluginFactory
-import love.yinlin.compose.window.FocusWindowEffect
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
 import love.yinlin.reflect.metaClassName
@@ -28,18 +27,19 @@ import love.yinlin.reflect.metaRawClassName
 @Stable
 class Engine(
     val viewport: Viewport, // 视口类型
+    val backgroundColor: Color, // 背景
     vararg userPlugins: PluginFactory, // 插件集
 ) {
     /**
      * 是否加载
      */
-    private var isInitialized: Boolean = false
+    var isInitialized: Boolean by mutableStateOf(false)
+        private set
 
     /**
      * 是否运行
      */
     var isRunning: Boolean by mutableStateOf(false)
-        private set
 
     // 插件依赖图
     @PublishedApi
@@ -122,14 +122,10 @@ class Engine(
 
     @Composable
     fun ViewportContent(modifier: Modifier = Modifier.fillMaxSize()) {
-        FocusWindowEffect { isFocus ->
-            isRunning = isFocus
-        }
-
         Layout(
             modifier = modifier,
             content = {
-                Box(modifier = Modifier.background(Color.Black).clipToBounds()) {
+                Box(modifier = Modifier.background(backgroundColor).clipToBounds()) {
                     visiblePlugins.fastForEach { plugin ->
                         key(plugin.id) {
                             Box(modifier = Modifier.fillMaxSize().zIndex(plugin.layerOrder.toFloat())) {
