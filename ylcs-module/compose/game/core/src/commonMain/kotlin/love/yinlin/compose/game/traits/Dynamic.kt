@@ -12,5 +12,5 @@ interface Dynamic {
     /**
      * 更新
      */
-    fun onUpdate(tick: Long)
+    fun onUpdate(tick: Int)
 }

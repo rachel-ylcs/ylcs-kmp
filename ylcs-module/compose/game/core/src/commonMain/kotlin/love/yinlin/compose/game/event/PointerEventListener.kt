@@ -13,11 +13,11 @@ open class PointerEventListener : EventListener {
         Event.Pointer.Move::class
     )
 
-    open fun onPointerDown(tick: Long, event: Event.Pointer.Down): Boolean = false
-    open fun onPointerUp(tick: Long, event: Event.Pointer.Up): Boolean = false
-    open fun onPointerMove(tick: Long, event: Event.Pointer.Move): Boolean = false
+    open fun onPointerDown(tick: Int, event: Event.Pointer.Down): Boolean = false
+    open fun onPointerUp(tick: Int, event: Event.Pointer.Up): Boolean = false
+    open fun onPointerMove(tick: Int, event: Event.Pointer.Move): Boolean = false
 
-    override fun onEvent(tick: Long, event: Event, source: Visible): Boolean = when (event) {
+    override fun onEvent(tick: Int, event: Event, source: Visible): Boolean = when (event) {
         is Event.Pointer.Down -> {
             val newPosition = event.position - source.position + source.center
             val newEvent = event.copy(position = newPosition)

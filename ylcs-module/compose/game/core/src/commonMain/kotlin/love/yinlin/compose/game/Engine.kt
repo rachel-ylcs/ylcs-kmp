@@ -116,6 +116,7 @@ class Engine(
                 }
             }
         }
+        isRunning = false
         scope.cancel()
         isInitialized = false
     }

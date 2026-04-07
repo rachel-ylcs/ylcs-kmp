@@ -76,7 +76,7 @@ open class Layer(
      */
     override var active: Boolean = true
 
-    override fun onUpdate(tick: Long) {
+    override fun onUpdate(tick: Int) {
         items.fastForEach { item ->
             if (item is Dynamic && item.active && item.alive) item.onUpdate(tick)
         }
@@ -87,7 +87,7 @@ open class Layer(
      */
     open val interactive: Boolean = true
 
-    internal fun triggerVisibleLayer(tick: Long, event: Event): Boolean {
+    internal fun triggerVisibleLayer(tick: Int, event: Event): Boolean {
         // 事件处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]

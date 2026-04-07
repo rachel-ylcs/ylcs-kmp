@@ -41,18 +41,12 @@ class ScenePlugin private constructor(
     engine: Engine
 ) : Plugin(engine) {
     /**
-     * @param fpsRate FPS统计频率(毫秒)
+     * @param fpsRate FPS统计频率(毫秒)，为0表示禁用
      */
     @Stable
     class Factory(val fpsRate: Long = 1000L) : PluginFactory {
         override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, engine)
     }
-
-    /**
-     * 引擎时间刻
-     */
-    private var engineTime: Long = 0L
-    private var lastRunningTime: Long = 0L
 
     /**
      * FPS
@@ -139,51 +133,44 @@ class ScenePlugin private constructor(
     // 游戏循环
     private suspend fun CoroutineScope.engineLoop() {
         var lastTime = withFrameMillis { it }
-        engineTime = lastTime - lastRunningTime
-
         var frameCount = 0L
         var lastFpsTime = lastTime
 
-        try {
-            while (isActive) {
-                withFrameMillis { frameTime ->
-                    // 每秒更新一次 FPS
-                    lastTime = frameTime
-                    val deltaFPSTime = frameTime - lastFpsTime
-                    if (fpsRate in 1 ..< deltaFPSTime) {
-                        fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
-                        lastFpsTime = frameTime
-                        frameCount = 0L
-                    }
-                    ++frameCount
+        while (isActive) {
+            withFrameMillis { frameTime ->
+                // 更新游戏刻
+                val deltaTime = (frameTime - lastTime).toInt()
+                lastTime = frameTime
 
-                    // 更新游戏刻
-                    val deltaTime = frameTime - engineTime
+                // 每秒更新一次 FPS
+                val deltaFPSTime = frameTime - lastFpsTime
+                if (fpsRate in 1 ..< deltaFPSTime) {
+                    fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
+                    lastFpsTime = frameTime
+                    frameCount = 0L
+                }
+                ++frameCount
 
-                    // 处理事件
-                    while (true) {
-                        // 事件转换
-                        val event = eventChannel.tryReceive().getOrNull() ?: break
-                        // 事件处理层级是逆向的，与渲染顺序相反
-                        for (index in layerEntities.indices.reversed()) {
-                            val layer = layerEntities[index]
-                            if (layer.interactive) { // 可交互的层
-                                if (layer.triggerVisibleLayer(deltaTime, event)) break // 消费完成
-                            }
-                        }
-                    }
-
-                    // 更新动态层
-                    dynamicEntities.fastForEach { dynamic ->
-                        if (dynamic.active) { // 已激活的层
-                            dynamic.onUpdate(deltaTime)
+                // 处理事件
+                while (true) {
+                    // 事件转换
+                    val event = eventChannel.tryReceive().getOrNull() ?: break
+                    // 事件处理层级是逆向的，与渲染顺序相反
+                    for (index in layerEntities.indices.reversed()) {
+                        val layer = layerEntities[index]
+                        if (layer.interactive) { // 可交互的层
+                            if (layer.triggerVisibleLayer(deltaTime, event)) break // 消费完成
                         }
                     }
                 }
+
+                // 更新动态层
+                dynamicEntities.fastForEach { dynamic ->
+                    if (dynamic.active) { // 已激活的层
+                        dynamic.onUpdate(deltaTime)
+                    }
+                }
             }
-        } finally {
-            // 暂停记录累积刻
-            lastRunningTime = lastTime - engineTime
         }
     }
 
