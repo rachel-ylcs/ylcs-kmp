@@ -37,28 +37,8 @@ abstract class Visible(
      */
     open val trigger: Trigger? = null
 
-    /**
-     * 附加层
-     */
-    protected open fun onAttached(layer: Layer) { }
-
-    /**
-     * 离开层
-     */
-    protected open fun onDetached(layer: Layer) { }
-
     var layer: Layer? = null
-        private set
-
-    internal fun onVisibleAttached(layer: Layer) {
-        this.layer = layer
-        onAttached(layer)
-    }
-
-    internal fun onVisibleDetached(layer: Layer) {
-        onDetached(layer)
-        this.layer = null
-    }
+        internal set
 
     /**
      * 初始化绘制

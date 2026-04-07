@@ -44,13 +44,13 @@ open class Layer(
         // 根据 layerOrder 二分查找
         val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
         items.add(-index - 1, item)
-        item.onVisibleAttached(this)
+        item.layer = this
         updateDirty()
     }
 
     operator fun minusAssign(item: Visible) {
         items -= item
-        item.onVisibleDetached(this)
+        item.layer = null
         updateDirty()
     }
 
@@ -60,14 +60,14 @@ open class Layer(
 
     final override fun onAttached(scene: ScenePlugin) {
         this.scene = scene
-        items.fastForEach { it.onVisibleAttached(this) }
+        items.fastForEach { it.layer = this }
         onLayerAttached(scene)
     }
 
     final override fun onDetached(scene: ScenePlugin) {
         onLayerDetached(scene)
         items.clear()
-        items.fastForEachReversed { it.onVisibleDetached(this) }
+        items.fastForEachReversed { it.layer = null }
         this.scene = null
     }
 
