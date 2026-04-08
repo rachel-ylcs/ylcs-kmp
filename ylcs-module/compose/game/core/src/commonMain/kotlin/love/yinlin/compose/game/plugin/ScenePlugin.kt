@@ -14,6 +14,7 @@ import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastForEach
@@ -38,14 +39,18 @@ import kotlin.uuid.ExperimentalUuidApi
 @Stable
 class ScenePlugin private constructor(
     private val fpsRate: Long,
+    cameraConfig: Camera.Config,
     engine: Engine
 ) : Plugin(engine) {
     /**
      * @param fpsRate FPS统计频率(毫秒)，为0表示禁用
      */
     @Stable
-    class Factory(val fpsRate: Long = 1000L) : PluginFactory {
-        override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, engine)
+    class Factory(
+        val fpsRate: Long = 1000L,
+        val cameraConfig: Camera.Config = Camera.Config(),
+    ) : PluginFactory {
+        override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, cameraConfig, engine)
     }
 
     /**
@@ -55,7 +60,7 @@ class ScenePlugin private constructor(
         private set
 
     // 相机
-    val camera = Camera()
+    val camera = Camera(cameraConfig)
 
     // 实体
     private val entities = mutableStateListOf<Entity>()
@@ -84,9 +89,10 @@ class ScenePlugin private constructor(
         if (isInitialized) entity.onDetached(this)
     }
 
-    fun clear() {
+    fun reset() {
         entities.clear()
         entities.fastForEachReversed { it.onDetached(this) }
+        camera.reset()
     }
 
     // 事件
@@ -138,7 +144,7 @@ class ScenePlugin private constructor(
 
         while (isActive) {
             withFrameMillis { frameTime ->
-                // 更新游戏刻
+                // 更新引擎刻
                 val deltaTime = (frameTime - lastTime).toInt()
                 lastTime = frameTime
 
@@ -164,6 +170,9 @@ class ScenePlugin private constructor(
                     }
                 }
 
+                // 更新相机动画
+                camera.updateAnimation(deltaTime)
+
                 // 更新动态层
                 dynamicEntities.fastForEach { dynamic ->
                     if (dynamic.active) { // 已激活的层
@@ -175,7 +184,7 @@ class ScenePlugin private constructor(
     }
 
     override fun onRelease() {
-        clear()
+        reset()
         clearEventChannel()
     }
 
@@ -200,6 +209,7 @@ class ScenePlugin private constructor(
         }.graphicsLayer { // 窗口坐标转换
             camera.whenDirtyTransformLayer(this, size)
         }) {
+            val density = LocalDensity.current
             val fontFamilyResolver = LocalFontFamilyResolver.current
             // 字体转接器
             val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
@@ -211,16 +221,11 @@ class ScenePlugin private constructor(
                 key(layer.id) {
                     val drawer = remember {
                         Drawer(
+                            density = density,
                             fontFamilyResolver = fontFamilyResolver,
                             fontProvider = fontProvider,
                             assetProvider = assetProvider
                         )
-                    }
-
-                    // 初始化绘制
-                    LaunchedEffect(Unit) {
-                        layer.initializeDrawVisibleLayer(drawer, camera.viewportSize, camera.viewportBounds)
-                        layer.updateDirty()
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer().drawWithCache {

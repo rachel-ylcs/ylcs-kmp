@@ -6,7 +6,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 
 @Stable
-data class RhymePlayInfo(
+class RhymePlayInfo(
     val playConfig: RhymePlayConfig,
     val musicInfo: MusicInfo,
     val lyricsConfig: RhymeLyricsConfig,

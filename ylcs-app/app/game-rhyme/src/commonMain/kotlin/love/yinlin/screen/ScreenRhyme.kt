@@ -39,6 +39,7 @@ import love.yinlin.compose.game.plugin.ScenePlugin
 import love.yinlin.compose.game.plugin.SoundPlugin
 import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.game.ui.RhymeMusicCard
+import love.yinlin.compose.game.viewport.Camera
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.animation.AnimationContent
@@ -64,14 +65,20 @@ import kotlin.time.Duration.Companion.seconds
 @Stable
 class ScreenRhyme : BasicScreen() {
     private val engine = Engine(
-        viewport = Viewport.MatchHeight(1000),
+        viewport = Viewport.MatchHeight(2000),
         backgroundColor = Colors.Black,
         FontPlugin.ResourceFactory(
             GlobalRes.font.xwwk,
             RhymeRes.font.rhyme,
         ),
         AssetPlugin.Factory(),
-        ScenePlugin.Factory(fpsRate = 0L),
+        ScenePlugin.Factory(
+            fpsRate = 0L,
+            cameraConfig = Camera.Config(
+                moveSmoothness = 1000f,
+                scaleSmoothness = 4f
+            )
+        ),
         SoundPlugin.Factory(listOf()),
         RhymePlugin.Factory(
             context = app.rawContext,

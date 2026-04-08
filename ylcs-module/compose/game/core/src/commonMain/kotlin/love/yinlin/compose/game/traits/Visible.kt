@@ -7,7 +7,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import love.yinlin.compose.game.viewport.Culling
 import love.yinlin.compose.game.drawer.Drawer
-import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.drawer.PrepareDrawer
 
@@ -39,14 +38,6 @@ abstract class Visible(
 
     var layer: Layer? = null
         internal set
-
-    /**
-     * 初始化绘制
-     *
-     * 只在首次渲染前调用一次，可以保存资源、测量或更新。
-     * 注意：此处可以初始化或更新相关变量以及自身属性。
-     */
-    open fun InitialDrawer.initializeDraw(viewportSize: Size, viewportBounds: Rect) { }
 
     /**
      * 绘制预处理

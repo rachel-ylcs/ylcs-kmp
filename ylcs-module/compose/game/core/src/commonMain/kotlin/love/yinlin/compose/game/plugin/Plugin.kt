@@ -2,16 +2,11 @@ package love.yinlin.compose.game.plugin
 
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.traits.Identifiable
 import love.yinlin.reflect.metaClassName
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KClass
 
 @Stable
@@ -44,8 +39,6 @@ abstract class Plugin(val engine: Engine) : Identifiable<String> {
      */
     @Composable
     open fun BoxScope.Content() { }
-
-    protected fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = engine.scope.launch(context = context, block = block)
 
     @OptIn(CompatibleRachelApi::class)
     final override val id: String = this.metaClassName

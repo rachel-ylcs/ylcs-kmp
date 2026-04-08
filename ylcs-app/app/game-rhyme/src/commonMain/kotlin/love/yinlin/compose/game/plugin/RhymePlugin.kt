@@ -7,11 +7,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.data.RhymePlayResult
+import love.yinlin.compose.game.layer.MapLayer
 import love.yinlin.compose.game.ui.RhymeAcrylicSurface
 import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.ui.icon.Icons
@@ -46,21 +49,17 @@ class RhymePlugin(
 
     }
 
-    private var info: RhymePlayInfo? = null
-
+    // 初始化游戏
     suspend fun setupGame(playInfo: RhymePlayInfo, audio: File) {
-        info = playInfo
         player.load(audio, true)
+        scene += MapLayer(scene.camera, player, playInfo)
     }
 
+    // 停止游戏
     fun stopGame() {
-        player.stop()
-        info = null
+        scene.reset()
         endListener(null)
-    }
-
-    fun resetGame() {
-
+        player.stop()
     }
 
     override suspend fun onInitialize(): Boolean {
@@ -81,9 +80,17 @@ class RhymePlugin(
         }
 
         if (engine.isRunning) {
-            PrimaryButton("暂停", onClick = {
-                engine.isRunning = false
-            })
+            Column(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
+                PrimaryButton("暂停", onClick = {
+                    engine.isRunning = false
+                })
+                PrimaryButton("测试", onClick = {
+                    val position = scene.camera.position
+                    val target = if (position.x > 500f && position.y > 500f) Offset.Zero else Offset(1000f, 1000f)
+
+                    scene.camera.animateUpdatePosition(target)
+                })
+            }
         }
         else {
             Box(
@@ -100,7 +107,7 @@ class RhymePlugin(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(Theme.padding.v9, Alignment.CenterVertically)
                     ) {
-                        SimpleClipText(text = "暂停中", style = Theme.typography.v5.bold)
+                        SimpleClipText(text = "暂停中", style = Theme.typography.v5.bold, modifier = Modifier.padding(Theme.padding.v9))
                         RhymeCommonButton(icon = Icons.Clear, text = "退出", onClick = ::stopGame, modifier = Modifier.fillMaxWidth())
                         RhymeCommonButton(icon = Icons.PlayArrow, text = "继续", onClick = { engine.isRunning = true }, modifier = Modifier.fillMaxWidth())
                     }

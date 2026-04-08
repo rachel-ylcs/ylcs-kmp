@@ -8,6 +8,7 @@ import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
@@ -19,10 +20,11 @@ import love.yinlin.compose.game.font.FontProvider
 
 @Stable
 class Drawer internal constructor(
+    density: Density,
     fontFamilyResolver: FontFamily.Resolver,
     fontProvider: FontProvider,
     assetProvider: AssetProvider
-) : PrepareDrawer(fontFamilyResolver, fontProvider, assetProvider) {
+) : PrepareDrawer(density, fontFamilyResolver, fontProvider, assetProvider) {
     @PublishedApi internal var rawScope: DrawScope? = null
 
     internal inline fun withRawScope(scope: DrawScope, block: Drawer.() -> Unit) {

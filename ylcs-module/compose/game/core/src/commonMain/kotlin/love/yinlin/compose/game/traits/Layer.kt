@@ -9,7 +9,6 @@ import androidx.compose.ui.util.fastForEachReversed
 import love.yinlin.compose.extension.translate
 import love.yinlin.compose.extension.scale
 import love.yinlin.compose.game.drawer.Drawer
-import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.drawer.PrepareDrawer
@@ -43,14 +42,31 @@ open class Layer(
     operator fun plusAssign(item: Visible) {
         // 根据 layerOrder 二分查找
         val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
-        items.add(-index - 1, item)
+        items.add(if (index < 0) -index - 1 else index, item)
         item.layer = this
+        updateDirty()
+    }
+
+    operator fun plusAssign(targetItems: Iterable<Visible>) {
+        for (item in targetItems) {
+            val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
+            items.add(if (index < 0) -index - 1 else index, item)
+            item.layer = this
+        }
         updateDirty()
     }
 
     operator fun minusAssign(item: Visible) {
         items -= item
         item.layer = null
+        updateDirty()
+    }
+
+    operator fun minusAssign(targetItems: Iterable<Visible>) {
+        for (item in targetItems) {
+            items -= item
+            item.layer = null
+        }
         updateDirty()
     }
 
@@ -76,7 +92,10 @@ open class Layer(
      */
     override var active: Boolean = true
 
-    override fun onUpdate(tick: Int) {
+    open fun preUpdate(tick: Int) { }
+
+    final override fun onUpdate(tick: Int) {
+        preUpdate(tick)
         items.fastForEach { item ->
             if (item is Dynamic && item.active && item.alive) item.onUpdate(tick)
         }
@@ -87,7 +106,10 @@ open class Layer(
      */
     open val interactive: Boolean = true
 
+    open fun preTrigger(tick: Int, event: Event): Boolean = false
+
     internal fun triggerVisibleLayer(tick: Int, event: Event): Boolean {
+        if (preTrigger(tick, event)) return true
         // 事件处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]
@@ -95,20 +117,6 @@ open class Layer(
             if (trigger.onEvent(tick, event, item)) return true // 消费完成
         }
         return false
-    }
-
-    private var isInitializeDraw: Boolean = false
-
-    // 初始化绘制
-    internal fun initializeDrawVisibleLayer(drawer: InitialDrawer, viewportSize: Size, viewportBounds: Rect) {
-        if (!isInitializeDraw) {
-            isInitializeDraw = true
-            items.fastForEach { item ->
-                with(item) {
-                    drawer.initializeDraw(viewportSize, viewportBounds)
-                }
-            }
-        }
     }
 
     // 绘制预处理

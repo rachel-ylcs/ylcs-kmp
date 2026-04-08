@@ -8,12 +8,27 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
+import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntSize
+import kotlin.math.abs
+import kotlin.math.exp
 
 @Stable
-class Camera internal constructor() {
+class Camera internal constructor(private val config: Config) {
+    @Stable
+    data class Config(
+        /**
+         * 相机移位缓动因子
+         */
+        val moveSmoothness: Float = 500f,
+        /**
+         * 相机缩放缓动因子
+         */
+        val scaleSmoothness: Float = 2f,
+    )
+
     /**
      * 视口大小
      */
@@ -31,12 +46,25 @@ class Camera internal constructor() {
      * 相机的位置是以视口中心点为锚点
      */
     var position: Offset = Offset.Zero
-        set(value) {
-            if (field != value) {
-                field = value
-                updateDirty()
-            }
+        private set
+
+    private var targetPosition: Offset = Offset.Unspecified
+
+    /**
+     * 更新相机位置
+     */
+    fun updatePosition(newPosition: Offset) {
+        if (newPosition != position) {
+            targetPosition = Offset.Unspecified
+            position = newPosition
+            updateDirty()
         }
+    }
+
+    /**
+     * 缓动更新位置
+     */
+    fun animateUpdatePosition(newPosition: Offset) { targetPosition = newPosition }
 
     /**
      * 相机缩放
@@ -44,12 +72,54 @@ class Camera internal constructor() {
      * 相机的缩放是以视口中心点为锚点
      */
     var scale: Float = 1f
-        set(value) {
-            if (field != value) {
-                field = value
-                updateDirty()
-            }
+        private set
+
+    private var targetScale: Float = Float.NaN
+
+    /**
+     * 更新相机缩放
+     */
+    fun updateScale(newScale: Float) {
+        if (newScale != scale) {
+            targetScale = Float.NaN
+            scale = newScale
+            updateDirty()
         }
+    }
+
+    /**
+     * 缓动更新缩放
+     */
+    fun animateUpdateScale(newScale: Float) { targetScale = newScale }
+
+    internal fun updateAnimation(deltaTime: Int) {
+        var isDirty = false
+        if (targetPosition.isSpecified) {
+            val target = targetPosition
+            val diff = target - position
+            val distance = diff.getDistance()
+            if (distance < 1f) {
+                // 极近直接复位
+                targetPosition = Offset.Unspecified
+                position = target
+            }
+            else position += diff * (1 - exp(-deltaTime * 6 / (config.moveSmoothness + distance))) // 指数衰减
+            isDirty = true
+        }
+        if (!targetScale.isNaN()) {
+            val target = targetScale
+            val diff = target - scale
+            val dist = abs(diff)
+            if (dist < 0.001f) {
+                // 极近直接复位
+                targetScale = Float.NaN
+                scale = target
+            }
+            else scale += diff * (1 - exp(-deltaTime * 0.016f / (config.scaleSmoothness + dist))) // 指数衰减
+            isDirty = true
+        }
+        if (isDirty) updateDirty()
+    }
 
     /**
      * 视口边界大小
@@ -62,6 +132,15 @@ class Camera internal constructor() {
      */
     var viewportBounds: Rect = Rect.Zero
         private set
+
+    internal fun reset() {
+        position = Offset.Zero
+        targetPosition = Offset.Unspecified
+        scale = 1f
+        targetScale = Float.NaN
+        viewportBoundSize = Size.Zero
+        viewportBounds = Rect.Zero
+    }
 
     internal fun updateViewport(size: IntSize, viewport: Viewport) {
         val (newSize, newScale) = viewport.applyCanvasBounds(size)

@@ -22,6 +22,8 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
 import love.yinlin.reflect.metaClassName
 import love.yinlin.reflect.metaRawClassName
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @OptIn(CompatibleRachelApi::class)
 @Stable
@@ -63,7 +65,10 @@ class Engine(
     inline fun <reified T : Plugin> plugin(): T = pluginMap[metaClassName<T>()] as T
     inline fun <reified T : Plugin> pluginOrNull(): T? = pluginMap[metaClassName<T>()] as? T
 
-    internal val scope = CoroutineScope(SupervisorJob() + cpuContext)
+    private val scope = CoroutineScope(SupervisorJob() + cpuContext)
+
+    fun launchCoroutine(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job =
+        scope.launch(context = context, block = block)
 
     /**
      * 初始化
