@@ -16,7 +16,6 @@ coroutines = "1.10.2"
 ktor = "3.4.2"
 sketch = "4.4.0-beta02"
 mmkv = "2.4.0"
-cryptography = "0.5.0"
 pag = "4.5.46"
 
 # Android
@@ -57,7 +56,7 @@ test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 
-androidx-annotation = { module = "androidx.annotation:annotation", version = "1.9.1" }
+androidx-annotation = { module = "androidx.annotation:annotation", version = "1.10.0" }
 androidx-collection = { module = "androidx.collection:collection", version = "1.6.0" }
 
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
@@ -77,7 +76,7 @@ kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.7.1-0.6.x-compat" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.0" }
-kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.10.0" }
+kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.11.0" }
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
 kotlinx-html = { module = "org.jetbrains.kotlinx:kotlinx-html", version = "0.12.0" }
 

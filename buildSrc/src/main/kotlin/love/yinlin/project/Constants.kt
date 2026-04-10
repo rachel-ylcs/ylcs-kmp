@@ -127,7 +127,7 @@ class Constants(project: Project) {
 
     // 混淆配置
     val proguard = ProguardConfig(
-        version = "7.9.0",
+        version = "7.9.1",
         defaultRule = "proguard-android-optimize.txt"
     )
 
