@@ -20,6 +20,6 @@ actual object PlatformFileSystem {
 
     actual fun cachePath(context: PlatformContext, appName: String): File {
         val paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true)
-        return File((paths.getOrNull(0) as? String) ?: "", appName, "temp")
+        return File((paths.firstOrNull() as? String) ?: "", appName, "temp")
     }
 }

@@ -3,18 +3,24 @@ package love.yinlin.compose.game.visible
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import love.yinlin.compose.game.common.BlockLine
+import love.yinlin.compose.game.common.BlockTime
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.data.music.RhymeAction
 
 @Stable
 class OffsetSlurBlock(
     position: Offset,
-    size: Size,
-    timeAppearance: Long,
-    timeStart: Long,
-    timeEnd: Long,
+    line: BlockLine,
+    time: BlockTime,
+    rawIndex: Int,
+    lineIndex: Int,
     override val rhymeAction: RhymeAction.Slur,
-) : Block(position, size, timeAppearance, timeStart, timeEnd) {
+) : Block(position, line, time, rawIndex, lineIndex) {
+    override fun onUpdate(tick: Int) {
+
+    }
+
     override fun Drawer.onDraw() {
 
     }

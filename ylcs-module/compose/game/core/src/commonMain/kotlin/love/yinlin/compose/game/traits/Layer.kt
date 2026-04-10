@@ -43,7 +43,7 @@ open class Layer(
         // 根据 layerOrder 二分查找
         val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
         items.add(if (index < 0) -index - 1 else index, item)
-        item.layer = this
+        item.onVisibleAttached(this)
         updateDirty()
     }
 
@@ -51,21 +51,21 @@ open class Layer(
         for (item in targetItems) {
             val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
             items.add(if (index < 0) -index - 1 else index, item)
-            item.layer = this
+            item.onVisibleAttached(this)
         }
         updateDirty()
     }
 
     operator fun minusAssign(item: Visible) {
         items -= item
-        item.layer = null
+        item.onVisibleDetached()
         updateDirty()
     }
 
     operator fun minusAssign(targetItems: Iterable<Visible>) {
         for (item in targetItems) {
             items -= item
-            item.layer = null
+            item.onVisibleDetached()
         }
         updateDirty()
     }
@@ -76,14 +76,14 @@ open class Layer(
 
     final override fun onAttached(scene: ScenePlugin) {
         this.scene = scene
-        items.fastForEach { it.layer = this }
+        items.fastForEach { it.onVisibleAttached(this) }
         onLayerAttached(scene)
     }
 
     final override fun onDetached(scene: ScenePlugin) {
         onLayerDetached(scene)
         items.clear()
-        items.fastForEachReversed { it.layer = null }
+        items.fastForEachReversed { it.onVisibleDetached() }
         this.scene = null
     }
 
@@ -109,7 +109,7 @@ open class Layer(
     open fun preTrigger(tick: Int, event: Event): Boolean = false
 
     internal fun triggerVisibleLayer(tick: Int, event: Event): Boolean {
-        if (preTrigger(tick, event)) return true
+        if (preTrigger(tick, event)) return true // Layer 拦截消息
         // 事件处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]

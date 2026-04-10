@@ -9,7 +9,7 @@ actual object PlatformFileSystem {
 
     private fun searchPath(directory: NSSearchPathDirectory): File {
         val paths = NSSearchPathForDirectoriesInDomains(directory, NSUserDomainMask, true)
-        return File((paths.getOrNull(0) as? String) ?: "")
+        return File((paths.firstOrNull() as? String) ?: "")
     }
 
     actual fun appPath(context: PlatformContext, appName: String): File = File(NSHomeDirectory())

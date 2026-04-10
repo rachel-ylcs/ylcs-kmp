@@ -24,7 +24,7 @@ abstract class Visible(
     /**
      * 是否裁切溢出
      */
-    open val clip: Boolean = true
+    open val clip: Boolean = false
 
     /**
      * 层级
@@ -36,8 +36,28 @@ abstract class Visible(
      */
     open val trigger: Trigger? = null
 
+    /**
+     * 附加层
+     */
+    protected open fun onAttached() { }
+
+    /**
+     * 离开层
+     */
+    protected open fun onDetached() { }
+
     var layer: Layer? = null
-        internal set
+        private set
+
+    internal fun onVisibleAttached(layer: Layer) {
+        this.layer = layer
+        onAttached()
+    }
+
+    internal fun onVisibleDetached() {
+        onDetached()
+        this.layer = null
+    }
 
     /**
      * 绘制预处理
@@ -157,6 +177,8 @@ abstract class Visible(
                 layer?.updateDirty()
             }
         }
+
+    fun updateDirty() { layer?.updateDirty() }
 
     //  ---  计算属性  ---
 

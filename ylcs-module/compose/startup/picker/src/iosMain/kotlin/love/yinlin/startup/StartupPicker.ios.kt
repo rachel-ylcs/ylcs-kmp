@@ -37,7 +37,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
         return if (fileManager.copyItemAtURL(url, tempUrl, null)) tempUrl else null
     }
 
-    actual suspend fun pickPicture(): Source? = pickPicture(1)?.getOrNull(0)
+    actual suspend fun pickPicture(): Source? = pickPicture(1)?.firstOrNull()
 
     actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.main {
         Coroutines.sync { future ->

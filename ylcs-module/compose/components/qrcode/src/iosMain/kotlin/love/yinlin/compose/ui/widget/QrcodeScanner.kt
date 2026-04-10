@@ -60,7 +60,7 @@ private class QrcodeView(private val onRectOfInterest: (CValue<CGRect>) -> Unit)
     }
 
     fun updateLayerOrientation() {
-        val previewLayer = layer.sublayers?.getOrNull(0) as? AVCaptureVideoPreviewLayer
+        val previewLayer = layer.sublayers?.firstOrNull() as? AVCaptureVideoPreviewLayer
         previewLayer?.frame = bounds
         val screenOrientation = UIDevice.currentDevice.orientation
         previewLayer?.connection?.videoOrientation = when (screenOrientation) {

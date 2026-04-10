@@ -21,11 +21,11 @@ class BlockMapGenerator private constructor(
 ) {
     private val lyrics = lyricsConfig.lyrics
     private val audioOffset = lyricsConfig.offset
-    private val prepareTime = when (playConfig.difficulty) {
-        RhymeDifficulty.Easy -> 3000
-        RhymeDifficulty.Medium -> 2000
-        RhymeDifficulty.Hard -> 1500
-        RhymeDifficulty.Extreme -> 1000
+    private val difficultyTimeRule = when (playConfig.difficulty) {
+        RhymeDifficulty.Easy -> DifficultyTimeRule(prepareTime = 3500, perfectTime = 500, goodTime = 750, badTime = 900, missTime = 1500)
+        RhymeDifficulty.Medium -> DifficultyTimeRule(prepareTime = 3000, perfectTime = 400, goodTime = 600, badTime = 720, missTime = 1200)
+        RhymeDifficulty.Hard -> DifficultyTimeRule(prepareTime = 2000, perfectTime = 300, goodTime = 450, badTime = 540, missTime = 900)
+        RhymeDifficulty.Extreme -> DifficultyTimeRule(prepareTime = 1500, perfectTime = 250, goodTime = 375, badTime = 450, missTime = 750)
     }
 
     private val occupiedSet = mutableSetOf<Offset>()
@@ -103,27 +103,46 @@ class BlockMapGenerator private constructor(
     fun generate(): List<Block> {
         // 生成地图位置
         val blockPositionMap = if (solve(0, -blockDimension, 0f, blockDimension, 0f)) result else emptyList()
-
-        val blockSize = Size(blockDimension, blockDimension)
+        var rawIndex = 0
 
         // 存储音游配置
         return blockPositionMap.fastMapIndexed { segmentIndex, segments ->
+            // 基础属性
             val line = lyrics[segmentIndex]
             val theme = line.theme
+            val lastAction = theme.last()
             val lineStart = line.start + audioOffset // 偏移补偿
+            val lineEnd = lineStart + lastAction.end
+
+            // 转角
+            val cornerPrevBlock = segments.last()
+            val cornerNextBlock = blockPositionMap.getOrNull(segmentIndex + 1)?.firstOrNull()
+            val corner = when {
+                cornerNextBlock == null -> null
+                cornerNextBlock.y > cornerPrevBlock.y -> BlockCorner.TopRight
+                cornerNextBlock.x < cornerPrevBlock.x -> BlockCorner.BottomRight
+                cornerNextBlock.y < cornerPrevBlock.y -> BlockCorner.BottomLeft
+                cornerNextBlock.x > cornerPrevBlock.x -> BlockCorner.TopLeft
+                else -> null
+            }
+
+            // 行属性
+            val blockLine = BlockLine(segmentIndex, corner, line.text, lineStart, lineEnd)
+
+            // 遍历方块
             segments.fastMapIndexed { i, pos ->
                 val action = theme[i]
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + lineStart
                 val end = action.end + lineStart
-                val appearance = start - prepareTime
+                val blockTime = BlockTime.build(difficultyTimeRule, start, end)
                 when (action) {
                     // 单音
                     is RhymeAction.Note -> NoteBlock(
                         position = pos,
-                        size = blockSize,
-                        timeAppearance = appearance,
-                        timeStart = start,
-                        timeEnd = end,
+                        line = blockLine,
+                        time = blockTime,
+                        rawIndex = rawIndex++,
+                        lineIndex = i,
                         rhymeAction = action
                     )
                     is RhymeAction.Slur -> {
@@ -131,19 +150,19 @@ class BlockMapGenerator private constructor(
                         // 延音
                         if (action.scale.fastAll { it == first }) FixedSlurBlock(
                             position = pos,
-                            size = blockSize,
-                            timeAppearance = appearance,
-                            timeStart = start,
-                            timeEnd = end,
+                            line = blockLine,
+                            time = blockTime,
+                            rawIndex = rawIndex++,
+                            lineIndex = i,
                             rhymeAction = action
                         )
                         // 连音
                         else OffsetSlurBlock(
                             position = pos,
-                            size = blockSize,
-                            timeAppearance = appearance,
-                            timeStart = start,
-                            timeEnd = end,
+                            line = blockLine,
+                            time = blockTime,
+                            rawIndex = rawIndex++,
+                            lineIndex = i,
                             rhymeAction = action
                         )
                     }

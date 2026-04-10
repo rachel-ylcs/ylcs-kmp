@@ -7,7 +7,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -69,6 +68,7 @@ class RhymePlugin(
     }
 
     override fun onRelease() {
+        stopGame()
         player.release()
     }
 
@@ -83,12 +83,6 @@ class RhymePlugin(
             Column(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
                 PrimaryButton("暂停", onClick = {
                     engine.isRunning = false
-                })
-                PrimaryButton("测试", onClick = {
-                    val position = scene.camera.position
-                    val target = if (position.x > 500f && position.y > 500f) Offset.Zero else Offset(1000f, 1000f)
-
-                    scene.camera.animateUpdatePosition(target)
                 })
             }
         }

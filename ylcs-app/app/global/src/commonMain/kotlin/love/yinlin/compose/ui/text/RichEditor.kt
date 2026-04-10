@@ -36,7 +36,7 @@ import love.yinlin.compose.ui.navigation.TabBar
 @Stable
 private object RichEditorParser {
     private fun RichList.parseStyle(args: List<String>): Boolean {
-        val type = args.getOrNull(0) ?: return false
+        val type = args.firstOrNull() ?: return false
         when (type) {
             RichType.Emoji.value -> emoji(
                 id = args.getOrNull(1)?.toIntOrNull() ?: return false
