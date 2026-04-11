@@ -1,10 +1,8 @@
 package love.yinlin.compose.game.common
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastMapIndexed
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.visible.Block
 import love.yinlin.compose.game.visible.FixedSlurBlock
@@ -21,11 +19,13 @@ class BlockMapGenerator private constructor(
 ) {
     private val lyrics = lyricsConfig.lyrics
     private val audioOffset = lyricsConfig.offset
-    private val difficultyTimeRule = when (playConfig.difficulty) {
-        RhymeDifficulty.Easy -> DifficultyTimeRule(prepareTime = 3500, perfectTime = 500, goodTime = 750, badTime = 900, missTime = 1500)
-        RhymeDifficulty.Medium -> DifficultyTimeRule(prepareTime = 3000, perfectTime = 400, goodTime = 600, badTime = 720, missTime = 1200)
-        RhymeDifficulty.Hard -> DifficultyTimeRule(prepareTime = 2000, perfectTime = 300, goodTime = 450, badTime = 540, missTime = 900)
-        RhymeDifficulty.Extreme -> DifficultyTimeRule(prepareTime = 1500, perfectTime = 250, goodTime = 375, badTime = 450, missTime = 750)
+    private val difficultyTimeRule = playConfig.difficulty.let {
+        DifficultyTimeRule(
+            prepareTime = BlockResult.PrepareDuration[it]!!,
+            perfectTime = BlockResult.PERFECT.durationRanges[it]!!,
+            goodTime = BlockResult.GOOD.durationRanges[it]!!,
+            badTime = BlockResult.BAD.durationRanges[it]!!
+        )
     }
 
     private val occupiedSet = mutableSetOf<Offset>()

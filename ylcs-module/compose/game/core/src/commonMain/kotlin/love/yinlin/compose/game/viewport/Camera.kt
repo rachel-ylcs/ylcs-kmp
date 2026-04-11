@@ -22,11 +22,11 @@ class Camera internal constructor(private val config: Config) {
         /**
          * 相机移位缓动因子
          */
-        val moveSmoothness: Float = 500f,
+        val moveSmoothness: Float = 0.005f,
         /**
          * 相机缩放缓动因子
          */
-        val scaleSmoothness: Float = 2f,
+        val scaleSmoothness: Float = 0.008f,
     )
 
     /**
@@ -97,25 +97,23 @@ class Camera internal constructor(private val config: Config) {
         if (targetPosition.isSpecified) {
             val target = targetPosition
             val diff = target - position
-            val distance = diff.getDistance()
-            if (distance < 1f) {
+            if (diff.getDistance() < 1f) {
                 // 极近直接复位
                 targetPosition = Offset.Unspecified
                 position = target
             }
-            else position += diff * (1 - exp(-deltaTime * 6 / (config.moveSmoothness + distance))) // 指数衰减
+            else position += diff * (1 - exp(-deltaTime * config.moveSmoothness)) // 指数衰减
             isDirty = true
         }
         if (!targetScale.isNaN()) {
             val target = targetScale
             val diff = target - scale
-            val dist = abs(diff)
-            if (dist < 0.001f) {
+            if (abs(diff) < 0.001f) {
                 // 极近直接复位
                 targetScale = Float.NaN
                 scale = target
             }
-            else scale += diff * (1 - exp(-deltaTime * 0.016f / (config.scaleSmoothness + dist))) // 指数衰减
+            else scale += diff * (1 - exp(-deltaTime * config.scaleSmoothness)) // 指数衰减
             isDirty = true
         }
         if (isDirty) updateDirty()

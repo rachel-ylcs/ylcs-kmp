@@ -2,13 +2,16 @@ package love.yinlin.compose.game.visible
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.common.BlockLine
+import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
 import love.yinlin.compose.game.drawer.Drawer
@@ -30,25 +33,23 @@ sealed class Block(
         const val DEFAULT_SCALE = 0.9f
         val DefaultSize = Size(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
         val DefaultCenter = DefaultSize.center
+        val DefaultRect = Rect(Offset.Zero, DefaultSize)
         val TopLeft = Offset.Zero
         val TopRight = Offset(DEFAULT_DIMENSION, 0f)
         val BottomLeft = Offset(0f, DEFAULT_DIMENSION)
         val BottomRight = Offset(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
 
-        val PrepareColor = Colors.White
-        val DefaultPrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red4, Colors.Orange4, Colors.Yellow4, Colors.Green4, Colors.Cyan4, Colors.Blue4, Colors.Purple4)
 
-        val InteractColor = Colors(0xFFA29BFE)
-
-        val MissColors = listOf(Colors(0xFFFF0844), Colors(0xFFFFB199))
-        val BadColors = listOf(Colors(0xFF6BBBFF), Colors(0xFFB8DCFF))
-        val GoodColors = listOf(Colors(0xFF43E97B), Colors(0xFF38F9D7))
-        val PerfectColors = listOf(Colors(0xFFF6D365), Colors(0xFFFDA085))
+        const val BLOCK_RESULT_SCALE = 0.35f
+        const val RELEASE_ANIMATION_DURATION = 300
+        val ReleaseStroke = Stroke(width = 20f, cap = StrokeCap.Round, join = StrokeJoin.Round)
     }
 
     abstract val rhymeAction: RhymeAction
 
-    protected var status: BlockStatus = BlockStatus.None
+    protected var blockStatus: BlockStatus = BlockStatus.None
 
     inline fun withMapLayer(block: (MapLayer, Int) -> Boolean) {
         (layer as? MapLayer)?.let { mapLayer ->
@@ -57,25 +58,51 @@ sealed class Block(
     }
 
     override fun onAttached() {
-        status = BlockStatus.Prepare(0)
+        blockStatus = BlockStatus.Prepare(0f)
     }
 
     override fun onDetached() {
-        status = BlockStatus.None
+        blockStatus = BlockStatus.None
     }
 
     inline fun Drawer.withBlockScale(block: Drawer.() -> Unit) = scale(DEFAULT_SCALE, DefaultCenter, block)
 
-    protected fun Drawer.drawCommonPrepare(progress: Float) {
+    protected fun Drawer.drawCommonPrepare(color: Color, progress: Float) {
         val delta = progress * DEFAULT_DIMENSION / 2f
         val deltaInv = DEFAULT_DIMENSION - delta
-        line(PrepareColor, TopLeft, Offset(delta, 0f), DefaultPrepareStroke)
-        line(PrepareColor, TopLeft, Offset(0f, delta), DefaultPrepareStroke)
-        line(PrepareColor, TopRight, Offset(deltaInv, 0f), DefaultPrepareStroke)
-        line(PrepareColor, TopRight, Offset(DEFAULT_DIMENSION, delta), DefaultPrepareStroke)
-        line(PrepareColor, BottomLeft, Offset(0f, deltaInv), DefaultPrepareStroke)
-        line(PrepareColor, BottomLeft, Offset(delta, DEFAULT_DIMENSION), DefaultPrepareStroke)
-        line(PrepareColor, BottomRight, Offset(deltaInv, DEFAULT_DIMENSION), DefaultPrepareStroke)
-        line(PrepareColor, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), DefaultPrepareStroke)
+        line(color, TopLeft, Offset(delta, 0f), PrepareStroke)
+        line(color, TopLeft, Offset(0f, delta), PrepareStroke)
+        line(color, TopRight, Offset(deltaInv, 0f), PrepareStroke)
+        line(color, TopRight, Offset(DEFAULT_DIMENSION, delta), PrepareStroke)
+        line(color, BottomLeft, Offset(0f, deltaInv), PrepareStroke)
+        line(color, BottomLeft, Offset(delta, DEFAULT_DIMENSION), PrepareStroke)
+        line(color, BottomRight, Offset(deltaInv, DEFAULT_DIMENSION), PrepareStroke)
+        line(color, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), PrepareStroke)
+    }
+
+    protected fun Drawer.drawBlockResultMiss(color: Color) {
+        line(color, TopLeft, BottomRight, ReleaseStroke)
+        line(color, TopRight, BottomLeft, ReleaseStroke)
+    }
+
+    protected fun Drawer.drawBlockResultBad(color: Color) {
+
+    }
+
+    protected fun Drawer.drawBlockResultGood(color: Color) {
+
+    }
+
+    protected fun Drawer.drawBlockResultPerfect(color: Color) {
+
+    }
+
+    protected fun Drawer.drawBlockResult(color: Color, result: BlockResult) {
+        when (result) {
+            BlockResult.MISS -> drawBlockResultMiss(color)
+            BlockResult.BAD -> drawBlockResultBad(color)
+            BlockResult.GOOD -> drawBlockResultGood(color)
+            BlockResult.PERFECT -> drawBlockResultPerfect(color)
+        }
     }
 }

@@ -164,7 +164,5 @@ open class Layer(
         return block()
     }
 
-    internal fun updateDirty() {
-        ++dirtyValue
-    }
+    fun updateDirty() { ++dirtyValue }
 }

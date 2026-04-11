@@ -1,7 +1,6 @@
 package love.yinlin.compose.game.plugin
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.collection.MutableLongLongMap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,9 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
@@ -107,30 +104,36 @@ class ScenePlugin private constructor(
 
     // 指针事件监听
     private suspend fun PointerInputScope.pointerInputLoop() {
-        awaitEachGesture {
-            val firstDown = awaitFirstDown(requireUnconsumed = false)
-            val trackedId = firstDown.id
+        awaitPointerEventScope {
+            val pointerMap = MutableLongLongMap()
 
-            // 指针按下
-            val originPosition = camera.transformPointer(firstDown.position, size.toSize())
-            eventChannel.trySend(Event.Pointer.Down(originPosition))
-
-            // 持续跟踪指针
             while (true) {
-                val event = awaitPointerEvent()
+                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
 
-                val change = event.changes.find { it.id == trackedId }
-                if (change == null || !change.pressed) { // 指针丢失或抬起
-                    val upPosition = change?.position?.let { camera.transformPointer(it, size.toSize()) } ?: Offset.Zero
-                    eventChannel.trySend(Event.Pointer.Up(upPosition, originPosition))
-                    break
-                }
-                else { // 移动
-                    if (change.positionChange() != Offset.Zero) {
-                        val movePosition = camera.transformPointer(change.position, size.toSize())
-                        eventChannel.trySend(Event.Pointer.Move(movePosition, originPosition))
+                for (change in event.changes) {
+                    val id = change.id.value
+                    val position = camera.transformPointer(change.position, size.toSize())
+
+                    when {
+                        // 1. 初次按下
+                        change.changedToDown() -> {
+                            pointerMap[id] = position.packedValue
+                            eventChannel.trySend(Event.Pointer.Down(position))
+                        }
+
+                        // 2. 抬起
+                        change.changedToUp() -> {
+                            val origin = pointerMap.getOrDefault(id, position.packedValue)
+                            pointerMap.remove(id)
+                            eventChannel.trySend(Event.Pointer.Up(position, Offset(origin)))
+                        }
+
+                        // 3. 指针移动
+                        change.pressed && change.positionChanged() -> {
+                            val origin = pointerMap.getOrDefault(id, position.packedValue)
+                            eventChannel.trySend(Event.Pointer.Move(position, Offset(origin)))
+                        }
                     }
-                    change.consume()
                 }
             }
         }

@@ -24,9 +24,10 @@ class MapLayer(
     private val blocks = BlockMapGenerator.generate(Block.DEFAULT_DIMENSION, playInfo.lyricsConfig, playInfo.playConfig)
 
     var audioPosition: Long = 0L
-    var currentIndex = -1
-        private set
-    private var prepareIndex = -1
+    // 音轨当前位置 用于相机跟随 与音频发声一致
+    private var currentIndex: Int = -1
+    // 预准备位置 用于提前显示动画
+    private var prepareIndex: Int = -1
 
     override fun preUpdate(tick: Int) {
         val currentAudioPosition = player.position
@@ -41,7 +42,7 @@ class MapLayer(
             }
         }
 
-        // 检查当前方块
+        // 检查当前音轨方块
         blocks.getOrNull(currentIndex + 1)?.let { nextBlock ->
             if (currentAudioPosition >= nextBlock.time.rawInteract) { // 当方块可交互的时候
                 ++currentIndex

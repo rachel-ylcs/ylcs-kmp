@@ -74,10 +74,7 @@ class ScreenRhyme : BasicScreen() {
         AssetPlugin.Factory(),
         ScenePlugin.Factory(
             fpsRate = 0L,
-            cameraConfig = Camera.Config(
-                moveSmoothness = 1000f,
-                scaleSmoothness = 4f
-            )
+            cameraConfig = Camera.Config()
         ),
         SoundPlugin.Factory(listOf()),
         RhymePlugin.Factory(
