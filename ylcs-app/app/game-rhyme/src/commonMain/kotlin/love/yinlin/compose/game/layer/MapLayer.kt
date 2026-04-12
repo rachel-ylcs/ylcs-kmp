@@ -26,7 +26,7 @@ class MapLayer(
     private val blocks = BlockMapGenerator.generate(Block.DEFAULT_DIMENSION, playInfo.lyricsConfig, playInfo.playConfig)
 
     var audioPosition: Long = 0L
-    // 音轨当前位置 用于相机跟随 与音频发声一致
+    // 当前位置 用于相机跟随 与音频发声一致
     private var currentIndex: Int = -1
     // 预准备位置 用于提前显示动画
     private var prepareIndex: Int = -1

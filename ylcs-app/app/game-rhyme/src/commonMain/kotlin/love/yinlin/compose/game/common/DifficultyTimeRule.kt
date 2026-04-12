@@ -3,9 +3,8 @@ package love.yinlin.compose.game.common
 import androidx.compose.runtime.Stable
 
 @Stable
-data class DifficultyTimeRule(
+data class DifficultyResultRule(
     val prepareTime: Int,
-    val perfectTime: Int,
-    val goodTime: Int,
-    val badTime: Int
+    val perfectRatio: Float,
+    val goodRatio: Float
 )

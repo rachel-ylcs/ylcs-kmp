@@ -1,6 +1,7 @@
 package love.yinlin.compose.game.common
 
 import androidx.compose.runtime.Stable
+import kotlin.math.roundToInt
 
 @Stable
 data class BlockTime(
@@ -14,22 +15,22 @@ data class BlockTime(
     val perfectEnd: Int, // perfect结束
     val goodEnd: Int, // good结束
     val badEnd: Int, // bad结束
-    val dismiss: Int, // 结束点, 并不一定是最大值
 ) {
     companion object {
-        fun build(rule: DifficultyTimeRule, start: Long, end: Long): BlockTime {
+        fun build(rule: DifficultyResultRule, start: Long, end: Long): BlockTime {
             val prepare = rule.prepareTime
+            val duration = (end - start).toInt()
+            val rawInteract = start - duration
             return BlockTime(
-                rawAppearance = start - prepare,
-                rawInteract = start - rule.badTime,
-                badStart = (prepare - rule.badTime).coerceAtLeast(0),
-                goodStart = (prepare - rule.goodTime).coerceAtLeast(0),
-                perfectStart = (prepare - rule.perfectTime).coerceAtLeast(0),
-                standard = prepare.coerceAtLeast(0),
-                perfectEnd = (prepare + rule.perfectTime).coerceAtLeast(0),
-                goodEnd = (prepare + rule.goodTime).coerceAtLeast(0),
-                badEnd = (prepare + rule.badTime).coerceAtLeast(0),
-                dismiss = (prepare + end - start).toInt().coerceAtLeast(0)
+                rawAppearance = rawInteract - prepare,
+                rawInteract = rawInteract,
+                badStart = prepare,
+                goodStart = (prepare + duration * (1 - rule.goodRatio)).roundToInt(),
+                perfectStart = (prepare + duration * (1 - rule.perfectRatio)).roundToInt(),
+                standard = prepare + duration,
+                perfectEnd = (prepare + duration * (1 + rule.perfectRatio)).roundToInt(),
+                goodEnd = (prepare + duration * (1 + rule.goodRatio)).roundToInt(),
+                badEnd = prepare + duration * 2
             )
         }
     }

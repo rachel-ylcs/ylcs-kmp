@@ -19,12 +19,11 @@ class BlockMapGenerator private constructor(
 ) {
     private val lyrics = lyricsConfig.lyrics
     private val audioOffset = lyricsConfig.offset
-    private val difficultyTimeRule = playConfig.difficulty.let {
-        DifficultyTimeRule(
+    private val difficultyResultRule = playConfig.difficulty.let {
+        DifficultyResultRule(
             prepareTime = BlockResult.PrepareDuration[it]!!,
-            perfectTime = BlockResult.PERFECT.durationRanges[it]!!,
-            goodTime = BlockResult.GOOD.durationRanges[it]!!,
-            badTime = BlockResult.BAD.durationRanges[it]!!
+            perfectRatio = BlockResult.PERFECT.ranges[it]!!,
+            goodRatio = BlockResult.GOOD.ranges[it]!!
         )
     }
 
@@ -134,7 +133,7 @@ class BlockMapGenerator private constructor(
                 val action = theme[i]
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + lineStart
                 val end = action.end + lineStart
-                val blockTime = BlockTime.build(difficultyTimeRule, start, end)
+                val blockTime = BlockTime.build(difficultyResultRule, start, end)
                 when (action) {
                     // 单音
                     is RhymeAction.Note -> NoteBlock(
