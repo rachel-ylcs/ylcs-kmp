@@ -5,19 +5,34 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.toIntSize
+import androidx.compose.ui.zIndex
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.data.RhymePlayResult
+import love.yinlin.compose.game.layer.BackgroundLayer
 import love.yinlin.compose.game.layer.MapLayer
 import love.yinlin.compose.game.ui.RhymeAcrylicSurface
 import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.input.PrimaryButton
+import love.yinlin.compose.ui.icon.RhymeIcons
+import love.yinlin.compose.ui.image.Icon
+import love.yinlin.compose.ui.node.BlurState
+import love.yinlin.compose.ui.node.blurTarget
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
@@ -28,16 +43,18 @@ import kotlin.reflect.KClass
 
 @Stable
 class RhymePlugin(
-    engine: Engine,
     context: PlatformContext,
-    private val endListener: (RhymePlayResult?) -> Unit
+    private val blurState: BlurState,
+    private val endListener: (RhymePlayResult?) -> Unit,
+    engine: Engine,
 ) : UIPlugin(engine) {
     @Stable
     class Factory(
         private val context: PlatformContext,
-        private val endListener: (RhymePlayResult?) -> Unit
+        private val blurState: BlurState,
+        private val endListener: (RhymePlayResult?) -> Unit,
     ) : PluginFactory {
-        override fun build(engine: Engine): Plugin = RhymePlugin(engine, context, endListener)
+        override fun build(engine: Engine): Plugin = RhymePlugin(context, blurState, endListener, engine)
     }
 
     override val dependencies: List<KClass<out Plugin>> = listOf(ScenePlugin::class, SoundPlugin::class)
@@ -48,10 +65,16 @@ class RhymePlugin(
 
     }
 
+    private var currentInfo: RhymePlayInfo? = null
+
+    private var progressState = mutableFloatStateOf(0f)
+
     // 初始化游戏
     suspend fun setupGame(playInfo: RhymePlayInfo, audio: File) {
+        currentInfo = playInfo
         player.load(audio, true)
-        scene += MapLayer(scene.camera, player, playInfo)
+        scene += BackgroundLayer()
+        scene += MapLayer(scene.camera, player, playInfo, progressState)
     }
 
     // 停止游戏
@@ -59,6 +82,7 @@ class RhymePlugin(
         scene.reset()
         endListener(null)
         player.stop()
+        currentInfo = null
     }
 
     override suspend fun onInitialize(): Boolean {
@@ -73,40 +97,99 @@ class RhymePlugin(
     }
 
     @Composable
-    override fun BoxScope.Content() {
-        LaunchedEffect(engine.isRunning) {
-            if (engine.isRunning) player.play()
-            else player.pause()
-        }
-
-        if (engine.isRunning) {
-            Column(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
-                PrimaryButton("暂停", onClick = {
-                    engine.isRunning = false
-                })
+    private fun PauseContent(modifier: Modifier = Modifier) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            RhymeAcrylicSurface(
+                modifier = Modifier.width(Theme.size.cell1),
+                shape = Theme.shape.v3,
+                contentPadding = Theme.padding.value5
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9, Alignment.CenterVertically)
+                ) {
+                    SimpleClipText(text = "暂停中", style = Theme.typography.v5.bold, modifier = Modifier.padding(Theme.padding.v9))
+                    RhymeCommonButton(icon = Icons.Clear, text = "退出", onClick = ::stopGame, modifier = Modifier.fillMaxWidth())
+                    RhymeCommonButton(icon = Icons.PlayArrow, text = "继续", onClick = { engine.isRunning = true }, modifier = Modifier.fillMaxWidth())
+                }
             }
         }
-        else {
-            Box(
-                modifier = Modifier.fillMaxSize().background(Theme.color.scrim.copy(alpha = 0.5f)).silentClick { },
-                contentAlignment = Alignment.Center
+    }
+
+    @Composable
+    private fun BoxScope.InfoContent() {
+        currentInfo?.let { info ->
+            Row(
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).align(Alignment.TopStart).blurTarget(blurState).padding(Theme.padding.value),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
             ) {
-                RhymeAcrylicSurface(
-                    modifier = Modifier.width(Theme.size.cell1),
-                    shape = Theme.shape.v3,
-                    contentPadding = Theme.padding.value5
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v9, Alignment.CenterVertically)
-                    ) {
-                        SimpleClipText(text = "暂停中", style = Theme.typography.v5.bold, modifier = Modifier.padding(Theme.padding.v9))
-                        RhymeCommonButton(icon = Icons.Clear, text = "退出", onClick = ::stopGame, modifier = Modifier.fillMaxWidth())
-                        RhymeCommonButton(icon = Icons.PlayArrow, text = "继续", onClick = { engine.isRunning = true }, modifier = Modifier.fillMaxWidth())
+                // 画封面
+                Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f).silentClick {
+                    engine.isRunning = false
+                }.drawWithContent {
+                    // 画背景
+                    val bounds = Rect(0f, 0f, size.width, size.height)
+                    val strokeWidth = size.width / 20
+                    clipPath(Path().apply { addOval(bounds) }) {
+                        drawImage(
+                            image = info.musicRecord,
+                            dstOffset = IntOffset.Zero,
+                            dstSize = size.toIntSize()
+                        )
+                    }
+                    // 画时长
+                    drawArc(
+                        color = Colors.White,
+                        startAngle = -90f,
+                        sweepAngle = 360f,
+                        useCenter = false,
+                        style = Stroke(strokeWidth, cap = StrokeCap.Round)
+                    )
+                    // 画进度
+                    drawArc(
+                        color = Colors.Green4,
+                        startAngle = -90f,
+                        sweepAngle = 360f * progressState.value,
+                        useCenter = false,
+                        style = Stroke(strokeWidth, cap = StrokeCap.Round)
+                    )
+                })
+                Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
+                    // 画标题
+                    SimpleClipText(
+                        text = info.musicInfo.name,
+                        style = Theme.typography.v6.bold
+                    )
+                    // 画难度星级
+                    Row {
+                       repeat(info.playConfig.difficulty.ordinal + 1) {
+                           Icon(icon = RhymeIcons.Star, color = Colors.Unspecified)
+                       }
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun UIContent(modifier: Modifier = Modifier) {
+        Box(modifier = modifier) {
+            InfoContent()
+        }
+    }
+
+    @Composable
+    override fun BoxScope.Content() {
+        UIContent(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current).zIndex(1f))
+        if (!engine.isRunning) PauseContent(modifier = Modifier.fillMaxSize().background(Theme.color.scrim.copy(alpha = 0.6f)).silentClick { }.zIndex(2f))
+
+        LaunchedEffect(engine.isRunning) {
+            if (engine.isRunning) player.play()
+            else player.pause()
         }
     }
 }

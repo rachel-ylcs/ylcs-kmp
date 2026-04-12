@@ -51,6 +51,8 @@ import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.input.Filter
+import love.yinlin.compose.ui.node.BlurState
+import love.yinlin.compose.ui.node.blurSource
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
@@ -64,6 +66,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class ScreenRhyme : BasicScreen() {
+    private val blurState = BlurState()
+
     private val engine = Engine(
         viewport = Viewport.MatchHeight(2000),
         backgroundColor = Colors.Black,
@@ -74,11 +78,13 @@ class ScreenRhyme : BasicScreen() {
         AssetPlugin.Factory(),
         ScenePlugin.Factory(
             fpsRate = 0L,
-            cameraConfig = Camera.Config()
+            cameraConfig = Camera.Config(),
+            extraModifier = Modifier.blurSource(blurState)
         ),
         SoundPlugin.Factory(listOf()),
         RhymePlugin.Factory(
             context = app.rawContext,
+            blurState = blurState,
             endListener = ::endGame
         )
     )

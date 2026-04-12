@@ -1,5 +1,6 @@
 package love.yinlin.compose.game.layer
 
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.game.common.BlockMapGenerator
 import love.yinlin.compose.game.data.RhymePlayInfo
@@ -14,7 +15,8 @@ import love.yinlin.media.AudioPlayer
 class MapLayer(
     private val camera: Camera,
     private val player: AudioPlayer,
-    playInfo: RhymePlayInfo
+    playInfo: RhymePlayInfo,
+    private val progressUpdater: MutableFloatState
 ) : Layer(layerOrder = 1), Dynamic {
     companion object {
         const val CAMERA_BLOCK_AREA_RATIO = 0.8f
@@ -30,8 +32,11 @@ class MapLayer(
     private var prepareIndex: Int = -1
 
     override fun preUpdate(tick: Int) {
+        // 更新进度
         val currentAudioPosition = player.position
+        val currentAudioDuration = player.duration
         audioPosition = currentAudioPosition
+        progressUpdater.value = if (currentAudioDuration == 0L) 0f else currentAudioPosition / currentAudioDuration.toFloat()
 
         // 检查新方块
         blocks.getOrNull(prepareIndex + 1)?.let { nextBlock ->

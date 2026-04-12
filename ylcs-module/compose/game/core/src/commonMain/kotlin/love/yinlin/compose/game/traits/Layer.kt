@@ -1,6 +1,8 @@
 package love.yinlin.compose.game.traits
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.draw.CacheDrawScope
+import androidx.compose.ui.draw.DrawResult
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -11,14 +13,15 @@ import love.yinlin.compose.extension.scale
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.drawer.LayerOrder
-import love.yinlin.compose.game.drawer.PrepareDrawer
+import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.plugin.ScenePlugin
 
 @Stable
 open class Layer(
     vararg visibles: Visible,
     val layerOrder: Int = LayerOrder.Default, // 层级
-): Entity(), Dynamic {
+    val layerType: LayerType = LayerType.Relative, // 层类型
+) : Entity(), Dynamic {
     private val items = visibles.sortedBy(Visible::layerOrder).toMutableList()
 
     val isEmpty: Boolean get() = items.isEmpty()
@@ -106,51 +109,104 @@ open class Layer(
      */
     open val interactive: Boolean = true
 
-    open fun preTrigger(tick: Int, event: Event): Boolean = false
-
-    internal fun triggerVisibleLayer(tick: Int, event: Event): Boolean {
-        if (preTrigger(tick, event)) return true // Layer 拦截消息
-        // 事件处理层级逆向
+    internal fun hitTestVisibleLayer(point: Offset): Visible? {
+        // 受击处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]
-            val trigger = item.trigger ?: continue
-            if (trigger.onEvent(tick, event, item)) return true // 消费完成
+            if (item.onHitTest(point)) return item
         }
-        return false
+        return null
     }
 
-    // 绘制预处理
-    internal fun prepareDrawVisibleLayer(drawer: PrepareDrawer, viewportSize: Size, bounds: Rect) {
-        items.fastForEach { item ->
-            // 更新视口剔除
-            item.updateCulling(bounds)
-            // 检查视口剔除
-            if (item.alive) {
-                with(item) {
-                    drawer.prepareDraw(viewportSize, bounds)
+    internal fun triggerVisibleLayer(tick: Int, event: Event): Boolean = when (event) {
+        // 检查是否是指针事件 拦截
+        is Event.Pointer -> {
+            val source = event.source
+            source.trigger?.onEvent(tick, event, source)
+            // 即使没有触发器，受击检测通过就必须消费完成
+            true
+        }
+        // 其他事件
+        else -> {
+            // 事件处理层级逆向
+            for (index in items.indices.reversed()) {
+                val source = items[index]
+                val trigger = source.trigger ?: continue
+                if (trigger.onEvent(tick, event, source)) return true // 消费完成
+            }
+            false
+        }
+    }
+
+    private fun Drawer.drawVisible(item: Visible) {
+        transform({
+            // 偏移
+            translate(item.position)
+            // 旋转
+            item.rotate.let { if (it != 0f) rotate(degrees = it, pivot = Offset.Zero) }
+            // 缩放
+            item.scale.let { if (it != 1f) scale(ratio = it, pivot = Offset.Zero) }
+            // Canvas偏移
+            translate(-item.center)
+            // 裁切
+            if (item.clip) item.aabb.onClip(this, item.size)
+        }) {
+            with(item) { onDraw() }
+        }
+    }
+
+    internal fun drawCacheVisibleLayerRelative(scope: CacheDrawScope, drawer: Drawer, viewportSize: Size, bounds: Rect): DrawResult {
+        return whenDirty {
+            if (visible) {
+                // 绘制预处理
+                drawer.withRawCacheScope(scope) {
+                    // 遍历元素
+                    items.fastForEach { item ->
+                        // 更新视口剔除
+                        item.updateCulling(bounds)
+                        // 检查视口剔除
+                        if (item.alive) {
+                            with(item) {
+                                prepareDraw(viewportSize, bounds)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 绘制
+            scope.onDrawWithContent {
+                if (visible) {
+                    drawer.withRawScope(this) {
+                        items.fastForEach { item ->
+                            // 检查视口剔除
+                            if (item.alive) drawVisible(item)
+                        }
+                    }
                 }
             }
         }
     }
 
-    // 绘制
-    internal fun drawVisibleLayer(drawer: Drawer) {
-        items.fastForEach { item ->
-            // 检查视口剔除
-            if (item.alive) {
-                drawer.transform({
-                    // 偏移
-                    translate(item.position)
-                    // 旋转
-                    item.rotate.let { if (it != 0f) rotate(degrees = it, pivot = Offset.Zero) }
-                    // 缩放
-                    item.scale.let { if (it != 1f) scale(ratio = it, pivot = Offset.Zero) }
-                    // Canvas偏移
-                    translate(-item.center)
-                    // 裁切
-                    if (item.clip) item.aabb.onClip(this, item.size)
-                }) {
-                    with(item) { onDraw() }
+    internal fun drawCacheVisibleLayerAbsolute(scope: CacheDrawScope, drawer: Drawer, viewportSize: Size): DrawResult {
+        return whenDirty {
+            if (visible) {
+                // 绘制预处理
+                drawer.withRawCacheScope(scope) {
+                    items.fastForEach { item ->
+                        with(item) {
+                            prepareDraw(viewportSize, bounds)
+                        }
+                    }
+                }
+            }
+
+            // 绘制
+            scope.onDrawWithContent {
+                if (visible) {
+                    drawer.withRawScope(this) {
+                        items.fastForEach { drawVisible(it) }
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ package love.yinlin.compose.game.plugin
 
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.drawer.LayerOrder
@@ -33,6 +34,11 @@ abstract class Plugin(val engine: Engine) : Identifiable<String> {
      * 层级
      */
     open val layerOrder: Int = LayerOrder.Default
+
+    /**
+     * 拓展修饰符
+     */
+    open val extraModifier: Modifier = Modifier
 
     /**
      * 内容

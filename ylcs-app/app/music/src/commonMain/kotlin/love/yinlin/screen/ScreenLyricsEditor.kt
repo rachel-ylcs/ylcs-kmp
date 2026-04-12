@@ -183,7 +183,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
 
                 ThemeContainer(contentColor) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).background(backgroundColor).clickable { },
+                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).background(backgroundColor).clickable { },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(

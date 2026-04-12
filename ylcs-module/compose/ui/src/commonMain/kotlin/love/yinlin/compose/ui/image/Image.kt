@@ -4,10 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import love.yinlin.compose.data.ImageQuality
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -28,6 +30,28 @@ fun Image(
         contentScale = contentScale,
         alpha = alpha,
         colorFilter = colorFilter
+    )
+}
+
+@Composable
+fun Image(
+    bitmap: ImageBitmap,
+    modifier: Modifier = Modifier,
+    alignment: Alignment = Alignment.Center,
+    contentScale: ContentScale = ContentScale.Fit,
+    alpha: Float = 1f,
+    colorFilter: ColorFilter? = null,
+    imageQuality: ImageQuality = ImageQuality.Medium
+) {
+    androidx.compose.foundation.Image(
+        bitmap = bitmap,
+        contentDescription = null,
+        modifier = modifier,
+        alignment = alignment,
+        contentScale = contentScale,
+        alpha = alpha,
+        colorFilter = colorFilter,
+        filterQuality = imageQuality.filterQuality
     )
 }
 

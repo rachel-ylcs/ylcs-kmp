@@ -144,15 +144,18 @@ class Camera internal constructor(private val config: Config) {
         val (newSize, newScale) = viewport.applyCanvasBounds(size)
         rawViewportScale = newScale
         viewportSize = newSize
-        updateDirty()
     }
 
-    internal fun transformPointer(pointer: Offset, size: Size): Offset {
-        val totalScale = rawViewportScale * scale
-        return (pointer - size.center) / totalScale + position
+    internal fun transformPointer(isRelative: Boolean, pointer: Offset, size: Size): Offset {
+        val diff = pointer - size.center
+        return if (isRelative) {
+            val totalScale = rawViewportScale * scale
+            diff / totalScale + position
+        }
+        else diff / rawViewportScale
     }
 
-    internal fun whenDirtyTransformLayer(scope: GraphicsLayerScope, size: Size) {
+    internal fun whenDirtyTransformLayerRelative(scope: GraphicsLayerScope, size: Size) {
         val _ = dirtyValue
         val totalScale = rawViewportScale * scale
         val (centerX, centerY) = size / 2f
@@ -163,6 +166,16 @@ class Camera internal constructor(private val config: Config) {
         scope.scaleY = totalScale
         scope.translationX = centerX - cameraX
         scope.translationY = centerY - cameraY
+    }
+
+    internal fun whenDirtyTransformLayerAbsolute(scope: GraphicsLayerScope, size: Size) {
+        // 不需要读取dirtyValue
+        val (centerX, centerY) = size / 2f
+        scope.transformOrigin = TransformOrigin(0f, 0f)
+        scope.scaleX = rawViewportScale
+        scope.scaleY = rawViewportScale
+        scope.translationX = centerX
+        scope.translationY = centerY
     }
 
     // 脏区标记

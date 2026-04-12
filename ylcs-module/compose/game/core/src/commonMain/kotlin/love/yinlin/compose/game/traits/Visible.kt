@@ -60,6 +60,16 @@ abstract class Visible(
     }
 
     /**
+     * 受击检测
+     */
+    internal fun onHitTest(point: Offset): Boolean {
+        // 获取相对于 visible 的位置
+        val visiblePosition = point - position + center
+        // 检查碰撞箱
+        return aabb.contains(size, visiblePosition)
+    }
+
+    /**
      * 绘制预处理
      *
      * 脏区更新时触发，不允许使用Drawer绘制内容，只能测量并更新。

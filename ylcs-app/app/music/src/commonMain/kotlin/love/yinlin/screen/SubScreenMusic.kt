@@ -567,7 +567,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             val musicInfo = library[id]
 
                             Row(
-                                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).clickable {
+                                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).clickable {
                                     launch { mp?.gotoIndex(index) }
                                     close()
                                 }.padding(Theme.padding.value),

@@ -264,7 +264,7 @@ class ScreenPlaylistLibrary : Screen() {
                 ) { index, item ->
                     ReorderableItem(state = reorderState, key = item.id) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max).longPressDraggableHandle(
+                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).longPressDraggableHandle(
                                 onDragStarted = {
                                     dragStartIndex = -1
                                     dragEndIndex = -1

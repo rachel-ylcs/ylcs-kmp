@@ -1,13 +1,11 @@
 package love.yinlin.compose.game.plugin
 
-import androidx.collection.MutableLongLongMap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
@@ -28,6 +26,7 @@ import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.font.FontProvider
 import love.yinlin.compose.game.drawer.LayerOrder
+import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
@@ -37,6 +36,7 @@ import kotlin.uuid.ExperimentalUuidApi
 class ScenePlugin private constructor(
     private val fpsRate: Long,
     cameraConfig: Camera.Config,
+    override val extraModifier: Modifier,
     engine: Engine
 ) : Plugin(engine) {
     /**
@@ -46,8 +46,9 @@ class ScenePlugin private constructor(
     class Factory(
         val fpsRate: Long = 1000L,
         val cameraConfig: Camera.Config = Camera.Config(),
+        val extraModifier: Modifier = Modifier,
     ) : PluginFactory {
-        override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, cameraConfig, engine)
+        override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, cameraConfig, extraModifier, engine)
     }
 
     /**
@@ -105,33 +106,72 @@ class ScenePlugin private constructor(
     // 指针事件监听
     private suspend fun PointerInputScope.pointerInputLoop() {
         awaitPointerEventScope {
-            val pointerMap = MutableLongLongMap()
+            val pointerMap = mutableMapOf<Long, Event>()
 
             while (true) {
                 val event = awaitPointerEvent(pass = PointerEventPass.Initial)
 
                 for (change in event.changes) {
                     val id = change.id.value
-                    val position = camera.transformPointer(change.position, size.toSize())
+                    val position = change.position
+                    val eventSize = size.toSize()
 
                     when {
-                        // 1. 初次按下
+                        // 初次按下
                         change.changedToDown() -> {
-                            pointerMap[id] = position.packedValue
-                            eventChannel.trySend(Event.Pointer.Down(position))
+                            // 事件处理层级是逆向的，与渲染顺序相反
+                            for (index in layerEntities.indices.reversed()) {
+                                val layer = layerEntities[index]
+                                if (layer.interactive) { // 可交互的层
+                                    // 根据层类型转换坐标
+                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Relative, position, eventSize)
+                                    // 构造受击检测
+                                    val visible = layer.hitTestVisibleLayer(transformPosition) ?: continue
+                                    // 消费完成
+                                    val event = Event.Pointer.Down(id, transformPosition, visible)
+                                    pointerMap[id] = event
+                                    // 发送按下事件到消息队列
+                                    eventChannel.trySend(event)
+                                    break
+                                }
+                            }
+                            // 空置点击不处理
                         }
 
-                        // 2. 抬起
+                        // 抬起
                         change.changedToUp() -> {
-                            val origin = pointerMap.getOrDefault(id, position.packedValue)
-                            pointerMap.remove(id)
-                            eventChannel.trySend(Event.Pointer.Up(position, Offset(origin)))
+                            // 检查是否是游离指针
+                            val event = pointerMap[id] as? Event.Pointer.Down
+                            if (event != null) {
+                                // 移除指针
+                                pointerMap.remove(id)
+                                // 检查是否layer还存在
+                                val visible = event.source
+                                val layer = visible.layer
+                                if (layer != null) {
+                                    // 转换坐标
+                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Relative, position, eventSize)
+                                    // 发送抬起事件到消息队列
+                                    eventChannel.trySend(Event.Pointer.Up(id, transformPosition, visible, event.position))
+                                }
+                            }
                         }
 
-                        // 3. 指针移动
+                        // 指针移动
                         change.pressed && change.positionChanged() -> {
-                            val origin = pointerMap.getOrDefault(id, position.packedValue)
-                            eventChannel.trySend(Event.Pointer.Move(position, Offset(origin)))
+                            // 检查是否是游离指针
+                            val event = pointerMap[id] as? Event.Pointer.Down
+                            if (event != null) {
+                                // 检查是否layer还存在
+                                val visible = event.source
+                                val layer = visible.layer
+                                if (layer != null) {
+                                    // 转换坐标
+                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Relative, position, eventSize)
+                                    // 发送移动事件到消息队列
+                                    eventChannel.trySend(Event.Pointer.Move(id, transformPosition, visible, event.position))
+                                }
+                            }
                         }
                     }
                 }
@@ -206,11 +246,7 @@ class ScenePlugin private constructor(
         Box(modifier = Modifier.fillMaxSize().onSizeChanged { // 相机坐标转换
             camera.updateViewport(it, engine.viewport)
         }.pointerInput(Unit) { // 指针事件监听
-            // 注意指针监听必须放在layer前面，然后手动坐标转换
-            // 如果放后面看起来坐标经layer自动转换了，但是原点在中心后非第四象限外的坐标将不接受指针事件了
             pointerInputLoop()
-        }.graphicsLayer { // 窗口坐标转换
-            camera.whenDirtyTransformLayer(this, size)
         }) {
             val density = LocalDensity.current
             val fontFamilyResolver = LocalFontFamilyResolver.current
@@ -231,28 +267,16 @@ class ScenePlugin private constructor(
                         )
                     }
 
-                    Box(modifier = Modifier.fillMaxSize().graphicsLayer().drawWithCache {
-                        camera.whenDirty { viewportSize, bounds ->
-                            layer.whenDirty {
-                                val layerVisible = layer.visible
-
-                                // 绘制预处理
-                                if (layerVisible) {
-                                    drawer.withRawCacheScope(this) {
-                                        layer.prepareDrawVisibleLayer(this, viewportSize, bounds)
-                                    }
-                                }
-
-                                // 绘制
-                                onDrawWithContent {
-                                    if (layerVisible) {
-                                        drawer.withRawScope(this) {
-                                            layer.drawVisibleLayer(this)
-                                        }
-                                    }
-                                }
+                    Box(modifier = Modifier.fillMaxSize().graphicsLayer {
+                        if (layer.layerType == LayerType.Relative) camera.whenDirtyTransformLayerRelative(this, size)
+                        else camera.whenDirtyTransformLayerAbsolute(this, size)
+                    }.drawWithCache {
+                        if (layer.layerType == LayerType.Relative) {
+                            camera.whenDirty { viewportSize, bounds ->
+                                layer.drawCacheVisibleLayerRelative(this, drawer, viewportSize, bounds)
                             }
                         }
+                        else layer.drawCacheVisibleLayerAbsolute(this, drawer, camera.viewportSize)
                     }.zIndex(layer.layerOrder.toFloat()))
                 }
             }
