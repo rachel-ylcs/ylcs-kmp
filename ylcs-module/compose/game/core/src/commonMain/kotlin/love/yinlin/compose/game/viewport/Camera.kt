@@ -2,6 +2,7 @@ package love.yinlin.compose.game.viewport
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
@@ -12,6 +13,7 @@ import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntSize
+import love.yinlin.compose.extension.mutableSizeStateOf
 import kotlin.math.abs
 import kotlin.math.exp
 
@@ -32,13 +34,13 @@ class Camera internal constructor(private val config: Config) {
     /**
      * 视口大小
      */
-    var viewportSize: Size = Size.Zero
+    var viewportSize: Size by mutableSizeStateOf(Size.Zero)
         private set
 
     /**
      * 原始视口缩放
      */
-    private var rawViewportScale: Float = 1f
+    private var rawViewportScale: Float by mutableFloatStateOf(1f)
 
     /**
      * 相机位置
@@ -146,16 +148,12 @@ class Camera internal constructor(private val config: Config) {
         viewportSize = newSize
     }
 
-    internal fun transformPointer(isRelative: Boolean, pointer: Offset, size: Size): Offset {
-        val diff = pointer - size.center
-        return if (isRelative) {
-            val totalScale = rawViewportScale * scale
-            diff / totalScale + position
-        }
-        else diff / rawViewportScale
+    internal fun transformPointer(isAbsolute: Boolean, pointer: Offset, size: Size): Offset = if (isAbsolute) pointer / rawViewportScale else {
+        val totalScale = rawViewportScale * scale
+        (pointer - size.center) / totalScale + position
     }
 
-    internal fun whenDirtyTransformLayerRelative(scope: GraphicsLayerScope, size: Size) {
+    internal fun transformLayerRelative(scope: GraphicsLayerScope, size: Size) {
         val _ = dirtyValue
         val totalScale = rawViewportScale * scale
         val (centerX, centerY) = size / 2f
@@ -168,14 +166,10 @@ class Camera internal constructor(private val config: Config) {
         scope.translationY = centerY - cameraY
     }
 
-    internal fun whenDirtyTransformLayerAbsolute(scope: GraphicsLayerScope, size: Size) {
-        // 不需要读取dirtyValue
-        val (centerX, centerY) = size / 2f
+    internal fun transformLayerAbsolute(scope: GraphicsLayerScope) {
         scope.transformOrigin = TransformOrigin(0f, 0f)
         scope.scaleX = rawViewportScale
         scope.scaleY = rawViewportScale
-        scope.translationX = centerX
-        scope.translationY = centerY
     }
 
     // 脏区标记

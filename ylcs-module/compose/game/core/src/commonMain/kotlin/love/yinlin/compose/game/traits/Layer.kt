@@ -138,7 +138,7 @@ open class Layer(
         }
     }
 
-    private fun Drawer.drawVisible(item: Visible) {
+    private fun Drawer.drawVisibleRelative(item: Visible) {
         transform({
             // 偏移
             translate(item.position)
@@ -150,6 +150,19 @@ open class Layer(
             translate(-item.center)
             // 裁切
             if (item.clip) item.aabb.onClip(this, item.size)
+        }) {
+            with(item) { onDraw() }
+        }
+    }
+
+    private fun Drawer.drawVisibleAbsolute(item: Visible) {
+        transform({
+            // 偏移
+            translate(item.position)
+            // 旋转
+            item.rotate.let { if (it != 0f) rotate(degrees = it, pivot = Offset.Zero) }
+            // 缩放
+            item.scale.let { if (it != 1f) scale(ratio = it, pivot = Offset.Zero) }
         }) {
             with(item) { onDraw() }
         }
@@ -180,7 +193,7 @@ open class Layer(
                     drawer.withRawScope(this) {
                         items.fastForEach { item ->
                             // 检查视口剔除
-                            if (item.alive) drawVisible(item)
+                            if (item.alive) drawVisibleRelative(item)
                         }
                     }
                 }
@@ -205,7 +218,7 @@ open class Layer(
             scope.onDrawWithContent {
                 if (visible) {
                     drawer.withRawScope(this) {
-                        items.fastForEach { drawVisible(it) }
+                        items.fastForEach { drawVisibleAbsolute(it) }
                     }
                 }
             }

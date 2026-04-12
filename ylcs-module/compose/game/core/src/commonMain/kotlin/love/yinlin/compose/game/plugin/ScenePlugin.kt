@@ -124,7 +124,7 @@ class ScenePlugin private constructor(
                                 val layer = layerEntities[index]
                                 if (layer.interactive) { // 可交互的层
                                     // 根据层类型转换坐标
-                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Relative, position, eventSize)
+                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
                                     // 构造受击检测
                                     val visible = layer.hitTestVisibleLayer(transformPosition) ?: continue
                                     // 消费完成
@@ -150,7 +150,7 @@ class ScenePlugin private constructor(
                                 val layer = visible.layer
                                 if (layer != null) {
                                     // 转换坐标
-                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Relative, position, eventSize)
+                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
                                     // 发送抬起事件到消息队列
                                     eventChannel.trySend(Event.Pointer.Up(id, transformPosition, visible, event.position))
                                 }
@@ -167,7 +167,7 @@ class ScenePlugin private constructor(
                                 val layer = visible.layer
                                 if (layer != null) {
                                     // 转换坐标
-                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Relative, position, eventSize)
+                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
                                     // 发送移动事件到消息队列
                                     eventChannel.trySend(Event.Pointer.Move(id, transformPosition, visible, event.position))
                                 }
@@ -268,8 +268,8 @@ class ScenePlugin private constructor(
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer {
-                        if (layer.layerType == LayerType.Relative) camera.whenDirtyTransformLayerRelative(this, size)
-                        else camera.whenDirtyTransformLayerAbsolute(this, size)
+                        if (layer.layerType == LayerType.Relative) camera.transformLayerRelative(this, size)
+                        else camera.transformLayerAbsolute(this)
                     }.drawWithCache {
                         if (layer.layerType == LayerType.Relative) {
                             camera.whenDirty { viewportSize, bounds ->
