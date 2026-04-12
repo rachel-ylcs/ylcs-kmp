@@ -26,7 +26,7 @@ import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.layer.BackgroundLayer
 import love.yinlin.compose.game.layer.MapLayer
-import love.yinlin.compose.game.ui.RhymeAcrylicSurface
+import love.yinlin.compose.game.ui.BlurSurface
 import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.RhymeIcons
@@ -102,9 +102,11 @@ class RhymePlugin(
             modifier = modifier,
             contentAlignment = Alignment.Center
         ) {
-            RhymeAcrylicSurface(
+            BlurSurface(
                 modifier = Modifier.width(Theme.size.cell1),
+                blurState = blurState,
                 shape = Theme.shape.v3,
+                border = Theme.border.v7,
                 contentPadding = Theme.padding.value5
             ) {
                 Column(
