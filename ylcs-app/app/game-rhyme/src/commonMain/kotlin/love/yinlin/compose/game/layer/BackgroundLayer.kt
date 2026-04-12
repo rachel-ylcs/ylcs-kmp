@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
@@ -29,8 +30,8 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
         val step = 20f
         val wavePath1 = Path()
         val wavePath2 = Path()
-        val waveColor1 = Colors(0xFF00E5FF).copy(alpha = 0.05f)
-        val waveColor2 = Colors(0xFFFF00FF).copy(alpha = 0.05f)
+        val waveColor1 = Colors(0xFF00E5FF).copy(alpha = 0.1f)
+        val waveColor2 = Colors(0xFFFF00FF).copy(alpha = 0.1f)
 
         override fun onUpdate(tick: Int) {
             size = camera.viewportSize
@@ -68,12 +69,13 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
     private class Ripple(val camera: Camera) : Visible(), Dynamic {
         var resonanceTime = 0f
         var resonanceUpdateTimer = 0f
-        val resonanceUpdateInterval = 100f
+        val resonanceUpdateInterval = 96f
         val resonancePath = Path()
-        val resonanceColor = Colors(0xFF7C4DFF).copy(alpha = 0.1f)
+        val resonanceColor = Colors(0xFF7C4DFF).copy(alpha = 0.15f)
         var resonanceTargetScale = 1f
         var resonanceCurrentScale = 1f
         val edgeNoises = FloatArray(50)
+        val noiseSize = edgeNoises.size
 
         override fun onUpdate(tick: Int) {
             size = camera.viewportSize
@@ -85,7 +87,7 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
             if (resonanceUpdateTimer >= resonanceUpdateInterval) {
                 resonanceUpdateTimer = 0f
                 resonanceTargetScale = 0.9f + Random.nextFloat() * 0.3f
-                repeat(edgeNoises.size) { i ->
+                repeat(noiseSize) { i ->
                     edgeNoises[i] = sin(resonanceTime * 5 + i) * 10 + Random.nextFloat() * 8f
                 }
             }
@@ -93,8 +95,8 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
             val (centerX, centerY) = center
             val currentBaseRadius = size.minDimension * resonanceCurrentScale / 4
             resonancePath.reset()
-            repeat(edgeNoises.size) { i ->
-                val angleRad = i * 6.283184f / edgeNoises.size
+            repeat(noiseSize) { i ->
+                val angleRad = i * 6.283184f / noiseSize
                 val r = currentBaseRadius + edgeNoises[i]
                 val px = centerX + r * cos(angleRad)
                 val py = centerY + r * sin(angleRad)
@@ -126,18 +128,22 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
                 red = Random.nextFloat() * 0.5f + 0.5f,
                 green = Random.nextFloat() * 0.5f + 0.5f,
                 blue = Random.nextFloat() * 0.5f + 0.5f,
-                alpha = 0.1f
+                alpha = 0.15f
             )
+
+            val position: Offset get() = Offset(x, y)
         }
 
         enum class LinkState { IDLE, LINKING, FADING }
 
-        private var linkState = LinkState.IDLE
-        private var boxes = emptyList<BoxNode>()
-        private val pathNodes = mutableListOf<BoxNode>()
-        private var currentTarget: BoxNode? = null
-        private var linkProgress = 0f
-        private var fadeAlpha = 1f
+        var linkState = LinkState.IDLE
+        var boxes = emptyList<BoxNode>()
+        val pathNodes = mutableListOf<BoxNode>()
+        var currentTarget: BoxNode? = null
+        var linkProgress = 0f
+        var fadeAlpha = 1f
+        val smallStroke = Stroke(5f, cap = StrokeCap.Round)
+        val largeStroke = Stroke(8f, cap = StrokeCap.Round)
 
         override fun onUpdate(tick: Int) {
             size = camera.viewportSize
@@ -204,16 +210,17 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
         }
 
         override fun Drawer.onDraw() {
-            val stableLineAlpha = if (linkState == LinkState.FADING) fadeAlpha * 0.05f else 0.05f
+            val stableLineAlpha = if (linkState == LinkState.FADING) fadeAlpha * 0.1f else 0.1f
+
             if (pathNodes.size > 1) {
                 for (i in 0 ..< pathNodes.size - 1) {
                     val start = pathNodes[i]
                     val end = pathNodes[i + 1]
                     line(
                         color = Colors.White.copy(alpha = stableLineAlpha),
-                        start = Offset(start.x, start.y),
-                        end = Offset(end.x, end.y),
-                        style = Stroke(3f)
+                        start = start.position,
+                        end = end.position,
+                        style = smallStroke
                     )
                 }
             }
@@ -223,23 +230,22 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
                 val end = pathNodes[0]
                 line(
                     color = Colors.White.copy(alpha = stableLineAlpha),
-                    start = Offset(start.x, start.y),
-                    end = Offset(end.x, end.y),
-                    style = Stroke(3f)
+                    start = start.position,
+                    end = end.position,
+                    style = smallStroke
                 )
             }
 
             val target = currentTarget
             if (linkState == LinkState.LINKING && target != null && pathNodes.isNotEmpty()) {
-                val start = pathNodes.last()
-                val endX = start.x + (target.x - start.x) * linkProgress
-                val endY = start.y + (target.y - start.y) * linkProgress
+                val startPosition = pathNodes.last().position
+                val endPosition = startPosition + (target.position - startPosition) * linkProgress
 
                 line(
-                    color = Colors.White.copy(alpha = 0.1f),
-                    start = Offset(start.x, start.y),
-                    end = Offset(endX, endY),
-                    style = Stroke(5f)
+                    color = Colors.White.copy(alpha = 0.15f),
+                    start = startPosition,
+                    end = endPosition,
+                    style = largeStroke
                 )
             }
 
@@ -247,19 +253,19 @@ open class BackgroundLayer : Layer(layerOrder = 0, layerType = LayerType.Absolut
                 val actualSize = 100f * box.currentScale
                 val halfSize = actualSize / 2f
 
-                rotate(box.angle, Offset(box.x, box.y)) {
+                rotate(box.angle, box.position) {
                     rect(
                         color = box.color,
                         position = Offset(box.x - halfSize, box.y - halfSize),
                         size = Size(actualSize, actualSize),
-                        style = Stroke(width = 5f)
+                        style = largeStroke
                     )
                     if (box.currentScale > 1.15f) {
                         rect(
                             color = box.color.copy(alpha = box.color.alpha * 0.5f),
                             position = Offset(box.x - halfSize * 1.25f, box.y - halfSize * 1.25f),
                             size = Size(actualSize * 1.25f, actualSize * 1.25f),
-                            style = Stroke(width = 3f)
+                            style = smallStroke
                         )
                     }
                 }
