@@ -1,9 +1,9 @@
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Stable
+import kotlinx.coroutines.await
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ByteArrayCompatible
-import love.yinlin.compatible.await
 import love.yinlin.extension.asIntArray
 import love.yinlin.platform.unsupportedPlatform
 import kotlin.js.ExperimentalWasmJsInterop

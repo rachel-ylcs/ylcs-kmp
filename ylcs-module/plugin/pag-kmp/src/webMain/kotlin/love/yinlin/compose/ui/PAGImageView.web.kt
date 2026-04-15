@@ -6,8 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import kotlinx.browser.window
-import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compatible.await
+import kotlinx.coroutines.await
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.extension.createElement
 import org.w3c.dom.HTMLCanvasElement
@@ -30,7 +29,7 @@ private class PAGImageViewWrapper : PlatformView<HTMLCanvasElement>(), Releasabl
     }
 }
 
-@OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
+@OptIn(ExperimentalWasmJsInterop::class)
 @Composable
 actual fun PAGImageView(
     composition: PAGComposition?,

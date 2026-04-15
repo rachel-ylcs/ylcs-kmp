@@ -1,10 +1,9 @@
-@file:OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.fs
 
 import kotlinx.browser.window
+import kotlinx.coroutines.await
 import kotlinx.coroutines.test.runTest
-import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compatible.await
 import kotlin.test.Test
 
 class TestOPFS {

@@ -4,12 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import kotlinx.browser.window
-import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compatible.await
+import kotlinx.coroutines.await
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.math.round
 
-@OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
+@OptIn(ExperimentalWasmJsInterop::class)
 @Composable
 actual fun PAGView(
     state: PAGState,

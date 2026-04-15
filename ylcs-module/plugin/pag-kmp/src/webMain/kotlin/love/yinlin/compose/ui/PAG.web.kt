@@ -1,11 +1,10 @@
-@file:OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compatible.await
+import kotlinx.coroutines.await
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.concurrent.Lock
 import org.libpag.PAGInit

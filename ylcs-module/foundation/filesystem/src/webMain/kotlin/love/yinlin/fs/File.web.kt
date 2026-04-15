@@ -1,12 +1,11 @@
-@file:OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.fs
 
 import kotlinx.browser.window
+import kotlinx.coroutines.await
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.files.FileMetadata
-import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compatible.await
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.extension.catchingError

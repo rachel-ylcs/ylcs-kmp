@@ -3,9 +3,9 @@
 package love.yinlin.media
 
 import androidx.compose.ui.util.fastMap
+import kotlinx.coroutines.await
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ByteArrayCompatible
-import love.yinlin.compatible.await
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
 import love.yinlin.fs.File
