@@ -46,8 +46,6 @@ include(
     "ylcs-module:compose:game:core",
     "ylcs-module:compose:icons",
     "ylcs-module:compose:platform-view",
-    "ylcs-module:compose:plugin:animated-webp-decoder",
-    "ylcs-module:compose:plugin:animated-webp-decoder-ndk",
     "ylcs-module:compose:screen",
     "ylcs-module:compose:startup:config",
     "ylcs-module:compose:startup:exception",
