@@ -1,38 +1,47 @@
 package love.yinlin.compose.game.plugin
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.toIntSize
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.delay
+import love.yinlin.app.game_rhyme.resources.Res
+import love.yinlin.app.game_rhyme.resources.rhyme
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.game.Engine
+import love.yinlin.compose.game.common.DataUpdater
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.layer.BackgroundLayer
+import love.yinlin.compose.game.layer.InteractLayer
 import love.yinlin.compose.game.layer.MapLayer
-import love.yinlin.compose.game.ui.BlurSurface
+import love.yinlin.compose.game.ui.RhymeBlurSurface
 import love.yinlin.compose.game.ui.RhymeCommonButton
+import love.yinlin.compose.game.ui.rhymeBlurTarget
+import love.yinlin.compose.rememberFontFamily
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.RhymeIcons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.BlurState
-import love.yinlin.compose.ui.node.blurTarget
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
@@ -40,6 +49,7 @@ import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.media.buildAudioPlayer
 import kotlin.reflect.KClass
+import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class RhymePlugin(
@@ -67,14 +77,18 @@ class RhymePlugin(
 
     private var currentInfo: RhymePlayInfo? = null
 
-    private var progressState = mutableFloatStateOf(0f)
+    private val dataUpdater = DataUpdater()
 
     // 初始化游戏
     suspend fun setupGame(playInfo: RhymePlayInfo, audio: File) {
         currentInfo = playInfo
         player.load(audio, true)
-        scene += BackgroundLayer()
-        scene += MapLayer(scene.camera, player, playInfo, progressState)
+        dataUpdater.init(playInfo)
+        val backgroundLayer = BackgroundLayer()
+        val interactLayer = InteractLayer()
+        val mapLayer = MapLayer(scene.camera, player, playInfo, dataUpdater, interactLayer)
+        // 先更新交互结果再处理地图
+        scene += listOf(backgroundLayer, interactLayer, mapLayer)
     }
 
     // 停止游戏
@@ -83,6 +97,7 @@ class RhymePlugin(
         endListener(null)
         player.stop()
         currentInfo = null
+        dataUpdater.reset()
     }
 
     override suspend fun onInitialize(): Boolean {
@@ -102,7 +117,7 @@ class RhymePlugin(
             modifier = modifier,
             contentAlignment = Alignment.Center
         ) {
-            BlurSurface(
+            RhymeBlurSurface(
                 modifier = Modifier.width(Theme.size.cell1),
                 blurState = blurState,
                 shape = Theme.shape.v3,
@@ -123,10 +138,10 @@ class RhymePlugin(
     }
 
     @Composable
-    private fun BoxScope.InfoContent() {
+    private fun InfoContent() {
         currentInfo?.let { info ->
             Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).align(Alignment.TopStart).blurTarget(blurState).padding(Theme.padding.value),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).rhymeBlurTarget(blurState).padding(Theme.padding.value),
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
             ) {
                 // 画封面
@@ -155,7 +170,7 @@ class RhymePlugin(
                     drawArc(
                         color = Colors.Green4,
                         startAngle = -90f,
-                        sweepAngle = 360f * progressState.value,
+                        sweepAngle = 360f * dataUpdater.audioProgress,
                         useCenter = false,
                         style = Stroke(strokeWidth, cap = StrokeCap.Round)
                     )
@@ -178,9 +193,49 @@ class RhymePlugin(
     }
 
     @Composable
+    private fun ColumnScope.ResultContent() {
+        val fontFamily = rememberFontFamily(Res.font.rhyme)
+
+        val (result, combo, id) = dataUpdater.currentResult ?: return
+
+        val scale = remember { Animatable(0f) }
+
+        LaunchedEffect(id) {
+            scale.snapTo(targetValue = 0f)
+            scale.animateTo(targetValue = 1f)
+            delay(1.seconds)
+            scale.animateTo(targetValue = 0f)
+        }
+
+        Box(modifier = Modifier.graphicsLayer {
+            scaleX = scale.value
+            scaleY = scale.value
+            transformOrigin = TransformOrigin.Center
+        }.align(Alignment.CenterHorizontally)) {
+            SimpleClipText(
+                text = result.title,
+                color = Colors.White,
+                style = Theme.typography.v3.bold.copy(fontFamily = fontFamily)
+            )
+            if (combo > 0) {
+                SimpleClipText(
+                    text = "+$combo",
+                    color = Colors.White,
+                    style = Theme.typography.v6.bold.copy(fontFamily = fontFamily),
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                )
+            }
+        }
+    }
+
+    @Composable
     private fun UIContent(modifier: Modifier = Modifier) {
-        Box(modifier = modifier) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
+        ) {
             InfoContent()
+            ResultContent()
         }
     }
 

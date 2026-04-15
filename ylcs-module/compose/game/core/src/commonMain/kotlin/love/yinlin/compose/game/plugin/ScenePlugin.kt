@@ -82,9 +82,27 @@ class ScenePlugin private constructor(
         if (isInitialized) entity.onAttached(this)
     }
 
+    operator fun plusAssign(items: Iterable<Entity>) {
+        entities += items
+        if (isInitialized) {
+            for (item in items) {
+                item.onAttached(this)
+            }
+        }
+    }
+
     operator fun minusAssign(entity: Entity) {
         entities -= entity
         if (isInitialized) entity.onDetached(this)
+    }
+
+    operator fun minusAssign(items: Iterable<Entity>) {
+        entities -= items.toSet()
+        if (isInitialized) {
+            for (item in items.reversed()) {
+                item.onDetached(this)
+            }
+        }
     }
 
     fun reset() {
@@ -126,9 +144,9 @@ class ScenePlugin private constructor(
                                     // 根据层类型转换坐标
                                     val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
                                     // 构造受击检测
-                                    val visible = layer.hitTestVisibleLayer(transformPosition) ?: continue
+                                    val (visible, arg) = layer.hitTestVisibleLayer(transformPosition) ?: continue
                                     // 消费完成
-                                    val event = Event.Pointer.Down(id, transformPosition, visible)
+                                    val event = Event.Pointer.Down(id, transformPosition, layer, visible, arg)
                                     pointerMap[id] = event
                                     // 发送按下事件到消息队列
                                     eventChannel.trySend(event)
@@ -145,15 +163,12 @@ class ScenePlugin private constructor(
                             if (event != null) {
                                 // 移除指针
                                 pointerMap.remove(id)
-                                // 检查是否layer还存在
+                                val layer = event.layer
                                 val visible = event.source
-                                val layer = visible.layer
-                                if (layer != null) {
-                                    // 转换坐标
-                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
-                                    // 发送抬起事件到消息队列
-                                    eventChannel.trySend(Event.Pointer.Up(id, transformPosition, visible, event.position))
-                                }
+                                // 转换坐标
+                                val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
+                                // 发送抬起事件到消息队列
+                                eventChannel.trySend(Event.Pointer.Up(id, transformPosition, layer, visible, event.position, event.arg))
                             }
                         }
 
@@ -162,15 +177,12 @@ class ScenePlugin private constructor(
                             // 检查是否是游离指针
                             val event = pointerMap[id] as? Event.Pointer.Down
                             if (event != null) {
-                                // 检查是否layer还存在
+                                val layer = event.layer
                                 val visible = event.source
-                                val layer = visible.layer
-                                if (layer != null) {
-                                    // 转换坐标
-                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
-                                    // 发送移动事件到消息队列
-                                    eventChannel.trySend(Event.Pointer.Move(id, transformPosition, visible, event.position))
-                                }
+                                // 转换坐标
+                                val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
+                                // 发送移动事件到消息队列
+                                eventChannel.trySend(Event.Pointer.Move(id, transformPosition, layer, visible, event.position, event.arg))
                             }
                         }
                     }
@@ -208,7 +220,7 @@ class ScenePlugin private constructor(
                     for (index in layerEntities.indices.reversed()) {
                         val layer = layerEntities[index]
                         if (layer.interactive) { // 可交互的层
-                            if (layer.triggerVisibleLayer(deltaTime, event)) break // 消费完成
+                            if (layer.triggerVisibleLayer(event)) break // 消费完成
                         }
                     }
                 }

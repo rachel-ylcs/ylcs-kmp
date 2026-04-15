@@ -8,5 +8,5 @@ import kotlin.reflect.KClass
 sealed interface EventListener {
     val target: Array<KClass<out Event>>
 
-    fun onEvent(tick: Int, event: Event, source: Visible): Boolean
+    fun onEvent(event: Event, source: Visible?): Boolean
 }

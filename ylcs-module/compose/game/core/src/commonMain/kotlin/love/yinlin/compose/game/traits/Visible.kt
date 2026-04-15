@@ -62,11 +62,11 @@ abstract class Visible(
     /**
      * 受击检测
      */
-    internal fun onHitTest(point: Offset): Boolean {
+    open fun onHitTest(point: Offset): Any? {
         // 获取相对于 visible 的位置
         val visiblePosition = point - position + center
         // 检查碰撞箱
-        return aabb.contains(size, visiblePosition)
+        return if (aabb.contains(size, visiblePosition)) Unit else null
     }
 
     /**

@@ -13,15 +13,15 @@ open class PointerEventListener : EventListener {
         Event.Pointer.Move::class
     )
 
-    open fun onPointerDown(tick: Int, event: Event.Pointer.Down) { }
-    open fun onPointerUp(tick: Int, event: Event.Pointer.Up) { }
-    open fun onPointerMove(tick: Int, event: Event.Pointer.Move) { }
+    open fun onPointerDown(event: Event.Pointer.Down) { }
+    open fun onPointerUp(event: Event.Pointer.Up) { }
+    open fun onPointerMove(event: Event.Pointer.Move) { }
 
-    final override fun onEvent(tick: Int, event: Event, source: Visible): Boolean {
+    final override fun onEvent(event: Event, source: Visible?): Boolean {
         when (event) {
-            is Event.Pointer.Down -> onPointerDown(tick, event)
-            is Event.Pointer.Up -> onPointerUp(tick, event)
-            is Event.Pointer.Move -> onPointerMove(tick, event)
+            is Event.Pointer.Down -> onPointerDown(event)
+            is Event.Pointer.Up -> onPointerUp(event)
+            is Event.Pointer.Move -> onPointerMove(event)
         }
         // 受击检测通过就必须消费完成
         return true

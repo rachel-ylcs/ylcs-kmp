@@ -25,7 +25,7 @@ class NoteBlock(
     private val mainColor: Color = ScaleColorList[scaleIndex]
 
     override fun onUpdate(tick: Int) {
-        withMapLayer { _, audioTick -> // 使用音轨刻
+        withMapLayer { mapLayer, audioTick -> // 使用音轨刻
             when (val status = blockStatus) {
                 is BlockStatus.None -> return@withMapLayer false // 未出现不处理
                 is BlockStatus.Prepare -> {
@@ -36,7 +36,10 @@ class NoteBlock(
                     val progress = 1 - (abs(time.standard - audioTick) / (time.standard - time.badStart).toFloat()).coerceIn(0f, 1f)
                     when (status.result) {
                         BlockResult.BAD -> when {
-                            audioTick >= time.badEnd -> blockStatus = BlockStatus.Release(0, 0f, BlockResult.MISS)
+                            audioTick >= time.badEnd -> {
+                                blockStatus = BlockStatus.Release(0, 0f, BlockResult.MISS)
+                                mapLayer.updateResult(BlockResult.MISS) // 提交分数
+                            }
                             audioTick >= time.goodEnd -> status.progress = progress
                             audioTick >= time.goodStart -> status.result = BlockResult.GOOD
                             else -> status.progress = progress

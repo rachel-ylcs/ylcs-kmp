@@ -91,7 +91,7 @@ class BlockMapGenerator private constructor(
 
                 // 回溯
                 result.removeAt(result.size - 1)
-                occupiedSet.removeAll(currentSegmentPoints.toSet())
+                occupiedSet -= currentSegmentPoints.toSet()
             }
         }
 

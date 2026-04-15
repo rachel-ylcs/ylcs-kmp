@@ -14,6 +14,7 @@ import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.drawer.LayerType
+import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.plugin.ScenePlugin
 
 @Stable
@@ -95,6 +96,9 @@ open class Layer(
      */
     override var active: Boolean = true
 
+    /**
+     * 预更新
+     */
     open fun preUpdate(tick: Int) { }
 
     final override fun onUpdate(tick: Int) {
@@ -109,34 +113,64 @@ open class Layer(
      */
     open val interactive: Boolean = true
 
-    internal fun hitTestVisibleLayer(point: Offset): Visible? {
+    /**
+     * 预受击测试
+     */
+    open fun preHitTest(point: Offset): Any? = null
+
+    /**
+     * 预事件处理
+     */
+    open val preTrigger: Trigger? = null
+
+    internal fun hitTestVisibleLayer(point: Offset): Pair<Visible?, Any>? {
+        val layerArg = preHitTest(point)
+        if (layerArg != null) return null to layerArg
         // 受击处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]
-            if (item.onHitTest(point)) return item
+            val arg = item.onHitTest(point)
+            if (arg != null) return item to arg
         }
         return null
     }
 
-    internal fun triggerVisibleLayer(tick: Int, event: Event): Boolean = when (event) {
+    internal fun triggerVisibleLayer(event: Event): Boolean = when (event) {
         // 检查是否是指针事件 拦截
         is Event.Pointer -> {
-            val source = event.source
-            source.trigger?.onEvent(tick, event, source)
-            // 即使没有触发器，受击检测通过就必须消费完成
-            true
+            if (event.layer != this) false
+            else {
+                val source = event.source
+                if (source == null) preTrigger?.onEvent(event, null)
+                else source.trigger?.onEvent(event, source)
+                // 即使没有触发器，受击检测通过就必须消费完成
+                true
+            }
         }
         // 其他事件
         else -> {
-            // 事件处理层级逆向
-            for (index in items.indices.reversed()) {
-                val source = items[index]
-                val trigger = source.trigger ?: continue
-                if (trigger.onEvent(tick, event, source)) return true // 消费完成
+            if (preTrigger?.onEvent(event, null) == true) true
+            else {
+                // 事件处理层级逆向
+                for (index in items.indices.reversed()) {
+                    val source = items[index]
+                    val trigger = source.trigger ?: continue
+                    if (trigger.onEvent(event, source)) return true // 消费完成
+                }
+                false
             }
-            false
         }
     }
+
+    /**
+     * 预准备绘制
+     */
+    open fun PrepareDrawer.prePrepareDraw(viewportSize: Size, viewportBounds: Rect) { }
+
+    /**
+     * 预绘制
+     */
+    open fun Drawer.preOnDraw() { }
 
     private fun Drawer.drawVisibleRelative(item: Visible) {
         transform({
@@ -173,6 +207,8 @@ open class Layer(
             if (visible) {
                 // 绘制预处理
                 drawer.withRawCacheScope(scope) {
+                    prePrepareDraw(viewportSize, bounds)
+
                     // 遍历元素
                     items.fastForEach { item ->
                         // 更新视口剔除
@@ -191,6 +227,8 @@ open class Layer(
             scope.onDrawWithContent {
                 if (visible) {
                     drawer.withRawScope(this) {
+                        preOnDraw()
+
                         items.fastForEach { item ->
                             // 检查视口剔除
                             if (item.alive) drawVisibleRelative(item)
@@ -206,9 +244,12 @@ open class Layer(
             if (visible) {
                 // 绘制预处理
                 drawer.withRawCacheScope(scope) {
+                    val viewportBounds = Rect(Offset.Zero, viewportSize)
+                    prePrepareDraw(viewportSize, viewportBounds)
+
                     items.fastForEach { item ->
                         with(item) {
-                            prepareDraw(viewportSize, bounds)
+                            prepareDraw(viewportSize, viewportBounds)
                         }
                     }
                 }
@@ -218,6 +259,8 @@ open class Layer(
             scope.onDrawWithContent {
                 if (visible) {
                     drawer.withRawScope(this) {
+                        preOnDraw()
+
                         items.fastForEach { drawVisibleAbsolute(it) }
                     }
                 }

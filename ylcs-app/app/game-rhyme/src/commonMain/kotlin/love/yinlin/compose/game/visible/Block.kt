@@ -40,7 +40,7 @@ sealed class Block(
         val BottomRight = Offset(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
 
         val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red4, Colors.Orange4, Colors.Yellow4, Colors.Green4, Colors.Cyan4, Colors.Blue4, Colors.Purple4)
+        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
 
         const val BLOCK_RESULT_SCALE = 0.35f
         const val RELEASE_ANIMATION_DURATION = 300
@@ -49,7 +49,8 @@ sealed class Block(
 
     abstract val rhymeAction: RhymeAction
 
-    protected var blockStatus: BlockStatus = BlockStatus.None
+    var blockStatus: BlockStatus = BlockStatus.None
+        protected set
 
     inline fun withMapLayer(block: (MapLayer, Int) -> Boolean) {
         (layer as? MapLayer)?.let { mapLayer ->

@@ -2,7 +2,6 @@ package love.yinlin.compose.game.visible
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockTime
 import love.yinlin.compose.game.drawer.Drawer

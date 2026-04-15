@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.delay
 import love.yinlin.app
 import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
@@ -41,6 +40,7 @@ import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.game.ui.RhymeMusicCard
 import love.yinlin.compose.game.viewport.Camera
 import love.yinlin.compose.graphics.decode
+import love.yinlin.compose.rememberFontFamily
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
@@ -61,7 +61,6 @@ import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.startup.StartupMusicPlayer
-import org.jetbrains.compose.resources.Font
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
@@ -160,7 +159,7 @@ class ScreenRhyme : BasicScreen() {
 
     @Composable
     private fun GameStartLayout() {
-        val rhymeFont = FontFamily(Font(RhymeRes.font.rhyme))
+        val rhymeFont = rememberFontFamily(RhymeRes.font.rhyme)
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -203,6 +202,7 @@ class ScreenRhyme : BasicScreen() {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v8)
             ) {
                 if (engine.isInitialized) {
+                    SimpleClipText(text = "横屏游玩体验更佳", color = Theme.color.primary, style = Theme.typography.v5.bold)
                     RhymeCommonButton(icon = Icons.LibraryMusic, text = "曲库", onClick = { gameState = RhymeState.MusicLibrary }, modifier = Modifier.fillMaxWidth())
                     RhymeCommonButton(icon = Icons.RewardCup, text = "排行榜", onClick = { gameState = RhymeState.Rank }, modifier = Modifier.fillMaxWidth())
                 }
