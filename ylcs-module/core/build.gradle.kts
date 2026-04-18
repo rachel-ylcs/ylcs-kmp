@@ -27,6 +27,13 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        commonTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test
+            )
+        }
+
         val clientMain by create(commonMain)
 
         nativeMain.configure(clientMain)

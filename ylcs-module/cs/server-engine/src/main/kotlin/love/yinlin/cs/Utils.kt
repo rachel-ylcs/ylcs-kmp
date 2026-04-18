@@ -41,6 +41,7 @@ internal fun copyResources(classLoader: ClassLoader, root: String) {
     else copyResourcesFromFile(File(publicResourceUrl.toURI()), targetFile)
 }
 
+// TODO: 考虑后面把md5换成纯kotlin实现的 -> love.yinlin.crypto.MD5
 val String.md5: String get() = catchingDefault("") {
     val md = MessageDigest.getInstance("MD5")
     md.update(this.toByteArray(StandardCharsets.UTF_8))
