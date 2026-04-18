@@ -7,61 +7,116 @@ import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
+import love.yinlin.compose.game.common.InteractStatus
+import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.data.music.RhymeAction
-import kotlin.math.abs
 
 @Stable
 class NoteBlock(
     position: Offset,
     line: BlockLine,
-    time: BlockTime,
+    override val time: Time,
     rawIndex: Int,
     lineIndex: Int,
     override val rhymeAction: RhymeAction.Note,
-) : Block(position, line, time, rawIndex, lineIndex) {
+) : Block<NoteBlock.Status>(position, line, rawIndex, lineIndex) {
+    @Stable
+    data class Time(
+        override val appearance: Long,
+        val perfectStart: Int,
+        val goodStart: Int,
+        val badStart: Int,
+        val missStart: Int
+    ) : BlockTime
+
+    interface Status : BlockStatus {
+        class Prepare : Status, BlockStatus.Prepare {
+            var progress: Float = 0f
+        }
+        class Interact : Status, BlockStatus.Interact {
+            var progress: Float = 0f
+            var result: BlockResult = BlockResult.PERFECT
+        }
+        class Release(val result: BlockResult) : Status, BlockStatus.Release {
+            var progress: Float = 0f
+            var tick: Int = 0
+        }
+        class Done(val result: BlockResult) : Status, BlockStatus.Done
+    }
+
+    companion object {
+        val PrepareDurationMap = mapOf(
+            RhymeDifficulty.Easy to 2000,
+            RhymeDifficulty.Medium to 1500,
+            RhymeDifficulty.Hard to 1250,
+            RhymeDifficulty.Extreme to 1000
+        )
+        val InteractDurationMap = mapOf(
+            RhymeDifficulty.Easy to 1000,
+            RhymeDifficulty.Medium to 850,
+            RhymeDifficulty.Hard to 650,
+            RhymeDifficulty.Extreme to 500
+        )
+
+        fun buildTime(difficulty: RhymeDifficulty, start: Long): Time {
+            val prepare = PrepareDurationMap[difficulty]!!
+            val interactDuration = InteractDurationMap[difficulty]!!
+            val perfectDuration = (interactDuration * BlockResult.GOOD.ratio).toInt()
+            return Time(
+                appearance = start - prepare - perfectDuration / 2,
+                perfectStart = prepare,
+                goodStart = prepare + perfectDuration,
+                badStart = prepare + (interactDuration * BlockResult.BAD.ratio).toInt(),
+                missStart = prepare + interactDuration
+            )
+        }
+    }
+
     private val scaleIndex: Int = (rhymeAction.scale - 1) % 7 + 1
     private val scaleLevel: Int = (rhymeAction.scale - 1) / 7
     private val mainColor: Color = ScaleColorList[scaleIndex]
 
+    override fun prepareStatus(): Status = Status.Prepare()
+
+    override fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact) {
+        if (currentStatus !is Status.Interact) return
+        // 单击交互只关心按下时刻
+        if (interactStatus[scaleIndex] == InteractStatus.Down) {
+            val result = currentStatus.result
+            blockStatus = Status.Release(result)
+            fromMapLayer?.updateResult(result)
+        }
+    }
+
     override fun onUpdate(tick: Int) {
         withMapLayer { mapLayer, audioTick -> // 使用音轨刻
             when (val status = blockStatus) {
-                is BlockStatus.None -> return@withMapLayer false // 未出现不处理
-                is BlockStatus.Prepare -> {
-                    if (audioTick >= time.badStart) blockStatus = BlockStatus.Interact(0f, BlockResult.BAD)
-                    else status.progress = (audioTick / time.badStart.toFloat()).coerceIn(0f, 1f)
+                null -> return@withMapLayer false // 未出现不处理
+                is Status.Prepare -> {
+                    if (audioTick >= time.perfectStart) blockStatus = Status.Interact()
+                    else status.progress = (audioTick / time.perfectStart.toFloat()).coerceIn(0f, 1f)
                 }
-                is BlockStatus.Interact -> {
-                    val progress = 1 - (abs(time.standard - audioTick) / (time.standard - time.badStart).toFloat()).coerceIn(0f, 1f)
-                    when (status.result) {
-                        BlockResult.BAD -> when {
-                            audioTick >= time.badEnd -> {
-                                blockStatus = BlockStatus.Release(0, 0f, BlockResult.MISS)
-                                mapLayer.updateResult(BlockResult.MISS) // 提交分数
-                            }
-                            audioTick >= time.goodEnd -> status.progress = progress
-                            audioTick >= time.goodStart -> status.result = BlockResult.GOOD
-                            else -> status.progress = progress
+                is Status.Interact -> {
+                    val progress = ((audioTick - time.perfectStart) / (time.missStart - time.perfectStart).toFloat()).coerceAtLeast(0f)
+                    status.progress = progress
+                    status.result = when {
+                        progress >= BlockResult.MISS.ratio -> { // 错过
+                            val blockResult = BlockResult.MISS
+                            blockStatus = Status.Release(blockResult)
+                            mapLayer.updateResult(blockResult) // 提交分数
+                            blockResult
                         }
-                        BlockResult.GOOD -> when {
-                            audioTick >= time.goodEnd -> status.result = BlockResult.BAD
-                            audioTick >= time.perfectEnd -> status.progress = progress
-                            audioTick >= time.perfectStart -> status.result = BlockResult.PERFECT
-                            else -> status.progress = progress
-                        }
-                        BlockResult.PERFECT -> when {
-                            audioTick >= time.perfectEnd -> status.result = BlockResult.GOOD
-                            audioTick >= time.perfectStart -> status.progress = progress
-                        }
-                        BlockResult.MISS -> { } // 不可能是MISS
+                        progress >= BlockResult.BAD.ratio -> BlockResult.BAD
+                        progress >= BlockResult.GOOD.ratio -> BlockResult.GOOD
+                        else -> BlockResult.PERFECT
                     }
                 }
-                is BlockStatus.Release -> {
+                is Status.Release -> {
                     // Release和Done的动画可以根据游戏刻来而不是音轨刻
                     // 以防音符终止了但动画仍需要继续
                     val oldTick = status.tick
-                    if (oldTick >= RELEASE_ANIMATION_DURATION) blockStatus = BlockStatus.Done(status.result)
+                    if (oldTick >= RELEASE_ANIMATION_DURATION) blockStatus = Status.Done(status.result)
                     else {
                         val newTick = oldTick + tick
                         status.tick = newTick
@@ -70,7 +125,7 @@ class NoteBlock(
                         status.progress = rawProgress * rawProgress * (3 * rawProgress + 2) + 1
                     }
                 }
-                is BlockStatus.Done -> { }
+                is Status.Done -> return@withMapLayer false
             }
             true
         }
@@ -78,26 +133,27 @@ class NoteBlock(
 
     override fun Drawer.onDraw() {
         when (val status = blockStatus) {
-            is BlockStatus.None -> return
-            is BlockStatus.Prepare -> {
-                withBlockScale { drawCommonPrepare(mainColor, status.progress) }
+            null -> return
+            is Status.Prepare -> {
+                withBlockScale {
+                    drawPrepareBorder(mainColor, status.progress)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), (status.progress * 2).coerceIn(0f, 1f))
+                }
             }
-            is BlockStatus.Interact -> {
+            is Status.Interact -> {
                 withBlockScale {
                     scale(status.progress, DefaultCenter) { rect(mainColor, DefaultRect) }
-                    drawCommonPrepare(mainColor, 1f)
+                    drawPrepareBorder(mainColor, 1f)
                 }
             }
-            is BlockStatus.Release -> {
+            is Status.Release -> {
                 withBlockScale {
-                    drawCommonPrepare(mainColor, 1f)
-                    scale(status.progress * BLOCK_RESULT_SCALE, DefaultCenter) { drawBlockResult(mainColor, status.result) }
+                    drawPrepareBorder(mainColor, 1f)
                 }
             }
-            is BlockStatus.Done -> {
+            is Status.Done -> {
                 withBlockScale {
-                    drawCommonPrepare(mainColor, 1f)
-                    scale(BLOCK_RESULT_SCALE, DefaultCenter) { drawBlockResult(mainColor, status.result) }
+                    drawPrepareBorder(mainColor, 1f)
                 }
             }
         }

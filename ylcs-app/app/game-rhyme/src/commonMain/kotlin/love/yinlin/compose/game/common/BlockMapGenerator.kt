@@ -19,13 +19,7 @@ class BlockMapGenerator private constructor(
 ) {
     private val lyrics = lyricsConfig.lyrics
     private val audioOffset = lyricsConfig.offset
-    private val difficultyResultRule = playConfig.difficulty.let {
-        DifficultyResultRule(
-            prepareTime = BlockResult.PrepareDuration[it]!!,
-            perfectRatio = BlockResult.PERFECT.ranges[it]!!,
-            goodRatio = BlockResult.GOOD.ranges[it]!!
-        )
-    }
+    private val difficulty = playConfig.difficulty
 
     private val occupiedSet = mutableSetOf<Offset>()
     private val result = mutableListOf<List<Offset>>()
@@ -99,7 +93,7 @@ class BlockMapGenerator private constructor(
     }
 
     // 地图生成算法 - 右转优先螺旋
-    fun generate(): List<Block> {
+    fun generate(): List<Block<out BlockStatus>> {
         // 生成地图位置
         val blockPositionMap = if (solve(0, -blockDimension, 0f, blockDimension, 0f)) result else emptyList()
         var rawIndex = 0
@@ -133,13 +127,12 @@ class BlockMapGenerator private constructor(
                 val action = theme[i]
                 val start = (theme.getOrNull(i - 1)?.end ?: 0) + lineStart
                 val end = action.end + lineStart
-                val blockTime = BlockTime.build(difficultyResultRule, start, end)
                 when (action) {
                     // 单音
                     is RhymeAction.Note -> NoteBlock(
                         position = pos,
                         line = blockLine,
-                        time = blockTime,
+                        time = NoteBlock.buildTime(difficulty, start),
                         rawIndex = rawIndex++,
                         lineIndex = i,
                         rhymeAction = action
@@ -150,7 +143,7 @@ class BlockMapGenerator private constructor(
                         if (action.scale.fastAll { it == first }) FixedSlurBlock(
                             position = pos,
                             line = blockLine,
-                            time = blockTime,
+                            time = FixedSlurBlock.buildTime(difficulty, start, end),
                             rawIndex = rawIndex++,
                             lineIndex = i,
                             rhymeAction = action
@@ -159,7 +152,7 @@ class BlockMapGenerator private constructor(
                         else OffsetSlurBlock(
                             position = pos,
                             line = blockLine,
-                            time = blockTime,
+                            time = OffsetSlurBlock.buildTime(difficulty, start, end),
                             rawIndex = rawIndex++,
                             lineIndex = i,
                             rhymeAction = action
@@ -171,7 +164,7 @@ class BlockMapGenerator private constructor(
     }
 
     companion object {
-        fun generate(blockDimension: Float, lyricsConfig: RhymeLyricsConfig, playConfig: RhymePlayConfig): List<Block> =
+        fun generate(blockDimension: Float, lyricsConfig: RhymeLyricsConfig, playConfig: RhymePlayConfig): List<Block<out BlockStatus>> =
             BlockMapGenerator(blockDimension, lyricsConfig, playConfig).generate()
     }
 }

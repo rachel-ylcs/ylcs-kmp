@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 import love.yinlin.app
 import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
 import love.yinlin.app.game_rhyme.resources.rhyme
+import love.yinlin.app.game_rhyme.resources.music
 import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.Colors
@@ -73,6 +74,7 @@ class ScreenRhyme : BasicScreen() {
         FontPlugin.ResourceFactory(
             GlobalRes.font.xwwk,
             RhymeRes.font.rhyme,
+            RhymeRes.font.music,
         ),
         AssetPlugin.Factory(),
         ScenePlugin.Factory(

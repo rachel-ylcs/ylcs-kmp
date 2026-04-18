@@ -3,6 +3,6 @@ package love.yinlin.compose.game.common
 import androidx.compose.runtime.Stable
 
 @Stable
-interface BlockTime {
-    val appearance: Long // 出现点 Status -> Prepare
+enum class InteractStatus {
+    None, Down, Up;
 }

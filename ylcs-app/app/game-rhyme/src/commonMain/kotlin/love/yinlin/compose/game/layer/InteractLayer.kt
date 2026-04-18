@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import love.yinlin.compose.Colors
 import love.yinlin.compose.extension.scale
 import love.yinlin.compose.extension.translate
+import love.yinlin.compose.game.common.InteractStatus
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.drawer.PrepareDrawer
@@ -40,6 +41,8 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
         var currentProgress: Float = 0f
         var targetProgress: Float = 0f
 
+        var currentEventId: Long? = null
+
         fun Drawer.drawInteract() {
             // 画指示圈
             if (currentProgress > 0f) {
@@ -58,6 +61,7 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
     }
 
     private val infos = Array(8) { InteractInfo(it) }
+    val interactStatus = Array(8) { InteractStatus.None }
 
     // 三等分宽度
     val w0 = 0f
@@ -105,15 +109,21 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
             override fun onPointerDown(event: Event.Pointer.Down) {
                 val index = event.arg as? Int ?: return
                 val info = infos[index]
-
-                info.targetProgress = 1f
+                if (info.currentEventId == null) {
+                    interactStatus[index] = InteractStatus.Down
+                    info.currentEventId = event.id
+                    info.targetProgress = 1f
+                }
             }
 
             override fun onPointerUp(event: Event.Pointer.Up) {
                 val index = event.arg as? Int ?: return
                 val info = infos[index]
-
-                info.targetProgress = 0f
+                if (info.currentEventId == event.id) {
+                    interactStatus[index] = InteractStatus.Up
+                    info.currentEventId = null
+                    info.targetProgress = 0f
+                }
             }
         }
     )

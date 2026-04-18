@@ -56,6 +56,6 @@ class DataUpdater {
         currentResult = BlockUpdateResult(result, newCombo, id)
         // 计算得分
         val reward = (result.score * scoreRatio).toInt()
-        score = reward + newCombo / comboRewardCount // 连击奖励
+        score += reward + newCombo / comboRewardCount // 连击奖励
     }
 }

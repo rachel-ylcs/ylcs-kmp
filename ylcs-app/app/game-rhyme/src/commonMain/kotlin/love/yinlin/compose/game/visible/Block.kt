@@ -9,11 +9,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.common.BlockLine
-import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
+import love.yinlin.compose.game.common.InteractStatus
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.layer.MapLayer
 import love.yinlin.compose.game.traits.Dynamic
@@ -21,10 +22,9 @@ import love.yinlin.compose.game.traits.Visible
 import love.yinlin.data.music.RhymeAction
 
 @Stable
-sealed class Block(
+sealed class Block<BS : BlockStatus>(
     position: Offset,
     val line: BlockLine, // 行信息
-    val time: BlockTime, // 时间信息
     val rawIndex: Int, // 在整个序列中的索引
     val lineIndex: Int, // 在segment中的索引
 ) : Visible(position, DefaultSize), Dynamic {
@@ -42,68 +42,59 @@ sealed class Block(
         val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
         val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
 
-        const val BLOCK_RESULT_SCALE = 0.35f
         const val RELEASE_ANIMATION_DURATION = 300
-        val ReleaseStroke = Stroke(width = 20f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+
+        val NoteScaleFontMap = arrayOf(
+            '9',
+            '1', '2', '3', '4', '5', '6', '7',
+            '\u0086', '\u0087', '\u0088', '*', '%', '^', '&',
+            '\uF021', '@', '#', '$', '\u00A7', '\u00A8', '\u00A9',
+        )
     }
 
-    abstract val rhymeAction: RhymeAction
+    abstract val rhymeAction: RhymeAction // 音符操作
+    abstract val time: BlockTime // 时间信息
 
-    var blockStatus: BlockStatus = BlockStatus.None
+    abstract fun prepareStatus(): BS
+    abstract fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact)
+
+    var blockStatus: BS? = null
         protected set
+
+    val fromMapLayer: MapLayer? get() = layer as? MapLayer
 
     inline fun withMapLayer(block: (MapLayer, Int) -> Boolean) {
         (layer as? MapLayer)?.let { mapLayer ->
-            if (block(mapLayer, (mapLayer.audioPosition - time.rawAppearance).toInt())) updateDirty()
+            if (block(mapLayer, (mapLayer.audioPosition - time.appearance).toInt())) updateDirty()
         }
     }
 
     override fun onAttached() {
-        blockStatus = BlockStatus.Prepare(0f)
+        blockStatus = prepareStatus()
     }
 
     override fun onDetached() {
-        blockStatus = BlockStatus.None
+        blockStatus = null
     }
 
     inline fun Drawer.withBlockScale(block: Drawer.() -> Unit) = scale(DEFAULT_SCALE, DefaultCenter, block)
 
-    protected fun Drawer.drawCommonPrepare(color: Color, progress: Float) {
+    protected fun Drawer.drawPrepareBorder(color: Color, progress: Float) {
         val delta = progress * DEFAULT_DIMENSION / 2f
         val deltaInv = DEFAULT_DIMENSION - delta
-        line(color, TopLeft, Offset(delta, 0f), PrepareStroke)
-        line(color, TopLeft, Offset(0f, delta), PrepareStroke)
-        line(color, TopRight, Offset(deltaInv, 0f), PrepareStroke)
-        line(color, TopRight, Offset(DEFAULT_DIMENSION, delta), PrepareStroke)
-        line(color, BottomLeft, Offset(0f, deltaInv), PrepareStroke)
-        line(color, BottomLeft, Offset(delta, DEFAULT_DIMENSION), PrepareStroke)
-        line(color, BottomRight, Offset(deltaInv, DEFAULT_DIMENSION), PrepareStroke)
-        line(color, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), PrepareStroke)
+        line(color, TopLeft, Offset(delta, 0f), style = PrepareStroke)
+        line(color, TopLeft, Offset(0f, delta), style = PrepareStroke)
+        line(color, TopRight, Offset(deltaInv, 0f), style = PrepareStroke)
+        line(color, TopRight, Offset(DEFAULT_DIMENSION, delta), style = PrepareStroke)
+        line(color, BottomLeft, Offset(0f, deltaInv), style = PrepareStroke)
+        line(color, BottomLeft, Offset(delta, DEFAULT_DIMENSION), style = PrepareStroke)
+        line(color, BottomRight, Offset(deltaInv, DEFAULT_DIMENSION), style = PrepareStroke)
+        line(color, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), style = PrepareStroke)
     }
 
-    protected fun Drawer.drawBlockResultMiss(color: Color) {
-        line(color, TopLeft, BottomRight, ReleaseStroke)
-        line(color, TopRight, BottomLeft, ReleaseStroke)
-    }
-
-    protected fun Drawer.drawBlockResultBad(color: Color) {
-
-    }
-
-    protected fun Drawer.drawBlockResultGood(color: Color) {
-
-    }
-
-    protected fun Drawer.drawBlockResultPerfect(color: Color) {
-
-    }
-
-    protected fun Drawer.drawBlockResult(color: Color, result: BlockResult) {
-        when (result) {
-            BlockResult.MISS -> drawBlockResultMiss(color)
-            BlockResult.BAD -> drawBlockResultBad(color)
-            BlockResult.GOOD -> drawBlockResultGood(color)
-            BlockResult.PERFECT -> drawBlockResultPerfect(color)
+    protected fun Drawer.drawSingleNoteFont(scale: Int, progress: Float) {
+        fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.let { graph ->
+            text(graph, TopLeft, DefaultSize, Colors.White.copy(alpha = progress), TextAlign.Center)
         }
     }
 }

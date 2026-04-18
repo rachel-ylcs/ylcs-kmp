@@ -11,6 +11,7 @@ import androidx.compose.ui.util.fastForEachReversed
 import love.yinlin.compose.extension.translate
 import love.yinlin.compose.extension.scale
 import love.yinlin.compose.game.drawer.Drawer
+import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.event.Event
 import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.compose.game.drawer.LayerType
@@ -161,6 +162,11 @@ open class Layer(
             }
         }
     }
+
+    /**
+     * 初始化绘制
+     */
+    open suspend fun InitialDrawer.preInitialDraw() { }
 
     /**
      * 预准备绘制

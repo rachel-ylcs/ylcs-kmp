@@ -279,6 +279,10 @@ class ScenePlugin private constructor(
                         )
                     }
 
+                    LaunchedEffect(Unit) {
+                        with(layer) { drawer.preInitialDraw() }
+                    }
+
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer {
                         if (layer.layerType == LayerType.Relative) camera.transformLayerRelative(this, size)
                         else camera.transformLayerAbsolute(this)

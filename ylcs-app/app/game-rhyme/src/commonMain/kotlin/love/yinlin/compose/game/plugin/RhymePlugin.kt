@@ -1,6 +1,11 @@
 package love.yinlin.compose.game.plugin
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -17,7 +22,9 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toIntSize
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
@@ -38,10 +45,12 @@ import love.yinlin.compose.game.ui.RhymeBlurSurface
 import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.game.ui.rhymeBlurTarget
 import love.yinlin.compose.rememberFontFamily
+import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.RhymeIcons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.BlurState
+import love.yinlin.compose.ui.node.align
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
@@ -138,7 +147,7 @@ class RhymePlugin(
     }
 
     @Composable
-    private fun InfoContent() {
+    private fun InfoContent(fontFamily: FontFamily) {
         currentInfo?.let { info ->
             Row(
                 modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).rhymeBlurTarget(blurState).padding(Theme.padding.value),
@@ -175,6 +184,7 @@ class RhymePlugin(
                         style = Stroke(strokeWidth, cap = StrokeCap.Round)
                     )
                 })
+
                 Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
                     // 画标题
                     SimpleClipText(
@@ -188,14 +198,31 @@ class RhymePlugin(
                        }
                     }
                 }
+
+                Box(modifier = Modifier.weight(1f))
+
+                // 画得分
+                AnimationContent(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    state = dataUpdater.score,
+                    enter = { fadeIn() + slideInVertically { it / 2 } },
+                    exit = { fadeOut() + slideOutVertically { -it / 2 } }
+                ) {
+                    SimpleClipText(
+                        text = it.toString(),
+                        color = Colors.White,
+                        style = Theme.typography.v3.bold.copy(
+                            fontFamily = fontFamily,
+                            letterSpacing = 2.sp
+                        )
+                    )
+                }
             }
         }
     }
 
     @Composable
-    private fun ColumnScope.ResultContent() {
-        val fontFamily = rememberFontFamily(Res.font.rhyme)
-
+    private fun ColumnScope.ResultContent(fontFamily: FontFamily) {
         val (result, combo, id) = dataUpdater.currentResult ?: return
 
         val scale = remember { Animatable(0f) }
@@ -215,13 +242,19 @@ class RhymePlugin(
             SimpleClipText(
                 text = result.title,
                 color = Colors.White,
-                style = Theme.typography.v3.bold.copy(fontFamily = fontFamily)
+                style = Theme.typography.v3.bold.copy(
+                    fontFamily = fontFamily,
+                    letterSpacing = 2.sp
+                )
             )
             if (combo > 0) {
                 SimpleClipText(
                     text = "+$combo",
                     color = Colors.White,
-                    style = Theme.typography.v6.bold.copy(fontFamily = fontFamily),
+                    style = Theme.typography.v6.bold.copy(
+                        fontFamily = fontFamily,
+                        letterSpacing = 2.sp
+                    ),
                     modifier = Modifier.align(Alignment.BottomEnd)
                 )
             }
@@ -230,12 +263,14 @@ class RhymePlugin(
 
     @Composable
     private fun UIContent(modifier: Modifier = Modifier) {
+        val fontFamily = rememberFontFamily(Res.font.rhyme)
+
         Column(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
         ) {
-            InfoContent()
-            ResultContent()
+            InfoContent(fontFamily)
+            ResultContent(fontFamily)
         }
     }
 
