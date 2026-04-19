@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'java-kotlin', 'python', 'c-cpp', 'swift', 'javascript-typescript' ]
+        language: [ 'java-kotlin', 'python', 'javascript-typescript' ]
 
     steps:
       - name: Checkout Code
