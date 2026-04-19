@@ -42,7 +42,7 @@ object KugouMusicAPI : PlatformMusicAPI {
     }
 
     /**
-     * 搜索歌曲（仅获取摘要信息，用于列表展示）
+     * 搜索歌曲（仅获取摘要信息）
      */
     suspend fun searchSongs(keyword: String, page: Int = 1): List<KugouSearchResult>? {
         val url = "$SEARCH_API?format=json&keyword=${Uri.encodeUri(keyword)}&page=$page&pagesize=100"
@@ -67,14 +67,17 @@ object KugouMusicAPI : PlatformMusicAPI {
     }
 
     /**
-     * 获取歌曲详情（音频直链、时长、歌手等）
+     * 获取歌曲详情（音频直链、时长、多歌手等）
      */
     suspend fun getSongDetail(hash: String, coverUrl: String): PlatformMusicInfo? {
         return NetClient.Common.request({
             url = "$SONG_INFO_API?cmd=playInfo&hash=$hash"
         }) { json: JsonObject ->
             val songName = json["songName"]?.String ?: ""
-            val singerName = json["singerName"]?.String ?: ""
+            // 关键修正：从 author_name 获取完整的多歌手字符串
+            val singerName = json["author_name"]?.String
+                ?: json["singerName"]?.String
+                ?: ""
             val timeLength = json["timeLength"]?.Int ?: 0
             val audioUrl = json["url"]?.String ?: ""
             val finalCover = coverUrl.ifEmpty {
