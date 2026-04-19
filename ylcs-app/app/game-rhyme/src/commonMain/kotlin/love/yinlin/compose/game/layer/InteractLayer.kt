@@ -27,7 +27,7 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
         companion object {
             const val INDICATOR_RADIUS = 10f
             const val BRUSH_RADIUS = 150f
-            const val BRUSH_DURATION = 64f
+            const val BRUSH_DURATION = 80f
             val DefaultStroke = Stroke(3f)
         }
 

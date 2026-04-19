@@ -10,6 +10,7 @@ import love.yinlin.compose.game.visible.BackgroundWave
 
 @Stable
 class BackgroundLayer : Layer(
+    BackgroundConstellation(layerOrder = 0),
     BackgroundWave(
         waveColor = Colors(0xFF00E5FF).copy(alpha = 0.1f),
         phaseRatio = 0.003f,
@@ -18,7 +19,7 @@ class BackgroundLayer : Layer(
         amplitudeRatio = 1f,
         layerOrder = 1
     ),
-    BackgroundRipple(),
+    BackgroundRipple(layerOrder = 2),
     BackgroundWave(
         waveColor = Colors(0xFFFF00FF).copy(alpha = 0.1f),
         phaseRatio = 0.002f,
@@ -27,7 +28,6 @@ class BackgroundLayer : Layer(
         amplitudeRatio = 0.8f,
         layerOrder = 3
     ),
-    BackgroundConstellation(),
     layerOrder = 0,
     layerType = LayerType.Absolute
 ) {

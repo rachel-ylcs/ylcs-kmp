@@ -15,7 +15,7 @@ import love.yinlin.compose.game.traits.Visible
 import kotlin.math.sin
 import kotlin.random.Random
 
-class BackgroundConstellation : Visible(), Dynamic {
+class BackgroundConstellation(override val layerOrder: Int) : Visible(), Dynamic {
     class BoxNode(var x: Float, var y: Float) {
         var scaleTime = Random.nextFloat() * 100f
         var scaleSpeed = Random.nextFloat() * 0.003f + 0.001f
@@ -110,8 +110,6 @@ class BackgroundConstellation : Visible(), Dynamic {
 
         updateDirty()
     }
-
-    override val layerOrder: Int = 0
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
         val (w, h) = viewportSize

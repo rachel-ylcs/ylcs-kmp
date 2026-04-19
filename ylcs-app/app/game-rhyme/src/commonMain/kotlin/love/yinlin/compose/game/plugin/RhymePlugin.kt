@@ -1,7 +1,5 @@
 package love.yinlin.compose.game.plugin
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -11,23 +9,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toIntSize
 import androidx.compose.ui.zIndex
-import kotlinx.coroutines.delay
 import love.yinlin.app.game_rhyme.resources.Res
 import love.yinlin.app.game_rhyme.resources.rhyme
 import love.yinlin.compose.Colors
@@ -50,7 +44,6 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.RhymeIcons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.BlurState
-import love.yinlin.compose.ui.node.align
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
@@ -58,7 +51,6 @@ import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.media.buildAudioPlayer
 import kotlin.reflect.KClass
-import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class RhymePlugin(
@@ -213,50 +205,10 @@ class RhymePlugin(
                         color = Colors.White,
                         style = Theme.typography.v3.bold.copy(
                             fontFamily = fontFamily,
-                            letterSpacing = 2.sp
+                            letterSpacing = 3.sp
                         )
                     )
                 }
-            }
-        }
-    }
-
-    @Composable
-    private fun ColumnScope.ResultContent(fontFamily: FontFamily) {
-        val (result, combo, id) = dataUpdater.currentResult ?: return
-
-        val scale = remember { Animatable(0f) }
-
-        LaunchedEffect(id) {
-            scale.snapTo(targetValue = 0f)
-            scale.animateTo(targetValue = 1f)
-            delay(1.seconds)
-            scale.animateTo(targetValue = 0f)
-        }
-
-        Box(modifier = Modifier.graphicsLayer {
-            scaleX = scale.value
-            scaleY = scale.value
-            transformOrigin = TransformOrigin.Center
-        }.align(Alignment.CenterHorizontally)) {
-            SimpleClipText(
-                text = result.title,
-                color = Colors.White,
-                style = Theme.typography.v3.bold.copy(
-                    fontFamily = fontFamily,
-                    letterSpacing = 2.sp
-                )
-            )
-            if (combo > 0) {
-                SimpleClipText(
-                    text = "+$combo",
-                    color = Colors.White,
-                    style = Theme.typography.v6.bold.copy(
-                        fontFamily = fontFamily,
-                        letterSpacing = 2.sp
-                    ),
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                )
             }
         }
     }
@@ -270,7 +222,6 @@ class RhymePlugin(
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
         ) {
             InfoContent(fontFamily)
-            ResultContent(fontFamily)
         }
     }
 

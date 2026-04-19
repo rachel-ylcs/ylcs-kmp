@@ -15,7 +15,7 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.random.Random
 
-class BackgroundRipple : Visible(), Dynamic {
+class BackgroundRipple(override val layerOrder: Int) : Visible(), Dynamic {
     var backgroundSize = Size.Zero
     var resonanceTime = 0f
     var resonanceUpdateTimer = 0f
@@ -55,8 +55,6 @@ class BackgroundRipple : Visible(), Dynamic {
 
         updateDirty()
     }
-
-    override val layerOrder: Int = 2
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
         backgroundSize = viewportSize

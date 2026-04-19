@@ -3,7 +3,6 @@ package love.yinlin.compose.game.visible
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import love.yinlin.compose.Colors
 import love.yinlin.compose.animation.Interpolator
@@ -88,11 +87,15 @@ class NoteBlock(
 
     override fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact) {
         if (currentStatus !is Status.Interact) return
-        // 单击交互只关心按下时刻
-        if (interactStatus[scaleIndex] == InteractStatus.Down) {
-            val result = currentStatus.result
-            blockStatus = Status.Release(currentStatus.progress, result)
-            fromMapLayer?.updateResult(result)
+        for (i in 0 .. 7) {
+            // 单击交互只关心按下时刻
+            if (interactStatus[i] == InteractStatus.Down) {
+                // 检查按键是否匹配
+                val result = if (i == scaleIndex) currentStatus.result else BlockResult.MISS
+                blockStatus = if (i == scaleIndex) Status.Release(currentStatus.progress, result) else Status.Missing()
+                fromMapLayer?.updateResult(result)
+                break
+            }
         }
     }
 
@@ -134,23 +137,21 @@ class NoteBlock(
                     val progress = status.progress
 
                     drawPrepareBorder(mainColor, progress)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, Interpolator.decelerate(progress))
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, Interpolator.decelerate(progress))
                 }
                 is Status.Interact -> {
-                    scale(status.progress, DefaultCenter) { rect(mainColor, DefaultRect, alpha = 0.4f) }
-                    drawPrepareBorder(mainColor, 1f)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, 1f)
+                    drawScaleBlock(mainColor, status.progress)
+                    drawFullPrepareBorder(mainColor)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, 1f)
                 }
                 is Status.Release -> {
                     val progress = status.progress
                     val releaseProgress = Interpolator.accelerate(1 - progress)
-                    val explodeProgress = Interpolator.decelerate(progress)
 
-                    scale(1f + explodeProgress * 0.2f, DefaultCenter) { rect(Colors.White, DefaultRect, style = Stroke(10f)) }
-
-                    scale(releaseProgress * status.lastProgress, DefaultCenter) { rect(mainColor, DefaultRect, alpha = 0.4f) }
-                    drawPrepareBorder(mainColor, 1f)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, releaseProgress)
+                    drawBounceBorder(mainColor, -3.542f * progress * progress + 2.542f * progress + 1)
+                    drawScaleBlock(mainColor, releaseProgress * status.lastProgress)
+                    drawFullPrepareBorder(mainColor, 3 * progress * (progress - 1) + 1)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, releaseProgress)
                     drawLyricsText(TextColor, Interpolator.decelerate(progress) * 0.5f)
                 }
                 is Status.Missing -> {
@@ -158,9 +159,9 @@ class NoteBlock(
                     val missingProgress = Interpolator.accelerate(1 - progress)
                     val missingColor = lerp(mainColor, MissingColor, progress)
 
-                    scale(missingProgress, DefaultCenter) { rect(missingColor, DefaultRect, alpha = 0.4f) }
-                    drawPrepareBorder(missingColor, 1f)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, missingProgress)
+                    drawScaleBlock(missingColor, missingProgress)
+                    drawFullPrepareBorder(missingColor)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, missingProgress)
                     drawLyricsText(MissingColor, Interpolator.decelerate(progress) * 0.5f)
                 }
                 is Status.Done -> {

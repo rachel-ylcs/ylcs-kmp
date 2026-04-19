@@ -42,6 +42,8 @@ sealed class Block<BS : BlockStatus>(
         val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
         val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
 
+        val BounceBorderStroke = arrayOf(Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f))
+
         val NoteScaleFontMap = arrayOf(
             '9',
             '1', '2', '3', '4', '5', '6', '7',
@@ -102,7 +104,25 @@ sealed class Block<BS : BlockStatus>(
         line(color, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), style = PrepareStroke)
     }
 
-    protected fun Drawer.drawSingleNoteFont(scale: Int, scaleRatio: Float, color: Color, alpha: Float) {
+    protected fun Drawer.drawFullPrepareBorder(color: Color, alpha: Float = 1f) {
+        rect(color, DefaultRect, alpha = alpha, style = PrepareStroke)
+    }
+
+    protected fun Drawer.drawScaleBlock(color: Color, scaleRatio: Float, alpha: Float = 0.4f) {
+        scale(scaleRatio, DefaultCenter) { rect(color, DefaultRect, alpha = alpha) }
+    }
+
+    protected fun Drawer.drawBounceBorder(color: Color, ratio: Float) {
+        scale(ratio, DefaultCenter) {
+            rect(color, DefaultRect, style = BounceBorderStroke[0], alpha = 0.2f)
+            rect(color, DefaultRect, style = BounceBorderStroke[1], alpha = 0.5f)
+            rect(color, DefaultRect, style = BounceBorderStroke[2], alpha = 0.9f)
+            rect(Colors.White, DefaultRect, style = BounceBorderStroke[3], alpha = 0.4f)
+            rect(Colors.White, DefaultRect, style = BounceBorderStroke[4], alpha = 0.8f)
+        }
+    }
+
+    protected fun Drawer.drawSingleNoteFont(scale: Int, color: Color, alpha: Float, scaleRatio: Float = 0.75f) {
         fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.let { graph ->
             scale(scaleRatio, DefaultCenter) {
                 text(graph, TopLeft, DefaultSize, color.copy(alpha = alpha), TextAlign.Center)
