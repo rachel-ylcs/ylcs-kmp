@@ -205,7 +205,7 @@ class RhymePlugin(
                         color = Colors.White,
                         style = Theme.typography.v3.bold.copy(
                             fontFamily = fontFamily,
-                            letterSpacing = 3.sp
+                            letterSpacing = 4.sp
                         )
                     )
                 }
