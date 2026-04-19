@@ -15,7 +15,7 @@ import love.yinlin.compose.game.traits.Visible
 import kotlin.math.sin
 import kotlin.random.Random
 
-object BackgroundConstellation : Visible(), Dynamic {
+class BackgroundConstellation : Visible(), Dynamic {
     class BoxNode(var x: Float, var y: Float) {
         var scaleTime = Random.nextFloat() * 100f
         var scaleSpeed = Random.nextFloat() * 0.003f + 0.001f
@@ -92,7 +92,7 @@ object BackgroundConstellation : Visible(), Dynamic {
                     currentTarget = if (unvisited.isNotEmpty()) unvisited.random() else pathNodes[0]
                     linkProgress = 0f
                 } else {
-                    linkProgress += tick * 0.0005f
+                    linkProgress += tick * 0.0003f
                     if (linkProgress >= 1f) {
                         if (target == pathNodes[0]) {
                             linkState = LinkState.FADING

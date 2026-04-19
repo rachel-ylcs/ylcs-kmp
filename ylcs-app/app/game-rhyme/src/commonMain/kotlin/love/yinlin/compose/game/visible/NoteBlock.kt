@@ -3,6 +3,10 @@ package love.yinlin.compose.game.visible
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.lerp
+import love.yinlin.compose.Colors
+import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -38,30 +42,30 @@ class NoteBlock(
             var progress: Float = 0f
             var result: BlockResult = BlockResult.PERFECT
         }
-        class Release(val result: BlockResult) : Status, BlockStatus.Release {
-            var progress: Float = 0f
-            var tick: Int = 0
+        class Release(val lastProgress: Float, val result: BlockResult) : Status, BlockStatus.Release {
+            override val duration: Int = 500
+            override var progress: Float = 0f
+            override var tick: Int = 0
         }
-        class Done(val result: BlockResult) : Status, BlockStatus.Done
+        class Missing : Status, BlockStatus.Missing {
+            override val duration: Int = 750
+            override var progress: Float = 0f
+            override var tick: Int = 0
+        }
+        class Done(val isMissing: Boolean, val result: BlockResult) : Status, BlockStatus.Done
     }
 
     companion object {
-        val PrepareDurationMap = mapOf(
-            RhymeDifficulty.Easy to 2000,
-            RhymeDifficulty.Medium to 1500,
-            RhymeDifficulty.Hard to 1250,
+        private val PrepareDurationMap = mapOf(
+            RhymeDifficulty.Easy to 2500,
+            RhymeDifficulty.Medium to 2000,
+            RhymeDifficulty.Hard to 1500,
             RhymeDifficulty.Extreme to 1000
-        )
-        val InteractDurationMap = mapOf(
-            RhymeDifficulty.Easy to 1000,
-            RhymeDifficulty.Medium to 850,
-            RhymeDifficulty.Hard to 650,
-            RhymeDifficulty.Extreme to 500
         )
 
         fun buildTime(difficulty: RhymeDifficulty, start: Long): Time {
             val prepare = PrepareDurationMap[difficulty]!!
-            val interactDuration = InteractDurationMap[difficulty]!!
+            val interactDuration = prepare / 2
             val perfectDuration = (interactDuration * BlockResult.GOOD.ratio).toInt()
             return Time(
                 appearance = start - prepare - perfectDuration / 2,
@@ -71,6 +75,9 @@ class NoteBlock(
                 missStart = prepare + interactDuration
             )
         }
+
+        val TextColor: Color = Colors.Ghost
+        val MissingColor: Color = Colors.Gray6
     }
 
     private val scaleIndex: Int = (rhymeAction.scale - 1) % 7 + 1
@@ -84,7 +91,7 @@ class NoteBlock(
         // 单击交互只关心按下时刻
         if (interactStatus[scaleIndex] == InteractStatus.Down) {
             val result = currentStatus.result
-            blockStatus = Status.Release(result)
+            blockStatus = Status.Release(currentStatus.progress, result)
             fromMapLayer?.updateResult(result)
         }
     }
@@ -102,29 +109,17 @@ class NoteBlock(
                     status.progress = progress
                     status.result = when {
                         progress >= BlockResult.MISS.ratio -> { // 错过
-                            val blockResult = BlockResult.MISS
-                            blockStatus = Status.Release(blockResult)
-                            mapLayer.updateResult(blockResult) // 提交分数
-                            blockResult
+                            blockStatus = Status.Missing()
+                            mapLayer.updateResult(BlockResult.MISS) // 提交分数
+                            BlockResult.MISS
                         }
                         progress >= BlockResult.BAD.ratio -> BlockResult.BAD
                         progress >= BlockResult.GOOD.ratio -> BlockResult.GOOD
                         else -> BlockResult.PERFECT
                     }
                 }
-                is Status.Release -> {
-                    // Release和Done的动画可以根据游戏刻来而不是音轨刻
-                    // 以防音符终止了但动画仍需要继续
-                    val oldTick = status.tick
-                    if (oldTick >= RELEASE_ANIMATION_DURATION) blockStatus = Status.Done(status.result)
-                    else {
-                        val newTick = oldTick + tick
-                        status.tick = newTick
-                        val rawProgress = (newTick / RELEASE_ANIMATION_DURATION.toFloat()).coerceIn(0f, 1f) - 1
-                        // 用OvershootInterpolator插值
-                        status.progress = rawProgress * rawProgress * (3 * rawProgress + 2) + 1
-                    }
-                }
+                is Status.Release -> updateCustomRelease(status, tick) { Status.Done(false, it.result) }
+                is Status.Missing -> updateCustomRelease(status, tick) { Status.Done(true, BlockResult.MISS) }
                 is Status.Done -> return@withMapLayer false
             }
             true
@@ -132,28 +127,45 @@ class NoteBlock(
     }
 
     override fun Drawer.onDraw() {
-        when (val status = blockStatus) {
-            null -> return
-            is Status.Prepare -> {
-                withBlockScale {
-                    drawPrepareBorder(mainColor, status.progress)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), (status.progress * 2).coerceIn(0f, 1f))
+        withBlockScale {
+            when (val status = blockStatus) {
+                null -> return
+                is Status.Prepare -> {
+                    val progress = status.progress
+
+                    drawPrepareBorder(mainColor, progress)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, Interpolator.decelerate(progress))
                 }
-            }
-            is Status.Interact -> {
-                withBlockScale {
-                    scale(status.progress, DefaultCenter) { rect(mainColor, DefaultRect) }
+                is Status.Interact -> {
+                    scale(status.progress, DefaultCenter) { rect(mainColor, DefaultRect, alpha = 0.4f) }
                     drawPrepareBorder(mainColor, 1f)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, 1f)
                 }
-            }
-            is Status.Release -> {
-                withBlockScale {
+                is Status.Release -> {
+                    val progress = status.progress
+                    val releaseProgress = Interpolator.accelerate(1 - progress)
+                    val explodeProgress = Interpolator.decelerate(progress)
+
+                    scale(1f + explodeProgress * 0.2f, DefaultCenter) { rect(Colors.White, DefaultRect, style = Stroke(10f)) }
+
+                    scale(releaseProgress * status.lastProgress, DefaultCenter) { rect(mainColor, DefaultRect, alpha = 0.4f) }
                     drawPrepareBorder(mainColor, 1f)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, releaseProgress)
+                    drawLyricsText(TextColor, Interpolator.decelerate(progress) * 0.5f)
                 }
-            }
-            is Status.Done -> {
-                withBlockScale {
-                    drawPrepareBorder(mainColor, 1f)
+                is Status.Missing -> {
+                    val progress = status.progress
+                    val missingProgress = Interpolator.accelerate(1 - progress)
+                    val missingColor = lerp(mainColor, MissingColor, progress)
+
+                    scale(missingProgress, DefaultCenter) { rect(missingColor, DefaultRect, alpha = 0.4f) }
+                    drawPrepareBorder(missingColor, 1f)
+                    drawSingleNoteFont(rhymeAction.scale.toInt(), 0.75f, TextColor, missingProgress)
+                    drawLyricsText(MissingColor, Interpolator.decelerate(progress) * 0.5f)
+                }
+                is Status.Done -> {
+                    drawPrepareBorder(if (status.isMissing) MissingColor else mainColor, 1f)
+                    drawLyricsText(if (status.isMissing) MissingColor else TextColor, 0.5f)
                 }
             }
         }

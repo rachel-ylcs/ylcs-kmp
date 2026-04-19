@@ -42,8 +42,6 @@ sealed class Block<BS : BlockStatus>(
         val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
         val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
 
-        const val RELEASE_ANIMATION_DURATION = 300
-
         val NoteScaleFontMap = arrayOf(
             '9',
             '1', '2', '3', '4', '5', '6', '7',
@@ -77,6 +75,18 @@ sealed class Block<BS : BlockStatus>(
         blockStatus = null
     }
 
+    protected inline fun <BRS : BlockStatus.Release, BDS : BS> updateCustomRelease(status: BRS, tick: Int, done: (BRS) -> BDS) {
+        // Release, Missing, Done的动画可以根据游戏刻来而不是音轨刻
+        // 以防音符终止了但动画仍需要继续
+        val oldTick = status.tick
+        if (oldTick >= status.duration) blockStatus = done(status)
+        else {
+            val newTick = oldTick + tick
+            status.tick = newTick
+            status.progress = (newTick / status.duration.toFloat()).coerceIn(0f, 1f)
+        }
+    }
+
     inline fun Drawer.withBlockScale(block: Drawer.() -> Unit) = scale(DEFAULT_SCALE, DefaultCenter, block)
 
     protected fun Drawer.drawPrepareBorder(color: Color, progress: Float) {
@@ -92,9 +102,19 @@ sealed class Block<BS : BlockStatus>(
         line(color, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), style = PrepareStroke)
     }
 
-    protected fun Drawer.drawSingleNoteFont(scale: Int, progress: Float) {
+    protected fun Drawer.drawSingleNoteFont(scale: Int, scaleRatio: Float, color: Color, alpha: Float) {
         fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.let { graph ->
-            text(graph, TopLeft, DefaultSize, Colors.White.copy(alpha = progress), TextAlign.Center)
+            scale(scaleRatio, DefaultCenter) {
+                text(graph, TopLeft, DefaultSize, color.copy(alpha = alpha), TextAlign.Center)
+            }
+        }
+    }
+
+    protected fun Drawer.drawLyricsText(color: Color, scaleRatio: Float) {
+        fromMapLayer?.lyricsTextMap?.get(rhymeAction.ch)?.let { graph ->
+            scale(scaleRatio, DefaultCenter) {
+                text(graph, TopLeft, DefaultSize, color, TextAlign.Center)
+            }
         }
     }
 }

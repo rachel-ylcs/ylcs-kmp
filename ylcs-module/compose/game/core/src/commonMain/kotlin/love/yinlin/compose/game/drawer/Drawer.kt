@@ -52,17 +52,11 @@ class Drawer internal constructor(
     }
 
     fun oval(color: Color, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawOval(color = color, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(
-            radiusX * 2,
-            radiusY * 2
-        ), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawOval(color = color, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun oval(brush: Brush, position: Offset, radiusX: Float, radiusY: Float, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawOval(brush = brush, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(
-            radiusX * 2,
-            radiusY * 2
-        ), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawOval(brush = brush, topLeft = position.translate(x = -radiusX, y = -radiusY), size = Size(radiusX * 2, radiusY * 2), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun rect(color: Color, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
@@ -82,31 +76,19 @@ class Drawer internal constructor(
     }
 
     fun roundRect(color: Color, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(
-            radius,
-            radius
-        ), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(color = color, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(brush: Brush, radius: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(
-            radius,
-            radius
-        ), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(brush = brush, topLeft = position, size = size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(color: Color, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(color = color, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(
-            radius,
-            radius
-        ), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(color = color, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun roundRect(brush: Brush, radius: Float, rect: Rect, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {
-        rawScope?.drawRoundRect(brush = brush, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(
-            radius,
-            radius
-        ), alpha = alpha, style = style, blendMode = blendMode)
+        rawScope?.drawRoundRect(brush = brush, topLeft = rect.topLeft, size = rect.size, cornerRadius = CornerRadius(radius, radius), alpha = alpha, style = style, blendMode = blendMode)
     }
 
     fun arc(color: Color, startAngle: Float, sweepAngle: Float, position: Offset, size: Size, alpha: Float = 1f, style: DrawStyle = Fill, blendMode: BlendMode = BlendMode.SrcOver) {

@@ -15,7 +15,7 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.random.Random
 
-object BackgroundRipple : Visible(), Dynamic {
+class BackgroundRipple : Visible(), Dynamic {
     var backgroundSize = Size.Zero
     var resonanceTime = 0f
     var resonanceUpdateTimer = 0f

@@ -2,8 +2,10 @@ package love.yinlin.compose.game.layer
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.font.FontWeight
-import love.yinlin.app.game_rhyme.resources.Res
+import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
 import love.yinlin.app.game_rhyme.resources.music
+import love.yinlin.app.global.resources.Res as GlobalRes
+import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.game.common.BlockMapGenerator
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -28,7 +30,7 @@ class MapLayer(
     private val interactLayer: InteractLayer,
 ) : Layer(layerOrder = 1), Dynamic {
     companion object {
-        const val CAMERA_BLOCK_AREA_RATIO = 0.8f
+        const val CAMERA_BLOCK_AREA_RATIO = 0.6f
     }
 
     // 地图
@@ -42,6 +44,12 @@ class MapLayer(
     private var prepareIndex: Int = -1
 
     override val interactive: Boolean = false
+
+    var baseNoteFontMap: List<TextGraph>? = null
+        private set
+
+    var lyricsTextBuilder: ((String) -> TextGraph)? = null
+    val lyricsTextMap = mutableMapOf<String, TextGraph>()
 
     override fun preUpdate(tick: Int) {
         // 更新进度
@@ -60,6 +68,12 @@ class MapLayer(
             if (currentAudioPosition >= nextBlock.time.appearance) {
                 // 到达方块出现刻
                 ++prepareIndex
+                // 生成文字
+                lyricsTextBuilder?.let { builder ->
+                    val ch = nextBlock.rhymeAction.ch
+                    lyricsTextMap.getOrPut(ch) { builder(ch) }
+                }
+                // 加入序列
                 this += nextBlock
             }
         }
@@ -103,12 +117,12 @@ class MapLayer(
         interactStatus.fill(InteractStatus.None) // 重置状态
     }
 
-    var baseNoteFontMap: List<TextGraph>? = null
-        private set
-
     override suspend fun InitialDrawer.preInitialDraw() {
         baseNoteFontMap = Block.NoteScaleFontMap.map { index ->
-            measureText(index.toString(), font = Res.font.music, fontWeight = FontWeight.Bold)
+            measureText(index.toString(), font = RhymeRes.font.music, fontWeight = FontWeight.Bold)
+        }
+        lyricsTextBuilder = { text ->
+            measureText(text, font = GlobalRes.font.xwwk, fontWeight = FontWeight.Bold)
         }
         updateDirty()
     }

@@ -26,7 +26,11 @@ class FixedSlurBlock(
 
     interface Status : BlockStatus {
         class Prepare : Status, BlockStatus.Prepare
-        class Release : Status, BlockStatus.Release
+        class Release : Status, BlockStatus.Release {
+            override val duration: Int = 500
+            override var progress: Float = 0f
+            override var tick: Int = 0
+        }
     }
 
     companion object {
