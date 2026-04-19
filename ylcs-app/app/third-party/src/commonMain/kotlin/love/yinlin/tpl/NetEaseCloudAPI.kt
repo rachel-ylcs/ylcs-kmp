@@ -10,7 +10,7 @@ import love.yinlin.tpl.lyrics.LrcParser
 import love.yinlin.uri.Uri
 
 @Stable
-object NetEaseCloudAPI : PlatformMusicParser {
+object NetEaseCloudAPI : PlatformMusicAPI {
     private const val NETEASECLOUD_HOST: String = "music.163.com"
     private object Container {
         fun detail(id: String) = "api/song/detail?id=${id}&ids=[${id}]"
@@ -64,22 +64,20 @@ object NetEaseCloudAPI : PlatformMusicParser {
         musicInfos.ifEmpty { null }
     }
 
-    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = when {
-        // 歌曲 http://163cn.tv/EElG0jr
-        link.contains("163cn.tv") -> Coroutines.io {
-            requestMusicId(link)?.let { requestMusic(it) }
-        }?.let { listOf(it) }
-        // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
-        link.contains("music.163.com") && link.contains("playlist") -> Coroutines.io {
-            val id = Uri.parse(link)?.params["id"]
-            if (id != null) requestPlaylist(id) else null
+    override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
+        return null
+    }
+
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
+        when {
+            // 歌曲 http://163cn.tv/EElG0jr
+            link.contains("163cn.tv") -> requestMusicId(link)?.let { requestMusic(it) }?.let(::listOf)
+            // 歌单 https://y.music.163.com/m/playlist?id=13674538430&userid=10015279209&creatorId=10015279209
+            link.contains("music.163.com") && link.contains("playlist") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
+            // 歌曲 https://music.163.com/#/song?textid=1064008&id=504686858
+            link.contains("music.163.com") && link.contains("song") -> Uri.parse(link)?.params["id"]?.let { requestMusic(it) }?.let(::listOf)
+            // 歌曲 504686858
+            else -> requestMusic(link)?.let(::listOf)
         }
-        // 歌曲 https://music.163.com/#/song?textid=1064008&id=504686858
-        link.contains("music.163.com") && link.contains("song") -> Coroutines.io {
-            val id = Uri.parse(link)?.params["id"]
-            if (id != null) requestMusic(id) else null
-        }?.let { listOf(it) }
-        // 歌曲 504686858
-        else -> Coroutines.io { requestMusic(link) }?.let { listOf(it) }
     }
 }

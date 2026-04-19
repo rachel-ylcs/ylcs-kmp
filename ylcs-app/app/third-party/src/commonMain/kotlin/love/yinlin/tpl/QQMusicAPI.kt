@@ -11,7 +11,7 @@ import love.yinlin.tpl.lyrics.LrcParser
 import kotlin.io.encoding.Base64
 
 @Stable
-object QQMusicAPI : PlatformMusicParser {
+object QQMusicAPI : PlatformMusicAPI {
     private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
     private fun decodeData(num: Int, json: JsonObject): List<JsonObject> {
@@ -89,30 +89,24 @@ object QQMusicAPI : PlatformMusicParser {
         items.ifEmpty { null }
     }
 
-    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = when {
-        // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
-        link.contains("c6.y.qq.com") -> Coroutines.io {
-            requestMusicId(link)?.let { requestMusic(it) }
-        }?.let { listOf(it) }
-        // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
-        link.contains("y.qq.com") && link.contains("songDetail") -> Coroutines.io {
-            requestMusic(link.substringAfterLast("/"))
-        }?.let { listOf(it) }
-        // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
-        link.contains("i2.y.qq.com") && link.contains("playlist") -> Coroutines.io {
-            val id = Uri.parse(link)?.params["id"]
-            if (id != null) requestPlaylist(id) else null
+    override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
+        return null
+    }
+
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
+        when {
+            // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
+            link.contains("c6.y.qq.com") -> requestMusicId(link)?.let { requestMusic(it) }?.let(::listOf)
+            // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
+            link.contains("y.qq.com") && link.contains("songDetail") -> requestMusic(link.substringAfterLast("/"))?.let(::listOf)
+            // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
+            link.contains("i2.y.qq.com") && link.contains("playlist") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
+            // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
+            link.contains("i.y.qq.com") && link.contains("taoge") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
+            // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
+            link.contains("y.qq.com") && link.contains("playlist") -> requestPlaylist(link.substringAfterLast("/"))
+            // 歌曲 003yJ3Ba1bDVJc
+            else -> requestMusic(link)?.let(::listOf)
         }
-        // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
-        link.contains("i.y.qq.com") && link.contains("taoge") -> Coroutines.io {
-            val id = Uri.parse(link)?.params["id"]
-            if (id != null) requestPlaylist(id) else null
-        }
-        // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
-        link.contains("y.qq.com") && link.contains("playlist") -> Coroutines.io {
-            requestPlaylist(link.substringAfterLast("/"))
-        }
-        // 歌曲 003yJ3Ba1bDVJc
-        else -> Coroutines.io { requestMusic(link) }?.let { listOf(it) }
     }
 }

@@ -4,6 +4,12 @@ import androidx.compose.runtime.Stable
 import love.yinlin.data.music.PlatformMusicInfo
 
 @Stable
-object KugouMusicAPI : PlatformMusicParser {
-    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = null
+object KugouMusicAPI : PlatformMusicAPI {
+    override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
+        return null
+    }
+
+    override suspend fun parseLink(link: String): List<PlatformMusicInfo>? {
+        return null
+    }
 }
