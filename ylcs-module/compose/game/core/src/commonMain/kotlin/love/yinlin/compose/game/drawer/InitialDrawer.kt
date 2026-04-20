@@ -32,14 +32,14 @@ open class InitialDrawer internal constructor(
         font: FontResource? = null,
         fontWeight: FontWeight = FontWeight.Normal,
         fontStyle: FontStyle = FontStyle.Normal,
-        letterSpacing: Float = 0f
+        letterSpacing: Float = 0.015f
     ): TextGraph {
         val intrinsics = ParagraphIntrinsics(
             text = text,
             style = TextStyle(
                 fontSize = BaselineTextFontSize,
                 fontWeight = fontWeight,
-                fontFamily = fontProvider[font],
+                fontFamily = font?.let { fontProvider[it] },
                 fontStyle = fontStyle,
                 letterSpacing = if (letterSpacing <= 0f) TextUnit.Unspecified else BaselineTextFontSize * letterSpacing
             ),

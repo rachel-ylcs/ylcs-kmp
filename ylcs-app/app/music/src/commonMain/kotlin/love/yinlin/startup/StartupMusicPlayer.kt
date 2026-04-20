@@ -141,7 +141,11 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
                 val modification = library[id]?.modification ?: 0
                 val configPath = File(app.modPath, id, ModResourceType.Config.filename)
                 val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
-                if (info != null) library[id] = info.copy(modification = modification + 1)
+                if (info != null) {
+                    Coroutines.main {
+                        library[id] = info.copy(modification = modification + 1)
+                    }
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import love.yinlin.app
@@ -78,8 +79,8 @@ class ScreenLyricsSettings : BasicScreen() {
                     SimpleEllipsisText(
                         text = "这是一条测试歌词~",
                         style = Theme.typography.v6.bold.copy(fontSize = Theme.typography.v6.bold.fontSize * config.textSize),
-                        color = Colors(config.textColor),
-                        modifier = Modifier.background(color = Colors(config.backgroundColor)).padding(Theme.padding.value)
+                        color = Color(config.textColor),
+                        modifier = Modifier.background(color = Color(config.backgroundColor)).padding(Theme.padding.value)
                     )
                 }
             }
@@ -121,7 +122,7 @@ class ScreenLyricsSettings : BasicScreen() {
                 ) {
                     SimpleEllipsisText("歌词前景色", style = Theme.typography.v7.bold)
                     ColorPicker(
-                        initColor = Colors(app.config.lyricsEngineConfig.textColor),
+                        initColor = Color(app.config.lyricsEngineConfig.textColor),
                         onColorChanged = { config = config.copy(textColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.fillMaxWidth()
@@ -134,7 +135,7 @@ class ScreenLyricsSettings : BasicScreen() {
                 ) {
                     SimpleEllipsisText("歌词背景色", style = Theme.typography.v7.bold)
                     ColorPicker(
-                        initColor = Colors(app.config.lyricsEngineConfig.textBackgroundColor),
+                        initColor = Color(app.config.lyricsEngineConfig.textBackgroundColor),
                         onColorChanged = { config = config.copy(textBackgroundColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.fillMaxWidth()
@@ -153,7 +154,7 @@ class ScreenLyricsSettings : BasicScreen() {
                 ) {
                     SimpleEllipsisText("浮窗背景色", style = Theme.typography.v7.bold)
                     ColorPicker(
-                        initColor = Colors(app.config.lyricsEngineConfig.backgroundColor),
+                        initColor = Color(app.config.lyricsEngineConfig.backgroundColor),
                         onColorChanged = { config = config.copy(backgroundColor = it.value) },
                         onColorChangeFinished = { app.config.lyricsEngineConfig = config },
                         modifier = Modifier.fillMaxWidth()

@@ -266,6 +266,10 @@ class Drawer internal constructor(
         rawScope?.clipPath(path) { block() }
     }
 
+    inline fun clipCircle(rect: Rect, block: Drawer.() -> Unit) {
+        clip(Path().apply { addOval(rect) }, block)
+    }
+
     inline fun transform(matrix: Matrix, block: Drawer.() -> Unit) {
         rawScope?.withTransform({ transform(matrix) }) { block() }
     }

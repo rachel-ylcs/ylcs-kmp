@@ -105,12 +105,6 @@ object Colors {
     val Amber6 = Color(217, 119, 6)
     val Amber7 = Color(180, 83, 9)
     val Amber8 = Color(146, 64, 14)
-
-    operator fun invoke(value: Int) = Color(value)
-    operator fun invoke(value: Long) = Color(value)
-    operator fun invoke(value: ULong) = Color(value)
-    operator fun invoke(red: Float, green: Float, blue: Float, alpha: Float = 1f) = Color(red, green, blue, alpha)
-    operator fun invoke(red: Int, green: Int, blue: Int, alpha: Int = 255) = Color(red, green, blue, alpha)
 }
 
 fun Color.blend(other: Color): Color {

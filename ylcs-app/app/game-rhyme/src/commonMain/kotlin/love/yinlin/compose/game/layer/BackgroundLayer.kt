@@ -1,32 +1,34 @@
 package love.yinlin.compose.game.layer
 
 import androidx.compose.runtime.Stable
-import love.yinlin.compose.Colors
+import androidx.compose.ui.graphics.Color
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.visible.BackgroundConstellation
 import love.yinlin.compose.game.visible.BackgroundRipple
 import love.yinlin.compose.game.visible.BackgroundWave
+import love.yinlin.compose.game.visible.FPSView
 
 @Stable
 class BackgroundLayer : Layer(
-    BackgroundConstellation(layerOrder = 0),
+    FPSView(layerOrder = 0, duration = 3000),
+    BackgroundConstellation(layerOrder = 1),
     BackgroundWave(
-        waveColor = Colors(0xFF00E5FF).copy(alpha = 0.1f),
+        waveColor = Color(0xFF00E5FF).copy(alpha = 0.1f),
         phaseRatio = 0.003f,
         phi = 0f,
         frequency = 0.001f,
         amplitudeRatio = 1f,
-        layerOrder = 1
+        layerOrder = 2
     ),
-    BackgroundRipple(layerOrder = 2),
+    BackgroundRipple(layerOrder = 3),
     BackgroundWave(
-        waveColor = Colors(0xFFFF00FF).copy(alpha = 0.1f),
+        waveColor = Color(0xFFFF00FF).copy(alpha = 0.1f),
         phaseRatio = 0.002f,
         phi = 3.141592f,
         frequency = 0.0012f,
         amplitudeRatio = 0.8f,
-        layerOrder = 3
+        layerOrder = 4
     ),
     layerOrder = 0,
     layerType = LayerType.Absolute

@@ -78,7 +78,6 @@ class ScreenRhyme : BasicScreen() {
         ),
         AssetPlugin.Factory(),
         ScenePlugin.Factory(
-            fpsRate = 0L,
             cameraConfig = Camera.Config(),
             extraModifier = Modifier.blurSource(blurState)
         ),
@@ -332,5 +331,6 @@ class ScreenRhyme : BasicScreen() {
                 }
             }
         }
+        engine.PreloadEnvironment()
     }
 }

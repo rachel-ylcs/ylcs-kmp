@@ -3,9 +3,9 @@ package love.yinlin.compose.game.visible
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
-import love.yinlin.compose.Colors
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.traits.Dynamic
@@ -20,7 +20,7 @@ class BackgroundRipple(override val layerOrder: Int) : Visible(), Dynamic {
     var resonanceTime = 0f
     var resonanceUpdateTimer = 0f
     val resonancePath = Path()
-    val resonanceColor = Colors(0xFF7C4DFF).copy(alpha = 0.15f)
+    val resonanceColor = Color(0xFF7C4DFF).copy(alpha = 0.15f)
     var resonanceTargetScale = 1f
     var resonanceCurrentScale = 1f
     val edgeNoises = FloatArray(50)

@@ -29,7 +29,7 @@ object Icons {
      * 真神 Compose Multiplatform
      */
     val ComposeMultiplatform by icon(rawSize = 64f) {
-        path(color = Colors(0xff6075f2)) {
+        path(color = Color(0xff6075f2)) {
             moveTo(56.25f, 18f)
             verticalLineTo(46f)
             lineTo(32f, 60f)
@@ -38,7 +38,7 @@ object Icons {
             lineTo(32f, 4f)
             close()
         }
-        path(color = Colors(0xff6B57ff)) {
+        path(color = Color(0xff6B57ff)) {
             moveToRelative(41.5f, 26.5f)
             verticalLineToRelative(11f)
             lineTo(32f, 43f)

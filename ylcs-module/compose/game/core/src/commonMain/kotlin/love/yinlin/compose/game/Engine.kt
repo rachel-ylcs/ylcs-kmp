@@ -49,6 +49,7 @@ class Engine(
     private val pluginDependencyMap: Map<String, List<String>>
     private val plugins: List<Plugin>
     private val visiblePlugins: List<Plugin>
+    private val preloadPlugins: List<Plugin>
 
     init {
         val analyzer = DependencyAnalyzer(
@@ -60,6 +61,7 @@ class Engine(
         pluginDependencyMap = analyzer.dependenciesMap
         plugins = analyzer.result
         visiblePlugins = plugins.fastFilter { it.layerOrder != LayerOrder.Invisible }
+        preloadPlugins = plugins.fastFilter { it.preloadEnvironment != null }
     }
 
     inline fun <reified T : Plugin> plugin(): T = pluginMap[metaClassName<T>()] as T
@@ -150,6 +152,15 @@ class Engine(
 
             layout(maxWidth, maxHeight) {
                 placeable.placeRelative(bounds.left, bounds.top)
+            }
+        }
+    }
+
+    @Composable
+    fun PreloadEnvironment() {
+        preloadPlugins.fastForEach { plugin ->
+            key(plugin.id) {
+                plugin.preloadEnvironment?.invoke()
             }
         }
     }

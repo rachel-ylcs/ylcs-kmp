@@ -46,6 +46,11 @@ abstract class Plugin(val engine: Engine) : Identifiable<String> {
     @Composable
     open fun BoxScope.Content() { }
 
+    /**
+     * 预加载环境
+     */
+    open val preloadEnvironment: (@Composable () -> Unit)? = null
+
     @OptIn(CompatibleRachelApi::class)
     final override val id: String = this.metaClassName
     final override val idString: String = id

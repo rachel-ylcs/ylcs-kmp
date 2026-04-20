@@ -9,7 +9,6 @@ import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.game.common.BlockMapGenerator
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
-import love.yinlin.compose.game.common.DataUpdater
 import love.yinlin.compose.game.common.InteractStatus
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.drawer.InitialDrawer
@@ -26,8 +25,8 @@ class MapLayer(
     private val camera: Camera,
     private val player: AudioPlayer,
     playInfo: RhymePlayInfo,
-    private val updater: DataUpdater,
     private val interactLayer: InteractLayer,
+    private val uiLayer: UILayer,
 ) : Layer(layerOrder = 1), Dynamic {
     companion object {
         const val CAMERA_BLOCK_AREA_RATIO = 0.6f
@@ -37,7 +36,6 @@ class MapLayer(
     private val blocks = BlockMapGenerator.generate(Block.DEFAULT_DIMENSION, playInfo.lyricsConfig, playInfo.playConfig)
 
     var audioPosition: Long = 0L
-    private var lastAudioPosition: Long = 0L
     // 当前位置 用于相机跟随 与音频发声一致
     private var currentIndex: Int = 0
     // 预准备位置 用于提前显示动画
@@ -56,12 +54,8 @@ class MapLayer(
         val currentAudioPosition = player.position
         val currentAudioDuration = player.duration
 
-        // 降频
-        if (currentAudioPosition - lastAudioPosition > 1000L) {
-            updater.audioProgress = if (currentAudioDuration == 0L) 0f else currentAudioPosition / currentAudioDuration.toFloat()
-            lastAudioPosition = currentAudioPosition
-        }
         audioPosition = currentAudioPosition
+        uiLayer.uiCover.updateAudioPosition(currentAudioPosition, currentAudioDuration)
 
         // 检查新方块
         blocks.getOrNull(prepareIndex + 1)?.let { nextBlock ->
@@ -128,6 +122,6 @@ class MapLayer(
     }
 
     fun updateResult(result: BlockResult, scoreRatio: Float = 1f) {
-        updater.updateResult(audioPosition, result, scoreRatio)
+        uiLayer.uiScore.updateResult(result, scoreRatio)
     }
 }

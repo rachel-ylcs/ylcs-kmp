@@ -148,7 +148,7 @@ class NoteBlock(
                     val progress = status.progress
                     val releaseProgress = Interpolator.accelerate(1 - progress)
 
-                    drawBounceBorder(mainColor, -3.542f * progress * progress + 2.542f * progress + 1)
+                    drawBounceBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
                     drawScaleBlock(mainColor, releaseProgress * status.lastProgress)
                     drawFullPrepareBorder(mainColor, 3 * progress * (progress - 1) + 1)
                     drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, releaseProgress)

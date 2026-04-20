@@ -124,13 +124,13 @@ open class Layer(
      */
     open val preTrigger: Trigger? = null
 
-    internal fun hitTestVisibleLayer(point: Offset): Pair<Visible?, Any>? {
+    internal fun hitTestVisibleLayer(isAbsolute: Boolean, point: Offset): Pair<Visible?, Any>? {
         val layerArg = preHitTest(point)
         if (layerArg != null) return null to layerArg
         // 受击处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]
-            val arg = item.onHitTest(point)
+            val arg = if (isAbsolute) item.onHitTestAbsolute(point) else item.onHitTestRelative(point)
             if (arg != null) return item to arg
         }
         return null
