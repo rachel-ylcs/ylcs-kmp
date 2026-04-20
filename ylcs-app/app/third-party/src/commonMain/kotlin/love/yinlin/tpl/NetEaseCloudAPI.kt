@@ -12,6 +12,8 @@ import love.yinlin.uri.Uri
 @Stable
 object NetEaseCloudAPI : PlatformMusicAPI {
     private const val NETEASECLOUD_HOST: String = "music.163.com"
+    private const val SEARCH_API = "http://$NETEASECLOUD_HOST/api/cloudsearch/pc"
+
     private object Container {
         fun detail(id: String) = "api/song/detail?id=${id}&ids=[${id}]"
         fun playlist(id: String) = "api/playlist/detail?id=$id&offset=0&limit=1000"
@@ -64,8 +66,16 @@ object NetEaseCloudAPI : PlatformMusicAPI {
         musicInfos.ifEmpty { null }
     }
 
+    // 新增搜索功能
     override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
-        return null
+        val url = "$SEARCH_API?s=$keyword&type=1&limit=50&offset=0"
+        return NetClient.Common.request({
+            this.url = url
+        }) { json: JsonObject ->
+            json.obj("result").arr("songs").map { it.Object["id"].String }
+        }?.let { ids ->
+            ids.mapNotNull { id -> requestMusic(id) }.ifEmpty { null }
+        }
     }
 
     override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
