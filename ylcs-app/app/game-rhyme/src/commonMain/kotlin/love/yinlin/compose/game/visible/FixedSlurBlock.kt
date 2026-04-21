@@ -2,6 +2,7 @@ package love.yinlin.compose.game.visible
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
@@ -36,6 +37,12 @@ class FixedSlurBlock(
     companion object {
         fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long): Time = Time(start)
     }
+
+    private val scaleIndex: Int = (rhymeAction.scale.first() - 1) % 7 + 1
+    private val scaleLevel: Int = (rhymeAction.scale.first() - 1) / 7
+    private val mainColor: Color = ScaleColorList[scaleIndex]
+
+    override val colorList: List<Color> = listOf(mainColor)
 
     override fun prepareStatus(): Status = Status.Release()
 

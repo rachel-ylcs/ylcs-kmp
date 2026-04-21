@@ -13,29 +13,28 @@ import love.yinlin.compose.game.common.InteractStatus
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.TextGraph
-import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.viewport.Camera
 import love.yinlin.compose.game.visible.Block
-import love.yinlin.media.AudioPlayer
+import love.yinlin.compose.game.visible.CornerTail
 
 // 地图层
 @Stable
 class MapLayer(
     private val camera: Camera,
-    private val player: AudioPlayer,
     playInfo: RhymePlayInfo,
+    val momentLayer: MomentLayer,
     private val interactLayer: InteractLayer,
     private val uiLayer: UILayer,
-) : Layer(layerOrder = 1), Dynamic {
+) : Layer(layerOrder = 2) {
     companion object {
+        // 镜头跟随安全区域比例
         const val CAMERA_BLOCK_AREA_RATIO = 0.6f
     }
 
     // 地图
     private val blocks = BlockMapGenerator.generate(Block.DEFAULT_DIMENSION, playInfo.lyricsConfig, playInfo.playConfig)
 
-    var audioPosition: Long = 0L
     // 当前位置 用于相机跟随 与音频发声一致
     private var currentIndex: Int = 0
     // 预准备位置 用于提前显示动画
@@ -46,20 +45,13 @@ class MapLayer(
     var baseNoteFontMap: List<TextGraph>? = null
         private set
 
-    var lyricsTextBuilder: ((String) -> TextGraph)? = null
+    private var lyricsTextBuilder: ((String) -> TextGraph)? = null
     val lyricsTextMap = mutableMapOf<String, TextGraph>()
 
     override fun preUpdate(tick: Int) {
-        // 更新进度
-        val currentAudioPosition = player.position
-        val currentAudioDuration = player.duration
-
-        audioPosition = currentAudioPosition
-        uiLayer.uiCover.updateAudioPosition(currentAudioPosition, currentAudioDuration)
-
         // 检查新方块
         blocks.getOrNull(prepareIndex + 1)?.let { nextBlock ->
-            if (currentAudioPosition >= nextBlock.time.appearance) {
+            if (momentLayer.audioPosition >= nextBlock.time.appearance) {
                 // 到达方块出现刻
                 ++prepareIndex
                 // 生成文字
@@ -79,8 +71,21 @@ class MapLayer(
             when (val blockStatus = currentBlock.blockStatus) {
                 is BlockStatus.Interact -> currentBlock.onInteract(interactStatus, blockStatus)
                 is BlockStatus.Release -> {
+                    // 更新位置
+                    val newIndex = currentIndex + 1
+                    currentIndex = newIndex
+
+                    // --  边角判定  --
+                    val currentLine = currentBlock.line
+                    if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
+                        // 添加尾角动画
+                        currentLine.endDirection?.let { endDirection ->
+                            this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
+                        }
+                    }
+
                     // 检查相机跟踪
-                    blocks.getOrNull(++currentIndex)?.let { nextBlock ->
+                    blocks.getOrNull(newIndex)?.let { nextBlock ->
                         val boundary = camera.viewportBounds
                         val gapRatio = (1 - CAMERA_BLOCK_AREA_RATIO) / 2
                         val horizontalMargin = boundary.width * gapRatio

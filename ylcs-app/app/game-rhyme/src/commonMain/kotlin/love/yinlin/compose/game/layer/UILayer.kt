@@ -11,7 +11,7 @@ import love.yinlin.compose.game.visible.UIScore
 
 @Stable
 class UILayer(info: RhymePlayInfo) : Layer(
-    layerOrder = 3,
+    layerOrder = 4,
     layerType = LayerType.Absolute
 ) {
     companion object {

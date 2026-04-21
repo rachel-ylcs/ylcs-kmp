@@ -95,6 +95,7 @@ class ScreenRhyme : BasicScreen() {
     private val library = mutableListOf<MusicInfo>()
 
     private fun startGame(info: MusicInfo, playConfig: RhymePlayConfig) {
+        if (engine.isRunning) return
         launch {
             catchingError {
                 val modPath = app.modPath

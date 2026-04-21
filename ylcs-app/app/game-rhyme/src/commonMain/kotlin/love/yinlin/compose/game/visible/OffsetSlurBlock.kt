@@ -2,6 +2,8 @@ package love.yinlin.compose.game.visible
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.fastMap
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
@@ -36,6 +38,11 @@ class OffsetSlurBlock(
     companion object {
         fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long): Time = Time(start)
     }
+
+    private val scaleIndexs: List<Int> = rhymeAction.scale.fastMap { (it - 1) % 7 + 1 }
+    private val scaleLevels: List<Int> = rhymeAction.scale.fastMap { (it - 1) / 7 }
+
+    override val colorList: List<Color> = scaleIndexs.fastMap { ScaleColorList[it] }
 
     override fun prepareStatus(): Status = Status.Release()
 

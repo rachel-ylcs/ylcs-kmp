@@ -96,7 +96,7 @@ class BlockMapGenerator private constructor(
     fun generate(): List<Block<out BlockStatus>> {
         // 生成地图位置
         val blockPositionMap = if (solve(0, -blockDimension, 0f, blockDimension, 0f)) result else emptyList()
-        var rawIndex = 0
+        var rawIndex = -1
 
         // 存储音游配置
         return blockPositionMap.fastMapIndexed { segmentIndex, segments ->
@@ -108,19 +108,23 @@ class BlockMapGenerator private constructor(
             val lineEnd = lineStart + lastAction.end
 
             // 转角
-            val cornerPrevBlock = segments.last()
-            val cornerNextBlock = blockPositionMap.getOrNull(segmentIndex + 1)?.firstOrNull()
-            val corner = when {
-                cornerNextBlock == null -> null
-                cornerNextBlock.y > cornerPrevBlock.y -> BlockCorner.TopRight
-                cornerNextBlock.x < cornerPrevBlock.x -> BlockCorner.BottomRight
-                cornerNextBlock.y < cornerPrevBlock.y -> BlockCorner.BottomLeft
-                cornerNextBlock.x > cornerPrevBlock.x -> BlockCorner.TopLeft
-                else -> null
-            }
+            val prev = segments[segments.lastIndex - 1]
+            val current = segments.last()
+            val next = blockPositionMap.getOrNull(segmentIndex + 1)?.firstOrNull()
+            val startDirection = BlockDirection.calculate(current, prev)
+            val endDirection = next?.let { BlockDirection.calculate(it, current) }
 
             // 行属性
-            val blockLine = BlockLine(segmentIndex, corner, line.text, lineStart, lineEnd)
+            val blockLine = BlockLine(
+                index = segmentIndex,
+                firstRawIndex = rawIndex + 1,
+                lastRawIndex = rawIndex + theme.size,
+                startDirection = startDirection,
+                endDirection = endDirection,
+                text = line.text,
+                lineStart = lineStart,
+                lineEnd = lineEnd
+            )
 
             // 遍历方块
             segments.fastMapIndexed { i, pos ->
@@ -133,7 +137,7 @@ class BlockMapGenerator private constructor(
                         position = pos,
                         line = blockLine,
                         time = NoteBlock.buildTime(difficulty, start),
-                        rawIndex = rawIndex++,
+                        rawIndex = ++rawIndex,
                         lineIndex = i,
                         rhymeAction = action
                     )
@@ -144,7 +148,7 @@ class BlockMapGenerator private constructor(
                             position = pos,
                             line = blockLine,
                             time = FixedSlurBlock.buildTime(difficulty, start, end),
-                            rawIndex = rawIndex++,
+                            rawIndex = ++rawIndex,
                             lineIndex = i,
                             rhymeAction = action
                         )
@@ -153,7 +157,7 @@ class BlockMapGenerator private constructor(
                             position = pos,
                             line = blockLine,
                             time = OffsetSlurBlock.buildTime(difficulty, start, end),
-                            rawIndex = rawIndex++,
+                            rawIndex = ++rawIndex,
                             lineIndex = i,
                             rhymeAction = action
                         )

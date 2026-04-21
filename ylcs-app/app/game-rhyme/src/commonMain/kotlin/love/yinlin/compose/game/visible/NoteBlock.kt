@@ -83,6 +83,8 @@ class NoteBlock(
     private val scaleLevel: Int = (rhymeAction.scale - 1) / 7
     private val mainColor: Color = ScaleColorList[scaleIndex]
 
+    override val colorList: List<Color> = listOf(mainColor)
+
     override fun prepareStatus(): Status = Status.Prepare()
 
     override fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact) {

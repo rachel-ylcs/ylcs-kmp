@@ -54,6 +54,7 @@ sealed class Block<BS : BlockStatus>(
 
     abstract val rhymeAction: RhymeAction // 音符操作
     abstract val time: BlockTime // 时间信息
+    abstract val colorList: List<Color> // 主要颜色列表
 
     abstract fun prepareStatus(): BS
     abstract fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact)
@@ -65,9 +66,11 @@ sealed class Block<BS : BlockStatus>(
 
     inline fun withMapLayer(block: (MapLayer, Int) -> Boolean) {
         (layer as? MapLayer)?.let { mapLayer ->
-            if (block(mapLayer, (mapLayer.audioPosition - time.appearance).toInt())) updateDirty()
+            if (block(mapLayer, (mapLayer.momentLayer.audioPosition - time.appearance).toInt())) updateDirty()
         }
     }
+
+    override val layerOrder: Int = 1
 
     override fun onAttached() {
         blockStatus = prepareStatus()

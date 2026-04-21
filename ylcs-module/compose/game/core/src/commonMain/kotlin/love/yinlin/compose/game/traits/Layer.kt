@@ -44,6 +44,15 @@ open class Layer(
             }
         }
 
+    private val removeCacheSet = mutableSetOf<Visible>()
+
+    /**
+     * 移除Visible
+     *
+     * 因为 Update 通常在遍历 Layer 时发生，如果中途改变了容器迭代器位置会不一致
+     */
+    fun removeAfterUpdate(visible: Visible) { removeCacheSet += visible }
+
     operator fun plusAssign(item: Visible) {
         // 根据 layerOrder 二分查找
         val index = items.binarySearchBy(item.layerOrder, selector = Visible::layerOrder)
@@ -61,17 +70,9 @@ open class Layer(
         updateDirty()
     }
 
-    operator fun minusAssign(item: Visible) {
+    private operator fun minusAssign(item: Visible) {
         items -= item
         item.onVisibleDetached()
-        updateDirty()
-    }
-
-    operator fun minusAssign(targetItems: Iterable<Visible>) {
-        for (item in targetItems) {
-            items -= item
-            item.onVisibleDetached()
-        }
         updateDirty()
     }
 
@@ -107,6 +108,9 @@ open class Layer(
         items.fastForEach { item ->
             if (item is Dynamic && item.active && item.alive) item.onUpdate(tick)
         }
+        // 移除不需要的
+        for (item in removeCacheSet) this -= item
+        removeCacheSet.clear()
     }
 
     /**

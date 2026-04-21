@@ -16,6 +16,7 @@ import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.layer.BackgroundLayer
 import love.yinlin.compose.game.layer.InteractLayer
 import love.yinlin.compose.game.layer.MapLayer
+import love.yinlin.compose.game.layer.MomentLayer
 import love.yinlin.compose.game.layer.UILayer
 import love.yinlin.compose.game.ui.RhymeBlurSurface
 import love.yinlin.compose.game.ui.RhymeCommonButton
@@ -62,9 +63,10 @@ class RhymePlugin(
         val backgroundLayer = BackgroundLayer()
         val interactLayer = InteractLayer()
         val uiLayer = UILayer(playInfo)
-        val mapLayer = MapLayer(scene.camera, player, playInfo, interactLayer, uiLayer)
+        val momentLayer = MomentLayer(playInfo, player, uiLayer)
+        val mapLayer = MapLayer(scene.camera, playInfo, momentLayer, interactLayer, uiLayer)
         // 先更新交互结果再处理地图
-        scene += listOf(backgroundLayer, interactLayer, mapLayer, uiLayer)
+        scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)
     }
 
     // 停止游戏

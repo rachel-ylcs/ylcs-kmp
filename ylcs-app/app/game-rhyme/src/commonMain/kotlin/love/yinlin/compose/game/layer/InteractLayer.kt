@@ -22,7 +22,7 @@ import love.yinlin.compose.game.visible.Block
 
 // 交互层
 @Stable
-class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
+class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
     internal class InteractInfo(index: Int) {
         companion object {
             const val INDICATOR_RADIUS = 10f

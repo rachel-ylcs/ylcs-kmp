@@ -5,7 +5,10 @@ import androidx.compose.runtime.Stable
 @Stable
 data class BlockLine(
     val index: Int,
-    val corner: BlockCorner?,
+    val firstRawIndex: Int,
+    val lastRawIndex: Int,
+    val startDirection: BlockDirection,
+    val endDirection: BlockDirection?,
     val text: String,
     val lineStart: Long,
     val lineEnd: Long
