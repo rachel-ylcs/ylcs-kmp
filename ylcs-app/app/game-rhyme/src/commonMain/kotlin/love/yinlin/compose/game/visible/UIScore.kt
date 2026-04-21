@@ -5,10 +5,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import love.yinlin.app.game_rhyme.resources.Res
-import love.yinlin.app.game_rhyme.resources.rhyme
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.data.RhymeDifficulty
@@ -70,13 +67,13 @@ class UIScore(playConfig: RhymePlayConfig) : Visible(size = DefaultSize), Dynami
     }
 
     private var viewportWidth: Float = 0f
-    private var textBuilder: ((String) -> TextGraph)? = null
+    var textBuilder: ((String) -> TextGraph)? = null
 
     /**
      * 得分
      */
     private var score: Int = 0
-    private var scoreGraph: TextGraph? = null
+    var scoreGraph: TextGraph? = null
 
     /**
      * 评级结果
@@ -118,7 +115,6 @@ class UIScore(playConfig: RhymePlayConfig) : Visible(size = DefaultSize), Dynami
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
         viewportWidth = viewportSize.width
-        if (textBuilder == null) textBuilder = { text -> measureText(text, Res.font.rhyme, FontWeight.Bold) }
     }
 
     override fun Drawer.onDraw() {

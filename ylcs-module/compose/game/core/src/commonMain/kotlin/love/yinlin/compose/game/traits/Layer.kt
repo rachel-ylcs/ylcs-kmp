@@ -170,7 +170,7 @@ open class Layer(
     /**
      * 初始化绘制
      */
-    open suspend fun InitialDrawer.preInitialDraw() { }
+    open fun InitialDrawer.preInitialDraw() { }
 
     /**
      * 预准备绘制

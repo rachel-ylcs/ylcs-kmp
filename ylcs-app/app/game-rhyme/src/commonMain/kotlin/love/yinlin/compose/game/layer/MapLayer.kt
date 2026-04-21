@@ -116,14 +116,13 @@ class MapLayer(
         interactStatus.fill(InteractStatus.None) // 重置状态
     }
 
-    override suspend fun InitialDrawer.preInitialDraw() {
+    override fun InitialDrawer.preInitialDraw() {
         baseNoteFontMap = Block.NoteScaleFontMap.map { index ->
             measureText(index.toString(), font = RhymeRes.font.music, fontWeight = FontWeight.Bold)
         }
         lyricsTextBuilder = { text ->
             measureText(text, font = GlobalRes.font.xwwk, fontWeight = FontWeight.Bold)
         }
-        updateDirty()
     }
 
     fun updateResult(result: BlockResult, scoreRatio: Float = 1f) {

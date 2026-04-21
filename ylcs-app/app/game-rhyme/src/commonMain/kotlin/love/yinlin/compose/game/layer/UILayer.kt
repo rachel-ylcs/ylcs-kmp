@@ -1,7 +1,13 @@
 package love.yinlin.compose.game.layer
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.font.FontWeight
+import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
+import love.yinlin.app.game_rhyme.resources.rhyme
+import love.yinlin.app.global.resources.Res as GlobalRes
+import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.game.data.RhymePlayInfo
+import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.plugin.ScenePlugin
 import love.yinlin.compose.game.traits.Layer
@@ -10,7 +16,7 @@ import love.yinlin.compose.game.visible.UIMusicInfo
 import love.yinlin.compose.game.visible.UIScore
 
 @Stable
-class UILayer(info: RhymePlayInfo) : Layer(
+class UILayer(private val info: RhymePlayInfo) : Layer(
     layerOrder = 4,
     layerType = LayerType.Absolute
 ) {
@@ -24,8 +30,12 @@ class UILayer(info: RhymePlayInfo) : Layer(
     val uiScore = UIScore(info.playConfig)
 
     override fun onLayerAttached(scene: ScenePlugin) {
-        this += uiCover
-        this += uiMusicInfo
-        this += uiScore
+        this += listOf(uiCover, uiMusicInfo, uiScore)
+    }
+
+    override fun InitialDrawer.preInitialDraw() {
+        uiMusicInfo.title = measureText(info.musicInfo.name, GlobalRes.font.xwwk, FontWeight.Bold)
+        uiScore.textBuilder = { text -> measureText(text, RhymeRes.font.rhyme, FontWeight.Bold) }
+        uiScore.scoreGraph = measureText("0", RhymeRes.font.rhyme, FontWeight.Bold)
     }
 }

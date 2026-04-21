@@ -253,16 +253,14 @@ class ScenePlugin private constructor(
                 @OptIn(ExperimentalUuidApi::class)
                 key(layer.id) {
                     val drawer = remember {
-                        Drawer(
+                        val initialDrawer = Drawer(
                             density = density,
                             fontFamilyResolver = fontFamilyResolver,
                             fontProvider = fontProvider,
                             assetProvider = assetProvider
                         )
-                    }
-
-                    LaunchedEffect(Unit) {
-                        with(layer) { drawer.preInitialDraw() }
+                        with(layer) { initialDrawer.preInitialDraw() }
+                        initialDrawer
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer {
