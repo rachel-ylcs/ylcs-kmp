@@ -1,8 +1,8 @@
 package love.yinlin.compose.game.layer
 
 import androidx.compose.runtime.Stable
-import love.yinlin.compose.game.common.Moment
 import love.yinlin.compose.game.common.Moments
+import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Layer
@@ -18,6 +18,8 @@ class MomentLayer(
 ) : Layer(layerOrder = 1, layerType = LayerType.Absolute) {
     override val interactive: Boolean = false
 
+    private val difficulty = playInfo.playConfig.difficulty
+
     // 音轨位置
     var audioPosition: Long = 0L
         private set
@@ -25,9 +27,9 @@ class MomentLayer(
     private var audioDuration: Long = 0L
 
     // 时刻表
-    private val moments = Moments(
-        Moment(3000L) { InteractTipArea() }
-    )
+    private val moments = Moments {
+        if (difficulty == RhymeDifficulty.Easy || difficulty == RhymeDifficulty.Medium) moment(3000L, ::InteractTipArea)
+    }
 
     override fun preUpdate(tick: Int) {
         // 更新进度

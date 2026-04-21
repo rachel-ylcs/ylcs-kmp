@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import love.yinlin.compose.Colors
 import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
@@ -55,13 +54,6 @@ class NoteBlock(
     }
 
     companion object {
-        private val PrepareDurationMap = mapOf(
-            RhymeDifficulty.Easy to 2500,
-            RhymeDifficulty.Medium to 2000,
-            RhymeDifficulty.Hard to 1500,
-            RhymeDifficulty.Extreme to 1000
-        )
-
         fun buildTime(difficulty: RhymeDifficulty, start: Long): Time {
             val prepare = PrepareDurationMap[difficulty]!!
             val interactDuration = prepare / 2
@@ -74,13 +66,11 @@ class NoteBlock(
                 missStart = prepare + interactDuration
             )
         }
-
-        val TextColor: Color = Colors.Ghost
-        val MissingColor: Color = Colors.Gray6
     }
 
-    private val scaleIndex: Int = (rhymeAction.scale - 1) % 7 + 1
-    private val scaleLevel: Int = (rhymeAction.scale - 1) / 7
+    private val rawNoteScale = rhymeAction.scale.toInt()
+    private val scaleIndex: Int = (rawNoteScale - 1) % 7 + 1
+    private val scaleLevel: Int = (rawNoteScale - 1) / 7
     private val mainColor: Color = ScaleColorList[scaleIndex]
 
     override val colorList: List<Color> = listOf(mainColor)
@@ -139,12 +129,12 @@ class NoteBlock(
                     val progress = status.progress
 
                     drawPrepareBorder(mainColor, progress)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, Interpolator.decelerate(progress))
+                    drawSingleNoteFont(rawNoteScale, TextColor, Interpolator.decelerate(progress))
                 }
                 is Status.Interact -> {
                     drawScaleBlock(mainColor, status.progress)
                     drawFullPrepareBorder(mainColor)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, 1f)
+                    drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                 }
                 is Status.Release -> {
                     val progress = status.progress
@@ -153,8 +143,8 @@ class NoteBlock(
                     drawBounceBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
                     drawScaleBlock(mainColor, releaseProgress * status.lastProgress)
                     drawFullPrepareBorder(mainColor, 3 * progress * (progress - 1) + 1)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, releaseProgress)
-                    drawLyricsText(TextColor, Interpolator.decelerate(progress) * 0.5f)
+                    drawSingleNoteFont(rawNoteScale, TextColor, releaseProgress)
+                    drawLyricsText(TextColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Missing -> {
                     val progress = status.progress
@@ -163,12 +153,12 @@ class NoteBlock(
 
                     drawScaleBlock(missingColor, missingProgress)
                     drawFullPrepareBorder(missingColor)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, missingProgress)
-                    drawLyricsText(MissingColor, Interpolator.decelerate(progress) * 0.5f)
+                    drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
+                    drawLyricsText(MissingColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Done -> {
                     drawPrepareBorder(if (status.isMissing) MissingColor else mainColor, 1f)
-                    drawLyricsText(if (status.isMissing) MissingColor else TextColor, 0.5f)
+                    drawLyricsText(if (status.isMissing) MissingColor else TextColor, LYRICS_TEXT_SCALE)
                 }
             }
         }
