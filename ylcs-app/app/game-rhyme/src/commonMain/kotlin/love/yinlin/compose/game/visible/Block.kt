@@ -51,9 +51,7 @@ sealed class Block<BS : BlockStatus>(
         protected val TextColor = Colors.Ghost
         protected val MissingColor = Colors.Gray6
 
-        protected const val MIN_LONG_PRESS_DURATION = 300 // 最小长按时间
-        protected const val LONG_PRESS_TOLERANCE = 100 // 长按容忍度
-
+        protected const val INNER_SCALE_BLOCK_ALPHA = 0.5f
         protected const val INNER_BORDER_SCALE = 0.8f
         protected const val INNER_BORDER_ALPHA = 0.75f
 
@@ -77,7 +75,7 @@ sealed class Block<BS : BlockStatus>(
     abstract val colorList: List<Color> // 主要颜色列表
 
     abstract fun prepareStatus(): BS
-    abstract fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact)
+    abstract fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact)
 
     var blockStatus: BS? = null
         protected set
@@ -98,6 +96,11 @@ sealed class Block<BS : BlockStatus>(
 
     override fun onDetached() {
         blockStatus = null
+    }
+
+    protected inline fun updateCustomPrepare(status: BlockStatus.Prepare, audioTick: Int, start: Int, interact: () -> BS) {
+        if (audioTick >= start) blockStatus = interact()
+        else status.progress = (audioTick / start.toFloat()).coerceIn(0f, 1f)
     }
 
     protected inline fun <BRS : BlockStatus.Release, BDS : BS> updateCustomRelease(status: BRS, tick: Int, done: (BRS) -> BDS) {
@@ -131,7 +134,7 @@ sealed class Block<BS : BlockStatus>(
         rect(color, DefaultRect, alpha = alpha, style = PrepareStroke)
     }
 
-    protected fun Drawer.drawScaleBlock(color: Color, scaleRatio: Float, alpha: Float = 0.4f) {
+    protected fun Drawer.drawScaleBlock(color: Color, scaleRatio: Float, alpha: Float = INNER_SCALE_BLOCK_ALPHA) {
         scale(scaleRatio, DefaultCenter) { rect(color, DefaultRect, alpha = alpha) }
     }
 

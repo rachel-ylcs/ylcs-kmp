@@ -32,10 +32,8 @@ class NoteBlock(
         val missStart: Int
     ) : BlockTime
 
-    interface Status : BlockStatus {
-        class Prepare : Status, BlockStatus.Prepare {
-            var progress: Float = 0f
-        }
+    sealed interface Status : BlockStatus {
+        class Prepare : Status, BlockStatus.Prepare()
         class Interact : Status, BlockStatus.Interact {
             var progress: Float = 0f
             var result: BlockResult = BlockResult.PERFECT
@@ -54,15 +52,22 @@ class NoteBlock(
     }
 
     companion object {
+        //   PERFECT  ->  GOOD  ->   BAD  ->  MISS
+        // 0         0.4        0.7        1
+        private const val PERFECT_RANGE = 0.4f
+        private const val GOOD_RANGE = 0.7f
+        private const val MIN_PRESS_TOLERANCE_RATIO = 3 // 最小交互容忍系数
+
         fun buildTime(difficulty: RhymeDifficulty, start: Long): Time {
             val prepare = PrepareDurationMap[difficulty]!!
             val interactDuration = prepare / 2
-            val perfectDuration = (interactDuration * BlockResult.GOOD.ratio).toInt()
+            val perfectDuration = (interactDuration * PERFECT_RANGE).toInt()
+            val pressTolerance = perfectDuration / MIN_PRESS_TOLERANCE_RATIO
             return Time(
-                appearance = start - prepare - perfectDuration / 2,
+                appearance = start - prepare - pressTolerance,
                 perfectStart = prepare,
                 goodStart = prepare + perfectDuration,
-                badStart = prepare + (interactDuration * BlockResult.BAD.ratio).toInt(),
+                badStart = prepare + (interactDuration * GOOD_RANGE).toInt(),
                 missStart = prepare + interactDuration
             )
         }
@@ -77,39 +82,40 @@ class NoteBlock(
 
     override fun prepareStatus(): Status = Status.Prepare()
 
-    override fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact) {
+    override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
         if (currentStatus !is Status.Interact) return
+        var targetIndex: Int = -1 // -1 表示未找到, -2 表示多指按下
         for (i in 0 .. 7) {
-            // 单击交互只关心按下时刻
-            if (interactStatus[i] == InteractStatus.Down) {
-                // 检查按键是否匹配
-                val result = if (i == scaleIndex) currentStatus.result else BlockResult.MISS
-                blockStatus = if (i == scaleIndex) Status.Release(currentStatus.progress, result) else Status.Missing()
-                fromMapLayer?.updateResult(result)
-                break
-            }
+            if (interactStatusList[i] !is InteractStatus.Down) continue // 单击交互只关心按下时刻
+            targetIndex = if (targetIndex == -1) i else -2 // 不存在按下的则标记此轨道按下, 存在按下的则保持多指按下
         }
+        // 确定评级结果
+        val result = when (val pressIndex = targetIndex) {
+            -1 -> null // 未按下无事发生
+            -2 -> BlockResult.MISS // 多指按下以MISS结算
+            else -> if (pressIndex == scaleIndex) currentStatus.result else BlockResult.MISS // 其他则检查音阶匹配
+        } ?: return
+        // 处理评级结果
+        blockStatus = if (result == BlockResult.MISS) Status.Missing() else Status.Release(currentStatus.progress, result)
+        fromMapLayer?.updateResult(result)
     }
 
     override fun onUpdate(tick: Int) {
         withMapLayer { mapLayer, audioTick -> // 使用音轨刻
             when (val status = blockStatus) {
                 null -> return@withMapLayer false // 未出现不处理
-                is Status.Prepare -> {
-                    if (audioTick >= time.perfectStart) blockStatus = Status.Interact()
-                    else status.progress = (audioTick / time.perfectStart.toFloat()).coerceIn(0f, 1f)
-                }
+                is Status.Prepare -> updateCustomPrepare(status, audioTick, time.perfectStart, Status::Interact)
                 is Status.Interact -> {
                     val progress = ((audioTick - time.perfectStart) / (time.missStart - time.perfectStart).toFloat()).coerceAtLeast(0f)
                     status.progress = progress
                     status.result = when {
-                        progress >= BlockResult.MISS.ratio -> { // 错过
+                        progress >= 1f -> { // 错过
                             blockStatus = Status.Missing()
                             mapLayer.updateResult(BlockResult.MISS) // 提交分数
                             BlockResult.MISS
                         }
-                        progress >= BlockResult.BAD.ratio -> BlockResult.BAD
-                        progress >= BlockResult.GOOD.ratio -> BlockResult.GOOD
+                        progress >= GOOD_RANGE -> BlockResult.BAD
+                        progress >= PERFECT_RANGE -> BlockResult.GOOD
                         else -> BlockResult.PERFECT
                     }
                 }

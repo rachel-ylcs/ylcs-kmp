@@ -65,55 +65,55 @@ class MapLayer(
         }
 
         // 处理方块交互
-        val interactStatus = interactLayer.interactStatus
-        blocks.getOrNull(currentIndex)?.let { currentBlock ->
-            // 只在交互状态下触发
-            when (val blockStatus = currentBlock.blockStatus) {
-                is BlockStatus.Interact -> currentBlock.onInteract(interactStatus, blockStatus)
-                is BlockStatus.Release -> {
-                    // 更新位置
-                    val newIndex = currentIndex + 1
-                    currentIndex = newIndex
+        interactLayer.withInteractInfo { interactStatusList ->
+            blocks.getOrNull(currentIndex)?.let { currentBlock ->
+                // 只在交互状态下触发
+                when (val blockStatus = currentBlock.blockStatus) {
+                    is BlockStatus.Interact -> currentBlock.onInteract(interactStatusList, blockStatus)
+                    is BlockStatus.Release -> {
+                        // 更新位置
+                        val newIndex = currentIndex + 1
+                        currentIndex = newIndex
 
-                    // --  边角判定  --
-                    val currentLine = currentBlock.line
-                    if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
-                        // 添加尾角动画
-                        currentLine.endDirection?.let { endDirection ->
-                            this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
+                        // --  边角判定  --
+                        val currentLine = currentBlock.line
+                        if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
+                            // 添加尾角动画
+                            currentLine.endDirection?.let { endDirection ->
+                                this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
+                            }
+                        }
+
+                        // 检查相机跟踪
+                        blocks.getOrNull(newIndex)?.let { nextBlock ->
+                            val boundary = camera.viewportBounds
+                            val gapRatio = (1 - CAMERA_BLOCK_AREA_RATIO) / 2
+                            val horizontalMargin = boundary.width * gapRatio
+                            val verticalMargin = boundary.height * gapRatio
+
+                            val limitLeft = boundary.left + horizontalMargin
+                            val limitRight = boundary.right - horizontalMargin
+                            val limitTop = boundary.top + verticalMargin
+                            val limitBottom = boundary.bottom - verticalMargin
+
+                            val (halfWidth, halfHeight) = nextBlock.size / 2f
+                            val center = nextBlock.position
+
+                            val blockLeft = center.x - halfWidth
+                            val blockRight = center.x + halfWidth
+                            val blockTop = center.y - halfHeight
+                            val blockBottom = center.y + halfHeight
+
+                            // 当前方块在视口边界的限制外
+                            if (blockLeft < limitLeft || blockRight > limitRight || blockTop < limitTop || blockBottom > limitBottom) {
+                                camera.animateUpdatePosition(center)
+                            }
                         }
                     }
-
-                    // 检查相机跟踪
-                    blocks.getOrNull(newIndex)?.let { nextBlock ->
-                        val boundary = camera.viewportBounds
-                        val gapRatio = (1 - CAMERA_BLOCK_AREA_RATIO) / 2
-                        val horizontalMargin = boundary.width * gapRatio
-                        val verticalMargin = boundary.height * gapRatio
-
-                        val limitLeft = boundary.left + horizontalMargin
-                        val limitRight = boundary.right - horizontalMargin
-                        val limitTop = boundary.top + verticalMargin
-                        val limitBottom = boundary.bottom - verticalMargin
-
-                        val (halfWidth, halfHeight) = nextBlock.size / 2f
-                        val center = nextBlock.position
-
-                        val blockLeft = center.x - halfWidth
-                        val blockRight = center.x + halfWidth
-                        val blockTop = center.y - halfHeight
-                        val blockBottom = center.y + halfHeight
-
-                        // 当前方块在视口边界的限制外
-                        if (blockLeft < limitLeft || blockRight > limitRight || blockTop < limitTop || blockBottom > limitBottom) {
-                            camera.animateUpdatePosition(center)
-                        }
-                    }
+                    else -> { }
                 }
-                else -> { }
             }
         }
-        interactStatus.fill(InteractStatus.None) // 重置状态
     }
 
     override fun InitialDrawer.preInitialDraw() {
@@ -126,6 +126,6 @@ class MapLayer(
     }
 
     fun updateResult(result: BlockResult, scoreRatio: Float = 1f) {
-        uiLayer.uiScore.updateResult(result, scoreRatio)
+        uiLayer.updateResult(result, scoreRatio)
     }
 }

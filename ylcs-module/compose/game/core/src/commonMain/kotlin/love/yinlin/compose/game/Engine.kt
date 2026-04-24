@@ -2,7 +2,9 @@ package love.yinlin.compose.game
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -129,11 +131,14 @@ class Engine(
     }
 
     @Composable
-    fun ViewportContent(modifier: Modifier = Modifier.fillMaxSize()) {
+    fun ViewportContent(
+        modifier: Modifier = Modifier.fillMaxSize(),
+        padding: PaddingValues = PaddingValues.Zero,
+    ) {
         Layout(
             modifier = modifier,
             content = {
-                Box(modifier = Modifier.background(backgroundColor).clipToBounds()) {
+                Box(modifier = Modifier.background(backgroundColor).padding(padding).clipToBounds()) {
                     visiblePlugins.fastForEach { plugin ->
                         key(plugin.id) {
                             Box(modifier = Modifier.fillMaxSize().zIndex(plugin.layerOrder.toFloat()).then(plugin.extraModifier)) {

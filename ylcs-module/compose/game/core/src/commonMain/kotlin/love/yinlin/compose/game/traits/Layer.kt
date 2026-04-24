@@ -26,10 +26,6 @@ open class Layer(
 ) : Entity(), Dynamic {
     private val items = visibles.sortedBy(Visible::layerOrder).toMutableList()
 
-    val isEmpty: Boolean get() = items.isEmpty()
-    val isNotEmpty: Boolean get() = items.isNotEmpty()
-    val visibleCount: Int get() = items.size
-
     var scene: ScenePlugin? = null
         private set
 

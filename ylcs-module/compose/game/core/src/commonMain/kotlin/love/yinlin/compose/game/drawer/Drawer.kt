@@ -4,11 +4,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.unpackFloat1
 import androidx.compose.ui.util.unpackFloat2
@@ -20,11 +17,10 @@ import love.yinlin.compose.game.font.FontProvider
 
 @Stable
 class Drawer internal constructor(
-    density: Density,
     fontFamilyResolver: FontFamily.Resolver,
     fontProvider: FontProvider,
     assetProvider: AssetProvider
-) : PrepareDrawer(density, fontFamilyResolver, fontProvider, assetProvider) {
+) : PrepareDrawer(fontFamilyResolver, fontProvider, assetProvider) {
     @PublishedApi internal var rawScope: DrawScope? = null
 
     internal inline fun withRawScope(scope: DrawScope, block: Drawer.() -> Unit) {
@@ -155,12 +151,12 @@ class Drawer internal constructor(
 
     // 文本绘制
 
-    internal inline fun text(
-        content: TextGraph,
+    internal inline fun <Graph : BasicTextGraph> text(
+        content: Graph,
         textPosition: Offset,
         textSize: Size,
         textAlign: TextAlign,
-        block: (Canvas, Paragraph) -> Unit,
+        block: (Canvas, Graph) -> Unit,
     ) {
         rawScope?.apply {
             withTransform({
@@ -181,7 +177,7 @@ class Drawer internal constructor(
                 // 光栅缩放
                 scale(scale, scale, Offset.Zero)
             }) {
-                block(drawContext.canvas, content.paragraph)
+                block(drawContext.canvas, content)
             }
         }
     }
@@ -191,21 +187,10 @@ class Drawer internal constructor(
         position: Offset,
         size: Size,
         color: Color,
-        textAlign: TextAlign = TextAlign.Start,
-        shadow: Shadow? = null,
-        decoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null,
-        blendMode: BlendMode = DrawScope.DefaultBlendMode
+        textAlign: TextAlign = TextAlign.Start
     ) {
         text(content, position, size, textAlign) { canvas, paragraph ->
-            paragraph.paint(
-                canvas = canvas,
-                color = color,
-                shadow = shadow,
-                textDecoration = decoration,
-                drawStyle = drawStyle,
-                blendMode = blendMode
-            )
+            paragraph.paint(canvas = canvas, color = color)
         }
     }
 
@@ -215,20 +200,39 @@ class Drawer internal constructor(
         size: Size,
         brush: Brush,
         textAlign: TextAlign = TextAlign.Start,
-        shadow: Shadow? = null,
-        decoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null,
-        blendMode: BlendMode = DrawScope.DefaultBlendMode
+        alpha: Float = 1f
     ) {
         text(content, position, size, textAlign) { canvas, paragraph ->
-            paragraph.paint(
-                canvas = canvas,
-                brush = brush,
-                shadow = shadow,
-                textDecoration = decoration,
-                drawStyle = drawStyle,
-                blendMode = blendMode
-            )
+            paragraph.paint(canvas = canvas, brush = brush, alpha = alpha)
+        }
+    }
+
+    fun strokeText(
+        content: StrokeTextGraph,
+        position: Offset,
+        size: Size,
+        color: Color,
+        strokeColor: Color,
+        stroke: Stroke,
+        textAlign: TextAlign = TextAlign.Start
+    ) {
+        text(content, position, size, textAlign) { canvas, paragraph ->
+            paragraph.paint(canvas = canvas, color = color, strokeColor = strokeColor, stroke = stroke)
+        }
+    }
+
+    fun strokeText(
+        content: StrokeTextGraph,
+        position: Offset,
+        size: Size,
+        brush: Brush,
+        strokeColor: Color,
+        stroke: Stroke,
+        textAlign: TextAlign = TextAlign.Start,
+        alpha: Float = 1f
+    ) {
+        text(content, position, size, textAlign) { canvas, paragraph ->
+            paragraph.paint(canvas = canvas, brush = brush, strokeColor = strokeColor, alpha = alpha, stroke = stroke)
         }
     }
 

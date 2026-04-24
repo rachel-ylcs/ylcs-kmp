@@ -7,11 +7,9 @@ import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.visible.BackgroundConstellation
 import love.yinlin.compose.game.visible.BackgroundRipple
 import love.yinlin.compose.game.visible.BackgroundWave
-import love.yinlin.compose.game.visible.FPSView
 
 @Stable
 class BackgroundLayer : Layer(
-    FPSView(layerOrder = 0, duration = 3000),
     BackgroundConstellation(layerOrder = 1),
     BackgroundWave(
         waveColor = Color(0xFF00E5FF).copy(alpha = 0.1f),

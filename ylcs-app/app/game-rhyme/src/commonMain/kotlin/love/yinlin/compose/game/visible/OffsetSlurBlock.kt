@@ -19,15 +19,15 @@ class OffsetSlurBlock(
     override val time: Time,
     rawIndex: Int,
     lineIndex: Int,
-    override val rhymeAction: RhymeAction.Slur,
-) : Block<OffsetSlurBlock.Status>(position, line, rawIndex, lineIndex) {
+    rhymeAction: RhymeAction.Slur,
+) : SlurBlock<OffsetSlurBlock.Status>(position, line, rawIndex, lineIndex, rhymeAction) {
     @Stable
     data class Time(
         override val appearance: Long
     ) : BlockTime
 
-    interface Status : BlockStatus {
-        class Prepare : Status, BlockStatus.Prepare
+    sealed interface Status : BlockStatus {
+        class Prepare : Status, BlockStatus.Prepare()
         class Release : Status, BlockStatus.Release {
             override val duration: Int = 500
             override var progress: Float = 0f
@@ -50,7 +50,7 @@ class OffsetSlurBlock(
 
     }
 
-    override fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact) {
+    override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
 
     }
 

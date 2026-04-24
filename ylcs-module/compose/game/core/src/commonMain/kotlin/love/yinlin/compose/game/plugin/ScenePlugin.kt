@@ -9,7 +9,6 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastForEach
@@ -242,7 +241,6 @@ class ScenePlugin private constructor(
         }.pointerInput(Unit) { // 指针事件监听
             pointerInputLoop()
         }) {
-            val density = LocalDensity.current
             val fontFamilyResolver = LocalFontFamilyResolver.current
             // 字体转接器
             val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
@@ -254,7 +252,6 @@ class ScenePlugin private constructor(
                 key(layer.id) {
                     val drawer = remember {
                         val initialDrawer = Drawer(
-                            density = density,
                             fontFamilyResolver = fontFamilyResolver,
                             fontProvider = fontProvider,
                             assetProvider = assetProvider

@@ -62,8 +62,8 @@ class RhymePlugin(
         player.load(audio, true)
         val backgroundLayer = BackgroundLayer()
         val interactLayer = InteractLayer()
-        val uiLayer = UILayer(playInfo)
-        val momentLayer = MomentLayer(playInfo, player, uiLayer)
+        val momentLayer = MomentLayer(playInfo, player)
+        val uiLayer = UILayer(playInfo, momentLayer)
         val mapLayer = MapLayer(scene.camera, playInfo, momentLayer, interactLayer, uiLayer)
         // 先更新交互结果再处理地图
         scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)

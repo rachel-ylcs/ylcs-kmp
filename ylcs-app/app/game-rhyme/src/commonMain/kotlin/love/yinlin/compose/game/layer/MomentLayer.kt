@@ -13,8 +13,7 @@ import love.yinlin.media.AudioPlayer
 @Stable
 class MomentLayer(
     playInfo: RhymePlayInfo,
-    private val player: AudioPlayer,
-    private val uiLayer: UILayer
+    private val player: AudioPlayer
 ) : Layer(layerOrder = 1, layerType = LayerType.Absolute) {
     override val interactive: Boolean = false
 
@@ -24,7 +23,8 @@ class MomentLayer(
     var audioPosition: Long = 0L
         private set
     // 音轨时长
-    private var audioDuration: Long = 0L
+    var audioDuration: Long = 0L
+        private set
 
     // 时刻表
     private val moments = Moments {
@@ -32,14 +32,10 @@ class MomentLayer(
     }
 
     override fun preUpdate(tick: Int) {
-        // 更新进度
         val currentAudioPosition = player.position
         val currentAudioDuration = player.duration
         audioPosition = currentAudioPosition
         audioDuration = currentAudioDuration
-
-        // 更新封面进度
-        uiLayer.uiCover.updateAudioPosition(currentAudioPosition, currentAudioDuration)
 
         // 时刻
         moments.check(currentAudioPosition) { this += it }
