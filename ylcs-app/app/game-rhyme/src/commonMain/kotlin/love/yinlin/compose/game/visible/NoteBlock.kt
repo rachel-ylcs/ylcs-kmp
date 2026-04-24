@@ -40,15 +40,11 @@ class NoteBlock(
             var progress: Float = 0f
             var result: BlockResult = BlockResult.PERFECT
         }
-        class Release(val lastProgress: Float, val result: BlockResult) : Status, BlockStatus.Release {
+        class Release(val lastProgress: Float, val result: BlockResult) : Status, BlockStatus.Release() {
             override val duration: Int = 500
-            override var progress: Float = 0f
-            override var tick: Int = 0
         }
-        class Missing : Status, BlockStatus.Missing {
+        class Missing(val lastProgress: Float) : Status, BlockStatus.Missing() {
             override val duration: Int = 750
-            override var progress: Float = 0f
-            override var tick: Int = 0
         }
         class Done(val isMissing: Boolean, val result: BlockResult) : Status, BlockStatus.Done
     }
@@ -64,17 +60,14 @@ class NoteBlock(
         // 0         0.4        0.7        1
         private const val PERFECT_RANGE = 0.4f
         private const val GOOD_RANGE = 0.7f
-        private const val MIN_PRESS_TOLERANCE_RATIO = 2 // 最小交互容忍系数
 
         fun buildTime(difficulty: RhymeDifficulty, start: Long): Time {
             val prepare = PrepareDurationMap[difficulty]!!
             val interactDuration = prepare / 2
-            val perfectDuration = (interactDuration * PERFECT_RANGE).toInt()
-            val pressTolerance = perfectDuration / MIN_PRESS_TOLERANCE_RATIO
             return Time(
-                appearance = start - prepare - pressTolerance,
+                appearance = start - prepare - PRESS_TOLERANCE,
                 perfectStart = prepare,
-                goodStart = prepare + perfectDuration,
+                goodStart = prepare + (interactDuration * PERFECT_RANGE).toInt(),
                 badStart = prepare + (interactDuration * GOOD_RANGE).toInt(),
                 missStart = prepare + interactDuration
             )
@@ -108,7 +101,8 @@ class NoteBlock(
             is InteractTarget.Single -> if (interactTarget.index == scaleIndex) currentStatus.result else BlockResult.MISS // 其他则检查音阶匹配
         } ?: return
         // 处理评级结果
-        blockStatus = if (result == BlockResult.MISS) Status.Missing() else Status.Release(currentStatus.progress, result)
+        val lastProgress = currentStatus.progress
+        blockStatus = if (result == BlockResult.MISS) Status.Missing(lastProgress) else Status.Release(lastProgress, result)
         fromMapLayer?.updateResult(result)
     }
 
@@ -122,7 +116,7 @@ class NoteBlock(
                     status.progress = progress
                     status.result = when {
                         progress >= 1f -> { // 错过
-                            blockStatus = Status.Missing()
+                            blockStatus = Status.Missing(1f)
                             mapLayer.updateResult(BlockResult.MISS) // 提交分数
                             BlockResult.MISS
                         }
@@ -204,7 +198,7 @@ class NoteBlock(
                     val missingProgress = Interpolator.accelerate(1 - progress)
                     val missingColor = lerp(mainColor, MissingColor, progress)
 
-                    drawInteractScaleBlock(missingColor, missingProgress)
+                    drawInteractScaleBlock(missingColor, missingProgress * status.lastProgress)
                     drawFullPrepareBorder(missingColor)
                     drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
                     drawLyricsText(MissingColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)

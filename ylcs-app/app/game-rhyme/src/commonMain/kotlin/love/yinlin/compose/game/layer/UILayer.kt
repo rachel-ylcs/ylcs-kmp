@@ -207,7 +207,7 @@ class UILayer(
         // 画FPS
         val barBottom = Offset(0f, barRadius)
         currentFpsGraph?.let { graph ->
-            text(graph, barBottom, Size(viewportWidth, textHeight), fpsColor, TextAlign.Center)
+            text(graph, barBottom, Size(viewportWidth, textHeight * 0.75f), fpsColor, TextAlign.Center)
         }
 
         val resultHeight = minDimension / 16
@@ -224,7 +224,7 @@ class UILayer(
             val totalWidth = resultWidth + comboWidth
 
             transform({
-                translate((viewportWidth - totalWidth) / 2, barRadius + textHeight * 1.5f)
+                translate((viewportWidth - totalWidth) / 2, barRadius + textHeight)
                 if (isOpen) scale(data.progress, Offset(totalWidth / 2, resultHeight / 2))
             }) {
                 // 画评级

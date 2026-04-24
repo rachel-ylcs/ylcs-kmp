@@ -48,12 +48,11 @@ sealed class Block<BS : BlockStatus>(
         protected const val LYRICS_TEXT_SCALE = 0.5f
         protected const val NOTE_TEXT_SCALE = 0.75f
 
+        protected const val PRESS_TOLERANCE = 150
+
         val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
         protected val TextColor = Colors.Ghost
         protected val MissingColor = Colors.Gray6
-
-        protected const val INNER_BORDER_SCALE = 0.8f
-        protected const val INNER_BORDER_ALPHA = 0.75f
 
         protected val PrepareDurationMap = mapOf(
             RhymeDifficulty.Easy to 2500,

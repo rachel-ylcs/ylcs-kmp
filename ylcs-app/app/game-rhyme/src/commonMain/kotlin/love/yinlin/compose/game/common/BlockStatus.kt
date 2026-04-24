@@ -5,11 +5,11 @@ interface BlockStatus {
         var progress: Float = 0f
     }
     interface Interact : BlockStatus
-    interface Release : BlockStatus {
-        val duration: Int
-        var progress: Float
-        var tick: Int
+    abstract class Release : BlockStatus {
+        abstract val duration: Int
+        var progress: Float = 0f
+        var tick: Int = 0
     }
-    interface Missing : Release
+    abstract class Missing : Release()
     interface Done : BlockStatus
 }
