@@ -3,11 +3,11 @@ import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinSerialization,
+        libs.plugins.kotlinCocoapods,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
-        libs.plugins.kotlinCocoapods,
-        libs.plugins.kotlinSerialization,
     )
 }
 

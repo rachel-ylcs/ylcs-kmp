@@ -1,5 +1,6 @@
 package love.yinlin.foundation
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -11,7 +12,7 @@ import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
 import love.yinlin.coroutines.mainContext
-import love.yinlin.extension.catchingNull
+import love.yinlin.extension.catchingError
 import kotlin.reflect.KProperty
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -107,7 +108,11 @@ open class StartupPool(
                 throw IllegalStateException("sync startup $id is dependent on async startup $dependentId")
             }
             // 初始化同步服务
-            val startup = catchingNull { syncStartup.build(pool) } ?: throw StartupError(id, "init")
+            val startup = try {
+                syncStartup.build(pool)
+            } catch (e: Throwable) {
+                throw StartupError(id, "init", e)
+            }
             startupMap[id] = startup
         }
 
@@ -132,9 +137,13 @@ open class StartupPool(
                                 else dependencyTask.await()
                             }
                             // 初始化异步服务
-                            val startup = Coroutines.catchingNull {
+                            val startup = try {
                                 factory.build(pool).also { it.init() }
-                            } ?: throw StartupError(id, "init")
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: Throwable) {
+                                throw StartupError(id, "init", e)
+                            }
                             Coroutines.main {
                                 mutex.with { startupMap[id] = startup } // LinkedHashMap线程不安全
                             }
@@ -161,7 +170,9 @@ open class StartupPool(
                         taskMap[id]?.await()
                         // 继续initLater
                         val startup = startupMap[id]
-                        if (startup != null) Coroutines.catchingNull { startup.initLater() } ?: throw StartupError(id, "initLater")
+                        if (startup != null) {
+                            Coroutines.catchingError { startup.initLater() }?.let { throw StartupError(id, "initLater", it) }
+                        }
                     }
                 }.awaitAll()
             }
@@ -173,7 +184,9 @@ open class StartupPool(
         for (factory in dependenciesList.asReversed()) {
             val id = factory.id
             val startup = startupMap[id]
-            if (startup != null) catchingNull { startup.destroyBefore() } ?: throw StartupError(id, "destroyBefore")
+            if (startup != null) {
+                catchingError { startup.destroyBefore() }?.let { throw StartupError(id, "destroyBefore", it) }
+            }
         }
     }
 
@@ -182,7 +195,9 @@ open class StartupPool(
         for (factory in dependenciesList.asReversed()) {
             val id = factory.id
             val startup = startupMap[id]
-            if (startup != null) catchingNull { startup.destroy() } ?: throw StartupError(id, "destroy")
+            if (startup != null) {
+                catchingError { startup.destroy() }?.let { throw StartupError(id, "destroy", it) }
+            }
         }
     }
 }

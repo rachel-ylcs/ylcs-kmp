@@ -5,9 +5,9 @@ import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
-        libs.plugins.kotlinSerialization,
     )
 }
 
