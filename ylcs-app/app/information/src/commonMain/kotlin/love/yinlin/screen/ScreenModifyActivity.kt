@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.util.fastCoerceAtLeast
 import kotlinx.io.readByteArray
 import love.yinlin.app
 import love.yinlin.common.DataSourceInformation
@@ -229,7 +230,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
     }
 
     suspend fun pickPictures(currentSize: Int, onPicsAdd: suspend (List<File>) -> Unit) {
-        app.picker.pickPicture((9 - currentSize).coerceAtLeast(1))?.use { sources ->
+        app.picker.pickPicture((9 - currentSize).fastCoerceAtLeast(1))?.use { sources ->
             val path = mutableListOf<File>()
             for (source in sources) {
                 app.createTempFile { sink ->

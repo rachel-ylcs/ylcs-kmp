@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.extension.mutableRefStateOf
@@ -69,9 +70,9 @@ class ScreenLyricsSettings : BasicScreen() {
         BoxWithConstraints(modifier = modifier) {
             Box(
                 modifier = Modifier.padding(
-                    start = this.maxWidth * config.android.left.coerceIn(0f, 1f),
-                    end = this.maxWidth * (1 - config.android.right).coerceIn(0f, 1f),
-                    top = Theme.padding.v3 * config.android.top.coerceIn(0f, 1f)
+                    start = this.maxWidth * config.android.left.fastCoerceIn(0f, 1f),
+                    end = this.maxWidth * (1 - config.android.right).fastCoerceIn(0f, 1f),
+                    top = Theme.padding.v3 * config.android.top.fastCoerceIn(0f, 1f)
                 ).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {

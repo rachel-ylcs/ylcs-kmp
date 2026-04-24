@@ -11,11 +11,12 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceAtMost
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.data.compose.Picture
-import kotlin.math.min
 
 @Composable
 fun NineGrid(
@@ -28,7 +29,7 @@ fun NineGrid(
     content: @Composable (Boolean, Picture, () -> Unit) -> Unit
 ) {
     // 无图跳过
-    val picSize = pics.size.coerceAtMost(9)
+    val picSize = pics.size.fastCoerceAtMost(9)
     if (picSize == 0) return
 
     // 默认图片最小宽度
@@ -67,7 +68,7 @@ fun NineGrid(
             val pic = pics[0]
 
             // 确定宽度
-            val targetWidth = if (constraints.hasFixedWidth) constraints.maxWidth else if (constraints.hasBoundedWidth) min(constraints.maxWidth, minPicWidthPx) else minPicWidthPx
+            val targetWidth = if (constraints.hasFixedWidth) constraints.maxWidth else if (constraints.hasBoundedWidth) minOf(constraints.maxWidth, minPicWidthPx) else minPicWidthPx
 
             // 测量
             val placeable = measurable.measure(Constraints(
@@ -78,7 +79,7 @@ fun NineGrid(
             ))
 
             val rawHeight = placeable.height
-            val layoutHeight = if (pic.isVideo) rawHeight else min(rawHeight, targetWidth)
+            val layoutHeight = if (pic.isVideo) rawHeight else minOf(rawHeight, targetWidth)
 
             layout(targetWidth, layoutHeight) {
                 placeable.placeRelative(0, 0)
@@ -92,7 +93,7 @@ fun NineGrid(
             // 确定总宽度
             val totalWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else minPicWidthPx
             // 计算方格尺寸
-            val itemSize = ((totalWidth - (columns - 1) * paddingPx) / columns).coerceAtLeast(0)
+            val itemSize = ((totalWidth - (columns - 1) * paddingPx) / columns).fastCoerceAtLeast(0)
 
             // 测量
             val itemConstraints = Constraints.fixed(itemSize, itemSize)

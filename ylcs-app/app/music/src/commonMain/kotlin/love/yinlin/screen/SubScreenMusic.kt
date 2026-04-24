@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.Job
@@ -338,7 +339,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
                 isDragging = true
 
-                displayTime = (down.position.x / width * duration).toLong().coerceIn(0L, duration)
+                displayTime = (down.position.x / width * duration).toLong().fastCoerceIn(0L, duration)
                 var dragChange = down
                 do {
                     val event = awaitPointerEvent()
@@ -346,7 +347,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     if (change.pressed != dragChange.pressed) break
 
                     if (change.positionChange() != Offset.Zero) {
-                        displayTime = (change.position.x / width * duration).toLong().coerceIn(0L, duration)
+                        displayTime = (change.position.x / width * duration).toLong().fastCoerceIn(0L, duration)
                         change.consume()
                     }
                     dragChange = change

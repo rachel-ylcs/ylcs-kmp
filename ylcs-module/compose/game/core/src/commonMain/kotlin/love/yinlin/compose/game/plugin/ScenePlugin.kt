@@ -63,10 +63,6 @@ class ScenePlugin private constructor(
         entities.fastMapNotNull { it as? Layer }.sortedBy(Layer::layerOrder)
     }
 
-    val isEmpty: Boolean get() = entities.isEmpty()
-    val isNotEmpty: Boolean get() = entities.isNotEmpty()
-    val entityCount: Int get() = entities.size
-
     operator fun plusAssign(entity: Entity) {
         entities += entity
         if (isInitialized) entity.onAttached(this)

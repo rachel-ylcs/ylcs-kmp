@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastJoinToString
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -73,7 +74,7 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
                 break
             }
         }
-        progress = if (totalLength == 0) 0f else (currentLength / totalLength).coerceIn(0f, 1f)
+        progress = if (totalLength == 0) 0f else (currentLength / totalLength).fastCoerceIn(0f, 1f)
     }
 
     @Composable

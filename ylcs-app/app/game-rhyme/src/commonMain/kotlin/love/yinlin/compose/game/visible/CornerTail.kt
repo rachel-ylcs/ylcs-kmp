@@ -4,6 +4,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceAtMost
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.game.common.BlockDirection
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.traits.Dynamic
@@ -60,7 +63,7 @@ class CornerTail private constructor(
     override fun onUpdate(tick: Int) {
         if (time < ANIMATION_DURATION) {
             time += tick
-            val t = (time / ANIMATION_DURATION.toFloat()).coerceIn(0f, 1f)
+            val t = (time / ANIMATION_DURATION.toFloat()).fastCoerceIn(0f, 1f)
             progress = 1 - (1 - t) * (1 - t)
         }
         else if (!isRemove) {
@@ -70,8 +73,8 @@ class CornerTail private constructor(
     }
 
     override fun Drawer.onDraw() {
-        val head = (progress / 0.7f).coerceAtMost(1f)
-        val tail = ((progress - 0.3f) / 0.7f).coerceAtLeast(0f)
+        val head = (progress / 0.7f).fastCoerceAtMost(1f)
+        val tail = ((progress - 0.3f) / 0.7f).fastCoerceAtLeast(0f)
         val start = startAngle + tail * angleDuration
         val sweep = (head - tail) * angleDuration
 

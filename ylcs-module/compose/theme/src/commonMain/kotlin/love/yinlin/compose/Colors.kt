@@ -2,6 +2,7 @@ package love.yinlin.compose
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.fastCoerceIn
 
 @Stable
 object Colors {
@@ -110,7 +111,7 @@ object Colors {
 fun Color.blend(other: Color): Color {
     val alpha1 = this.alpha
     val alpha2 = other.alpha * (1f - alpha1)
-    val totalAlpha = (alpha1 + alpha2).coerceIn(0f, 1f)
+    val totalAlpha = (alpha1 + alpha2).fastCoerceIn(0f, 1f)
     return if (totalAlpha == 0f) Colors.Transparent else Color(
         red = (this.red * alpha1 + other.red * alpha2) / totalAlpha,
         green = (this.green * alpha1 + other.green * alpha2) / totalAlpha,

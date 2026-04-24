@@ -14,13 +14,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.util.fastRoundToInt
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ValueTheme
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.status.LinearProgress
 import love.yinlin.compose.ui.text.SimpleEllipsisText
-import kotlin.math.roundToInt
 
 @Stable
 class DialogProgress<R : Any> : DialogTemplate<R>() {
@@ -60,7 +60,7 @@ class DialogProgress<R : Any> : DialogTemplate<R>() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    SimpleEllipsisText(text = "${(progress * 100).roundToInt()}%")
+                    SimpleEllipsisText(text = "${(progress * 100).fastRoundToInt()}%")
                     SimpleEllipsisText(text = "$current / $total")
                 }
             }

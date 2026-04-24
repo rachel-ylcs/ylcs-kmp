@@ -29,7 +29,6 @@ import love.yinlin.compose.ui.layout.measureId
 import love.yinlin.compose.ui.layout.require
 import love.yinlin.compose.ui.node.fastAnimateRotate
 import love.yinlin.compose.ui.text.SimpleEllipsisText
-import kotlin.math.max
 
 private val LocalTreeNodeColor = localComposition<Color>()
 private val LocalTreeNodeStyle = localComposition<TextStyle>()
@@ -74,7 +73,7 @@ object TreeViewScope {
             val iconStart = expandIconStart + heightPx + gap
             val textStart = iconStart + if (iconPlaceable != null) (heightPx + gap) else 0
             val contentWidth = textStart + textPlaceable.width
-            val layoutWidth = max(constraints.minWidth, contentWidth)
+            val layoutWidth = maxOf(constraints.minWidth, contentWidth)
 
             layout(layoutWidth, heightPx) {
                 expandIconPlaceable?.placeRelative(expandIconStart, 0)

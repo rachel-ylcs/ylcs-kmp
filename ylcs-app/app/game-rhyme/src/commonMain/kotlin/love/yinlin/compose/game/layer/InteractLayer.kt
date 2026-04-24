@@ -7,7 +7,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceAtMost
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.extension.scale
@@ -133,10 +134,10 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
         // 重置当前所有指针状态
         statusList.fastForEachIndexed { index, status ->
             when (status) {
-                null -> {}
+                null -> { }
                 is InteractStatus.Down -> statusList[index] = InteractStatus.AwaitUp(status.id)
                 is InteractStatus.Up -> statusList[index] = null
-                else -> {} // AwaitUp 不处理
+                else -> { } // AwaitUp 不处理
             }
         }
     }
@@ -149,7 +150,7 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
             val tp = info.targetProgress
             if (cp == tp) continue
             val step = tick / InteractInfo.BRUSH_DURATION
-            info.currentProgress = if (cp < tp) (cp + step).coerceAtMost(tp) else (cp - step).coerceAtLeast(tp)
+            info.currentProgress = if (cp < tp) (cp + step).fastCoerceAtMost(tp) else (cp - step).fastCoerceAtLeast(tp)
             isDirty = true
         }
         if (isDirty) updateDirty()

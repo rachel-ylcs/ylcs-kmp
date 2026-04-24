@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockStatus
@@ -31,6 +32,7 @@ sealed class Block<BS : BlockStatus>(
 ) : Visible(position, DefaultSize), Dynamic {
     companion object {
         const val DEFAULT_DIMENSION = 200f
+        const val DEFAULT_RADIUS = DEFAULT_DIMENSION / 2
         val DefaultSize = Size(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
         protected const val DEFAULT_SCALE = 0.9f
         protected val DefaultCenter = DefaultSize.center
@@ -41,17 +43,15 @@ sealed class Block<BS : BlockStatus>(
         protected val BottomRight = Offset(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
 
         protected val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
-
         protected val BounceBorderStroke = arrayOf(Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f))
 
         protected const val LYRICS_TEXT_SCALE = 0.5f
         protected const val NOTE_TEXT_SCALE = 0.75f
 
+        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
         protected val TextColor = Colors.Ghost
         protected val MissingColor = Colors.Gray6
 
-        protected const val INNER_SCALE_BLOCK_ALPHA = 0.5f
         protected const val INNER_BORDER_SCALE = 0.8f
         protected const val INNER_BORDER_ALPHA = 0.75f
 
@@ -100,7 +100,7 @@ sealed class Block<BS : BlockStatus>(
 
     protected inline fun updateCustomPrepare(status: BlockStatus.Prepare, audioTick: Int, start: Int, interact: () -> BS) {
         if (audioTick >= start) blockStatus = interact()
-        else status.progress = (audioTick / start.toFloat()).coerceIn(0f, 1f)
+        else status.progress = (audioTick / start.toFloat()).fastCoerceIn(0f, 1f)
     }
 
     protected inline fun <BRS : BlockStatus.Release, BDS : BS> updateCustomRelease(status: BRS, tick: Int, done: (BRS) -> BDS) {
@@ -111,42 +111,11 @@ sealed class Block<BS : BlockStatus>(
         else {
             val newTick = oldTick + tick
             status.tick = newTick
-            status.progress = (newTick / status.duration.toFloat()).coerceIn(0f, 1f)
+            status.progress = (newTick / status.duration.toFloat()).fastCoerceIn(0f, 1f)
         }
     }
 
     protected inline fun Drawer.withBlockScale(block: Drawer.() -> Unit) = scale(DEFAULT_SCALE, DefaultCenter, block)
-
-    protected fun Drawer.drawPrepareBorder(color: Color, progress: Float, alpha: Float = 1f) {
-        val delta = progress * DEFAULT_DIMENSION / 2f
-        val deltaInv = DEFAULT_DIMENSION - delta
-        line(color, TopLeft, Offset(delta, 0f), style = PrepareStroke, alpha = alpha)
-        line(color, TopLeft, Offset(0f, delta), style = PrepareStroke, alpha = alpha)
-        line(color, TopRight, Offset(deltaInv, 0f), style = PrepareStroke, alpha = alpha)
-        line(color, TopRight, Offset(DEFAULT_DIMENSION, delta), style = PrepareStroke, alpha = alpha)
-        line(color, BottomLeft, Offset(0f, deltaInv), style = PrepareStroke, alpha = alpha)
-        line(color, BottomLeft, Offset(delta, DEFAULT_DIMENSION), style = PrepareStroke, alpha = alpha)
-        line(color, BottomRight, Offset(deltaInv, DEFAULT_DIMENSION), style = PrepareStroke, alpha = alpha)
-        line(color, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), style = PrepareStroke, alpha = alpha)
-    }
-
-    protected fun Drawer.drawFullPrepareBorder(color: Color, alpha: Float = 1f) {
-        rect(color, DefaultRect, alpha = alpha, style = PrepareStroke)
-    }
-
-    protected fun Drawer.drawScaleBlock(color: Color, scaleRatio: Float, alpha: Float = INNER_SCALE_BLOCK_ALPHA) {
-        scale(scaleRatio, DefaultCenter) { rect(color, DefaultRect, alpha = alpha) }
-    }
-
-    protected fun Drawer.drawBounceBorder(color: Color, ratio: Float) {
-        scale(ratio, DefaultCenter) {
-            rect(color, DefaultRect, style = BounceBorderStroke[0], alpha = 0.2f)
-            rect(color, DefaultRect, style = BounceBorderStroke[1], alpha = 0.5f)
-            rect(color, DefaultRect, style = BounceBorderStroke[2], alpha = 0.9f)
-            rect(Colors.White, DefaultRect, style = BounceBorderStroke[3], alpha = 0.4f)
-            rect(Colors.White, DefaultRect, style = BounceBorderStroke[4], alpha = 0.8f)
-        }
-    }
 
     protected fun Drawer.drawSingleNoteFont(scale: Int, color: Color, alpha: Float, scaleRatio: Float = NOTE_TEXT_SCALE) {
         fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.let { graph ->

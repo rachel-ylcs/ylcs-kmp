@@ -6,6 +6,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.util.fastCoerceAtLeast
 import love.yinlin.app.game_rhyme.resources.Res
 import love.yinlin.app.game_rhyme.resources.rhyme
 import love.yinlin.compose.Colors
@@ -25,7 +26,7 @@ class InteractTipArea : MomentVisible(12000) {
     private var alpha: Float = 0f
 
     override fun onUpdateMoment(progress: Float) {
-        alpha = (0.1f * abs(sin(progress * 3 * Interpolator.PI))).coerceAtLeast(0f)
+        alpha = (0.1f * abs(sin(progress * 3 * Interpolator.PI))).fastCoerceAtLeast(0f)
     }
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
@@ -45,7 +46,11 @@ class InteractTipArea : MomentVisible(12000) {
         area[5] = Offset(w2, h1)
         area[6] = Offset(w2, h0)
 
-        if (noteFontMap == null) noteFontMap = List(7) { measureText(it.toString(), font = Res.font.rhyme, fontWeight = FontWeight.Bold) }
+        if (noteFontMap == null) {
+            noteFontMap = List(7) {
+                measureText(areaScaleList[it].toString(), font = Res.font.rhyme, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 
     override fun Drawer.onDraw() {

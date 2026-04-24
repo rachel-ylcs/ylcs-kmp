@@ -71,7 +71,6 @@ import love.yinlin.platform.Platform
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.UriGenerator
-import kotlin.math.max
 
 @Stable
 class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
@@ -140,7 +139,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
                     }
                 ) { measurables, constraints ->
                     val textPlaceable = measurables.first().measure(constraints)
-                    val boxSize = max(textPlaceable.width, textPlaceable.height)
+                    val boxSize = maxOf(textPlaceable.width, textPlaceable.height)
                     layout(boxSize, boxSize) {
                         textPlaceable.placeRelative(x = (boxSize - textPlaceable.width) / 2, y = (boxSize - textPlaceable.height) / 2)
                     }

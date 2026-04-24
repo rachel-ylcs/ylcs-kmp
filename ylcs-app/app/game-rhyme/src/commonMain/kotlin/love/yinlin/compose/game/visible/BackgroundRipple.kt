@@ -6,12 +6,12 @@ import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Visible
 import kotlin.math.cos
-import kotlin.math.min
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -32,7 +32,7 @@ class BackgroundRipple(override val layerOrder: Int) : Visible(), Dynamic {
 
         resonanceTime += tick * 0.01f
         resonanceUpdateTimer += tick
-        resonanceCurrentScale += (resonanceTargetScale - resonanceCurrentScale) * (tick * 0.01f).coerceIn(0f, 1f)
+        resonanceCurrentScale += (resonanceTargetScale - resonanceCurrentScale) * (tick * 0.01f).fastCoerceIn(0f, 1f)
 
         if (resonanceUpdateTimer >= 96f) {
             resonanceUpdateTimer = 0f
@@ -42,7 +42,7 @@ class BackgroundRipple(override val layerOrder: Int) : Visible(), Dynamic {
             }
         }
 
-        val currentBaseRadius = min(centerX, centerY) * resonanceCurrentScale / 2
+        val currentBaseRadius = minOf(centerX, centerY) * resonanceCurrentScale / 2
         resonancePath.reset()
         repeat(noiseSize) { i ->
             val angleRad = i * 6.283184f / noiseSize

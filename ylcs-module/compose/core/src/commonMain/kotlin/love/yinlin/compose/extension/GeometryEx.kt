@@ -4,13 +4,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.IntOffset
-import kotlin.math.roundToInt
+import androidx.compose.ui.util.fastRoundToInt
 
 fun Offset.translate(x: Float = 0f, y: Float = 0f) = this.copy(x = this.x + x, y = this.y + y)
 
 fun Offset.scale(dx: Float = 1f, dy: Float = 1f) = this.copy(x = this.x * dx, y = this.y * dy)
 
-fun Offset.roundToIntOffset() = IntOffset(x = this.x.roundToInt(), y = this.y.roundToInt())
+fun Offset.roundToIntOffset() = IntOffset(x = this.x.fastRoundToInt(), y = this.y.fastRoundToInt())
 
 fun Offset.onLine(other: Offset, ratio: Float): Offset = Offset(x = this.x + (other.x - this.x) * ratio, y = this.y + (other.y - this.y) * ratio)
 

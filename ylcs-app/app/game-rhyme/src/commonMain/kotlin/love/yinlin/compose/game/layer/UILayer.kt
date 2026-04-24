@@ -27,7 +27,7 @@ import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.drawer.StrokeTextGraph
 import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.traits.Layer
-import kotlin.math.min
+import kotlin.math.ceil
 
 @Stable
 class UILayer(
@@ -38,8 +38,7 @@ class UILayer(
     layerType = LayerType.Absolute
 ) {
     companion object {
-        private val ScoreStroke = Stroke(2f)
-        private val ResultStroke = Stroke(1f)
+        private val TextStroke = Stroke(2f)
     }
 
     override val interactive: Boolean = false
@@ -119,7 +118,7 @@ class UILayer(
         val oldCombo = resultData?.combo ?: 0
         val newCombo = if (result == BlockResult.MISS || result == BlockResult.BAD) 0 else oldCombo + 1
         // 计算得分
-        val reward = (result.score * scoreRatio).toInt()
+        val reward = ceil(result.score * scoreRatio).toInt() // 向上取整
         val deltaScore = reward + newCombo / comboRewardCount
         score += deltaScore // 连击奖励
 
@@ -174,7 +173,7 @@ class UILayer(
     }
 
     override fun Drawer.preOnDraw() {
-        val minDimension = min(viewportWidth, viewportHeight)
+        val minDimension = minOf(viewportWidth, viewportHeight)
 
         val barHeight = minDimension / 50
         val barRadius = barHeight / 2
@@ -229,10 +228,10 @@ class UILayer(
                 if (isOpen) scale(data.progress, Offset(totalWidth / 2, resultHeight / 2))
             }) {
                 // 画评级
-                strokeText(resultGraph, Offset.Zero, Size(resultWidth, resultHeight), mainColor, strokeColor, ResultStroke)
+                strokeText(resultGraph, Offset.Zero, Size(resultWidth, resultHeight), mainColor, strokeColor, TextStroke)
                 // 画连击
                 comboGraph?.let { graph ->
-                    strokeText(graph, Offset(resultWidth, 0f), Size(comboWidth, resultHeight), mainColor, strokeColor, ResultStroke)
+                    strokeText(graph, Offset(resultWidth, 0f), Size(comboWidth, resultHeight), mainColor, strokeColor, TextStroke)
                 }
             }
         }
@@ -240,7 +239,7 @@ class UILayer(
         // 画分数
         scoreGraph?.let { graph ->
             val scoreWidth = viewportWidth - barRadius
-            strokeText(graph, barBottom, Size(scoreWidth, resultHeight), Colors.Dark, Colors.White, ScoreStroke, TextAlign.End)
+            strokeText(graph, barBottom, Size(scoreWidth, resultHeight), Colors.Dark, Colors.White, TextStroke, TextAlign.End)
         }
     }
 }

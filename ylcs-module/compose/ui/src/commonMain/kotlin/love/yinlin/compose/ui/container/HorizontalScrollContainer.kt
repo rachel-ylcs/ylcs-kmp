@@ -18,6 +18,8 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceAtMost
 import kotlinx.coroutines.launch
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberTrue
@@ -87,8 +89,8 @@ fun HorizontalScrollContainer(
         modifier = modifier,
         enabled = rememberDerivedState { !state.isScrollInProgress }
     ) {
-        val targetPage = if (it > 0) (state.currentPage + 1).coerceAtMost(state.pageCount - 1)
-        else (state.currentPage - 1).coerceAtLeast(0)
+        val targetPage = if (it > 0) (state.currentPage + 1).fastCoerceAtMost(state.pageCount - 1)
+        else (state.currentPage - 1).fastCoerceAtLeast(0)
         if (targetPage != state.currentPage) state.animateScrollToPage(targetPage)
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.util.fastCoerceAtLeast
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberFalse
@@ -63,7 +64,7 @@ fun ComboBox(
                     .clip(shape)
                     .background(Theme.color.surface)
                     .border(border, Theme.color.outline, shape),
-                state = rememberLazyListState(initialFirstVisibleItemIndex = index.coerceAtLeast(0))
+                state = rememberLazyListState(initialFirstVisibleItemIndex = index.fastCoerceAtLeast(0))
             ) {
                 itemsIndexed(
                     items = items,

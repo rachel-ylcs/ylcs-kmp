@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.extension.rememberValueState
-import kotlin.math.max
 
 @Composable
 fun AdaptiveTwoBox(
@@ -51,7 +51,7 @@ fun AdaptiveTwoBox(
 
         if (isHorizontal) {
             layoutWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else (w1 + w2)
-            layoutHeight = max(h1, h2).coerceIn(constraints.minHeight, constraints.maxHeight)
+            layoutHeight = maxOf(h1, h2).fastCoerceIn(constraints.minHeight, constraints.maxHeight)
             with(horizontalArrangement) {
                 arrange(layoutWidth, intArrayOf(w1, w2), layoutDirection, outX)
             }
@@ -59,7 +59,7 @@ fun AdaptiveTwoBox(
             outY[1] = verticalAlignment.align(h2, layoutHeight)
         }
         else {
-            layoutWidth = max(w1, w2).coerceIn(constraints.minWidth, constraints.maxWidth)
+            layoutWidth = maxOf(w1, w2).fastCoerceIn(constraints.minWidth, constraints.maxWidth)
             layoutHeight = if (constraints.hasBoundedHeight) constraints.maxHeight else (h1 + h2)
             with(verticalArrangement) {
                 arrange(layoutHeight, intArrayOf(h1, h2), outY)

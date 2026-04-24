@@ -5,7 +5,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
-import kotlin.math.min
 
 /**
  * 视口
@@ -21,7 +20,7 @@ sealed interface Viewport {
             require(width > 0 && height > 0)
             val scaleX = outerWidth / width.toFloat()
             val scaleY = outerHeight / height.toFloat()
-            val minScale = min(scaleX, scaleY)
+            val minScale = minOf(scaleX, scaleY)
             val windowWidth = (width * minScale).toInt()
             val windowHeight = (height * minScale).toInt()
             val offsetX = (outerWidth - windowWidth) / 2

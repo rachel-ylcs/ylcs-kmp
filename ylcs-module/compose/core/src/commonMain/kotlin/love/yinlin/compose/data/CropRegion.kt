@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.util.fastCoerceIn
 
 @Stable
 data class CropRegion(
@@ -13,10 +14,10 @@ data class CropRegion(
     val heightPercent: Float
 ) {
     constructor(rect: Rect, container: Size) : this(
-        xPercent = (rect.left / container.width).coerceIn(0f, 1f),
-        yPercent = (rect.top / container.height).coerceIn(0f, 1f),
-        widthPercent = (rect.width / container.width).coerceIn(0f, 1f),
-        heightPercent = (rect.height / container.height).coerceIn(0f, 1f),
+        xPercent = (rect.left / container.width).fastCoerceIn(0f, 1f),
+        yPercent = (rect.top / container.height).fastCoerceIn(0f, 1f),
+        widthPercent = (rect.width / container.width).fastCoerceIn(0f, 1f),
+        heightPercent = (rect.height / container.height).fastCoerceIn(0f, 1f),
     )
 
     override fun toString(): String = "CropRegion($xPercent, $yPercent, $widthPercent, $heightPercent)"

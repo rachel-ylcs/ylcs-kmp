@@ -21,6 +21,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
@@ -140,9 +141,9 @@ fun Input(
             enabled = enabled,
             readOnly = !enabled,
             textStyle = textStyle,
-            singleLine = maxLines.coerceAtLeast(1) == 1,
-            minLines = minLines.coerceAtLeast(1),
-            maxLines = maxLines.coerceAtLeast(1),
+            singleLine = maxLines.fastCoerceAtLeast(1) == 1,
+            minLines = minLines.fastCoerceAtLeast(1),
+            maxLines = maxLines.fastCoerceAtLeast(1),
             keyboardOptions = state.keyboardOptions ?: remember(imeAction) {
                 KeyboardOptions(
                     keyboardType = KeyboardType.Text,

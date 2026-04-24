@@ -1,6 +1,7 @@
 package love.yinlin.media.lyrics
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.util.fastCoerceIn
 import kotlinx.serialization.Serializable
 import love.yinlin.compose.Colors
 
@@ -26,7 +27,7 @@ data class LyricsEngineConfig(
 ) {
     val textSizeProgress: Float get() = textSize / 0.75f - 1f
 
-    fun copyTextSize(percent: Float) = this.copy(textSize = ((percent + 1f) * 0.75f).coerceIn(0.75f, 1.5f))
+    fun copyTextSize(percent: Float) = this.copy(textSize = ((percent + 1f) * 0.75f).fastCoerceIn(0.75f, 1.5f))
 
     @Stable
     @Serializable
@@ -44,9 +45,9 @@ data class LyricsEngineConfig(
         val rightProgress: Float get() = right
         val topProgress: Float get() = top
 
-        fun copyLeft(percent: Float) = this.copy(left = percent.coerceIn(0f, 1f))
-        fun copyRight(percent: Float) = this.copy(right = percent.coerceIn(0f, 1f))
-        fun copyTop(percent: Float) = this.copy(top = percent.coerceIn(0f, 1f))
+        fun copyLeft(percent: Float) = this.copy(left = percent.fastCoerceIn(0f, 1f))
+        fun copyRight(percent: Float) = this.copy(right = percent.fastCoerceIn(0f, 1f))
+        fun copyTop(percent: Float) = this.copy(top = percent.fastCoerceIn(0f, 1f))
     }
 
     @Stable
