@@ -29,7 +29,6 @@ import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
-import kotlin.uuid.ExperimentalUuidApi
 
 @Stable
 class ScenePlugin private constructor(
@@ -248,7 +247,6 @@ class ScenePlugin private constructor(
             val assetProvider = remember { engine.pluginOrNull<AssetPlugin>()?.assetProvider ?: AssetProvider.Default }
 
             layerEntities.fastForEach { layer ->
-                @OptIn(ExperimentalUuidApi::class)
                 key(layer.id) {
                     val drawer = remember {
                         val initialDrawer = Drawer(
