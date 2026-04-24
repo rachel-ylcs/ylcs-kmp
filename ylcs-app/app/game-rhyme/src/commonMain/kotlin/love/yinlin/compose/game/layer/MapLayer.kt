@@ -9,7 +9,6 @@ import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.game.common.BlockMapGenerator
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
-import love.yinlin.compose.game.common.InteractStatus
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.TextGraph
@@ -57,7 +56,7 @@ class MapLayer(
                 // 生成文字
                 lyricsTextBuilder?.let { builder ->
                     val ch = nextBlock.rhymeAction.ch
-                    lyricsTextMap.getOrPut(ch) { builder(ch) }
+                    if (!lyricsTextMap.containsKey(ch)) lyricsTextMap[ch] = builder(ch)
                 }
                 // 加入序列
                 this += nextBlock

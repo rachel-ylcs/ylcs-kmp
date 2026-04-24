@@ -2,7 +2,6 @@ package love.yinlin.startup
 
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.ThemeMode
-import love.yinlin.compose.config.Patches
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.data.config.AnimationSpeedConfig
 import love.yinlin.data.config.FontScaleConfig
@@ -15,11 +14,7 @@ import love.yinlin.media.lyrics.LyricsEngineConfig
 import love.yinlin.media.lyrics.LyricsEngineType
 
 @Stable
-class StartupAppConfig(
-    pool: StartupPool,
-    version: Int,
-    patches: Patches
-) : StartupConfig(pool, version, patches) {
+class StartupAppConfig(pool: StartupPool) : StartupConfig(pool) {
     /* ------------------  系统  ------------------ */
 
     // 主题模式

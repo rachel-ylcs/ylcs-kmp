@@ -46,7 +46,7 @@ class MMKV(path: String) {
         private external fun nativeRemove(handle: Long, key: String)
     }
 
-    val nativeHandle: Long = nativeInit(path)
+    private val nativeHandle: Long = nativeInit(path)
 
     fun set(key: String, value: Boolean, expire: Int) = nativeSetBoolean(nativeHandle, key, value, expire)
     fun set(key: String, value: Int, expire: Int) = nativeSetInt(nativeHandle, key, value, expire)
