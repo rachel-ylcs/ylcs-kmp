@@ -52,7 +52,7 @@ template(object : KotlinAndroidTemplate() {
                 copy {
                     from(originOutput)
                     into(C.root.outputs)
-                    rename { _ -> "RachelModLyricsEditor.APK" }
+                    rename { _ -> "RachelModLyricsEditor.apk" }
                 }
             }
         }
