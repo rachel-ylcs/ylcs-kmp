@@ -12,7 +12,8 @@ import kotlin.io.encoding.Base64
 
 @Stable
 object QQMusicAPI : PlatformMusicAPI {
-    private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
+    private inline fun buildUrl(data: JsonObjectScope.() -> Unit): String =
+        "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
     private fun decodeData(num: Int, json: JsonObject): List<JsonObject> {
         val arr = mutableListOf<JsonObject>()
@@ -90,22 +91,36 @@ object QQMusicAPI : PlatformMusicAPI {
     }
 
     override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
-        return null
+        val url = buildUrl {
+            obj("req_0") {
+                "module" with "music.search.SearchCgiService"
+                "method" with "DoSearchForQQMusicMobile"
+                obj("param") {
+                    "query" with keyword
+                    "num_per_page" with 50
+                    "grp" with true
+                }
+            }
+        }
+
+        val songMids = NetClient.Common.request({
+            this.url = url
+        }) { json: JsonObject ->
+            json.obj("req_0").obj("data").obj("body").arr("item_song").map {
+                it.Object["mid"].String
+            }
+        } ?: return null
+
+        return songMids.mapNotNull { mid -> requestMusic(mid) }.ifEmpty { null }
     }
 
     override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
         when {
-            // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
             link.contains("c6.y.qq.com") -> requestMusicId(link)?.let { requestMusic(it) }?.let(::listOf)
-            // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
             link.contains("y.qq.com") && link.contains("songDetail") -> requestMusic(link.substringAfterLast("/"))?.let(::listOf)
-            // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
             link.contains("i2.y.qq.com") && link.contains("playlist") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
-            // 歌单 https://i.y.qq.com/n2/m/share/details/taoge.html?id=9094549201
             link.contains("i.y.qq.com") && link.contains("taoge") -> Uri.parse(link)?.params["id"]?.let { requestPlaylist(it) }
-            // 歌单 https://y.qq.com/n/ryqq/playlist/9094549201
             link.contains("y.qq.com") && link.contains("playlist") -> requestPlaylist(link.substringAfterLast("/"))
-            // 歌曲 003yJ3Ba1bDVJc
             else -> requestMusic(link)?.let(::listOf)
         }
     }
