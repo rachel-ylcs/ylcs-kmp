@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.util.fastCoerceIn
+import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberFalse
@@ -36,8 +38,6 @@ import love.yinlin.compose.ui.layout.measureId
 import love.yinlin.compose.ui.layout.require
 import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.shadow
-import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 @Stable
 private enum class SliderMeasureId : MeasureId {
@@ -85,7 +85,7 @@ fun Slider(
     var currentPercent by rememberValueState(value)
 
     LaunchedEffect(value) {
-        val newValue = value.coerceIn(0f, 1f)
+        val newValue = value.fastCoerceIn(0f, 1f)
         if (!isDragging && currentPercent != newValue) currentPercent = newValue
     }
 
@@ -117,7 +117,7 @@ fun Slider(
                 isDragging = true
                 val width = size.width.toFloat()
                 if (width > 0) {
-                    val newPercent = (down.position.x / width).coerceIn(0f, 1f)
+                    val newPercent = (down.position.x / width).fastCoerceIn(0f, 1f)
                     currentPercent = newPercent
                     updatedOnValueChange?.invoke(newPercent)
                 }
@@ -129,7 +129,7 @@ fun Slider(
                     if (change.pressed != dragChange.pressed) break
 
                     if (change.positionChange() != Offset.Zero) {
-                        val newPercent = (change.position.x / width).coerceIn(0f, 1f)
+                        val newPercent = (change.position.x / width).fastCoerceIn(0f, 1f)
                         currentPercent = newPercent
                         updatedOnValueChange?.invoke(newPercent)
                         change.consume()
@@ -151,7 +151,7 @@ fun Slider(
         val trackPlaceable = measurables.require(SliderMeasureId.Track).measure(
             Constraints.fixed(layoutWidth, trackHeightPx)
         )
-        val activeTrackWidth = (layoutWidth * currentPercent).roundToInt()
+        val activeTrackWidth = (layoutWidth * currentPercent).fastRoundToInt()
 
         val activeTrackPlaceable = measurables.require(SliderMeasureId.ActiveTrack).measure(
             Constraints.fixed(activeTrackWidth, trackHeightPx)
@@ -175,7 +175,7 @@ fun Slider(
             if (thumbPlaceable != null) {
                 val thumbY = centerY - (desiredHeight / 2)
                 val thumbCenterX = layoutWidth * currentPercent
-                val thumbX = (thumbCenterX - desiredHeight / 2).roundToInt()
+                val thumbX = (thumbCenterX - desiredHeight / 2).fastRoundToInt()
                 thumbPlaceable.placeRelative(thumbX, thumbY)
             }
         }
@@ -191,13 +191,13 @@ interface SliderConverter<T> {
 @Stable
 data class SliderIntConverter(val min: Int, val max: Int) : SliderConverter<Int> {
     override fun from(value: Int): Float = if (min == max) 0f else (value - min).toFloat() / (max - min)
-    override fun to(value: Float): Int = (min + (max - min) * value).roundToInt()
+    override fun to(value: Float): Int = (min + (max - min) * value).fastRoundToInt()
 }
 
 @Stable
 data class SliderLongConverter(val min: Long, val max: Long) : SliderConverter<Long> {
     override fun from(value: Long): Float = if (min == max) 0f else (value - min).toFloat() / (max - min)
-    override fun to(value: Float): Long = (min + (max - min) * value).roundToLong()
+    override fun to(value: Float): Long = (min + (max - min) * value).fastRoundToInt().toLong()
 }
 
 @Stable

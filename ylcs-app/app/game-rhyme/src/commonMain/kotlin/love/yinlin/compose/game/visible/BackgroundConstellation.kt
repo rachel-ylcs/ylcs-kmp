@@ -3,6 +3,7 @@ package love.yinlin.compose.game.visible
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.util.fastFilter
@@ -27,7 +28,7 @@ class BackgroundConstellation(override val layerOrder: Int) : Visible(), Dynamic
         var dx = (Random.nextFloat() - 0.5f) * 0.1f
         var dy = (Random.nextFloat() - 0.5f) * 0.1f
 
-        val color = Colors(
+        val color = Color(
             red = Random.nextFloat() * 0.5f + 0.5f,
             green = Random.nextFloat() * 0.5f + 0.5f,
             blue = Random.nextFloat() * 0.5f + 0.5f,

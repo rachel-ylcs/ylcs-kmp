@@ -6,8 +6,8 @@ import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
-import com.github.panpf.sketch.decode.AnimatedWebpDecoder
-import com.github.panpf.sketch.decode.GifDecoder
+import com.github.panpf.sketch.decode.supportAnimatedWebp
+import com.github.panpf.sketch.decode.supportGif
 import com.github.panpf.sketch.fetch.ComposeResourceUriFetcher
 import com.github.panpf.sketch.fetch.KtorHttpUriFetcher
 import com.github.panpf.sketch.http.KtorStack
@@ -43,8 +43,8 @@ class StartupUrlImage(
         addFetcher(ComposeResourceUriFetcher.Factory())
         addFetcher(KtorHttpUriFetcher.Factory(KtorStack(client = buildFileClient().delegate)))
 
-        addDecoder(GifDecoder.Factory())
-        addDecoder(AnimatedWebpDecoder.Factory())
+        supportGif()
+        supportAnimatedWebp()
     }
 
     private val sketch: Sketch = buildSketch(pool.rawContext).apply {

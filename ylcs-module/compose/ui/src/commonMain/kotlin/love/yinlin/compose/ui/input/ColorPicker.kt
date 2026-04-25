@@ -21,13 +21,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.graphics.HSV
 import love.yinlin.compose.graphics.hsv
 import love.yinlin.compose.ui.layout.MeasurePolicies
-import kotlin.math.min
 
 @Composable
 private fun ValueSlider(
@@ -39,12 +39,12 @@ private fun ValueSlider(
 
     Layout(modifier = Modifier.pointerInput(Unit) {
         detectDragGestures(
-            onDrag = { change, _ -> onValueChange(1 - (change.position.y / size.height).coerceIn(0f, 1f)) },
+            onDrag = { change, _ -> onValueChange(1 - (change.position.y / size.height).fastCoerceIn(0f, 1f)) },
             onDragEnd = onFinished
         )
     }.pointerInput(Unit) {
         detectTapGestures { offset ->
-            onValueChange(1 - (offset.y / size.height).coerceIn(0f, 1f))
+            onValueChange(1 - (offset.y / size.height).fastCoerceIn(0f, 1f))
             onFinished()
         }
     }.drawWithContent {
@@ -54,7 +54,7 @@ private fun ValueSlider(
         drawRect(brush)
         drawRoundRect(
             color = Colors.White,
-            topLeft = Offset(0f, ((1 - hsv.value) * h - height / 2).coerceIn(0f, h - height)),
+            topLeft = Offset(0f, ((1 - hsv.value) * h - height / 2).fastCoerceIn(0f, h - height)),
             size = Size(w, height),
             cornerRadius = CornerRadius(height / 4),
             style = Stroke(width = height / 4)
@@ -78,14 +78,14 @@ private fun SpectrumArea(
     Layout(modifier = Modifier.pointerInput(Unit) {
         detectDragGestures(
             onDrag = { change, _ ->
-                onHsvChange((change.position.x / size.width).coerceIn(0f, 1f) * 360, 1 - (change.position.y / size.height).coerceIn(0f, 1f))
+                onHsvChange((change.position.x / size.width).fastCoerceIn(0f, 1f) * 360, 1 - (change.position.y / size.height).fastCoerceIn(0f, 1f))
             },
             onDragEnd = onFinished
         )
     }.pointerInput(Unit) {
         detectTapGestures { offset ->
-            val h = (offset.x / size.width).coerceIn(0f, 1f) * 360f
-            val s = 1f - (offset.y / size.height).coerceIn(0f, 1f)
+            val h = (offset.x / size.width).fastCoerceIn(0f, 1f) * 360f
+            val s = 1f - (offset.y / size.height).fastCoerceIn(0f, 1f)
             onHsvChange(h, s)
             onFinished()
         }
@@ -96,7 +96,7 @@ private fun SpectrumArea(
 
             val x = (hsv.hue / 360f) * size.width
             val y = (1f - hsv.saturation) * size.height
-            val boxSize = min(size.width, size.height) * 0.05f
+            val boxSize = minOf(size.width, size.height) * 0.05f
             val center = Offset(x, y)
             val stroke = Stroke(width = boxSize * 0.25f)
 
@@ -120,14 +120,14 @@ private fun AlphaSlider(
     Layout(modifier = Modifier.pointerInput(enabled) {
         if (enabled) {
             detectDragGestures(
-                onDrag = { change, _ -> onAlphaChange(1 - (change.position.y / size.height).coerceIn(0f, 1f)) },
+                onDrag = { change, _ -> onAlphaChange(1 - (change.position.y / size.height).fastCoerceIn(0f, 1f)) },
                 onDragEnd = onFinished
             )
         }
     }.pointerInput(enabled) {
         if (enabled) {
             detectTapGestures { offset ->
-                onAlphaChange(1 - (offset.y / size.height).coerceIn(0f, 1f))
+                onAlphaChange(1 - (offset.y / size.height).fastCoerceIn(0f, 1f))
                 onFinished()
             }
         }
@@ -148,7 +148,7 @@ private fun AlphaSlider(
         if (!enabled) drawRect(disabledContainer)
         else drawRoundRect(
             color = Colors.White,
-            topLeft = Offset(0f, ((1 - alpha) * h - height / 2).coerceIn(0f, h - height)),
+            topLeft = Offset(0f, ((1 - alpha) * h - height / 2).fastCoerceIn(0f, h - height)),
             size = Size(w, height),
             cornerRadius = CornerRadius(height / 4),
             style = Stroke(width = height / 4)

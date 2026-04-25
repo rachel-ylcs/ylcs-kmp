@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
-import kotlin.math.min
 
 @Composable
 private inline fun LookaheadScope.AdderBoxCell(
@@ -65,7 +64,7 @@ fun <T> AdderBox(
             BackgroundContainer {
                 val itemNum = items.size
 
-                for (index in 0 ..< min(itemNum, maxNum))  {
+                for (index in 0 ..< minOf(itemNum, maxNum))  {
                     val item = items[index]
 
                     key(key?.invoke(item) ?: index) {

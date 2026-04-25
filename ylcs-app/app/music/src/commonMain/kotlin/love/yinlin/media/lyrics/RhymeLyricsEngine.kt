@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastJoinToString
-import love.yinlin.compose.Colors
-import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.text.FastCenterText
@@ -74,7 +74,7 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
                 break
             }
         }
-        progress = if (totalLength == 0) 0f else (currentLength / totalLength).coerceIn(0f, 1f)
+        progress = if (totalLength == 0) 0f else (currentLength / totalLength).fastCoerceIn(0f, 1f)
     }
 
     @Composable
@@ -92,13 +92,13 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
             drawAction = {
                 draw(measure(measurer, item.text, if (isCurrent) currentStyle else normalStyle)) {
                     clipRect(if (isCurrent) it.width * progress else 0f, 0f, it.width, it.height) {
-                        drawText(it, Colors(config.textBackgroundColor))
+                        drawText(it, Color(config.textBackgroundColor))
                     }
                 }
                 if (isCurrent) {
                     draw(result = measure(measurer, item.text, currentStyle)) {
                         clipRect(0f, 0f, it.width * progress, it.height) {
-                            drawText(it, Colors(config.textColor))
+                            drawText(it, Color(config.textColor))
                         }
                     }
                 }
@@ -118,12 +118,12 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
                 val result = measure(measurer, lines?.getOrNull(currentIndex)?.text ?: "", style)
                 draw(result) {
                     val offset = it.width * progress
-                    drawBackground(result, Colors(config.backgroundColor))
+                    drawBackground(result, Color(config.backgroundColor))
                     clipRect(offset, 0f, it.width, it.height) {
-                        drawText(it, Colors(config.textBackgroundColor))
+                        drawText(it, Color(config.textBackgroundColor))
                     }
                     clipRect(0f, 0f, offset, it.height) {
-                        drawText(it, Colors(config.textColor))
+                        drawText(it, Color(config.textColor))
                     }
                 }
             },

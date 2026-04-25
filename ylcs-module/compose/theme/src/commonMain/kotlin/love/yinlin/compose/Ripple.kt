@@ -22,7 +22,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.max
 
 data object Ripple : IndicationNodeFactory {
     const val PRESSED_ALPHA = 0.15f
@@ -129,7 +128,7 @@ data object Ripple : IndicationNodeFactory {
         }
 
         fun DrawScope.draw(color: Color) {
-            if (startRadius == null) startRadius = max(size.width, size.height) * 0.3f
+            if (startRadius == null) startRadius = maxOf(size.width, size.height) * 0.3f
             if (origin == null) origin = center
             if (targetCenter == null) targetCenter = Offset(size.width / 2.0f, size.height / 2.0f)
 

@@ -28,7 +28,7 @@ class UUIDKey<T>(val data: T) {
         override fun deserialize(decoder: Decoder): UUIDKey<T> = UUIDKey(decoder.decodeSerializableValue(dataSerializer))
     }
 
-    val key: Any = Uuid.generateV7()
+    val key: Uuid = Uuid.generateV7()
 
     operator fun component1(): T = data
     override fun equals(other: Any?): Boolean = (other as? UUIDKey<T>)?.key == key

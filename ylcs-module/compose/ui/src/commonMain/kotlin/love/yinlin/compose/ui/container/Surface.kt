@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
@@ -48,7 +49,7 @@ fun Surface(
         val shadowPx = with(LocalDensity.current) { shadowElevation.toPx() }
         val surfaceColor = Theme.color.surface
         val backgroundColor = if (absoluteTonalLevel <= 0) surfaceColor else {
-            val alpha = ((4.5f * ln(absoluteTonalLevel / 2f + 1) + 2) / 100).coerceIn(0f, 1f)
+            val alpha = ((4.5f * ln(absoluteTonalLevel / 2f + 1) + 2) / 100).fastCoerceIn(0f, 1f)
             Theme.color.primaryContainer.copy(alpha = alpha).compositeOver(surfaceColor)
         }
         Box(

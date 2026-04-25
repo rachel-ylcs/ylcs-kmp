@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
-        libs.plugins.kotlinSerialization,
     )
 }
 

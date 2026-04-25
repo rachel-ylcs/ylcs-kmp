@@ -2,7 +2,9 @@ package love.yinlin.compose.game
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -49,6 +51,7 @@ class Engine(
     private val pluginDependencyMap: Map<String, List<String>>
     private val plugins: List<Plugin>
     private val visiblePlugins: List<Plugin>
+    private val preloadPlugins: List<Plugin>
 
     init {
         val analyzer = DependencyAnalyzer(
@@ -60,6 +63,7 @@ class Engine(
         pluginDependencyMap = analyzer.dependenciesMap
         plugins = analyzer.result
         visiblePlugins = plugins.fastFilter { it.layerOrder != LayerOrder.Invisible }
+        preloadPlugins = plugins.fastFilter { it.preloadEnvironment != null }
     }
 
     inline fun <reified T : Plugin> plugin(): T = pluginMap[metaClassName<T>()] as T
@@ -127,11 +131,14 @@ class Engine(
     }
 
     @Composable
-    fun ViewportContent(modifier: Modifier = Modifier.fillMaxSize()) {
+    fun ViewportContent(
+        modifier: Modifier = Modifier.fillMaxSize(),
+        padding: PaddingValues = PaddingValues.Zero,
+    ) {
         Layout(
             modifier = modifier,
             content = {
-                Box(modifier = Modifier.background(backgroundColor).clipToBounds()) {
+                Box(modifier = Modifier.background(backgroundColor).padding(padding).clipToBounds()) {
                     visiblePlugins.fastForEach { plugin ->
                         key(plugin.id) {
                             Box(modifier = Modifier.fillMaxSize().zIndex(plugin.layerOrder.toFloat()).then(plugin.extraModifier)) {
@@ -150,6 +157,15 @@ class Engine(
 
             layout(maxWidth, maxHeight) {
                 placeable.placeRelative(bounds.left, bounds.top)
+            }
+        }
+    }
+
+    @Composable
+    fun PreloadEnvironment() {
+        preloadPlugins.fastForEach { plugin ->
+            key(plugin.id) {
+                plugin.preloadEnvironment?.invoke()
             }
         }
     }

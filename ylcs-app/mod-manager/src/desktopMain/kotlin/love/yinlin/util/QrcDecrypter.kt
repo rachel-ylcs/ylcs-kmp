@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets
 import java.util.HexFormat
 import java.util.Locale.getDefault
 import java.util.zip.Inflater
-import kotlin.math.min
 
 @Stable
 object QrcDecrypter {
@@ -405,11 +404,11 @@ object QrcDecrypter {
         val result = ByteArray(length)
         var i = 0
         while (i < length) {
-            val blockSize = min(8, length - i)
+            val blockSize = minOf(8, length - i)
             var inputBlock = data.copyOfRange(i, i + blockSize)
             if (inputBlock.size < 8) inputBlock = inputBlock.copyOf(8)
             val outputBlock = processDesBlock(inputBlock, keySchedule)
-            System.arraycopy(outputBlock, 0, result, i, min(8, length - i))
+            System.arraycopy(outputBlock, 0, result, i, minOf(8, length - i))
             i += 8
         }
         return result

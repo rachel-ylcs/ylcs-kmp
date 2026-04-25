@@ -18,6 +18,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastCoerceAtLeast
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.mutableRefStateOf
@@ -106,7 +107,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
 
         LaunchedEffect(currentIndex) {
             if (!listState.isScrollInProgress && lines != null) {
-                listState.animateScrollToItem(currentIndex.coerceAtLeast(0))
+                listState.animateScrollToItem(currentIndex.fastCoerceAtLeast(0))
             }
         }
 

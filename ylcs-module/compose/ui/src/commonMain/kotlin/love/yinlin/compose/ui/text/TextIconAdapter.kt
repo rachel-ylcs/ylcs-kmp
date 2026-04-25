@@ -9,7 +9,6 @@ import love.yinlin.compose.ui.layout.MeasureIdProvider
 import love.yinlin.compose.ui.layout.find
 import love.yinlin.compose.ui.layout.provider
 import love.yinlin.compose.ui.layout.require
-import kotlin.math.max
 
 private enum class TextIconAdapterMeasureId : MeasureId {
     Text, Icon;
@@ -85,7 +84,7 @@ fun TextIconBinder(
         val gap = if (iconPlaceable == null) 0 else (textHeight * gapRatio).toInt()
 
         val totalHeight = textHeight + iconHeight + gap
-        val maxWidth = max(textPlaceable.width, iconPlaceable?.width ?: 0)
+        val maxWidth = maxOf(textPlaceable.width, iconPlaceable?.width ?: 0)
 
         layout(maxWidth, totalHeight) {
             val textX = (maxWidth - textPlaceable.width) / 2

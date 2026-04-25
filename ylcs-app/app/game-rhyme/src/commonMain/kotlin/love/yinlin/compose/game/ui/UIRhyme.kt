@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -17,7 +18,6 @@ import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import love.yinlin.app
-import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.container.Surface
@@ -85,8 +85,8 @@ internal fun RhymeMusicCard(
 
 private val DefaultRhymeBlurStyle = HazeStyle(
     blurRadius = 10.dp,
-    backgroundColor = Colors(0xDD292929),
-    tint = HazeTint(Colors(0x6C292929))
+    backgroundColor = Color(0xDD292929),
+    tint = HazeTint(Color(0x6C292929))
 )
 
 @OptIn(ExperimentalHazeApi::class)

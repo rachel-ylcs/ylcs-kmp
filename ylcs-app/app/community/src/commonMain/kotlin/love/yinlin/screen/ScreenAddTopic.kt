@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.util.fastCoerceAtLeast
 import kotlinx.io.readByteArray
 import love.yinlin.app
 import love.yinlin.common.DataSourceDiscovery
@@ -55,7 +56,7 @@ class ScreenAddTopic : Screen() {
     private val input = TopicInputState()
 
     private suspend fun pickPictures() {
-        app.picker.pickPicture((9 - input.pics.size).coerceAtLeast(1))?.use { sources ->
+        app.picker.pickPicture((9 - input.pics.size).fastCoerceAtLeast(1))?.use { sources ->
             for (source in sources) {
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(source.readByteArray())!!

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.input.Slider
@@ -20,11 +21,11 @@ import kotlin.jvm.JvmName
 data class SliderArgs<T : Number>(internal val tmpValue: T, val minValue: T, val maxValue: T)
 
 @get:JvmName("SliderArgsIntValue")
-val SliderArgs<Int>.value: Int get() = this.tmpValue.coerceIn(this.minValue, this.maxValue)
+val SliderArgs<Int>.value: Int get() = this.tmpValue.fastCoerceIn(this.minValue, this.maxValue)
 @get:JvmName("SliderArgsLongValue")
-val SliderArgs<Long>.value: Long get() = this.tmpValue.coerceIn(this.minValue, this.maxValue)
+val SliderArgs<Long>.value: Long get() = this.tmpValue.fastCoerceIn(this.minValue, this.maxValue)
 @get:JvmName("SliderArgsFloatValue")
-val SliderArgs<Float>.value: Float get() = this.tmpValue.coerceIn(this.minValue, this.maxValue)
+val SliderArgs<Float>.value: Float get() = this.tmpValue.fastCoerceIn(this.minValue, this.maxValue)
 
 @Composable
 private fun <T : Number> ArgsSliderContainer(

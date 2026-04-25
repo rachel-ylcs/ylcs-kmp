@@ -9,7 +9,6 @@ import love.yinlin.compose.DurationTheme
 import love.yinlin.compose.PlatformApplication
 import love.yinlin.compose.ThemeMode
 import love.yinlin.compose.ToolingTheme
-import love.yinlin.compose.config.patches
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.window.DeepLink
@@ -53,7 +52,7 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
 
     val kv by startup(StartupKVFactory(configPath))
 
-    val config by startup(StartupConfig.custom(Local.info.version, patches(), ::StartupAppConfig))
+    val config by startup(StartupConfig.custom(::StartupAppConfig))
 
     val exceptionHandler by startup(StartupExceptionHandler.Factory("crash_key") { key, e, error ->
         kv.set(key, "${DateEx.CurrentString}\n${error}")

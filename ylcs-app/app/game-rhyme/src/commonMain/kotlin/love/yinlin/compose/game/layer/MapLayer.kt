@@ -9,35 +9,31 @@ import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.game.common.BlockMapGenerator
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
-import love.yinlin.compose.game.common.DataUpdater
-import love.yinlin.compose.game.common.InteractStatus
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.TextGraph
-import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.viewport.Camera
 import love.yinlin.compose.game.visible.Block
-import love.yinlin.media.AudioPlayer
+import love.yinlin.compose.game.visible.CornerTail
 
 // 地图层
 @Stable
 class MapLayer(
     private val camera: Camera,
-    private val player: AudioPlayer,
     playInfo: RhymePlayInfo,
-    private val updater: DataUpdater,
+    val momentLayer: MomentLayer,
     private val interactLayer: InteractLayer,
-) : Layer(layerOrder = 1), Dynamic {
+    private val uiLayer: UILayer,
+) : Layer(layerOrder = 2) {
     companion object {
+        // 镜头跟随安全区域比例
         const val CAMERA_BLOCK_AREA_RATIO = 0.6f
     }
 
     // 地图
     private val blocks = BlockMapGenerator.generate(Block.DEFAULT_DIMENSION, playInfo.lyricsConfig, playInfo.playConfig)
 
-    var audioPosition: Long = 0L
-    private var lastAudioPosition: Long = 0L
     // 当前位置 用于相机跟随 与音频发声一致
     private var currentIndex: Int = 0
     // 预准备位置 用于提前显示动画
@@ -48,30 +44,19 @@ class MapLayer(
     var baseNoteFontMap: List<TextGraph>? = null
         private set
 
-    var lyricsTextBuilder: ((String) -> TextGraph)? = null
+    private var lyricsTextBuilder: ((String) -> TextGraph)? = null
     val lyricsTextMap = mutableMapOf<String, TextGraph>()
 
     override fun preUpdate(tick: Int) {
-        // 更新进度
-        val currentAudioPosition = player.position
-        val currentAudioDuration = player.duration
-
-        // 降频
-        if (currentAudioPosition - lastAudioPosition > 1000L) {
-            updater.audioProgress = if (currentAudioDuration == 0L) 0f else currentAudioPosition / currentAudioDuration.toFloat()
-            lastAudioPosition = currentAudioPosition
-        }
-        audioPosition = currentAudioPosition
-
         // 检查新方块
         blocks.getOrNull(prepareIndex + 1)?.let { nextBlock ->
-            if (currentAudioPosition >= nextBlock.time.appearance) {
+            if (momentLayer.audioPosition >= nextBlock.time.appearance) {
                 // 到达方块出现刻
                 ++prepareIndex
                 // 生成文字
                 lyricsTextBuilder?.let { builder ->
                     val ch = nextBlock.rhymeAction.ch
-                    lyricsTextMap.getOrPut(ch) { builder(ch) }
+                    if (!lyricsTextMap.containsKey(ch)) lyricsTextMap[ch] = builder(ch)
                 }
                 // 加入序列
                 this += nextBlock
@@ -79,55 +64,67 @@ class MapLayer(
         }
 
         // 处理方块交互
-        val interactStatus = interactLayer.interactStatus
-        blocks.getOrNull(currentIndex)?.let { currentBlock ->
-            // 只在交互状态下触发
-            when (val blockStatus = currentBlock.blockStatus) {
-                is BlockStatus.Interact -> currentBlock.onInteract(interactStatus, blockStatus)
-                is BlockStatus.Release -> {
-                    // 检查相机跟踪
-                    blocks.getOrNull(++currentIndex)?.let { nextBlock ->
-                        val boundary = camera.viewportBounds
-                        val gapRatio = (1 - CAMERA_BLOCK_AREA_RATIO) / 2
-                        val horizontalMargin = boundary.width * gapRatio
-                        val verticalMargin = boundary.height * gapRatio
+        interactLayer.withInteractInfo { interactStatusList ->
+            blocks.getOrNull(currentIndex)?.let { currentBlock ->
+                // 只在交互状态下触发
+                when (val blockStatus = currentBlock.blockStatus) {
+                    is BlockStatus.Interact -> currentBlock.onInteract(interactStatusList, blockStatus)
+                    is BlockStatus.Release -> {
+                        // 更新位置
+                        val newIndex = currentIndex + 1
+                        currentIndex = newIndex
 
-                        val limitLeft = boundary.left + horizontalMargin
-                        val limitRight = boundary.right - horizontalMargin
-                        val limitTop = boundary.top + verticalMargin
-                        val limitBottom = boundary.bottom - verticalMargin
+                        // --  边角判定  --
+                        val currentLine = currentBlock.line
+                        if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
+                            // 添加尾角动画
+                            currentLine.endDirection?.let { endDirection ->
+                                this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
+                            }
+                        }
 
-                        val (halfWidth, halfHeight) = nextBlock.size / 2f
-                        val center = nextBlock.position
+                        // 检查相机跟踪
+                        blocks.getOrNull(newIndex)?.let { nextBlock ->
+                            val boundary = camera.viewportBounds
+                            val gapRatio = (1 - CAMERA_BLOCK_AREA_RATIO) / 2
+                            val horizontalMargin = boundary.width * gapRatio
+                            val verticalMargin = boundary.height * gapRatio
 
-                        val blockLeft = center.x - halfWidth
-                        val blockRight = center.x + halfWidth
-                        val blockTop = center.y - halfHeight
-                        val blockBottom = center.y + halfHeight
+                            val limitLeft = boundary.left + horizontalMargin
+                            val limitRight = boundary.right - horizontalMargin
+                            val limitTop = boundary.top + verticalMargin
+                            val limitBottom = boundary.bottom - verticalMargin
 
-                        // 当前方块在视口边界的限制外
-                        if (blockLeft < limitLeft || blockRight > limitRight || blockTop < limitTop || blockBottom > limitBottom) {
-                            camera.animateUpdatePosition(center)
+                            val (halfWidth, halfHeight) = nextBlock.size / 2f
+                            val center = nextBlock.position
+
+                            val blockLeft = center.x - halfWidth
+                            val blockRight = center.x + halfWidth
+                            val blockTop = center.y - halfHeight
+                            val blockBottom = center.y + halfHeight
+
+                            // 当前方块在视口边界的限制外
+                            if (blockLeft < limitLeft || blockRight > limitRight || blockTop < limitTop || blockBottom > limitBottom) {
+                                camera.animateUpdatePosition(center)
+                            }
                         }
                     }
+                    else -> { }
                 }
-                else -> { }
             }
         }
-        interactStatus.fill(InteractStatus.None) // 重置状态
     }
 
-    override suspend fun InitialDrawer.preInitialDraw() {
+    override fun InitialDrawer.preInitialDraw() {
         baseNoteFontMap = Block.NoteScaleFontMap.map { index ->
             measureText(index.toString(), font = RhymeRes.font.music, fontWeight = FontWeight.Bold)
         }
         lyricsTextBuilder = { text ->
             measureText(text, font = GlobalRes.font.xwwk, fontWeight = FontWeight.Bold)
         }
-        updateDirty()
     }
 
     fun updateResult(result: BlockResult, scoreRatio: Float = 1f) {
-        updater.updateResult(audioPosition, result, scoreRatio)
+        uiLayer.updateResult(result, scoreRatio)
     }
 }

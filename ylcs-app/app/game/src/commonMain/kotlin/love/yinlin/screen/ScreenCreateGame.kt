@@ -6,6 +6,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.app
 import love.yinlin.common.GameMapper
 import love.yinlin.compose.Device
@@ -38,15 +40,15 @@ class ScreenCreateGame(private val game: Game) : Screen() {
     ) {
         private val minReward: Int = config.minReward
         private val maxReward: Int = config.maxReward
-        val reward: Int = tmpReward.coerceIn(minReward, maxReward)
+        val reward: Int = tmpReward.fastCoerceIn(minReward, maxReward)
         val rewardArgs = SliderArgs(reward, minReward, maxReward)
         private val minCost: Int = 0
-        private val maxCost: Int = (reward / config.maxCostRatio).coerceAtLeast(minCost)
-        val cost: Int = tmpCost.coerceIn(minCost, maxCost)
+        private val maxCost: Int = (reward / config.maxCostRatio).fastCoerceAtLeast(minCost)
+        val cost: Int = tmpCost.fastCoerceIn(minCost, maxCost)
         val costArgs = SliderArgs(cost, minCost, maxCost)
         private val minNum: Int = config.minRank
-        private val maxNum: Int = if (cost == 0) config.maxRank else (reward / cost / 3).coerceIn(minNum, config.maxRank)
-        val num: Int = tmpNum.coerceIn(minNum, maxNum)
+        private val maxNum: Int = if (cost == 0) config.maxRank else (reward / cost / 3).fastCoerceIn(minNum, config.maxRank)
+        val num: Int = tmpNum.fastCoerceIn(minNum, maxNum)
         val numArgs = SliderArgs(num, minNum, maxNum)
     }
 

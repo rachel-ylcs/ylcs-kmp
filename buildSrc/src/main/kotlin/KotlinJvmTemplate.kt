@@ -42,6 +42,7 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
             applicationDefaultJvmArgs = buildList {
                 addAll(jvmArgs)
                 add("--enable-native-access=ALL-UNNAMED")
+                add("-XX:+UseCompactObjectHeaders")
             }
             application()
         }

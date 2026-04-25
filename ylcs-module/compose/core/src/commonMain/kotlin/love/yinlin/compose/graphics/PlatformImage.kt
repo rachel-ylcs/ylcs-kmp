@@ -4,8 +4,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import love.yinlin.compose.data.CropRegion
 import love.yinlin.compose.data.ImageFormat
 import love.yinlin.compose.data.ImageQuality
-import kotlin.math.max
-import kotlin.math.min
 
 // ByteArray <-> ImageBitmap
 
@@ -32,8 +30,8 @@ expect fun PlatformImage.crop(rect: CropRegion)
 
 internal fun calculateThumbnailScale(width: Int, height: Int, longImageThreshold: Float, maxSizeNormal: Int, minSizeLong: Int): Triple<Int, Int, Boolean> {
     val aspectRatio = width / height.toFloat()
-    val minSize = min(width, height)
-    val maxSize = max(width, height)
+    val minSize = minOf(width, height)
+    val maxSize = maxOf(width, height)
     return if (aspectRatio < 1 / longImageThreshold || aspectRatio > longImageThreshold) { // 长图
         if (maxSize > minSizeLong) { // 需要缩放
             val scale = maxSize / minSizeLong.toFloat()

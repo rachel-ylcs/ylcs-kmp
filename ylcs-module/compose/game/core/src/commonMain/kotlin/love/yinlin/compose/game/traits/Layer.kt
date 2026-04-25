@@ -26,10 +26,6 @@ open class Layer(
 ) : Entity(), Dynamic {
     private val items = visibles.sortedBy(Visible::layerOrder).toMutableList()
 
-    val isEmpty: Boolean get() = items.isEmpty()
-    val isNotEmpty: Boolean get() = items.isNotEmpty()
-    val visibleCount: Int get() = items.size
-
     var scene: ScenePlugin? = null
         private set
 
@@ -43,6 +39,15 @@ open class Layer(
                 updateDirty()
             }
         }
+
+    private val removeCacheSet = mutableSetOf<Visible>()
+
+    /**
+     * 移除Visible
+     *
+     * 因为 Update 通常在遍历 Layer 时发生，如果中途改变了容器迭代器位置会不一致
+     */
+    fun removeAfterUpdate(visible: Visible) { removeCacheSet += visible }
 
     operator fun plusAssign(item: Visible) {
         // 根据 layerOrder 二分查找
@@ -61,17 +66,9 @@ open class Layer(
         updateDirty()
     }
 
-    operator fun minusAssign(item: Visible) {
+    private operator fun minusAssign(item: Visible) {
         items -= item
         item.onVisibleDetached()
-        updateDirty()
-    }
-
-    operator fun minusAssign(targetItems: Iterable<Visible>) {
-        for (item in targetItems) {
-            items -= item
-            item.onVisibleDetached()
-        }
         updateDirty()
     }
 
@@ -107,6 +104,9 @@ open class Layer(
         items.fastForEach { item ->
             if (item is Dynamic && item.active && item.alive) item.onUpdate(tick)
         }
+        // 移除不需要的
+        for (item in removeCacheSet) this -= item
+        removeCacheSet.clear()
     }
 
     /**
@@ -124,13 +124,13 @@ open class Layer(
      */
     open val preTrigger: Trigger? = null
 
-    internal fun hitTestVisibleLayer(point: Offset): Pair<Visible?, Any>? {
+    internal fun hitTestVisibleLayer(isAbsolute: Boolean, point: Offset): Pair<Visible?, Any>? {
         val layerArg = preHitTest(point)
         if (layerArg != null) return null to layerArg
         // 受击处理层级逆向
         for (index in items.indices.reversed()) {
             val item = items[index]
-            val arg = item.onHitTest(point)
+            val arg = if (isAbsolute) item.onHitTestAbsolute(point) else item.onHitTestRelative(point)
             if (arg != null) return item to arg
         }
         return null
@@ -166,7 +166,7 @@ open class Layer(
     /**
      * 初始化绘制
      */
-    open suspend fun InitialDrawer.preInitialDraw() { }
+    open fun InitialDrawer.preInitialDraw() { }
 
     /**
      * 预准备绘制

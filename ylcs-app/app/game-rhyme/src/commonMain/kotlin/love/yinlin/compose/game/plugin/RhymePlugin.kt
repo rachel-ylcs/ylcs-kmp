@@ -1,9 +1,5 @@
 package love.yinlin.compose.game.plugin
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -11,38 +7,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toIntSize
 import androidx.compose.ui.zIndex
-import love.yinlin.app.game_rhyme.resources.Res
-import love.yinlin.app.game_rhyme.resources.rhyme
-import love.yinlin.compose.Colors
-import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.game.Engine
-import love.yinlin.compose.game.common.DataUpdater
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.layer.BackgroundLayer
 import love.yinlin.compose.game.layer.InteractLayer
 import love.yinlin.compose.game.layer.MapLayer
+import love.yinlin.compose.game.layer.MomentLayer
+import love.yinlin.compose.game.layer.UILayer
 import love.yinlin.compose.game.ui.RhymeBlurSurface
 import love.yinlin.compose.game.ui.RhymeCommonButton
-import love.yinlin.compose.game.ui.rhymeBlurTarget
-import love.yinlin.compose.rememberFontFamily
-import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.icon.RhymeIcons
-import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
@@ -78,18 +56,17 @@ class RhymePlugin(
 
     private var currentInfo: RhymePlayInfo? = null
 
-    private val dataUpdater = DataUpdater()
-
     // 初始化游戏
     suspend fun setupGame(playInfo: RhymePlayInfo, audio: File) {
         currentInfo = playInfo
         player.load(audio, true)
-        dataUpdater.init(playInfo)
         val backgroundLayer = BackgroundLayer()
         val interactLayer = InteractLayer()
-        val mapLayer = MapLayer(scene.camera, player, playInfo, dataUpdater, interactLayer)
+        val momentLayer = MomentLayer(playInfo, player)
+        val uiLayer = UILayer(playInfo, momentLayer)
+        val mapLayer = MapLayer(scene.camera, playInfo, momentLayer, interactLayer, uiLayer)
         // 先更新交互结果再处理地图
-        scene += listOf(backgroundLayer, interactLayer, mapLayer)
+        scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)
     }
 
     // 停止游戏
@@ -98,7 +75,6 @@ class RhymePlugin(
         endListener(null)
         player.stop()
         currentInfo = null
-        dataUpdater.reset()
     }
 
     override suspend fun onInitialize(): Boolean {
@@ -139,96 +115,10 @@ class RhymePlugin(
     }
 
     @Composable
-    private fun InfoContent(fontFamily: FontFamily) {
-        currentInfo?.let { info ->
-            Row(
-                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).rhymeBlurTarget(blurState).padding(Theme.padding.value),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
-            ) {
-                // 画封面
-                Box(modifier = Modifier.fillMaxHeight().aspectRatio(1f).silentClick {
-                    engine.isRunning = false
-                }.drawWithContent {
-                    // 画背景
-                    val bounds = Rect(0f, 0f, size.width, size.height)
-                    val strokeWidth = size.width / 20
-                    clipPath(Path().apply { addOval(bounds) }) {
-                        drawImage(
-                            image = info.musicRecord,
-                            dstOffset = IntOffset.Zero,
-                            dstSize = size.toIntSize()
-                        )
-                    }
-                    // 画时长
-                    drawArc(
-                        color = Colors.White,
-                        startAngle = -90f,
-                        sweepAngle = 360f,
-                        useCenter = false,
-                        style = Stroke(strokeWidth, cap = StrokeCap.Round)
-                    )
-                    // 画进度
-                    drawArc(
-                        color = Colors.Green4,
-                        startAngle = -90f,
-                        sweepAngle = 360f * dataUpdater.audioProgress,
-                        useCenter = false,
-                        style = Stroke(strokeWidth, cap = StrokeCap.Round)
-                    )
-                })
-
-                Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
-                    // 画标题
-                    SimpleClipText(
-                        text = info.musicInfo.name,
-                        style = Theme.typography.v6.bold
-                    )
-                    // 画难度星级
-                    Row {
-                       repeat(info.playConfig.difficulty.ordinal + 1) {
-                           Icon(icon = RhymeIcons.Star, color = Colors.Unspecified)
-                       }
-                    }
-                }
-
-                Box(modifier = Modifier.weight(1f))
-
-                // 画得分
-                AnimationContent(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    state = dataUpdater.score,
-                    enter = { fadeIn() + slideInVertically { it / 2 } },
-                    exit = { fadeOut() + slideOutVertically { -it / 2 } }
-                ) {
-                    SimpleClipText(
-                        text = it.toString(),
-                        color = Colors.White,
-                        style = Theme.typography.v3.bold.copy(
-                            fontFamily = fontFamily,
-                            letterSpacing = 4.sp
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun UIContent(modifier: Modifier = Modifier) {
-        val fontFamily = rememberFontFamily(Res.font.rhyme)
-
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-        ) {
-            InfoContent(fontFamily)
-        }
-    }
-
-    @Composable
     override fun BoxScope.Content() {
-        UIContent(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current).zIndex(1f))
-        if (!engine.isRunning) PauseContent(modifier = Modifier.fillMaxSize().background(Theme.color.scrim.copy(alpha = 0.6f)).silentClick { }.zIndex(2f))
+        if (!engine.isRunning) {
+            PauseContent(modifier = Modifier.fillMaxSize().background(Theme.color.scrim.copy(alpha = 0.6f)).silentClick { }.zIndex(2f))
+        }
 
         LaunchedEffect(engine.isRunning) {
             if (engine.isRunning) player.play()

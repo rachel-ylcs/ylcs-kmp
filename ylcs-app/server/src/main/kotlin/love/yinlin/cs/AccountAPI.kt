@@ -1,6 +1,7 @@
 package love.yinlin.cs
 
 import love.yinlin.callMap
+import love.yinlin.crypto.MD5
 import love.yinlin.cs.service.*
 import love.yinlin.cs.user.*
 import love.yinlin.data.rachel.mail.Mail
@@ -20,7 +21,7 @@ fun APIScope.accountAPI() {
         VN.throwName(name)
         VN.throwPassword(pwd)
         val user = db.querySQLSingle("SELECT uid, pwd FROM user WHERE name = ?", name) ?: failure("ID未注册")
-        if (user["pwd"].String != pwd.md5) failure("密码错误")
+        if (user["pwd"].String != MD5.Default.encodeToString(pwd)) failure("密码错误")
         val uid = user["uid"].Int
         // 根据 uid, platform, timestamp 生成 token
         result(AN.throwGenerateToken(Token(uid, platform)))
@@ -61,7 +62,7 @@ fun APIScope.accountAPI() {
             INSERT INTO mail(uid, type, title, content, filter, param1, param2) ${values(7)}
         """, inviter["uid"].Int, Mail.Type.DECISION, "用户注册审核",
             "小银子\"${name}\"填写你作为邀请人注册，是否同意？",
-            Mail.Filter.Register.toString(), name, pwd.md5)
+            Mail.Filter.Register.toString(), name, MD5.Default.encodeToString(pwd))
     }
 
     callMap[Mail.Filter.Register] = {
@@ -110,7 +111,7 @@ fun APIScope.accountAPI() {
         db.throwExecuteSQL("""
             INSERT INTO mail(uid, type, title, content, filter, param1, param2) ${values(7)}
         """, inviterUid, Mail.Type.DECISION, "用户修改密码审核",
-            "\"${name}\"需要修改密码，是否同意？", Mail.Filter.ForgotPassword.toString(), name, pwd.md5)
+            "\"${name}\"需要修改密码，是否同意？", Mail.Filter.ForgotPassword.toString(), name, MD5.Default.encodeToString(pwd))
     }
 
     callMap[Mail.Filter.ForgotPassword] = {
@@ -127,8 +128,8 @@ fun APIScope.accountAPI() {
         VN.throwPassword(oldPwd, newPwd)
         val uid = AN.throwExpireToken(token)
         val user = db.throwGetUser(uid, "pwd")
-        val oldPwdMd5 = oldPwd.md5
-        val newPwdMd5 = newPwd.md5
+        val oldPwdMd5 = MD5.Default.encodeToString(oldPwd)
+        val newPwdMd5 = MD5.Default.encodeToString(newPwd)
         if (user["pwd"].String != oldPwdMd5) failure("原密码错误")
         else if (oldPwdMd5 == newPwdMd5) failure("原密码与新密码相同")
         else {

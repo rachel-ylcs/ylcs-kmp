@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
@@ -37,7 +39,7 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
                 }
 
                 LaunchedEffect(screenHeight, lyricsTopOffset) {
-                    val topOffset = screenHeight * 0.2f * lyricsTopOffset.second.coerceIn(0f, 1f)
+                    val topOffset = screenHeight * 0.2f * lyricsTopOffset.second.fastCoerceIn(0f, 1f)
                     val gravity = (if (lyricsTopOffset.first) Gravity.TOP else Gravity.BOTTOM) or Gravity.START
                     updateLayoutParams(gravity, Offset(0f, topOffset))
                 }
@@ -56,10 +58,10 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
                     ) { measurables, constraints ->
                         val config = app.config.lyricsEngineConfig
                         val maxWidth = constraints.maxWidth
-                        val start = (maxWidth * config.android.left.coerceIn(0f, 1f)).toInt()
-                        val end = (maxWidth * (1 - config.android.right).coerceIn(0f, 1f)).toInt()
+                        val start = (maxWidth * config.android.left.fastCoerceIn(0f, 1f)).toInt()
+                        val end = (maxWidth * (1 - config.android.right).fastCoerceIn(0f, 1f)).toInt()
 
-                        val childWidth = (maxWidth - start - end).coerceAtLeast(0)
+                        val childWidth = (maxWidth - start - end).fastCoerceAtLeast(0)
                         val placeable = measurables.firstOrNull()?.measure(constraints.copy(
                             minWidth = childWidth,
                             maxWidth = childWidth,

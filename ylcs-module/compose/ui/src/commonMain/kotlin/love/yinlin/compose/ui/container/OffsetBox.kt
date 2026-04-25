@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.zIndex
 import kotlin.math.abs
 
@@ -21,8 +22,8 @@ fun OffsetBox(
             val dx = x.roundToPx()
             val dy = y.roundToPx()
             layout(
-                width = (placeable.width - abs(dx)).coerceAtLeast(0),
-                height = (placeable.height - abs(dy)).coerceAtLeast(0)
+                width = (placeable.width - abs(dx)).fastCoerceAtLeast(0),
+                height = (placeable.height - abs(dy)).fastCoerceAtLeast(0)
             ) {
                 placeable.placeRelative(dx, dy)
             }

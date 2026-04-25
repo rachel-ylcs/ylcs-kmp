@@ -115,7 +115,13 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         val items = Coroutines.io {
             app.modPath.list().mapNotNull {
                 val configPath = File(app.modPath, it.name, ModResourceType.Config.filename)
-                catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
+                try {
+                    configPath.readText()!!.parseJsonValue<MusicInfo>()
+                }
+                catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
             }
         }
         for (item in items) library[item.id] = item
@@ -141,7 +147,11 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
                 val modification = library[id]?.modification ?: 0
                 val configPath = File(app.modPath, id, ModResourceType.Config.filename)
                 val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
-                if (info != null) library[id] = info.copy(modification = modification + 1)
+                if (info != null) {
+                    Coroutines.main {
+                        library[id] = info.copy(modification = modification + 1)
+                    }
+                }
             }
         }
     }

@@ -66,7 +66,7 @@ class RichNodeStyle @PublishedApi internal constructor(
         override fun RichParseScope.convert(list: RichList, json: JsonElement) = json.cast<JsonObject> {
             list.style(
                 fontSize = json[RichArg.FontSize.value]?.Float?.sp,
-                color = json[RichArg.Color.value]?.Int?.let { Colors(it) },
+                color = json[RichArg.Color.value]?.Int?.let(::Color),
                 bold = json[RichArg.Bold.value]?.Boolean == true,
                 italic = json[RichArg.Italic.value]?.Boolean == true,
                 underline = json[RichArg.Underline.value]?.Boolean == true,

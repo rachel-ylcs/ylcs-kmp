@@ -23,6 +23,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceAtMost
+import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -55,8 +58,8 @@ class PullState(
 
     fun calcFraction(isTop: Boolean): Float {
         val offset = dragOffset.value
-        val absOffset = (if (isTop) offset else -offset).coerceAtLeast(0f)
-        return (absOffset / maxDistance).coerceIn(0f, 1f)
+        val absOffset = (if (isTop) offset else -offset).fastCoerceAtLeast(0f)
+        return (absOffset / maxDistance).fastCoerceIn(0f, 1f)
     }
 
     fun calcLerpColor(fraction: Float, color1: Color, color2: Color) = when {
@@ -101,14 +104,14 @@ class PullState(
 
             // 如果当前处于下拉状态，但用户向上滑动，优先消耗事件来回退拖拽距离
             if (current > 0f && available.y < 0f) {
-                val newOffset = (current + available.y).coerceAtLeast(0f)
+                val newOffset = (current + available.y).fastCoerceAtLeast(0f)
                 scope.launch { dragOffset.snapTo(newOffset) }
                 return Offset(0f, newOffset - current)
             }
 
             // 如果当前处于上拉状态，但用户向下滑动，优先消耗事件来回退拖拽距离
             if (current < 0f && available.y > 0f) {
-                val newOffset = (current + available.y).coerceAtMost(0f)
+                val newOffset = (current + available.y).fastCoerceAtMost(0f)
                 scope.launch { dragOffset.snapTo(newOffset) }
                 return Offset(0f, newOffset - current)
             }
@@ -125,14 +128,14 @@ class PullState(
 
                 // 下拉刷新
                 if (available.y > 0f && canRefresh.value) {
-                    val newOffset = (current + available.y * friction).coerceAtMost(maxDistance)
+                    val newOffset = (current + available.y * friction).fastCoerceAtMost(maxDistance)
                     scope.launch { dragOffset.snapTo(newOffset) }
                     return Offset(0f, (newOffset - current) / friction)
                 }
 
                 // 上拉加载
                 if (available.y < 0f && canLoading.value) {
-                    val newOffset = (current + available.y * friction).coerceAtLeast(-maxDistance)
+                    val newOffset = (current + available.y * friction).fastCoerceAtLeast(-maxDistance)
                     scope.launch { dragOffset.snapTo(newOffset) }
                     return Offset(0f, (newOffset - current) / friction)
                 }
@@ -177,10 +180,10 @@ class PullState(
                     if (delta != 0f) {
                         // 模拟与 NestedScroll 完全一致的阻力与极值限制
                         val newOffset = when {
-                            delta > 0f && canRefresh.value && current >= 0f -> (current + delta * friction).coerceAtMost(maxDistance)
-                            delta < 0f && canLoading.value && current <= 0f -> (current + delta * friction).coerceAtLeast(-maxDistance)
-                            current > 0f && delta < 0f -> (current + delta).coerceAtLeast(0f)
-                            current < 0f && delta > 0f -> (current + delta).coerceAtMost(0f)
+                            delta > 0f && canRefresh.value && current >= 0f -> (current + delta * friction).fastCoerceAtMost(maxDistance)
+                            delta < 0f && canLoading.value && current <= 0f -> (current + delta * friction).fastCoerceAtLeast(-maxDistance)
+                            current > 0f && delta < 0f -> (current + delta).fastCoerceAtLeast(0f)
+                            current < 0f && delta > 0f -> (current + delta).fastCoerceAtMost(0f)
                             else -> null
                         }
 

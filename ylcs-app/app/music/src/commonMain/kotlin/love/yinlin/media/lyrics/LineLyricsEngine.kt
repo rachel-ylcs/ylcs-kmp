@@ -6,11 +6,10 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
-import love.yinlin.compose.Colors
-import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.text.FastCenterText
@@ -42,7 +41,7 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
     @Composable
     override fun LineItem(item: StaticLine, config: LyricsEngineConfig, isCurrent: Boolean, measurer: TextMeasurer) {
         val color by animateColorAsState(
-            targetValue = if (isCurrent) Colors(config.textColor) else Colors(config.textBackgroundColor),
+            targetValue = if (isCurrent) Color(config.textColor) else Color(config.textBackgroundColor),
             animationSpec = tween(durationMillis = Theme.animation.duration.v3)
         )
         val normalStyle = Theme.typography.v6
@@ -67,8 +66,8 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
             layoutAction = { layout(measurer, "T", textStyle.copy(fontSize = textStyle.fontSize * config.textSize)) },
             drawAction = {
                 draw(measure(measurer, lines?.getOrNull(currentIndex)?.text ?: "", textStyle.copy(fontSize = textStyle.fontSize * config.textSize))) {
-                    drawBackground(it, Colors(config.backgroundColor))
-                    drawText(it, Colors(config.textColor))
+                    drawBackground(it, Color(config.backgroundColor))
+                    drawText(it, Color(config.textColor))
                 }
             },
             modifier = Modifier.fillMaxWidth()

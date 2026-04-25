@@ -32,6 +32,9 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceIn
+import androidx.compose.ui.util.fastRoundToInt
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -44,7 +47,6 @@ import love.yinlin.compose.ui.layout.require
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.fastAnimateOffsetX
 import love.yinlin.compose.ui.node.fastAnimateOffsetY
-import kotlin.math.roundToInt
 
 @Stable
 abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
@@ -111,7 +113,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
             private set
 
         fun updateDelta(delta: Float) {
-            offset = (offset + delta).roundToInt().coerceAtLeast(0)
+            offset = (offset + delta).fastRoundToInt().fastCoerceAtLeast(0)
         }
 
         fun stop() {
@@ -182,8 +184,8 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
                 }
             }) { measurables, constraints ->
                 val parentHeight = constraints.maxHeight
-                val safeMaxRatio = maxPortraitRatio.coerceIn(0.1f, 1f)
-                val safeMinRatio = minPortraitRatio.coerceIn(0.1f, maxPortraitRatio)
+                val safeMaxRatio = maxPortraitRatio.fastCoerceIn(0.1f, 1f)
+                val safeMinRatio = minPortraitRatio.fastCoerceIn(0.1f, maxPortraitRatio)
                 val minHeight = (parentHeight * safeMinRatio).toInt()
                 val maxHeight = (parentHeight * safeMaxRatio).toInt()
                 val maxWidth = constraints.maxWidth

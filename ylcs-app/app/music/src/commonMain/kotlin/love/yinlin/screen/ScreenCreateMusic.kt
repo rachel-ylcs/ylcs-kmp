@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.fastJoinToString
 import love.yinlin.app
 import love.yinlin.compose.LocalImmersivePadding
@@ -94,7 +95,7 @@ class ScreenCreateMusic : Screen() {
         // 假定歌词至少有 5 行
         require(items.size > 5) { "歌词至少包含 5 行" }
         var currentTime = 1000L // 从第一秒开始
-        val step = (60000L / items.size).coerceAtLeast(100L) // 假定歌曲为 1 分钟
+        val step = (60000L / items.size).fastCoerceAtLeast(100L) // 假定歌曲为 1 分钟
         val newLyrics = items.fastJoinToString("\n") { text ->
             currentTime += step
             "[${currentTime.timeString}.00]$text"

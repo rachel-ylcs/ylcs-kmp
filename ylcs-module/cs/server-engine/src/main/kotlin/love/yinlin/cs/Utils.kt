@@ -1,12 +1,9 @@
 package love.yinlin.cs
 
-import love.yinlin.extension.catchingDefault
 import java.io.File
 import java.net.JarURLConnection
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import java.security.MessageDigest
 import java.sql.Timestamp
 
 internal fun copyResources(classLoader: ClassLoader, root: String) {
@@ -39,19 +36,6 @@ internal fun copyResources(classLoader: ClassLoader, root: String) {
         }
     }
     else copyResourcesFromFile(File(publicResourceUrl.toURI()), targetFile)
-}
-
-// TODO: 考虑后面把md5换成纯kotlin实现的 -> love.yinlin.crypto.MD5
-val String.md5: String get() = catchingDefault("") {
-    val md = MessageDigest.getInstance("MD5")
-    md.update(this.toByteArray(StandardCharsets.UTF_8))
-    val hexString = StringBuilder()
-    for (b in md.digest()) {
-        val hex = Integer.toHexString(0xff and b.toInt())
-        if (hex.length == 1) hexString.append('0')
-        hexString.append(hex)
-    }
-    hexString.toString()
 }
 
 val currentTS: Timestamp get() = Timestamp(System.currentTimeMillis())

@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
-        libs.plugins.androidLibraryNew,
         libs.plugins.kotlinSerialization,
+        libs.plugins.androidLibraryNew,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
     )

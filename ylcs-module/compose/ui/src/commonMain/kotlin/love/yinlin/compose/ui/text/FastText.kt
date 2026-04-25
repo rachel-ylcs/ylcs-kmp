@@ -19,6 +19,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.util.fastCoerceAtLeast
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
 
@@ -68,7 +69,7 @@ data class FastTextDrawScope(private val constraints: Constraints, @PublishedApi
         FastTextResult(measurer.measure(text = text, style = style, constraints = constraints, maxLines = 1))
 
     inline fun draw(result: FastTextResult, drawBlock: DrawScope.(FastTextResult) -> Unit) = scope.withTransform({
-        translate((scope.size.width - result.width).coerceAtLeast(0f) / 2, 0f)
+        translate((scope.size.width - result.width).fastCoerceAtLeast(0f) / 2, 0f)
         clipRect(0f, 0f, result.width, result.height)
     }) {
         drawBlock(result)

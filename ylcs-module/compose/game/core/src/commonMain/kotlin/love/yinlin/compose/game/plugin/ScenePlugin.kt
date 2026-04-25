@@ -9,7 +9,6 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastForEach
@@ -30,32 +29,23 @@ import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Entity
 import love.yinlin.compose.game.traits.Layer
-import kotlin.uuid.ExperimentalUuidApi
 
 @Stable
 class ScenePlugin private constructor(
-    private val fpsRate: Long,
     cameraConfig: Camera.Config,
     override val extraModifier: Modifier,
     engine: Engine
 ) : Plugin(engine) {
     /**
-     * @param fpsRate FPS统计频率(毫秒)，为0表示禁用
+     * @param cameraConfig 相机配置
      */
     @Stable
     class Factory(
-        val fpsRate: Long = 1000L,
         val cameraConfig: Camera.Config = Camera.Config(),
         val extraModifier: Modifier = Modifier,
     ) : PluginFactory {
-        override fun build(engine: Engine): Plugin = ScenePlugin(fpsRate, cameraConfig, extraModifier, engine)
+        override fun build(engine: Engine): Plugin = ScenePlugin(cameraConfig, extraModifier, engine)
     }
-
-    /**
-     * FPS
-     */
-    var fps: Int by mutableIntStateOf(0)
-        private set
 
     // 相机
     val camera = Camera(cameraConfig)
@@ -72,10 +62,6 @@ class ScenePlugin private constructor(
     private val layerEntities by derivedStateOf {
         entities.fastMapNotNull { it as? Layer }.sortedBy(Layer::layerOrder)
     }
-
-    val isEmpty: Boolean get() = entities.isEmpty()
-    val isNotEmpty: Boolean get() = entities.isNotEmpty()
-    val entityCount: Int get() = entities.size
 
     operator fun plusAssign(entity: Entity) {
         entities += entity
@@ -141,10 +127,11 @@ class ScenePlugin private constructor(
                             for (index in layerEntities.indices.reversed()) {
                                 val layer = layerEntities[index]
                                 if (layer.interactive) { // 可交互的层
+                                    val isAbsolute = layer.layerType == LayerType.Absolute
                                     // 根据层类型转换坐标
-                                    val transformPosition = camera.transformPointer(layer.layerType == LayerType.Absolute, position, eventSize)
+                                    val transformPosition = camera.transformPointer(isAbsolute, position, eventSize)
                                     // 构造受击检测
-                                    val (visible, arg) = layer.hitTestVisibleLayer(transformPosition) ?: continue
+                                    val (visible, arg) = layer.hitTestVisibleLayer(isAbsolute, transformPosition) ?: continue
                                     // 消费完成
                                     val event = Event.Pointer.Down(id, transformPosition, layer, visible, arg)
                                     pointerMap[id] = event
@@ -194,23 +181,12 @@ class ScenePlugin private constructor(
     // 游戏循环
     private suspend fun CoroutineScope.engineLoop() {
         var lastTime = withFrameMillis { it }
-        var frameCount = 0L
-        var lastFpsTime = lastTime
 
         while (isActive) {
             withFrameMillis { frameTime ->
                 // 更新引擎刻
                 val deltaTime = (frameTime - lastTime).toInt()
                 lastTime = frameTime
-
-                // 每秒更新一次 FPS
-                val deltaFPSTime = frameTime - lastFpsTime
-                if (fpsRate in 1 ..< deltaFPSTime) {
-                    fps = if (frameCount == 0L) 0 else (frameCount * 1000 / deltaFPSTime).toInt()
-                    lastFpsTime = frameTime
-                    frameCount = 0L
-                }
-                ++frameCount
 
                 // 处理事件
                 while (true) {
@@ -260,7 +236,6 @@ class ScenePlugin private constructor(
         }.pointerInput(Unit) { // 指针事件监听
             pointerInputLoop()
         }) {
-            val density = LocalDensity.current
             val fontFamilyResolver = LocalFontFamilyResolver.current
             // 字体转接器
             val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
@@ -268,19 +243,15 @@ class ScenePlugin private constructor(
             val assetProvider = remember { engine.pluginOrNull<AssetPlugin>()?.assetProvider ?: AssetProvider.Default }
 
             layerEntities.fastForEach { layer ->
-                @OptIn(ExperimentalUuidApi::class)
                 key(layer.id) {
                     val drawer = remember {
-                        Drawer(
-                            density = density,
+                        val initialDrawer = Drawer(
                             fontFamilyResolver = fontFamilyResolver,
                             fontProvider = fontProvider,
                             assetProvider = assetProvider
                         )
-                    }
-
-                    LaunchedEffect(Unit) {
-                        with(layer) { drawer.preInitialDraw() }
+                        with(layer) { initialDrawer.preInitialDraw() }
+                        initialDrawer
                     }
 
                     Box(modifier = Modifier.fillMaxSize().graphicsLayer {

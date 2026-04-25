@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.Theme
 
 @Composable
@@ -23,10 +24,10 @@ fun LinearProgress(
 
     Layout(modifier = modifier.clip(shape = shape).drawWithContent {
         drawRect(color = trackColor)
-        drawRect(color = activeColor, size = Size(width = size.width * value.coerceIn(0f, 1f), height = size.height))
+        drawRect(color = activeColor, size = Size(width = size.width * value.fastCoerceIn(0f, 1f), height = size.height))
     }) { _, constraints ->
-        val width = if (constraints.hasFixedWidth) constraints.maxWidth else minWidth.toPx().toInt().coerceIn(constraints.minWidth, constraints.maxWidth)
-        val height = if (constraints.hasFixedHeight) constraints.maxHeight else minHeight.toPx().toInt().coerceIn(constraints.minHeight, constraints.maxHeight)
+        val width = if (constraints.hasFixedWidth) constraints.maxWidth else minWidth.toPx().toInt().fastCoerceIn(constraints.minWidth, constraints.maxWidth)
+        val height = if (constraints.hasFixedHeight) constraints.maxHeight else minHeight.toPx().toInt().fastCoerceIn(constraints.minHeight, constraints.maxHeight)
 
         layout(width, height) { }
     }

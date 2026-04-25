@@ -358,6 +358,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                         jvmArgs += desktopJvmArgs
                         jvmArgs += "--enable-native-access=ALL-UNNAMED"
+                        jvmArgs += "-XX:+UseCompactObjectHeaders"
 
                         buildTypes {
                             release {

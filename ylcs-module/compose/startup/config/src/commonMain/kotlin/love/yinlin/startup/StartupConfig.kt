@@ -5,7 +5,6 @@ import kotlinx.serialization.serializer
 import love.yinlin.compose.config.CacheState
 import love.yinlin.compose.config.ListState
 import love.yinlin.compose.config.MapState
-import love.yinlin.compose.config.Patches
 import love.yinlin.compose.config.ValueState
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
@@ -17,34 +16,17 @@ import love.yinlin.foundation.SyncStartup
 import love.yinlin.foundation.SyncStartupFactory
 
 @Stable
-open class StartupConfig(
-    pool: StartupPool,
-    version: Int,
-    patches: Patches
-) : SyncStartup(pool) {
+open class StartupConfig(pool: StartupPool) : SyncStartup(pool) {
     companion object {
-        inline fun <reified S : StartupConfig> custom(
-            version: Int,
-            patches: Patches,
-            crossinline factory: (StartupPool, Int, Patches) -> S
-        ): StartupFactory<S> = object : SyncStartupFactory<S>() {
+        inline fun <reified S : StartupConfig> custom(crossinline factory: (StartupPool) -> S): StartupFactory<S> = object : SyncStartupFactory<S>() {
             override val id: String = StartupID<S>()
             override val dependencies: List<String> = listOf(StartupID<StartupKV>())
-            override fun build(pool: StartupPool): S = factory(pool, version, patches)
+            override fun build(pool: StartupPool): S = factory(pool)
         }
     }
 
     @PublishedApi
     internal val kv: StartupKV = pool.requireClass()
-
-    init {
-        for (patch in patches) {
-            val key = "#patch#${patch.name}"
-            if (!kv.get(key, false) && (patch.version == null || patch.version >= version) && patch.enabled) {
-                if (patch.attach()) kv.set(key, true)
-            }
-        }
-    }
 
     inline fun <reified T : Enum<T>> enumState(
         default: T,

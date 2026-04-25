@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.util.fastCoerceAtMost
 import androidx.compose.ui.zIndex
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.AsyncImageState
@@ -89,7 +90,7 @@ internal class WebImageIndicator(
     override fun DrawScope.drawProgress(drawProgress: Float) {
         val widthRadius = size.width / 2f
         val heightRadius = size.height / 2f
-        val radius = widthRadius.coerceAtMost(heightRadius)
+        val radius = widthRadius.fastCoerceAtMost(heightRadius)
         val center = Offset(widthRadius, heightRadius)
         val ringWidth = (indicatorSize * 0.1f).toPx()
         drawImage(

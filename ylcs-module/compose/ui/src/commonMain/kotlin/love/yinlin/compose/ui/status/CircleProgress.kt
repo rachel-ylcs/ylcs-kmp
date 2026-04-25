@@ -9,8 +9,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.util.fastCoerceIn
 import love.yinlin.compose.Theme
-import kotlin.math.min
 
 @Composable
 fun CircleProgress(
@@ -22,7 +22,7 @@ fun CircleProgress(
     val minRadius = Theme.size.input7
 
     Layout(modifier = modifier.drawWithContent {
-        val minEdge = min(size.width, size.height)
+        val minEdge = minOf(size.width, size.height)
         val radius = minEdge / 2
         val actualStrokeWidth = radius / 4
 
@@ -41,7 +41,7 @@ fun CircleProgress(
         drawArc(
             color = activeColor,
             startAngle = -90f,
-            sweepAngle = value.coerceIn(0f, 1f) * 360,
+            sweepAngle = value.fastCoerceIn(0f, 1f) * 360f,
             useCenter = false,
             topLeft = topLeft,
             size = arcSize,
@@ -49,9 +49,9 @@ fun CircleProgress(
         )
     }) { _, constraints ->
         val minRadiusPx = minRadius.toPx().toInt()
-        val width = if (constraints.hasFixedWidth) constraints.maxWidth else minRadiusPx.coerceIn(constraints.minWidth, constraints.maxWidth)
-        val height = if (constraints.hasFixedHeight) constraints.maxHeight else minRadiusPx.coerceIn(constraints.minHeight, constraints.maxHeight)
-        val radius = min(width, height)
+        val width = if (constraints.hasFixedWidth) constraints.maxWidth else minRadiusPx.fastCoerceIn(constraints.minWidth, constraints.maxWidth)
+        val height = if (constraints.hasFixedHeight) constraints.maxHeight else minRadiusPx.fastCoerceIn(constraints.minHeight, constraints.maxHeight)
+        val radius = minOf(width, height)
 
         layout(radius, radius) {}
     }

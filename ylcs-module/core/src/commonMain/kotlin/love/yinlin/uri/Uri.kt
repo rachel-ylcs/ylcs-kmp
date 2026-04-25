@@ -60,7 +60,7 @@ data class Uri(
                 catchingError {
                     builder.append(decodeToStringAndReset())
                 }?.let {
-                    builder.append('\ufffd')
+                    builder.append('\uFFFD')
                 }
             }
         }
@@ -156,7 +156,7 @@ data class Uri(
                             for (_ in 0..1) {
                                 if (i >= length) {
                                     flushDecodingByteAccumulator(builder)
-                                    builder.append('\ufffd')
+                                    builder.append('\uFFFD')
                                     return builder.toString()
                                 }
                                 val newDigit: Int = when (val nextC = str[i++]) {
@@ -167,7 +167,7 @@ data class Uri(
                                 }
                                 if (newDigit < 0) {
                                     flushDecodingByteAccumulator(builder)
-                                    builder.append('\ufffd')
+                                    builder.append('\uFFFD')
                                     break
                                 }
                                 hexValue = (hexValue * 0x10 + newDigit).toByte()

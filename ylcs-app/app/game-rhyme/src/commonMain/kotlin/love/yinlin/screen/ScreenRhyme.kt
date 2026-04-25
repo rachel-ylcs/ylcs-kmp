@@ -78,7 +78,6 @@ class ScreenRhyme : BasicScreen() {
         ),
         AssetPlugin.Factory(),
         ScenePlugin.Factory(
-            fpsRate = 0L,
             cameraConfig = Camera.Config(),
             extraModifier = Modifier.blurSource(blurState)
         ),
@@ -96,6 +95,7 @@ class ScreenRhyme : BasicScreen() {
     private val library = mutableListOf<MusicInfo>()
 
     private fun startGame(info: MusicInfo, playConfig: RhymePlayConfig) {
+        if (engine.isRunning) return
         launch {
             catchingError {
                 val modPath = app.modPath
@@ -154,6 +154,7 @@ class ScreenRhyme : BasicScreen() {
     override fun onBack() {
         when (gameState) {
             is RhymeState.Start -> super.onBack()
+            is RhymeState.Prepare -> gameState = RhymeState.MusicLibrary
             is RhymeState.Playing -> engine.isRunning = false
             else -> gameState = RhymeState.Start
         }
@@ -273,7 +274,9 @@ class ScreenRhyme : BasicScreen() {
             ) {
                 SimpleClipText(text = "准备", style = Theme.typography.v4.bold, modifier = Modifier.padding(Theme.padding.value7))
                 ActionScope.Right.Container(modifier = Modifier.weight(1f).padding(Theme.padding.value9)) {
-                    Icon(icon = Icons.ArrowBack, tip = "返回", onClick = ::onBack)
+                    Icon(icon = Icons.ArrowBack, tip = "返回", onClick = {
+                        gameState = RhymeState.MusicLibrary
+                    })
                     Icon(icon = Icons.PlayArrow, tip = "开始", onClick = {
                         startGame(info, RhymePlayConfig(
                             difficulty = difficulty,
@@ -326,11 +329,12 @@ class ScreenRhyme : BasicScreen() {
                     is RhymeState.Start -> GameStartLayout()
                     is RhymeState.MusicLibrary -> GameMusicLibraryLayout()
                     is RhymeState.Prepare -> GamePrepareLayout(state.info)
-                    is RhymeState.Playing -> engine.ViewportContent(modifier = Modifier.fillMaxSize())
+                    is RhymeState.Playing -> engine.ViewportContent(modifier = Modifier.fillMaxSize(), padding = LocalImmersivePadding.current)
                     is RhymeState.Settling -> GameSettlingLayout()
                     is RhymeState.Rank -> GameRankLayout()
                 }
             }
         }
+        engine.PreloadEnvironment()
     }
 }

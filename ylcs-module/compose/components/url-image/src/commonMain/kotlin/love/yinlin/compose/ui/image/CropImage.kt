@@ -21,6 +21,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceAtMost
 import com.github.panpf.sketch.size
 import love.yinlin.compose.Colors
 import love.yinlin.compose.data.CropRegion
@@ -28,8 +30,6 @@ import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberRefNull
 import love.yinlin.compose.extension.translate
-import kotlin.math.max
-import kotlin.math.min
 
 @Stable
 private sealed interface TouchRegion {
@@ -212,17 +212,17 @@ fun CropImage(
                             state.frameRect.run {
                                 if (aspectRatio == 0f) {
                                     val newLeft = (left + dragAmount.x)
-                                        .coerceAtLeast(imageRect.left)
-                                        .coerceAtMost(right - minimumVertexDistance)
+                                        .fastCoerceAtLeast(imageRect.left)
+                                        .fastCoerceAtMost(right - minimumVertexDistance)
                                     val newTop = (top + dragAmount.y)
-                                        .coerceAtLeast(imageRect.top)
-                                        .coerceAtMost(bottom - minimumVertexDistance)
+                                        .fastCoerceAtLeast(imageRect.top)
+                                        .fastCoerceAtMost(bottom - minimumVertexDistance)
                                     val newRight = (right + dragAmount.x)
-                                        .coerceAtMost(imageRect.right)
-                                        .coerceAtLeast(left + minimumVertexDistance)
+                                        .fastCoerceAtMost(imageRect.right)
+                                        .fastCoerceAtLeast(left + minimumVertexDistance)
                                     val newBottom = (bottom + dragAmount.y)
-                                        .coerceAtMost(imageRect.bottom)
-                                        .coerceAtLeast(top + minimumVertexDistance)
+                                        .fastCoerceAtMost(imageRect.bottom)
+                                        .fastCoerceAtLeast(top + minimumVertexDistance)
                                     when (it) {
                                         TouchRegion.Vertex.TOP_LEFT -> Rect(newLeft, newTop, right, bottom)
                                         TouchRegion.Vertex.TOP_RIGHT -> Rect(left, newTop, newRight, bottom)
@@ -238,38 +238,38 @@ fun CropImage(
                                     when (it) {
                                         TouchRegion.Vertex.TOP_LEFT -> {
                                             val rLeft = (left + dragAmount.x)
-                                                .coerceAtLeast(imageRect.left)
-                                                .coerceAtMost(right - minimumVertexDistance)
+                                                .fastCoerceAtLeast(imageRect.left)
+                                                .fastCoerceAtMost(right - minimumVertexDistance)
                                             val rTop = (a * rLeft + b)
-                                                .coerceAtLeast(imageRect.top)
-                                                .coerceAtMost(bottom - minimumVertexDistance)
+                                                .fastCoerceAtLeast(imageRect.top)
+                                                .fastCoerceAtMost(bottom - minimumVertexDistance)
                                             copy(left = (rTop - b) / a, top = rTop)
                                         }
                                         TouchRegion.Vertex.TOP_RIGHT -> {
                                             val rRight = (right + dragAmount.x)
-                                                .coerceAtMost(imageRect.right)
-                                                .coerceAtLeast(left + minimumVertexDistance)
+                                                .fastCoerceAtMost(imageRect.right)
+                                                .fastCoerceAtLeast(left + minimumVertexDistance)
                                             val rTop = (a * rRight + b)
-                                                .coerceAtLeast(imageRect.top)
-                                                .coerceAtMost(bottom - minimumVertexDistance)
+                                                .fastCoerceAtLeast(imageRect.top)
+                                                .fastCoerceAtMost(bottom - minimumVertexDistance)
                                             copy(right = (rTop - b) / a, top = rTop)
                                         }
                                         TouchRegion.Vertex.BOTTOM_LEFT -> {
                                             val rLeft = (left + dragAmount.x)
-                                                .coerceAtLeast(imageRect.left)
-                                                .coerceAtMost(right - minimumVertexDistance)
+                                                .fastCoerceAtLeast(imageRect.left)
+                                                .fastCoerceAtMost(right - minimumVertexDistance)
                                             val rBottom = (a * rLeft + b)
-                                                .coerceAtMost(imageRect.bottom)
-                                                .coerceAtLeast(top + minimumVertexDistance)
+                                                .fastCoerceAtMost(imageRect.bottom)
+                                                .fastCoerceAtLeast(top + minimumVertexDistance)
                                             copy(left = (rBottom - b) / a, bottom = rBottom)
                                         }
                                         TouchRegion.Vertex.BOTTOM_RIGHT -> {
                                             val rRight = (right + dragAmount.x)
-                                                .coerceAtMost(imageRect.right)
-                                                .coerceAtLeast(left + minimumVertexDistance)
+                                                .fastCoerceAtMost(imageRect.right)
+                                                .fastCoerceAtLeast(left + minimumVertexDistance)
                                             val rBottom = (a * rRight + b)
-                                                .coerceAtMost(imageRect.bottom)
-                                                .coerceAtLeast(top + minimumVertexDistance)
+                                                .fastCoerceAtMost(imageRect.bottom)
+                                                .fastCoerceAtLeast(top + minimumVertexDistance)
                                             copy(right = (rBottom - b) / a, bottom = rBottom)
                                         }
                                     }
@@ -310,7 +310,7 @@ fun CropImage(
                     Size(imageRect.width * 0.8f, imageRect.height * 0.8f)
                 }
                 else {
-                    val scale = min(imageRect.width, imageRect.height) / max(imageRect.width, imageRect.width / aspectRatio)
+                    val scale = minOf(imageRect.width, imageRect.height) / maxOf(imageRect.width, imageRect.width / aspectRatio)
                     Size(imageRect.width * scale * 0.8f, imageRect.width * scale / aspectRatio * 0.8f)
                 }
                 state.frameRect = Rect(

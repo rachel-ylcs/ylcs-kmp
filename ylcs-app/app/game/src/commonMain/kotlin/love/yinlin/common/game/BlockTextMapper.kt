@@ -50,7 +50,6 @@ import love.yinlin.extension.json
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import kotlin.jvm.JvmInline
-import kotlin.math.min
 import kotlin.math.sqrt
 
 @Stable
@@ -150,7 +149,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
                                     onStringSelectedUpdate()?.let { newString ->
                                         // 确定当前索引的位置
                                         val startIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index % blockSize else index / blockSize
-                                        repeat(min(blockSize - startIndex, newString.length)) {
+                                        repeat(minOf(blockSize - startIndex, newString.length)) {
                                             val actualIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index + it else index + it * blockSize
                                             data[actualIndex].decode { currentCharacter, currentHide ->
                                                 // 防止将不可重写的格子重写

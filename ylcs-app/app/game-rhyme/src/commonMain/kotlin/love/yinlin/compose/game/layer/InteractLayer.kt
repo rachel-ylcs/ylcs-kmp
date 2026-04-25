@@ -7,6 +7,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.util.fastCoerceAtLeast
+import androidx.compose.ui.util.fastCoerceAtMost
+import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.extension.scale
 import love.yinlin.compose.extension.translate
@@ -22,8 +25,8 @@ import love.yinlin.compose.game.visible.Block
 
 // 交互层
 @Stable
-class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
-    internal class InteractInfo(index: Int) {
+class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
+    class InteractInfo(index: Int) {
         companion object {
             const val INDICATOR_RADIUS = 10f
             const val BRUSH_RADIUS = 150f
@@ -41,14 +44,14 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
         var currentProgress: Float = 0f
         var targetProgress: Float = 0f
 
-        var currentEventId: Long? = null
+        private val baseScale: Float get() = mRect.maxDimension / BRUSH_RADIUS * 1.25f
 
         fun Drawer.drawInteract() {
             // 画指示圈
             if (currentProgress > 0f) {
                 transform({
                     translate(mRect.center)
-                    scale(mRect.maxDimension / BRUSH_RADIUS * currentProgress, Offset.Zero)
+                    scale(baseScale * currentProgress, Offset.Zero)
                 }) {
                     circle(brush, Offset.Zero, BRUSH_RADIUS)
                 }
@@ -61,7 +64,7 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
     }
 
     private val infos = Array(8) { InteractInfo(it) }
-    val interactStatus = Array(8) { InteractStatus.None }
+    @PublishedApi internal val statusList = MutableList<InteractStatus?>(8) { null }
 
     // 三等分宽度
     val w0 = 0f
@@ -108,25 +111,36 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
         object : PointerEventListener() {
             override fun onPointerDown(event: Event.Pointer.Down) {
                 val index = event.arg as? Int ?: return
-                val info = infos[index]
-                if (info.currentEventId == null) {
-                    interactStatus[index] = InteractStatus.Down
-                    info.currentEventId = event.id
-                    info.targetProgress = 1f
-                }
+                val info = infos.getOrNull(index) ?: return
+                if (statusList[index] != null) return // 轨道已经按下
+                statusList[index] = InteractStatus.Down(event.id)
+                info.targetProgress = 1f
             }
 
             override fun onPointerUp(event: Event.Pointer.Up) {
                 val index = event.arg as? Int ?: return
-                val info = infos[index]
-                if (info.currentEventId == event.id) {
-                    interactStatus[index] = InteractStatus.Up
-                    info.currentEventId = null
-                    info.targetProgress = 0f
-                }
+                val info = infos.getOrNull(index) ?: return
+                val status = statusList[index] as? InteractStatus.AwaitUp ?: return // 不是等待抬起状态
+                if (status.id != event.id) return // ID不一致
+                statusList[index] = InteractStatus.Up(event.id)
+                info.targetProgress = 0f
             }
         }
     )
+
+    inline fun withInteractInfo(block: (List<InteractStatus?>) -> Unit) {
+        // 消费指针状态
+        block(statusList)
+        // 重置当前所有指针状态
+        statusList.fastForEachIndexed { index, status ->
+            when (status) {
+                null -> { }
+                is InteractStatus.Down -> statusList[index] = InteractStatus.AwaitUp(status.id)
+                is InteractStatus.Up -> statusList[index] = null
+                else -> { } // AwaitUp 不处理
+            }
+        }
+    }
 
     override fun preUpdate(tick: Int) {
         var isDirty = false
@@ -136,7 +150,7 @@ class InteractLayer : Layer(layerOrder = 2, layerType = LayerType.Absolute) {
             val tp = info.targetProgress
             if (cp == tp) continue
             val step = tick / InteractInfo.BRUSH_DURATION
-            info.currentProgress = if (cp < tp) (cp + step).coerceAtMost(tp) else (cp - step).coerceAtLeast(tp)
+            info.currentProgress = if (cp < tp) (cp + step).fastCoerceAtMost(tp) else (cp - step).fastCoerceAtLeast(tp)
             isDirty = true
         }
         if (isDirty) updateDirty()

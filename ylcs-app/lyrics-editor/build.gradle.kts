@@ -4,9 +4,9 @@ import java.util.Properties
 
 plugins {
     install(
+        libs.plugins.kotlinSerialization,
         libs.plugins.androidApplication,
         libs.plugins.composeCompiler,
-        libs.plugins.kotlinSerialization,
     )
 }
 

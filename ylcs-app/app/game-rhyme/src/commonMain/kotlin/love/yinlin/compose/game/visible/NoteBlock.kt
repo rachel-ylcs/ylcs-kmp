@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.util.fastCoerceAtLeast
 import love.yinlin.compose.Colors
 import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.game.common.BlockLine
@@ -33,91 +34,94 @@ class NoteBlock(
         val missStart: Int
     ) : BlockTime
 
-    interface Status : BlockStatus {
-        class Prepare : Status, BlockStatus.Prepare {
-            var progress: Float = 0f
-        }
+    sealed interface Status : BlockStatus {
+        class Prepare : Status, BlockStatus.Prepare()
         class Interact : Status, BlockStatus.Interact {
             var progress: Float = 0f
             var result: BlockResult = BlockResult.PERFECT
         }
-        class Release(val lastProgress: Float, val result: BlockResult) : Status, BlockStatus.Release {
+        class Release(val lastProgress: Float, val result: BlockResult) : Status, BlockStatus.Release() {
             override val duration: Int = 500
-            override var progress: Float = 0f
-            override var tick: Int = 0
         }
-        class Missing : Status, BlockStatus.Missing {
+        class Missing(val lastProgress: Float) : Status, BlockStatus.Missing() {
             override val duration: Int = 750
-            override var progress: Float = 0f
-            override var tick: Int = 0
         }
         class Done(val isMissing: Boolean, val result: BlockResult) : Status, BlockStatus.Done
     }
 
+    sealed interface InteractTarget {
+        data object None : InteractTarget
+        data object Multiple : InteractTarget
+        data class Single(val index: Int) : InteractTarget
+    }
+
     companion object {
-        private val PrepareDurationMap = mapOf(
-            RhymeDifficulty.Easy to 2500,
-            RhymeDifficulty.Medium to 2000,
-            RhymeDifficulty.Hard to 1500,
-            RhymeDifficulty.Extreme to 1000
-        )
+        //   PERFECT  ->  GOOD  ->   BAD  ->  MISS
+        // 0         0.4        0.7        1
+        private const val PERFECT_RANGE = 0.4f
+        private const val GOOD_RANGE = 0.7f
 
         fun buildTime(difficulty: RhymeDifficulty, start: Long): Time {
             val prepare = PrepareDurationMap[difficulty]!!
             val interactDuration = prepare / 2
-            val perfectDuration = (interactDuration * BlockResult.GOOD.ratio).toInt()
             return Time(
-                appearance = start - prepare - perfectDuration / 2,
+                appearance = start - prepare - PRESS_TOLERANCE,
                 perfectStart = prepare,
-                goodStart = prepare + perfectDuration,
-                badStart = prepare + (interactDuration * BlockResult.BAD.ratio).toInt(),
+                goodStart = prepare + (interactDuration * PERFECT_RANGE).toInt(),
+                badStart = prepare + (interactDuration * GOOD_RANGE).toInt(),
                 missStart = prepare + interactDuration
             )
         }
 
-        val TextColor: Color = Colors.Ghost
-        val MissingColor: Color = Colors.Gray6
+        private const val INNER_SCALE_BLOCK_ALPHA = 0.5f
     }
 
-    private val scaleIndex: Int = (rhymeAction.scale - 1) % 7 + 1
-    private val scaleLevel: Int = (rhymeAction.scale - 1) / 7
+    private val rawNoteScale = rhymeAction.scale.toInt()
+    private val scaleIndex: Int = (rawNoteScale - 1) % 7 + 1
+    private val scaleLevel: Int = (rawNoteScale - 1) / 7
     private val mainColor: Color = ScaleColorList[scaleIndex]
+
+    override val colorList: List<Color> = listOf(mainColor)
 
     override fun prepareStatus(): Status = Status.Prepare()
 
-    override fun onInteract(interactStatus: Array<InteractStatus>, currentStatus: BlockStatus.Interact) {
+    override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
         if (currentStatus !is Status.Interact) return
+        // 单击交互只关心按下时刻
+        var target: InteractTarget = InteractTarget.None
         for (i in 0 .. 7) {
-            // 单击交互只关心按下时刻
-            if (interactStatus[i] == InteractStatus.Down) {
-                // 检查按键是否匹配
-                val result = if (i == scaleIndex) currentStatus.result else BlockResult.MISS
-                blockStatus = if (i == scaleIndex) Status.Release(currentStatus.progress, result) else Status.Missing()
-                fromMapLayer?.updateResult(result)
-                break
-            }
+            if (interactStatusList[i] !is InteractStatus.Down) continue
+            // 不存在按下的则标记此轨道按下, 存在按下的则保持多指按下
+            target = if (target == InteractTarget.None) InteractTarget.Single(i) else InteractTarget.Multiple
         }
+        // 确定评级结果
+        val result = when (val interactTarget = target) {
+            is InteractTarget.None -> null // 未按下无事发生
+            is InteractTarget.Multiple -> BlockResult.MISS // 多指按下以MISS结算
+            is InteractTarget.Single -> if (interactTarget.index == scaleIndex) currentStatus.result else BlockResult.MISS // 其他则检查音阶匹配
+        } ?: return
+        // 处理评级结果
+        val lastProgress = currentStatus.progress
+        blockStatus = if (result == BlockResult.MISS) Status.Missing(lastProgress) else Status.Release(lastProgress, result)
+        fromMapLayer?.updateResult(result)
     }
 
     override fun onUpdate(tick: Int) {
         withMapLayer { mapLayer, audioTick -> // 使用音轨刻
             when (val status = blockStatus) {
                 null -> return@withMapLayer false // 未出现不处理
-                is Status.Prepare -> {
-                    if (audioTick >= time.perfectStart) blockStatus = Status.Interact()
-                    else status.progress = (audioTick / time.perfectStart.toFloat()).coerceIn(0f, 1f)
-                }
+                is Status.Prepare -> updateCustomPrepare(status, audioTick, time.perfectStart, Status::Interact)
                 is Status.Interact -> {
-                    val progress = ((audioTick - time.perfectStart) / (time.missStart - time.perfectStart).toFloat()).coerceAtLeast(0f)
+                    val progress = ((audioTick - time.perfectStart) / (time.missStart - time.perfectStart).toFloat()).fastCoerceAtLeast(0f)
                     status.progress = progress
                     status.result = when {
-                        progress >= BlockResult.MISS.ratio -> { // 错过
-                            blockStatus = Status.Missing()
+                        progress >= 1f -> { // 错过
+                            blockStatus = Status.Missing(1f)
                             mapLayer.updateResult(BlockResult.MISS) // 提交分数
                             BlockResult.MISS
                         }
-                        progress >= BlockResult.BAD.ratio -> BlockResult.BAD
-                        progress >= BlockResult.GOOD.ratio -> BlockResult.GOOD
+                        progress >= GOOD_RANGE -> BlockResult.BAD
+                        progress >= PERFECT_RANGE -> BlockResult.GOOD
                         else -> BlockResult.PERFECT
                     }
                 }
@@ -129,6 +133,41 @@ class NoteBlock(
         }
     }
 
+    // 画四角准备框
+    private fun Drawer.drawPrepareBorder(color: Color, progress: Float) {
+        val delta = progress * DEFAULT_RADIUS
+        val deltaInv = DEFAULT_DIMENSION - delta
+        line(color, TopLeft, Offset(delta, 0f), style = PrepareStroke)
+        line(color, TopLeft, Offset(0f, delta), style = PrepareStroke)
+        line(color, TopRight, Offset(deltaInv, 0f), style = PrepareStroke)
+        line(color, TopRight, Offset(DEFAULT_DIMENSION, delta), style = PrepareStroke)
+        line(color, BottomLeft, Offset(0f, deltaInv), style = PrepareStroke)
+        line(color, BottomLeft, Offset(delta, DEFAULT_DIMENSION), style = PrepareStroke)
+        line(color, BottomRight, Offset(deltaInv, DEFAULT_DIMENSION), style = PrepareStroke)
+        line(color, BottomRight, Offset(DEFAULT_DIMENSION, deltaInv), style = PrepareStroke)
+    }
+
+    // 画最终态的四角准备框
+    private fun Drawer.drawFullPrepareBorder(color: Color, alpha: Float = 1f) {
+        rect(color, DefaultRect, alpha = alpha, style = PrepareStroke)
+    }
+
+    // 画交互缩放块
+    private fun Drawer.drawInteractScaleBlock(color: Color, scaleRatio: Float) {
+        scale(scaleRatio, DefaultCenter) { rect(color, DefaultRect, alpha = INNER_SCALE_BLOCK_ALPHA) }
+    }
+
+    // 画弹出边框动画
+    private fun Drawer.drawBounceBorder(color: Color, ratio: Float) {
+        scale(ratio, DefaultCenter) {
+            rect(color, DefaultRect, style = BounceBorderStroke[0], alpha = 0.2f)
+            rect(color, DefaultRect, style = BounceBorderStroke[1], alpha = 0.5f)
+            rect(color, DefaultRect, style = BounceBorderStroke[2], alpha = 0.9f)
+            rect(Colors.White, DefaultRect, style = BounceBorderStroke[3], alpha = 0.4f)
+            rect(Colors.White, DefaultRect, style = BounceBorderStroke[4], alpha = 0.8f)
+        }
+    }
+
     override fun Drawer.onDraw() {
         withBlockScale {
             when (val status = blockStatus) {
@@ -137,36 +176,36 @@ class NoteBlock(
                     val progress = status.progress
 
                     drawPrepareBorder(mainColor, progress)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, Interpolator.decelerate(progress))
+                    drawSingleNoteFont(rawNoteScale, TextColor, Interpolator.decelerate(progress))
                 }
                 is Status.Interact -> {
-                    drawScaleBlock(mainColor, status.progress)
+                    drawInteractScaleBlock(mainColor, status.progress)
                     drawFullPrepareBorder(mainColor)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, 1f)
+                    drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                 }
                 is Status.Release -> {
                     val progress = status.progress
                     val releaseProgress = Interpolator.accelerate(1 - progress)
 
-                    drawBounceBorder(mainColor, -3.542f * progress * progress + 2.542f * progress + 1)
-                    drawScaleBlock(mainColor, releaseProgress * status.lastProgress)
+                    drawBounceBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
+                    drawInteractScaleBlock(mainColor, releaseProgress * status.lastProgress)
                     drawFullPrepareBorder(mainColor, 3 * progress * (progress - 1) + 1)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, releaseProgress)
-                    drawLyricsText(TextColor, Interpolator.decelerate(progress) * 0.5f)
+                    drawSingleNoteFont(rawNoteScale, TextColor, releaseProgress)
+                    drawLyricsText(TextColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Missing -> {
                     val progress = status.progress
                     val missingProgress = Interpolator.accelerate(1 - progress)
                     val missingColor = lerp(mainColor, MissingColor, progress)
 
-                    drawScaleBlock(missingColor, missingProgress)
+                    drawInteractScaleBlock(missingColor, missingProgress * status.lastProgress)
                     drawFullPrepareBorder(missingColor)
-                    drawSingleNoteFont(rhymeAction.scale.toInt(), TextColor, missingProgress)
-                    drawLyricsText(MissingColor, Interpolator.decelerate(progress) * 0.5f)
+                    drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
+                    drawLyricsText(MissingColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Done -> {
-                    drawPrepareBorder(if (status.isMissing) MissingColor else mainColor, 1f)
-                    drawLyricsText(if (status.isMissing) MissingColor else TextColor, 0.5f)
+                    drawFullPrepareBorder(if (status.isMissing) MissingColor else mainColor)
+                    drawLyricsText(if (status.isMissing) MissingColor else TextColor, LYRICS_TEXT_SCALE)
                 }
             }
         }

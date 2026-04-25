@@ -53,7 +53,7 @@ class RichNodeTopic internal constructor(
             list.topic(
                 uri = json[RichArg.Uri.value].String,
                 text = json[RichArg.Text.value].String,
-                color = json[RichArg.Color.value]?.Int?.let { Colors(it) }
+                color = json[RichArg.Color.value]?.Int?.let(::Color)
             )
         }
     }
