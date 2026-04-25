@@ -167,10 +167,8 @@ class ScreenRhyme : BasicScreen() {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v1, Alignment.CenterVertically)
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            SimpleClipText(text = "Rhyme", style = Theme.typography.v1.bold.copy(fontFamily = rhymeFont))
-
             val rotateColors = remember { listOf(Colors.Green4, Colors.Red4, Colors.Orange4, Colors.Pink4, Colors.Purple4) }
             val rotateValues = remember { mutableStateListOf(0f, 0f, 0f, 0f, 0f) }
 
@@ -183,19 +181,27 @@ class ScreenRhyme : BasicScreen() {
                 }
             }
 
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h7, Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v1)
             ) {
-                repeat(rotateValues.size) { index ->
-                    val angle by animateFloatAsState(rotateValues[index])
-                    Box(modifier = Modifier.size(Theme.size.icon).drawWithContent {
-                        rotate(angle) {
-                            drawRect(rotateColors[index])
-                            drawRect(Colors.White, style = Stroke(2f))
-                        }
-                    })
+                SimpleClipText(text = "Rhyme", style = Theme.typography.v1.bold.copy(fontFamily = rhymeFont))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h7, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(rotateValues.size) { index ->
+                        val angle by animateFloatAsState(rotateValues[index])
+                        Box(modifier = Modifier.size(Theme.size.icon).drawWithContent {
+                            rotate(angle) {
+                                drawRect(rotateColors[index])
+                                drawRect(Colors.White, style = Stroke(2f))
+                            }
+                        })
+                    }
                 }
             }
 
@@ -204,10 +210,9 @@ class ScreenRhyme : BasicScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v8)
             ) {
-                if (engine.isInitialized) {
+                val isInitialized = engine.isInitialized
+                if (isInitialized) {
                     SimpleClipText(text = "横屏游玩体验更佳", color = Theme.color.primary, style = Theme.typography.v5.bold)
-                    RhymeCommonButton(icon = Icons.LibraryMusic, text = "曲库", onClick = { gameState = RhymeState.MusicLibrary }, modifier = Modifier.fillMaxWidth())
-                    RhymeCommonButton(icon = Icons.RewardCup, text = "排行榜", onClick = { gameState = RhymeState.Rank }, modifier = Modifier.fillMaxWidth())
                 }
                 else if (gameError) {
                     SimpleClipText(text = "引擎加载失败", color = Theme.color.error, style = Theme.typography.v5.bold)
@@ -216,7 +221,19 @@ class ScreenRhyme : BasicScreen() {
                     WaveLoading.Content()
                     SimpleClipText(text = "正在加载中...", style = Theme.typography.v5.bold)
                 }
-                RhymeCommonButton(icon = Icons.ArrowBack, text = "返回", onClick = ::onBack, modifier = Modifier.fillMaxWidth())
+
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+                    maxItemsInEachRow = 2
+                ) {
+                    if (isInitialized) {
+                        RhymeCommonButton(icon = Icons.LibraryMusic, text = "曲库", onClick = { gameState = RhymeState.MusicLibrary }, modifier = Modifier.weight(1f))
+                        RhymeCommonButton(icon = Icons.RewardCup, text = "排行榜", onClick = { gameState = RhymeState.Rank }, modifier = Modifier.weight(1f))
+                    }
+                    RhymeCommonButton(icon = Icons.ArrowBack, text = "返回", onClick = ::onBack, modifier = Modifier.weight(1f))
+                }
             }
         }
     }

@@ -18,7 +18,6 @@ import kotlin.math.abs
 import kotlin.math.sin
 
 class InteractTipArea : MomentVisible(12000) {
-    private val areaScaleList = arrayOf(4, 3, 2, 1, 5, 6, 7)
     private var area: Array<Offset> = Array(7) { Offset.Zero }
     private var areaSize: Size = Size.Zero
     private var noteFontMap: List<TextGraph>? = null
@@ -48,7 +47,7 @@ class InteractTipArea : MomentVisible(12000) {
 
         if (noteFontMap == null) {
             noteFontMap = List(7) {
-                measureText(areaScaleList[it].toString(), font = Res.font.rhyme, fontWeight = FontWeight.Bold)
+                measureText((it + 1).toString(), font = Res.font.rhyme, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -60,7 +59,7 @@ class InteractTipArea : MomentVisible(12000) {
             val textColor = Colors.White.copy(alpha = alpha)
 
             repeat(7) { index ->
-                val color = Block.ScaleColorList[areaScaleList[index]]
+                val color = Block.ScaleColorList[index + 1]
                 val topLeft = area[index]
 
                 rect(color, topLeft, areaSize, alpha = alpha)
