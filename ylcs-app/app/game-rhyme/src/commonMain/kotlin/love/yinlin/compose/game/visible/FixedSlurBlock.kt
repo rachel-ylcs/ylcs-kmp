@@ -25,8 +25,8 @@ class FixedSlurBlock(
     override val time: Time,
     rawIndex: Int,
     lineIndex: Int,
-    rhymeAction: RhymeAction.Slur,
-) : SlurBlock<FixedSlurBlock.Status>(position, line, rawIndex, lineIndex, rhymeAction) {
+    override val rhymeAction: RhymeAction.Slur,
+) : Block<FixedSlurBlock.Status>(position, line, rawIndex, lineIndex) {
     @Stable
     data class Time(
         override val appearance: Long,
@@ -64,20 +64,16 @@ class FixedSlurBlock(
     }
 
     companion object {
-        private const val BASE_SCORE_RATIO = 1.5f // 基础得分倍率
-        private const val BASE_FIXED_DURATION = 300 // 基础固定时长
         private const val PERFECT_RATIO = 0.5f
         private const val GOOD_RATIO = 0.25f
-        private val BaseDurationMap = mapOf(
-            RhymeDifficulty.Easy to 1f,
-            RhymeDifficulty.Medium to 0.75f,
-            RhymeDifficulty.Hard to 0.5f,
-            RhymeDifficulty.Extreme to 0.3f,
-        )
+
+        private const val INNER_ROTATE_BLOCK_ALPHA = 0.3f
+        private const val ROTATE_BLOCK_ALPHA = 0.8f
+        private val InnerProgressTipColor = Colors.White
 
         fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long): Time {
             val prepare = PrepareDurationMap[difficulty]!!
-            val duration = (end - start).toInt() + (BASE_FIXED_DURATION * BaseDurationMap[difficulty]!!).toInt()
+            val duration = (end - start).toInt()
             return Time(
                 appearance = start - prepare - PRESS_TOLERANCE,
                 start = prepare,
@@ -103,7 +99,7 @@ class FixedSlurBlock(
             else -> BlockResult.BAD
         }
         blockStatus = Status.Release(startProgress, endProgress, result)
-        updateResult(result, BASE_SCORE_RATIO)
+        updateResult(result)
     }
 
     override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
@@ -174,6 +170,46 @@ class FixedSlurBlock(
         }
     }
 
+    // 画圆形准备框
+    private fun Drawer.drawPrepareCircleBorder(color: Color, progress: Float) {
+        val delta = progress * 180f
+        arc(color, startAngle = -90f, sweepAngle = delta, Offset.Zero, DefaultSize, style = PrepareStroke)
+        arc(color, startAngle = 90f, sweepAngle = delta, Offset.Zero, DefaultSize, style = PrepareStroke)
+    }
+
+    // 画最终态的圆形准备框
+    private fun Drawer.drawFinalPrepareCircleBorder(color: Color, alpha: Float = 1f) {
+        circle(color, DefaultCenter, DEFAULT_RADIUS, alpha, style = PrepareStroke)
+    }
+
+    // 画弹出边框动画
+    private fun Drawer.drawBounceCircleBorder(color: Color, ratio: Float) {
+        scale(ratio, DefaultCenter) {
+            circle(color, DefaultCenter, DEFAULT_RADIUS, style = BounceBorderStroke[0], alpha = 0.2f)
+            circle(color, DefaultCenter, DEFAULT_RADIUS, style = BounceBorderStroke[1], alpha = 0.5f)
+            circle(color, DefaultCenter, DEFAULT_RADIUS, style = BounceBorderStroke[2], alpha = 0.9f)
+            circle(Colors.White, DefaultCenter, DEFAULT_RADIUS, style = BounceBorderStroke[3], alpha = 0.4f)
+            circle(Colors.White, DefaultCenter, DEFAULT_RADIUS, style = BounceBorderStroke[4], alpha = 0.8f)
+        }
+    }
+
+    // 画交互旋转块
+    private fun Drawer.drawInteractRotateBlock(color: Color, progress: Float, alpha: Float) {
+        arc(color, startAngle = -90f, sweepAngle = 360f * progress, Offset.Zero, DefaultSize, alpha = alpha, useCenter = true)
+    }
+
+    // 画分段交互旋转块
+    private fun Drawer.drawInteractRotateBlock(color1: Color, color2: Color, progress1: Float, progress2: Float, alpha1: Float, alpha2: Float) {
+        val angle = 360 * progress1
+        arc(color1, startAngle = -90f, sweepAngle = angle, Offset.Zero, DefaultSize, alpha = alpha1, useCenter = true)
+        arc(color2, startAngle = -90f + angle, sweepAngle = 360f * progress2 - angle, Offset.Zero, DefaultSize, alpha = alpha2, useCenter = true)
+    }
+
+    // 画最终态内部块
+    private fun Drawer.drawFinalInnerBlock(color: Color, alpha: Float) {
+        circle(color, DefaultCenter, DEFAULT_RADIUS, alpha)
+    }
+
     override fun Drawer.onDraw() {
         withBlockScale {
             when (val status = blockStatus) {
@@ -181,12 +217,12 @@ class FixedSlurBlock(
                 is Status.Prepare -> {
                     val progress = status.progress
 
-                    drawPrepareBorder(mainColor, progress)
+                    drawPrepareCircleBorder(mainColor, progress)
                     drawSingleNoteFont(rawNoteScale, TextColor, Interpolator.decelerate(progress))
                 }
                 is Status.InteractStart -> {
                     drawInteractRotateBlock(InnerProgressTipColor, status.progress, INNER_ROTATE_BLOCK_ALPHA)
-                    drawFullPrepareBorder(mainColor)
+                    drawFinalPrepareCircleBorder(mainColor)
                     drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                 }
                 is Status.InteractPressing -> {
@@ -194,20 +230,28 @@ class FixedSlurBlock(
 
                     scale(1.1f + oscillation * 0.1f, DefaultCenter) {
                         drawInteractRotateBlock(InnerProgressTipColor, mainColor, status.startProgress, status.progress, INNER_ROTATE_BLOCK_ALPHA, ROTATE_BLOCK_ALPHA)
-                        drawFullPrepareBorder(Colors.White, 0.5f + oscillation / 2)
-                        drawFullPrepareBorder(mainColor, 1f - oscillation / 2)
+                        drawFinalPrepareCircleBorder(Colors.White, 0.5f + oscillation / 2)
+                        drawFinalPrepareCircleBorder(mainColor, 1f - oscillation / 2)
                     }
                     drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                 }
                 is Status.Release -> {
                     val progress = status.progress
                     val releaseProgress = Interpolator.accelerate(1 - progress)
+                    val tipColor = lerp(InnerProgressTipColor, mainColor, progress)
 
-                    drawBounceBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
-                    drawInteractRotateBlock(InnerProgressTipColor, mainColor, status.startProgress, status.endProgress, alpha1 = INNER_ROTATE_BLOCK_ALPHA * releaseProgress, alpha2 = ROTATE_BLOCK_ALPHA * releaseProgress)
-                    drawFullPrepareBorder(mainColor, 3 * progress * (progress - 1) + 1)
+                    drawBounceCircleBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
+                    drawInteractRotateBlock(
+                        tipColor,
+                        mainColor,
+                        status.startProgress,
+                        Interpolator.map(progress, status.endProgress, 1f),
+                        alpha1 = Interpolator.map(progress, INNER_ROTATE_BLOCK_ALPHA, 1f),
+                        alpha2 = Interpolator.map(progress, ROTATE_BLOCK_ALPHA, 1f)
+                    )
+                    drawFinalPrepareCircleBorder(mainColor, 3 * progress * (progress - 1) + 1)
                     drawSingleNoteFont(rawNoteScale, TextColor, releaseProgress)
-                    drawLyricsText(TextColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
+                    drawLyricsText(TextColor, (1 - releaseProgress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Missing -> {
                     val progress = status.progress
@@ -215,12 +259,13 @@ class FixedSlurBlock(
                     val missingColor = lerp(mainColor, MissingColor, progress)
 
                     drawInteractRotateBlock(missingColor, status.startProgress, alpha = INNER_ROTATE_BLOCK_ALPHA * missingProgress)
-                    drawFullPrepareBorder(missingColor)
+                    drawFinalPrepareCircleBorder(missingColor)
                     drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
-                    drawLyricsText(MissingColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
+                    drawLyricsText(MissingColor, (1 - missingProgress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Done -> {
-                    drawFullPrepareBorder(if (status.isMissing) MissingColor else mainColor)
+                    if (!status.isMissing) drawFinalInnerBlock(mainColor, status.result.alpha)
+                    drawFinalPrepareCircleBorder(if (status.isMissing) MissingColor else mainColor)
                     drawLyricsText(if (status.isMissing) MissingColor else TextColor, LYRICS_TEXT_SCALE)
                 }
             }

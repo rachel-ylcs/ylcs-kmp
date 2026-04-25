@@ -124,7 +124,7 @@ class MapLayer(
         }
     }
 
-    fun updateResult(result: BlockResult, scoreRatio: Float = 1f) {
-        uiLayer.updateResult(result, scoreRatio)
+    fun updateResult(result: BlockResult) {
+        uiLayer.updateResult(result)
     }
 }

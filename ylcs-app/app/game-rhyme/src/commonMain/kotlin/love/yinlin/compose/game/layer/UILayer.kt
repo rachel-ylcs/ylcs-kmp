@@ -111,14 +111,14 @@ class UILayer(
     // 统计数据收集
     private val statistics = IntArray(BlockResult.entries.size)
 
-    fun updateResult(result: BlockResult, scoreRatio: Float) {
+    fun updateResult(result: BlockResult) {
         // 统计
         statistics[result.ordinal] += 1
         // 计算连击
         val oldCombo = resultData?.combo ?: 0
         val newCombo = if (result == BlockResult.MISS || result == BlockResult.BAD) 0 else oldCombo + 1
         // 计算得分
-        val reward = ceil(result.score * scoreRatio).toInt() // 向上取整
+        val reward = result.score // 向上取整
         val deltaScore = reward + newCombo / comboRewardCount
         score += deltaScore // 连击奖励
 

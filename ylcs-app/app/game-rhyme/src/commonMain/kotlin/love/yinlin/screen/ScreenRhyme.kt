@@ -224,8 +224,8 @@ class ScreenRhyme : BasicScreen() {
 
                 FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
                     maxItemsInEachRow = 2
                 ) {
                     if (isInitialized) {

@@ -33,6 +33,7 @@ expect class StrokeTextGraph internal constructor(
     override val blendMode: BlendMode
     override fun widthScale(height: Float): Long
     override fun width(height: Float): Float
+    override fun height(width: Float): Float
     override fun size(height: Float): Size
     fun paint(canvas: Canvas, color: Color, strokeColor: Color, stroke: Stroke)
     fun paint(canvas: Canvas, brush: Brush, alpha: Float, strokeColor: Color, stroke: Stroke)

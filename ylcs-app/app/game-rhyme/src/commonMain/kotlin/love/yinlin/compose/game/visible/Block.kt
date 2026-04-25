@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastCoerceIn
+import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.compose.Colors
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockStatus
@@ -35,20 +36,23 @@ sealed class Block<BS : BlockStatus>(
         const val DEFAULT_RADIUS = DEFAULT_DIMENSION / 2
         val DefaultSize = Size(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
         protected const val DEFAULT_SCALE = 0.9f
-        protected val DefaultCenter = DefaultSize.center
         protected val DefaultRect = Rect(Offset.Zero, DefaultSize)
         protected val TopLeft = Offset.Zero
+        protected val TopCenter = Offset(DEFAULT_RADIUS, 0f)
         protected val TopRight = Offset(DEFAULT_DIMENSION, 0f)
+        protected val CenterLeft = Offset(0f, DEFAULT_RADIUS)
+        protected val DefaultCenter = Offset(DEFAULT_RADIUS, DEFAULT_RADIUS)
+        protected val CenterRight = Offset(DEFAULT_DIMENSION, DEFAULT_RADIUS)
         protected val BottomLeft = Offset(0f, DEFAULT_DIMENSION)
+        protected val BottomCenter = Offset(DEFAULT_RADIUS, DEFAULT_DIMENSION)
         protected val BottomRight = Offset(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
 
         protected val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
         protected val BounceBorderStroke = arrayOf(Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f))
 
         protected const val LYRICS_TEXT_SCALE = 0.5f
-        protected const val NOTE_TEXT_SCALE = 0.75f
 
-        protected const val PRESS_TOLERANCE = 150
+        protected const val PRESS_TOLERANCE = 200
 
         val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
         protected val TextColor = Colors.Ghost
@@ -116,14 +120,38 @@ sealed class Block<BS : BlockStatus>(
 
     protected inline fun Drawer.withBlockScale(block: Drawer.() -> Unit) = scale(DEFAULT_SCALE, DefaultCenter, block)
 
-    protected fun Drawer.drawSingleNoteFont(scale: Int, color: Color, alpha: Float, scaleRatio: Float = NOTE_TEXT_SCALE) {
+    // 画单字音符
+    protected fun Drawer.drawSingleNoteFont(scale: Int, color: Color, alpha: Float) {
         fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.let { graph ->
-            scale(scaleRatio, DefaultCenter) {
-                text(graph, TopLeft, DefaultSize, color.copy(alpha = alpha), TextAlign.Center)
+            val r = DEFAULT_DIMENSION
+            val w = r / 3
+            val h = graph.height(w)
+            val s = Size(w, h)
+            val p = Offset((r - w) / 2, (r - h) / 2)
+            text(graph, p, s, color.copy(alpha = alpha))
+        }
+    }
+
+    // 画多字音符
+    protected fun Drawer.drawMultipleNoteFont(scaleList: List<Int>, color: Color, alpha: Float) {
+        fromMapLayer?.baseNoteFontMap?.let { map ->
+            val n = scaleList.size
+            val r = DEFAULT_DIMENSION
+            val w = r / 2
+            val pw = w / n
+            val x = (r - w) / 2
+            scaleList.fastForEachIndexed { i, scale ->
+                val graph = map[scale]
+                val ph = graph.height(pw)
+                val s = Size(pw, ph)
+                val y = (r - ph) / 2
+                val p = Offset(x + i * pw, y)
+                text(graph, p, s, color.copy(alpha = alpha))
             }
         }
     }
 
+    // 画单字歌词
     protected fun Drawer.drawLyricsText(color: Color, scaleRatio: Float) {
         fromMapLayer?.lyricsTextMap?.get(rhymeAction.ch)?.let { graph ->
             scale(scaleRatio, DefaultCenter) {

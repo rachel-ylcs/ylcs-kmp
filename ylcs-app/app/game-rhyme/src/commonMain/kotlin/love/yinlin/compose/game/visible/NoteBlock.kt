@@ -134,9 +134,10 @@ class NoteBlock(
     }
 
     // 画四角准备框
-    private fun Drawer.drawPrepareBorder(color: Color, progress: Float) {
+    private fun Drawer.drawPrepareRectBorder(color: Color, progress: Float) {
         val delta = progress * DEFAULT_RADIUS
         val deltaInv = DEFAULT_DIMENSION - delta
+
         line(color, TopLeft, Offset(delta, 0f), style = PrepareStroke)
         line(color, TopLeft, Offset(0f, delta), style = PrepareStroke)
         line(color, TopRight, Offset(deltaInv, 0f), style = PrepareStroke)
@@ -148,17 +149,12 @@ class NoteBlock(
     }
 
     // 画最终态的四角准备框
-    private fun Drawer.drawFullPrepareBorder(color: Color, alpha: Float = 1f) {
+    private fun Drawer.drawFinalPrepareRectBorder(color: Color, alpha: Float = 1f) {
         rect(color, DefaultRect, alpha = alpha, style = PrepareStroke)
     }
 
-    // 画交互缩放块
-    private fun Drawer.drawInteractScaleBlock(color: Color, scaleRatio: Float) {
-        scale(scaleRatio, DefaultCenter) { rect(color, DefaultRect, alpha = INNER_SCALE_BLOCK_ALPHA) }
-    }
-
     // 画弹出边框动画
-    private fun Drawer.drawBounceBorder(color: Color, ratio: Float) {
+    private fun Drawer.drawBounceRectBorder(color: Color, ratio: Float) {
         scale(ratio, DefaultCenter) {
             rect(color, DefaultRect, style = BounceBorderStroke[0], alpha = 0.2f)
             rect(color, DefaultRect, style = BounceBorderStroke[1], alpha = 0.5f)
@@ -168,6 +164,16 @@ class NoteBlock(
         }
     }
 
+    // 画交互缩放块
+    private fun Drawer.drawInteractScaleBlock(color: Color, scaleRatio: Float, alpha: Float) {
+        scale(scaleRatio, DefaultCenter) { rect(color, DefaultRect, alpha = alpha) }
+    }
+
+    // 画最终态内部块
+    private fun Drawer.drawFinalInnerBlock(color: Color, alpha: Float) {
+        rect(color, DefaultRect, alpha = alpha)
+    }
+
     override fun Drawer.onDraw() {
         withBlockScale {
             when (val status = blockStatus) {
@@ -175,36 +181,42 @@ class NoteBlock(
                 is Status.Prepare -> {
                     val progress = status.progress
 
-                    drawPrepareBorder(mainColor, progress)
+                    drawPrepareRectBorder(mainColor, progress)
                     drawSingleNoteFont(rawNoteScale, TextColor, Interpolator.decelerate(progress))
                 }
                 is Status.Interact -> {
-                    drawInteractScaleBlock(mainColor, status.progress)
-                    drawFullPrepareBorder(mainColor)
+                    drawInteractScaleBlock(mainColor, status.progress, INNER_SCALE_BLOCK_ALPHA)
+                    drawFinalPrepareRectBorder(mainColor)
                     drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                 }
                 is Status.Release -> {
                     val progress = status.progress
+                    val lastProgress = status.lastProgress
                     val releaseProgress = Interpolator.accelerate(1 - progress)
 
-                    drawBounceBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
-                    drawInteractScaleBlock(mainColor, releaseProgress * status.lastProgress)
-                    drawFullPrepareBorder(mainColor, 3 * progress * (progress - 1) + 1)
+                    drawBounceRectBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
+                    drawInteractScaleBlock(
+                        mainColor,
+                        Interpolator.map(progress, lastProgress, 1f),
+                        Interpolator.map(progress, INNER_SCALE_BLOCK_ALPHA, status.result.alpha)
+                    )
+                    drawFinalPrepareRectBorder(mainColor, 3 * progress * (progress - 1) + 1)
                     drawSingleNoteFont(rawNoteScale, TextColor, releaseProgress)
-                    drawLyricsText(TextColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
+                    drawLyricsText(TextColor, (1 - releaseProgress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Missing -> {
                     val progress = status.progress
                     val missingProgress = Interpolator.accelerate(1 - progress)
                     val missingColor = lerp(mainColor, MissingColor, progress)
 
-                    drawInteractScaleBlock(missingColor, missingProgress * status.lastProgress)
-                    drawFullPrepareBorder(missingColor)
+                    drawInteractScaleBlock(missingColor, missingProgress * status.lastProgress, INNER_SCALE_BLOCK_ALPHA)
+                    drawFinalPrepareRectBorder(missingColor)
                     drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
-                    drawLyricsText(MissingColor, Interpolator.decelerate(progress) * LYRICS_TEXT_SCALE)
+                    drawLyricsText(MissingColor, (1 - missingProgress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Done -> {
-                    drawFullPrepareBorder(if (status.isMissing) MissingColor else mainColor)
+                    if (!status.isMissing) drawFinalInnerBlock(mainColor, status.result.alpha)
+                    drawFinalPrepareRectBorder(if (status.isMissing) MissingColor else mainColor)
                     drawLyricsText(if (status.isMissing) MissingColor else TextColor, LYRICS_TEXT_SCALE)
                 }
             }

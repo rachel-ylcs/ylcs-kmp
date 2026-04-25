@@ -10,6 +10,10 @@ interface Interpolator {
     companion object {
         const val PI = 3.141592f
 
+        // 映射
+        // 0 ~ 1 -> a -> b
+        inline fun map(x: Float, a: Float, b: Float) = (b - a) * x + a
+
         // 加速插值
         // 先慢后快
         // 0 ~ 1 -> 0 ~ 1
