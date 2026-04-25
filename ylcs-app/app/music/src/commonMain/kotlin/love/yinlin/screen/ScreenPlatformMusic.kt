@@ -241,5 +241,5 @@ class ScreenPlatformMusic(private val deeplink: Uri?, type: PlatformMusicType) :
     }
 
     private val parseDialog = this land DialogInput(hint = "ID/链接/歌单", maxLength = 128)
-    private val searchDialog = this land DialogInput(hint = "歌曲关键词", maxLength = 16)
+    private val searchDialog = this land DialogInput(hint = "歌曲关键词", maxLength = 32)
 }
