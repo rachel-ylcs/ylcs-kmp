@@ -51,7 +51,7 @@ class ScenePlugin private constructor(
     val camera = Camera(cameraConfig)
 
     // 实体
-    private val entities = mutableStateListOf<Entity>()
+    @PublishedApi internal val entities = mutableStateListOf<Entity>()
 
     // 动态实体 - 更新
     private val dynamicEntities by derivedStateOf {
@@ -62,6 +62,10 @@ class ScenePlugin private constructor(
     private val layerEntities by derivedStateOf {
         entities.fastMapNotNull { it as? Layer }.sortedBy(Layer::layerOrder)
     }
+
+    inline fun <reified T : Entity> findEntity(): T? = entities.find { it is T } as? T
+
+    inline fun <reified T : Entity> requireEntity(): T = entities.find { it is T } as T
 
     operator fun plusAssign(entity: Entity) {
         entities += entity

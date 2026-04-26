@@ -20,6 +20,7 @@ import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.FPSCounter
 import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayInfo
+import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.LayerType
@@ -132,6 +133,11 @@ class UILayer(
             updateDirty()
         }
     }
+
+    fun submitResult(): RhymePlayResult = RhymePlayResult(
+        score = score,
+        statistics = statistics.toList()
+    )
 
     override fun preUpdate(tick: Int) {
         var isDirty = false
