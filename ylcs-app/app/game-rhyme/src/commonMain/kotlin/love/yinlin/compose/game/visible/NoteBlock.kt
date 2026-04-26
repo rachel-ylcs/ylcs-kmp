@@ -5,13 +5,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.util.fastCoerceAtLeast
-import love.yinlin.compose.Colors
 import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
 import love.yinlin.compose.game.common.InteractStatus
+import love.yinlin.compose.game.common.InteractTarget
 import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.data.music.RhymeAction
@@ -49,12 +49,6 @@ class NoteBlock(
         class Done(val isMissing: Boolean, val result: BlockResult) : Status, BlockStatus.Done
     }
 
-    sealed interface InteractTarget {
-        data object None : InteractTarget
-        data object Multiple : InteractTarget
-        data class Single(val index: Int) : InteractTarget
-    }
-
     companion object {
         //   PERFECT  ->  GOOD  ->   BAD  ->  MISS
         // 0         0.4        0.7        1
@@ -73,7 +67,7 @@ class NoteBlock(
             )
         }
 
-        private const val INNER_SCALE_BLOCK_ALPHA = 0.5f
+        private const val INNER_MAIN_ALPHA = 0.5f
     }
 
     private val rawNoteScale = rhymeAction.scale.toInt()
@@ -89,10 +83,11 @@ class NoteBlock(
         if (currentStatus !is Status.Interact) return
         // 单击交互只关心按下时刻
         var target: InteractTarget = InteractTarget.None
-        for (i in 0 .. 7) {
-            if (interactStatusList[i] !is InteractStatus.Down) continue
+        for (i in 1 .. 7) {
+            val status = interactStatusList[i]
+            if (status !is InteractStatus.Down) continue
             // 不存在按下的则标记此轨道按下, 存在按下的则保持多指按下
-            target = if (target == InteractTarget.None) InteractTarget.Single(i) else InteractTarget.Multiple
+            target = if (target == InteractTarget.None) InteractTarget.Single(status.id, i) else InteractTarget.Multiple
         }
         // 确定评级结果
         val result = when (val interactTarget = target) {
@@ -153,17 +148,6 @@ class NoteBlock(
         rect(color, DefaultRect, alpha = alpha, style = PrepareStroke)
     }
 
-    // 画弹出边框动画
-    private fun Drawer.drawBounceRectBorder(color: Color, ratio: Float) {
-        scale(ratio, DefaultCenter) {
-            rect(color, DefaultRect, style = BounceBorderStroke[0], alpha = 0.2f)
-            rect(color, DefaultRect, style = BounceBorderStroke[1], alpha = 0.5f)
-            rect(color, DefaultRect, style = BounceBorderStroke[2], alpha = 0.9f)
-            rect(Colors.White, DefaultRect, style = BounceBorderStroke[3], alpha = 0.4f)
-            rect(Colors.White, DefaultRect, style = BounceBorderStroke[4], alpha = 0.8f)
-        }
-    }
-
     // 画交互缩放块
     private fun Drawer.drawInteractScaleBlock(color: Color, scaleRatio: Float, alpha: Float) {
         scale(scaleRatio, DefaultCenter) { rect(color, DefaultRect, alpha = alpha) }
@@ -185,7 +169,7 @@ class NoteBlock(
                     drawSingleNoteFont(rawNoteScale, TextColor, Interpolator.decelerate(progress))
                 }
                 is Status.Interact -> {
-                    drawInteractScaleBlock(mainColor, status.progress, INNER_SCALE_BLOCK_ALPHA)
+                    drawInteractScaleBlock(mainColor, status.progress, INNER_MAIN_ALPHA)
                     drawFinalPrepareRectBorder(mainColor)
                     drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                 }
@@ -194,11 +178,15 @@ class NoteBlock(
                     val lastProgress = status.lastProgress
                     val releaseProgress = Interpolator.accelerate(1 - progress)
 
-                    drawBounceRectBorder(mainColor, 1.875f * progress * (1 - progress) + 1)
+                    withBounceAnimation(progress) {
+                        drawBounceAnimation(mainColor) { color, stroke, alpha ->
+                            rect(color, DefaultRect, style = stroke, alpha = alpha)
+                        }
+                    }
                     drawInteractScaleBlock(
                         mainColor,
                         Interpolator.map(progress, lastProgress, 1f),
-                        Interpolator.map(progress, INNER_SCALE_BLOCK_ALPHA, status.result.alpha)
+                        Interpolator.map(progress, INNER_MAIN_ALPHA, status.result.alpha)
                     )
                     drawFinalPrepareRectBorder(mainColor, 3 * progress * (progress - 1) + 1)
                     drawSingleNoteFont(rawNoteScale, TextColor, releaseProgress)
@@ -209,7 +197,7 @@ class NoteBlock(
                     val missingProgress = Interpolator.accelerate(1 - progress)
                     val missingColor = lerp(mainColor, MissingColor, progress)
 
-                    drawInteractScaleBlock(missingColor, missingProgress * status.lastProgress, INNER_SCALE_BLOCK_ALPHA)
+                    drawInteractScaleBlock(missingColor, missingProgress * status.lastProgress, INNER_MAIN_ALPHA)
                     drawFinalPrepareRectBorder(missingColor)
                     drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
                     drawLyricsText(MissingColor, (1 - missingProgress) * LYRICS_TEXT_SCALE)

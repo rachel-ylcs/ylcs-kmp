@@ -5,9 +5,9 @@ import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastMapIndexed
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.visible.Block
-import love.yinlin.compose.game.visible.FixedSlurBlock
+import love.yinlin.compose.game.visible.ContinuedBlock
+import love.yinlin.compose.game.visible.MultipleBlock
 import love.yinlin.compose.game.visible.NoteBlock
-import love.yinlin.compose.game.visible.OffsetSlurBlock
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.music.RhymeLyricsConfig
 
@@ -144,19 +144,19 @@ class BlockMapGenerator private constructor(
                     is RhymeAction.Slur -> {
                         val first = action.scale.first()
                         // 延音
-                        if (action.scale.fastAll { it == first }) FixedSlurBlock(
+                        if (action.scale.fastAll { it == first }) ContinuedBlock(
                             position = pos,
                             line = blockLine,
-                            time = FixedSlurBlock.buildTime(difficulty, start, end),
+                            time = ContinuedBlock.buildTime(difficulty, start, end),
                             rawIndex = ++rawIndex,
                             lineIndex = i,
                             rhymeAction = action
                         )
                         // 连音
-                        else OffsetSlurBlock(
+                        else MultipleBlock(
                             position = pos,
                             line = blockLine,
-                            time = OffsetSlurBlock.buildTime(difficulty, start, end),
+                            time = MultipleBlock.buildTime(difficulty, start, end),
                             rawIndex = ++rawIndex,
                             lineIndex = i,
                             rhymeAction = action

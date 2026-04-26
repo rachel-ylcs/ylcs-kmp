@@ -34,6 +34,7 @@ sealed class Block<BS : BlockStatus>(
     companion object {
         const val DEFAULT_DIMENSION = 200f
         const val DEFAULT_RADIUS = DEFAULT_DIMENSION / 2
+        const val INNER_RADIUS = DEFAULT_RADIUS / 2
         val DefaultSize = Size(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
         protected const val DEFAULT_SCALE = 0.9f
         protected val DefaultRect = Rect(Offset.Zero, DefaultSize)
@@ -46,9 +47,14 @@ sealed class Block<BS : BlockStatus>(
         protected val BottomLeft = Offset(0f, DEFAULT_DIMENSION)
         protected val BottomCenter = Offset(DEFAULT_RADIUS, DEFAULT_DIMENSION)
         protected val BottomRight = Offset(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
+        protected val InnerTopLeft = Offset(INNER_RADIUS, INNER_RADIUS)
+        protected val InnerTopRight = Offset(DEFAULT_DIMENSION - INNER_RADIUS, INNER_RADIUS)
+        protected val InnerBottomLeft = Offset(INNER_RADIUS, DEFAULT_DIMENSION - INNER_RADIUS)
+        protected val InnerBottomRight = Offset(DEFAULT_DIMENSION - INNER_RADIUS, DEFAULT_DIMENSION - INNER_RADIUS)
 
         protected val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
         protected val BounceBorderStroke = arrayOf(Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f))
+        protected val BounceBorderAlpha = floatArrayOf(0.2f, 0.5f, 0.9f, 0.4f, 0.8f)
 
         protected const val LYRICS_TEXT_SCALE = 0.5f
 
@@ -120,6 +126,19 @@ sealed class Block<BS : BlockStatus>(
 
     protected inline fun Drawer.withBlockScale(block: Drawer.() -> Unit) = scale(DEFAULT_SCALE, DefaultCenter, block)
 
+    // 画弹出动画
+    protected inline fun Drawer.withBounceAnimation(progress: Float, block: Drawer.() -> Unit) {
+        scale(1.875f * progress * (1 - progress) + 1, DefaultCenter, block)
+    }
+
+    protected inline fun Drawer.drawBounceAnimation(color: Color, block: Drawer.(Color, Stroke, Float) -> Unit) {
+        block(color, BounceBorderStroke[0], BounceBorderAlpha[0])
+        block(color, BounceBorderStroke[1], BounceBorderAlpha[1])
+        block(color, BounceBorderStroke[2], BounceBorderAlpha[2])
+        block(Colors.White, BounceBorderStroke[3], BounceBorderAlpha[3])
+        block(Colors.White, BounceBorderStroke[4], BounceBorderAlpha[4])
+    }
+
     // 画单字音符
     protected fun Drawer.drawSingleNoteFont(scale: Int, color: Color, alpha: Float) {
         fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.let { graph ->
@@ -137,7 +156,7 @@ sealed class Block<BS : BlockStatus>(
         fromMapLayer?.baseNoteFontMap?.let { map ->
             val n = scaleList.size
             val r = DEFAULT_DIMENSION
-            val w = r / 2
+            val w = if (n == 2) r / 2 else r * 2 / 3
             val pw = w / n
             val x = (r - w) / 2
             scaleList.fastForEachIndexed { i, scale ->
