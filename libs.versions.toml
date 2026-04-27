@@ -14,7 +14,7 @@ skiko = "0.9.47" # 0.144.4的skiko-uiview在web上二进制不兼容，要等上
 lifecycle = "2.10.0"
 coroutines = "1.11.0-rc02"
 ktor = "3.4.3"
-sketch = "4.5.0-alpha03"
+sketch = "4.5.0-alpha02"
 mmkv = "2.4.0"
 pag = "4.5.50"
 
