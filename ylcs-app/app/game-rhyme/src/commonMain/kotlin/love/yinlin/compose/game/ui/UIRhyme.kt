@@ -1,5 +1,6 @@
 package love.yinlin.compose.game.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -18,11 +19,14 @@ import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import love.yinlin.app
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.game.data.RhymeIllustration
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LocalFileImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -79,6 +83,46 @@ internal fun RhymeMusicCard(
             Column(modifier = Modifier.weight(1f).padding(Theme.padding.value)) {
                 SimpleEllipsisText(text = info.name, style = Theme.typography.v6.bold)
             }
+        }
+    }
+}
+
+@Composable
+internal fun RhymeIllustrationLayout(
+    illustration: RhymeIllustration,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = modifier,
+        shadowElevation = Theme.shadow.v5,
+        tonalLevel = 1,
+        shape = Theme.shape.v5,
+        onClick = onClick
+    ) {
+        val info = illustration.info
+
+        WebImage(
+            uri = illustration.url,
+            key = info.id,
+            modifier = Modifier.fillMaxSize()
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Colors.Dark.copy(alpha = 0.8f))
+                .padding(Theme.padding.value)
+                .align(Alignment.BottomCenter),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+        ) {
+            val unlocked = illustration.unlocked
+
+            SimpleEllipsisText(text = info.title, color = Colors.White, style = Theme.typography.v7.bold)
+            SimpleEllipsisText(
+                text = if (unlocked) "已解锁" else "银币: ${info.cost}",
+                color = if (unlocked) Colors.Green4 else Colors.Purple4
+            )
         }
     }
 }

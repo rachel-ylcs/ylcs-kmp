@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -38,7 +39,7 @@ fun Surface(
     tonalLevel: Int = 0,
     border: BorderStroke? = null,
     onClick: (() -> Unit)? = null,
-    content: @Composable () -> Unit,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     val absoluteTonalLevel = LocalSurfaceTonalLevel.current + tonalLevel
     CompositionLocalProvider(

@@ -10,6 +10,10 @@ internal sealed interface RhymeState {
     @Stable
     data object MusicLibrary : RhymeState // 曲库
     @Stable
+    data object Illustration : RhymeState // 立绘
+    @Stable
+    data object Help : RhymeState // 帮助
+    @Stable
     data class Prepare(val info: MusicInfo): RhymeState // 准备
     @Stable
     data class Playing(val info: MusicInfo, val playConfig: RhymePlayConfig) : RhymeState // 游戏中
