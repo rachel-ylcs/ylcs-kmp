@@ -25,6 +25,7 @@ class MapLayer(
     private val character: Character,
     playInfo: RhymePlayInfo,
     val momentLayer: MomentLayer,
+    val backgroundLayer: BackgroundLayer,
     private val interactLayer: InteractLayer,
     private val uiLayer: UILayer,
 ) : Layer(layerOrder = 2) {

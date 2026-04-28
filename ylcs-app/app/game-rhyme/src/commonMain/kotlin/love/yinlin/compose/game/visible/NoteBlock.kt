@@ -99,6 +99,7 @@ class NoteBlock(
         val lastProgress = currentStatus.progress
         blockStatus = if (result == BlockResult.MISS) Status.Missing(lastProgress) else Status.Release(lastProgress, result)
         fromMapLayer?.updateResult(result)
+        fromMapLayer?.backgroundLayer?.activateSkill()
     }
 
     override fun onUpdate(tick: Int) {

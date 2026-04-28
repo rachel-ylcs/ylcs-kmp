@@ -30,6 +30,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.game.Engine
+import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymeIllustration
 import love.yinlin.compose.game.data.RhymePlayConfig
@@ -196,19 +197,31 @@ class ScreenRhyme : BasicScreen() {
                 require(lyricsText != null) { "歌词资源文件丢失或损坏" }
                 val lyricsConfig = lyricsText.parseJsonValue<RhymeLyricsConfig>()
                 // 解析封面图片
-                val recordImage = info.path(modPath, ModResourceType.Record).readByteArray()?.let { ImageBitmap.decode(it) }
+                val recordImage = Coroutines.io {
+                    info.path(modPath, ModResourceType.Record).readByteArray()?.let { ImageBitmap.decode(it) }
+                }
                 require(recordImage != null) { "封面资源文件丢失" }
                 require(lyricsConfig.id == info.id) { "歌词资源文件与MOD不匹配" }
                 // 音频路径
                 val audio = info.path(modPath, ModResourceType.Audio)
+                // 创建角色
+                val characterInfo = playConfig.character
+                val characterFactory = Character.Factory[characterInfo]
+                require(characterFactory != null) { "未知角色" }
+                val character = characterFactory()
+                val characterImage = Coroutines.io {
+                    app.cache.loadByteArray(ServerRes.Game.Rhyme.CV.illustration(characterInfo.id).url)?.let { ImageBitmap.decode(it) }
+                }
 
                 engine.plugin<RhymePlugin>().setupGame(
                     playInfo = RhymePlayInfo(
                         playConfig = playConfig,
                         musicInfo = info,
                         lyricsConfig = lyricsConfig,
-                        musicRecord = recordImage
+                        musicRecord = recordImage,
+                        characterCV =  characterImage
                     ),
+                    character = character,
                     audio = audio
                 )
                 engine.isRunning = true

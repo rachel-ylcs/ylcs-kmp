@@ -2,6 +2,7 @@ package love.yinlin.compose.game.layer
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Layer
@@ -10,7 +11,10 @@ import love.yinlin.compose.game.visible.BackgroundRipple
 import love.yinlin.compose.game.visible.BackgroundWave
 
 @Stable
-class BackgroundLayer(private val character: Character) : Layer(
+class BackgroundLayer(
+    character: Character,
+    characterImage: ImageBitmap?,
+) : Layer(
     BackgroundConstellation(layerOrder = 1),
     BackgroundWave(
         waveColor = Color(0xFF00E5FF).copy(alpha = 0.1f),
@@ -20,7 +24,11 @@ class BackgroundLayer(private val character: Character) : Layer(
         amplitudeRatio = 1f,
         layerOrder = 2
     ),
-    BackgroundRipple(layerOrder = 3),
+    BackgroundRipple(
+        character = character,
+        characterImage = characterImage,
+        layerOrder = 3
+    ),
     BackgroundWave(
         waveColor = Color(0xFFFF00FF).copy(alpha = 0.1f),
         phaseRatio = 0.002f,
@@ -33,4 +41,8 @@ class BackgroundLayer(private val character: Character) : Layer(
     layerType = LayerType.Absolute
 ) {
     override val interactive: Boolean = false
+
+    fun activateSkill() {
+        requireVisible<BackgroundRipple>().skillOpened = true
+    }
 }

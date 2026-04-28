@@ -61,24 +61,19 @@ class RhymePlugin(
     private var isGameRunning: Boolean by mutableRefStateOf(false)
 
     // 初始化游戏
-    suspend fun setupGame(playInfo: RhymePlayInfo, audio: File) {
+    suspend fun setupGame(playInfo: RhymePlayInfo, character: Character, audio: File) {
         if (!isGameRunning) {
-            val characterFactory = Character.Factory[playInfo.playConfig.character]
-            if (characterFactory != null) {
-                isGameRunning = true
-                // 初始化角色
-                val character = characterFactory()
-                // 加载音频
-                player.load(audio, true)
-                // 加载画布
-                val backgroundLayer = BackgroundLayer(character)
-                val interactLayer = InteractLayer()
-                val momentLayer = MomentLayer(playInfo, player)
-                val uiLayer = UILayer(character, playInfo, momentLayer)
-                val mapLayer = MapLayer(scene.camera, character, playInfo, momentLayer, interactLayer, uiLayer)
-                // 先更新交互结果再处理地图
-                scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)
-            }
+            isGameRunning = true
+            // 加载音频
+            player.load(audio, true)
+            // 加载画布
+            val backgroundLayer = BackgroundLayer(character, playInfo.characterCV)
+            val interactLayer = InteractLayer()
+            val momentLayer = MomentLayer(playInfo, player)
+            val uiLayer = UILayer(character, playInfo, momentLayer)
+            val mapLayer = MapLayer(scene.camera, character, playInfo, momentLayer, backgroundLayer, interactLayer, uiLayer)
+            // 先更新交互结果再处理地图
+            scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)
         }
     }
 
