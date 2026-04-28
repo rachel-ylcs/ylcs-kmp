@@ -1,5 +1,6 @@
 package love.yinlin.cs
 
+import love.yinlin.cs.service.values
 import love.yinlin.cs.user.*
 import love.yinlin.data.rachel.rhyme.CharacterInfo
 import love.yinlin.data.rachel.rhyme.RhymeRepository
@@ -34,6 +35,19 @@ fun APIScope.rhymeAPI() {
 
     ApiRhymeUploadRecord.response { token, sid, result ->
         val uid = AN.throwExpireToken(token)
+        if (result.uid != uid || result.sid != sid || !result.valid) failure("数据一致性校验失败")
+        db.throwInsertSQLGeneratedKey("INSERT INTO rhyme_record(sid, uid, result) ${values(3)}", sid, uid, result.toJsonString())
+    }
 
+    ApiRhymeGetRank.response { token, sid ->
+        AN.throwExpireToken(token)
+        val rankList = db.throwQuerySQL("""
+            SELECT rid, user.uid, name, result
+            FROM rhyme_record
+            LEFT JOIN user
+            ON rhyme_record.uid = user.uid
+            WHERE sid = ?
+        """, sid)
+        result(rankList.to())
     }
 }

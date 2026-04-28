@@ -65,26 +65,30 @@ internal fun RhymeCommonButton(
 internal fun RhymeMusicCard(
     info: MusicInfo,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
+    content: @Composable () -> Unit
 ) {
     Surface(
         modifier = modifier,
         shadowElevation = Theme.shadow.v5,
         tonalLevel = 1,
-        shape = Theme.shape.v7,
-        onClick = onClick
+        shape = Theme.shape.v7
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             LocalFileImage(
                 uri = info.path(app.modPath, ModResourceType.Record).path,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(Theme.size.image7)
             )
-            Column(modifier = Modifier.weight(1f).padding(Theme.padding.value)) {
+            Column(
+                modifier = Modifier.weight(1f).padding(Theme.padding.value),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+            ) {
                 SimpleEllipsisText(text = info.name, style = Theme.typography.v6.bold)
+                Box(modifier = Modifier.fillMaxWidth()) { content() }
             }
         }
     }

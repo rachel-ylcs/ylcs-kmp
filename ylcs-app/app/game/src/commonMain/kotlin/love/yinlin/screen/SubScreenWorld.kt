@@ -245,7 +245,7 @@ class SubScreenWorld(parent: NavigationScreen) : SubScreen(parent) {
                         SimpleEllipsisText(
                             text = rank.name,
                             style = if (rankIndex in 1 .. 3) Theme.typography.v7.bold else Theme.typography.v7,
-                            color = when (index) {
+                            color = when (rankIndex) {
                                 1 -> Theme.color.primary
                                 2 -> Theme.color.secondary
                                 3 -> Theme.color.tertiary

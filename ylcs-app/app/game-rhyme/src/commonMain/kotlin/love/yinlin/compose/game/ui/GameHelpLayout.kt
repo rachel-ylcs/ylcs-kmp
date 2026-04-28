@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.compose.Colors
+import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.text.SimpleClipText
@@ -28,9 +29,9 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 @Composable
-internal fun GameHelpLayout(modifier: Modifier = Modifier) {
+internal fun GameHelpLayout() {
     Box(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current),
         contentAlignment = Alignment.Center
     ) {
         Column(

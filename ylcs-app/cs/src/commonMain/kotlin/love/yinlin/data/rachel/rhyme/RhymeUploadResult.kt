@@ -8,6 +8,7 @@ import love.yinlin.extension.DateEx
 @Serializable
 @Stable
 data class RhymeUploadResult(
+    val uid: Int, // 用户ID
     val sid: String, // 歌曲ID
     val ts: Long, // 时间戳
     val difficulty: Int, // 难度
@@ -19,6 +20,7 @@ data class RhymeUploadResult(
 ) {
     companion object {
         private fun buildRaw(
+            uid: Int,
             sid: String,
             ts: Long,
             difficulty: Int,
@@ -27,6 +29,7 @@ data class RhymeUploadResult(
             score: Int,
             statistics: List<Int>
         ): String = XXHash64.encodeToString(buildString {
+            append(uid)
             append(sid)
             append(ts)
             append(difficulty)
@@ -38,20 +41,22 @@ data class RhymeUploadResult(
         }) + ts.toString().map { digit -> 'a' + (digit - '0') }.joinToString("")
 
         private fun hash(
+            uid: Int,
             sid: String,
             ts: Long,
             difficulty: Int,
             character: Int,
             result: RhymePlayResult
-        ): String = buildRaw(sid, ts, difficulty, character, result.duration, result.score, result.statistics)
+        ): String = buildRaw(uid, sid, ts, difficulty, character, result.duration, result.score, result.statistics)
 
         fun build(
+            uid: Int,
             sid: String,
             ts: Long,
             difficulty: Int,
             character: Int,
             result: RhymePlayResult
-        ): RhymeUploadResult = RhymeUploadResult(sid, ts, difficulty, character, result.duration, result.score, result.statistics, hash(sid, ts, difficulty, character, result))
+        ): RhymeUploadResult = RhymeUploadResult(uid, sid, ts, difficulty, character, result.duration, result.score, result.statistics, hash(uid, sid, ts, difficulty, character, result))
     }
 
     val valid: Boolean get() {
@@ -59,6 +64,6 @@ data class RhymeUploadResult(
         val ots = hash.substring(32).map { it - 'a' }.joinToString("").toLongOrNull() ?: return false
         if (ots != ts) return false
         if (DateEx.CurrentLong - ots !in 1L .. 3600000L) return false
-        return buildRaw(sid, ots, difficulty, character, duration, score, statistics) == hash
+        return buildRaw(uid, sid, ots, difficulty, character, duration, score, statistics) == hash
     }
 }

@@ -34,6 +34,7 @@ import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymeIllustration
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.data.RhymePlayInfo
+import love.yinlin.compose.game.data.RhymeRankItem
 import love.yinlin.compose.game.data.RhymeState
 import love.yinlin.compose.game.viewport.Viewport
 import love.yinlin.compose.game.plugin.AssetPlugin
@@ -42,6 +43,8 @@ import love.yinlin.compose.game.plugin.RhymePlugin
 import love.yinlin.compose.game.plugin.ScenePlugin
 import love.yinlin.compose.game.plugin.SoundPlugin
 import love.yinlin.compose.game.ui.GameHelpLayout
+import love.yinlin.compose.game.ui.GameRankLayout
+import love.yinlin.compose.game.ui.GameSettlingLayout
 import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.game.ui.RhymeIllustrationLayout
 import love.yinlin.compose.game.ui.RhymeIllustrationSelector
@@ -63,23 +66,22 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.input.SecondaryTextButton
 import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.node.blurSource
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.cs.ApiRhymeGetUserRepository
-import love.yinlin.cs.ApiRhymeUnlockCharacter
-import love.yinlin.cs.ServerRes
-import love.yinlin.cs.request
-import love.yinlin.cs.url
+import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.rhyme.CharacterInfo
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
 import love.yinlin.data.rachel.rhyme.RhymeRepository
+import love.yinlin.data.rachel.rhyme.RhymeUploadResult
+import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.startup.StartupMusicPlayer
@@ -148,6 +150,42 @@ class ScreenRhyme : BasicScreen() {
         }
     }
 
+    private var isSubmit: Boolean = false
+
+    private suspend fun loadRhymeRank(info: MusicInfo) {
+        slot.loading.open(content = "正在加载排行榜") {
+            ApiRhymeGetRank.request(app.config.userToken, info.id) { rankList ->
+                gameState = RhymeState.Rank(info, RhymeRankItem.parse(rankList))
+            }.errorTip
+        }
+    }
+
+    private suspend fun submitResult(info: MusicInfo, playConfig: RhymePlayConfig, result: RhymePlayResult) {
+        if (isSubmit) slot.tip.warning("不可重复上传成绩")
+        else {
+            val profile = app.config.userProfile
+            if (profile == null) slot.tip.warning("请先登录")
+            else {
+                slot.loading.open(content = "正在上传成绩") {
+                    val sid = info.id
+                    val uid = profile.uid
+                    val uploadResult = RhymeUploadResult.build(
+                        uid,
+                        sid,
+                        DateEx.CurrentLong,
+                        playConfig.difficulty.ordinal,
+                        playConfig.character.id,
+                        result
+                    )
+                    ApiRhymeUploadRecord.request(app.config.userToken, sid, uploadResult) {
+                        isSubmit = true
+                        slot.tip.success("提交成功")
+                    }.errorTip
+                }
+            }
+        }
+    }
+
     private fun startGame(info: MusicInfo, playConfig: RhymePlayConfig) {
         if (engine.isRunning) return
         launch {
@@ -174,6 +212,7 @@ class ScreenRhyme : BasicScreen() {
                     audio = audio
                 )
                 engine.isRunning = true
+                isSubmit = false
                 gameState = RhymeState.Playing(info, playConfig)
             }.errorTip
         }
@@ -214,7 +253,7 @@ class ScreenRhyme : BasicScreen() {
     override fun onBack() {
         when (gameState) {
             is RhymeState.Start -> super.onBack()
-            is RhymeState.Prepare -> gameState = RhymeState.MusicLibrary
+            is RhymeState.Prepare, is RhymeState.Rank -> gameState = RhymeState.MusicLibrary
             is RhymeState.Playing -> engine.isRunning = false
             else -> gameState = RhymeState.Start
         }
@@ -272,14 +311,7 @@ class ScreenRhyme : BasicScreen() {
             ) {
                 val isInitialized = engine.isInitialized
                 if (isInitialized) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h, Alignment.CenterHorizontally),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        SimpleClipText(text = "横屏游玩体验更佳", color = Theme.color.primary, style = Theme.typography.v5.bold)
-                        Icon(icon = Icons.Info, tip = "帮助", color = Theme.color.primary, onClick = { gameState = RhymeState.Help })
-                    }
+                    SimpleClipText(text = "横屏游玩体验更佳", color = Theme.color.primary, style = Theme.typography.v5.bold)
                 }
                 else if (gameError) {
                     SimpleClipText(text = "引擎加载失败", color = Theme.color.error, style = Theme.typography.v5.bold)
@@ -297,25 +329,10 @@ class ScreenRhyme : BasicScreen() {
                 ) {
                     if (isInitialized) {
                         RhymeCommonButton(icon = Icons.LibraryMusic, text = "曲库", onClick = { gameState = RhymeState.MusicLibrary }, modifier = Modifier.weight(1f))
-                        RhymeCommonButton(icon = Icons.LibraryMusic, text = "立绘", onClick = { gameState = RhymeState.Illustration }, modifier = Modifier.weight(1f))
-                        RhymeCommonButton(icon = Icons.RewardCup, text = "排行", onClick = { gameState = RhymeState.Rank }, modifier = Modifier.weight(1f))
+                        RhymeCommonButton(icon = Icons.AccountCircle, text = "立绘", onClick = { gameState = RhymeState.Illustration }, modifier = Modifier.weight(1f))
+                        RhymeCommonButton(icon = Icons.Info, text = "帮助", onClick = { gameState = RhymeState.Help }, modifier = Modifier.weight(1f))
                     }
                     RhymeCommonButton(icon = Icons.ArrowBack, text = "返回", onClick = ::onBack, modifier = Modifier.weight(1f))
-                    RhymeCommonButton(icon = Icons.ArrowBack, text = "结算", onClick = {
-                        gameState = RhymeState.Settling(
-                            info = library[0],
-                            playConfig = RhymePlayConfig(
-                                difficulty = RhymeDifficulty.Medium,
-                                audioDelay = 2000L,
-                                character = CharacterInfo.Default
-                            ),
-                            result = RhymePlayResult(
-                                duration = 2000L,
-                                score = 2034,
-                                statistics = listOf(64, 37, 125, 210)
-                            )
-                        )
-                    }, modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -351,11 +368,18 @@ class ScreenRhyme : BasicScreen() {
                     modifier = Modifier.fillMaxWidth().weight(1f),
                 ) {
                     items(items = library, key = { it.id }) { info ->
-                        RhymeMusicCard(
-                            info = info,
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = { gameState = RhymeState.Prepare(info) }
-                        )
+                        RhymeMusicCard(info = info, modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                PrimaryTextButton(text = "开始", icon = Icons.PlayArrow, onClick = { gameState = RhymeState.Prepare(info) })
+                                SecondaryTextButton(text = "排行", icon = Icons.RewardCup, onClick = {
+                                    launch { loadRhymeRank(info) }
+                                })
+                            }
+                        }
                     }
                 }
             }
@@ -375,8 +399,6 @@ class ScreenRhyme : BasicScreen() {
                 }
             }
 
-
-
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(Theme.size.cell4),
                 contentPadding = Theme.padding.eValue10,
@@ -388,9 +410,7 @@ class ScreenRhyme : BasicScreen() {
                     RhymeIllustrationLayout(
                         illustration = illustration,
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                        onClick = {
-                            characterSheet.open(illustration)
-                        }
+                        onClick = { characterSheet.open(illustration) }
                     )
                 }
             }
@@ -425,7 +445,7 @@ class ScreenRhyme : BasicScreen() {
                 modifier = Modifier.widthIn(min = Theme.size.cell1, max = Theme.size.cell1 * 1.5f).padding(Theme.padding.value9),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
             ) {
-                RhymeMusicCard(info = info, modifier = Modifier.fillMaxWidth())
+                RhymeMusicCard(info = info, modifier = Modifier.fillMaxWidth()) { }
 
                 SimpleClipText(text = "难度", style = Theme.typography.v6.bold)
 
@@ -467,16 +487,6 @@ class ScreenRhyme : BasicScreen() {
     }
 
     @Composable
-    private fun GameSettlingLayout() {
-
-    }
-
-    @Composable
-    private fun GameRankLayout() {
-
-    }
-
-    @Composable
     override fun BasicContent() {
         Theme.ThemeModeWrapper(true) {
             AnimationContent(gameState, modifier = Modifier.fillMaxSize().background(Theme.color.background)) { state ->
@@ -484,11 +494,15 @@ class ScreenRhyme : BasicScreen() {
                     is RhymeState.Start -> GameStartLayout()
                     is RhymeState.MusicLibrary -> GameMusicLibraryLayout()
                     is RhymeState.Illustration -> GameIllustrationLayout()
-                    is RhymeState.Help -> GameHelpLayout(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current))
+                    is RhymeState.Help -> GameHelpLayout()
                     is RhymeState.Prepare -> GamePrepareLayout(state.info)
                     is RhymeState.Playing -> engine.ViewportContent(modifier = Modifier.fillMaxSize(), padding = LocalImmersivePadding.current)
-                    is RhymeState.Settling -> GameSettlingLayout()
-                    is RhymeState.Rank -> GameRankLayout()
+                    is RhymeState.Settling -> GameSettlingLayout(state, ::onBack) {
+                        launch {
+                            submitResult(state.info, state.playConfig, state.result)
+                        }
+                    }
+                    is RhymeState.Rank -> GameRankLayout(state.info, state.map)
                 }
             }
         }

@@ -4,8 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,8 +26,8 @@ import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.drawer.StrokeTextGraph
 import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.traits.Layer
+import love.yinlin.compose.game.ui.StarPaths
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
-import kotlin.math.ceil
 
 @Stable
 class UILayer(
@@ -112,7 +110,8 @@ class UILayer(
     private val comboGraphMap = mutableMapOf<Int, StrokeTextGraph>()
 
     // 统计数据收集
-    private val statistics = IntArray(BlockResult.entries.size)
+    private val statistics = IntArray(BlockResult.entries.size) // 各评级数量
+    private var maxCombo: Int = 0
 
     fun updateResult(result: BlockResult) {
         // 统计
@@ -120,6 +119,8 @@ class UILayer(
         // 计算连击
         val oldCombo = resultData?.combo ?: 0
         val newCombo = if (result == BlockResult.MISS || result == BlockResult.BAD) 0 else oldCombo + 1
+        // 记录最大连击
+        if (newCombo > maxCombo) maxCombo = newCombo
         // 计算得分
         val reward = result.score // 向上取整
         val deltaScore = reward + newCombo / comboRewardCount
@@ -139,6 +140,7 @@ class UILayer(
     fun submitResult(): RhymePlayResult = RhymePlayResult(
         duration = info.lyricsConfig.duration,
         score = score,
+        maxCombo = maxCombo,
         statistics = statistics.toList()
     )
 
@@ -251,79 +253,4 @@ class UILayer(
             strokeText(graph, barBottom, Size(scoreWidth, resultHeight), Colors.Dark, Colors.White, TextStroke, TextAlign.End)
         }
     }
-}
-
-private val StarPaths by lazy {
-    listOf(
-        Path().apply {
-            moveTo(539.457f, 110.815f)
-            lineTo(418.568f, 355.852f)
-            lineTo(539.457f, 483.457f)
-            lineTo(539.457f, 110.815f)
-            close()
-        } to Color(0xFF60C9C3),
-        Path().apply {
-            moveTo(418.568f, 355.852f)
-            lineTo(148.05f, 395.16f)
-            lineTo(539.457f, 483.457f)
-            lineTo(418.568f, 355.852f)
-            close()
-        } to Color(0xFF6ADDD6),
-        Path().apply {
-            moveTo(660.444f, 355.852f)
-            lineTo(539.457f, 110.815f)
-            lineTo(539.457f, 483.457f)
-            lineTo(660.444f, 355.852f)
-            close()
-        } to Color(0xFF6ADDD6),
-        Path().apply {
-            moveTo(930.864f, 395.16f)
-            lineTo(660.444f, 355.852f)
-            lineTo(539.457f, 483.457f)
-            lineTo(930.864f, 395.16f)
-            close()
-        } to Color(0xFFA9ECEB),
-        Path().apply {
-            moveTo(735.111f, 585.975f)
-            lineTo(930.864f, 395.16f)
-            lineTo(539.457f, 483.457f)
-            lineTo(735.111f, 585.975f)
-            close()
-        } to Color(0xFF00A298),
-        Path().apply {
-            moveTo(539.457f, 483.457f)
-            lineTo(781.333f, 855.309f)
-            lineTo(735.111f, 585.975f)
-            lineTo(539.457f, 483.457f)
-            close()
-        } to Color(0xFFA9ECEB),
-        Path().apply {
-            moveTo(148.049f, 395.16f)
-            lineTo(343.802f, 585.975f)
-            lineTo(539.457f, 483.457f)
-            lineTo(148.049f, 395.16f)
-            close()
-        } to Color(0xFF00A298),
-        Path().apply {
-            moveTo(343.802f, 585.975f)
-            lineTo(297.58f, 855.309f)
-            lineTo(539.457f, 483.457f)
-            lineTo(343.802f, 585.975f)
-            close()
-        } to Color(0xFF6ADDD6),
-        Path().apply {
-            moveTo(297.58f, 855.309f)
-            lineTo(539.457f, 728.1f)
-            lineTo(539.457f, 483.457f)
-            lineTo(297.58f, 855.309f)
-            close()
-        } to Color(0xFF00C4B8),
-        Path().apply {
-            moveTo(539.457f, 483.457f)
-            lineTo(539.457f, 728.1f)
-            lineTo(781.333f, 855.309f)
-            lineTo(539.457f, 483.457f)
-            close()
-        } to Color(0xFF6ADDD6)
-    )
 }

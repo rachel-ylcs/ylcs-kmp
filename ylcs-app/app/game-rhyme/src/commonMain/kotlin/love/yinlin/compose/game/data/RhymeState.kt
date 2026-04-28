@@ -21,5 +21,5 @@ internal sealed interface RhymeState {
     @Stable
     data class Settling(val info: MusicInfo, val playConfig: RhymePlayConfig, val result: RhymePlayResult) : RhymeState // 结算
     @Stable
-    data object Rank : RhymeState // 排行榜
+    data class Rank(val info: MusicInfo, val map: Map<RhymeDifficulty, List<RhymeRankItem>>) : RhymeState // 排行榜
 }
