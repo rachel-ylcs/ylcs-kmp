@@ -2,6 +2,7 @@ package love.yinlin.compose.game.layer
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
+import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.visible.BackgroundConstellation
@@ -9,7 +10,7 @@ import love.yinlin.compose.game.visible.BackgroundRipple
 import love.yinlin.compose.game.visible.BackgroundWave
 
 @Stable
-class BackgroundLayer : Layer(
+class BackgroundLayer(private val character: Character) : Layer(
     BackgroundConstellation(layerOrder = 1),
     BackgroundWave(
         waveColor = Color(0xFF00E5FF).copy(alpha = 0.1f),

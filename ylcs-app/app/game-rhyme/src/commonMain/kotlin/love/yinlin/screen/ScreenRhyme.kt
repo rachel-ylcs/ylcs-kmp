@@ -3,9 +3,12 @@ package love.yinlin.screen
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +34,6 @@ import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymeIllustration
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.data.RhymePlayInfo
-import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.data.RhymeState
 import love.yinlin.compose.game.viewport.Viewport
 import love.yinlin.compose.game.plugin.AssetPlugin
@@ -42,6 +44,7 @@ import love.yinlin.compose.game.plugin.SoundPlugin
 import love.yinlin.compose.game.ui.GameHelpLayout
 import love.yinlin.compose.game.ui.RhymeCommonButton
 import love.yinlin.compose.game.ui.RhymeIllustrationLayout
+import love.yinlin.compose.game.ui.RhymeIllustrationSelector
 import love.yinlin.compose.game.ui.RhymeMusicCard
 import love.yinlin.compose.game.viewport.Camera
 import love.yinlin.compose.graphics.decode
@@ -53,25 +56,29 @@ import love.yinlin.compose.ui.common.ArgsSlider
 import love.yinlin.compose.ui.common.SliderArgs
 import love.yinlin.compose.ui.common.value
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.input.PrimaryTextButton
-import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.node.blurSource
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.cs.ApiRhymeGetUserRepository
+import love.yinlin.cs.ApiRhymeUnlockCharacter
 import love.yinlin.cs.ServerRes
+import love.yinlin.cs.request
 import love.yinlin.cs.url
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymePlayResult
 import love.yinlin.data.rachel.rhyme.RhymeRepository
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.parseJsonValue
@@ -107,7 +114,39 @@ class ScreenRhyme : BasicScreen() {
     private var gameError: Boolean by mutableStateOf(false)
 
     private val library = mutableListOf<MusicInfo>()
-    private val repository: RhymeRepository? by mutableStateOf(null)
+    private var repository: RhymeRepository? by mutableStateOf(null)
+    private val illustrationList by derivedStateOf {
+        CharacterInfo.Pool.map { (id, info) ->
+            RhymeIllustration(
+                info = info,
+                url = ServerRes.Game.Rhyme.CV.illustration(id).url,
+                unlocked = if (info == CharacterInfo.Default) true else repository?.characters?.contains(id) == true
+            )
+        }
+    }
+    private val unlockedIllustrationList by derivedStateOf { illustrationList.filter { it.unlocked } }
+
+    private suspend fun unlockCharacter(info: CharacterInfo) {
+        val profile = app.config.userProfile
+        val oldRepository = repository
+        if (profile == null || oldRepository == null) slot.tip.warning("请先登录")
+        else {
+            val newCharacters = oldRepository.characters.toMutableList()
+            if (info.id in newCharacters) slot.tip.warning("你已经解锁该立绘")
+            else {
+                val cost = info.cost
+                if (profile.coin < cost) slot.tip.warning("你的银币不够哦")
+                else {
+                    ApiRhymeUnlockCharacter.request(app.config.userToken, info.id) {
+                        newCharacters += info.id
+                        repository = oldRepository.copy(characters = newCharacters)
+                        app.config.userProfile = profile.copy(coin = profile.coin - cost, exp = profile.exp + cost / 2)
+                        slot.tip.success("解锁成功")
+                    }.warningTip
+                }
+            }
+        }
+    }
 
     private fun startGame(info: MusicInfo, playConfig: RhymePlayConfig) {
         if (engine.isRunning) return
@@ -158,6 +197,11 @@ class ScreenRhyme : BasicScreen() {
                     if (info.path(modPath, ModResourceType.Rhyme).exists()) info else null
                 }
             }
+        }
+        // 初始化仓库
+        Coroutines.io {
+            val token = app.config.userToken
+            if (token.isNotEmpty()) ApiRhymeGetUserRepository.request(token) { repository = it }
         }
         // 初始化游戏引擎
         if (!engine.initialize()) gameError = true
@@ -257,6 +301,21 @@ class ScreenRhyme : BasicScreen() {
                         RhymeCommonButton(icon = Icons.RewardCup, text = "排行", onClick = { gameState = RhymeState.Rank }, modifier = Modifier.weight(1f))
                     }
                     RhymeCommonButton(icon = Icons.ArrowBack, text = "返回", onClick = ::onBack, modifier = Modifier.weight(1f))
+                    RhymeCommonButton(icon = Icons.ArrowBack, text = "结算", onClick = {
+                        gameState = RhymeState.Settling(
+                            info = library[0],
+                            playConfig = RhymePlayConfig(
+                                difficulty = RhymeDifficulty.Medium,
+                                audioDelay = 2000L,
+                                character = CharacterInfo.Default
+                            ),
+                            result = RhymePlayResult(
+                                duration = 2000L,
+                                score = 2034,
+                                statistics = listOf(64, 37, 125, 210)
+                            )
+                        )
+                    }, modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -316,15 +375,7 @@ class ScreenRhyme : BasicScreen() {
                 }
             }
 
-            val illustrationList = remember {
-                CharacterInfo.Pool.map { (id, info) ->
-                    RhymeIllustration(
-                        info = info,
-                        url = ServerRes.Game.Rhyme.CV.illustration(id).url,
-                        unlocked = if (info == CharacterInfo.Default) true else repository?.characters?.contains(id) == true
-                    )
-                }
-            }
+
 
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(Theme.size.cell4),
@@ -350,6 +401,7 @@ class ScreenRhyme : BasicScreen() {
     private fun GamePrepareLayout(info: MusicInfo) {
         var difficulty by rememberState { RhymePlayConfig.Default.difficulty }
         var audioDelay by rememberState { SliderArgs(0L, RhymePlayConfig.MIN_AUDIO_DELAY, RhymePlayConfig.MAX_AUDIO_DELAY) }
+        var character by rememberState { RhymePlayConfig.Default.character }
 
         Column(modifier = Modifier.fillMaxSize().padding(LocalImmersivePadding.current)) {
             Row(
@@ -362,14 +414,15 @@ class ScreenRhyme : BasicScreen() {
                     Icon(icon = Icons.PlayArrow, tip = "开始", onClick = {
                         startGame(info, RhymePlayConfig(
                             difficulty = difficulty,
-                            audioDelay = audioDelay.value
+                            audioDelay = audioDelay.value,
+                            character = character
                         ))
                     })
                 }
             }
 
             Column(
-                modifier = Modifier.width(Theme.size.cell1).padding(Theme.padding.value9),
+                modifier = Modifier.widthIn(min = Theme.size.cell1, max = Theme.size.cell1 * 1.5f).padding(Theme.padding.value9),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
             ) {
                 RhymeMusicCard(info = info, modifier = Modifier.fillMaxWidth())
@@ -389,6 +442,26 @@ class ScreenRhyme : BasicScreen() {
                     onValueChange = { audioDelay = audioDelay.copy(tmpValue = it) },
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                SimpleClipText(text = "立绘", style = Theme.typography.v6.bold)
+
+                val state = rememberLazyListState()
+                HorizontalScrollContainer(state, modifier = Modifier.fillMaxWidth()) {
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        state = state,
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    ) {
+                        items(items = unlockedIllustrationList, key = { it.info.id }) { illustration ->
+                            RhymeIllustrationSelector(
+                                illustration = illustration,
+                                checked = character == illustration.info,
+                                modifier = Modifier.width(Theme.size.cell6).aspectRatio(1f),
+                                onClick = { character = illustration.info }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -462,7 +535,7 @@ class ScreenRhyme : BasicScreen() {
                             )
                             if (!unlocked) {
                                 PrimaryTextButton(text = "解锁", icon = Icons.Store, onClick = {
-
+                                    launch { unlockCharacter(info) }
                                 })
                             }
                         }

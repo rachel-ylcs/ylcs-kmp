@@ -6,6 +6,7 @@ import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
 import love.yinlin.app.game_rhyme.resources.music
 import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.app.global.resources.xwwk
+import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.common.BlockMapGenerator
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -21,6 +22,7 @@ import love.yinlin.compose.game.visible.CornerTail
 @Stable
 class MapLayer(
     private val camera: Camera,
+    private val character: Character,
     playInfo: RhymePlayInfo,
     val momentLayer: MomentLayer,
     private val interactLayer: InteractLayer,

@@ -461,6 +461,9 @@ val ApiPrizeDrawPrize by API.post.i<String, Int>().o<String>()
 val ApiRhymeGetUserRepository by API.post.i<String>().o<RhymeRepository>()
 
 @APIParam("token")
+val ApiRhymeUnlockCharacter by API.post.i<String, Int>().o()
+
+@APIParam("token")
 @APIParam("sid")
 @APIParam("result")
-val ApiRhymeUploadRecord by API.post.i<String, Int, RhymeUploadResult>().o()
+val ApiRhymeUploadRecord by API.post.i<String, String, RhymeUploadResult>().o()

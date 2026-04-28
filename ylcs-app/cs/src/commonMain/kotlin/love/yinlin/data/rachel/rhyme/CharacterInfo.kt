@@ -1,8 +1,10 @@
 package love.yinlin.data.rachel.rhyme
 
 import androidx.compose.runtime.Stable
+import kotlinx.serialization.Serializable
 
 @Stable
+@Serializable
 enum class CharacterInfo(
     val id: Int, // ID
     val title: String, // 名称
@@ -20,7 +22,7 @@ enum class CharacterInfo(
 相遇莫错过
         """.trimIndent(),
         skill = """
-A. 你没有任何琴韵，坚守初心定有回报
+A. 坚守初心定有回报
         """.trimIndent(),
         cost = 0
     ),
@@ -37,7 +39,7 @@ A. 你没有任何琴韵，坚守初心定有回报
         """.trimIndent(),
         skill = """
 A. 【断尾时刻】音轨到达最后一句时触发
-B. 断尾时刻所有音符自动以Perfect结算
+B. 断尾时刻所有音符以Perfect结算
         """.trimIndent(),
         cost = 10
     ),
@@ -109,7 +111,7 @@ A. 你的Bad结算有20%概率不重置连击
         """.trimIndent(),
         skill = """
 A. 【转角时刻】音轨到达一句的最后一个音符时触发
-B. 转角时刻所有音符自动以Perfect结算
+B. 转角时刻所有音符以Perfect结算
         """.trimIndent(),
         cost = 60
     ),

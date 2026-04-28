@@ -164,7 +164,7 @@ internal fun GameHelpLayout(modifier: Modifier = Modifier) {
                     })
                 }
                 Text(
-                    text = "手指动作轻盈飞快，根据简谱中不同的音符类型在相应位置完成交互，合理运用琴心避免出错或遗漏，争取获得高分。",
+                    text = "手指动作轻盈飞快，根据简谱中不同的音符类型在相应位置完成交互，合理运用琴韵避免出错或遗漏，争取获得高分。",
                     modifier = Modifier.fillMaxWidth()
                 )
             }

@@ -16,11 +16,11 @@ import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.Colors
 import love.yinlin.compose.extension.scale
+import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.FPSCounter
 import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayInfo
-import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.LayerType
@@ -28,10 +28,12 @@ import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.drawer.StrokeTextGraph
 import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.traits.Layer
+import love.yinlin.data.rachel.rhyme.RhymePlayResult
 import kotlin.math.ceil
 
 @Stable
 class UILayer(
+    private val character: Character,
     private val info: RhymePlayInfo,
     private val momentLayer: MomentLayer
 ) : Layer(
@@ -135,6 +137,7 @@ class UILayer(
     }
 
     fun submitResult(): RhymePlayResult = RhymePlayResult(
+        duration = info.lyricsConfig.duration,
         score = score,
         statistics = statistics.toList()
     )

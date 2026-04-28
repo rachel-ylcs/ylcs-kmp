@@ -14,8 +14,8 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.game.Engine
+import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.data.RhymePlayInfo
-import love.yinlin.compose.game.data.RhymePlayResult
 import love.yinlin.compose.game.layer.BackgroundLayer
 import love.yinlin.compose.game.layer.InteractLayer
 import love.yinlin.compose.game.layer.MapLayer
@@ -28,6 +28,7 @@ import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.data.rachel.rhyme.RhymePlayResult
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.media.buildAudioPlayer
@@ -62,15 +63,22 @@ class RhymePlugin(
     // 初始化游戏
     suspend fun setupGame(playInfo: RhymePlayInfo, audio: File) {
         if (!isGameRunning) {
-            isGameRunning = true
-            player.load(audio, true)
-            val backgroundLayer = BackgroundLayer()
-            val interactLayer = InteractLayer()
-            val momentLayer = MomentLayer(playInfo, player)
-            val uiLayer = UILayer(playInfo, momentLayer)
-            val mapLayer = MapLayer(scene.camera, playInfo, momentLayer, interactLayer, uiLayer)
-            // 先更新交互结果再处理地图
-            scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)
+            val characterFactory = Character.Factory[playInfo.playConfig.character]
+            if (characterFactory != null) {
+                isGameRunning = true
+                // 初始化角色
+                val character = characterFactory()
+                // 加载音频
+                player.load(audio, true)
+                // 加载画布
+                val backgroundLayer = BackgroundLayer(character)
+                val interactLayer = InteractLayer()
+                val momentLayer = MomentLayer(playInfo, player)
+                val uiLayer = UILayer(character, playInfo, momentLayer)
+                val mapLayer = MapLayer(scene.camera, character, playInfo, momentLayer, interactLayer, uiLayer)
+                // 先更新交互结果再处理地图
+                scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)
+            }
         }
     }
 
