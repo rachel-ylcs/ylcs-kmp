@@ -2,6 +2,6 @@ package love.yinlin.compose.game.character
 
 import love.yinlin.data.rachel.rhyme.CharacterInfo
 
-class CharacterPiFuDuHai : Character {
+class CharacterPiFuDuHai : Character() {
     override val info: CharacterInfo = CharacterInfo.PiFuDuHai
 }

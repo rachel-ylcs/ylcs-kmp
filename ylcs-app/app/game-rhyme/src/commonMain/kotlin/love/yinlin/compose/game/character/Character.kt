@@ -2,8 +2,10 @@ package love.yinlin.compose.game.character
 
 import love.yinlin.data.rachel.rhyme.CharacterInfo
 
-sealed interface Character {
-    val info: CharacterInfo
+sealed class Character {
+    abstract val info: CharacterInfo
+
+    var showText: String? = null
 
     companion object {
         val Factory = mapOf(

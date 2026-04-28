@@ -7,11 +7,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.util.fastCoerceIn
+import love.yinlin.app.global.resources.Res
+import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.Colors
+import love.yinlin.compose.extension.translate
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.PrepareDrawer
+import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Visible
 import kotlin.math.cos
@@ -32,12 +37,17 @@ class BackgroundRipple(
     var resonanceCurrentScale = 1f
     val edgeNoises = FloatArray(50)
     val noiseSize = edgeNoises.size
-    var characterBounds = Rect.Zero
+
+    var characterRadius: Float = 0f
+    var characterBounds: Rect = Rect.Zero
 
     var skillTick: Int = 0
     var skillAlpha: Float = 0.2f
     var skillOpened: Boolean = false
     val skillDuration: Int = 300
+
+    var skillShowText: String? = null
+    var skillShowTextGraph: TextGraph? = null
 
     override fun onUpdate(tick: Int) {
         val (centerX, centerY) = backgroundSize.center
@@ -85,16 +95,33 @@ class BackgroundRipple(
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
         backgroundSize = viewportSize
-        characterBounds = Rect(viewportSize.center, viewportSize.minDimension / 3.5f)
+        characterRadius = viewportSize.minDimension / 3.5f
+        characterBounds = Rect(viewportSize.center, characterRadius)
+
+        val newText = character.showText
+        if (skillShowText != newText) {
+            skillShowText = newText
+            skillShowTextGraph = newText?.let { measureText(it, Res.font.xwwk, FontWeight.Bold) }
+        }
     }
 
     override fun Drawer.onDraw() {
-        characterImage?.let { cv ->
-            clip(resonancePath) {
-                circle(Colors.Black, characterBounds.center, characterBounds.width / 2f)
+        val characterCenter = characterBounds.center
+
+        clip(resonancePath) {
+            characterImage?.let { cv ->
+                circle(Colors.Black, characterCenter, characterRadius)
                 image(cv, characterBounds, alpha = skillAlpha)
             }
+
+            skillShowTextGraph?.let { graph ->
+                val h = characterRadius / 8f
+                val w = graph.width(h)
+                roundRect(Colors.Black, h, characterCenter.translate(x = -w, y = h * 4), Size(w * 2, h), alpha = 0.75f)
+                text(graph, characterCenter.translate(x = -w / 2, y = h * 4), Size(w, h), Colors.White.copy(alpha = skillAlpha))
+            }
         }
+
         path(path = resonancePath, color = resonanceColor, style = Stroke(width = 20f), alpha = skillAlpha)
     }
 }

@@ -22,7 +22,7 @@ import love.yinlin.compose.game.visible.CornerTail
 @Stable
 class MapLayer(
     private val camera: Camera,
-    private val character: Character,
+    val character: Character,
     playInfo: RhymePlayInfo,
     val momentLayer: MomentLayer,
     val backgroundLayer: BackgroundLayer,

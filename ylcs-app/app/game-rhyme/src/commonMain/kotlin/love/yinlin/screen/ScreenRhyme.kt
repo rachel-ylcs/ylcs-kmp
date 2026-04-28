@@ -163,7 +163,7 @@ class ScreenRhyme : BasicScreen() {
 
     private suspend fun submitResult(info: MusicInfo, playConfig: RhymePlayConfig, result: RhymePlayResult) {
         if (isSubmit) slot.tip.warning("不可重复上传成绩")
-        else {
+        else if (slot.confirm.open("确认上传此成绩并参与排行吗")) {
             val profile = app.config.userProfile
             if (profile == null) slot.tip.warning("请先登录")
             else {
