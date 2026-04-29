@@ -41,7 +41,7 @@ class Constants(project: Project) {
     val resourceTag = when (platform) {
         BuildPlatform.Windows -> "windows-x64"
         BuildPlatform.Linux -> "linux-x64"
-        BuildPlatform.Mac -> if (architecture == BuildArchitecture.X86_64) "macos-x64" else "macos-arm64"
+        BuildPlatform.Mac -> "macos-arm64"
     }
 
     // Gradle版本

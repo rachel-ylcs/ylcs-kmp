@@ -61,7 +61,6 @@ class KotlinMultiplatformSourceSetsScope(
                 if (p.C.platform == BuildPlatform.Mac) {
                     when (p.C.architecture) {
                         BuildArchitecture.AARCH64 -> add(set.iosSimulatorArm64Main.get())
-                        BuildArchitecture.X86_64 -> add(set.iosX64Main.get())
                         else -> {}
                     }
                 }
