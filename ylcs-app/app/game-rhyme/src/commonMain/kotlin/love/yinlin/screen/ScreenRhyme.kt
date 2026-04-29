@@ -31,7 +31,6 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.character.Character
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymeIllustration
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.data.RhymePlayInfo
@@ -79,6 +78,7 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
 import love.yinlin.data.rachel.rhyme.RhymeRepository
 import love.yinlin.data.rachel.rhyme.RhymeUploadResult

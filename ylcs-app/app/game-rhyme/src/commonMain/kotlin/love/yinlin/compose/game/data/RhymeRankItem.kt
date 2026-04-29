@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import love.yinlin.cs.ServerRes
 import love.yinlin.cs.url
 import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymeRank
 
 @Stable

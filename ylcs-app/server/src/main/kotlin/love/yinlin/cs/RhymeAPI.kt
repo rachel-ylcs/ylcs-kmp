@@ -3,6 +3,7 @@ package love.yinlin.cs
 import love.yinlin.cs.service.values
 import love.yinlin.cs.user.*
 import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymeRepository
 import love.yinlin.extension.Int
 import love.yinlin.extension.obj
@@ -36,18 +37,24 @@ fun APIScope.rhymeAPI() {
     ApiRhymeUploadRecord.response { token, sid, result ->
         val uid = AN.throwExpireToken(token)
         if (result.uid != uid || result.sid != sid || !result.valid) failure("数据一致性校验失败")
-        db.throwInsertSQLGeneratedKey("INSERT INTO rhyme_record(sid, uid, result) ${values(3)}", sid, uid, result.toJsonString())
+        db.throwInsertSQLGeneratedKey("""
+            INSERT INTO rhyme_record(sid, uid, difficulty, score, result) ${values(5)}
+        """, sid, uid, result.difficulty, result.score, result.toJsonString())
     }
 
     ApiRhymeGetRank.response { token, sid ->
         AN.throwExpireToken(token)
+        val sql = RhymeDifficulty.entries.joinToString("\nUNION ALL") {
+            "(SELECT rid, uid, result FROM rhyme_record WHERE sid = ? AND difficulty = ${it.ordinal} ORDER BY score DESC, rid ASC LIMIT 10)"
+        }
+        val args = Array<Any?>(RhymeDifficulty.entries.size) { sid }
         val rankList = db.throwQuerySQL("""
-            SELECT rid, user.uid, name, result
-            FROM rhyme_record
-            LEFT JOIN user
-            ON rhyme_record.uid = user.uid
-            WHERE sid = ?
-        """, sid)
+            SELECT t.rid, t.uid, t.result, u.name 
+            FROM (
+                $sql
+            ) AS t
+            LEFT JOIN user u ON t.uid = u.uid
+        """, *args)
         result(rankList.to())
     }
 }

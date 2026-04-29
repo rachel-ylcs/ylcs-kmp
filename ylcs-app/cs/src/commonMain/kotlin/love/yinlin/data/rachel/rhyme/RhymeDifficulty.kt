@@ -1,4 +1,4 @@
-package love.yinlin.compose.game.data
+package love.yinlin.data.rachel.rhyme
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
@@ -12,7 +12,7 @@ enum class RhymeDifficulty(val title: String) {
     Extreme("极限");
 
     companion object {
-        fun fromInt(value: Int) = when (value) {
+        fun fromInt(value: Int): RhymeDifficulty = when (value) {
             Medium.ordinal -> Medium
             Hard.ordinal -> Hard
             Extreme.ordinal -> Extreme

@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.util.fastForEach
-import love.yinlin.compose.game.data.RhymeDifficulty
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 
 internal val StarPaths by lazy {
     listOf(

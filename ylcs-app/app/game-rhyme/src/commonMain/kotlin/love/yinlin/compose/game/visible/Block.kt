@@ -17,12 +17,12 @@ import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
 import love.yinlin.compose.game.common.InteractStatus
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.layer.MapLayer
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Visible
 import love.yinlin.data.music.RhymeAction
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 
 @Stable
 sealed class Block<BS : BlockStatus>(

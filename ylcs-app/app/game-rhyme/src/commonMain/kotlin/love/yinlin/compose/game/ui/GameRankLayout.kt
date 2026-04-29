@@ -16,7 +16,6 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberState
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.data.RhymeRankItem
 import love.yinlin.compose.ui.container.Surface
@@ -27,6 +26,7 @@ import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 
 @Composable
 internal fun GameRankLayout(

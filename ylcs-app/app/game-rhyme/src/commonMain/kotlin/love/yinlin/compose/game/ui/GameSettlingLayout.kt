@@ -34,7 +34,6 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.game.common.BlockResult
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymeState
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.rememberFontFamily
@@ -53,6 +52,7 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.timeString

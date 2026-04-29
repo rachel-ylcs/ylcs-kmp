@@ -16,10 +16,10 @@ import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
 import love.yinlin.compose.game.common.InteractStatus
 import love.yinlin.compose.game.common.InteractTarget
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.layer.MapLayer
 import love.yinlin.data.music.RhymeAction
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import kotlin.math.sin
 
 @Stable
@@ -63,8 +63,8 @@ class ContinuedBlock(
     }
 
     companion object {
-        private const val PERFECT_RATIO = 0.75f
-        private const val GOOD_RATIO = 0.5f
+        private const val PERFECT_RATIO = 0.6f
+        private const val GOOD_RATIO = 0.4f
 
         private const val INNER_TIP_ALPHA = 0.3f
         private const val INNER_MAIN_ALPHA = 0.8f

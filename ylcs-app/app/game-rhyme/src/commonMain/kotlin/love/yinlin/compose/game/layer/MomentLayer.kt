@@ -4,11 +4,11 @@ import androidx.compose.runtime.Stable
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
 import love.yinlin.compose.game.common.Moments
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.visible.InteractTipArea
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.media.AudioPlayer
 
 // 时刻层

@@ -19,7 +19,6 @@ import love.yinlin.compose.game.character.CharacterChuXing
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.FPSCounter
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.data.RhymeSkillResult
 import love.yinlin.compose.game.drawer.Drawer
@@ -30,6 +29,7 @@ import love.yinlin.compose.game.drawer.StrokeTextGraph
 import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.ui.StarPaths
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
 
 @Stable

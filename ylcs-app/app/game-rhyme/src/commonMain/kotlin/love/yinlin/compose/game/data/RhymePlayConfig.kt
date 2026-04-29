@@ -2,6 +2,7 @@ package love.yinlin.compose.game.data
 
 import androidx.compose.runtime.Stable
 import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 
 @Stable
 data class RhymePlayConfig(
