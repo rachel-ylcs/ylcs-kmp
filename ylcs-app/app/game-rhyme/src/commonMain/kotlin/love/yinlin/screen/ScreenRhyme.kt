@@ -190,44 +190,46 @@ class ScreenRhyme : BasicScreen() {
     private fun startGame(info: MusicInfo, playConfig: RhymePlayConfig) {
         if (engine.isRunning) return
         launch {
-            catchingError {
-                val modPath = app.modPath
-                // 解析歌词文件
-                val lyricsText = info.path(modPath, ModResourceType.Rhyme).readText()
-                require(lyricsText != null) { "歌词资源文件丢失或损坏" }
-                val lyricsConfig = lyricsText.parseJsonValue<RhymeLyricsConfig>()
-                // 解析封面图片
-                val recordImage = Coroutines.io {
-                    info.path(modPath, ModResourceType.Record).readByteArray()?.let { ImageBitmap.decode(it) }
-                }
-                require(recordImage != null) { "封面资源文件丢失" }
-                require(lyricsConfig.id == info.id) { "歌词资源文件与MOD不匹配" }
-                // 音频路径
-                val audio = info.path(modPath, ModResourceType.Audio)
-                // 创建角色
-                val characterInfo = playConfig.character
-                val characterFactory = Character.Factory[characterInfo]
-                require(characterFactory != null) { "未知角色" }
-                val character = characterFactory()
-                val characterImage = Coroutines.io {
-                    app.cache.loadByteArray(ServerRes.Game.Rhyme.CV.illustration(characterInfo.id).url)?.let { ImageBitmap.decode(it) }
-                }
+            slot.loading.open {
+                catchingError {
+                    val modPath = app.modPath
+                    // 解析歌词文件
+                    val lyricsText = info.path(modPath, ModResourceType.Rhyme).readText()
+                    require(lyricsText != null) { "歌词资源文件丢失或损坏" }
+                    val lyricsConfig = lyricsText.parseJsonValue<RhymeLyricsConfig>()
+                    // 解析封面图片
+                    val recordImage = Coroutines.io {
+                        info.path(modPath, ModResourceType.Record).readByteArray()?.let { ImageBitmap.decode(it) }
+                    }
+                    require(recordImage != null) { "封面资源文件丢失" }
+                    require(lyricsConfig.id == info.id) { "歌词资源文件与MOD不匹配" }
+                    // 音频路径
+                    val audio = info.path(modPath, ModResourceType.Audio)
+                    // 创建角色
+                    val characterInfo = playConfig.character
+                    val characterFactory = Character.Factory[characterInfo]
+                    require(characterFactory != null) { "未知角色" }
+                    val character = characterFactory()
+                    val characterImage = Coroutines.io {
+                        app.cache.loadByteArray(ServerRes.Game.Rhyme.CV.illustration(characterInfo.id).url)?.let { ImageBitmap.decode(it) }
+                    }
 
-                engine.plugin<RhymePlugin>().setupGame(
-                    playInfo = RhymePlayInfo(
-                        playConfig = playConfig,
-                        musicInfo = info,
-                        lyricsConfig = lyricsConfig,
-                        musicRecord = recordImage,
-                        characterCV =  characterImage
-                    ),
-                    character = character,
-                    audio = audio
-                )
-                engine.isRunning = true
-                isSubmit = false
-                gameState = RhymeState.Playing(info, playConfig)
-            }.errorTip
+                    engine.plugin<RhymePlugin>().setupGame(
+                        playInfo = RhymePlayInfo(
+                            playConfig = playConfig,
+                            musicInfo = info,
+                            lyricsConfig = lyricsConfig,
+                            musicRecord = recordImage,
+                            characterCV =  characterImage
+                        ),
+                        character = character,
+                        audio = audio
+                    )
+                    engine.isRunning = true
+                    isSubmit = false
+                    gameState = RhymeState.Playing(info, playConfig)
+                }.errorTip
+            }
         }
     }
 

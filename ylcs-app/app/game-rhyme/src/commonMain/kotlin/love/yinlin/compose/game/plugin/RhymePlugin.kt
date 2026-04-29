@@ -80,8 +80,8 @@ class RhymePlugin(
     // 停止游戏
     fun stopGame(result: RhymePlayResult?) {
         if (isGameRunning) {
-            scene.reset()
             endListener(result)
+            scene.reset()
             player.stop()
             isGameRunning = false
         }
