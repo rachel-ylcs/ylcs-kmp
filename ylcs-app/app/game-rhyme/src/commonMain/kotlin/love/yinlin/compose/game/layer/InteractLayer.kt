@@ -122,8 +122,13 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
             override fun onPointerUp(event: Event.Pointer.Up) {
                 val index = event.arg as? Int ?: return
                 val info = infos.getOrNull(index) ?: return
-                val status = statusList[index] as? InteractStatus.AwaitUp ?: return // 不是等待抬起状态
-                if (status.id != event.id) return // ID不一致
+                val id = when (val status = statusList[index]) { // 异常状态
+                    null -> null
+                    is InteractStatus.Down -> status.id
+                    is InteractStatus.AwaitUp -> status.id
+                    is InteractStatus.Up -> null
+                }
+                if (id != event.id) return // ID不一致
                 statusList[index] = InteractStatus.Up(event.id)
                 info.targetProgress = 0f
             }

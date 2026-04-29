@@ -117,9 +117,9 @@ class ScenePlugin private constructor(
             val pointerMap = mutableMapOf<Long, Event>()
 
             while (true) {
-                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                val pointerEvent = awaitPointerEvent(pass = PointerEventPass.Initial)
 
-                for (change in event.changes) {
+                for (change in pointerEvent.changes) {
                     val id = change.id.value
                     val position = change.position
                     val eventSize = size.toSize()
@@ -148,9 +148,10 @@ class ScenePlugin private constructor(
                         }
 
                         // 抬起
-                        change.changedToUp() -> {
+                        change.changedToUpIgnoreConsumed() -> {
                             // 检查是否是游离指针
                             val event = pointerMap[id] as? Event.Pointer.Down
+
                             if (event != null) {
                                 // 移除指针
                                 pointerMap.remove(id)
