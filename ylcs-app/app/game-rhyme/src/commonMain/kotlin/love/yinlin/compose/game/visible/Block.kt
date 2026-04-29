@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastCoerceIn
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.compose.Colors
+import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockStatus
 import love.yinlin.compose.game.common.BlockTime
@@ -25,10 +26,11 @@ import love.yinlin.data.music.RhymeAction
 
 @Stable
 sealed class Block<BS : BlockStatus>(
+    val character: Character,
     position: Offset,
     val line: BlockLine, // 行信息
-    val rawIndex: Int, // 在整个序列中的索引
-    val lineIndex: Int, // 在segment中的索引
+    val rawIndex: Int, // 原始索引
+    val lineIndex: Int, // 行内索引
 ) : Visible(position, DefaultSize), Dynamic {
     companion object {
         const val DEFAULT_DIMENSION = 200f
@@ -59,7 +61,7 @@ sealed class Block<BS : BlockStatus>(
 
         protected const val PRESS_TOLERANCE = 200
 
-        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Yellow4, Colors.Cyan4)
+        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Cyan4, Colors.Yellow4)
         protected val TextColor = Colors.Ghost
         protected val MissingColor = Colors.Gray6
 

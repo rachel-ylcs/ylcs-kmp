@@ -7,6 +7,9 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.util.fastCoerceAtLeast
 import love.yinlin.compose.Colors
 import love.yinlin.compose.animation.Interpolator
+import love.yinlin.compose.game.character.Character
+import love.yinlin.compose.game.character.CharacterLiDiShiGongFenA
+import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -21,13 +24,14 @@ import kotlin.math.sin
 
 @Stable
 class ContinuedBlock(
+    character: Character,
     position: Offset,
     line: BlockLine,
     override val time: Time,
     rawIndex: Int,
     lineIndex: Int,
     override val rhymeAction: RhymeAction.Slur,
-) : Block<ContinuedBlock.Status>(position, line, rawIndex, lineIndex) {
+) : Block<ContinuedBlock.Status>(character, position, line, rawIndex, lineIndex) {
     @Stable
     data class Time(
         override val appearance: Long,
@@ -59,16 +63,17 @@ class ContinuedBlock(
     }
 
     companion object {
-        private const val PERFECT_RATIO = 0.5f
-        private const val GOOD_RATIO = 0.25f
+        private const val PERFECT_RATIO = 0.75f
+        private const val GOOD_RATIO = 0.5f
 
         private const val INNER_TIP_ALPHA = 0.3f
         private const val INNER_MAIN_ALPHA = 0.8f
         private val InnerProgressTipColor = Colors.White
 
-        fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long): Time {
-            val prepare = PrepareDurationMap[difficulty]!!
-            val duration = (end - start).toInt()
+        fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long, extraPrepareRatio: Float): Time {
+            val rawPrepare = PrepareDurationMap[difficulty]!!
+            val prepare = (rawPrepare * (1 + extraPrepareRatio)).toInt()
+            val duration = maxOf((end - start).toInt(), rawPrepare / 2)
             return Time(
                 appearance = start - prepare - PRESS_TOLERANCE,
                 start = prepare,
@@ -84,6 +89,9 @@ class ContinuedBlock(
 
     override val colorList: List<Color> = listOf(mainColor)
 
+    private val isCharacterLiDiShiGongFenA = character is CharacterLiDiShiGongFenA
+    private val isCharacterLiDiShiGongFenB = character is CharacterLiDiShiGongFenB
+
     override fun prepareStatus(): Status = Status.Prepare()
 
     private fun MapLayer.updateCustomResult(startProgress: Float, endProgress: Float) {
@@ -94,7 +102,7 @@ class ContinuedBlock(
             else -> BlockResult.BAD
         }
         blockStatus = Status.Release(startProgress, endProgress, result)
-        updateResult(result)
+        updateBlockResult(this@ContinuedBlock, result)
     }
 
     override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
@@ -111,7 +119,7 @@ class ContinuedBlock(
                 val newStatus = when (val interactTarget = target) {
                     is InteractTarget.None -> null // 未按下无事发生
                     is InteractTarget.Multiple -> { // 多指按下以MISS结算
-                        mapLayer.updateResult(BlockResult.MISS)
+                        mapLayer.updateBlockResult(this, BlockResult.MISS)
                         Status.Missing(currentStatus.progress)
                     }
                     is InteractTarget.Single -> { // 长按开始
@@ -119,7 +127,7 @@ class ContinuedBlock(
                             Status.InteractPressing(interactTarget.id, currentStatus.progress)
                         }
                         else { // 按错轨道按MISS结算
-                            mapLayer.updateResult(BlockResult.MISS)
+                            mapLayer.updateBlockResult(this, BlockResult.MISS)
                             Status.Missing(currentStatus.progress)
                         }
                     }
@@ -147,7 +155,7 @@ class ContinuedBlock(
                     status.progress = progress
                     if (progress >= 1f) {
                         blockStatus = Status.Missing(1f)
-                        mapLayer.updateResult(BlockResult.MISS)
+                        mapLayer.updateBlockResult(this, BlockResult.MISS)
                     }
                 }
                 is Status.InteractPressing -> {
@@ -199,57 +207,71 @@ class ContinuedBlock(
             when (val status = blockStatus) {
                 null -> return
                 is Status.Prepare -> {
-                    val progress = status.progress
+                    if (!isCharacterLiDiShiGongFenA) {
+                        val progress = status.progress
 
-                    drawPrepareCircleBorder(mainColor, progress)
-                    drawSingleNoteFont(rawNoteScale, TextColor, Interpolator.decelerate(progress))
+                        drawPrepareCircleBorder(mainColor, progress)
+                        drawSingleNoteFont(rawNoteScale, TextColor, Interpolator.decelerate(progress))
+                    }
                 }
                 is Status.InteractStart -> {
-                    drawInteractRotateBlock(InnerProgressTipColor, status.progress, INNER_TIP_ALPHA)
-                    drawFinalPrepareCircleBorder(mainColor)
-                    drawSingleNoteFont(rawNoteScale, TextColor, 1f)
+                    if (!isCharacterLiDiShiGongFenA) {
+                        drawInteractRotateBlock(InnerProgressTipColor, status.progress, INNER_TIP_ALPHA)
+                        drawFinalPrepareCircleBorder(mainColor)
+                        drawSingleNoteFont(rawNoteScale, TextColor, 1f)
+                    }
                 }
                 is Status.InteractPressing -> {
-                    val oscillation = status.oscillation
+                    if (!isCharacterLiDiShiGongFenA) {
+                        val oscillation = status.oscillation
+                        val oscillationRatio = if (isCharacterLiDiShiGongFenB) 1f else 1.1f + oscillation * 0.1f
 
-                    scale(1.1f + oscillation * 0.1f, DefaultCenter) {
-                        drawInteractRotateBlock(InnerProgressTipColor, mainColor, status.startProgress, status.progress, INNER_TIP_ALPHA, INNER_MAIN_ALPHA)
-                        drawFinalPrepareCircleBorder(Colors.White, 0.5f + oscillation / 2)
-                        drawFinalPrepareCircleBorder(mainColor, 1f - oscillation / 2)
+                        scale(oscillationRatio, DefaultCenter) {
+                            drawInteractRotateBlock(InnerProgressTipColor, mainColor, status.startProgress, status.progress, INNER_TIP_ALPHA, INNER_MAIN_ALPHA)
+                            drawFinalPrepareCircleBorder(Colors.White, 0.5f + oscillation / 2)
+                            drawFinalPrepareCircleBorder(mainColor, 1f - oscillation / 2)
+                        }
+                        drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                     }
-                    drawSingleNoteFont(rawNoteScale, TextColor, 1f)
                 }
                 is Status.Release -> {
-                    val progress = status.progress
-                    val releaseProgress = Interpolator.accelerate(1 - progress)
-                    val tipColor = lerp(InnerProgressTipColor, mainColor, progress)
+                    if (!isCharacterLiDiShiGongFenA) {
+                        val progress = status.progress
+                        val releaseProgress = Interpolator.accelerate(1 - progress)
+                        val tipColor = lerp(InnerProgressTipColor, mainColor, progress)
 
-                    withBounceAnimation(progress) {
-                        drawBounceAnimation(mainColor) { color, stroke, alpha ->
-                            circle(color, DefaultCenter, DEFAULT_RADIUS, style = stroke, alpha = alpha)
+                        if (!isCharacterLiDiShiGongFenB) {
+                            withBounceAnimation(progress) {
+                                drawBounceAnimation(mainColor) { color, stroke, alpha ->
+                                    circle(color, DefaultCenter, DEFAULT_RADIUS, style = stroke, alpha = alpha)
+                                }
+                            }
                         }
+
+                        drawInteractRotateBlock(
+                            tipColor,
+                            mainColor,
+                            status.startProgress,
+                            Interpolator.map(progress, status.endProgress, 1f),
+                            alpha1 = Interpolator.map(progress, INNER_TIP_ALPHA, 1f),
+                            alpha2 = Interpolator.map(progress, INNER_MAIN_ALPHA, 1f)
+                        )
+                        drawFinalPrepareCircleBorder(mainColor, 3 * progress * (progress - 1) + 1)
+                        drawSingleNoteFont(rawNoteScale, TextColor, releaseProgress)
+                        drawLyricsText(TextColor, (1 - releaseProgress) * LYRICS_TEXT_SCALE)
                     }
-                    drawInteractRotateBlock(
-                        tipColor,
-                        mainColor,
-                        status.startProgress,
-                        Interpolator.map(progress, status.endProgress, 1f),
-                        alpha1 = Interpolator.map(progress, INNER_TIP_ALPHA, 1f),
-                        alpha2 = Interpolator.map(progress, INNER_MAIN_ALPHA, 1f)
-                    )
-                    drawFinalPrepareCircleBorder(mainColor, 3 * progress * (progress - 1) + 1)
-                    drawSingleNoteFont(rawNoteScale, TextColor, releaseProgress)
-                    drawLyricsText(TextColor, (1 - releaseProgress) * LYRICS_TEXT_SCALE)
                 }
                 is Status.Missing -> {
-                    val progress = status.progress
-                    val missingProgress = Interpolator.accelerate(1 - progress)
-                    val missingColor = lerp(mainColor, MissingColor, progress)
+                    if (!isCharacterLiDiShiGongFenA) {
+                        val progress = status.progress
+                        val missingProgress = Interpolator.accelerate(1 - progress)
+                        val missingColor = lerp(mainColor, MissingColor, progress)
 
-                    drawInteractRotateBlock(missingColor, status.startProgress, alpha = INNER_TIP_ALPHA * missingProgress)
-                    drawFinalPrepareCircleBorder(missingColor)
-                    drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
-                    drawLyricsText(MissingColor, (1 - missingProgress) * LYRICS_TEXT_SCALE)
+                        drawInteractRotateBlock(missingColor, status.startProgress, alpha = INNER_TIP_ALPHA * missingProgress)
+                        drawFinalPrepareCircleBorder(missingColor)
+                        drawSingleNoteFont(rawNoteScale, TextColor, missingProgress)
+                        drawLyricsText(MissingColor, (1 - missingProgress) * LYRICS_TEXT_SCALE)
+                    }
                 }
                 is Status.Done -> {
                     if (!status.isMissing) drawFinalInnerBlock(mainColor, status.result.alpha)

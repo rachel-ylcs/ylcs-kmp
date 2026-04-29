@@ -69,7 +69,7 @@ class RhymePlugin(
             // 加载画布
             val backgroundLayer = BackgroundLayer(character, playInfo.characterCV)
             val interactLayer = InteractLayer()
-            val momentLayer = MomentLayer(playInfo, player)
+            val momentLayer = MomentLayer(character, playInfo, player)
             val uiLayer = UILayer(character, playInfo, momentLayer)
             val mapLayer = MapLayer(scene.camera, character, playInfo, momentLayer, backgroundLayer, interactLayer, uiLayer)
             // 先更新交互结果再处理地图

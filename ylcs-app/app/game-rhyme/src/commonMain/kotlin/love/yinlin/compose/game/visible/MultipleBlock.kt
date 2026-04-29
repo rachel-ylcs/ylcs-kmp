@@ -11,6 +11,9 @@ import androidx.compose.ui.util.fastMap
 import love.yinlin.compose.Colors
 import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.extension.Path
+import love.yinlin.compose.game.character.Character
+import love.yinlin.compose.game.character.CharacterLiDiShiGongFenA
+import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -24,13 +27,14 @@ import love.yinlin.data.music.RhymeAction
 
 @Stable
 class MultipleBlock(
+    character: Character,
     position: Offset,
     line: BlockLine,
     override val time: Time,
     rawIndex: Int,
     lineIndex: Int,
     override val rhymeAction: RhymeAction.Slur,
-) : Block<MultipleBlock.Status>(position, line, rawIndex, lineIndex) {
+) : Block<MultipleBlock.Status>(character, position, line, rawIndex, lineIndex) {
     @Stable
     data class Time(
         override val appearance: Long,
@@ -89,9 +93,10 @@ class MultipleBlock(
         )
         private val InnerPaths = listOf(emptyList(), emptyList(), InnerPath2, InnerPath3, InnerPath4)
 
-        fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long): Time {
-            val prepare = PrepareDurationMap[difficulty]!!
-            val duration = maxOf((end - start).toInt(), prepare / 2)
+        fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long, extraPrepareRatio: Float): Time {
+            val rawPrepare = PrepareDurationMap[difficulty]!!
+            val prepare = (rawPrepare * (1 + extraPrepareRatio)).toInt()
+            val duration = maxOf((end - start).toInt(), rawPrepare / 2)
             return Time(
                 appearance = start - prepare - PRESS_TOLERANCE,
                 start = prepare,
@@ -107,6 +112,9 @@ class MultipleBlock(
 
     override val colorList: List<Color> = scaleIndexs.fastMap { ScaleColorList[it] }
 
+    private val isCharacterLiDiShiGongFenA = character is CharacterLiDiShiGongFenA
+    private val isCharacterLiDiShiGongFenB = character is CharacterLiDiShiGongFenB
+
     override fun prepareStatus(): Status = Status.Prepare()
 
     private fun MapLayer.updateCustomResult(lastProgress: Float, noteProgressList: List<Float?>) {
@@ -119,7 +127,7 @@ class MultipleBlock(
             else -> BlockResult.BAD
         }
         blockStatus = if (result == BlockResult.MISS) Status.Missing(lastProgress, noteProgressList) else Status.Release(lastProgress, noteProgressList, result)
-        updateResult(result)
+        updateBlockResult(this@MultipleBlock, result)
     }
 
     override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
@@ -361,37 +369,48 @@ class MultipleBlock(
             when (val status = blockStatus) {
                 null -> return
                 is Status.Prepare -> {
-                    val progress = status.progress
+                    if (!isCharacterLiDiShiGongFenA) {
+                        val progress = status.progress
 
-                    drawPrepareDiamondBorder(progress)
-                    drawMultipleNoteFont(rawNoteScaleList, TextColor, Interpolator.decelerate(progress))
+                        drawPrepareDiamondBorder(progress)
+                        drawMultipleNoteFont(rawNoteScaleList, TextColor, Interpolator.decelerate(progress))
+                    }
                 }
                 is Status.Interact -> {
-                    drawInteractScaleBlock(InnerProgressTipColor, status.progress, INNER_TIP_ALPHA)
-                    drawInteractPressedArea(status.noteProgressList, INNER_MAIN_ALPHA)
-                    drawFinalPrepareDiamondBorder(colorListProvider, 1f)
-                    drawMultipleNoteFont(rawNoteScaleList, TextColor, 1f)
+                    if (!isCharacterLiDiShiGongFenA) {
+                        drawInteractScaleBlock(InnerProgressTipColor, status.progress, INNER_TIP_ALPHA)
+                        drawInteractPressedArea(status.noteProgressList, INNER_MAIN_ALPHA)
+                        drawFinalPrepareDiamondBorder(colorListProvider, 1f)
+                        drawMultipleNoteFont(rawNoteScaleList, TextColor, 1f)
+                    }
                 }
                 is Status.Release -> {
-                    val progress = status.progress
-                    val releaseProgress = Interpolator.accelerate(1 - progress)
+                    if (!isCharacterLiDiShiGongFenA) {
+                        val progress = status.progress
+                        val releaseProgress = Interpolator.accelerate(1 - progress)
 
-                    drawBounceDiamondBorder(progress)
-                    drawInteractScaleBlock(InnerProgressTipColor, status.lastProgress, INNER_TIP_ALPHA * releaseProgress)
-                    drawInteractPressedArea(progress, status.noteProgressList, INNER_MAIN_ALPHA)
-                    drawFinalPrepareDiamondBorder(colorListProvider, 3 * progress * (progress - 1) + 1)
-                    drawMultipleNoteFont(rawNoteScaleList, TextColor, releaseProgress)
-                    drawLyricsText(TextColor, (1 - releaseProgress) * LYRICS_TEXT_SCALE)
+                        if (!isCharacterLiDiShiGongFenB) {
+                            drawBounceDiamondBorder(progress)
+                        }
+
+                        drawInteractScaleBlock(InnerProgressTipColor, status.lastProgress, INNER_TIP_ALPHA * releaseProgress)
+                        drawInteractPressedArea(progress, status.noteProgressList, INNER_MAIN_ALPHA)
+                        drawFinalPrepareDiamondBorder(colorListProvider, 3 * progress * (progress - 1) + 1)
+                        drawMultipleNoteFont(rawNoteScaleList, TextColor, releaseProgress)
+                        drawLyricsText(TextColor, (1 - releaseProgress) * LYRICS_TEXT_SCALE)
+                    }
                 }
                 is Status.Missing -> {
-                    val progress = status.progress
-                    val missingProgress = Interpolator.accelerate(1 - progress)
+                    if (!isCharacterLiDiShiGongFenA) {
+                        val progress = status.progress
+                        val missingProgress = Interpolator.accelerate(1 - progress)
 
-                    drawInteractScaleBlock(InnerProgressTipColor, status.lastProgress, INNER_TIP_ALPHA * missingProgress)
-                    drawInteractPressedArea(progress, status.noteProgressList, 0f)
-                    drawFinalPrepareDiamondBorder({ lerp(colorList[it], MissingColor, progress) }, 1f)
-                    drawMultipleNoteFont(rawNoteScaleList, TextColor, missingProgress)
-                    drawLyricsText(MissingColor, (1 - missingProgress) * LYRICS_TEXT_SCALE)
+                        drawInteractScaleBlock(InnerProgressTipColor, status.lastProgress, INNER_TIP_ALPHA * missingProgress)
+                        drawInteractPressedArea(progress, status.noteProgressList, 0f)
+                        drawFinalPrepareDiamondBorder({ lerp(colorList[it], MissingColor, progress) }, 1f)
+                        drawMultipleNoteFont(rawNoteScaleList, TextColor, missingProgress)
+                        drawLyricsText(MissingColor, (1 - missingProgress) * LYRICS_TEXT_SCALE)
+                    }
                 }
                 is Status.Done -> {
                     if (status.isMissing) {

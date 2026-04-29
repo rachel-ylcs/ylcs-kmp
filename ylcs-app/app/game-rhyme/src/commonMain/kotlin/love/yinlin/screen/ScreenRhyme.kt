@@ -455,10 +455,10 @@ class ScreenRhyme : BasicScreen() {
             }
 
             Column(
-                modifier = Modifier.widthIn(min = Theme.size.cell1, max = Theme.size.cell1 * 1.5f).padding(Theme.padding.value9),
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
             ) {
-                RhymeMusicCard(info = info, modifier = Modifier.fillMaxWidth()) { }
+                RhymeMusicCard(info = info, modifier = Modifier.widthIn(min = Theme.size.cell1, max = Theme.size.cell1 * 1.5f)) { }
 
                 SimpleClipText(text = "难度", style = Theme.typography.v6.bold)
 
@@ -473,7 +473,7 @@ class ScreenRhyme : BasicScreen() {
                     title = "延迟补偿(毫秒)",
                     args = audioDelay,
                     onValueChange = { audioDelay = audioDelay.copy(tmpValue = it) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.widthIn(min = Theme.size.cell1, max = Theme.size.cell1 * 1.5f)
                 )
 
                 SimpleClipText(text = "立绘", style = Theme.typography.v6.bold)
@@ -495,6 +495,8 @@ class ScreenRhyme : BasicScreen() {
                         }
                     }
                 }
+
+                Text(text = remember(character) { character.skill })
             }
         }
     }
@@ -573,7 +575,7 @@ class ScreenRhyme : BasicScreen() {
 
                 SimpleClipText(text = "琴韵", color = Theme.color.primary, style = Theme.typography.v5.bold)
 
-                Text(text = info.skill, color = Theme.color.secondary)
+                Text(text = remember(info) { info.skill }, color = Theme.color.secondary)
             }
         }
     }

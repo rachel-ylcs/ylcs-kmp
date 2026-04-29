@@ -3,6 +3,8 @@ package love.yinlin.compose.game.common
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastMapIndexed
+import love.yinlin.compose.game.character.Character
+import love.yinlin.compose.game.character.CharacterChiChi
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.visible.Block
 import love.yinlin.compose.game.visible.ContinuedBlock
@@ -93,9 +95,13 @@ class BlockMapGenerator private constructor(
     }
 
     // 地图生成算法 - 右转优先螺旋
-    fun generate(): List<Block<out BlockStatus>> {
+    fun generate(character: Character): List<Block<out BlockStatus>> {
+        // 拓展准备时间
+        val extraPrepareRatio = if (character is CharacterChiChi) character.range else 0f
+
         // 生成地图位置
         val blockPositionMap = if (solve(0, -blockDimension, 0f, blockDimension, 0f)) result else emptyList()
+        val lineCount = blockPositionMap.size
         var rawIndex = -1
 
         // 存储音游配置
@@ -103,6 +109,7 @@ class BlockMapGenerator private constructor(
             // 基础属性
             val line = lyrics[segmentIndex]
             val theme = line.theme
+            val blockCount = theme.size
             val lastAction = theme.last()
             val lineStart = line.start + audioOffset // 偏移补偿
             val lineEnd = lineStart + lastAction.end
@@ -116,9 +123,11 @@ class BlockMapGenerator private constructor(
 
             // 行属性
             val blockLine = BlockLine(
+                lineCount = lineCount,
                 index = segmentIndex,
+                blockCount = blockCount,
                 firstRawIndex = rawIndex + 1,
-                lastRawIndex = rawIndex + theme.size,
+                lastRawIndex = rawIndex + blockCount,
                 startDirection = startDirection,
                 endDirection = endDirection,
                 text = line.text,
@@ -134,9 +143,10 @@ class BlockMapGenerator private constructor(
                 when (action) {
                     // 单音
                     is RhymeAction.Note -> NoteBlock(
+                        character = character,
                         position = pos,
                         line = blockLine,
-                        time = NoteBlock.buildTime(difficulty, start),
+                        time = NoteBlock.buildTime(difficulty, start, extraPrepareRatio),
                         rawIndex = ++rawIndex,
                         lineIndex = i,
                         rhymeAction = action
@@ -144,23 +154,29 @@ class BlockMapGenerator private constructor(
                     is RhymeAction.Slur -> {
                         val first = action.scale.first()
                         // 延音
-                        if (action.scale.fastAll { it == first }) ContinuedBlock(
-                            position = pos,
-                            line = blockLine,
-                            time = ContinuedBlock.buildTime(difficulty, start, end),
-                            rawIndex = ++rawIndex,
-                            lineIndex = i,
-                            rhymeAction = action
-                        )
+                        if (action.scale.fastAll { it == first }) {
+                            ContinuedBlock(
+                                character = character,
+                                position = pos,
+                                line = blockLine,
+                                time = ContinuedBlock.buildTime(difficulty, start, end, extraPrepareRatio),
+                                rawIndex = ++rawIndex,
+                                lineIndex = i,
+                                rhymeAction = action
+                            )
+                        }
                         // 连音
-                        else MultipleBlock(
-                            position = pos,
-                            line = blockLine,
-                            time = MultipleBlock.buildTime(difficulty, start, end),
-                            rawIndex = ++rawIndex,
-                            lineIndex = i,
-                            rhymeAction = action
-                        )
+                        else {
+                            MultipleBlock(
+                                character = character,
+                                position = pos,
+                                line = blockLine,
+                                time = MultipleBlock.buildTime(difficulty, start, end, extraPrepareRatio),
+                                rawIndex = ++rawIndex,
+                                lineIndex = i,
+                                rhymeAction = action
+                            )
+                        }
                     }
                 }
             }
@@ -168,7 +184,11 @@ class BlockMapGenerator private constructor(
     }
 
     companion object {
-        fun generate(blockDimension: Float, lyricsConfig: RhymeLyricsConfig, playConfig: RhymePlayConfig): List<Block<out BlockStatus>> =
-            BlockMapGenerator(blockDimension, lyricsConfig, playConfig).generate()
+        fun generate(
+            blockDimension: Float,
+            lyricsConfig: RhymeLyricsConfig,
+            playConfig: RhymePlayConfig,
+            character: Character
+        ): List<Block<out BlockStatus>> = BlockMapGenerator(blockDimension, lyricsConfig, playConfig).generate(character)
     }
 }

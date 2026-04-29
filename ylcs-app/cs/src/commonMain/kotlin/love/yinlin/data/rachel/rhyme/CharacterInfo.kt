@@ -9,9 +9,10 @@ enum class CharacterInfo(
     val id: Int, // ID
     val title: String, // 名称
     val description: String, // 描述
-    val skill: String, // 技能
+    val rawSkill: String, // 技能
     val cost: Int, // 花费
     val enabled: Boolean = true, // 是否开启
+    val metadata: Map<String, CharacterMetadata> = emptyMap(), // 元信息
 ) {
     ChuXing(
         id = 1,
@@ -21,7 +22,7 @@ enum class CharacterInfo(
 激动的邂逅 命运的枷锁
 相遇莫错过
         """.trimIndent(),
-        skill = """
+        rawSkill = """
 A. 坚守初心定有回报
         """.trimIndent(),
         cost = 0
@@ -37,7 +38,7 @@ A. 坚守初心定有回报
 也算天公作美
 不再会才人心快慰
         """.trimIndent(),
-        skill = """
+        rawSkill = """
 A. 【断尾时刻】音轨到达最后一句时触发
 B. 断尾时刻所有音符以Perfect结算
         """.trimIndent(),
@@ -52,11 +53,14 @@ B. 断尾时刻所有音符以Perfect结算
 迢迢河汉间 有磷火坠地如彗锋
 奢望着能生死相拥
         """.trimIndent(),
-        skill = """
-A. 你的第4个Good转化为Perfect结算
+        rawSkill = """
+A. 你的第{maxGoodCount}个Good转化为Perfect结算
 B. 触发A后重新计数
         """.trimIndent(),
-        cost = 20
+        cost = 10,
+        metadata = mapOf(
+            "maxGoodCount" to CharacterMetadata.MInt(4), // 最大Good数
+        )
     ),
     PiFuDuHai(
         id = 4,
@@ -67,10 +71,13 @@ B. 触发A后重新计数
 天国或地狱 也奢求 你无垢眼眸
 就让我 再次被你拯救
         """.trimIndent(),
-        skill = """
-A. 你具有额外30%的视野
+        rawSkill = """
+A. 你具有额外{range}的视野
         """.trimIndent(),
-        cost = 30
+        cost = 10,
+        metadata = mapOf(
+            "range" to CharacterMetadata.MPercent(0.3f), // 视野
+        )
     ),
     ChiChi(
         id = 5,
@@ -81,10 +88,13 @@ A. 你具有额外30%的视野
 可意难平到后来若真是堪堪
 那又该多不堪
         """.trimIndent(),
-        skill = """
-A. 你具有额外20%的准备时间
+        rawSkill = """
+A. 你具有额外{range}的准备时间
         """.trimIndent(),
-        cost = 40
+        cost = 10,
+        metadata = mapOf(
+            "range" to CharacterMetadata.MPercent(0.3f), // 额外时间
+        )
     ),
     BuLi(
         id = 6,
@@ -95,10 +105,13 @@ A. 你具有额外20%的准备时间
 唤旧事一念恩 还我千刀新痕
 静悄悄刻铭文 惊你心头夜奔
         """.trimIndent(),
-        skill = """
-A. 你的Bad结算有20%概率不重置连击
+        rawSkill = """
+A. 你的Bad结算有{probability}概率不重置连击
         """.trimIndent(),
-        cost = 50
+        cost = 10,
+        metadata = mapOf(
+            "probability" to CharacterMetadata.MPercent(0.3f),
+        )
     ),
     WuJiYa(
         id = 7,
@@ -109,11 +122,11 @@ A. 你的Bad结算有20%概率不重置连击
 有多少天涯走不完
 我才是沧流中无际彼岸
         """.trimIndent(),
-        skill = """
+        rawSkill = """
 A. 【转角时刻】音轨到达一句的最后一个音符时触发
 B. 转角时刻所有音符以Perfect结算
         """.trimIndent(),
-        cost = 60
+        cost = 10
     ),
     LiDiShiGongFenA(
         id = 8,
@@ -124,11 +137,11 @@ B. 转角时刻所有音符以Perfect结算
 人寻找真切
 假想爱里面
         """.trimIndent(),
-        skill = """
+        rawSkill = """
 A. 你看不见局内所有未完成结算的音符
 B. 你的所有Bad转化为Good结算
         """.trimIndent(),
-        cost = 70
+        cost = 10
     ),
     LiDiShiGongFenB(
         id = 9,
@@ -139,15 +152,20 @@ B. 你的所有Bad转化为Good结算
 就让我们 赶在日出之前
 有多远 就飞多远
         """.trimIndent(),
-        skill = """
-A. 你看不见局内所有已完成的音符
-B. 你看不见局内UI信息
-C. 你看不见局内背景
-D. 你的局内动画大幅削弱表现效果
-E. 你听不见局内音效
+        rawSkill = """
+A. 你看不见局内大部分UI信息
+B. 你看不见局内背景
+C. 你看不见局内大部分动画效果
+D. 你听不见局内音效
         """.trimIndent(),
-        cost = 80
+        cost = 10
     );
+
+    val skill: String get() {
+        var raw = rawSkill
+        for ((key, value) in metadata) raw = raw.replace("{${key}}", value.description)
+        return raw
+    }
 
     companion object {
         val Default = ChuXing

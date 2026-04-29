@@ -117,6 +117,7 @@ fun APIScope.gameAPI() {
             FROM game_rank
             WHERE type = ?
             ORDER BY r ASC
+            LIMIT 10
         """, game.ordinal)
         result(ranks.to())
     }

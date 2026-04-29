@@ -25,7 +25,7 @@ class InteractTipArea : MomentVisible(12000) {
     private var alpha: Float = 0f
 
     override fun onUpdateMoment(progress: Float) {
-        alpha = (0.1f * abs(sin(progress * 3 * Interpolator.PI))).fastCoerceAtLeast(0f)
+        alpha = (0.2f * abs(sin(progress * 3 * Interpolator.PI))).fastCoerceAtLeast(0f)
     }
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
