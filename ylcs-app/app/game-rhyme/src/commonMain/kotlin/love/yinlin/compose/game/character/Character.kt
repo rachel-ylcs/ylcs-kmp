@@ -26,6 +26,7 @@ sealed class Character {
             CharacterInfo.PiFuDuHai to ::CharacterPiFuDuHai,
             CharacterInfo.WuJiYa to ::CharacterWuJiYa,
             CharacterInfo.WuNian to ::CharacterWuNian,
+            CharacterInfo.ShengSiJie to ::CharacterShengSiJie,
         )
     }
 }
