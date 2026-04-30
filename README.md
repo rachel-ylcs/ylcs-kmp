@@ -113,7 +113,6 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 |  Type   |     Author      |                                                                                Name                                                                                |
 |:-------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| Library | alexzhirkevich  |                                                          [qrose](https://github.com/alexzhirkevich/qrose)                                                          |
 | Library | brettwooldridge |                                                      [HikariCP](https://github.com/brettwooldridge/HikariCP)                                                       |
 | Library |    Calvin-LL    |                                                      [reorderable](https://github.com/Calvin-LL/Reorderable)                                                       |
 | Library |   chrisbanes    |                                                             [haze](https://github.com/chrisbanes/haze)                                                             |
