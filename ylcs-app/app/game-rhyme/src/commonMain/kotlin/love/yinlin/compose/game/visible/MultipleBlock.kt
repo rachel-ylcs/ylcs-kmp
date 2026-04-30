@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.fastCoerceAtMost
 import androidx.compose.ui.util.fastForEachIndexed
@@ -14,6 +15,7 @@ import love.yinlin.compose.extension.Path
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenA
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
+import love.yinlin.compose.game.character.CharacterSaTuoGe
 import love.yinlin.compose.game.character.CharacterWuNian
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
@@ -115,6 +117,7 @@ class MultipleBlock(
 
     private val isCharacterLiDiShiGongFenA = character is CharacterLiDiShiGongFenA
     private val isCharacterLiDiShiGongFenB = character is CharacterLiDiShiGongFenB
+    private val isCharacterSaTuoGe = character is CharacterSaTuoGe
 
     override fun prepareStatus(): Status = Status.Prepare()
 
@@ -143,25 +146,44 @@ class MultipleBlock(
         // 确定评级结果
         when (val interactTarget = target) {
             is InteractTarget.None -> { } // 未按下无事发生
-            is InteractTarget.Multiple -> mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList) // 多指按下立即结算
+            is InteractTarget.Multiple -> {
+                if (character is CharacterWuNian && character.activate()) mapLayer.backgroundLayer.activateSkill()
+                else mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList) // 多指立即结算
+            } // 多指按下立即结算
             is InteractTarget.Single -> { // 单指按下
-                for (i in 0 ..< noteCount) {
-                    val p = currentStatus.noteProgressList[i]
-                    if (p != null) continue // 已经达到此阶段
-                    // 检查对应索引的音符是否匹配
-                    if (interactTarget.index == scaleIndexs[i]) { // 匹配
-                        currentStatus.noteProgressList[i] = 0f // 设置动画进度
-                        // 检查是否已经是最后一个阶段, 立即结算
-                        if (i == noteCount - 1) mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList)
+                if (isCharacterSaTuoGe) {
+                    var isConsumed = false
+                    for (i in 0 ..< noteCount) {
+                        val p = currentStatus.noteProgressList[i]
+                        if (p != null) continue // 已经按过
+                        if (interactTarget.index == scaleIndexs[i]) { // 匹配
+                            isConsumed = true
+                            currentStatus.noteProgressList[i] = 0f // 设置动画进度
+                            // 检查是否已经全部完成, 立即结算
+                            if (currentStatus.noteProgressList.fastAll { it != null }) mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList)
+                            break
+                        }
+                        // 不匹配无视顺序继续找
                     }
-                    else if (character is CharacterWuNian && character.activate()) {
-                        // 无视错按
-                        mapLayer.backgroundLayer.activateSkill()
-                    }
-                    else mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList) // 立即结算
-                    break
+                    // 没找到立即结算
+                    if (!isConsumed) mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList)
                 }
-                // 理论上不可达
+                else {
+                    for (i in 0 ..< noteCount) {
+                        val p = currentStatus.noteProgressList[i]
+                        if (p != null) continue // 已经达到此阶段
+                        // 检查对应索引的音符是否匹配
+                        if (interactTarget.index == scaleIndexs[i]) { // 匹配
+                            currentStatus.noteProgressList[i] = 0f // 设置动画进度
+                            // 检查是否已经是最后一个阶段, 立即结算
+                            if (i == noteCount - 1) mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList)
+                        }
+                        else if (character is CharacterWuNian && character.activate()) mapLayer.backgroundLayer.activateSkill() // 无视错按
+                        else mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList) // 立即结算
+                        break
+                    }
+                    // 理论上不可达
+                }
             }
         }
     }
