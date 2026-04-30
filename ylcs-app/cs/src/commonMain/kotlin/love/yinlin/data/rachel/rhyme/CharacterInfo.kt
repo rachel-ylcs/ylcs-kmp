@@ -169,7 +169,7 @@ D. 你听不见局内音效
         rawSkill = """
 A. 你具有{maxCount}次忽略错按的机会
         """.trimIndent(),
-        cost = 60,
+        cost = 50,
         metadata = mapOf(
             "maxCount" to CharacterMetadata.MInt(10)
         )
@@ -186,7 +186,7 @@ A. 你具有{maxCount}次忽略错按的机会
         rawSkill = """
 A. 你具有{maxCount}次将Miss转化为Good的机会
         """.trimIndent(),
-        cost = 60,
+        cost = 50,
         metadata = mapOf(
             "maxCount" to CharacterMetadata.MInt(3)
         )
@@ -203,7 +203,7 @@ A. 你具有{maxCount}次将Miss转化为Good的机会
         rawSkill = """
 A. 你具有{maxCount}次将Bad转化为Good的机会
         """.trimIndent(),
-        cost = 50,
+        cost = 40,
         metadata = mapOf(
             "maxCount" to CharacterMetadata.MInt(6)
         )
@@ -220,7 +220,7 @@ A. 你具有{maxCount}次将Bad转化为Good的机会
         rawSkill = """
 A. 你的多音符点击顺序自由
         """.trimIndent(),
-        cost = 50
+        cost = 60
     ),
     WanYouYinLi(
         id = 14,
