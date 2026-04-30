@@ -15,10 +15,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.HazeTint
+import dev.chrisbanes.haze.blur.HazeBlurStyle
+import dev.chrisbanes.haze.blur.HazeColorEffect
+import dev.chrisbanes.haze.blur.blurEffect
 import dev.chrisbanes.haze.hazeEffect
 import love.yinlin.app
 import love.yinlin.compose.Colors
@@ -30,7 +30,6 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.node.BlurState
-import love.yinlin.compose.ui.node.align
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.mod.ModResourceType
@@ -166,21 +165,19 @@ internal fun RhymeIllustrationSelector(
     }
 }
 
-private val DefaultRhymeBlurStyle = HazeStyle(
+private val DefaultRhymeBlurStyle = HazeBlurStyle(
     blurRadius = 10.dp,
     backgroundColor = Color(0xDD292929),
-    tint = HazeTint(Color(0x6C292929))
+    colorEffect = HazeColorEffect.tint(Color(0x6C292929))
 )
 
-@OptIn(ExperimentalHazeApi::class)
-fun Modifier.rhymeBlurTarget(state: BlurState): Modifier = this.hazeEffect(
-    state = state,
-    style = DefaultRhymeBlurStyle
-) {
-    inputScale = HazeInputScale.Fixed(0.66667f)
+fun Modifier.rhymeBlurTarget(state: BlurState): Modifier = this.hazeEffect(state = state) {
+    blurEffect {
+        style = DefaultRhymeBlurStyle
+        inputScale = HazeInputScale.Fixed(0.66667f)
+    }
 }
 
-@OptIn(ExperimentalHazeApi::class)
 @Composable
 internal fun RhymeBlurSurface(
     blurState: BlurState,

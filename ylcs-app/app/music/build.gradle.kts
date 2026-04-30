@@ -26,7 +26,8 @@ template(object : KotlinMultiplatformTemplate() {
 
                 ExportLib,
 
-                libs.tool.blur,
+                libs.haze,
+                libs.haze.blur,
             )
         }
 
