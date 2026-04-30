@@ -14,6 +14,7 @@ import love.yinlin.compose.extension.Path
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenA
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
+import love.yinlin.compose.game.character.CharacterWuNian
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -152,6 +153,10 @@ class MultipleBlock(
                         currentStatus.noteProgressList[i] = 0f // 设置动画进度
                         // 检查是否已经是最后一个阶段, 立即结算
                         if (i == noteCount - 1) mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList)
+                    }
+                    else if (character is CharacterWuNian && character.activate()) {
+                        // 无视错按
+                        mapLayer.backgroundLayer.activateSkill()
                     }
                     else mapLayer.updateCustomResult(currentStatus.progress, currentStatus.noteProgressList) // 立即结算
                     break

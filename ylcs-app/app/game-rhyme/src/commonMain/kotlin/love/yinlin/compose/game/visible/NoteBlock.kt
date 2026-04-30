@@ -9,6 +9,7 @@ import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenA
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
+import love.yinlin.compose.game.character.CharacterWuNian
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -88,6 +89,7 @@ class NoteBlock(
     override fun prepareStatus(): Status = Status.Prepare()
 
     override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
+        val mapLayer = fromMapLayer ?: return
         if (currentStatus !is Status.Interact) return
         // 单击交互只关心按下时刻
         var target: InteractTarget = InteractTarget.None
@@ -100,13 +102,26 @@ class NoteBlock(
         // 确定评级结果
         val result = when (val interactTarget = target) {
             is InteractTarget.None -> null // 未按下无事发生
-            is InteractTarget.Multiple -> BlockResult.MISS // 多指按下以MISS结算
-            is InteractTarget.Single -> if (interactTarget.index == scaleIndex) currentStatus.result else BlockResult.MISS // 其他则检查音阶匹配
+            is InteractTarget.Multiple -> {
+                if (character is CharacterWuNian && character.activate()) {
+                    // 无视错按
+                    mapLayer.backgroundLayer.activateSkill()
+                    null
+                } else BlockResult.MISS
+            } // 多指按下以MISS结算
+            is InteractTarget.Single -> {
+                if (interactTarget.index == scaleIndex) currentStatus.result
+                else if (character is CharacterWuNian && character.activate()) {
+                    // 无视错按
+                    mapLayer.backgroundLayer.activateSkill()
+                    null
+                } else BlockResult.MISS
+            } // 其他则检查音阶匹配
         } ?: return
         // 处理评级结果
         val lastProgress = currentStatus.progress
         blockStatus = if (result == BlockResult.MISS) Status.Missing(lastProgress) else Status.Release(lastProgress, result)
-        fromMapLayer?.updateBlockResult(this, result)
+        mapLayer.updateBlockResult(this, result)
     }
 
     override fun onUpdate(tick: Int) {

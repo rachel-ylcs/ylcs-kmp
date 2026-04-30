@@ -10,6 +10,7 @@ import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenA
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
+import love.yinlin.compose.game.character.CharacterWuNian
 import love.yinlin.compose.game.common.BlockLine
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -119,12 +120,24 @@ class ContinuedBlock(
                 val newStatus = when (val interactTarget = target) {
                     is InteractTarget.None -> null // 未按下无事发生
                     is InteractTarget.Multiple -> { // 多指按下以MISS结算
-                        mapLayer.updateBlockResult(this, BlockResult.MISS)
-                        Status.Missing(currentStatus.progress)
+                        if (character is CharacterWuNian && character.activate()) {
+                            // 无视错按
+                            mapLayer.backgroundLayer.activateSkill()
+                            null
+                        }
+                        else {
+                            mapLayer.updateBlockResult(this, BlockResult.MISS)
+                            Status.Missing(currentStatus.progress)
+                        }
                     }
                     is InteractTarget.Single -> { // 长按开始
                         if (interactTarget.index == scaleIndex) { // 检查轨道匹配
                             Status.InteractPressing(interactTarget.id, currentStatus.progress)
+                        }
+                        else if (character is CharacterWuNian && character.activate()) {
+                            // 无视错按
+                            mapLayer.backgroundLayer.activateSkill()
+                            null
                         }
                         else { // 按错轨道按MISS结算
                             mapLayer.updateBlockResult(this, BlockResult.MISS)
