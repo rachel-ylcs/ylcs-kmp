@@ -9,7 +9,7 @@ permissions:
   contents: write
 jobs:
   deploy:
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6

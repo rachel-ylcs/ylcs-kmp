@@ -8,7 +8,7 @@ on:
 jobs:
   publish:
     name: Publish To Maven Central
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout Code
         id: check

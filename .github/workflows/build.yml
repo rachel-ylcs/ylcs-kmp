@@ -132,7 +132,7 @@ jobs:
     name: Build iOS
     needs: changes
     if: ${{ needs.changes.outputs.ios == 'true' }}
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
