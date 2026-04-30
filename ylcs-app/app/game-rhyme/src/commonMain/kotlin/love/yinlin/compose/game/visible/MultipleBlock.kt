@@ -108,7 +108,7 @@ class MultipleBlock(
 
     private val noteCount: Int = rhymeAction.scale.size
     private val rawNoteScaleList: List<Int> = rhymeAction.scale.fastMap { it.toInt() }
-    private val scaleIndexs: List<Int> = rawNoteScaleList.fastMap { (it - 1) % 7 + 1 }
+    internal val scaleIndexs: List<Int> = rawNoteScaleList.fastMap { (it - 1) % 7 + 1 }
     private val scaleLevels: List<Int> = rawNoteScaleList.fastMap { (it - 1) / 7 }
 
     override val colorList: List<Color> = scaleIndexs.fastMap { ScaleColorList[it] }

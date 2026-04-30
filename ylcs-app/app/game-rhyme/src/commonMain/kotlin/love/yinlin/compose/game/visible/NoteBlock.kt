@@ -77,7 +77,7 @@ class NoteBlock(
     }
 
     private val rawNoteScale = rhymeAction.scale.toInt()
-    private val scaleIndex: Int = (rawNoteScale - 1) % 7 + 1
+    internal val scaleIndex: Int = (rawNoteScale - 1) % 7 + 1
     private val scaleLevel: Int = (rawNoteScale - 1) / 7
     private val mainColor: Color = ScaleColorList[scaleIndex]
 

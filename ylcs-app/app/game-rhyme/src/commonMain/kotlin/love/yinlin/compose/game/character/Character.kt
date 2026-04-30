@@ -28,6 +28,8 @@ sealed class Character {
             CharacterInfo.WuNian to ::CharacterWuNian,
             CharacterInfo.ShengSiJie to ::CharacterShengSiJie,
             CharacterInfo.JingLiChao to ::CharacterJingLiChao,
+            CharacterInfo.SaTuoGe to ::CharacterSaTuoGe,
+            CharacterInfo.WanYouYinLi to ::CharacterWanYouYinLi,
         )
     }
 }

@@ -234,7 +234,7 @@ A. 你的多音符点击顺序自由
         rawSkill = """
 A. 你的包含音级4的音符以Perfect结算
         """.trimIndent(),
-        cost = 40
+        cost = 50
     ),
     QiXi(
         id = 15,
@@ -248,7 +248,7 @@ A. 你的包含音级4的音符以Perfect结算
         rawSkill = """
 A. 你的包含音级7的音符以Perfect结算
         """.trimIndent(),
-        cost = 40
+        cost = 50
     ),
     LiuGuangJi(
         id = 16,
