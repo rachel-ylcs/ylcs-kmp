@@ -3,18 +3,18 @@
 # Plugins #
 kotlin = "2.4.0-Beta2"
 agp = "9.2.0"
-cmp = "1.11.0-beta03" # 1.11.0-alpha04的shader二进制不兼容, 等上游适配
+cmp = "1.11.0-beta03"
 mavenPublish = "0.36.0"
 dokka = "2.2.0"
 
 # Libs #
 
 # Common
-skiko = "0.144.5" # 0.144.4的skiko-uiview在web上二进制不兼容，等上游适配
+skiko = "0.144.5"
 lifecycle = "2.10.0" # 2.11.0-alpha03与compose存在未知的冲突bug，无法确认是否是上游问题
 coroutines = "1.11.0-rc02"
 ktor = "3.4.3"
-sketch = "4.5.0-alpha03" # 4.5.0-alpha03与AGP版本不兼容，等上游适配
+sketch = "4.5.0-alpha03"
 haze = "2.0.0-alpha01"
 mmkv = "2.4.0"
 pag = "4.5.50"

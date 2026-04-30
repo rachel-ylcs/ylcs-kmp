@@ -39,8 +39,7 @@ A. 坚守初心定有回报
 不再会才人心快慰
         """.trimIndent(),
         rawSkill = """
-A. 【断尾时刻】音轨到达最后一句时触发
-B. 断尾时刻所有音符以Perfect结算
+A. 音轨到达最后一句时所有音符以Perfect结算
         """.trimIndent(),
         cost = 10
     ),
@@ -54,12 +53,11 @@ B. 断尾时刻所有音符以Perfect结算
 奢望着能生死相拥
         """.trimIndent(),
         rawSkill = """
-A. 你的第{maxGoodCount}个Good转化为Perfect结算
-B. 触发A后重新计数
+A. 你的第{maxGoodCount}个Good转化为Perfect结算并重新计数
         """.trimIndent(),
         cost = 10,
         metadata = mapOf(
-            "maxGoodCount" to CharacterMetadata.MInt(4), // 最大Good数
+            "maxGoodCount" to CharacterMetadata.MInt(5), // 最大Good数
         )
     ),
     PiFuDuHai(
@@ -123,8 +121,7 @@ A. 你的Bad结算有{probability}概率不重置连击
 我才是沧流中无际彼岸
         """.trimIndent(),
         rawSkill = """
-A. 【转角时刻】音轨到达一句的最后一个音符时触发
-B. 转角时刻所有音符以Perfect结算
+A. 音轨到达一句的最后一个音符以Perfect结算
         """.trimIndent(),
         cost = 10
     ),
@@ -159,6 +156,116 @@ C. 你看不见局内大部分动画效果
 D. 你听不见局内音效
         """.trimIndent(),
         cost = 10
+    ),
+    WuNian(
+        id = 10,
+        title = "无念",
+        description = """
+离离芳菲舞流光
+漫漫长路冷冷尘霜
+亦真亦幻落星相望
+旧梦依稀人路茫茫
+        """.trimIndent(),
+        rawSkill = """
+A. 你具有{maxCount}次忽略错按的机会
+        """.trimIndent(),
+        cost = 10,
+        metadata = mapOf(
+            "maxCount" to CharacterMetadata.MInt(10)
+        )
+    ),
+    ShengSiJie(
+        id = 11,
+        title = "生死劫",
+        description = """
+我梦中流连的云竹青山
+井中古月又轮了几番圆满
+但求来世将这情字落款
+今生命里劫数难转
+        """.trimIndent(),
+        rawSkill = """
+A. 你具有{maxCount}次将Miss转化为Good的机会
+        """.trimIndent(),
+        cost = 10,
+        metadata = mapOf(
+            "maxCount" to CharacterMetadata.MInt(3)
+        )
+    ),
+    JingLiChao(
+        id = 12,
+        title = "锦鲤抄",
+        description = """
+晨曦惊扰了陌上新桑
+风卷起庭前落花穿过回廊
+浓墨追逐着情绪流淌
+染我素衣白裳
+        """.trimIndent(),
+        rawSkill = """
+A. 你具有{maxCount}次将Bad转化为Good的机会
+        """.trimIndent(),
+        cost = 10,
+        metadata = mapOf(
+            "maxCount" to CharacterMetadata.MInt(6)
+        )
+    ),
+    SaTuoGe(
+        id = 13,
+        title = "洒拓歌",
+        description = """
+推杯换盏 新酿旧醅自味冷暖辛辣
+偏壶斗平 独酌见底余酒不足分他
+扶头仍酣 醉里戏称人世不过来耍
+酒后莫问生杀
+        """.trimIndent(),
+        rawSkill = """
+A. 你的多音符点击顺序自由
+        """.trimIndent(),
+        cost = 10
+    ),
+    WanYouYinLi(
+        id = 14,
+        title = "万有引力",
+        description = """
+我在人群中游弋
+直到能和你平行
+你不是启程原因
+而是我最终的目的地
+        """.trimIndent(),
+        rawSkill = """
+A. 你的包含音级4的音符以Perfect结算
+        """.trimIndent(),
+        cost = 10
+    ),
+    QiXi(
+        id = 15,
+        title = "七夕",
+        description = """
+七夕的夜 银烛秋光
+喜鹊唱在柳梢新月明亮
+青石小巷 灯火摇晃
+牵你的手演织女和牛郎
+        """.trimIndent(),
+        rawSkill = """
+A. 你的包含音级7的音符以Perfect结算
+        """.trimIndent(),
+        cost = 10
+    ),
+    LiuGuangJi(
+        id = 16,
+        title = "流光记",
+        description = """
+月亮舟楫 驮来天星
+屋檐下晚风 正搭讪蝉鸣
+可怜牛郎织女 还没到重逢假期
+是不是喜鹊偷懒 不肯太殷勤
+        """.trimIndent(),
+        rawSkill = """
+A. 你的连击奖励要求降低{range}
+        """.trimIndent(),
+        cost = 10,
+        metadata = mapOf(
+            "range" to CharacterMetadata.MPercent(0.1f)
+        )
     );
 
     val skill: String get() {
