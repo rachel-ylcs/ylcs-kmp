@@ -41,7 +41,7 @@ A. 坚守初心定有回报
         rawSkill = """
 A. 音轨到达最后一句时所有音符以Perfect结算
         """.trimIndent(),
-        cost = 10
+        cost = 30
     ),
     FuCaoWeiYing(
         id = 3,
@@ -55,7 +55,7 @@ A. 音轨到达最后一句时所有音符以Perfect结算
         rawSkill = """
 A. 你的第{maxGoodCount}个Good转化为Perfect结算并重新计数
         """.trimIndent(),
-        cost = 10,
+        cost = 50,
         metadata = mapOf(
             "maxGoodCount" to CharacterMetadata.MInt(5), // 最大Good数
         )
@@ -70,9 +70,9 @@ A. 你的第{maxGoodCount}个Good转化为Perfect结算并重新计数
 就让我 再次被你拯救
         """.trimIndent(),
         rawSkill = """
-A. 你具有额外{range}的视野
+A. 你具有额外{range}的地图视野
         """.trimIndent(),
-        cost = 10,
+        cost = 40,
         metadata = mapOf(
             "range" to CharacterMetadata.MPercent(0.3f), // 视野
         )
@@ -89,7 +89,7 @@ A. 你具有额外{range}的视野
         rawSkill = """
 A. 你具有额外{range}的准备时间
         """.trimIndent(),
-        cost = 10,
+        cost = 60,
         metadata = mapOf(
             "range" to CharacterMetadata.MPercent(0.3f), // 额外时间
         )
@@ -106,7 +106,7 @@ A. 你具有额外{range}的准备时间
         rawSkill = """
 A. 你的Bad结算有{probability}概率不重置连击
         """.trimIndent(),
-        cost = 10,
+        cost = 40,
         metadata = mapOf(
             "probability" to CharacterMetadata.MPercent(0.3f),
         )
@@ -123,7 +123,7 @@ A. 你的Bad结算有{probability}概率不重置连击
         rawSkill = """
 A. 音轨到达一句的最后一个音符以Perfect结算
         """.trimIndent(),
-        cost = 10
+        cost = 40
     ),
     LiDiShiGongFenA(
         id = 8,
@@ -138,7 +138,7 @@ A. 音轨到达一句的最后一个音符以Perfect结算
 A. 你看不见局内所有未完成结算的音符
 B. 你的所有Bad转化为Good结算
         """.trimIndent(),
-        cost = 10
+        cost = 40
     ),
     LiDiShiGongFenB(
         id = 9,
@@ -155,7 +155,7 @@ B. 你看不见局内背景
 C. 你看不见局内大部分动画效果
 D. 你听不见局内音效
         """.trimIndent(),
-        cost = 10
+        cost = 40
     ),
     WuNian(
         id = 10,
@@ -169,7 +169,7 @@ D. 你听不见局内音效
         rawSkill = """
 A. 你具有{maxCount}次忽略错按的机会
         """.trimIndent(),
-        cost = 10,
+        cost = 60,
         metadata = mapOf(
             "maxCount" to CharacterMetadata.MInt(10)
         )
@@ -186,7 +186,7 @@ A. 你具有{maxCount}次忽略错按的机会
         rawSkill = """
 A. 你具有{maxCount}次将Miss转化为Good的机会
         """.trimIndent(),
-        cost = 10,
+        cost = 60,
         metadata = mapOf(
             "maxCount" to CharacterMetadata.MInt(3)
         )
@@ -203,7 +203,7 @@ A. 你具有{maxCount}次将Miss转化为Good的机会
         rawSkill = """
 A. 你具有{maxCount}次将Bad转化为Good的机会
         """.trimIndent(),
-        cost = 10,
+        cost = 50,
         metadata = mapOf(
             "maxCount" to CharacterMetadata.MInt(6)
         )
@@ -220,7 +220,7 @@ A. 你具有{maxCount}次将Bad转化为Good的机会
         rawSkill = """
 A. 你的多音符点击顺序自由
         """.trimIndent(),
-        cost = 10
+        cost = 50
     ),
     WanYouYinLi(
         id = 14,
@@ -234,7 +234,7 @@ A. 你的多音符点击顺序自由
         rawSkill = """
 A. 你的包含音级4的音符以Perfect结算
         """.trimIndent(),
-        cost = 10
+        cost = 40
     ),
     QiXi(
         id = 15,
@@ -248,7 +248,7 @@ A. 你的包含音级4的音符以Perfect结算
         rawSkill = """
 A. 你的包含音级7的音符以Perfect结算
         """.trimIndent(),
-        cost = 10
+        cost = 40
     ),
     LiuGuangJi(
         id = 16,
@@ -262,7 +262,7 @@ A. 你的包含音级7的音符以Perfect结算
         rawSkill = """
 A. 你的连击奖励要求降低{range}
         """.trimIndent(),
-        cost = 10,
+        cost = 60,
         metadata = mapOf(
             "range" to CharacterMetadata.MPercent(0.1f)
         )
