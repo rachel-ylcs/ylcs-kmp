@@ -27,7 +27,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Setup Node
         uses: actions/setup-node@v6
