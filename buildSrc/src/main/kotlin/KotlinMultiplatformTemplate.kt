@@ -195,8 +195,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     if (C.platform == BuildPlatform.Mac) {
                         when (C.architecture) {
                             BuildArchitecture.AARCH64 -> add(iosSimulatorArm64())
-                            // https://blog.jetbrains.com/kotlin/2023/02/update-regarding-kotlin-native-targets/
-                            BuildArchitecture.X86_64 -> @Suppress("Deprecation") add(iosX64())
                             else -> { }
                         }
                     }
@@ -208,7 +206,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         target.binaries.framework {
                             @OptIn(KotlinNativeCacheApi::class)
                             disableNativeCache(
-                                version = DisableCacheInKotlinVersion.`2_3_20`,
+                                version = DisableCacheInKotlinVersion.`2_4_0`,
                                 reason = "cache bug",
                                 issueUrl = java.net.URI("https://youtrack.jetbrains.com/issue/KT-80715")
                             )
