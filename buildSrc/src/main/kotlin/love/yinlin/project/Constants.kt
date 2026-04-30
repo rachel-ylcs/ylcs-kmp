@@ -100,7 +100,7 @@ class Constants(project: Project) {
 
     // iOS 配置
     val ios = IosConfig(
-        target = "16.0"
+        target = "26.0"
     )
 
     // Desktop 配置
