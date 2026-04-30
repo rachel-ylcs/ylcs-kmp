@@ -17,6 +17,7 @@ import love.yinlin.compose.extension.scale
 import love.yinlin.compose.game.character.Character
 import love.yinlin.compose.game.character.CharacterChuXing
 import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
+import love.yinlin.compose.game.character.CharacterLiuGuangJi
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.FPSCounter
 import love.yinlin.compose.game.data.RhymePlayInfo
@@ -96,11 +97,15 @@ class UILayer(
     // 难度
     private val difficulty = info.playConfig.difficulty
     // 连击奖励
-    private val comboRewardCount = when (info.playConfig.difficulty) {
-        RhymeDifficulty.Easy -> 30
-        RhymeDifficulty.Medium -> 25
-        RhymeDifficulty.Hard -> 20
-        RhymeDifficulty.Extreme -> 20
+    private val comboRewardCount = run {
+        val baseCount = when (info.playConfig.difficulty) {
+            RhymeDifficulty.Easy -> 30
+            RhymeDifficulty.Medium -> 25
+            RhymeDifficulty.Hard -> 20
+            RhymeDifficulty.Extreme -> 20
+        }
+        val ratio = if (character is CharacterLiuGuangJi) character.range else 0f
+        (baseCount * (1 - ratio)).toInt()
     }
 
     private var strokeTextBuilder: ((String) -> StrokeTextGraph)? = null
