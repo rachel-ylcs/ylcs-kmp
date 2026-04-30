@@ -122,15 +122,23 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
             override fun onPointerUp(event: Event.Pointer.Up) {
                 val index = event.arg as? Int ?: return
                 val info = infos.getOrNull(index) ?: return
-                val id = when (val status = statusList[index]) { // 异常状态
-                    null -> null
-                    is InteractStatus.Down -> status.id
-                    is InteractStatus.AwaitUp -> status.id
-                    is InteractStatus.Up -> null
+                when (val status = statusList[index]) {
+                    is InteractStatus.Down -> {
+                        if (status.id == event.id) { // ID一致
+                            // 极限情况：同一帧内快速按下和抬起，此时两个消息会进入消息循环
+                            // 直接相互抵消默认没发生即可，不需要经过AwaitUp阶段
+                            statusList[index] = null
+                            info.targetProgress = 0f
+                        }
+                    }
+                    is InteractStatus.AwaitUp -> {
+                        if (status.id == event.id) { // ID一致
+                            statusList[index] = InteractStatus.Up(event.id)
+                            info.targetProgress = 0f
+                        }
+                    }
+                    else -> { }
                 }
-                if (id != event.id) return // ID不一致
-                statusList[index] = InteractStatus.Up(event.id)
-                info.targetProgress = 0f
             }
         }
     )

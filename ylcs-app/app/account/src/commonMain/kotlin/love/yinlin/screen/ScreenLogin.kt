@@ -8,7 +8,6 @@ import androidx.compose.ui.text.input.ImeAction
 import love.yinlin.app
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.img_logo
-import love.yinlin.common.DataSourceAccount
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -64,7 +63,7 @@ class ScreenLogin : Screen() {
         ApiAccountLogin.request(id, pwd, platform) { token ->
             app.config.userShortToken = DateEx.CurrentLong
             app.config.userToken = token
-            DataSourceAccount.updateUserProfile()
+            ApiProfileGetProfile.request(token) { app.config.userProfile = it }
             pop()
         }.errorTip
     }
