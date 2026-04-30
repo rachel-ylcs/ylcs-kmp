@@ -40,8 +40,8 @@ class StartupUrlImage(
     }
 
     private fun ComponentRegistry.Builder.registerComponent() {
-        addFetcher(ComposeResourceUriFetcher.Factory())
-        addFetcher(KtorHttpUriFetcher.Factory(KtorStack(client = buildFileClient().delegate)))
+        add(ComposeResourceUriFetcher.Factory())
+        add(KtorHttpUriFetcher.Factory(KtorStack(client = buildFileClient().delegate)))
 
         supportGif()
         supportAnimatedWebp()

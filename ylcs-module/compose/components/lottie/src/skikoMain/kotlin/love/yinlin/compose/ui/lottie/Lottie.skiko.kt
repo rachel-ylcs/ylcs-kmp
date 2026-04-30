@@ -5,7 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.skiaCanvas
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import love.yinlin.compose.extension.rememberRefNull
@@ -45,7 +45,7 @@ actual fun Lottie(data: String, modifier: Modifier) {
             animation?.let { anim ->
                 drawIntoCanvas { canvas ->
                     anim.seekFrameTime(currentTime, invalidationController)
-                    anim.render(canvas.nativeCanvas, 0f, 0f, size.width, size.height)
+                    anim.render(canvas.skiaCanvas, 0f, 0f, size.width, size.height)
                 }
             }
         }
