@@ -12,6 +12,6 @@ internal class LinuxMusicController(fetcher: MediaMetadataFetcher) : CommonMusic
     override suspend fun play() { }
     override suspend fun pause() { }
     override suspend fun seekTo(position: Long) { }
-    override fun innerGotoIndex(index: Int, playing: Boolean) { }
+    override fun innerGotoIndex(path: String, playing: Boolean): Boolean = false
     override fun innerStop() { }
 }
