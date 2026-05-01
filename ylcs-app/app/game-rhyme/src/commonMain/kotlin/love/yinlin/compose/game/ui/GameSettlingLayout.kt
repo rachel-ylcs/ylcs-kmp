@@ -208,13 +208,29 @@ private fun SettlingResult(
                 1.0f to Color(0xFFE29E35)
             ) }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SecondaryButton(
+                    text = "返回",
+                    icon = Icons.ArrowBack,
+                    style = Theme.typography.v6.bold,
+                    onClick = onBack,
+                    padding = Theme.padding.value9
+                )
+                PrimaryButton(
+                    text = "提交成绩",
+                    icon = Icons.Upload,
+                    style = Theme.typography.v6.bold,
+                    onClick = onSubmit,
+                    padding = Theme.padding.value9
+                )
+            }
+
             SimpleClipText(text = "· 结算 ·", style = Theme.typography.v5.bold, color = Theme.color.primary)
-            SimpleClipText(
-                text = "—— 得分",
-                style = Theme.typography.v5.bold,
-                color = Theme.color.secondary,
-                modifier = Modifier.fillMaxWidth()
-            )
+
             StrokeText(
                 text = result.score.toString(),
                 strokeColor = Colors.White,
@@ -224,13 +240,6 @@ private fun SettlingResult(
             )
 
             ResultDivider(modifier = Modifier.fillMaxWidth().height(Theme.size.icon))
-
-            SimpleClipText(
-                text = "—— 统计",
-                style = Theme.typography.v5.bold,
-                color = Theme.color.secondary,
-                modifier = Modifier.fillMaxWidth()
-            )
 
             val countList = remember {
                 (result.statistics.mapIndexed { index, count ->
@@ -251,27 +260,6 @@ private fun SettlingResult(
             }
 
             SimpleEllipsisText(text = remember { DateEx.CurrentString }, style = Theme.typography.v6.bold, modifier = Modifier.fillMaxWidth())
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9, Alignment.End),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                SecondaryButton(
-                    text = "返回",
-                    icon = Icons.ArrowBack,
-                    style = Theme.typography.v6.bold,
-                    onClick = onBack,
-                    padding = Theme.padding.value9
-                )
-                PrimaryButton(
-                    text = "提交成绩",
-                    icon = Icons.Upload,
-                    style = Theme.typography.v6.bold,
-                    onClick = onSubmit,
-                    padding = Theme.padding.value9
-                )
-            }
         }
     }
 }

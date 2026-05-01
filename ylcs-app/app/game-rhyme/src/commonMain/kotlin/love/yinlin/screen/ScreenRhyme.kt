@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -457,7 +459,7 @@ class ScreenRhyme : BasicScreen() {
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
             ) {
                 RhymeMusicCard(info = info, modifier = Modifier.widthIn(min = Theme.size.cell1, max = Theme.size.cell1 * 1.5f)) { }
