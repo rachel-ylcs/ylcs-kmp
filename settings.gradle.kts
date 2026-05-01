@@ -10,11 +10,9 @@ pluginManagement {
             maven("https://maven.aliyun.com/repository/google")
             maven("https://maven.aliyun.com/repository/gradle-plugin")
         }
-        else {
-            mavenCentral()
-            google()
-            gradlePluginPortal()
-        }
+        mavenCentral()
+        google()
+        gradlePluginPortal()
     }
 }
 
@@ -30,10 +28,8 @@ dependencyResolutionManagement {
             maven("https://maven.aliyun.com/repository/central")
             maven("https://maven.aliyun.com/repository/google")
         }
-        else {
-            mavenCentral()
-            google()
-        }
+        mavenCentral()
+        google()
     }
 
     versionCatalogs {
