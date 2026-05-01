@@ -63,7 +63,7 @@ data class RhymeUploadResult(
         if (hash.length != 45) return false
         val ots = hash.substring(32).map { it - 'a' }.joinToString("").toLongOrNull() ?: return false
         if (ots != ts) return false
-        if (DateEx.CurrentLong - ots !in 1L .. 3600000L) return false
+        if (DateEx.CurrentLong - ots !in -60000L .. 3600000L) return false
         return buildRaw(uid, sid, ots, difficulty, character, duration, score, statistics) == hash
     }
 }
