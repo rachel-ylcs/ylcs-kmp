@@ -1,6 +1,9 @@
 pluginManagement {
-    val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
-    val useMirror = localProperties.containsKey("mirror.enabled")
+    val useMirror = try {
+        val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
+        localProperties.containsKey("mirror.enabled")
+    }
+    catch (_: Throwable) { false }
     repositories {
         if (useMirror) {
             maven("https://maven.aliyun.com/repository/central")
@@ -17,8 +20,11 @@ pluginManagement {
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
-    val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
-    val useMirror = localProperties.containsKey("mirror.enabled")
+    val useMirror = try {
+        val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
+        localProperties.containsKey("mirror.enabled")
+    }
+    catch (_: Throwable) { false }
     repositories {
         if (useMirror) {
             maven("https://maven.aliyun.com/repository/central")
