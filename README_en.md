@@ -86,12 +86,8 @@ The interface library covers various components such as themes, text, inputs, im
 >  A small silver gathering application developed based on the `Rachel` framework, integrating information, music listening, beautiful pictures, forums, and social networking.
 >
 >  银临茶舍 QQ Group：`828049503`
-
-![rachel](ylcs-docs/docs/assets/background.png)
-
-### Build Art
-
-![art](ylcs-docs/docs/assets/art.png)
+> 
+>  银临茶舍 Official WebSite: [https://yinlin.love](https://yinlin.love)
 
 Based on this case, you can learn that in addition to the `Rachel framework` and `Rachel interface library`,
 there are more interesting implementations of `KMP` in terms of architecture design and cross-platform compatibility,
@@ -102,6 +98,20 @@ including but not limited to the following:
 - Black box interface for multi-window and floating windows
 - Cross-platform implementation of audio and video, multimedia, and WebView
 - A simple game engine based on canvas self drawing
+
+### Feature Preview
+
+![app1](ylcs-docs/docs/assets/app1.png)
+![app2](ylcs-docs/docs/assets/app2.png)
+![app3](ylcs-docs/docs/assets/app3.png)
+![app4](ylcs-docs/docs/assets/app4.png)
+![app5](ylcs-docs/docs/assets/app5.png)
+![app6](ylcs-docs/docs/assets/app6.png)
+![app7](ylcs-docs/docs/assets/app7.png)
+
+### Video
+
+https://private-user-images.githubusercontent.com/76944654/586743677-ce62598a-7516-4ca9-bc2c-5b74d3f0907b.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Nzc3MjYzMzcsIm5iZiI6MTc3NzcyNjAzNywicGF0aCI6Ii83Njk0NDY1NC81ODY3NDM2NzctY2U2MjU5OGEtNzUxNi00Y2E5LWJjMmMtNWI3NGQzZjA5MDdiLm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA1MDIlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNTAyVDEyNDcxN1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTRmMTE4ODg4OGFlMzQzYTIwNWJkYTg1NDNiYjA2NTZmYzVkMjJmMTg3NTZlNTRiMDMyMDkwYTZlMGY3NzEzMWQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.5JTH4EpoqLDxRf3v-pLe-ae4Oex3jkzVXeSvhUO2Y_g
 
 ## Contributors
 

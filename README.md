@@ -84,12 +84,8 @@ implementation("love.yinlin.compose:app:x.x.x")
 >  基于`Rachel`框架开发的集资讯、听歌、美图、论坛、社交于一体的小银子聚集地应用程序
 > 
 >  银临茶舍水群：`828049503`
-
-![rachel](ylcs-docs/docs/assets/background.png)
-
-### 构建艺术
-
-![art](ylcs-docs/docs/assets/art.png)
+> 
+>  银临茶舍官网：[https://yinlin.love](https://yinlin.love)
 
 基于本案例，你可以学习到除了 `Rachel` 框架、`Rachel` 界面库外，更多 `KMP` 在架构设计、跨平台兼容等方面上有趣的实现，包括但不限于如下：
 
@@ -97,7 +93,21 @@ implementation("love.yinlin.compose:app:x.x.x")
 - 基于 Screen 的单一数据源的开发模式
 - 多窗口、悬浮窗口的黑盒接口
 - 音视频、多媒体、WebView 的跨平台实现
-- 基于 Canvas 自绘的简单游戏引擎
+- 基于 Canvas 自绘的简单游戏引擎和一款音游的设计实现
+
+### 功能预览
+
+![app1](ylcs-docs/docs/assets/app1.png)
+![app2](ylcs-docs/docs/assets/app2.png)
+![app3](ylcs-docs/docs/assets/app3.png)
+![app4](ylcs-docs/docs/assets/app4.png)
+![app5](ylcs-docs/docs/assets/app5.png)
+![app6](ylcs-docs/docs/assets/app6.png)
+![app7](ylcs-docs/docs/assets/app7.png)
+
+### 宣发视频
+
+https://private-user-images.githubusercontent.com/76944654/586743677-ce62598a-7516-4ca9-bc2c-5b74d3f0907b.mp4?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Nzc3MjYzMzcsIm5iZiI6MTc3NzcyNjAzNywicGF0aCI6Ii83Njk0NDY1NC81ODY3NDM2NzctY2U2MjU5OGEtNzUxNi00Y2E5LWJjMmMtNWI3NGQzZjA5MDdiLm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjA1MDIlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwNTAyVDEyNDcxN1omWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTRmMTE4ODg4OGFlMzQzYTIwNWJkYTg1NDNiYjA2NTZmYzVkMjJmMTg3NTZlNTRiMDMyMDkwYTZlMGY3NzEzMWQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT12aWRlbyUyRm1wNCJ9.5JTH4EpoqLDxRf3v-pLe-ae4Oex3jkzVXeSvhUO2Y_g
 
 ## 贡献者
 
