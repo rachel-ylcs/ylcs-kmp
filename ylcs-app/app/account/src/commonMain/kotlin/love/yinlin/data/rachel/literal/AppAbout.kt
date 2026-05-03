@@ -9,10 +9,10 @@ import love.yinlin.compose.ui.icon.Icons
 internal object AppAbout {
      val updateInfo = AppUpdateInfo(
         platform = "Android/iOS/Windows/Linux/macOS/Web 发布",
-        title = "银临茶舍 音乐播放器更新",
+        title = "银临茶舍 音游上线",
         force = false,
         maintenance = false,
-        date = LocalDate(2026, 3, 25),
+        date = LocalDate(2026, 4, 30),
         groups = listOf(
             AppUpdateRecordGroup(
                 type = "特性",
@@ -20,10 +20,8 @@ internal object AppAbout {
                 color = Colors.Steel5,
                 background = Colors.Steel2,
                 records = listOf(
-                    "1. 伴奏系统上线, 全曲库纯净伴奏解锁",
-                    "2. 动态歌词引擎支持, 与音游共享配置",
-                    "3. 官网落地, 支持在线下载和查看使用教程",
-                    "4. 音游内测上线, 内测期将陆续支持银临全曲集",
+                    "1. Rhyme音游正式不删档公测，持续更新",
+                    "2. 各音乐平台支持下载和搜索歌曲导入MOD",
                 )
             ),
             AppUpdateRecordGroup(
@@ -32,14 +30,12 @@ internal object AppAbout {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = listOf(
-                    "1. 优化播放器、歌单、曲库等UI界面的展示",
-                    "2. 歌单顺序随时调整，不需要停止播放器",
-                    "3. 安卓端主页返回可以退到桌面",
-                    "4. 优化选项弹窗的最小高度",
-                    "5. 悬浮歌词增加背景色设置、重置恢复默认设置",
-                    "6. 优化密码输入显示按钮长按式为点击切换式",
-                    "7. 简化部分页面，无标题栏风格",
-                    "8. 减小安装包体积, 优化性能",
+                    "1. 酷狗音乐平台导入支持",
+                    "2. 所有第三方音乐平台搜索支持",
+                    "3. 工坊曲库更新",
+                    "4. 微博@内部跳转支持",
+                    "5. 支持Android17设备",
+                    "6. 减小安装包体积, 优化性能",
                 )
             ),
             AppUpdateRecordGroup(
@@ -48,13 +44,8 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复空白处无法上拉加载的问题",
-                    "2. 修复安卓端悬浮歌词遮挡屏幕的问题",
-                    "3. 修复无法进入抖音板块的问题",
-                    "4. 修复图表大小异常的问题",
-                    "5. 修复歌词编辑器崩溃的问题",
-                    "6. 修复平板设置页不能滚动的问题",
-                    "7. 修复电脑端悬浮歌词设置不生效的问题",
+                    "1. 修复登录后无响应的问题",
+                    "2. 修复全屏状态栏遮挡的问题",
                 )
             )
         )

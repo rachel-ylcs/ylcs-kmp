@@ -2,8 +2,8 @@ package love.yinlin.startup
 
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.cache.DiskCache
-import love.yinlin.compose.cache.XXHash64
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.crypto.XXHash64
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
@@ -18,7 +18,7 @@ class StartupCache(pool: StartupPool, cachePath: File) : SyncStartup(pool) {
         override fun build(pool: StartupPool): StartupCache = StartupCache(pool, cachePath)
     }
 
-    private val diskCache = DiskCache(cachePath = cachePath, key = XXHash64::hash) { source, sink ->
+    private val diskCache = DiskCache<String>(cachePath = cachePath, key = XXHash64::encodeToString) { source, sink ->
         Coroutines.io { NetClient.File.download(source, sink) }
     }
 

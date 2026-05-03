@@ -32,7 +32,7 @@ abstract class GameMapper {
     }
 
     companion object {
-        val Groups = Game.entries.groupBy { it.type }
+        val Groups = Game.entries.asSequence().sortedBy { it.type.order }.groupBy(Game::type)
 
         // 使用when是为了利用enum域穷尽检查，实际查找仍然是基于预先associateWith的Map
         val TypeIcons = GameType.entries.associateWith {

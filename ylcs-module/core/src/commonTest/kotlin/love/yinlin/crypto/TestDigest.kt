@@ -10,4 +10,16 @@ class TestDigest {
         assertEquals(MD5(is16Bit = false, isUppercase = true).encodeToString("Hello World"), "B10A8DB164E0754105B7A99BE72E3FE5")
         assertEquals(MD5(is16Bit = true, isUppercase = false).encodeToString("Kotlin你好"), "7201c66022293f97")
     }
+
+    @Test
+    fun testXXHash64() {
+        listOf(
+            "hello world",
+            "hello world!",
+            "love.yinlin",
+            "XXHash64XXHash64XXHash64XXHash64XXHash64XXHash64XXHash64",
+        ).forEach {
+            println("$it -> ${XXHash64.encodeToString(it)}")
+        }
+    }
 }

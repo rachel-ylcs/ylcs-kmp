@@ -8,7 +8,7 @@ on:
 jobs:
   publish:
     name: Publish To Maven Central
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout Code
         id: check
@@ -27,7 +27,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Setup Node
         uses: actions/setup-node@v6

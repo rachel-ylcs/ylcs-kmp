@@ -6,6 +6,9 @@ import love.yinlin.app.game_rhyme.resources.Res as RhymeRes
 import love.yinlin.app.game_rhyme.resources.music
 import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.app.global.resources.xwwk
+import love.yinlin.compose.game.character.Character
+import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
+import love.yinlin.compose.game.character.CharacterPiFuDuHai
 import love.yinlin.compose.game.common.BlockMapGenerator
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.BlockStatus
@@ -21,8 +24,10 @@ import love.yinlin.compose.game.visible.CornerTail
 @Stable
 class MapLayer(
     private val camera: Camera,
-    playInfo: RhymePlayInfo,
+    private val character: Character,
+    private val playInfo: RhymePlayInfo,
     val momentLayer: MomentLayer,
+    val backgroundLayer: BackgroundLayer,
     private val interactLayer: InteractLayer,
     private val uiLayer: UILayer,
 ) : Layer(layerOrder = 2) {
@@ -32,7 +37,12 @@ class MapLayer(
     }
 
     // 地图
-    private val blocks = BlockMapGenerator.generate(Block.DEFAULT_DIMENSION, playInfo.lyricsConfig, playInfo.playConfig)
+    private val blocks = BlockMapGenerator.generate(
+        blockDimension = Block.DEFAULT_DIMENSION,
+        lyricsConfig = playInfo.lyricsConfig,
+        playConfig = playInfo.playConfig,
+        character = character
+    )
 
     // 当前位置 用于相机跟随 与音频发声一致
     private var currentIndex: Int = 0
@@ -75,11 +85,13 @@ class MapLayer(
                         currentIndex = newIndex
 
                         // --  边角判定  --
-                        val currentLine = currentBlock.line
-                        if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
-                            // 添加尾角动画
-                            currentLine.endDirection?.let { endDirection ->
-                                this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
+                        if (character !is CharacterLiDiShiGongFenB) {
+                            val currentLine = currentBlock.line
+                            if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
+                                // 添加尾角动画
+                                currentLine.endDirection?.let { endDirection ->
+                                    this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
+                                }
                             }
                         }
 
@@ -104,7 +116,7 @@ class MapLayer(
                             val blockBottom = center.y + halfHeight
 
                             // 当前方块在视口边界的限制外
-                            if (blockLeft < limitLeft || blockRight > limitRight || blockTop < limitTop || blockBottom > limitBottom) {
+                            if (blockLeft <= limitLeft || blockRight >= limitRight || blockTop <= limitTop || blockBottom >= limitBottom) {
                                 camera.animateUpdatePosition(center)
                             }
                         }
@@ -122,9 +134,13 @@ class MapLayer(
         lyricsTextBuilder = { text ->
             measureText(text, font = GlobalRes.font.xwwk, fontWeight = FontWeight.Bold)
         }
+        if (character is CharacterPiFuDuHai) camera.updateScale(1 / (1 + character.range)) // 蚍蜉渡海具备额外视野
     }
 
-    fun updateResult(result: BlockResult, scoreRatio: Float = 1f) {
-        uiLayer.updateResult(result, scoreRatio)
+    fun updateBlockResult(block: Block<*>, result: BlockResult) {
+        val skillResult = character.modifyResult(playInfo.musicInfo, playInfo.playConfig, block, result)
+        if (skillResult.active) backgroundLayer.activateSkill()
+        else if (skillResult.dirty) backgroundLayer.updateSkill()
+        uiLayer.updateResult(skillResult)
     }
 }

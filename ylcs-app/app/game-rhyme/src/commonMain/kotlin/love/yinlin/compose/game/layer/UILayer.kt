@@ -4,8 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -16,10 +14,14 @@ import love.yinlin.app.global.resources.Res as GlobalRes
 import love.yinlin.app.global.resources.xwwk
 import love.yinlin.compose.Colors
 import love.yinlin.compose.extension.scale
+import love.yinlin.compose.game.character.Character
+import love.yinlin.compose.game.character.CharacterChuXing
+import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
+import love.yinlin.compose.game.character.CharacterLiuGuangJi
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.common.FPSCounter
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayInfo
+import love.yinlin.compose.game.data.RhymeSkillResult
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.InitialDrawer
 import love.yinlin.compose.game.drawer.LayerType
@@ -27,10 +29,13 @@ import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.drawer.StrokeTextGraph
 import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.traits.Layer
-import kotlin.math.ceil
+import love.yinlin.compose.game.ui.StarPaths
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
+import love.yinlin.data.rachel.rhyme.RhymePlayResult
 
 @Stable
 class UILayer(
+    private val character: Character,
     private val info: RhymePlayInfo,
     private val momentLayer: MomentLayer
 ) : Layer(
@@ -42,6 +47,8 @@ class UILayer(
     }
 
     override val interactive: Boolean = false
+
+    private val showUI = character !is CharacterLiDiShiGongFenB
 
     private var viewportWidth: Float = 0f
     private var viewportHeight: Float = 0f
@@ -90,11 +97,15 @@ class UILayer(
     // 难度
     private val difficulty = info.playConfig.difficulty
     // 连击奖励
-    private val comboRewardCount = when (info.playConfig.difficulty) {
-        RhymeDifficulty.Easy -> 30
-        RhymeDifficulty.Medium -> 25
-        RhymeDifficulty.Hard -> 20
-        RhymeDifficulty.Extreme -> 20
+    private val comboRewardCount = run {
+        val baseCount = when (info.playConfig.difficulty) {
+            RhymeDifficulty.Easy -> 30
+            RhymeDifficulty.Medium -> 25
+            RhymeDifficulty.Hard -> 20
+            RhymeDifficulty.Extreme -> 20
+        }
+        val ratio = if (character is CharacterLiuGuangJi) character.range else 0f
+        (baseCount * (1 - ratio)).toInt()
     }
 
     private var strokeTextBuilder: ((String) -> StrokeTextGraph)? = null
@@ -109,16 +120,20 @@ class UILayer(
     private val comboGraphMap = mutableMapOf<Int, StrokeTextGraph>()
 
     // 统计数据收集
-    private val statistics = IntArray(BlockResult.entries.size)
+    private val statistics = IntArray(BlockResult.entries.size) // 各评级数量
+    private var maxCombo: Int = 0
 
-    fun updateResult(result: BlockResult, scoreRatio: Float) {
+    fun updateResult(skillResult: RhymeSkillResult) {
+        val result = skillResult.result
         // 统计
         statistics[result.ordinal] += 1
         // 计算连击
         val oldCombo = resultData?.combo ?: 0
-        val newCombo = if (result == BlockResult.MISS || result == BlockResult.BAD) 0 else oldCombo + 1
+        val newCombo = if (skillResult.addCombo) oldCombo + 1 else 0
+        // 记录最大连击
+        if (newCombo > maxCombo) maxCombo = newCombo
         // 计算得分
-        val reward = ceil(result.score * scoreRatio).toInt() // 向上取整
+        val reward = result.score // 向上取整
         val deltaScore = reward + newCombo / comboRewardCount
         score += deltaScore // 连击奖励
 
@@ -133,36 +148,51 @@ class UILayer(
         }
     }
 
+    fun submitResult(): RhymePlayResult {
+        // 默认角色享受1.05倍总分加成
+        val totalScore = if (character is CharacterChuXing) (score * 1.05f).toInt() else score
+        return RhymePlayResult(
+            duration = info.lyricsConfig.duration,
+            score = totalScore,
+            maxCombo = maxCombo,
+            statistics = statistics.toList()
+        )
+    }
+
     override fun preUpdate(tick: Int) {
         var isDirty = false
 
-        // 更新进度
-        val audioPosition = momentLayer.audioPosition
-        val audioDuration = momentLayer.audioDuration
-        if (audioPosition - lastAudioPosition > 500L) { // 降频
-            audioProgress = if (audioDuration == 0L) 0f else audioPosition / audioDuration.toFloat()
-            lastAudioPosition = audioPosition
-            isDirty = true
-        }
-
-        // 更新FPS
-        fpsCounter.update(tick) { fps ->
-            fpsTextBuilder?.let { builder ->
-                if (fpsCache.size >= 16) fpsCache.clear()
-                currentFpsGraph = fpsCache.getOrPut(fps) { builder(fps) }
+        if (showUI) {
+            // 更新进度
+            val audioPosition = momentLayer.audioPosition
+            val audioDuration = momentLayer.audioDuration
+            if (audioPosition - lastAudioPosition > 500L) { // 降频
+                audioProgress = if (audioDuration == 0L) 0f else audioPosition / audioDuration.toFloat()
+                lastAudioPosition = audioPosition
                 isDirty = true
             }
-        }
 
-        // 更新评级结果
-        if (resultData?.update(tick) == true) isDirty = true
+            // 更新FPS
+            fpsCounter.update(tick) { fps ->
+                fpsTextBuilder?.let { builder ->
+                    if (fpsCache.size >= 16) fpsCache.clear()
+                    currentFpsGraph = fpsCache.getOrPut(fps) { builder(fps) }
+                    isDirty = true
+                }
+            }
+
+            // 更新评级结果
+            if (resultData?.update(tick) == true) isDirty = true
+        }
 
         if (isDirty) updateDirty()
     }
 
     override fun InitialDrawer.preInitialDraw() {
-        title = measureText(info.musicInfo.name, GlobalRes.font.xwwk, FontWeight.Bold)
-        fpsTextBuilder = { measureText("FPS: $it", RhymeRes.font.rhyme, FontWeight.Bold) }
+        if (showUI) {
+            title = measureText(info.musicInfo.name, GlobalRes.font.xwwk, FontWeight.Bold)
+            fpsTextBuilder = { measureText("FPS: $it", RhymeRes.font.rhyme, FontWeight.Bold) }
+        }
         strokeTextBuilder = { measureStrokeText(it, RhymeRes.font.rhyme, FontWeight.Bold) }
         scoreGraph = measureStrokeText("0", RhymeRes.font.rhyme, FontWeight.Bold)
     }
@@ -178,60 +208,64 @@ class UILayer(
         val barHeight = minDimension / 50
         val barRadius = barHeight / 2
         val barPosition = Offset(0f, -barRadius)
-        // 画时长
-        roundRect(Colors.Ghost, barRadius, barPosition, Size(viewportWidth, barHeight))
-        // 画进度
-        roundRect(Colors.Green6, barRadius, barPosition, Size(viewportWidth * audioProgress, barHeight))
-
+        val barBottom = Offset(0f, barRadius)
         val textHeight = minDimension / 24
-        title?.let { graph ->
-            val textWidth = graph.width(textHeight)
-            // 画封面
-            val coverRect = Rect(Offset(barRadius, barHeight), Size(textHeight, textHeight))
-            circle(Colors.Ghost, coverRect.center, textHeight / 2, style = Stroke(textHeight / 10))
-            clipCircle(coverRect) { image(info.musicRecord, coverRect) }
+        val resultHeight = minDimension / 16
 
-            // 画歌名
-            text(graph, Offset(textHeight * 1.5f + barRadius, barHeight), Size(textWidth, textHeight), Colors.Ghost)
-            // 画难度
-            repeat(difficulty.ordinal + 1) { index ->
-                transform({
-                    translate(textWidth + (index + 2) * textHeight, barHeight)
-                    scale(textHeight / 1024f, Offset.Zero)
-                }) {
-                    StarPaths.fastForEach { (path, color) -> path(color, path) }
+        if (showUI) {
+            // 画时长
+            roundRect(Colors.Ghost, barRadius, barPosition, Size(viewportWidth, barHeight))
+            // 画进度
+            roundRect(Colors.Green6, barRadius, barPosition, Size(viewportWidth * audioProgress, barHeight))
+
+            title?.let { graph ->
+                val textWidth = graph.width(textHeight)
+                // 画封面
+                val coverRect = Rect(Offset(barRadius, barHeight), Size(textHeight, textHeight))
+                circle(Colors.Ghost, coverRect.center, textHeight / 2, style = Stroke(textHeight / 10))
+                clipCircle(coverRect) { image(info.musicRecord, coverRect) }
+
+                // 画歌名
+                text(graph, Offset(textHeight * 1.5f + barRadius, barHeight), Size(textWidth, textHeight), Colors.Ghost)
+                // 画难度
+                repeat(difficulty.ordinal + 1) { index ->
+                    transform({
+                        translate(textWidth + (index + 2) * textHeight, barHeight)
+                        scale(textHeight / 1024f, Offset.Zero)
+                    }) {
+                        StarPaths.fastForEach { (path, color) -> path(color, path) }
+                    }
                 }
             }
-        }
 
-        // 画FPS
-        val barBottom = Offset(0f, barRadius)
-        currentFpsGraph?.let { graph ->
-            text(graph, barBottom, Size(viewportWidth, textHeight * 0.75f), fpsColor, TextAlign.Center)
-        }
+            // 画FPS
+            currentFpsGraph?.let { graph ->
+                text(graph, barBottom, Size(viewportWidth, textHeight * 0.75f), fpsColor, TextAlign.Center)
+            }
 
-        val resultHeight = minDimension / 16
-        resultData?.let { data ->
-            val resultGraph = data.resultGraph
-            val resultWidth = resultGraph.width(resultHeight)
-            val isOpen = data.isOpen
-            val alpha = if (isOpen) 1f else data.progress
-            val mainColor = data.result.color.copy(alpha = alpha)
-            val strokeColor = Colors.White.copy(alpha = alpha)
+            // 画结果
+            resultData?.let { data ->
+                val resultGraph = data.resultGraph
+                val resultWidth = resultGraph.width(resultHeight)
+                val isOpen = data.isOpen
+                val alpha = if (isOpen) 1f else data.progress
+                val mainColor = data.result.color.copy(alpha = alpha)
+                val strokeColor = Colors.White.copy(alpha = alpha)
 
-            val comboGraph = data.comboGraph
-            val comboWidth = comboGraph?.width(resultHeight) ?: 0f
-            val totalWidth = resultWidth + comboWidth
+                val comboGraph = data.comboGraph
+                val comboWidth = comboGraph?.width(resultHeight) ?: 0f
+                val totalWidth = resultWidth + comboWidth
 
-            transform({
-                translate((viewportWidth - totalWidth) / 2, barRadius + textHeight)
-                if (isOpen) scale(data.progress, Offset(totalWidth / 2, resultHeight / 2))
-            }) {
-                // 画评级
-                strokeText(resultGraph, Offset.Zero, Size(resultWidth, resultHeight), mainColor, strokeColor, TextStroke)
-                // 画连击
-                comboGraph?.let { graph ->
-                    strokeText(graph, Offset(resultWidth, 0f), Size(comboWidth, resultHeight), mainColor, strokeColor, TextStroke)
+                transform({
+                    translate((viewportWidth - totalWidth) / 2, barRadius + textHeight)
+                    if (isOpen) scale(data.progress, Offset(totalWidth / 2, resultHeight / 2))
+                }) {
+                    // 画评级
+                    strokeText(resultGraph, Offset.Zero, Size(resultWidth, resultHeight), mainColor, strokeColor, TextStroke)
+                    // 画连击
+                    comboGraph?.let { graph ->
+                        strokeText(graph, Offset(resultWidth, 0f), Size(comboWidth, resultHeight), mainColor, strokeColor, TextStroke)
+                    }
                 }
             }
         }
@@ -242,79 +276,4 @@ class UILayer(
             strokeText(graph, barBottom, Size(scoreWidth, resultHeight), Colors.Dark, Colors.White, TextStroke, TextAlign.End)
         }
     }
-}
-
-private val StarPaths by lazy {
-    listOf(
-        Path().apply {
-            moveTo(539.457f, 110.815f)
-            lineTo(418.568f, 355.852f)
-            lineTo(539.457f, 483.457f)
-            lineTo(539.457f, 110.815f)
-            close()
-        } to Color(0xFF60C9C3),
-        Path().apply {
-            moveTo(418.568f, 355.852f)
-            lineTo(148.05f, 395.16f)
-            lineTo(539.457f, 483.457f)
-            lineTo(418.568f, 355.852f)
-            close()
-        } to Color(0xFF6ADDD6),
-        Path().apply {
-            moveTo(660.444f, 355.852f)
-            lineTo(539.457f, 110.815f)
-            lineTo(539.457f, 483.457f)
-            lineTo(660.444f, 355.852f)
-            close()
-        } to Color(0xFF6ADDD6),
-        Path().apply {
-            moveTo(930.864f, 395.16f)
-            lineTo(660.444f, 355.852f)
-            lineTo(539.457f, 483.457f)
-            lineTo(930.864f, 395.16f)
-            close()
-        } to Color(0xFFA9ECEB),
-        Path().apply {
-            moveTo(735.111f, 585.975f)
-            lineTo(930.864f, 395.16f)
-            lineTo(539.457f, 483.457f)
-            lineTo(735.111f, 585.975f)
-            close()
-        } to Color(0xFF00A298),
-        Path().apply {
-            moveTo(539.457f, 483.457f)
-            lineTo(781.333f, 855.309f)
-            lineTo(735.111f, 585.975f)
-            lineTo(539.457f, 483.457f)
-            close()
-        } to Color(0xFFA9ECEB),
-        Path().apply {
-            moveTo(148.049f, 395.16f)
-            lineTo(343.802f, 585.975f)
-            lineTo(539.457f, 483.457f)
-            lineTo(148.049f, 395.16f)
-            close()
-        } to Color(0xFF00A298),
-        Path().apply {
-            moveTo(343.802f, 585.975f)
-            lineTo(297.58f, 855.309f)
-            lineTo(539.457f, 483.457f)
-            lineTo(343.802f, 585.975f)
-            close()
-        } to Color(0xFF6ADDD6),
-        Path().apply {
-            moveTo(297.58f, 855.309f)
-            lineTo(539.457f, 728.1f)
-            lineTo(539.457f, 483.457f)
-            lineTo(297.58f, 855.309f)
-            close()
-        } to Color(0xFF00C4B8),
-        Path().apply {
-            moveTo(539.457f, 483.457f)
-            lineTo(539.457f, 728.1f)
-            lineTo(781.333f, 855.309f)
-            lineTo(539.457f, 483.457f)
-            close()
-        } to Color(0xFF6ADDD6)
-    )
 }

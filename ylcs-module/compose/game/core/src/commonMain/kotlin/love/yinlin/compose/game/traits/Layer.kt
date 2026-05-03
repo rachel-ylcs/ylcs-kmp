@@ -24,7 +24,7 @@ open class Layer(
     val layerOrder: Int = LayerOrder.Default, // 层级
     val layerType: LayerType = LayerType.Relative, // 层类型
 ) : Entity(), Dynamic {
-    private val items = visibles.sortedBy(Visible::layerOrder).toMutableList()
+    @PublishedApi internal val items = visibles.sortedBy(Visible::layerOrder).toMutableList()
 
     var scene: ScenePlugin? = null
         private set
@@ -48,6 +48,10 @@ open class Layer(
      * 因为 Update 通常在遍历 Layer 时发生，如果中途改变了容器迭代器位置会不一致
      */
     fun removeAfterUpdate(visible: Visible) { removeCacheSet += visible }
+
+    inline fun <reified T : Visible> findVisible(): T? = items.find { it is T } as? T
+
+    inline fun <reified T : Visible> requireVisible(): T = items.find { it is T } as T
 
     operator fun plusAssign(item: Visible) {
         // 根据 layerOrder 二分查找

@@ -72,27 +72,12 @@ internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMus
         }
     }
 
-    override fun innerStop() {
-        musicList.clear()
-        duration = 0L
-        currentId = null
-        currentIndex = -1
-        resetShuffled()
-        nativeSetSource(nativeHandle, null)
-        listener?.onPlayerStop()
-    }
+    override fun innerStop() { nativeSetSource(nativeHandle, null) }
 
-    override fun innerGotoIndex(index: Int, playing: Boolean) {
-        if (index in musicList.indices) {
-            val path = fetcher.extractAudioUri(musicList[index])
-            if (path != null) {
-                currentIndex = index
-                nativeSetSource(nativeHandle, path)
-                shouldImmediatePlay = playing
-                return
-            }
-        }
-        innerStop()
+    override fun innerGotoIndex(path: String, playing: Boolean): Boolean {
+        nativeSetSource(nativeHandle, path)
+        shouldImmediatePlay = playing
+        return true
     }
 
     // Callback
@@ -125,7 +110,7 @@ internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMus
     private fun nativeMediaEnded() {
         if (!isReady) return
 
-        innerGotoIndex(when (playMode) {
+        internalGotoIndex(when (playMode) {
             MediaPlayMode.Order -> loopNextIndex
             MediaPlayMode.Loop -> currentIndex
             MediaPlayMode.Random -> randomNextIndex ?: reshuffled()

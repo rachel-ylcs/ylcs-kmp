@@ -1,5 +1,7 @@
 package love.yinlin.crypto
 
-fun interface Digest {
+interface Digest {
     fun encode(data: ByteArray): ByteArray
+    fun encodeToString(data: ByteArray): String
+    fun encodeToString(data: String): String
 }

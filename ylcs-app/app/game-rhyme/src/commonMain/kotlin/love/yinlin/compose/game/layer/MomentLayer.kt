@@ -1,17 +1,20 @@
 package love.yinlin.compose.game.layer
 
 import androidx.compose.runtime.Stable
+import love.yinlin.compose.game.character.Character
+import love.yinlin.compose.game.character.CharacterLiDiShiGongFenB
 import love.yinlin.compose.game.common.Moments
-import love.yinlin.compose.game.data.RhymeDifficulty
 import love.yinlin.compose.game.data.RhymePlayInfo
 import love.yinlin.compose.game.drawer.LayerType
 import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.visible.InteractTipArea
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.media.AudioPlayer
 
 // 时刻层
 @Stable
 class MomentLayer(
+    character: Character,
     playInfo: RhymePlayInfo,
     private val player: AudioPlayer
 ) : Layer(layerOrder = 1, layerType = LayerType.Absolute) {
@@ -28,7 +31,10 @@ class MomentLayer(
 
     // 时刻表
     private val moments = Moments {
-        if (difficulty == RhymeDifficulty.Easy || difficulty == RhymeDifficulty.Medium) moment(3000L, ::InteractTipArea)
+        val difficultyEnabled = difficulty == RhymeDifficulty.Easy || difficulty == RhymeDifficulty.Medium
+        if (difficultyEnabled && character !is CharacterLiDiShiGongFenB) {
+            moment(3000L, ::InteractTipArea)
+        }
     }
 
     override fun preUpdate(tick: Int) {

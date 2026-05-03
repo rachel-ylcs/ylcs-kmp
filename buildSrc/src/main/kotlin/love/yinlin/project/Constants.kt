@@ -41,7 +41,7 @@ class Constants(project: Project) {
     val resourceTag = when (platform) {
         BuildPlatform.Windows -> "windows-x64"
         BuildPlatform.Linux -> "linux-x64"
-        BuildPlatform.Mac -> if (architecture == BuildArchitecture.X86_64) "macos-x64" else "macos-arm64"
+        BuildPlatform.Mac -> "macos-arm64"
     }
 
     // Gradle版本
@@ -70,8 +70,8 @@ class Constants(project: Project) {
         name = "ylcs",
         projectName = "ylcs-app",
         displayName = "银临茶舍",
-        version = 355,
-        versionName = "3.5.5",
+        version = 360,
+        versionName = "3.6.0",
         minVersion = 341,
         minVersionName = "3.4.1",
         description = "银临茶舍KMP跨平台APP",
@@ -92,15 +92,15 @@ class Constants(project: Project) {
     // Android 配置
     val android = AndroidConfig(
         minSdk = 29,
-        compileSdk = 36,
-        targetSdk = 36,
+        compileSdk = 37,
+        targetSdk = 37,
         ndkAbi = arrayOf("arm64-v8a"),
         ndkVersion = "29.0.14206865",
     )
 
     // iOS 配置
     val ios = IosConfig(
-        target = "16.0"
+        target = "26.0"
     )
 
     // Desktop 配置

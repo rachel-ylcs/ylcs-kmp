@@ -18,8 +18,6 @@ template(object : KotlinMultiplatformTemplate() {
                 ExportLib,
                 projects.ylcsModule.compose.ui,
                 projects.ylcsModule.compose.platformView,
-
-                libs.tool.qrcode,
             )
         }
 

@@ -10,5 +10,6 @@ class RhymePlayInfo(
     val playConfig: RhymePlayConfig,
     val musicInfo: MusicInfo,
     val lyricsConfig: RhymeLyricsConfig,
-    val musicRecord: ImageBitmap
+    val musicRecord: ImageBitmap,
+    val characterCV: ImageBitmap?,
 )

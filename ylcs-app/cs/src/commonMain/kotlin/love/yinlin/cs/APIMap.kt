@@ -27,10 +27,12 @@ import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.platform.Platform
-import love.yinlin.data.rachel.rhyme.RhymeRank
 import love.yinlin.data.rachel.prize.Prize
 import love.yinlin.data.rachel.prize.PrizeItemdata
 import love.yinlin.data.rachel.prize.Prizedata
+import love.yinlin.data.rachel.rhyme.RhymeRank
+import love.yinlin.data.rachel.rhyme.RhymeRepository
+import love.yinlin.data.rachel.rhyme.RhymeUploadResult
 
 // Common
 
@@ -448,27 +450,26 @@ val ApiPrizeParticipate by API.post.i<String, Int>().o()
 
 
 @APIParam("pid")
-@APIReturn("Map<Int, List<Int>>") // {itemId1:[uid1,uid2], itemid2:[uid3], ...}
+@APIReturn("Map<Int, List<Int>>") // {itemId1:[uid1,uid2], itemId2:[uid3], ...}
 val ApiPrizeGetWinners by API.post.i<Int>().o<String>()
 
-
+// 管理员手动开奖，生成中奖名单
 @APIParam("token")
 @APIParam("pid")
 val ApiPrizeDrawPrize by API.post.i<String, Int>().o<String>()
-//管理员手动开奖，生成中奖名单
+
+@APIParam("token")
+val ApiRhymeGetUserRepository by API.post.i<String>().o<RhymeRepository>()
+
+@APIParam("token")
+val ApiRhymeUnlockCharacter by API.post.i<String, Int>().o()
 
 @APIParam("token")
 @APIParam("sid")
-@APIParam("difficulty")
-@APIParam("score")
-val ApiRhymeUploadRecord by API.post.i<String, Int, Int, Int>().o()
+@APIParam("result")
+val ApiRhymeUploadRecord by API.post.i<String, String, RhymeUploadResult>().o()
 
+@APIParam("token")
 @APIParam("sid")
-@APIParam("difficulty")
-@APIParam("score")
-@APIParam("uid", default = "0")
-@APIParam("num", default = "APIConfig.MIN_PAGE_NUM")
-val ApiRhymeGetSongRank by API.post.i<Int, Int, Int, Int, Int>().o<List<RhymeRank>>()
-
-
-
+@APIReturn("List<RhymeRank>")
+val ApiRhymeGetRank by API.post.i<String, String>().o<List<RhymeRank>>()

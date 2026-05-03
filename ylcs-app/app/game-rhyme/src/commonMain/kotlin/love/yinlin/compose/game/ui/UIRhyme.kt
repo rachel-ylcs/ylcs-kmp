@@ -1,5 +1,7 @@
 package love.yinlin.compose.game.ui
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -10,19 +12,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.HazeTint
+import dev.chrisbanes.haze.blur.HazeBlurStyle
+import dev.chrisbanes.haze.blur.HazeColorEffect
+import dev.chrisbanes.haze.blur.blurEffect
 import dev.chrisbanes.haze.hazeEffect
 import love.yinlin.app
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.game.data.RhymeIllustration
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LocalFileImage
+import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.node.BlurState
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -58,46 +64,120 @@ internal fun RhymeCommonButton(
 internal fun RhymeMusicCard(
     info: MusicInfo,
     modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null
+    content: @Composable () -> Unit
 ) {
     Surface(
         modifier = modifier,
         shadowElevation = Theme.shadow.v5,
         tonalLevel = 1,
-        shape = Theme.shape.v7,
-        onClick = onClick
+        shape = Theme.shape.v7
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
+            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             LocalFileImage(
                 uri = info.path(app.modPath, ModResourceType.Record).path,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(Theme.size.image7)
             )
-            Column(modifier = Modifier.weight(1f).padding(Theme.padding.value)) {
+            Column(
+                modifier = Modifier.weight(1f).padding(Theme.padding.value),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+            ) {
                 SimpleEllipsisText(text = info.name, style = Theme.typography.v6.bold)
+                Box(modifier = Modifier.fillMaxWidth()) { content() }
             }
         }
     }
 }
 
-private val DefaultRhymeBlurStyle = HazeStyle(
-    blurRadius = 10.dp,
-    backgroundColor = Color(0xDD292929),
-    tint = HazeTint(Color(0x6C292929))
-)
-
-@OptIn(ExperimentalHazeApi::class)
-fun Modifier.rhymeBlurTarget(state: BlurState): Modifier = this.hazeEffect(
-    state = state,
-    style = DefaultRhymeBlurStyle
+@Composable
+internal fun RhymeIllustrationLayout(
+    illustration: RhymeIllustration,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
-    inputScale = HazeInputScale.Fixed(0.66667f)
+    Surface(
+        modifier = modifier,
+        shadowElevation = Theme.shadow.v5,
+        tonalLevel = 1,
+        shape = Theme.shape.v5,
+        onClick = onClick
+    ) {
+        val info = illustration.info
+
+        WebImage(
+            uri = illustration.url,
+            key = info.id,
+            modifier = Modifier.fillMaxSize()
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Colors.Dark.copy(alpha = 0.8f))
+                .padding(Theme.padding.value)
+                .align(Alignment.BottomCenter),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+        ) {
+            val unlocked = illustration.unlocked
+
+            SimpleEllipsisText(text = info.title, color = Colors.White, style = Theme.typography.v7.bold)
+            SimpleEllipsisText(
+                text = if (unlocked) "已解锁" else "银币: ${info.cost}",
+                color = if (unlocked) Colors.Green4 else Colors.Purple4
+            )
+        }
+    }
 }
 
-@OptIn(ExperimentalHazeApi::class)
+@Composable
+internal fun RhymeIllustrationSelector(
+    illustration: RhymeIllustration,
+    checked: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = modifier,
+        shadowElevation = Theme.shadow.v5,
+        tonalLevel = 1,
+        shape = Theme.shape.v5,
+        border = if (checked) BorderStroke(Theme.border.v4, Theme.color.primary) else null,
+        onClick = onClick
+    ) {
+        val info = illustration.info
+
+        WebImage(
+            uri = illustration.url,
+            key = info.id,
+            modifier = Modifier.fillMaxSize()
+        )
+        SimpleEllipsisText(
+            text = info.title,
+            color = Colors.White,
+            style = Theme.typography.v8.bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().background(Colors.Dark.copy(alpha = 0.8f)).padding(Theme.padding.value).align(Alignment.BottomCenter)
+        )
+    }
+}
+
+private val DefaultRhymeBlurStyle = HazeBlurStyle(
+    blurRadius = 10.dp,
+    backgroundColor = Color(0xDD292929),
+    colorEffect = HazeColorEffect.tint(Color(0x6C292929))
+)
+
+fun Modifier.rhymeBlurTarget(state: BlurState): Modifier = this.hazeEffect(state = state) {
+    blurEffect {
+        style = DefaultRhymeBlurStyle
+        inputScale = HazeInputScale.Fixed(0.66667f)
+    }
+}
+
 @Composable
 internal fun RhymeBlurSurface(
     blurState: BlurState,

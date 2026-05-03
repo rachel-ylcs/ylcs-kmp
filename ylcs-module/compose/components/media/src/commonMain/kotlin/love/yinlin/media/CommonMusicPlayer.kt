@@ -15,7 +15,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
     protected var currentIndex: Int by mutableIntStateOf(-1)
 
     abstract fun innerStop()
-    abstract fun innerGotoIndex(index: Int, playing: Boolean = true)
+    abstract fun innerGotoIndex(path: String, playing: Boolean = true): Boolean
 
     protected val loopPreviousIndex: Int get() = (currentIndex + musicList.size - 1) % musicList.size
 
@@ -58,18 +58,40 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         if (mode == MediaPlayMode.Random) reshuffled(start = currentIndex)
     }
 
-    final override suspend fun stop() { if (isReady) innerStop() }
+    protected fun internalStop() {
+        musicList.clear()
+        duration = 0L
+        currentId = null
+        currentIndex = -1
+        resetShuffled()
+        innerStop()
+        listener?.onPlayerStop()
+    }
+
+    protected fun internalGotoIndex(index: Int, playing: Boolean = true) {
+        var success = false
+        if (index in musicList.indices) {
+            val path = fetcher.extractAudioUri(musicList[index])
+            if (path != null) {
+                currentIndex = index
+                success = innerGotoIndex(path, playing)
+            }
+        }
+        if (!success) internalStop()
+    }
+
+    final override suspend fun stop() { if (isReady) internalStop() }
 
     final override suspend fun gotoPrevious() {
-        if (isReady) innerGotoIndex(if (playMode == MediaPlayMode.Random) randomPreviousIndex ?: reshuffled() else loopPreviousIndex)
+        if (isReady) internalGotoIndex(if (playMode == MediaPlayMode.Random) randomPreviousIndex ?: reshuffled() else loopPreviousIndex)
     }
 
     final override suspend fun gotoNext() {
-        if (isReady) innerGotoIndex(if (playMode == MediaPlayMode.Random) randomNextIndex ?: reshuffled() else loopNextIndex)
+        if (isReady) internalGotoIndex(if (playMode == MediaPlayMode.Random) randomNextIndex ?: reshuffled() else loopNextIndex)
     }
 
     final override suspend fun gotoIndex(index: Int) {
-        if (isReady) innerGotoIndex(index)
+        if (isReady) internalGotoIndex(index)
     }
 
     final override suspend fun prepareMedias(medias: List<String>, startIndex: Int?, playing: Boolean) {
@@ -77,7 +99,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         if (index >= 0 && index < medias.size) {
             musicList.replaceAll(medias)
             reshuffled(size = medias.size, start = index)
-            innerGotoIndex(index, playing)
+            internalGotoIndex(index, playing)
         }
     }
 
@@ -112,11 +134,11 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         if (isReady) {
             val size = musicList.size
             if (index in musicList.indices) {
-                if (size == 1) innerStop()
+                if (size == 1) internalStop()
                 else {
                     musicList.removeAt(index)
                     if (playMode == MediaPlayMode.Random) {
-                        if (currentIndex == index) innerGotoIndex(reshuffled(size = size - 1))
+                        if (currentIndex == index) internalGotoIndex(reshuffled(size = size - 1))
                         else {
                             // 如果删除了随机序的起点则重新令当前播放的为起点
                             val rest = shuffledList.indices.toMutableList()
@@ -129,7 +151,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
                         }
                     }
                     else {
-                        if (currentIndex == index) innerGotoIndex(if (index == size - 1) index - 1 else index)
+                        if (currentIndex == index) internalGotoIndex(if (index == size - 1) index - 1 else index)
                         reshuffled(size = size - 1)
                     }
                 }

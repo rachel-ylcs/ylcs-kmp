@@ -1,18 +1,20 @@
 package love.yinlin.compose.game.data
 
 import androidx.compose.runtime.Stable
-import kotlinx.serialization.Serializable
+import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 
-@Serializable
 @Stable
 data class RhymePlayConfig(
     val difficulty: RhymeDifficulty, // 难度
-    val audioDelay: Long, // 消除延迟
+    val audioDelay: Long, // 音频延迟
+    val character: CharacterInfo, // 角色
 ) {
     companion object {
         val Default = RhymePlayConfig(
             difficulty = RhymeDifficulty.Easy,
-            audioDelay = 0L
+            audioDelay = 0L,
+            character = CharacterInfo.Default
         )
 
         const val MIN_AUDIO_DELAY = -500L

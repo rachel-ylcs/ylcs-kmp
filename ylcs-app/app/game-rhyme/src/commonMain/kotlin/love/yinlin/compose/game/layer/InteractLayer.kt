@@ -66,6 +66,8 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
     private val infos = Array(8) { InteractInfo(it) }
     @PublishedApi internal val statusList = MutableList<InteractStatus?>(8) { null }
 
+    private var lastViewportSize: Size = Size.Zero
+
     // 三等分宽度
     val w0 = 0f
     var w1: Float = 0f
@@ -78,22 +80,22 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
     var h3: Float = 0f
 
     override fun preHitTest(point: Offset): Any? {
-        // 4   7
-        // 3   6
-        // 2 1 5
+        // 1   7
+        // 2   6
+        // 3 4 5
         val (x, y) = point
         return when {
             x < w0 -> null
             x < w1 -> when {
                 y < h0 -> null
-                y < h1 -> 4
-                y < h2 -> 3
-                y < h3 -> 2
+                y < h1 -> 1
+                y < h2 -> 2
+                y < h3 -> 3
                 else -> null
             }
             x < w2 -> when {
                 y < h2 -> null
-                y < h3 -> 1
+                y < h3 -> 4
                 else -> null
             }
             x < w3 -> when {
@@ -120,10 +122,23 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
             override fun onPointerUp(event: Event.Pointer.Up) {
                 val index = event.arg as? Int ?: return
                 val info = infos.getOrNull(index) ?: return
-                val status = statusList[index] as? InteractStatus.AwaitUp ?: return // 不是等待抬起状态
-                if (status.id != event.id) return // ID不一致
-                statusList[index] = InteractStatus.Up(event.id)
-                info.targetProgress = 0f
+                when (val status = statusList[index]) {
+                    is InteractStatus.Down -> {
+                        if (status.id == event.id) { // ID一致
+                            // 极限情况：同一帧内快速按下和抬起，此时两个消息会进入消息循环
+                            // 直接相互抵消默认没发生即可，不需要经过AwaitUp阶段
+                            statusList[index] = null
+                            info.targetProgress = 0f
+                        }
+                    }
+                    is InteractStatus.AwaitUp -> {
+                        if (status.id == event.id) { // ID一致
+                            statusList[index] = InteractStatus.Up(event.id)
+                            info.targetProgress = 0f
+                        }
+                    }
+                    else -> { }
+                }
             }
         }
     )
@@ -157,35 +172,37 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
     }
 
     override fun PrepareDrawer.prePrepareDraw(viewportSize: Size, viewportBounds: Rect) {
-        val (w, h) = viewportSize
-        w1 = w / 3
-        w2 = w * 2 / 3
-        w3 = w
-        if (w >= h) { // 横屏满屏
-            h0 = 0f
-            h1 = h / 3
-            h2 = h * 2 / 3
-        }
-        else { // 竖屏半屏
-            val half = h / 2
-            h0 = half
-            h1 = half * 4 / 3
-            h2 = half * 5 / 3
-        }
-        h3 = h
+        if (lastViewportSize != viewportSize) {
+            lastViewportSize = viewportSize
+            val (w, h) = viewportSize
+            w1 = w / 3
+            w2 = w * 2 / 3
+            w3 = w
+            if (w >= h) { // 横屏满屏
+                h0 = 0f
+                h1 = h / 3
+                h2 = h * 2 / 3
+            }
+            else { // 竖屏半屏
+                val half = h / 2
+                h0 = half
+                h1 = half * 4 / 3
+                h2 = half * 5 / 3
+            }
+            h3 = h
 
-        val ic = InteractInfo.INDICATOR_RADIUS
-        val ivh = (h1 - h0) / 2
-        val ivs = Size(ic * 2, ivh)
-        val ihw = (w1 - w0) / 2
-        val ihs = Size(ihw, ic * 2)
-        infos[4].mRect = Rect(Offset(-ic, h0 + ivh / 2), ivs)
-        infos[3].mRect = Rect(Offset(-ic, h1 + ivh / 2), ivs)
-        infos[2].mRect = Rect(Offset(-ic, h2 + ivh / 2), ivs)
-        infos[1].mRect = Rect(Offset(w1 + ihw / 2, h3 - ic), ihs)
-        infos[5].mRect = Rect(Offset(w3 - ic, h2 + ivh / 2), ivs)
-        infos[6].mRect = Rect(Offset(w3 - ic, h1 + ivh / 2), ivs)
-        infos[7].mRect = Rect(Offset(w3 - ic, h0 + ivh / 2), ivs)
+            val ic = InteractInfo.INDICATOR_RADIUS
+            val ivh = (h1 - h0) / 2
+            val ivs = Size(ic * 2, ivh)
+            val ihs = Size(ivh, ic * 2)
+            infos[1].mRect = Rect(Offset(-ic, h0 + ivh / 2), ivs)
+            infos[2].mRect = Rect(Offset(-ic, h1 + ivh / 2), ivs)
+            infos[3].mRect = Rect(Offset(-ic, h2 + ivh / 2), ivs)
+            infos[4].mRect = Rect(Offset((w1 * 3 - ivh) / 2, h3 - ic), ihs)
+            infos[5].mRect = Rect(Offset(w3 - ic, h2 + ivh / 2), ivs)
+            infos[6].mRect = Rect(Offset(w3 - ic, h1 + ivh / 2), ivs)
+            infos[7].mRect = Rect(Offset(w3 - ic, h0 + ivh / 2), ivs)
+        }
     }
 
     override fun Drawer.preOnDraw() {

@@ -27,6 +27,7 @@ actual class StrokeTextGraph internal actual constructor(
 
     actual override fun widthScale(height: Float): Long = BasicTextGraph.widthScale(paragraph, height)
     actual override fun width(height: Float): Float = BasicTextGraph.width(paragraph, height)
+    actual override fun height(width: Float): Float = BasicTextGraph.height(paragraph, width)
     actual override fun size(height: Float): Size = BasicTextGraph.size(paragraph, height)
     actual fun paint(canvas: Canvas, color: Color, strokeColor: Color, stroke: Stroke) {
         paragraph.paint(canvas, color, shadow, textDecoration, null, blendMode)

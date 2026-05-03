@@ -63,6 +63,7 @@ class ScreenLogin : Screen() {
         ApiAccountLogin.request(id, pwd, platform) { token ->
             app.config.userShortToken = DateEx.CurrentLong
             app.config.userToken = token
+            ApiProfileGetProfile.request(token) { app.config.userProfile = it }
             pop()
         }.errorTip
     }

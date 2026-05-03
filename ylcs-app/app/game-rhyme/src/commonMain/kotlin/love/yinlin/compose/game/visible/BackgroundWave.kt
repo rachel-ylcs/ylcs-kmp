@@ -19,8 +19,13 @@ class BackgroundWave(
     val amplitudeRatio: Float,
     override val layerOrder: Int
 ) : Visible(), Dynamic {
+    companion object {
+        private const val STEP = 20f
+        private const val WAVE_ALPHA = 0.15f
+        private val WaveStroke = Stroke(width = 16f)
+    }
+
     var backgroundSize = Size.Zero
-    val step = 20f
     var wavePhase = 0f
     var waveAmplitudeTime = 0f
     val wavePath = Path()
@@ -38,7 +43,7 @@ class BackgroundWave(
         wavePath.moveTo(0f, hy + sin(wavePhase + phi) * dynamicAmplitude)
         while (x <= w) {
             wavePath.lineTo(x, hy + sin(x * frequency + wavePhase) * dynamicAmplitude * amplitudeRatio)
-            x += step
+            x += STEP
         }
         wavePath.lineTo(w, hy + sin(w * frequency + wavePhase) * dynamicAmplitude * amplitudeRatio)
 
@@ -50,6 +55,6 @@ class BackgroundWave(
     }
 
     override fun Drawer.onDraw() {
-        path(path = wavePath, color = waveColor, style = Stroke(width = 16f))
+        path(path = wavePath, color = waveColor, style = WaveStroke, alpha = WAVE_ALPHA)
     }
 }

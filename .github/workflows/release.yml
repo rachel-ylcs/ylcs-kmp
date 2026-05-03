@@ -26,7 +26,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Build
         run: ./gradlew ylcs-app:android-app:androidArtifact
@@ -39,7 +39,7 @@ jobs:
 
   package-ios:
     name: Package iOS
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -159,7 +159,7 @@ jobs:
 
   package-macos:
     name: Package macOS
-    runs-on: macos-latest
+    runs-on: macos-26
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6

@@ -51,7 +51,7 @@ class ScenePlugin private constructor(
     val camera = Camera(cameraConfig)
 
     // 实体
-    private val entities = mutableStateListOf<Entity>()
+    @PublishedApi internal val entities = mutableStateListOf<Entity>()
 
     // 动态实体 - 更新
     private val dynamicEntities by derivedStateOf {
@@ -62,6 +62,10 @@ class ScenePlugin private constructor(
     private val layerEntities by derivedStateOf {
         entities.fastMapNotNull { it as? Layer }.sortedBy(Layer::layerOrder)
     }
+
+    inline fun <reified T : Entity> findEntity(): T? = entities.find { it is T } as? T
+
+    inline fun <reified T : Entity> requireEntity(): T = entities.find { it is T } as T
 
     operator fun plusAssign(entity: Entity) {
         entities += entity
@@ -113,9 +117,9 @@ class ScenePlugin private constructor(
             val pointerMap = mutableMapOf<Long, Event>()
 
             while (true) {
-                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                val pointerEvent = awaitPointerEvent(pass = PointerEventPass.Initial)
 
-                for (change in event.changes) {
+                for (change in pointerEvent.changes) {
                     val id = change.id.value
                     val position = change.position
                     val eventSize = size.toSize()
@@ -144,9 +148,10 @@ class ScenePlugin private constructor(
                         }
 
                         // 抬起
-                        change.changedToUp() -> {
+                        change.changedToUpIgnoreConsumed() -> {
                             // 检查是否是游离指针
                             val event = pointerMap[id] as? Event.Pointer.Down
+
                             if (event != null) {
                                 // 移除指针
                                 pointerMap.remove(id)

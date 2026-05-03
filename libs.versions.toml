@@ -2,19 +2,20 @@
 
 # Plugins #
 kotlin = "2.4.0-Beta2"
-agp = "9.0.0-alpha06"
-cmp = "1.11.0-alpha03" # 1.11.0-alpha04的shader二进制不兼容, 要等上游适配
+agp = "9.2.0"
+cmp = "1.11.0-beta03"
 mavenPublish = "0.36.0"
 dokka = "2.2.0"
 
 # Libs #
 
 # Common
-skiko = "0.9.47" # 0.144.4的skiko-uiview在web上二进制不兼容，要等上游适配
-lifecycle = "2.10.0"
-coroutines = "1.11.0-rc01"
+skiko = "0.144.5"
+lifecycle = "2.10.0" # 2.11.0-alpha03与compose存在未知的冲突bug，无法确认是否是上游问题
+coroutines = "1.11.0-rc02"
 ktor = "3.4.3"
-sketch = "4.5.0-alpha02"
+sketch = "4.5.0-alpha03"
+haze = "2.0.0-alpha01"
 mmkv = "2.4.0"
 pag = "4.5.50"
 
@@ -64,7 +65,7 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
-compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.0.1" }
+compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.1.0-beta01" }
 compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.0" }
 compose-navigation3-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
@@ -74,7 +75,7 @@ compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runti
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.32.1" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0-rc01" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0-rc02" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.11.0" }
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
@@ -93,9 +94,10 @@ sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version
 sketch-extensions-compose = { module = "io.github.panpf.sketch4:sketch-extensions-compose", version.ref = "sketch" }
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.4.0" }
 
-tool-blur = { module = "dev.chrisbanes.haze:haze", version = "1.7.2" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
+
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.1.0" }
-tool-qrcode = { module = "io.github.alexzhirkevich:qrose", version = "1.1.2" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
@@ -144,4 +146,4 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 logback = { module = "ch.qos.logback:logback-classic", version = "1.5.32" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
-redis = { module = "redis.clients:jedis", version = "7.4.1" }
+redis = { module = "redis.clients:jedis", version = "7.5.0" }

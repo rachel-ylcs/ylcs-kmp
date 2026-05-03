@@ -29,6 +29,7 @@ interface BasicTextGraph {
 
     fun widthScale(height: Float): Long
     fun width(height: Float): Float
+    fun height(width: Float): Float
     fun size(height: Float): Size
 
     companion object {
@@ -46,6 +47,11 @@ interface BasicTextGraph {
         internal fun width(paragraph: Paragraph, height: Float): Float {
             val rawHeight = paragraph.height
             return if (rawHeight == 0f) 0f else paragraph.width * height / rawHeight
+        }
+
+        internal fun height(paragraph: Paragraph, width: Float): Float {
+            val rawWidth = paragraph.width
+            return if (rawWidth == 0f) 0f else paragraph.height * width / rawWidth
         }
 
         /**

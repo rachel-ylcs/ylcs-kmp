@@ -135,7 +135,7 @@ class MD5(private val is16Bit: Boolean = false, private val isUppercase: Boolean
 
     override fun encode(data: ByteArray): ByteArray = calculate(data)
 
-    fun encodeToString(data: ByteArray): String = formatResult(calculate(data), is16Bit, isUppercase)
+    override fun encodeToString(data: ByteArray): String = formatResult(calculate(data), is16Bit, isUppercase)
 
-    fun encodeToString(data: String): String = formatResult(calculate(data.encodeToByteArray()), is16Bit, isUppercase)
+    override fun encodeToString(data: String): String = formatResult(calculate(data.encodeToByteArray()), is16Bit, isUppercase)
 }

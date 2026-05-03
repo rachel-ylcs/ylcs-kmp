@@ -1,5 +1,15 @@
 pluginManagement {
+    val useMirror = try {
+        val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
+        localProperties.containsKey("mirror.enabled")
+    }
+    catch (_: Throwable) { false }
     repositories {
+        if (useMirror) {
+            maven("https://maven.aliyun.com/repository/central")
+            maven("https://maven.aliyun.com/repository/google")
+            maven("https://maven.aliyun.com/repository/gradle-plugin")
+        }
         mavenCentral()
         google()
         gradlePluginPortal()
@@ -8,10 +18,18 @@ pluginManagement {
 
 @Suppress("UnstableApiUsage")
 dependencyResolutionManagement {
+    val useMirror = try {
+        val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
+        localProperties.containsKey("mirror.enabled")
+    }
+    catch (_: Throwable) { false }
     repositories {
+        if (useMirror) {
+            maven("https://maven.aliyun.com/repository/central")
+            maven("https://maven.aliyun.com/repository/google")
+        }
         mavenCentral()
         google()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
     versionCatalogs {

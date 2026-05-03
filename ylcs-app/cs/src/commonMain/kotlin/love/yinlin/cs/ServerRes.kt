@@ -22,6 +22,9 @@ object ServerRes : APIRes("public") {
     object Game : APIRes(this) {
         fun res(id: Int, key: String = "") = APIRes(this, "game$id$key.webp")
         object Rhyme : APIRes(this) {
+            object CV : APIRes(this) {
+                fun illustration(id: Int) = APIRes(this, "cv$id.webp")
+            }
             fun res(filename: String) = APIRes(this, filename)
         }
     }

@@ -15,10 +15,7 @@ internal class AndroidAudioPlayer(context: PlatformContext, onEndListener: () ->
 
     private val listener: Player.Listener = object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
-            if (playbackState == Player.STATE_ENDED) {
-                player?.clearMediaItems()
-                onEndListener()
-            }
+            if (playbackState == Player.STATE_ENDED) onEndListener()
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -65,7 +62,7 @@ internal class AndroidAudioPlayer(context: PlatformContext, onEndListener: () ->
     }
 
     override fun stop() {
-        player?.clearMediaItems()
+        player?.stop()
     }
 
     override fun seekTo(position: Long) {

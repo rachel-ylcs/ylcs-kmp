@@ -1,61 +1,60 @@
 package love.yinlin.cs
 
-import love.yinlin.cs.APIConfig.coercePageNum
-import love.yinlin.cs.service.*
+import love.yinlin.cs.service.values
 import love.yinlin.cs.user.*
-import love.yinlin.extension.String
+import love.yinlin.data.rachel.rhyme.CharacterInfo
+import love.yinlin.data.rachel.rhyme.RhymeDifficulty
+import love.yinlin.data.rachel.rhyme.RhymeRepository
+import love.yinlin.extension.Int
+import love.yinlin.extension.obj
 import love.yinlin.extension.to
+import love.yinlin.extension.toJsonString
 
 fun APIScope.rhymeAPI() {
-    ApiRhymeUploadRecord.response { token, sid, difficulty, score ->
+    ApiRhymeGetUserRepository.response { token ->
         val uid = AN.throwExpireToken(token)
-        VN.throwId(sid)
-        db.throwTransaction {
-            it.throwExecuteSQL(
-                """
-                INSERT INTO rhyme_record(sid, uid, difficulty, score)
-                VALUES(?, ?, ?, ?)
-            """.trimIndent(),
-                sid, uid, difficulty, score
-            )
-
-            val user = it.throwQuerySQLSingle(
-                "SELECT name FROM user WHERE uid = ?",
-                uid
-            )
-            val name = user["name"].String
-
-            // 按 (sid, difficulty, uid) 索引维护最高分
-            it.throwExecuteSQL(
-                """
-                INSERT INTO rhyme_rank(sid, difficulty, uid, name, score)
-                VALUES(?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    name = VALUES(name),
-                    score = GREATEST(score, VALUES(score))
-            """.trimIndent(),
-                sid, difficulty, uid, name, score
-            )
-        }
+        val user = db.throwGetUser(uid, "rhyme")
+        result(user.obj("rhyme").to<RhymeRepository>())
     }
 
-    // 基于 score+uid 游标分页
-    ApiRhymeGetSongRank.response { sid, difficulty, score, uid, num ->
-        VN.throwId(sid)
+    ApiRhymeUnlockCharacter.response { token, id ->
+        val uid = AN.throwExpireToken(token)
+        val user = db.throwGetUser(uid, "coin, rhyme")
+        val coin = user["coin"].Int
+        val cost = CharacterInfo.Pool[id]?.cost ?: failure("未知立绘")
+        if (coin < cost) failure("你的银币不够哦")
+        val repository = user.obj("rhyme").to<RhymeRepository>()
+        val characters = repository.characters.toMutableList()
+        if (id in characters) failure("你已经解锁该立绘")
+        characters += id
+        val newRhyme = repository.copy(characters = characters)
+        db.throwExecuteSQL("""
+            UPDATE user SET coin = coin - ? , exp = exp + ? , rhyme = ?
+            WHERE uid = ? AND coin >= ?
+        """, cost, cost / 2, newRhyme.toJsonString(), uid, cost)
+    }
 
-        val ranks = db.throwQuerySQL(
-            """
-            SELECT uid, name, score
-            FROM rhyme_rank
-            WHERE sid = ? AND difficulty = ?
-              AND (score < ? OR (score = ? AND uid > ?))
-            ORDER BY score DESC, uid ASC
-            LIMIT ?
-        """.trimIndent(),
-            sid, difficulty, score, score, uid, num.coercePageNum
-        )
-        result(ranks.to())
+    ApiRhymeUploadRecord.response { token, sid, result ->
+        val uid = AN.throwExpireToken(token)
+        if (result.uid != uid || result.sid != sid || !result.valid) failure("数据一致性校验失败")
+        db.throwInsertSQLGeneratedKey("""
+            INSERT INTO rhyme_record(sid, uid, difficulty, score, result) ${values(5)}
+        """, sid, uid, result.difficulty, result.score, result.toJsonString())
+    }
+
+    ApiRhymeGetRank.response { token, sid ->
+        AN.throwExpireToken(token)
+        val sql = RhymeDifficulty.entries.joinToString("\nUNION ALL") {
+            "(SELECT rid, uid, result FROM rhyme_record WHERE sid = ? AND difficulty = ${it.ordinal} ORDER BY score DESC, rid ASC LIMIT 10)"
+        }
+        val args = Array<Any?>(RhymeDifficulty.entries.size) { sid }
+        val rankList = db.throwQuerySQL("""
+            SELECT t.rid, t.uid, t.result, u.name 
+            FROM (
+                $sql
+            ) AS t
+            LEFT JOIN user u ON t.uid = u.uid
+        """, *args)
+        result(rankList.to())
     }
 }
-
-

@@ -6,11 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +25,6 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
-import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.OverlayAction
 import love.yinlin.compose.ui.container.OverlayTopBar
 import love.yinlin.compose.ui.container.Surface
@@ -41,7 +36,6 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.SecondaryTextButton
 import love.yinlin.compose.ui.input.TertiaryTextButton
@@ -251,7 +245,7 @@ class SubScreenWorld(parent: NavigationScreen) : SubScreen(parent) {
                         SimpleEllipsisText(
                             text = rank.name,
                             style = if (rankIndex in 1 .. 3) Theme.typography.v7.bold else Theme.typography.v7,
-                            color = when (index) {
+                            color = when (rankIndex) {
                                 1 -> Theme.color.primary
                                 2 -> Theme.color.secondary
                                 3 -> Theme.color.tertiary
