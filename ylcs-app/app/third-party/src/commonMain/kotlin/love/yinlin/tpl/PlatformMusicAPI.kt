@@ -12,6 +12,7 @@ interface PlatformMusicAPI {
             PlatformMusicType.QQMusic -> QQMusicAPI
             PlatformMusicType.NetEaseCloud -> NetEaseCloudAPI
             PlatformMusicType.Kugou -> KugouMusicAPI
+            PlatformMusicType.Soda -> SodaMusicAPI
         }
     }
 }

@@ -297,6 +297,10 @@ class ScreenMusicLibrary : Screen() {
                 pop()
                 navigate(::ScreenPlatformMusic, null, PlatformMusicType.Kugou)
             })
+            Icon(icon = Icons2.SodaMusic, color = Colors.Unspecified, tip = "汽水音乐", onClick = {
+                pop()
+                navigate(::ScreenPlatformMusic, null, PlatformMusicType.Soda)
+            })
         }
         Row(
             modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
