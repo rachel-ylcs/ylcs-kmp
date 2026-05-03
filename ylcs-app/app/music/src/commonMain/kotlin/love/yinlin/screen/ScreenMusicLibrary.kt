@@ -299,7 +299,7 @@ class ScreenMusicLibrary : Screen() {
             })
             Icon(icon = Icons2.SodaMusic, color = Colors.Unspecified, tip = "汽水音乐", onClick = {
                 pop()
-                navigate(::ScreenPlatformMusic, null, PlatformMusicType.Qishui)
+                navigate(::ScreenPlatformMusic, null, PlatformMusicType.Soda)
             })
         }
         Row(
