@@ -21,17 +21,15 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.*
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.OverlayAction
-import love.yinlin.compose.ui.container.OverlayTopBar
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogInput
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
-import love.yinlin.compose.ui.input.PrimaryLoadingButton
+import love.yinlin.compose.ui.input.PrimaryLoadingTextButton
+import love.yinlin.compose.ui.input.SecondaryLoadingTextButton
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -39,7 +37,6 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.catchingNull
 import love.yinlin.extension.timeString
 import love.yinlin.media.buildAudioPlayer
 import love.yinlin.tpl.lyrics.LrcLine
@@ -237,34 +234,61 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
     @Composable
     override fun BasicContent() {
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            OverlayTopBar(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
-                left = OverlayAction.Sync("返回", Icons.ArrowBack, onClick = ::onBack),
-                right = OverlayAction.Async("保存", Icons.Check, canSave, onClick = ::saveLyrics)
-            )
-
             Row(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h7),
+                modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).padding(Theme.padding.value),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LocalFileImage(
-                    uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
-                    circle = true,
-                    modifier = Modifier.size(Theme.size.image7)
-                )
-                SimpleEllipsisText(text = musicInfo.name, style = Theme.typography.v6.bold)
+                OverlayAction.Sync("返回", Icons.ArrowBack, onClick = ::onBack).Content(true)
+                Row(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LocalFileImage(
+                        uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
+                        circle = true,
+                        modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+                    )
+                    SimpleEllipsisText(text = musicInfo.name, style = Theme.typography.v6.bold)
+                }
+                OverlayAction.Async("保存", Icons.Check, canSave, onClick = ::saveLyrics).Content(false)
             }
-            ActionScope.Left.Container(Modifier.fillMaxWidth().padding(Theme.padding.value9)) {
-                PrimaryLoadingButton(text = "滚动到当前", onClick = {
+
+            FlowRow(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            ) {
+                PrimaryLoadingTextButton(text = "滚动到当前", icon = Icons.ArrowDownward, onClick = {
                     if (currentIndex in lyrics.indices) listState.animateScrollToItem(currentIndex)
                 })
-                PrimaryLoadingButton(text = "全局偏移", onClick = {
-                    val offset = catchingNull { offsetDialog.open("0")?.toLong() ?: 0L }
-                    if (offset == null) slot.tip.warning("偏移不是整数")
+                PrimaryLoadingTextButton(text = "全局偏移", icon = Icons.SwapHoriz, onClick = {
+                    val offset = offsetDialog.open("0")?.toLongOrNull() ?: 0L
+                    if (offset == 0L) slot.tip.warning("偏移不是整数")
                     else lyrics.replaceAllByData(lyrics.mapByData { it.copy(position = it.position + offset) })
                 })
+                SecondaryLoadingTextButton(text = "导出到剪贴板", icon = Icons.Download, onClick = {
+                    val lyricsText = Coroutines.cpu { LrcParser(lyrics.data).toString() }
+                    if (app.copyText(lyricsText)) slot.tip.success("导出到剪贴板成功")
+                    else slot.tip.warning("导出失败")
+                })
+                SecondaryLoadingTextButton(text = "导入LRC歌词", icon = Icons.Upload, onClick = {
+                    val needPlay = player.isPlaying
+                    if (needPlay) player.pause()
+                    val lyricsText = importDialog.open()
+                    if (lyricsText != null) {
+                        val parseLines = LrcParser(lyricsText).lines
+                        if (parseLines != null) {
+                            lyrics.replaceAllByData(parseLines)
+                            slot.tip.success("导入LRC歌词成功")
+                        }
+                        else slot.tip.warning("LRC歌词存在错误")
+                    }
+                    if (needPlay) player.play()
+                })
             }
+
             MusicProgressLayout(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value))
             LyricsEditorLayout(modifier = Modifier.fillMaxWidth().weight(1f))
         }
@@ -272,4 +296,5 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
 
     private val inputDialog = this land DialogInput(hint = "输入歌词行", maxLength = 32)
     private val offsetDialog = this land DialogInput(hint = "输入毫秒偏移量(-9000 ~ 9000)", maxLength = 5)
+    private val importDialog = this land DialogInput(hint = "导入LRC歌词", maxLines = 10, minLines = 10)
 }

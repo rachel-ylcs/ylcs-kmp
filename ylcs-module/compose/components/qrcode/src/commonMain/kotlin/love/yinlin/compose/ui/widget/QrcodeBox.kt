@@ -2,8 +2,23 @@ package love.yinlin.compose.ui.widget
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import love.yinlin.compose.ui.tool.UnsupportedPlatformComponent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import io.github.alexzhirkevich.qrose.options.QrBallShape
+import io.github.alexzhirkevich.qrose.options.QrBrush
+import io.github.alexzhirkevich.qrose.options.QrFrameShape
+import io.github.alexzhirkevich.qrose.options.QrLogoPadding
+import io.github.alexzhirkevich.qrose.options.QrLogoShape
+import io.github.alexzhirkevich.qrose.options.QrPixelShape
+import io.github.alexzhirkevich.qrose.options.brush
+import io.github.alexzhirkevich.qrose.options.circle
+import io.github.alexzhirkevich.qrose.options.roundCorners
+import io.github.alexzhirkevich.qrose.options.solid
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
+import love.yinlin.compose.Theme
+import love.yinlin.compose.ui.image.Image
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun QrcodeBox(
@@ -11,5 +26,33 @@ fun QrcodeBox(
     modifier: Modifier = Modifier,
     logo: DrawableResource? = null,
 ) {
-    UnsupportedPlatformComponent(modifier = modifier)
+    val logoPainter = logo?.let { painterResource(it) }
+    val primaryColor = Theme.color.primary
+    val secondaryColor = Theme.color.secondary
+
+    val painter = rememberQrCodePainter(data = text) {
+        logo {
+            painter = logoPainter
+            padding = QrLogoPadding.Natural(1f)
+            shape = QrLogoShape.circle()
+            size = 0.25f
+        }
+        shapes {
+            ball = QrBallShape.circle()
+            darkPixel = QrPixelShape.roundCorners()
+            frame = QrFrameShape.roundCorners(0.25f)
+        }
+        colors {
+            dark = QrBrush.brush {
+                Brush.linearGradient(
+                    0f to primaryColor.copy(alpha = 0.9f),
+                    1f to secondaryColor.copy(0.9f),
+                    end = Offset(it, it)
+                )
+            }
+            frame = QrBrush.solid(primaryColor)
+        }
+    }
+
+    Image(painter = painter, modifier = modifier)
 }
