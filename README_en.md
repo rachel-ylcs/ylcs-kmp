@@ -121,21 +121,14 @@ https://private-user-images.githubusercontent.com/76944654/586743677-ce62598a-75
 
 `银临茶舍` is an open-source software licensed under the MIT license, Please refer to [LICENSE](LICENSE) for more information.
 
-## Credits
+## Credits & Dependencies
 
 Sort by first letter.
 
-|  Type   |     Author      |                                                                                Name                                                                                |
-|:-------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| Library | brettwooldridge |                                                      [HikariCP](https://github.com/brettwooldridge/HikariCP)                                                       |
-| Library |    Calvin-LL    |                                                      [reorderable](https://github.com/Calvin-LL/Reorderable)                                                       |
-| Library |   chrisbanes    |                                                             [haze](https://github.com/chrisbanes/haze)                                                             |
-| Library |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
-| Library |    jenly1314    |                            [zxing-lite](https://github.com/jenly1314/ZXingLite), [camera-scan](https://github.com/jenly1314/CameraScan)                            |
-| Library |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
-| Library |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
-| Library |      mysql      |                                                                   [mysql](https://dev.mysql.com)                                                                   |
-| Library |      panpf      |                                                             [sketch](https://github.com/panpf/sketch)                                                              |
-| Library |     qos-ch      |                                                            [logback](https://github.com/qos-ch/logback)                                                            |
-| Library |      redis      |                                                              [jedis](https://github.com/redis/jedis)                                                               |
-| Library |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
+|   Type   |     Author      |                                                                                Name                                                                                |
+|:--------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Library  |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
+| Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
+| Library  |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
+| Library  |      panpf      |                                                             [sketch](https://github.com/panpf/sketch)                                                              |
+| Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
