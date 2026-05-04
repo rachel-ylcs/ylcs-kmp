@@ -42,9 +42,9 @@ object MiguMusicAPI : PlatformMusicAPI {
             this.url = url
             headers = defaultHeaders
         }) { json: JsonObject ->
-            json.obj("songResultData")?.arr("result")?.mapNotNull { item ->
+            json.obj("songResultData").arr("result").mapNotNull { item ->
                 val obj = item.Object
-                val singers = obj.arr("singers").joinToString("、") { it.Object["name"].String }
+                val singers = obj.arr("singers").joinToString(",") { it.Object["name"].String }
                 val imgItems = obj.arr("imgItems")
                 val imgUrl = if (imgItems.isNotEmpty()) imgItems.last().Object["img"].String else ""
                 MiguSearchResult(
@@ -57,7 +57,7 @@ object MiguMusicAPI : PlatformMusicAPI {
                     duration = obj["duration"]?.Int ?: 0,
                     album = obj["album"]?.String ?: ""
                 )
-            } ?: emptyList()
+            }
         }?.ifEmpty { null }
     }
 
@@ -73,7 +73,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         // 检查接口是否成功，不成功（如无版权）则直接返回 null
         if (detailJson["code"]?.String != "000000") return null
 
-        val data = detailJson.obj("data") ?: return null
+        val data = detailJson.obj("data")
         val audioUrl = data["url"]?.String ?: return null
 
         val lrcUrl = data["lrcUrl"]?.String ?: result.lyricUrl ?: ""
@@ -104,7 +104,7 @@ object MiguMusicAPI : PlatformMusicAPI {
             url = "$ALBUM_SONGLIST_API?pageNo=1&pageSize=200&albumId=$albumId"
             headers = defaultHeaders
         }) { json: JsonObject ->
-            json.obj("data")?.arr("songList")?.mapNotNull { item ->
+            json.obj("data").arr("songList").mapNotNull { item ->
                 val obj = item.Object
                 val singers = obj.arr("singerList").joinToString("、") { it.Object["name"].String }
                 val rawImg = obj["img3"]?.String ?: obj["img2"]?.String ?: obj["img1"]?.String ?: ""
@@ -119,7 +119,7 @@ object MiguMusicAPI : PlatformMusicAPI {
                     duration = obj["duration"]?.Int ?: 0,
                     album = obj["album"]?.String ?: ""
                 )
-            } ?: emptyList()
+            }
         }?.ifEmpty { null }
 
     private suspend fun requestPlaylistSongs(playlistId: String): List<MiguSearchResult>? =
@@ -127,7 +127,7 @@ object MiguMusicAPI : PlatformMusicAPI {
             url = "$PLAYLIST_SONGLIST_API?pageNo=1&pageSize=200&playlistId=$playlistId"
             headers = defaultHeaders
         }) { json: JsonObject ->
-            json.obj("data")?.arr("songList")?.mapNotNull { item ->
+            json.obj("data").arr("songList").mapNotNull { item ->
                 val obj = item.Object
                 val singers = obj.arr("singerList").joinToString("、") { it.Object["name"].String }
                 val rawImg = obj["img3"]?.String ?: obj["img2"]?.String ?: obj["img1"]?.String ?: ""
@@ -142,7 +142,7 @@ object MiguMusicAPI : PlatformMusicAPI {
                     duration = obj["duration"]?.Int ?: 0,
                     album = obj["album"]?.String ?: ""
                 )
-            } ?: emptyList()
+            }
         }?.ifEmpty { null }
 
     private suspend fun requestSongById(songId: String): MiguSearchResult? {
@@ -152,8 +152,8 @@ object MiguMusicAPI : PlatformMusicAPI {
             headers = defaultHeaders
         }) { json: JsonObject -> json } ?: return null
 
-        val songObj = json.obj("data")?.obj("song") ?: return null
-        val singers = songObj.arr("singerList")?.joinToString("、") { it.Object["name"].String } ?: ""
+        val songObj = json.obj("data").obj("song")
+        val singers = songObj.arr("singerList").joinToString("、") { it.Object["name"].String }
         val imgUrl = songObj["img3"]?.String ?: songObj["img2"]?.String ?: songObj["img1"]?.String ?: ""
 
         return MiguSearchResult(
@@ -204,11 +204,7 @@ object MiguMusicAPI : PlatformMusicAPI {
                         else -> null
                     } ?: return@let null
 
-                    val result = mutableListOf<PlatformMusicInfo>()
-                    for (song in songs) {
-                        requestMusic(song)?.let { result.add(it) }
-                    }
-                    result.ifEmpty { null }
+                    songs.mapNotNull { requestMusic(it) }.ifEmpty { null }
                 }
             }
             else -> search(link)
