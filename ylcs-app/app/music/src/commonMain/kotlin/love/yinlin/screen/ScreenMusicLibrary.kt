@@ -195,39 +195,40 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun onMusicDelete() {
-        val player = mp ?: return
-        if (player.isReady) slot.tip.warning("请先停止播放器")
+        val deleteItems = selectIdList
+        val currentList = mp?.musicList ?: emptyList()
+        if (deleteItems.any { it in currentList }) slot.tip.warning("请先停止播放器")
         else if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
-            val deleteItems = selectIdList
-            for (item in deleteItems) {
-                val removeItem = player.library.remove(item)
-                removeItem?.path(app.modPath)?.deleteRecursively()
+            val source = mp?.library
+            if (source == null) slot.tip.error("播放器初始化失败")
+            else {
+                for (item in deleteItems) {
+                    val removeItem = source.remove(item)
+                    removeItem?.path(app.modPath)?.deleteRecursively()
+                }
+                resetLibrary()
             }
-            resetLibrary()
         }
     }
 
     private suspend fun onMusicPackage() {
-        val player = mp ?: return
-        if (player.isReady) slot.tip.warning("请先停止播放器")
-        else {
-            catchingError {
+        val packageItems = selectIdList
+        catchingError {
+            slot.loading.open {
                 Coroutines.io {
                     app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.write { sink ->
-                        slot.loading.open {
-                            val packageItems = selectIdList
-                            ModFactory.Merge(
-                                mediaPaths = packageItems.fastMapNotNull { player.library[it]?.path(app.modPath) },
-                                sink = sink,
-                                info = ModInfo(author = app.config.userProfile?.name ?: "无名")
-                            ).process(filters = ModResourceType.ALL) { _, _, _ -> }
-                            exitManagement()
-                            slot.tip.success("导出MOD成功")
-                        }
+                        val player = mp!!
+                        ModFactory.Merge(
+                            mediaPaths = packageItems.fastMapNotNull { player.library[it]?.path(app.modPath) },
+                            sink = sink,
+                            info = ModInfo(author = app.config.userProfile?.name ?: "无名")
+                        ).process(filters = ModResourceType.ALL) { _, _, _ -> }
                     }
                 }
-            }?.let { slot.tip.warning("导出MOD失败") }
-        }
+                exitManagement()
+                slot.tip.success("导出MOD成功")
+            }
+        }?.let { slot.tip.warning("导出MOD失败") }
     }
 
     override val title: String get() = if (isSearching) "搜索" else "曲库"
