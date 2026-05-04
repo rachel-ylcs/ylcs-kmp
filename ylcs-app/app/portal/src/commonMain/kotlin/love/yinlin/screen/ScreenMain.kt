@@ -3,6 +3,7 @@ package love.yinlin.screen
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +25,7 @@ import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.screen.DataSource
 import love.yinlin.compose.screen.MultiDataSource
 import love.yinlin.compose.screen.NavigationScreen
+import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -127,54 +129,57 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
             shadowElevation = Theme.shadow.v1,
             tonalLevel = 5
         ) {
-            Column(modifier = Modifier.width(Theme.size.cell4).fillMaxHeight().verticalScroll(rememberScrollState())) {
-                TabItem.entries.fastForEachIndexed { i, item ->
-                    val isCurrent = i == index
-                    val primaryColor = Theme.color.primary
-                    val indicatorAngle = animateFloatAsState(
-                        targetValue = if (isCurrent) 360f else 0f,
-                        animationSpec = tween(Theme.animation.duration.v5)
-                    )
+            val state = rememberScrollState()
+
+            HorizontalScrollContainer(state) {
+                Row(modifier = Modifier.fillMaxWidth().horizontalScroll(state)) {
+                    TabItem.entries.fastForEachIndexed { i, item ->
+                        key(item) {
+                            val isCurrent = i == index
+                            val primaryColor = Theme.color.primary
+                            val indicatorAngle = animateFloatAsState(
+                                targetValue = if (isCurrent) 360f else 0f,
+                                animationSpec = tween(Theme.animation.duration.v5)
+                            )
+
+                            Row(
+                                modifier = Modifier.clickable { navigateSubScreen(i) }.drawBehind {
+                                    val (boxWidth, boxHeight) = this.size
+                                    val indicatorRatio = indicatorAngle.value / 720
+                                    val indicatorWidth = boxWidth * 0.03f
+                                    drawRoundRect(
+                                        color = primaryColor,
+                                        topLeft = Offset(indicatorWidth, (1 - indicatorRatio) / 2 * boxHeight),
+                                        size = Size(indicatorWidth, indicatorRatio * boxHeight),
+                                        cornerRadius = CornerRadius(indicatorWidth)
+                                    )
+                                }.padding(Theme.padding.value9),
+                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    icon = if (isCurrent) item.iconActive else item.iconNormal,
+                                    modifier = Modifier.size(Theme.size.smallIcon).fastRotate(indicatorAngle)
+                                )
+                                SimpleClipText(
+                                    text = item.title,
+                                    color = if (isCurrent) primaryColor else LocalColor.current,
+                                    style = Theme.typography.v7.bold
+                                )
+                            }
+                        }
+                    }
+
+                    Box(modifier = Modifier.weight(1f))
 
                     Row(
-                        modifier = Modifier.fillMaxWidth().clickable {
-                            navigateSubScreen(i)
-                        }.drawBehind {
-                            val (boxWidth, boxHeight) = this.size
-                            val indicatorRatio = indicatorAngle.value / 720
-                            val indicatorWidth = boxWidth * 0.03f
-                            drawRoundRect(
-                                color = primaryColor,
-                                topLeft = Offset(indicatorWidth, (1 - indicatorRatio) / 2 * boxHeight),
-                                size = Size(indicatorWidth, indicatorRatio * boxHeight),
-                                cornerRadius = CornerRadius(indicatorWidth)
-                            )
-                        }.padding(Theme.padding.value9),
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                        modifier = Modifier.clickable { navigate(::ScreenSettings) }.padding(Theme.padding.value9),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            icon = if (isCurrent) item.iconActive else item.iconNormal,
-                            modifier = Modifier.size(Theme.size.smallIcon).fastRotate(indicatorAngle)
-                        )
-                        SimpleClipText(
-                            text = item.title,
-                            color = if (isCurrent) primaryColor else LocalColor.current,
-                            style = Theme.typography.v7.bold,
-                            modifier = Modifier.weight(1f)
-                        )
+                        Icon(icon = Icons.Settings, modifier = Modifier.size(Theme.size.smallIcon))
+                        SimpleClipText(text = "设置", style = Theme.typography.v7.bold)
                     }
-                }
-                Box(modifier = Modifier.weight(1f))
-                Row(
-                    modifier = Modifier.fillMaxWidth().clickable {
-                        navigate(::ScreenSettings)
-                    }.padding(Theme.padding.value9),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(icon = Icons.Settings, modifier = Modifier.size(Theme.size.smallIcon))
-                    SimpleClipText(text = "设置", style = Theme.typography.v7.bold, modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -198,11 +203,11 @@ class ScreenMain : NavigationScreen(), DataSource by MultiDataSource(
 
     @Composable
     private fun Landscape(index: Int, content: @Composable () -> Unit) {
-        Row(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             val immersivePadding = LocalImmersivePadding.current
 
-            LandscapeNavigator(index, immersivePadding.withoutEnd, Modifier.fillMaxHeight().zIndex(2f))
-            currentContent(immersivePadding.withoutStart, Modifier.weight(1f).fillMaxHeight().zIndex(1f), content)
+            LandscapeNavigator(index, immersivePadding.withoutBottom, Modifier.fillMaxWidth().zIndex(2f))
+            currentContent(immersivePadding.withoutTop, Modifier.fillMaxWidth().weight(1f).zIndex(1f), content)
         }
     }
 
