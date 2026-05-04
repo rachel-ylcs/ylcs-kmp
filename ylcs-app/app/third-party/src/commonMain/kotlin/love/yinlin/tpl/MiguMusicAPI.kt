@@ -34,7 +34,7 @@ object MiguMusicAPI : PlatformMusicAPI {
     )
 
     /**
-     * 搜索歌曲（仅获取摘要信息）
+     * 搜索歌曲
      */
     suspend fun searchSongs(keyword: String): List<MiguSearchResult>? {
         val searchSwitch = """{"song":1,"album":0,"singer":0,"tagSong":1,"mvSong":0,"bestShow":1}"""
@@ -64,7 +64,7 @@ object MiguMusicAPI : PlatformMusicAPI {
     }
 
     /**
-     * 获取歌曲详情（音频直链、歌词等）
+     * 获取单曲详情（音频直链、歌词）
      */
     suspend fun requestMusic(result: MiguSearchResult): PlatformMusicInfo? {
         val detailUrl = "$DETAIL_API?resourceType=2&toneFlag=HQ&contentId=${result.contentId}&copyrightId=${result.copyrightId}&lowerQualityContentId=${result.contentId}"
@@ -152,7 +152,33 @@ object MiguMusicAPI : PlatformMusicAPI {
         }?.ifEmpty { null }
 
     /**
-     * 解析短链接（重定向后从最终 URL 提取类型和 ID）
+     * 根据单曲ID获取单曲信息（用于单曲短链接）
+     */
+    private suspend fun requestSongById(songId: String): MiguSearchResult? {
+        val detailUrl = "$DETAIL_API?resourceType=2&toneFlag=HQ&contentId=$songId&lowerQualityContentId=$songId"
+        val json = NetClient.Common.request<JsonObject>({
+            url = detailUrl
+            headers = defaultHeaders
+        }) { json: JsonObject -> json } ?: return null
+
+        val songObj = json.obj("data")?.obj("song") ?: return null
+        val singers = songObj.arr("singerList")?.joinToString("、") { it.Object["name"].String } ?: ""
+        val imgUrl = songObj["img3"]?.String ?: songObj["img2"]?.String ?: songObj["img1"]?.String ?: ""
+
+        return MiguSearchResult(
+            contentId = songObj["contentId"]?.String ?: songId,
+            copyrightId = songObj["copyrightId"]?.String ?: "",
+            name = songObj["songName"]?.String ?: "",
+            singers = singers,
+            imgUrl = imgUrl,
+            lyricUrl = null,
+            duration = songObj["duration"]?.Int ?: 0,
+            album = songObj["album"]?.String ?: ""
+        )
+    }
+
+    /**
+     * 解析短链接（重定向后从最终URL提取类型和ID）
      */
     private suspend fun resolveLink(link: String): Pair<String, String>? {
         val finalUrl: String = NetClient.Common.request<String, String>({
@@ -168,6 +194,9 @@ object MiguMusicAPI : PlatformMusicAPI {
         val playlistId = """playlist/index\.html\?id=(\d+)""".toRegex().find(finalUrl)?.groupValues?.get(1)
         if (playlistId != null) return "playlist" to playlistId
 
+        val songId = """song/index\.html\?id=(\d+)""".toRegex().find(finalUrl)?.groupValues?.get(1)
+        if (songId != null) return "song" to songId
+
         return null
     }
 
@@ -178,15 +207,14 @@ object MiguMusicAPI : PlatformMusicAPI {
 
     override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
         when {
-            //就这两
             link.contains("c.migu.cn") -> {
                 resolveLink(link)?.let { (type, id) ->
-                    val songs = when (type) {
-                        "album" -> requestAlbumSongs(id)
-                        "playlist" -> requestPlaylistSongs(id)
+                    when (type) {
+                        "album" -> requestAlbumSongs(id)?.mapNotNull { requestMusic(it) }?.ifEmpty { null }
+                        "playlist" -> requestPlaylistSongs(id)?.mapNotNull { requestMusic(it) }?.ifEmpty { null }
+                        "song" -> requestSongById(id)?.let { requestMusic(it) }?.let { listOf(it) }
                         else -> null
                     }
-                    songs?.mapNotNull { requestMusic(it) }?.ifEmpty { null }
                 }
             }
             else -> search(link)
