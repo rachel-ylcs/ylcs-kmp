@@ -4,6 +4,7 @@ import io.ktor.http.Cookie
 import io.ktor.http.Headers
 
 interface ResponseScope<Body> {
+    val url: String
     val headers: Headers
     val cookies: List<Cookie>
     val rawBody: ByteArray
