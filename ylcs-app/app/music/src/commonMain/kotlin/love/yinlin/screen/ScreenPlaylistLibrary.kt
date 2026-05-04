@@ -48,6 +48,7 @@ import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
+import love.yinlin.data.music.Playlist
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
@@ -86,7 +87,7 @@ class ScreenPlaylistLibrary : Screen() {
 
     private suspend fun addPlaylist() {
         inputPlaylistNameDialog.open()?.let { name ->
-            if (playlistLibrary[name] == null) {
+            if (name != Playlist.Default.name && playlistLibrary[name] == null) {
                 playlistLibrary[name] = MusicPlaylist(name, emptyList())
                 currentPage = tabs.indexOf(name)
             }
@@ -100,7 +101,7 @@ class ScreenPlaylistLibrary : Screen() {
                 val oldName = tabs[index]
                 val newName = inputPlaylistNameDialog.open(oldName)
                 if (newName != null) {
-                    if (playlistLibrary[newName] == null) {
+                    if (newName != Playlist.Default.name && playlistLibrary[newName] == null) {
                         playlistLibrary.renameKey(oldName, newName) {
                             it.copy(name = newName)
                         }
@@ -114,7 +115,8 @@ class ScreenPlaylistLibrary : Screen() {
                 if (slot.confirm.open(content = "删除歌单\"$name\"")) {
                     // 若正在播放则停止播放器
                     mp?.let { player ->
-                        if (player.playlist?.name == name) player.stop()
+                        val currentPlaylist = player.playlist
+                        if (currentPlaylist is Playlist.User && currentPlaylist.name == name) player.stop()
                     }
 
                     playlistLibrary -= name
@@ -129,7 +131,7 @@ class ScreenPlaylistLibrary : Screen() {
         val playlist = playlistLibrary[name]
         if (playlist != null) {
             if (playlist.items.isNotEmpty()) {
-                mp?.startPlaylist(playlist, startId, true)
+                mp?.startPlaylist(Playlist.User(name), startId, true)
                 pop()
             }
             else slot.tip.warning("歌单中还没有添加歌曲哦")
@@ -144,7 +146,8 @@ class ScreenPlaylistLibrary : Screen() {
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
                 mp?.let { player ->
-                    if (player.playlist?.name == name) {
+                    val currentPlaylist = player.playlist
+                    if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
                         val playingIndex = player.musicList.indexOf(musicInfo.id)
                         if (playingIndex != -1) player.removeMedia(playingIndex)
                     }
@@ -167,7 +170,8 @@ class ScreenPlaylistLibrary : Screen() {
             playlistLibrary[name] = playlist.copy(items = newItems)
             mp?.let { player ->
                 // 检查是否当前正在播放此歌单并移动相应媒体
-                if (player.playlist?.name == name) {
+                val currentPlaylist = player.playlist
+                if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
                     launch { player.moveMedia(fromIndex, toIndex) }
                 }
             }
@@ -282,10 +286,19 @@ class ScreenPlaylistLibrary : Screen() {
                             }.padding(Theme.padding.value),
                             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                         ) {
-                            LocalFileImage(
-                                uri = item.path(ModResourceType.Record).path,
-                                modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v8)
-                            )
+                            Box(
+                                modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v8),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (!item.isDeleted) {
+                                    LocalFileImage(
+                                        uri = item.path(ModResourceType.Record).path,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                                else Icon(icon = Icons.QuestionMark)
+                            }
+
                             Column(modifier = Modifier.weight(1f)) {
                                 SimpleEllipsisText(
                                     text = item.name,

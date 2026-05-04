@@ -5,9 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Stable
 @Serializable
-data class MusicPlaylist(
-    val name: String,
-    val items: List<String>
-) {
-    constructor(name: String, item: String) : this(name, listOf(item))
-}
+data class MusicPlaylist(val name: String, val items: List<String>)
