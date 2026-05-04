@@ -233,7 +233,13 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     navigate(::ScreenPlaylistLibrary)
                 })
                 LoadingTextButton(icon = Icons.Token, text = "工坊", enabled = enabled, onClick = {
-                    modFactoryDialog.open()
+                    when (val result = modFactoryDialog.open()) {
+                        null -> {}
+                        DialogModFactory.ModResult.FromCenter -> navigate(::ScreenModCenter)
+                        DialogModFactory.ModResult.FromCreate -> navigate(::ScreenCreateMusic)
+                        DialogModFactory.ModResult.FromImport -> navigate(::ScreenImportMusic, null)
+                        is DialogModFactory.ModResult.FromPlatform -> navigate(::ScreenPlatformMusic, null, result.type)
+                    }
                 })
 
                 Box(modifier = Modifier.weight(1f))

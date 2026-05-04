@@ -17,19 +17,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastFilter
-import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMapNotNull
 import love.yinlin.app
-import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.ExpandableContent
-import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogChoice
 import love.yinlin.compose.ui.floating.DialogInput
@@ -37,7 +34,6 @@ import love.yinlin.compose.ui.floating.DialogTemplate
 import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.floating.FABAction
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
@@ -46,7 +42,6 @@ import love.yinlin.compose.ui.input.PrimaryLoadingButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.input.TextButton
-import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.node.fastAnimateRotate
 import love.yinlin.compose.ui.node.shadow
@@ -56,7 +51,6 @@ import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
-import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.replaceAll
@@ -276,23 +270,6 @@ class ScreenMusicLibrary : Screen() {
 
     @Composable
     override fun ColumnScope.SecondTitleBar() {
-        Divider()
-        ActionScope.Left.Container(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value)) {
-            Icon(icon = Icons.Upload, tip = "导入", onClick = {
-                pop()
-                navigate(::ScreenImportMusic, null)
-            })
-            Icon(icon = Icons.DesignServices, tip = "创造", onClick = {
-                pop()
-                navigate(::ScreenCreateMusic)
-            })
-            PlatformMusicType.entries.fastForEach { type ->
-                Icon(icon = type.icon, color = Colors.Unspecified, tip = type.description, onClick = {
-                    pop()
-                    navigate(::ScreenPlatformMusic, null, type)
-                })
-            }
-        }
         Row(
             modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
             horizontalArrangement = Arrangement.SpaceBetween,

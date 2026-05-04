@@ -12,7 +12,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import love.yinlin.app
 import love.yinlin.common.DataBin
-import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -24,7 +23,6 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.coroutines.Coroutines
@@ -41,18 +39,18 @@ import love.yinlin.tpl.PlatformMusicAPI
 import love.yinlin.uri.Uri
 
 @Stable
-class ScreenPlatformMusic(private val deeplink: Uri?, type: PlatformMusicType) : Screen() {
+class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: PlatformMusicType) : Screen() {
+    private val platformAPI = PlatformMusicAPI.build(platformType)
+
     private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
-    private var platformType by mutableStateOf(type)
     private var items by mutableRefStateOf(emptyList<PlatformMusicInfo>())
 
     private val gridState = LazyGridState()
 
     private suspend fun searchMusic(result: String) {
         slot.loading.open {
-            val api = PlatformMusicAPI.build(platformType)
-            val result = api.search(result)
+            val result = platformAPI.search(result)
             gridState.requestScrollToItem(0)
             if (result != null) items = result
             else slot.tip.warning("搜索失败")
@@ -61,8 +59,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, type: PlatformMusicType) :
 
     private suspend fun parseMusic(result: String) {
         slot.loading.open {
-            val api = PlatformMusicAPI.build(platformType)
-            val result = api.parseLink(result)
+            val result = platformAPI.parseLink(result)
             gridState.requestScrollToItem(0)
             if (result != null) items = result
             else slot.tip.warning("解析失败")
@@ -209,34 +206,27 @@ class ScreenPlatformMusic(private val deeplink: Uri?, type: PlatformMusicType) :
 
     @Composable
     override fun Content() {
-        Column(
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().padding(Theme.padding.eValue),
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+        Box(
+            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            val types = PlatformMusicType.entries
-            Filter(
-                size = types.size,
-                selectedProvider = { platformType == types[it] },
-                titleProvider = { types[it].description },
-                iconProvider = { types[it].icon },
-                iconColor = Colors.Unspecified,
-                onClick = { index, selected -> if (selected) platformType = types[index] },
-                modifier = Modifier.fillMaxWidth()
-            )
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(Theme.size.cell1),
-                state = gridState,
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.e),
-                modifier = Modifier.fillMaxWidth().weight(1f)
-            ) {
-                items(
-                    items = items,
-                    key = { it.id }
+            if (items.isNotEmpty()) {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(Theme.size.cell1),
+                    state = gridState,
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                    modifier = Modifier.fillMaxSize().padding(Theme.padding.eValue)
                 ) {
-                    PlatformMusicInfoCard(info = it, modifier = Modifier.fillMaxWidth())
+                    items(
+                        items = items,
+                        key = { it.id }
+                    ) {
+                        PlatformMusicInfoCard(info = it, modifier = Modifier.fillMaxWidth())
+                    }
                 }
             }
+            else SimpleEllipsisText(text = "未检索或结果为空")
         }
     }
 
