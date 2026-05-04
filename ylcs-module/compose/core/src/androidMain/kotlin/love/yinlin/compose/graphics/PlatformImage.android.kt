@@ -19,7 +19,7 @@ import androidx.core.graphics.scale
 private fun ImageFormat.encodedImageFormat(quality: ImageQuality): Bitmap.CompressFormat = when {
     this == ImageFormat.JPG -> Bitmap.CompressFormat.JPEG
     this == ImageFormat.PNG -> Bitmap.CompressFormat.PNG
-    Build.VERSION.SDK_INT < Build.VERSION_CODES.R -> Bitmap.CompressFormat.WEBP
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.R -> @Suppress("DEPRECATION") Bitmap.CompressFormat.WEBP
     quality == ImageQuality.Full -> Bitmap.CompressFormat.WEBP_LOSSLESS
     else -> Bitmap.CompressFormat.WEBP_LOSSY
 }
