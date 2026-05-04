@@ -6,6 +6,7 @@ import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.data.config.AnimationSpeedConfig
 import love.yinlin.data.config.FontScaleConfig
 import love.yinlin.data.music.MusicPlaylist
+import love.yinlin.data.music.Playlist
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.weibo.WeiboUserInfo
@@ -39,7 +40,7 @@ class StartupAppConfig(pool: StartupPool) : StartupConfig(pool) {
     // 歌单
     val playlistLibrary by mapState<String, MusicPlaylist>(version = "20251112")
     // 上次播放列表
-    var lastPlaylist by stringState("")
+    var lastPlaylist: Playlist by jsonState(version = "20260505") { Playlist.None }
     // 上次播放歌曲
     var lastMusic by stringState("")
     // 播放模式

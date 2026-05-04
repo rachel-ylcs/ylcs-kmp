@@ -1,6 +1,7 @@
 package love.yinlin.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -20,7 +21,9 @@ import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMapNotNull
+import androidx.compose.ui.zIndex
 import love.yinlin.app
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
@@ -42,6 +45,7 @@ import love.yinlin.compose.ui.input.PrimaryLoadingButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.input.TextButton
+import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.dashBorder
 import love.yinlin.compose.ui.node.fastAnimateRotate
 import love.yinlin.compose.ui.node.shadow
@@ -51,6 +55,7 @@ import love.yinlin.data.MimeType
 import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.data.music.Playlist
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.replaceAll
@@ -174,7 +179,8 @@ class ScreenMusicLibrary : Screen() {
                         playlistLibrary[name] = playlist.copy(items = oldItems + newItems)
                         // 添加到当前播放的列表
                         mp?.let { player ->
-                            if (player.playlist?.name == name) {
+                            val currentPlaylist = player.playlist
+                            if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
                                 player.addMedias(newItems.asSequence().filter { it !in player.musicList }.toList())
                             }
                         }
@@ -189,40 +195,38 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun onMusicDelete() {
-        mp?.let { player ->
-            if (player.isReady) slot.tip.warning("请先停止播放器")
-            else if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
-                val deleteItems = selectIdList
-                for (item in deleteItems) {
-                    val removeItem = player.library.remove(item)
-                    removeItem?.path(app.modPath)?.deleteRecursively()
-                }
-                resetLibrary()
+        val player = mp ?: return
+        if (player.isReady) slot.tip.warning("请先停止播放器")
+        else if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
+            val deleteItems = selectIdList
+            for (item in deleteItems) {
+                val removeItem = player.library.remove(item)
+                removeItem?.path(app.modPath)?.deleteRecursively()
             }
+            resetLibrary()
         }
     }
 
     private suspend fun onMusicPackage() {
-        mp?.let { player ->
-            if (player.isReady) slot.tip.warning("请先停止播放器")
-            else {
-                catchingError {
-                    Coroutines.io {
-                        app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.write { sink ->
-                            slot.loading.open {
-                                val packageItems = selectIdList
-                                ModFactory.Merge(
-                                    mediaPaths = packageItems.fastMapNotNull { player.library[it]?.path(app.modPath) },
-                                    sink = sink,
-                                    info = ModInfo(author = app.config.userProfile?.name ?: "无名")
-                                ).process(filters = ModResourceType.ALL) { _, _, _ -> }
-                                exitManagement()
-                                slot.tip.success("导出MOD成功")
-                            }
+        val player = mp ?: return
+        if (player.isReady) slot.tip.warning("请先停止播放器")
+        else {
+            catchingError {
+                Coroutines.io {
+                    app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.write { sink ->
+                        slot.loading.open {
+                            val packageItems = selectIdList
+                            ModFactory.Merge(
+                                mediaPaths = packageItems.fastMapNotNull { player.library[it]?.path(app.modPath) },
+                                sink = sink,
+                                info = ModInfo(author = app.config.userProfile?.name ?: "无名")
+                            ).process(filters = ModResourceType.ALL) { _, _, _ -> }
+                            exitManagement()
+                            slot.tip.success("导出MOD成功")
                         }
                     }
-                }?.let { slot.tip.warning("导出MOD失败") }
-            }
+                }
+            }?.let { slot.tip.warning("导出MOD失败") }
         }
     }
 
@@ -287,31 +291,38 @@ class ScreenMusicLibrary : Screen() {
         onLongClick: () -> Unit,
         onClick: () -> Unit
     ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .shadow(Theme.shape.v5, Theme.shadow.v7)
-            .clip(Theme.shape.v5)
-            .background(if (musicInfo.selected) Theme.color.primaryContainer else Theme.color.surface)
-            .combinedClickable(onClick = onClick, onLongClick = if (enableLongClick) onLongClick else null)
+        ThemeContainer(
+            color = if (musicInfo.selected) Theme.color.onContainer else Theme.color.onSurface,
+            variantColor = if (musicInfo.selected) Theme.color.onContainerVariant else Theme.color.onSurfaceVariant
         ) {
-            ThemeContainer(
-                color = if (musicInfo.selected) Theme.color.onContainer else Theme.color.onSurface,
-                variantColor = if (musicInfo.selected) Theme.color.onContainerVariant else Theme.color.onSurfaceVariant
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .condition(musicInfo.selected) {
+                        border(Theme.border.v4, Colors.Yellow4, Theme.shape.v5)
+                    }
+                    .shadow(Theme.shape.v5, Theme.shadow.v7)
+                    .clip(Theme.shape.v5)
+                    .background(Theme.color.surface)
+                    .combinedClickable(onClick = onClick, onLongClick = if (enableLongClick) onLongClick else null)
             ) {
                 LocalFileImage(
                     uri = musicInfo.path(ModResourceType.Record).path,
-                    musicInfo,
+                    musicInfo.id,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.aspectRatio(1f).fillMaxHeight()
+                    alpha = 0.3f,
+                    modifier = Modifier.matchParentSize().zIndex(1f)
                 )
                 Column(
-                    modifier = Modifier.weight(1f).fillMaxHeight().padding(Theme.padding.eValue),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+                    modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue).zIndex(2f),
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
                     SimpleEllipsisText(text = musicInfo.name, style = Theme.typography.v7.bold)
                     SimpleEllipsisText(text = musicInfo.singer, style = Theme.typography.v8)
+                    LoadingIcon(icon = Icons.PlayArrow, tip = "试听", onClick = {
+                        mp?.startPlaylist(Playlist.Default, musicInfo.id, true)
+                        pop()
+                    })
                 }
             }
         }
@@ -333,24 +344,26 @@ class ScreenMusicLibrary : Screen() {
             }
         }
         else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(Theme.size.cell4),
-                state = gridState,
-                contentPadding = Theme.padding.eValue,
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.e),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
-                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
-            ) {
-                itemsIndexed(
-                    items = library,
-                    key = { _, item -> item.id }
-                ) { index, item ->
-                    MusicCard(
-                        musicInfo = item,
-                        enableLongClick = !isManaging,
-                        onLongClick = { onCardLongClick(index) },
-                        onClick = { onCardClick(index) }
-                    )
+            Theme.ThemeModeWrapper(true) {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(Theme.size.cell4),
+                    state = gridState,
+                    contentPadding = Theme.padding.eValue,
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                    modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
+                ) {
+                    itemsIndexed(
+                        items = library,
+                        key = { _, item -> item.id }
+                    ) { index, item ->
+                        MusicCard(
+                            musicInfo = item,
+                            enableLongClick = !isManaging,
+                            onLongClick = { onCardLongClick(index) },
+                            onClick = { onCardClick(index) }
+                        )
+                    }
                 }
             }
         }
