@@ -8,6 +8,10 @@ import java.net.Proxy
 
 private fun HttpClientConfig<OkHttpConfig>.useEngine() = engine {
     proxy = Proxy.NO_PROXY
+    config {
+        followRedirects(true)
+        followSslRedirects(true)
+    }
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(OkHttp) {
