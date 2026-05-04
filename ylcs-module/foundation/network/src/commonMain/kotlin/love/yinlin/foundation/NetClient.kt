@@ -16,6 +16,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpStatement
 import io.ktor.client.statement.bodyAsBytes
 import io.ktor.client.statement.bodyAsChannel
+import io.ktor.client.statement.request
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
@@ -64,10 +65,12 @@ class NetClient internal constructor(val delegate: HttpClient) {
                 }
                 scope.buildHeaders(headers)
             }.execute { response ->
+                val url = response.request.url.toString()
                 val headers = response.headers
                 val cookies = response.setCookie()
                 val rawBody = response.bodyAsBytes()
                 val scope = object : ResponseScope<Body> {
+                    override val url: String = url
                     override val headers: Headers = headers
                     override val cookies: List<Cookie> = cookies
                     override val rawBody: ByteArray = rawBody
