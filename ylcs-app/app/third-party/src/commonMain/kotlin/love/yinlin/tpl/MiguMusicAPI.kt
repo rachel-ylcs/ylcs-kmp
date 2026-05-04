@@ -33,9 +33,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         val album: String
     )
 
-    /**
-     * 搜索歌曲
-     */
+    // 搜索歌曲摘要
     suspend fun searchSongs(keyword: String): List<MiguSearchResult>? {
         val searchSwitch = """{"song":1,"album":0,"singer":0,"tagSong":1,"mvSong":0,"bestShow":1}"""
         val url = "$SEARCH_API?text=${Uri.encodeUri(keyword)}&searchSwitch=${Uri.encodeUri(searchSwitch)}&pageSize=50&pageNo=1"
@@ -63,9 +61,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         }?.ifEmpty { null }
     }
 
-    /**
-     * 获取单曲详情（音频直链、歌词）
-     */
+    // 获取单曲详情（音频 + 歌词）
     suspend fun requestMusic(result: MiguSearchResult): PlatformMusicInfo? {
         val detailUrl = "$DETAIL_API?resourceType=2&toneFlag=HQ&contentId=${result.contentId}&copyrightId=${result.copyrightId}&lowerQualityContentId=${result.contentId}"
 
@@ -73,6 +69,9 @@ object MiguMusicAPI : PlatformMusicAPI {
             url = detailUrl
             headers = defaultHeaders
         }) { json: JsonObject -> json } ?: return null
+
+        // 检查接口是否成功，不成功（如无版权）则直接返回 null
+        if (detailJson["code"]?.String != "000000") return null
 
         val data = detailJson.obj("data") ?: return null
         val audioUrl = data["url"]?.String ?: return null
@@ -99,9 +98,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         )
     }
 
-    /**
-     * 获取专辑歌曲列表
-     */
+    // 专辑/歌单歌曲列表（略，同之前）
     private suspend fun requestAlbumSongs(albumId: String): List<MiguSearchResult>? =
         NetClient.Common.request({
             url = "$ALBUM_SONGLIST_API?pageNo=1&pageSize=200&albumId=$albumId"
@@ -125,9 +122,6 @@ object MiguMusicAPI : PlatformMusicAPI {
             } ?: emptyList()
         }?.ifEmpty { null }
 
-    /**
-     * 获取歌单歌曲列表
-     */
     private suspend fun requestPlaylistSongs(playlistId: String): List<MiguSearchResult>? =
         NetClient.Common.request({
             url = "$PLAYLIST_SONGLIST_API?pageNo=1&pageSize=200&playlistId=$playlistId"
@@ -151,9 +145,6 @@ object MiguMusicAPI : PlatformMusicAPI {
             } ?: emptyList()
         }?.ifEmpty { null }
 
-    /**
-     * 根据单曲ID获取单曲信息（用于单曲短链接）
-     */
     private suspend fun requestSongById(songId: String): MiguSearchResult? {
         val detailUrl = "$DETAIL_API?resourceType=2&toneFlag=HQ&contentId=$songId&lowerQualityContentId=$songId"
         val json = NetClient.Common.request<JsonObject>({
@@ -177,9 +168,6 @@ object MiguMusicAPI : PlatformMusicAPI {
         )
     }
 
-    /**
-     * 解析短链接（重定向后从最终URL提取类型和ID）
-     */
     private suspend fun resolveLink(link: String): Pair<String, String>? {
         val finalUrl: String = NetClient.Common.request<String, String>({
             url = link
@@ -209,12 +197,18 @@ object MiguMusicAPI : PlatformMusicAPI {
         when {
             link.contains("c.migu.cn") -> {
                 resolveLink(link)?.let { (type, id) ->
-                    when (type) {
-                        "album" -> requestAlbumSongs(id)?.mapNotNull { requestMusic(it) }?.ifEmpty { null }
-                        "playlist" -> requestPlaylistSongs(id)?.mapNotNull { requestMusic(it) }?.ifEmpty { null }
-                        "song" -> requestSongById(id)?.let { requestMusic(it) }?.let { listOf(it) }
+                    val songs = when (type) {
+                        "album" -> requestAlbumSongs(id)
+                        "playlist" -> requestPlaylistSongs(id)
+                        "song" -> requestSongById(id)?.let { listOf(it) }
                         else -> null
+                    } ?: return@let null
+
+                    val result = mutableListOf<PlatformMusicInfo>()
+                    for (song in songs) {
+                        requestMusic(song)?.let { result.add(it) }
                     }
+                    result.ifEmpty { null }
                 }
             }
             else -> search(link)
