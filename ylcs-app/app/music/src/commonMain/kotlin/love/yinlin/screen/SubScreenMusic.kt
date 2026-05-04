@@ -45,6 +45,7 @@ import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.floating.Menus
 import love.yinlin.compose.ui.floating.Sheet
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -54,6 +55,7 @@ import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderIntConverter
+import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.layout.MeasurePolicies
 import love.yinlin.compose.ui.node.*
@@ -145,63 +147,25 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     }
 
     @Composable
-    private fun MusicBackground(modifier: Modifier = Modifier) {
-        val music = mp?.currentMusic
-        if (music != null) {
-            LocalFileImage(
-                uri = music.path(if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background).path,
-                music, isAnimationBackground,
-                contentScale = ContentScale.Crop,
-                alpha = 0.85f,
-                modifier = modifier
-            )
-        }
-        else Box(modifier = modifier)
-    }
-
-    @Composable
-    private fun ToolLayout(modifier: Modifier = Modifier) {
+    private fun ToolLayout(musicInfo: MusicInfo?, modifier: Modifier = Modifier) {
         Column(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
         ) {
-            ActionScope.SplitContainer(
-                modifier = Modifier.fillMaxWidth(),
-                left = {
-                    Icon(icon = Icons.LibraryMusic, tip = "曲库", onClick = {
-                        if (mp?.isInit == true) navigate(::ScreenMusicLibrary)
-                        else slot.tip.warning("播放器初始化失败")
-                    })
-                    Icon(icon = Icons.QueueMusic, tip = "歌单", onClick = {
-                        if (mp?.isInit == true) navigate(::ScreenPlaylistLibrary)
-                        else slot.tip.warning("播放器初始化失败")
-                    })
-                    Icon(icon = Icons.Lyrics, tip = "歌词", onClick = {
-                        if (mp?.isInit == true) navigate(::ScreenLyricsSettings)
-                        else slot.tip.warning("播放器初始化失败")
-                    })
-                    Icon(icon = Icons.Token, tip = "工坊", onClick = {
-                        navigate(::ScreenModCenter)
-                    })
-                },
-                right = {
-                    Icon(icon = Icons.AlarmOn, tip = "睡眠模式", onClick = {
-                        if (mp != null) sleepModeSheet.open()
-                        else slot.tip.warning("播放器初始化失败")
-                    })
-                }
-            )
+            val player = mp
+            val enabled = player?.isInit == true
 
-            val music = mp?.currentMusic
-
-            AnimationContent(music?.name) {
+            AnimationContent(
+                state = musicInfo?.name,
+                modifier = Modifier.fillMaxWidth().padding(start = Theme.padding.h, end = Theme.padding.h, top = Theme.padding.v)
+            ) {
                 SimpleEllipsisText(text = it ?: "无音源", color = Colors.Green4, style = Theme.typography.v4.bold)
             }
 
             ActionScope.SplitContainer(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h),
                 left = {
-                    AnimationContent(music?.singer) {
+                    AnimationContent(musicInfo?.singer) {
                         SimpleEllipsisText(text = it ?: "未知歌手", color = Colors.Green1, style = Theme.typography.v6)
                     }
                 },
@@ -209,7 +173,11 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     Icon(
                         icon = Icons.GifBox,
                         tip = "动画",
-                        color = if (isAnimationBackground) Theme.color.primary else LocalColor.current,
+                        color = when {
+                            isAnimationBackground -> Theme.color.primary
+                            hasAnimation -> Theme.color.secondary
+                            else -> LocalColor.current
+                        },
                         onClick = {
                             if (hasAnimation) isAnimationBackground = !isAnimationBackground
                             else slot.tip.warning("未安装动画资源")
@@ -218,40 +186,72 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     Icon(
                         icon = Icons.MusicNote,
                         tip = "伴奏",
+                        color = if (hasAccompaniment) Theme.color.secondary else LocalColor.current,
                         onClick = {
-                            if (hasAccompaniment) {
-                                mp?.let { player ->
+                            if (musicInfo != null) {
+                                if (hasAccompaniment && enabled) {
                                     launch {
                                         player.pause()
-                                        player.currentMusic?.let { navigate(::ScreenAccompaniment, it, player.engine.type) }
+                                        navigate(::ScreenAccompaniment, musicInfo, player.engine.type)
                                     }
                                 }
+                                else slot.tip.warning("未安装伴奏资源")
                             }
-                            else slot.tip.warning("未安装伴奏资源")
                         }
                     )
                     Icon(
                         icon = Icons.MusicVideo,
                         tip = "视频",
+                        color = if (hasVideo) Theme.color.secondary else LocalColor.current,
                         onClick = {
-                            if (hasVideo) {
-                                mp?.let {
+                            if (musicInfo != null) {
+                                if (hasVideo && enabled) {
                                     launch {
-                                        it.pause()
-                                        it.currentMusic?.path(ModResourceType.Video)?.let { file ->
-                                            navigate(::ScreenVideo, file.path)
-                                        }
+                                        player.pause()
+                                        navigate(::ScreenVideo, musicInfo.path(ModResourceType.Video).path)
                                     }
                                 }
+                                else slot.tip.warning("未安装视频资源")
                             }
-                            else slot.tip.warning("未安装视频资源")
                         }
                     )
-                    Icon(icon = Icons.Comment, tip = "歌评", onClick = {
-                        mp?.currentMusic?.let { navigate(::ScreenMusicDetails, it.id) }
-                    })
                 }
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                var showMenu by rememberFalse()
+
+                TextButton(icon = Icons.LibraryMusic, text = "曲库", enabled = enabled, onClick = {
+                    navigate(::ScreenMusicLibrary)
+                })
+                TextButton(icon = Icons.QueueMusic, text = "歌单", enabled = enabled, onClick = {
+                    navigate(::ScreenPlaylistLibrary)
+                })
+                TextButton(icon = Icons.Token, text = "工坊", enabled = enabled, onClick = {
+                    navigate(::ScreenModCenter)
+                })
+
+                Box(modifier = Modifier.weight(1f))
+
+                Menus(
+                    visible = showMenu,
+                    onClose = { showMenu = false },
+                    menus = {
+                        Menu(text = "歌词设置", icon = Icons.Lyrics, enabled = enabled, onClick = {
+                            navigate(::ScreenLyricsSettings)
+                        })
+                        Menu(text = "睡眠模式", icon = Icons.AlarmOn, enabled = enabled, onClick = {
+                            if (mp?.isReady != true) slot.tip.warning("未启动播放器")
+                            else sleepModeSheet.open()
+                        })
+                    }
+                ) {
+                    TextButton(text = "更多", icon = Icons.Add, onClick = { showMenu = true })
+                }
+            }
         }
     }
 
@@ -290,18 +290,18 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         )
     }
 
-    private val musicCoverLayout = movableComposable { modifier: Modifier ->
+    private val musicCoverLayout = movableComposable { musicInfo: MusicInfo?, modifier: Modifier ->
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
             AnimationContent(
-                state = mp?.currentMusic,
+                state = musicInfo,
                 duration = Theme.animation.duration.v1,
                 enter = { fadeIn(animationSpec = tween(it)) },
                 exit = { fadeOut(animationSpec = tween(it, delayMillis = it / 2)) },
                 modifier = Modifier.fillMaxSize(fraction = 0.641f).fastClipCircle().zIndex(2f)
-            ) {
-                if (it != null) {
-                    MusicCover(musicInfo = it, modifier = Modifier.fillMaxSize().border(
+            ) { info ->
+                if (info != null) {
+                    MusicCover(musicInfo = info, modifier = Modifier.fillMaxSize().border(
                         width = Theme.border.v10,
                         color = Theme.color.outline,
                         shape = Theme.shape.circle
@@ -318,7 +318,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     }
 
     @Composable
-    private fun MusicProgressSlider(modifier: Modifier) {
+    private fun MusicProgressSlider(musicInfo: MusicInfo?, modifier: Modifier) {
         var isDragging by rememberFalse()
         var displayTime by rememberValueState(0L)
 
@@ -328,7 +328,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             }
         }
 
-        Layout(modifier = modifier.pointerInput(Unit) {
+        Layout(modifier = modifier.pointerInput(musicInfo) {
             awaitEachGesture {
                 val down = awaitFirstDown(requireUnconsumed = false)
 
@@ -354,7 +354,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 } while (dragChange.pressed)
                 launch {
                     // 检查是否在副歌点附近
-                    val seekTime = mp?.currentMusic?.chorus?.find { abs(it - displayTime) <= 3000L } ?: displayTime
+                    val seekTime = musicInfo?.chorus?.find { abs(it - displayTime) <= 3000L } ?: displayTime
                     player.seekTo(seekTime)
                 }
 
@@ -374,7 +374,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             // 画进度
             drawRoundRect(color = Colors.Green5, size = Size(offsetProgress, height), cornerRadius = cornerRadius)
             // 画副歌点
-            mp?.currentMusic?.chorus?.fastForEach { hotpot ->
+            musicInfo?.chorus?.fastForEach { hotpot ->
                 val offsetChorus = width * hotpot / duration.toFloat()
                 val leftBound = offsetChorus - hotpotRadius
                 val rightBound = offsetChorus + hotpotRadius
@@ -388,14 +388,14 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }, MeasurePolicies.Empty)
     }
 
-    private val musicProgressLayout = movableComposable { modifier: Modifier ->
+    private val musicProgressLayout = movableComposable { musicInfo: MusicInfo?, modifier: Modifier ->
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
             FastFixedText("00:00", { currentDebounceTime.timeString })
-            MusicProgressSlider(modifier = Modifier.weight(1f).height(6.dp).pointerIcon(PointerIcon.Hand))
+            MusicProgressSlider(musicInfo = musicInfo, modifier = Modifier.weight(1f).height(6.dp).pointerIcon(PointerIcon.Hand))
             FastFixedText("00:00", { (mp?.duration ?: 0L).timeString })
         }
     }
@@ -445,80 +445,74 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
     override fun Content() {
         Theme.ThemeModeWrapper(true) {
             Box(modifier = Modifier.fillMaxSize().background(Theme.color.background)) {
-                val deviceType by rememberDeviceType()
-                val immersivePadding = LocalImmersivePadding.current
+                val player = mp
+                val musicInfo = player?.currentMusic
+                val isReady = player != null && player.isReady
 
-                MusicBackground(modifier = Modifier.fillMaxSize().blurSource(blurState).zIndex(1f))
+                Box(modifier = Modifier.fillMaxSize().blurSource(blurState).zIndex(1f)) {
+                    if (musicInfo != null) {
+                        val infoType = if (isAnimationBackground) ModResourceType.Animation else ModResourceType.Background
+                        val path = musicInfo.path(infoType).path
+                        LocalFileImage(uri = path, path, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                    }
+                }
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .zIndex(2f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxSize().blurTarget(blurState).padding(LocalImmersivePadding.current).zIndex(2f),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    ToolLayout(modifier = Modifier
-                        .padding(immersivePadding.withoutBottom + Theme.padding.value9)
-                        .fillMaxWidth()
-                        .clip(Theme.shape.v5)
-                        .blurTarget(blurState)
-                        .padding(Theme.padding.value)
-                    )
+                    val deviceType by rememberDeviceType()
 
-                    val player = mp
-                    val isReady = player != null && player.isReady
+                    ToolLayout(musicInfo = musicInfo, modifier = Modifier.fillMaxWidth())
 
-                    if (deviceType == Device.Type.PORTRAIT) {
-                        if (isReady) {
-                            musicCoverLayout(Modifier
-                                .weight(1f, fill = false)
+                    if (isReady) {
+                        if (deviceType == Device.Type.PORTRAIT) {
+                            musicCoverLayout(musicInfo, Modifier
+                                .padding(Theme.padding.value7)
                                 .heightIn(max = Theme.size.image2)
                                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
                                 .shadow(Theme.shape.circle, Theme.shadow.v3)
                             )
+                            lyricsLayout(player, Modifier.fillMaxWidth().weight(1f))
                         }
-                    }
-                    else {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().weight(1f).padding(Theme.padding.eValue5),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (isReady) {
-                                musicCoverLayout(Modifier
-                                    .weight(1f, fill = false)
-                                    .widthIn(max = Theme.size.image1)
+                        else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().weight(1f),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                val isLandscape = deviceType == Device.Type.LANDSCAPE
+                                val padding = if (isLandscape) Theme.padding.eValue5 else Theme.padding.eValue7
+
+                                musicCoverLayout(musicInfo, Modifier
+                                    .padding(padding)
+                                    .widthIn(max = if (isLandscape) Theme.size.image1 else Theme.size.image2)
                                     .aspectRatio(1f)
                                     .shadow(Theme.shape.circle, Theme.shadow.v3)
                                 )
 
-                                val width = if (deviceType == Device.Type.LANDSCAPE) Theme.size.cell1 else Theme.size.cell2
-                                lyricsLayout(player, Modifier.width(width).fillMaxHeight().clip(Theme.shape.v5).blurTarget(blurState))
+                                lyricsLayout(player, Modifier
+                                    .padding(padding)
+                                    .widthIn(max = if (isLandscape) Theme.size.cell1 * 1.5f else Theme.size.cell1)
+                                    .fillMaxHeight()
+                                )
                             }
                         }
                     }
 
-                    Column(modifier = Modifier
-                        .padding(immersivePadding.withoutTop + PaddingValues(top = Theme.padding.v9))
-                        .fillMaxWidth()
-                        .blurTarget(blurState)
-                    ) {
-                        if (deviceType == Device.Type.PORTRAIT && isReady) lyricsLayout(player, Modifier.fillMaxWidth().height(Theme.size.cell4))
-
-                        if (deviceType == Device.Type.LANDSCAPE) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
-                                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                musicControlLayout(Modifier.weight(1f))
-                                musicProgressLayout(Modifier.weight(3f))
-                            }
+                    if (deviceType == Device.Type.LANDSCAPE) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            musicControlLayout(Modifier.weight(1f))
+                            musicProgressLayout(musicInfo, Modifier.weight(3f))
                         }
-                        else {
-                            musicProgressLayout(Modifier.fillMaxWidth().padding(PaddingValues(start = Theme.padding.h9, end = Theme.padding.h9, top = Theme.padding.v9)))
-                            musicControlLayout(Modifier.fillMaxWidth().padding(Theme.padding.value9))
-                        }
+                    }
+                    else {
+                        musicProgressLayout(musicInfo, Modifier.fillMaxWidth().padding(Theme.padding.value9))
+                        musicControlLayout(Modifier.fillMaxWidth().padding(Theme.padding.value9))
                     }
                 }
             }
