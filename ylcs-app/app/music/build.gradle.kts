@@ -13,7 +13,6 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 libs.compose.resources,
-                libs.tool.reorder,
 
                 projects.ylcsApp.app.global,
                 projects.ylcsApp.app.community,
@@ -23,11 +22,6 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.components.dragDrop,
                 projects.ylcsModule.compose.components.paginationLayout,
                 projects.ylcsModule.compose.components.media,
-
-                ExportLib,
-
-                libs.haze,
-                libs.haze.blur,
             )
         }
 

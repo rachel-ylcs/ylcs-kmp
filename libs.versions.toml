@@ -2,7 +2,7 @@
 
 # Plugins #
 kotlin = "2.4.0-Beta2"
-agp = "9.2.0"
+agp = "9.0.0-alpha06"
 cmp = "1.11.0-beta03"
 mavenPublish = "0.36.0"
 dokka = "2.2.0"
@@ -17,7 +17,7 @@ ktor = "3.4.3"
 sketch = "4.5.0-alpha03"
 haze = "2.0.0-alpha01"
 mmkv = "2.4.0"
-pag = "4.5.50"
+pag = "4.5.52"
 
 # Android
 androidx-activity = "1.13.0"
@@ -75,7 +75,7 @@ compose-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runti
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version = "0.32.1" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0-rc02" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.8.0-rc02-0.6.x-compat" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version = "0.9.0" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.11.0" }
 kotlinx-broswer = { module = "org.jetbrains.kotlinx:kotlinx-browser", version = "0.5.0" }
@@ -94,9 +94,8 @@ sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version
 sketch-extensions-compose = { module = "io.github.panpf.sketch4:sketch-extensions-compose", version.ref = "sketch" }
 sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.4.0" }
 
-haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
-haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
-
+tool-haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+tool-haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
 tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.1.0" }
 
 # JVM

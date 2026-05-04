@@ -240,7 +240,7 @@ private class Random(
         require(probabilities.isNotEmpty()) {
             "Random color list can't be empty"
         }
-        (listOf(0f) + probabilities.map { it.first }).reduceIndexed { index, sum, i ->
+        val _ = (listOf(0f) + probabilities.map { it.first }).reduceIndexed { index, sum, i ->
             _probabilities.add(sum..(sum + i) to probabilities[index - 1].second)
             sum + i
         }

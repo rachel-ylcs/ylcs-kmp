@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastFilter
+import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMapNotNull
@@ -285,22 +286,12 @@ class ScreenMusicLibrary : Screen() {
                 pop()
                 navigate(::ScreenCreateMusic)
             })
-            Icon(icon = Icons2.QQMusic, color = Colors.Unspecified, tip = "QQ音乐", onClick = {
-                pop()
-                navigate(::ScreenPlatformMusic, null, PlatformMusicType.QQMusic)
-            })
-            Icon(icon = Icons2.NetEaseCloudMusic, color = Colors.Unspecified, tip = "网易云音乐", onClick = {
-                pop()
-                navigate(::ScreenPlatformMusic, null, PlatformMusicType.NetEaseCloud)
-            })
-            Icon(icon = Icons2.KugouMusic, color = Colors.Unspecified, tip = "酷狗音乐", onClick = {
-                pop()
-                navigate(::ScreenPlatformMusic, null, PlatformMusicType.Kugou)
-            })
-            Icon(icon = Icons2.SodaMusic, color = Colors.Unspecified, tip = "汽水音乐", onClick = {
-                pop()
-                navigate(::ScreenPlatformMusic, null, PlatformMusicType.Soda)
-            })
+            PlatformMusicType.entries.fastForEach { type ->
+                Icon(icon = type.icon, color = Colors.Unspecified, tip = type.description, onClick = {
+                    pop()
+                    navigate(::ScreenPlatformMusic, null, type)
+                })
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),

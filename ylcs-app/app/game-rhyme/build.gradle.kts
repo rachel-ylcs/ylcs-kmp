@@ -15,6 +15,7 @@ template(object : KotlinMultiplatformTemplate() {
                 libs.compose.resources,
                 projects.ylcsApp.app.global,
                 projects.ylcsApp.app.music,
+
                 projects.ylcsModule.compose.components.media,
                 projects.ylcsModule.compose.game.core,
             )

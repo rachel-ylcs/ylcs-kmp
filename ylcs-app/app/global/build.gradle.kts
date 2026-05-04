@@ -14,7 +14,12 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.compose.resources,
 
+                libs.tool.haze,
+                libs.tool.haze.blur,
+
                 ExportLib,
+
+                libs.tool.reorder,
 
                 projects.ylcsApp.cs,
                 projects.ylcsApp.mod,
@@ -30,9 +35,9 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.icons,
                 projects.ylcsModule.compose.screen,
 
-                projects.ylcsModule.compose.components.urlImage,
                 projects.ylcsModule.compose.components.lottie,
                 projects.ylcsModule.compose.components.richText,
+                projects.ylcsModule.compose.components.urlImage,
             )
         }
     }

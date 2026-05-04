@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
@@ -17,10 +16,7 @@ import kotlinx.coroutines.isActive
 import love.yinlin.app
 import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
-import love.yinlin.compose.Colors
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
+import love.yinlin.compose.*
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.BasicScreen
@@ -29,12 +25,7 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.Slider
-import love.yinlin.compose.ui.node.BlurState
-import love.yinlin.compose.ui.node.blurSource
-import love.yinlin.compose.ui.node.blurTarget
-import love.yinlin.compose.ui.node.fastClipCircle
-import love.yinlin.compose.ui.node.fastRotate
-import love.yinlin.compose.ui.node.shadow
+import love.yinlin.compose.ui.node.*
 import love.yinlin.compose.ui.text.FastFixedText
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.window.rememberFocusWindowState
@@ -169,42 +160,41 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
     override fun BasicContent() {
         Theme.ThemeModeWrapper(true) {
             Box(
-                modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().background(Theme.color.background),
+                modifier = Modifier.fillMaxSize().background(Theme.color.background),
                 contentAlignment = Alignment.Center
             ) {
-                val maxWidth = Theme.size.cell1 * 1.25f
-
                 LocalFileImage(
                     uri = music.path(app.modPath, ModResourceType.Background).path,
                     contentScale = ContentScale.Crop,
-                    alpha = 0.85f,
-                    modifier = Modifier.widthIn(max = maxWidth).fillMaxSize().blurSource(blurState).zIndex(1f)
+                    modifier = Modifier.fillMaxSize().blurSource(blurState).zIndex(1f)
                 )
 
-                Column(
-                    modifier = Modifier.widthIn(max = maxWidth).fillMaxSize().zIndex(2f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                Box(
+                    modifier = Modifier.fillMaxSize().blurTarget(blurState).padding(LocalImmersivePadding.current).zIndex(2f),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier.size(Theme.size.image2).shadow(Theme.shape.circle, Theme.shadow.v3),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
-                        MusicCover(modifier = Modifier.fillMaxSize(fraction = 0.641f).fastClipCircle().border(
-                            width = Theme.border.v10,
-                            color = Theme.color.outline,
-                            shape = Theme.shape.circle
-                        ).zIndex(2f))
-                    }
-
                     Column(
-                        modifier = Modifier.padding(Theme.padding.eValue9).fillMaxWidth().clip(Theme.shape.v5).blurTarget(blurState),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.widthIn(max = Theme.size.cell1 * 1.5f).fillMaxSize().padding(Theme.padding.eValue5),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v5)
                     ) {
-                        SimpleClipText(text = music.name, color = Theme.color.primary, style = Theme.typography.v5.bold, modifier = Modifier.padding(Theme.padding.value))
+                        Box(
+                            modifier = Modifier.size(Theme.size.image2).shadow(Theme.shape.circle, Theme.shadow.v3),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
+                            MusicCover(modifier = Modifier.fillMaxSize(fraction = 0.641f).fastClipCircle().border(
+                                width = Theme.border.v10,
+                                color = Theme.color.outline,
+                                shape = Theme.shape.circle
+                            ).zIndex(2f))
+                        }
+
+                        SimpleClipText(text = music.name, color = Theme.color.primary, style = Theme.typography.v5.bold, modifier = Modifier.padding(Theme.padding.value9))
+
                         MusicProgressLayout(modifier = Modifier.padding(horizontal = Theme.padding.h).fillMaxWidth())
-                        Box(modifier = Modifier.fillMaxWidth().aspectRatio(2f)) {
+
+                        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                             engine.LyricsCanvas(config = app.config.lyricsEngineConfig, host = engineHost)
                         }
                     }
