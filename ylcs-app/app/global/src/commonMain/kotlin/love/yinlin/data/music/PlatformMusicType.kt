@@ -1,8 +1,10 @@
 package love.yinlin.data.music
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
+import love.yinlin.compose.Colors
 import love.yinlin.compose.ui.icon.Icons2
 
 @Stable
@@ -32,5 +34,13 @@ enum class PlatformMusicType {
         Kugou -> Icons2.KugouMusic
         Soda -> Icons2.SodaMusic
         Migu -> Icons2.MiguMusic
+    }
+
+    val color: Color get() = when (this) {
+        QQMusic -> Colors.Yellow4
+        NetEaseCloud -> Colors.Red4
+        Kugou -> Colors.Blue4
+        Soda -> Colors.Green4
+        Migu -> Colors.Pink4
     }
 }
