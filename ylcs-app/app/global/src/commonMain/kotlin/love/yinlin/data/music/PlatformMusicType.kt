@@ -8,14 +8,14 @@ import love.yinlin.compose.ui.icon.Icons2
 @Stable
 @Serializable
 enum class PlatformMusicType {
-    QQMusic, NetEaseCloud, Kugou, Soda, MiGu;
+    QQMusic, NetEaseCloud, Kugou, Soda, Migu;
 
     val description: String get() = when (this) {
         QQMusic -> "QQ音乐"
         NetEaseCloud -> "网易云音乐"
         Kugou -> "酷狗音乐"
         Soda -> "汽水音乐"
-        MiGu -> "咪咕音乐"
+        Migu -> "咪咕音乐"
     }
 
     val prefix: String get() = when (this) {
@@ -23,7 +23,7 @@ enum class PlatformMusicType {
         NetEaseCloud -> "NEC"
         Kugou -> "KG"
         Soda -> "QS"
-        MiGu -> "MG"
+        Migu -> "MG"
     }
 
     val icon: ImageVector get() = when (this) {
@@ -31,6 +31,6 @@ enum class PlatformMusicType {
         NetEaseCloud -> Icons2.NetEaseCloudMusic
         Kugou -> Icons2.KugouMusic
         Soda -> Icons2.SodaMusic
-        MiGu -> Icons2.MiGuMusic
+        Migu -> Icons2.MiguMusic
     }
 }

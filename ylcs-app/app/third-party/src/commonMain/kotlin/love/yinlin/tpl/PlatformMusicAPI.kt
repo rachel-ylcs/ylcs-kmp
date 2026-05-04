@@ -13,7 +13,7 @@ interface PlatformMusicAPI {
             PlatformMusicType.NetEaseCloud -> NetEaseCloudAPI
             PlatformMusicType.Kugou -> KugouMusicAPI
             PlatformMusicType.Soda -> SodaMusicAPI
-            PlatformMusicType.MiGu -> MiGuMusicAPI
+            PlatformMusicType.Migu -> MiguMusicAPI
         }
     }
 }

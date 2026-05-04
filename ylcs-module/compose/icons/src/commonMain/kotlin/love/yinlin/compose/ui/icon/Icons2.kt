@@ -1786,7 +1786,7 @@ object Icons2 {
         }
     }
 
-    val MiGuMusic by icon(rawSize = 1024f) {
+    val MiguMusic by icon(rawSize = 1024f) {
         path(color = Color(0xFFCE046D)) {
             moveTo(972.8f, 51.2f)
             curveToRelative(-35.8f, -33.3f, -74.2f, -51.2f, -122.9f, -51.2f)
