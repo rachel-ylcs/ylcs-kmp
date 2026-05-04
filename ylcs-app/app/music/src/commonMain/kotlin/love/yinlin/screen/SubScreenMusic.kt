@@ -44,6 +44,7 @@ import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
+import love.yinlin.compose.ui.common.DialogModFactory
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.floating.Menus
 import love.yinlin.compose.ui.floating.Sheet
@@ -52,6 +53,7 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.LocalFileImage
+import love.yinlin.compose.ui.input.LoadingTextButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderIntConverter
@@ -230,8 +232,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                 TextButton(icon = Icons.QueueMusic, text = "歌单", enabled = enabled, onClick = {
                     navigate(::ScreenPlaylistLibrary)
                 })
-                TextButton(icon = Icons.Token, text = "工坊", enabled = enabled, onClick = {
-                    navigate(::ScreenModCenter)
+                LoadingTextButton(icon = Icons.Token, text = "工坊", enabled = enabled, onClick = {
+                    modFactoryDialog.open()
                 })
 
                 Box(modifier = Modifier.weight(1f))
@@ -518,6 +520,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
             }
         }
     }
+
+    private val modFactoryDialog = this land DialogModFactory()
 
     private val currentPlaylistSheet = this land object : Sheet() {
         override val scrollable: Boolean = false
