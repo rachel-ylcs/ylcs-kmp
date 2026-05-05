@@ -28,14 +28,16 @@ object SodaMusicAPI : PlatformMusicAPI {
 
     // ---------- 短链接解析 ----------
     private suspend fun extractPlaylistIdFromShortLink(shortUrl: String): String? {
-        val html = NetClient.Common.request<String>({
+        // 获取重定向后的最终 URL（不再解析 HTML）
+        val finalUrl: String = NetClient.Common.request<String, String>({
             this.url = shortUrl
             headers = defaultHeaders
-        }) { text: String -> text } ?: return null
+        }) {
+            url
+        } ?: return null
 
-        val metaRegex = Regex("""<meta[^>]*?name="url"[^>]*?content="([^">]+)"""")
-        val longUrl = metaRegex.find(html)?.groupValues?.get(1) ?: return null
-        return """playlist_id=(\d+)""".toRegex().find(longUrl)?.groupValues?.get(1)
+        // 直接从最终 URL 的参数中提取 playlist_id
+        return Uri.parse(finalUrl)?.params?.get("playlist_id")
     }
 
     // ---------- 歌单 API ----------

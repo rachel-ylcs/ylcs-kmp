@@ -33,7 +33,9 @@ object MiguMusicAPI : PlatformMusicAPI {
         val album: String
     )
 
-    // 搜索歌曲摘要
+    /**
+     * 搜索歌曲（仅获取摘要信息）
+     */
     suspend fun searchSongs(keyword: String): List<MiguSearchResult>? {
         val searchSwitch = """{"song":1,"album":0,"singer":0,"tagSong":1,"mvSong":0,"bestShow":1}"""
         val url = "$SEARCH_API?text=${Uri.encodeUri(keyword)}&searchSwitch=${Uri.encodeUri(searchSwitch)}&pageSize=50&pageNo=1"
@@ -44,7 +46,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         }) { json: JsonObject ->
             json.obj("songResultData").arr("result").mapNotNull { item ->
                 val obj = item.Object
-                val singers = obj.arr("singers").joinToString(",") { it.Object["name"].String }
+                val singers = obj.arr("singers").joinToString("、") { it.Object["name"].String }
                 val imgItems = obj.arr("imgItems")
                 val imgUrl = if (imgItems.isNotEmpty()) imgItems.last().Object["img"].String else ""
                 MiguSearchResult(
@@ -61,7 +63,9 @@ object MiguMusicAPI : PlatformMusicAPI {
         }?.ifEmpty { null }
     }
 
-    // 获取单曲详情（音频 + 歌词）
+    /**
+     * 获取歌曲详情（音频直链、歌词等）
+     */
     suspend fun requestMusic(result: MiguSearchResult): PlatformMusicInfo? {
         val detailUrl = "$DETAIL_API?resourceType=2&toneFlag=HQ&contentId=${result.contentId}&copyrightId=${result.copyrightId}&lowerQualityContentId=${result.contentId}"
 
@@ -70,12 +74,10 @@ object MiguMusicAPI : PlatformMusicAPI {
             headers = defaultHeaders
         }) { json: JsonObject -> json } ?: return null
 
-        // 检查接口是否成功，不成功（如无版权）则直接返回 null
         if (detailJson["code"]?.String != "000000") return null
 
         val data = detailJson.obj("data")
-        val audioUrl = data["url"]?.String ?: return null
-
+        val audioUrl = data["url"].String
         val lrcUrl = data["lrcUrl"]?.String ?: result.lyricUrl ?: ""
         val lyrics = if (lrcUrl.isNotEmpty()) {
             NetClient.Common.request({
@@ -98,7 +100,9 @@ object MiguMusicAPI : PlatformMusicAPI {
         )
     }
 
-    // 专辑/歌单歌曲列表（略，同之前）
+    /**
+     * 获取专辑歌曲列表
+     */
     private suspend fun requestAlbumSongs(albumId: String): List<MiguSearchResult>? =
         NetClient.Common.request({
             url = "$ALBUM_SONGLIST_API?pageNo=1&pageSize=200&albumId=$albumId"
@@ -122,6 +126,9 @@ object MiguMusicAPI : PlatformMusicAPI {
             }
         }?.ifEmpty { null }
 
+    /**
+     * 获取歌单歌曲列表
+     */
     private suspend fun requestPlaylistSongs(playlistId: String): List<MiguSearchResult>? =
         NetClient.Common.request({
             url = "$PLAYLIST_SONGLIST_API?pageNo=1&pageSize=200&playlistId=$playlistId"
@@ -145,6 +152,9 @@ object MiguMusicAPI : PlatformMusicAPI {
             }
         }?.ifEmpty { null }
 
+    /**
+     * 根据单曲ID获取摘要（用于单曲短链接）
+     */
     private suspend fun requestSongById(songId: String): MiguSearchResult? {
         val detailUrl = "$DETAIL_API?resourceType=2&toneFlag=HQ&contentId=$songId&lowerQualityContentId=$songId"
         val json = NetClient.Common.request<JsonObject>({
@@ -168,6 +178,9 @@ object MiguMusicAPI : PlatformMusicAPI {
         )
     }
 
+    /**
+     * 解析短链接（重定向后从最终 URL 提取类型和 ID）
+     */
     private suspend fun resolveLink(link: String): Pair<String, String>? {
         val finalUrl: String = NetClient.Common.request<String, String>({
             url = link
@@ -176,16 +189,15 @@ object MiguMusicAPI : PlatformMusicAPI {
             url
         } ?: return null
 
-        val albumId = """album/index\.html\?id=(\d+)""".toRegex().find(finalUrl)?.groupValues?.get(1)
-        if (albumId != null) return "album" to albumId
+        val params = Uri.parse(finalUrl)?.params ?: return null
+        val id = params["id"] ?: return null
 
-        val playlistId = """playlist/index\.html\?id=(\d+)""".toRegex().find(finalUrl)?.groupValues?.get(1)
-        if (playlistId != null) return "playlist" to playlistId
-
-        val songId = """song/index\.html\?id=(\d+)""".toRegex().find(finalUrl)?.groupValues?.get(1)
-        if (songId != null) return "song" to songId
-
-        return null
+        return when {
+            finalUrl.contains("album") -> "album" to id
+            finalUrl.contains("playlist") -> "playlist" to id
+            finalUrl.contains("song") -> "song" to id
+            else -> null
+        }
     }
 
     override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
