@@ -4,6 +4,7 @@ import love.yinlin.cs.APIConfig.coercePageNum
 import love.yinlin.cs.service.*
 import love.yinlin.cs.user.*
 import love.yinlin.data.rachel.profile.UserPrivilege
+import love.yinlin.data.rachel.song.SongPreview
 import love.yinlin.extension.to
 
 fun APIScope.songAPI() {
@@ -45,6 +46,57 @@ fun APIScope.songAPI() {
             ORDER BY sid ASC
         """, album)
         result(songs.to())
+    }
+
+    ApiSongSearchFilter.response { filter ->
+        val args = mutableListOf<Any>()
+        val sql = buildString {
+            append("SELECT sid, version, name FROM song WHERE 1=1")
+
+            val key = filter.key
+            if (key != null) {
+                append(" AND name LIKE ?")
+                args.add("%$key%")
+            }
+
+            val singer = filter.singer
+            if (singer != null) {
+                append(" AND FIND_IN_SET(?, singer) > 0")
+                args.add(singer)
+            }
+
+            val lyricist = filter.lyricist
+            if (lyricist != null) {
+                append(" AND FIND_IN_SET(?, lyricist) > 0")
+                args.add(lyricist)
+            }
+
+            val composer = filter.composer
+            if (composer != null) {
+                append(" AND FIND_IN_SET(?, composer) > 0")
+                args.add(composer)
+            }
+
+            val album = filter.album
+            if (album != null) {
+                append(" AND album = ?")
+                args.add(album)
+            }
+
+            if (filter.useAnimation) append(" AND animation = 1")
+            if (filter.useVideo) append(" AND video = 1")
+            if (filter.useRhyme) append(" AND rhyme = 1")
+            if (filter.useAccompaniment) append(" AND accompaniment = 1")
+
+            append(" ORDER BY sid ASC")
+        }
+
+        val songs: List<SongPreview> = if (args.isEmpty() && !filter.useAnimation && !filter.useVideo && !filter.useRhyme && !filter.useAccompaniment) {
+            emptyList()
+        }
+        else db.throwQuerySQL(sql, *args.toTypedArray()).to()
+
+        result(songs)
     }
 
     ApiSongGetSongComments.response { sid, cid, num ->

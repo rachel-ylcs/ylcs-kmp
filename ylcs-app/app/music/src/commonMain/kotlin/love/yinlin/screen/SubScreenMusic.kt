@@ -44,8 +44,8 @@ import love.yinlin.compose.screen.NavigationScreen
 import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.animation.WaveLoading
-import love.yinlin.compose.ui.common.DialogModFactory
 import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.ui.floating.DialogModFactory
 import love.yinlin.compose.ui.floating.Menus
 import love.yinlin.compose.ui.floating.Sheet
 import love.yinlin.compose.ui.icon.Icons

@@ -18,8 +18,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
-import love.yinlin.compose.ui.floating.DialogChoice
-import love.yinlin.compose.ui.floating.DialogInput
+import love.yinlin.compose.ui.floating.DialogServerModFilter
 import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.floating.FABScrollTop
 import love.yinlin.compose.ui.icon.Icons
@@ -30,28 +29,12 @@ import love.yinlin.compose.ui.layout.PaginationGrid
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
+import love.yinlin.data.rachel.song.SongFilter
 import love.yinlin.data.rachel.song.SongPreview
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
 class ScreenModCenter : Screen() {
-    companion object {
-        val AlbumList = listOf(
-            "银临EP",
-            "腐草为萤",
-            "蚍蜉渡海",
-            "风花雪月",
-            "琉璃",
-            "离地十公分·A面",
-            "离地十公分·B面",
-            "山色有无中",
-            "粼粼",
-            "单曲集",
-            "影视剧OST",
-            "游戏OST"
-        )
-    }
-
     private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val provider = RachelStatefulProvider()
@@ -77,20 +60,10 @@ class ScreenModCenter : Screen() {
         ApiSongGetSongs.request(pageSongs.offset, pageSongs.pageNum) { pageSongs.moreData(it) }
     }
 
-    private suspend fun searchNewData(key: String) {
+    private suspend fun requestFilterData(filter: SongFilter) {
         provider.withLoading {
             gridState.requestScrollToItem(0)
-            val result = ApiSongSearchSongs.requestNull(key)!!.o1
-            pageSongs.newData(result)
-            pageSongs.canLoading = false
-            result.isNotEmpty()
-        }
-    }
-
-    private suspend fun filterAlbumNewData(album: String) {
-        provider.withLoading {
-            gridState.requestScrollToItem(0)
-            val result = ApiSongSearchSongsByAlbum.requestNull(album)!!.o1
+            val result = ApiSongSearchFilter.requestNull(filter)!!.o1
             pageSongs.newData(result)
             pageSongs.canLoading = false
             result.isNotEmpty()
@@ -104,14 +77,17 @@ class ScreenModCenter : Screen() {
     }
 
     @Composable
+    override fun RowScope.LeftActions() {
+        LoadingIcon(icon = Icons.Refresh, tip = "刷新", onClick = {
+            requestNewData(true)
+        })
+    }
+
+    @Composable
     override fun RowScope.RightActions() {
         LoadingIcon(icon = Icons.Search, tip = "搜索", onClick = {
-            val result = searchDialog.open()
-            if (result != null) searchNewData(result)
-        })
-        LoadingIcon(icon = Icons.Filter, tip = "专辑筛选", onClick = {
-            val result = albumDialog.open()
-            if (result != null) filterAlbumNewData(AlbumList[result])
+            val result = filterDialog.open()
+            if (result != null) requestFilterData(result)
         })
     }
 
@@ -170,7 +146,5 @@ class ScreenModCenter : Screen() {
 
     override val fab: FAB = FABScrollTop(gridState)
 
-    private val searchDialog = this land DialogInput(hint = "歌曲名", maxLength = 32)
-
-    private val albumDialog = this land DialogChoice.fromItems(AlbumList)
+    private val filterDialog = this land DialogServerModFilter()
 }

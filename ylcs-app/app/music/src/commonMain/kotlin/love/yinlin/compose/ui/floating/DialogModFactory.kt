@@ -1,4 +1,4 @@
-package love.yinlin.compose.ui.common
+package love.yinlin.compose.ui.floating
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +17,6 @@ import androidx.compose.ui.util.fastForEach
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.text.SimpleClipText

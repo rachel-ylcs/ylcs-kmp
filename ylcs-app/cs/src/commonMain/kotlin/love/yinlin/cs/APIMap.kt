@@ -2,6 +2,7 @@ package love.yinlin.cs
 
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.annotation.DeprecatedApi
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.data.rachel.follows.BlockedUserInfo
 import love.yinlin.data.rachel.follows.FollowInfo
@@ -33,6 +34,7 @@ import love.yinlin.data.rachel.prize.Prizedata
 import love.yinlin.data.rachel.rhyme.RhymeRank
 import love.yinlin.data.rachel.rhyme.RhymeRepository
 import love.yinlin.data.rachel.rhyme.RhymeUploadResult
+import love.yinlin.data.rachel.song.SongFilter
 
 // Common
 
@@ -388,11 +390,16 @@ val ApiSongGetSongs by API.post.i<String, Int>().o<List<SongPreview>>()
 @APIParam("sid")
 val ApiSongGetSong by API.post.i<String>().o<Song>()
 
+@DeprecatedApi("3.7.0")
 @APIParam("key")
 val ApiSongSearchSongs by API.post.i<String>().o<List<SongPreview>>()
 
+@DeprecatedApi("3.7.0")
 @APIParam("album")
 val ApiSongSearchSongsByAlbum by API.post.i<String>().o<List<SongPreview>>()
+
+@APIParam("filter")
+val ApiSongSearchFilter by API.post.i<SongFilter>().o<List<SongPreview>>()
 
 @APIParam("sid")
 @APIParam("cid", default = "0L")
