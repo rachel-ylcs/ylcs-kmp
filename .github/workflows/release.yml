@@ -280,7 +280,7 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: ylcs-modManager
+          name: ylcs-mod-manager
           path: outputs/modManager.zip
 
   package-landpage:
@@ -337,13 +337,23 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: ylcs-weiboPictureDownloader
+          name: ylcs-weibo-picture-downloader
           path: outputs/weiboPictureDownloader.zip
 
   publish-release:
     name: Publish Release
-    if: ${{ always() }}
-    needs: [package-android, package-ios, package-windows, package-linux, package-macos, package-web, package-server, package-modManager, package-landpage]
+    needs: [
+      package-android,
+      package-ios,
+      package-windows,
+      package-linux,
+      package-macos,
+      package-web,
+      package-server,
+      package-modManager,
+      package-landpage,
+      package-weiboPictureDownloader
+    ]
     runs-on: ubuntu-latest
     permissions:
       contents: write # 发布 Release 需要写权限
@@ -399,7 +409,7 @@ jobs:
           path: artifacts
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: 银临茶舍 ${{ github.ref_name }} 发布🎉🎉🎉
           body: ${{ steps.changelog.outputs.changelog }}
@@ -417,7 +427,8 @@ jobs:
             artifacts/ylcs-js/*
             artifacts/ylcs-wasm/*
             artifacts/ylcs-server/*
-            artifacts/ylcs-modManager/*
+            artifacts/ylcs-mod-manager/*
             artifacts/ylcs-landpage/*
+            artifacts/ylcs-weibo-picture-downloader/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
