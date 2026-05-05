@@ -22,11 +22,51 @@ object QQMusicAPI : PlatformMusicAPI {
         }
         return arr
     }
+    //解析专辑
+    suspend fun requestAlbum(id: String): List<PlatformMusicInfo>? = NetClient.Common.request({
+        url = buildUrl {
+            obj("req_0") {
+                "module" with "music.musichallAlbum.AlbumSongList"
+                "method" with "GetAlbumSongList"
+                obj("param") {
+                    "albumId" with (id.toLongOrNull() ?: 0L)
+                    "begin" with 0
+                    "num" with 1000
+                }
+            }
+        }
+    }) { body: JsonObject ->
+        val (json) = decodeData(1, body)
+        json.arr("songList").map { it.Object.obj("songInfo")["mid"].String }
+    }?.let { list ->
+        val items = mutableListOf<PlatformMusicInfo>()
+        for (mid in list) requestMusic(mid)?.let { items += it }
+        items.ifEmpty { null }
+    }
+    //解析短链
+    //处理分支
+    private suspend fun resolveQQShortLink(shortUrl: String): List<PlatformMusicInfo>? {
+        val finalUrl: String = NetClient.Common.request<String, String>({
+            url = shortUrl
+        }) {
+            url
+        } ?: return null
 
-    suspend fun requestMusicId(url: String): String? = NetClient.Common.request({
-        this.url = url
-    }) { text: String ->
-        "\"mid\":\\s*\"([^\"]*)".toRegex().find(text)!!.groupValues[1]
+        return when {
+            finalUrl.contains("playlist") -> {
+                val id = finalUrl.substringAfterLast("/").substringBefore("?")
+                requestPlaylist(id)
+            }
+            finalUrl.contains("albumDetail") -> {
+                val id = finalUrl.substringAfterLast("/").substringBefore("?")
+                requestAlbum(id)  // 专辑有专用接口了
+            }
+            finalUrl.contains("songDetail") -> {
+                val id = finalUrl.substringAfterLast("/").substringBefore("?")
+                requestMusic(id)?.let { listOf(it) }
+            }
+            else -> null
+        }
     }
 
     suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.Common.request({
@@ -116,8 +156,8 @@ object QQMusicAPI : PlatformMusicAPI {
 
     override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
         when {
-            // 歌曲 https://c6.y.qq.com/base/fcgi-bin/u?__=8e1SWwxbKv0F
-            link.contains("c6.y.qq.com") -> requestMusicId(link)?.let { requestMusic(it) }?.let(::listOf)
+            // 修改为调用统一的短链解析
+            link.contains("c6.y.qq.com") -> resolveQQShortLink(link)
             // 歌曲 https://y.qq.com/n/ryqq/songDetail/003yJ3Ba1bDVJc
             link.contains("y.qq.com") && link.contains("songDetail") -> requestMusic(link.substringAfterLast("/"))?.let(::listOf)
             // 歌单 https://i2.y.qq.com/n3/other/pages/share/personalized_playlist_v2/index.html?id=9094549201
