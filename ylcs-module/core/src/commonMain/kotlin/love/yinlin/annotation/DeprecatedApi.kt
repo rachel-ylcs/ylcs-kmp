@@ -3,9 +3,11 @@ package love.yinlin.annotation
 import kotlin.annotation.AnnotationTarget.*
 
 /**
- * 引用了 native 库的操作，需要提前加载库
+ * 弃用API
+ *
+ * 将在指定版本开始彻底移除它
  */
 @Target(CLASS, ANNOTATION_CLASS, TYPE_PARAMETER, PROPERTY, FIELD, LOCAL_VARIABLE, VALUE_PARAMETER, CONSTRUCTOR, FUNCTION, PROPERTY_GETTER, PROPERTY_SETTER, TYPE, EXPRESSION, FILE, TYPEALIAS)
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
-annotation class NativeLibApi(vararg val libs: String)
+annotation class DeprecatedApi(val version: String)
