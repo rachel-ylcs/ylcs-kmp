@@ -7,6 +7,7 @@ import io.ktor.client.engine.okhttp.OkHttpConfig
 import java.net.Proxy
 
 private fun HttpClientConfig<OkHttpConfig>.useEngine() {
+    followRedirects = true
     engine {
         proxy = Proxy.NO_PROXY
         config {

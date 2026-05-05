@@ -7,6 +7,7 @@ import io.ktor.client.engine.winhttp.WinHttpClientEngineConfig
 import io.ktor.http.HttpProtocolVersion
 
 private fun HttpClientConfig<WinHttpClientEngineConfig>.useEngine() {
+    followRedirects = true
     engine {
         protocolVersion = HttpProtocolVersion.HTTP_1_1
     }

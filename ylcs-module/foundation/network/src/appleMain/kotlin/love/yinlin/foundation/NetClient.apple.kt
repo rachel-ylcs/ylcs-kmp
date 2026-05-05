@@ -6,6 +6,7 @@ import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.engine.darwin.DarwinClientEngineConfig
 
 private fun HttpClientConfig<DarwinClientEngineConfig>.useEngine() {
+    followRedirects = true
     engine {
         configureRequest {
             setAllowsCellularAccess(true)

@@ -6,6 +6,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.cio.CIOEngineConfig
 
 private fun HttpClientConfig<CIOEngineConfig>.useEngine() {
+    followRedirects = true
     engine {
 
     }
