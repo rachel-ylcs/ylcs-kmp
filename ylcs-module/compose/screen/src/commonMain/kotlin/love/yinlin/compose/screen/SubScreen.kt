@@ -2,6 +2,9 @@ package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import love.yinlin.compose.ui.floating.BasicSheet
@@ -12,6 +15,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 @Stable
 abstract class SubScreen(val parent: NavigationScreen) {
+    internal var contentLoaded: Boolean by mutableStateOf(false)
+
     /**
      * 首次进入子页面的初始化事件
      */
