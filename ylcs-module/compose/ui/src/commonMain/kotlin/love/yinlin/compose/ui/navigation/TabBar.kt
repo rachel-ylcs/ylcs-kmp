@@ -45,6 +45,7 @@ fun TabBar(
     padding: PaddingValues = Theme.padding.value9,
     style: TextStyle = LocalStyle.current.bold,
     activeColor: Color = Theme.color.primary,
+    onCurrentClick: ((Int) -> Unit)? = null,
     onLongClick: ((Int) -> Unit)? = null,
 ) {
     HorizontalScrollContainer(state = state, modifier = modifier.semantics(Role.Tab)) {
@@ -72,7 +73,10 @@ fun TabBar(
                 TextIconAdapter(
                     modifier = Modifier.combinedClickable(
                         enabled = enabled,
-                        onClick = { if (!selected) onNavigate(i) },
+                        onClick = {
+                            if (selected) onCurrentClick?.invoke(i)
+                            else onNavigate(i)
+                        },
                         onLongClick = { onLongClick?.invoke(i) }
                     ).drawBehind {
                         val (boxWidth, boxHeight) = this.size
