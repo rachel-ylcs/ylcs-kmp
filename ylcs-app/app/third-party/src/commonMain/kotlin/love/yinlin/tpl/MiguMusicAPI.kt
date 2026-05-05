@@ -44,7 +44,7 @@ object MiguMusicAPI : PlatformMusicAPI {
             this.url = url
             headers = defaultHeaders
         }) { json: JsonObject ->
-            json.obj("songResultData")?.arr("result")?.mapNotNull { item ->
+            json.obj("songResultData").arr("result").mapNotNull { item ->
                 val obj = item.Object
                 val singers = obj.arr("singers").joinToString("、") { it.Object["name"].String }
                 val imgItems = obj.arr("imgItems")
@@ -59,7 +59,7 @@ object MiguMusicAPI : PlatformMusicAPI {
                     duration = obj["duration"]?.Int ?: 0,
                     album = obj["album"]?.String ?: ""
                 )
-            } ?: emptyList()
+            }
         }?.ifEmpty { null }
     }
 
@@ -74,9 +74,10 @@ object MiguMusicAPI : PlatformMusicAPI {
             headers = defaultHeaders
         }) { json: JsonObject -> json } ?: return null
 
-        val data = detailJson.obj("data") ?: return null
-        val audioUrl = data["url"]?.String ?: return null
+        if (detailJson["code"]?.String != "000000") return null
 
+        val data = detailJson.obj("data")
+        val audioUrl = data["url"].String
         val lrcUrl = data["lrcUrl"]?.String ?: result.lyricUrl ?: ""
         val lyrics = if (lrcUrl.isNotEmpty()) {
             NetClient.Common.request({
@@ -107,7 +108,7 @@ object MiguMusicAPI : PlatformMusicAPI {
             url = "$ALBUM_SONGLIST_API?pageNo=1&pageSize=200&albumId=$albumId"
             headers = defaultHeaders
         }) { json: JsonObject ->
-            json.obj("data")?.arr("songList")?.mapNotNull { item ->
+            json.obj("data").arr("songList").mapNotNull { item ->
                 val obj = item.Object
                 val singers = obj.arr("singerList").joinToString("、") { it.Object["name"].String }
                 val rawImg = obj["img3"]?.String ?: obj["img2"]?.String ?: obj["img1"]?.String ?: ""
@@ -122,7 +123,7 @@ object MiguMusicAPI : PlatformMusicAPI {
                     duration = obj["duration"]?.Int ?: 0,
                     album = obj["album"]?.String ?: ""
                 )
-            } ?: emptyList()
+            }
         }?.ifEmpty { null }
 
     /**
@@ -133,7 +134,7 @@ object MiguMusicAPI : PlatformMusicAPI {
             url = "$PLAYLIST_SONGLIST_API?pageNo=1&pageSize=200&playlistId=$playlistId"
             headers = defaultHeaders
         }) { json: JsonObject ->
-            json.obj("data")?.arr("songList")?.mapNotNull { item ->
+            json.obj("data").arr("songList").mapNotNull { item ->
                 val obj = item.Object
                 val singers = obj.arr("singerList").joinToString("、") { it.Object["name"].String }
                 val rawImg = obj["img3"]?.String ?: obj["img2"]?.String ?: obj["img1"]?.String ?: ""
@@ -148,8 +149,34 @@ object MiguMusicAPI : PlatformMusicAPI {
                     duration = obj["duration"]?.Int ?: 0,
                     album = obj["album"]?.String ?: ""
                 )
-            } ?: emptyList()
+            }
         }?.ifEmpty { null }
+
+    /**
+     * 根据单曲ID获取摘要（用于单曲短链接）
+     */
+    private suspend fun requestSongById(songId: String): MiguSearchResult? {
+        val detailUrl = "$DETAIL_API?resourceType=2&toneFlag=HQ&contentId=$songId&lowerQualityContentId=$songId"
+        val json = NetClient.Common.request<JsonObject>({
+            url = detailUrl
+            headers = defaultHeaders
+        }) { json: JsonObject -> json } ?: return null
+
+        val songObj = json.obj("data").obj("song")
+        val singers = songObj.arr("singerList").joinToString("、") { it.Object["name"].String }
+        val imgUrl = songObj["img3"]?.String ?: songObj["img2"]?.String ?: songObj["img1"]?.String ?: ""
+
+        return MiguSearchResult(
+            contentId = songObj["contentId"]?.String ?: songId,
+            copyrightId = songObj["copyrightId"]?.String ?: "",
+            name = songObj["songName"]?.String ?: "",
+            singers = singers,
+            imgUrl = imgUrl,
+            lyricUrl = null,
+            duration = songObj["duration"]?.Int ?: 0,
+            album = songObj["album"]?.String ?: ""
+        )
+    }
 
     /**
      * 解析短链接（重定向后从最终 URL 提取类型和 ID）
@@ -162,13 +189,15 @@ object MiguMusicAPI : PlatformMusicAPI {
             url
         } ?: return null
 
-        val albumId = """album/index\.html\?id=(\d+)""".toRegex().find(finalUrl)?.groupValues?.get(1)
-        if (albumId != null) return "album" to albumId
+        val params = Uri.parse(finalUrl)?.params ?: return null
+        val id = params["id"] ?: return null
 
-        val playlistId = """playlist/index\.html\?id=(\d+)""".toRegex().find(finalUrl)?.groupValues?.get(1)
-        if (playlistId != null) return "playlist" to playlistId
-
-        return null
+        return when {
+            finalUrl.contains("album") -> "album" to id
+            finalUrl.contains("playlist") -> "playlist" to id
+            finalUrl.contains("song") -> "song" to id
+            else -> null
+        }
     }
 
     override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
@@ -178,15 +207,16 @@ object MiguMusicAPI : PlatformMusicAPI {
 
     override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
         when {
-            //就这两
             link.contains("c.migu.cn") -> {
                 resolveLink(link)?.let { (type, id) ->
                     val songs = when (type) {
                         "album" -> requestAlbumSongs(id)
                         "playlist" -> requestPlaylistSongs(id)
+                        "song" -> requestSongById(id)?.let { listOf(it) }
                         else -> null
-                    }
-                    songs?.mapNotNull { requestMusic(it) }?.ifEmpty { null }
+                    } ?: return@let null
+
+                    songs.mapNotNull { requestMusic(it) }.ifEmpty { null }
                 }
             }
             else -> search(link)
