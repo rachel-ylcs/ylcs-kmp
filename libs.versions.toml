@@ -3,19 +3,19 @@
 # Plugins #
 kotlin = "2.4.0-Beta2"
 agp = "9.0.0-alpha06"
-cmp = "1.11.0-beta03"
+cmp = "1.11.0-rc01"
 mavenPublish = "0.36.0"
 dokka = "2.2.0"
 
 # Libs #
 
 # Common
-skiko = "0.144.5"
-lifecycle = "2.10.0" # 2.11.0-alpha03与compose存在未知的冲突bug，无法确认是否是上游问题
+skiko = "0.144.6"
+lifecycle = "2.11.0-beta01"
 coroutines = "1.11.0-rc02"
 ktor = "3.4.3"
-sketch = "4.5.0-alpha02" # 4.5.0-alpha03的android的target是37
-haze = "2.0.0-alpha01"
+sketch = "4.5.0-alpha02" # 4.5.0-alpha03的android的target是37, 存在冲突
+haze = "2.0.0-alpha01" # 2.0.0-alpha01 存在上游旋转屏幕bug
 mmkv = "2.4.0"
 pag = "4.5.52"
 
@@ -65,8 +65,8 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
-compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.1.0-beta01" }
-compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.0" }
+compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.1.0-rc01" }
+compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.1" }
 compose-navigation3-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }

@@ -15,7 +15,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
@@ -71,7 +70,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
                     popTransitionSpec = transitionSpecProvider,
                     entryDecorators = listOf(
                         rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator(),
+                        rememberCompatibleViewModelStoreNavEntryDecorator(),
                     ),
                     entryProvider = { manager.registerScreen(map, it) }
                 )
