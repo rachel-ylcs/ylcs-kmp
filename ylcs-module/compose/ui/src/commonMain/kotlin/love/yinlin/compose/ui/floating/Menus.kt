@@ -26,15 +26,15 @@ class MenuScope(val onClose: () -> Unit) {
     fun Menu(text: String? = null, icon: ImageVector? = null, enabled: Boolean = true, onClick: (() -> Unit)? = null) {
         val contentColor = if (enabled) LocalColor.current else Theme.color.disabledContent
         ThemeContainer(contentColor) {
-            TextIconAdapter(
-                modifier = Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = {
-                    onClick?.invoke()
-                    onClose()
-                }).padding(Theme.padding.value)
-            ) { idIcon, idText ->
-                if (icon != null) Icon(icon = icon, modifier = Modifier.idIcon())
-                else Box(modifier = Modifier.idIcon())
-                SimpleEllipsisText(text = text ?: "", modifier = Modifier.idText())
+            Box(modifier = Modifier.fillMaxWidth().clickable(enabled = enabled, onClick = {
+                onClick?.invoke()
+                onClose()
+            }).padding(Theme.padding.value)) {
+                TextIconAdapter { idIcon, idText ->
+                    if (icon != null) Icon(icon = icon, modifier = Modifier.idIcon())
+                    else Box(modifier = Modifier.idIcon())
+                    SimpleEllipsisText(text = text ?: "", modifier = Modifier.idText())
+                }
             }
         }
     }
@@ -54,7 +54,7 @@ fun Menus(
         position = FlyoutPosition.Bottom,
         flyout = {
             Column(modifier = Modifier
-                .width(IntrinsicSize.Min)
+                .width(IntrinsicSize.Max)
                 .heightIn(max = maxFlyoutHeight)
                 .clip(Theme.shape.v7)
                 .background(Theme.color.surface)

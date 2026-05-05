@@ -12,12 +12,14 @@ private fun HttpClientConfig<JsClientEngineConfig>.useEngine() {
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(Js) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(Js) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)

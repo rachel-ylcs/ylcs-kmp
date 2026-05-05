@@ -13,12 +13,14 @@ private fun HttpClientConfig<OkHttpConfig>.useEngine() {
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(OkHttp) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(OkHttp) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)

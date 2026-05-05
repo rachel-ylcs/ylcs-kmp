@@ -12,12 +12,14 @@ private fun HttpClientConfig<CIOEngineConfig>.useEngine() {
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(CIO) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(CIO) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)

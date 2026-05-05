@@ -13,12 +13,14 @@ private fun HttpClientConfig<WinHttpClientEngineConfig>.useEngine() {
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(WinHttp) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(WinHttp) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)

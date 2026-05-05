@@ -3,7 +3,9 @@ package love.yinlin.startup
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.util.fastFilter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -16,7 +18,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.mainContext
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
-import love.yinlin.data.music.MusicPlaylist
+import love.yinlin.data.music.Playlist
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
@@ -58,17 +60,16 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     }
 
     // 数据仓库
-    var playlist: MusicPlaylist? by mutableRefStateOf(null)
+    var playlist: Playlist by mutableStateOf(Playlist.None)
         private set
     val library = mutableStateMapOf<String, MusicInfo>()
 
     // 回调监听器
     val listener = object : MusicPlayerListener {
         override fun onMusicChanged(id: String?) {
-            val lastPlaylist = playlist?.name ?: ""
+            val lastPlaylist = playlist
             app.config.lastPlaylist = lastPlaylist
-            if (lastPlaylist.isNotEmpty()) id?.let { app.config.lastMusic = it }
-            else app.config.lastMusic = ""
+            app.config.lastMusic = if (lastPlaylist is Playlist.None) "" else id ?: ""
         }
 
         override fun onPlayModeChanged(mode: MediaPlayMode) {
@@ -76,8 +77,8 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         }
 
         override fun onPlayerStop() {
-            playlist = null
-            app.config.lastPlaylist = ""
+            playlist = Playlist.None
+            app.config.lastPlaylist = Playlist.None
             app.config.lastMusic = ""
         }
     }
@@ -136,9 +137,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
             if (engine != firstEngine) engine = firstEngine
         }?.let { engine = LyricsEngine.Default }
         // 恢复上一次播放
-        app.config.playlistLibrary[app.config.lastPlaylist]?.let {
-            startPlaylist(it, app.config.lastMusic.ifEmpty { null }, false)
-        }
+        startPlaylist(app.config.lastPlaylist, app.config.lastMusic.ifEmpty { null }, false)
     }
 
     suspend fun updateMusicLibraryInfo(ids: List<String>) {
@@ -154,26 +153,30 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
                 }
             }
         }
+        // 如果是默认歌单填充进去
+        if (playlist is Playlist.Default) musicList += ids
     }
 
-    suspend fun startPlaylist(playlist: MusicPlaylist, startId: String? = null, playing: Boolean) {
-        if (controller.isInit) {
-            if (this.playlist == playlist) {
-                // 切换本歌单的其他歌曲
-                if (currentId != startId && startId != null) {
-                    val targetIndex = musicList.indexOf(startId)
-                    if (targetIndex != -1) controller.gotoIndex(targetIndex)
-                }
+    suspend fun startPlaylist(newPlaylist: Playlist, startId: String? = null, playing: Boolean) {
+        if (!controller.isInit || newPlaylist is Playlist.None) return
+        if (playlist == newPlaylist) {
+            // 切换本歌单的其他歌曲
+            if (currentId != startId && startId != null) {
+                val targetIndex = musicList.indexOf(startId)
+                if (targetIndex != -1) controller.gotoIndex(targetIndex)
             }
-            else {
-                // 切换其他歌单
-                val actualMusicList = playlist.items.filter { it in library }
+        }
+        else {
+            // 切换其他歌单
+            val actualMusicList = when (newPlaylist) {
+                is Playlist.Default -> library.values.map { it.id }
+                is Playlist.User -> app.config.playlistLibrary[newPlaylist.name]?.items?.fastFilter { it in library } ?: emptyList()
+            }
+            if (actualMusicList.isNotEmpty()) {
                 controller.stop()
-                if (actualMusicList.isNotEmpty()) {
-                    this.playlist = playlist
-                    val index = if (startId != null) actualMusicList.indexOf(startId) else -1
-                    controller.prepareMedias(actualMusicList, if (index != -1) index else null, playing)
-                }
+                playlist = newPlaylist
+                val index = if (startId != null) actualMusicList.indexOf(startId) else -1
+                controller.prepareMedias(actualMusicList, if (index != -1) index else null, playing)
             }
         }
     }

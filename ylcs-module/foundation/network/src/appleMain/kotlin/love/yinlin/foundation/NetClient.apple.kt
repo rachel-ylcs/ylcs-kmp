@@ -17,12 +17,14 @@ private fun HttpClientConfig<DarwinClientEngineConfig>.useEngine() {
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(Darwin) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(Darwin) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
