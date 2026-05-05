@@ -153,6 +153,8 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
                 }
             }
         }
+        // 如果是默认歌单填充进去
+        if (playlist is Playlist.Default) musicList += ids
     }
 
     suspend fun startPlaylist(newPlaylist: Playlist, startId: String? = null, playing: Boolean) {

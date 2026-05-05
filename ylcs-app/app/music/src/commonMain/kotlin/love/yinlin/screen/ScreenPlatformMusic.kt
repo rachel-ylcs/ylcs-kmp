@@ -104,8 +104,8 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
                     info.path(modPath, ModResourceType.LineLyrics).writeText(platformMusicInfo.lyrics)
                     // 9. 更新曲库
                     mp?.updateMusicLibraryInfo(listOf(id))
-                    slot.tip.success("导入 ${platformMusicInfo.name} 成功")
                 }
+                slot.tip.success("导入 ${platformMusicInfo.name} 成功")
             }?.let { slot.tip.warning("下载失败 ${it.message}") }
         }
     }
