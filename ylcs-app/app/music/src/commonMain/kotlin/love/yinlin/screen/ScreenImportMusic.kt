@@ -68,32 +68,30 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
     }
 
     private suspend fun processMod(path: ImplicitUri) {
-        mp?.let { player ->
-            if (player.isReady) slot.tip.warning("请先停止播放器")
-            else catchingError {
-                val data = path.read { source ->
-                    ModFactory.Release(source, app.modPath).process { current, total, id ->
-                        step = Step.Processing(message = "解压中... [$id] $current / $total")
-                    }
+        val player = mp ?: return
+        if (player.isReady) slot.tip.warning("请先停止播放器")
+        else catchingError {
+            val data = path.read { source ->
+                ModFactory.Release(source, app.modPath).process { current, total, id ->
+                    step = Step.Processing(message = "解压中... [$id] $current / $total")
                 }
-                player.updateMusicLibraryInfo(data.medias)
-                slot.tip.success("解压成功")
-                step = Step.Initial()
-            }?.let {
-                step = Step.Initial(it.message ?: "未知错误", isError = true)
             }
+            player.updateMusicLibraryInfo(data.medias)
+            slot.tip.success("解压成功")
+            step = Step.Initial()
+        }?.let {
+            step = Step.Initial(it.message ?: "未知错误", isError = true)
         }
     }
 
     override val title: String = "导入MOD"
 
     override suspend fun initialize() {
-        deeplink?.let { uri ->
-            catchingError {
-                step = Step.Prepare(app.implicitFileUri(uri))
-            }?.let {
-                step = Step.Initial(it.message ?: "未知错误", isError = true)
-            }
+        val uri = deeplink ?: return
+        catchingError {
+            step = Step.Prepare(app.implicitFileUri(uri))
+        }?.let {
+            step = Step.Initial(it.message ?: "未知错误", isError = true)
         }
     }
 

@@ -92,7 +92,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     val playMode get() = controller.playMode
     val position: Long get() = controller.position
     val duration: Long get() = controller.duration
-    val musicList get() = controller.musicList
+    val musicList: List<String> get() = controller.musicList
     val currentId: String? get() = controller.currentId
     val currentMusic: MusicInfo? get() = controller.currentId?.let { library[it] }
     val error: Throwable? get() = controller.error
@@ -103,7 +103,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     suspend fun gotoNext() = controller.gotoNext()
     suspend fun gotoIndex(index: Int) = controller.gotoIndex(index)
     suspend fun seekTo(position: Long) = controller.seekTo(position)
-    suspend fun addMedias(medias: List<String>) = controller.addMedias(medias)
+    suspend fun updateNewMedias(medias: List<String>) = controller.updateNewMedias(medias)
     suspend fun removeMedia(index: Int) = controller.removeMedia(index)
     suspend fun moveMedia(fromIndex: Int, toIndex: Int) = controller.moveMedia(fromIndex, toIndex)
 
@@ -140,21 +140,28 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         startPlaylist(app.config.lastPlaylist, app.config.lastMusic.ifEmpty { null }, false)
     }
 
+    private fun fetchCurrentPlaylist(list: Playlist): List<String> = when (list) {
+        is Playlist.None -> emptyList()
+        is Playlist.Default -> library.values.map { it.id }
+        is Playlist.User -> app.config.playlistLibrary[list.name]?.items?.fastFilter { it in library } ?: emptyList()
+    }
+
     suspend fun updateMusicLibraryInfo(ids: List<String>) {
-        Coroutines.io {
-            for (id in ids) {
-                val modification = library[id]?.modification ?: 0
-                val configPath = File(app.modPath, id, ModResourceType.Config.filename)
-                val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
-                if (info != null) {
-                    Coroutines.main {
-                        library[id] = info.copy(modification = modification + 1)
-                    }
+        // 更新曲库
+        val newInfoList = Coroutines.io {
+            buildMap {
+                for (id in ids) {
+                    val modification = library[id]?.modification ?: 0
+                    val configPath = File(app.modPath, id, ModResourceType.Config.filename)
+                    val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
+                    if (info != null) put(id, info.copy(modification = modification + 1))
                 }
             }
         }
-        // 如果是默认歌单填充进去
-        if (playlist is Playlist.Default) musicList += ids
+        library.putAll(newInfoList)
+        // 更新当前播放列表
+        val actualMusicList = fetchCurrentPlaylist(playlist)
+        if (actualMusicList.isNotEmpty()) updateNewMedias(actualMusicList)
     }
 
     suspend fun startPlaylist(newPlaylist: Playlist, startId: String? = null, playing: Boolean) {
@@ -168,10 +175,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         }
         else {
             // 切换其他歌单
-            val actualMusicList = when (newPlaylist) {
-                is Playlist.Default -> library.values.map { it.id }
-                is Playlist.User -> app.config.playlistLibrary[newPlaylist.name]?.items?.fastFilter { it in library } ?: emptyList()
-            }
+            val actualMusicList = fetchCurrentPlaylist(newPlaylist)
             if (actualMusicList.isNotEmpty()) {
                 controller.stop()
                 playlist = newPlaylist
