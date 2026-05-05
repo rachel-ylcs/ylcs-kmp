@@ -69,6 +69,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
     private suspend fun downloadMusic(platformMusicInfo: PlatformMusicInfo) {
         slot.loading.open {
             catchingError {
+                val id = "${platformType.prefix}${platformMusicInfo.id}"
                 Coroutines.io {
                     // 1. 下载音频
                     val audioFile = app.createTempFile { NetClient.File.download(platformMusicInfo.audioUrl, it) }
@@ -77,7 +78,6 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
                     require(audioFile != null && audioFile.fileSize() > 1024 * 1024L) { "解析音频失败" }
                     require(recordFile != null && recordFile.fileSize() > 1024 * 10L) { "解析封面失败" }
                     // 3. 生成目录
-                    val id = "${platformType.prefix}${platformMusicInfo.id}"
                     val modPath = app.modPath
                     val musicPath = File(modPath, id)
                     musicPath.mkdir()
@@ -102,9 +102,9 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
                     info.path(modPath, ModResourceType.Background).writeByteArray(DataBin.BlackBackgroundPicture)
                     // 8. 写入歌词
                     info.path(modPath, ModResourceType.LineLyrics).writeText(platformMusicInfo.lyrics)
-                    // 9. 更新曲库
-                    mp?.updateMusicLibraryInfo(listOf(id))
                 }
+                // 9. 更新曲库
+                mp?.updateMusicLibraryInfo(listOf(id))
                 slot.tip.success("导入 ${platformMusicInfo.name} 成功")
             }?.let { slot.tip.warning("下载失败 ${it.message}") }
         }

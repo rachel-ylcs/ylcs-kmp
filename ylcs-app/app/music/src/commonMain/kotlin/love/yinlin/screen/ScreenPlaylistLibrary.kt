@@ -213,7 +213,7 @@ class ScreenPlaylistLibrary : Screen() {
             },
             iconProvider = { Icons.Playlist },
             padding = Theme.padding.eValue9,
-            onLongClick = { launch { processPlaylist(it) } },
+            onCurrentClick = { launch { processPlaylist(it) } },
             modifier = modifier
         )
     }

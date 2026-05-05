@@ -121,13 +121,24 @@ abstract class MusicPlayer(protected val fetcher: MediaMetadataFetcher) {
 
     /**
      * 加载媒体
+     *
+     * 首次播放时使用
+     *
+     * @param medias 媒体ID列表
+     * @param startIndex 起始索引
+     * @param playing 是否立即播放
      */
     abstract suspend fun prepareMedias(medias: List<String>, startIndex: Int?, playing: Boolean)
 
     /**
-     * 添加媒体
+     * 更新媒体
+     *
+     * 在播放过程中增加新的媒体，实现需要维持新的顺序。
+     * 调用方必须保证旧媒体列表是新媒体列表的子集。
+     *
+     * @param medias 媒体ID列表与新增加媒体ID列表的总体，新增加的媒体可能安插在原列表的任何位置
      */
-    abstract suspend fun addMedias(medias: List<String>)
+    abstract suspend fun updateNewMedias(medias: List<String>)
 
     /**
      * 移除媒体

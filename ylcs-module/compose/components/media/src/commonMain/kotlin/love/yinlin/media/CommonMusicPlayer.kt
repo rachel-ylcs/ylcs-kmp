@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.extension.moveItem
 import love.yinlin.extension.replaceAll
-import kotlin.random.Random
 
 @Stable
 abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
@@ -103,31 +102,15 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         }
     }
 
-    final override suspend fun addMedias(medias: List<String>) {
-        if (isReady) {
-            musicList.addAll(medias)
-
-            /*
-            * 将当前播放位置随机序前面的索引接到随机序末尾
-            * 保持第一个元素是始终是当前播放索引
-            * 然后将新导入的媒体随机插入其中
-            * 得到新的随机序索引表
-            *  */
-            val indices = shuffledList.indices
-            if (playMode == MediaPlayMode.Random) {
-                val indexInShuffled = indices.indexOf(currentIndex)
-                val rotated = indices.subList(indexInShuffled, indices.size) + indices.subList(0, indexInShuffled)
-                val head = rotated.first()
-                val rest = rotated.drop(1).toMutableList()
-                repeat(medias.size) {
-                    // 生成0到当前rest长度的随机位置
-                    val position = Random.nextInt(rest.size + 1)
-                    rest.add(position, indices.size + it)
-                }
-                shuffledList.internalSet(listOf(head) + rest)
-            }
-            else reshuffled(size = indices.size + medias.size)
-        }
+    final override suspend fun updateNewMedias(medias: List<String>) {
+        val currentPlayingId = musicList.getOrNull(currentIndex) ?: return
+        val newIndex = medias.indexOf(currentPlayingId)
+        // 自己维护的列表可以直接替换
+        musicList.replaceAll(medias)
+        // 更新当前媒体索引
+        currentIndex = newIndex
+        // 重置随机索引列表
+        reshuffled(size = medias.size, start = newIndex)
     }
 
     final override suspend fun removeMedia(index: Int) {

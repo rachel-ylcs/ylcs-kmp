@@ -176,12 +176,13 @@ class ScreenMusicLibrary : Screen() {
                         if (item !in oldItems) newItems += item
                     }
                     if (newItems.isNotEmpty()) {
-                        playlistLibrary[name] = playlist.copy(items = oldItems + newItems)
-                        // 添加到当前播放的列表
+                        val totalItems = oldItems + newItems
+                        playlistLibrary[name] = playlist.copy(items = totalItems)
                         mp?.let { player ->
+                            // 添加到当前播放的列表
                             val currentPlaylist = player.playlist
                             if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
-                                player.addMedias(newItems.asSequence().filter { it !in player.musicList }.toList())
+                                player.updateNewMedias(totalItems)
                             }
                         }
                         slot.tip.success("已添加${newItems.size}首歌曲")
