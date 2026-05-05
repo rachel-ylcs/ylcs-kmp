@@ -50,21 +50,27 @@ abstract class NavigationScreen : BasicScreen() {
             ) { index ->
                 Box(modifier = Modifier.fillMaxSize()) {
                     subScreenList.getOrNull(index)?.screen?.let { subScreen ->
-                        subScreen.Content()
+                        if (subScreen.contentLoaded) {
+                            subScreen.Content()
 
-                        subScreen.fab.Land()
+                            subScreen.fab.Land()
+                        }
                     }
                 }
             }
 
             LaunchedEffect(pageIndex) {
                 subScreenList.getOrNull(pageIndex)?.let { info ->
+                    val subScreen = info.screen
                     info.flag(
                         update = {
-                            launch { info.screen.update() }
+                            launch { subScreen.update() }
                         },
                         init = {
-                            launch { info.screen.initialize() }
+                            if (!subScreen.contentLoaded) {
+                                subScreen.contentLoaded = true
+                                launch { subScreen.initialize() }
+                            }
                         }
                     )
                 }
@@ -74,6 +80,8 @@ abstract class NavigationScreen : BasicScreen() {
 
     @Composable
     final override fun Floating() {
-        subScreenList.getOrNull(pagerState.currentPage)?.screen?.SubComposedFloating()
+        subScreenList.getOrNull(pagerState.currentPage)?.screen?.let { subScreen ->
+            if (subScreen.contentLoaded) subScreen.SubComposedFloating()
+        }
     }
 }
