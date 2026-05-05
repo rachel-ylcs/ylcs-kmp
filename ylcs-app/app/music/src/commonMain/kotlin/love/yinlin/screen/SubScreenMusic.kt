@@ -159,13 +159,13 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
             AnimationContent(
                 state = musicInfo?.name,
-                modifier = Modifier.fillMaxWidth().padding(start = Theme.padding.h, end = Theme.padding.h, top = Theme.padding.v)
+                modifier = Modifier.fillMaxWidth().padding(start = Theme.padding.h10, end = Theme.padding.h10, top = Theme.padding.v)
             ) {
                 SimpleEllipsisText(text = it ?: "无音源", color = Colors.Green4, style = Theme.typography.v4.bold)
             }
 
             ActionScope.SplitContainer(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h10),
                 left = {
                     AnimationContent(musicInfo?.singer) {
                         SimpleEllipsisText(text = it ?: "未知歌手", color = Colors.Green1, style = Theme.typography.v6)
