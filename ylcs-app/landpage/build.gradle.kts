@@ -36,13 +36,14 @@ template(object : KotlinJsTemplate() {
             dependsOn(tasks.named("jsBrowserDistribution"))
 
             doLast {
+                val outputAppDir = C.root.app.landpage.output
                 copy {
                     from(C.root.app.landpage.originOutput)
-                    into(C.root.app.landpage.output)
+                    into(outputAppDir)
                 }
-                delete(*C.root.app.landpage.output.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                zip(C.root.app.landpage.output, C.root.outputs.file("landpage.zip"))
-                delete(C.root.app.landpage.output)
+                delete(*outputAppDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(outputAppDir, C.root.outputs.file("landpage.zip"))
+                delete(outputAppDir)
             }
         }
     }

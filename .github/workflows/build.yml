@@ -31,6 +31,7 @@ jobs:
       modManager: ${{ steps.filter.outputs.modManager }}
       landpage: ${{ steps.filter.outputs.landpage }}
       gallery: ${{ steps.filter.outputs.gallery }}
+      weiboPictureDownloader: ${{ steps.filter.outputs.weiboPictureDownloader }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -93,13 +94,16 @@ jobs:
               - 'ylcs-app/server/**'
             modManager:
               - *common
-              - 'ylcs-app/modManager/**'
+              - 'ylcs-app/mod-manager/**'
             landpage:
               - *common
               - 'ylcs-app/landpage/**'
             gallery:
               - *common
               - 'ylcs-app/gallery/**'
+            weiboPictureDownloader:
+              - *common
+              - 'ylcs-app/weibo-picture-downloader/'
 
   build-android:
     name: Build Android
@@ -313,3 +317,25 @@ jobs:
 
       - name: Build
         run: ./gradlew ylcs-app:gallery:desktopJar
+
+  build-weiboPictureDownloader:
+    name: Build Weibo Picture Downloader
+    needs: changes
+    if: ${{ needs.changes.outputs.weiboPictureDownloader == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: oracle
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:weibo-picture-downloader:weiboPictureDownloaderRun

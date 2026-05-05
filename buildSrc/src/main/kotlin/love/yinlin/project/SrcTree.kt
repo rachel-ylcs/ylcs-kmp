@@ -71,6 +71,12 @@ class AppNode(val root: RootProjectNode, c: Constants) : Directory by root.dir("
         val originOutput: Directory = build.dir("compose").dir("binaries").dir("main-release").dir("app")
     }
     val modManager = ModManagerNode(this)
+
+    class WeiboPictureDownloader(parent: AppNode) : Directory by parent.dir("weibo-picture-downloader") {
+        private val build: Directory = dir("build")
+        val originOutput: RegularFile = build.dir("bin").dir("windows").dir("releaseExecutable").file("weibo_picture_downloader.exe")
+    }
+    val weiboPictureDownloader = WeiboPictureDownloader(this)
 }
 
 class DocsNode(root: RootProjectNode) : Directory by root.dir("ylcs-docs") {
@@ -86,6 +92,7 @@ class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 class ArtifactsNode(root: RootProjectNode) : Directory by root.dir("artifacts") {
     val include: Directory = dir("include")
     val desktopNative: Directory = dir("desktopNative")
+    val tool: Directory = dir("tool")
 }
 
 class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {

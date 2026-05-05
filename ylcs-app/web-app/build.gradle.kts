@@ -55,18 +55,20 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
             doLast {
+                val outputJsDir = C.root.app.webApp.jsOutput
+                val outputWasmDir = C.root.app.webApp.wasmOutput
                 copy {
                     from(C.root.app.webApp.originJsOutput)
-                    into(C.root.app.webApp.jsOutput)
+                    into(outputJsDir)
                 }
-                delete(*C.root.app.webApp.jsOutput.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                delete(*outputJsDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
                 copy {
                     from(C.root.app.webApp.originWasmOutput)
-                    into(C.root.app.webApp.wasmOutput)
+                    into(outputWasmDir)
                 }
-                delete(*C.root.app.webApp.wasmOutput.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                zip(C.root.app.webApp.jsOutput, C.root.outputs.file("ylcs-js.zip"))
-                zip(C.root.app.webApp.wasmOutput, C.root.outputs.file("ylcs-wasm.zip"))
+                delete(*outputWasmDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(outputJsDir, C.root.outputs.file("ylcs-js.zip"))
+                zip(outputWasmDir, C.root.outputs.file("ylcs-wasm.zip"))
             }
         }
 
@@ -75,13 +77,14 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
             doLast {
+                val outputAppDir = C.root.app.webApp.wasmOutput
                 copy {
                     from(C.root.app.webApp.originWasmOutput)
-                    into(C.root.app.webApp.wasmOutput)
+                    into(outputAppDir)
                 }
-                delete(*C.root.app.webApp.wasmOutput.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                zip(C.root.app.webApp.wasmOutput, C.root.outputs.file("[WebWasm]${C.app.displayName}${C.app.versionName}.zip"))
-                delete(C.root.app.webApp.wasmOutput)
+                delete(*outputAppDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                zip(outputAppDir, C.root.outputs.file("[WebWasm]${C.app.displayName}${C.app.versionName}.zip"))
+                delete(outputAppDir)
             }
         }
     }

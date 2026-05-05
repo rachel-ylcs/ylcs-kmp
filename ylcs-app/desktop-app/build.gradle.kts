@@ -134,21 +134,22 @@ template(object : KotlinMultiplatformTemplate() {
                 }
 
                 val artifactName = "${C.app.displayName}${C.app.versionName}"
+                val outputAppDir = outputDir.dir(C.app.name)
                 when (C.platform) {
                     BuildPlatform.Windows -> {
-                        zip(outputDir.dir(C.app.name).dir("app"), outputDir.file("[Windows]${artifactName}升级包.zip"))
-                        zip(outputDir.dir(C.app.name), outputDir.file("[Windows]${artifactName}.zip"))
+                        zip(outputAppDir.dir("app"), outputDir.file("[Windows]${artifactName}升级包.zip"))
+                        zip(outputAppDir, outputDir.file("[Windows]${artifactName}.zip"))
                     }
                     BuildPlatform.Linux -> {
-                        zip(outputDir.dir(C.app.name).dir("lib").dir("app"), outputDir.file("[Linux]${artifactName}升级包.zip"))
-                        zip(outputDir.dir(C.app.name), outputDir.file("[Linux]${artifactName}.zip"))
+                        zip(outputAppDir.dir("lib").dir("app"), outputDir.file("[Linux]${artifactName}升级包.zip"))
+                        zip(outputAppDir, outputDir.file("[Linux]${artifactName}.zip"))
                     }
                     BuildPlatform.Mac -> {
                         zip(outputDir.dir("${C.app.name}.app"), outputDir.file("[macOS]${artifactName}.zip"))
                     }
                 }
 
-                delete(outputDir.dir(C.app.name))
+                delete(outputAppDir)
             }
         }
     }
