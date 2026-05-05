@@ -6,7 +6,6 @@ import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.engine.darwin.DarwinClientEngineConfig
 
 private fun HttpClientConfig<DarwinClientEngineConfig>.useEngine() {
-    followRedirects = true
     engine {
         configureRequest {
             setAllowsCellularAccess(true)
@@ -18,12 +17,14 @@ private fun HttpClientConfig<DarwinClientEngineConfig>.useEngine() {
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(Darwin) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(Darwin) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)

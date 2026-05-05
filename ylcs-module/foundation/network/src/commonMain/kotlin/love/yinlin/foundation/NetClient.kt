@@ -3,6 +3,7 @@ package love.yinlin.foundation
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngineConfig
+import io.ktor.client.plugins.HttpRedirect
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
@@ -65,11 +66,13 @@ class NetClient internal constructor(val delegate: HttpClient) {
                 }
                 scope.buildHeaders(headers)
             }.execute { response ->
+                val status = response.status
                 val url = response.request.url.toString()
                 val headers = response.headers
                 val cookies = response.setCookie()
                 val rawBody = response.bodyAsBytes()
                 val scope = object : ResponseScope<Body> {
+                    override val status: HttpStatusCode = status
                     override val url: String = url
                     override val headers: Headers = headers
                     override val cookies: List<Cookie> = cookies
@@ -161,6 +164,14 @@ class NetClient internal constructor(val delegate: HttpClient) {
                 response.bodyAsBytes()
             }
         }
+    }
+}
+
+internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useRedirect() {
+    followRedirects = true
+
+    install(HttpRedirect) {
+        allowHttpsDowngrade = true
     }
 }
 

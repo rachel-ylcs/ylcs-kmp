@@ -7,23 +7,20 @@ import io.ktor.client.engine.okhttp.OkHttpConfig
 import java.net.Proxy
 
 private fun HttpClientConfig<OkHttpConfig>.useEngine() {
-    followRedirects = true
     engine {
         proxy = Proxy.NO_PROXY
-        config {
-            followRedirects(true)
-            followSslRedirects(true)
-        }
     }
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(OkHttp) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(OkHttp) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)

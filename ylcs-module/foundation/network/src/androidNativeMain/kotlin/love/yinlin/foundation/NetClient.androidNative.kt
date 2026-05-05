@@ -6,19 +6,20 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.cio.CIOEngineConfig
 
 private fun HttpClientConfig<CIOEngineConfig>.useEngine() {
-    followRedirects = true
     engine {
 
     }
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(CIO) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(CIO) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)

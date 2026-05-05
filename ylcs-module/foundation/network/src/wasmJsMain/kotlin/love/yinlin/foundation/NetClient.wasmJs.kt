@@ -6,19 +6,20 @@ import io.ktor.client.engine.js.Js
 import io.ktor.client.engine.js.JsClientEngineConfig
 
 private fun HttpClientConfig<JsClientEngineConfig>.useEngine() {
-    followRedirects = true
     engine {
 
     }
 }
 
 actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient(Js) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
 })
 
 actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(Js) {
+    useRedirect()
     useEngine()
     useJson()
     useTimeout(timeout)
