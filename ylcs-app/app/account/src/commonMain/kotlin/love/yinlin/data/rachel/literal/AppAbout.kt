@@ -12,7 +12,7 @@ internal object AppAbout {
         title = "银临茶舍 音游上线",
         force = false,
         maintenance = false,
-        date = LocalDate(2026, 4, 30),
+        date = LocalDate(2026, 5, 6),
         groups = listOf(
             AppUpdateRecordGroup(
                 type = "特性",
@@ -30,12 +30,11 @@ internal object AppAbout {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = listOf(
-                    "1. 酷狗音乐平台导入支持",
-                    "2. 所有第三方音乐平台搜索支持",
-                    "3. 工坊曲库更新",
-                    "4. 微博@内部跳转支持",
-                    "5. 支持Android17设备",
-                    "6. 减小安装包体积, 优化性能",
+                    "1. 汽水音乐/咪咕音乐平台导入支持",
+                    "2. 音乐界面UI美化更新",
+                    "3. 默认歌单支持",
+                    "4. 工坊MOD搜索筛选支持",
+                    "5. LRC编辑器支持导入和导出歌词",
                 )
             ),
             AppUpdateRecordGroup(
@@ -44,8 +43,9 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = listOf(
-                    "1. 修复登录后无响应的问题",
-                    "2. 修复全屏状态栏遮挡的问题",
+                    "1. 修复菜单宽度太窄的问题",
+                    "2. 修复MOD导入不更新曲库的问题",
+                    "3. 修复安卓端旋转屏幕崩溃的问题",
                 )
             )
         )
