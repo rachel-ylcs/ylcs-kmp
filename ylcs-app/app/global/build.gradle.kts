@@ -14,8 +14,9 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.compose.resources,
 
-                libs.tool.haze,
-                libs.tool.haze.blur,
+//                libs.tool.haze,
+//                libs.tool.haze.blur,
+                projects.ylcsApp.app.hazeFix,
 
                 ExportLib,
 

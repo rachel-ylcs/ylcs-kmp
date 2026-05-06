@@ -298,7 +298,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         )
     }
 
-    private val musicCoverLayout = movableComposable { musicInfo: MusicInfo?, modifier: Modifier ->
+    @Composable
+    private fun MusicCoverLayout(musicInfo: MusicInfo?, modifier: Modifier) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Image(res = Res.drawable.img_music_record, modifier = Modifier.fillMaxSize().zIndex(1f))
             AnimationContent(
@@ -319,7 +320,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    private val lyricsLayout = movableComposable { player: StartupMusicPlayer, modifier: Modifier ->
+    @Composable
+    private fun LyricsLayout(player: StartupMusicPlayer, modifier: Modifier) {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
             player.engine.LyricsCanvas(config = app.config.lyricsEngineConfig, host = player.engineHost)
         }
@@ -396,7 +398,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }, MeasurePolicies.Empty)
     }
 
-    private val musicProgressLayout = movableComposable { musicInfo: MusicInfo?, modifier: Modifier ->
+    @Composable
+    private fun MusicProgressLayout(musicInfo: MusicInfo?, modifier: Modifier) {
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
@@ -408,7 +411,8 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
     }
 
-    private val musicControlLayout = movableComposable { modifier: Modifier ->
+    @Composable
+    private fun MusicControlLayout(modifier: Modifier) {
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -475,13 +479,13 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
                     if (isReady) {
                         if (deviceType == Device.Type.PORTRAIT) {
-                            musicCoverLayout(musicInfo, Modifier
+                            MusicCoverLayout(musicInfo, Modifier
                                 .padding(Theme.padding.value7)
                                 .heightIn(max = Theme.size.image2)
                                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
                                 .shadow(Theme.shape.circle, Theme.shadow.v3)
                             )
-                            lyricsLayout(player, Modifier.fillMaxWidth().weight(1f))
+                            LyricsLayout(player, Modifier.fillMaxWidth().weight(1f))
                         }
                         else {
                             Row(
@@ -492,14 +496,14 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                                 val isLandscape = deviceType == Device.Type.LANDSCAPE
                                 val padding = if (isLandscape) Theme.padding.eValue5 else Theme.padding.eValue7
 
-                                musicCoverLayout(musicInfo, Modifier
+                                MusicCoverLayout(musicInfo, Modifier
                                     .padding(padding)
                                     .widthIn(max = if (isLandscape) Theme.size.image1 else Theme.size.image2)
                                     .aspectRatio(1f)
                                     .shadow(Theme.shape.circle, Theme.shadow.v3)
                                 )
 
-                                lyricsLayout(player, Modifier
+                                LyricsLayout(player, Modifier
                                     .padding(padding)
                                     .widthIn(max = if (isLandscape) Theme.size.cell1 * 1.5f else Theme.size.cell1)
                                     .fillMaxHeight()
@@ -515,13 +519,13 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            musicControlLayout(Modifier.weight(1f))
-                            musicProgressLayout(musicInfo, Modifier.weight(3f))
+                            MusicControlLayout(Modifier.weight(1f))
+                            MusicProgressLayout(musicInfo, Modifier.weight(3f))
                         }
                     }
                     else {
-                        musicProgressLayout(musicInfo, Modifier.fillMaxWidth().padding(Theme.padding.value9))
-                        musicControlLayout(Modifier.fillMaxWidth().padding(Theme.padding.value9))
+                        MusicProgressLayout(musicInfo, Modifier.fillMaxWidth().padding(Theme.padding.value9))
+                        MusicControlLayout(Modifier.fillMaxWidth().padding(Theme.padding.value9))
                     }
                 }
             }

@@ -1,0 +1,102 @@
+// Copyright 2024, Christopher Banes and the Haze project contributors
+// SPDX-License-Identifier: Apache-2.0
+
+package dev.chrisbanes.haze
+
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.isUnspecified
+import androidx.compose.ui.graphics.RenderEffect
+import androidx.compose.ui.graphics.Shader
+import androidx.compose.ui.graphics.TileMode
+
+/**
+ * Platform-specific render effect type.
+ * - On Android (API 31+): `android.graphics.RenderEffect`
+ * - On Skiko: `org.jetbrains.skia.ImageFilter`
+ */
+expect class PlatformRenderEffect
+
+/**
+ * Platform-specific color filter type.
+ * - On Android: `android.graphics.ColorFilter`
+ * - On Skiko: `org.jetbrains.skia.ColorFilter`
+ */
+expect class PlatformColorFilter
+
+/**
+ * Creates a [PlatformRenderEffect] from a shader.
+ */
+expect fun createShaderRenderEffect(shader: Shader, crop: Rect? = null): PlatformRenderEffect
+
+/**
+ * Creates a blend [PlatformRenderEffect] from two render effects.
+ */
+expect fun createBlendRenderEffect(
+  blendMode: HazeBlendMode,
+  background: PlatformRenderEffect,
+  foreground: PlatformRenderEffect,
+  crop: Rect? = null,
+): PlatformRenderEffect
+
+/**
+ * Creates a color filter [PlatformRenderEffect].
+ */
+expect fun createColorFilterRenderEffect(
+  colorFilter: PlatformColorFilter,
+  input: PlatformRenderEffect? = null,
+  crop: Rect? = null,
+): PlatformRenderEffect
+
+/**
+ * Creates a blur [PlatformRenderEffect].
+ *
+ * Returns `null` when both [radiusX] and [radiusY] are <= 0, indicating no blur is needed.
+ *
+ * @param radiusX Blur radius in the X direction (pixels)
+ * @param radiusY Blur radius in the Y direction (pixels)
+ */
+expect fun createBlurRenderEffect(
+  radiusX: Float,
+  radiusY: Float,
+  tileMode: TileMode,
+  input: PlatformRenderEffect? = null,
+  crop: Rect? = null,
+): PlatformRenderEffect?
+
+/**
+ * Creates an offset [PlatformRenderEffect].
+ */
+expect fun createOffsetRenderEffect(
+  offsetX: Float,
+  offsetY: Float,
+  input: PlatformRenderEffect? = null,
+  crop: Rect? = null,
+): PlatformRenderEffect
+
+/**
+ * Chains this render effect with another, composing them.
+ */
+expect fun PlatformRenderEffect.then(other: PlatformRenderEffect): PlatformRenderEffect
+
+/**
+ * Blends this render effect with a foreground effect.
+ */
+fun PlatformRenderEffect.blendForeground(
+  foreground: PlatformRenderEffect,
+  blendMode: HazeBlendMode,
+  offset: Offset = Offset.Unspecified,
+): PlatformRenderEffect = createBlendRenderEffect(
+  blendMode = blendMode,
+  background = this,
+  foreground = when {
+    offset.isUnspecified -> foreground
+    offset == Offset.Zero -> foreground
+    else -> createOffsetRenderEffect(offset.x, offset.y, foreground)
+  },
+)
+
+/**
+ * Converts this platform render effect to a Compose [RenderEffect].
+ */
+expect fun PlatformRenderEffect.asComposeRenderEffect(): RenderEffect
