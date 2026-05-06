@@ -98,7 +98,8 @@ class ScreenPlaylistLibrary : Screen() {
 
     private suspend fun processPlaylist(index: Int) {
         when (processPlaylistDialog.open()) {
-            0 -> {
+            0 -> playPlaylist(null) // 播放
+            1 -> { // 重命名
                 val oldName = tabs[index]
                 val newName = inputPlaylistNameDialog.open(oldName)
                 if (newName != null) {
@@ -111,7 +112,7 @@ class ScreenPlaylistLibrary : Screen() {
                     else slot.tip.warning("歌单已存在")
                 }
             }
-            1 -> {
+            2 -> { // 删除
                 val name = tabs[index]
                 if (slot.confirm.open(content = "删除歌单\"$name\"")) {
                     // 若正在播放则停止播放器
@@ -329,11 +330,6 @@ class ScreenPlaylistLibrary : Screen() {
     }
 
     @Composable
-    override fun RowScope.LeftActions() {
-        if (currentPage != -1) LoadingIcon(icon = Icons.PlayArrow, tip = "播放", onClick = { playPlaylist(null) })
-    }
-
-    @Composable
     override fun RowScope.RightActions() {
         Icon(icon = Icons.CloudUpload, tip = "云备份", onClick = cloudBackupSheet::open)
         LoadingIcon(icon = Icons.Add, tip = "创建歌单", onClick = ::addPlaylist)
@@ -479,6 +475,6 @@ class ScreenPlaylistLibrary : Screen() {
     private val inputPlaylistNameDialog = this land DialogInput(hint = "歌单名", maxLength = 16)
 
     private val processPlaylistDialog = this land DialogChoice.fromIconItems(
-        items = listOf("重命名" to Icons.Edit, "删除" to Icons.Delete)
+        items = listOf("播放" to Icons.PlayArrow, "重命名" to Icons.Edit, "删除" to Icons.Delete)
     )
 }
