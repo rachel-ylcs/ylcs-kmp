@@ -60,8 +60,8 @@ abstract class DialogChoice : Dialog<Int>() {
                         Row(
                             modifier = Modifier.widthIn(min = Theme.size.cell1).clickable {
                                 future?.send(index)
-                            }.padding(Theme.padding.value),
-                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                            }.padding(Theme.padding.value10),
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h10),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(index)
