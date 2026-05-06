@@ -46,7 +46,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         }) { json: JsonObject ->
             json.obj("songResultData").arr("result").mapNotNull { item ->
                 val obj = item.Object
-                val singers = obj.arr("singers").joinToString("、") { it.Object["name"].String }
+                val singers = obj.arr("singers").joinToString(",") { it.Object["name"].String }
                 val imgItems = obj.arr("imgItems")
                 val imgUrl = if (imgItems.isNotEmpty()) imgItems.last().Object["img"].String else ""
                 MiguSearchResult(
@@ -110,7 +110,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         }) { json: JsonObject ->
             json.obj("data").arr("songList").mapNotNull { item ->
                 val obj = item.Object
-                val singers = obj.arr("singerList").joinToString("、") { it.Object["name"].String }
+                val singers = obj.arr("singerList").joinToString(",") { it.Object["name"].String }
                 val rawImg = obj["img3"]?.String ?: obj["img2"]?.String ?: obj["img1"]?.String ?: ""
                 val imgUrl = if (rawImg.startsWith("/")) "https://d.musicapp.migu.cn$rawImg" else rawImg
                 MiguSearchResult(
@@ -136,7 +136,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         }) { json: JsonObject ->
             json.obj("data").arr("songList").mapNotNull { item ->
                 val obj = item.Object
-                val singers = obj.arr("singerList").joinToString("、") { it.Object["name"].String }
+                val singers = obj.arr("singerList").joinToString(",") { it.Object["name"].String }
                 val rawImg = obj["img3"]?.String ?: obj["img2"]?.String ?: obj["img1"]?.String ?: ""
                 val imgUrl = if (rawImg.startsWith("/")) "https://d.musicapp.migu.cn$rawImg" else rawImg
                 MiguSearchResult(
@@ -163,7 +163,7 @@ object MiguMusicAPI : PlatformMusicAPI {
         }) { json: JsonObject -> json } ?: return null
 
         val songObj = json.obj("data").obj("song")
-        val singers = songObj.arr("singerList").joinToString("、") { it.Object["name"].String }
+        val singers = songObj.arr("singerList").joinToString(",") { it.Object["name"].String }
         val imgUrl = songObj["img3"]?.String ?: songObj["img2"]?.String ?: songObj["img1"]?.String ?: ""
 
         return MiguSearchResult(
