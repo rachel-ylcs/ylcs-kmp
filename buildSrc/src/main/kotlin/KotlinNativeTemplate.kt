@@ -12,6 +12,8 @@ class KotlinNativeSourceSetsScope(
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
     val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
     val androidNativeTest: KotlinSourceSet by lazy { set.getByName("androidNativeTest") }
+    val nativeMain: KotlinSourceSet by lazy { with(extension) { set.nativeMain.get() } }
+    val nativeTest: KotlinSourceSet by lazy { with(extension) { set.nativeTest.get() } }
     val windowsMain: KotlinSourceSet by lazy { set.getByName("windowsMain") }
     val windowsTest: KotlinSourceSet by lazy { set.getByName("windowsTest") }
     val linuxMain: KotlinSourceSet by lazy { set.getByName("linuxMain") }
