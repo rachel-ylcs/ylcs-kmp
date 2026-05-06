@@ -27,6 +27,7 @@ import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.layer.MapLayer
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
+import love.yinlin.extension.then
 
 @Stable
 class MultipleBlock(
@@ -369,7 +370,7 @@ class MultipleBlock(
     // 画已交互状态
     private fun Drawer.drawInteractPressedArea(progressList: List<Float?>, alpha: Float) {
         repeat(noteCount) { index ->
-            progressList[index]?.let { progress ->
+            progressList[index]?.then { progress ->
                 path(colorList[index], InnerPaths[noteCount][index], alpha = alpha * progress)
             }
         }
@@ -377,7 +378,7 @@ class MultipleBlock(
 
     private fun Drawer.drawInteractPressedArea(p: Float, progressList: List<Float?>, alpha: Float) {
         repeat(noteCount) { index ->
-            progressList[index]?.let { progress ->
+            progressList[index]?.then { progress ->
                 path(colorList[index], InnerPaths[noteCount][index], alpha = Interpolator.map(p, progress, alpha))
             }
         }

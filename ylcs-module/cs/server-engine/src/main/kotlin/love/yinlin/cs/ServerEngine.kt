@@ -25,6 +25,7 @@ import love.yinlin.extension.parseJson
 import love.yinlin.extension.to
 import love.yinlin.cs.service.Database
 import love.yinlin.cs.service.Redis
+import love.yinlin.extension.then
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -66,10 +67,10 @@ abstract class ServerEngine {
 
         val classLoader = this::class.java.classLoader
         if (isCopyResources) copyResources(classLoader, public)
-        configFile?.let {
+        configFile?.then {
             classLoader.getResourceAsStream(it)?.asSource()?.buffered()?.use { source ->
                 source.readByteArray().decodeToString().parseJson.Object
-            }?.let { obj -> config = obj }
+            }?.then { obj -> config = obj }
         }
 
         if (useDatabase) {
@@ -84,7 +85,7 @@ abstract class ServerEngine {
             rd.onRedisCreate()
         }
 
-        val customLogger = loggerClass?.java?.let { LoggerFactory.getLogger(it) }
+        val customLogger = loggerClass?.java?.let(LoggerFactory::getLogger)
         embeddedServer(
             factory = Netty,
             configure = {
@@ -115,8 +116,8 @@ abstract class ServerEngine {
                         staticFiles(public, File(public))
 
                         val scope = object : APIScope(this, log) {}
-                        database?.let { if (useDatabase) scope.db = it }
-                        redis?.let { if (useRedis) scope.redis = it }
+                        database?.then { if (useDatabase) scope.db = it }
+                        redis?.then { if (useRedis) scope.redis = it }
 
                         scope.api.forEach { it() }
                         proxy?.apply { listen() }

@@ -9,6 +9,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.await
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.extension.createElement
+import love.yinlin.extension.then
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
 import kotlin.js.ExperimentalWasmJsInterop
@@ -40,7 +41,7 @@ actual fun PAGImageView(
     val wrapper = rememberPlatformView { PAGImageViewWrapper() }
 
     wrapper.HostView(modifier = modifier.onSizeChanged { size ->
-        wrapper.host?.let {
+        wrapper.host?.then {
             it.width = size.width
             it.height = size.height
             it.style.width = "${round(size.width / window.devicePixelRatio)}px"
@@ -50,12 +51,12 @@ actual fun PAGImageView(
     })
 
     wrapper.Monitor(config, wrapper.pagView) {
-        wrapper.pagView?.let { pagView ->
-            config.repeatCount.let { if (pagView.repeatCount != it) pagView.setRepeatCount(it) }
-            config.scaleMode.ordinal.let { if (pagView.scaleMode() != it) pagView.setScaleMode(it) }
-            config.cachedEnabled?.let { if (pagView.cacheEnabled() != it) pagView.setCacheEnabled(it) }
-            config.cacheScale?.let { if (pagView.cacheScale() != it) pagView.setCacheScale(it) }
-            config.maxFrameRate?.let { if (pagView.maxFrameRate() != it) pagView.setMaxFrameRate(it) }
+        wrapper.pagView?.then { pagView ->
+            config.repeatCount.then { if (pagView.repeatCount != it) pagView.setRepeatCount(it) }
+            config.scaleMode.ordinal.then { if (pagView.scaleMode() != it) pagView.setScaleMode(it) }
+            config.cachedEnabled?.then { if (pagView.cacheEnabled() != it) pagView.setCacheEnabled(it) }
+            config.cacheScale?.then { if (pagView.cacheScale() != it) pagView.setCacheScale(it) }
+            config.maxFrameRate?.then { if (pagView.maxFrameRate() != it) pagView.setMaxFrameRate(it) }
         }
     }
 
@@ -72,7 +73,7 @@ actual fun PAGImageView(
     }
 
     wrapper.Monitor(isPlaying, wrapper.pagView) {
-        wrapper.pagView?.let { pagView ->
+        wrapper.pagView?.then { pagView ->
             if (isPlaying) {
                 if (!pagView.isPlaying) pagView.play()
             }

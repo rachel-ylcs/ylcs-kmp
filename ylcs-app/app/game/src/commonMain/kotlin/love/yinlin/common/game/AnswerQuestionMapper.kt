@@ -51,6 +51,7 @@ import love.yinlin.data.rachel.game.info.AQQuestion
 import love.yinlin.data.rachel.game.info.AQResult
 import love.yinlin.data.rachel.game.info.AQUserAnswer
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.then
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
@@ -78,7 +79,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
             }
         }
 
-        data?.let { (questions, answers) ->
+        data?.then { (questions, answers) ->
             var currentIndex by rememberValueState(0)
             val question = questions[currentIndex]
             val answer = answers[currentIndex]
@@ -158,7 +159,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
             }
         }
 
-        pairData?.let { (totalAnswer, actualResult) ->
+        pairData?.then { (totalAnswer, actualResult) ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "正确率: ${actualResult.correctCount} / ${actualResult.totalCount}", modifier = Modifier.idText())
@@ -240,7 +241,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
 
         private suspend fun modifyTitle(item: QuestionItem) {
             val title = item.question.title
-            titleInputDialog.open(initText = title)?.let { text ->
+            titleInputDialog.open(initText = title)?.then { text ->
                 questions[currentIndex] = when (item) {
                     is QuestionItem.Choice -> item.copy(question = item.question.copy(title = text))
                     is QuestionItem.MultiChoice -> item.copy(question = item.question.copy(title = text))
@@ -317,7 +318,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
                 is QuestionItem.Blank -> item.answer.value
             }.toMutableList()
             val dialog = if (item is QuestionItem.Blank) answerInputDialog else optionInputDialog
-            dialog.open(initText = options[index])?.let { text ->
+            dialog.open(initText = options[index])?.then { text ->
                 options[index] = text
                 questions[currentIndex] = when (item) {
                     is QuestionItem.Choice -> item.copy(question = item.question.copy(options = options))
@@ -536,7 +537,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.let { (_, questions) ->
+            preflight?.then { (_, questions) ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -638,7 +639,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
 
         @Composable
         override fun ColumnScope.Settlement() {
-            result?.let {
+            result?.then {
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = "正确率: ${it.correctCount} / ${it.totalCount}", modifier = Modifier.idText())

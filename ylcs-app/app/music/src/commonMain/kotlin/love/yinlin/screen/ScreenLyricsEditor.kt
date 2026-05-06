@@ -37,6 +37,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.media.buildAudioPlayer
 import love.yinlin.tpl.lyrics.LrcLine
@@ -85,7 +86,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                 }
             }
 
-        }?.let { slot.tip.error("播放器加载失败") }
+        }?.then { slot.tip.error("播放器加载失败") }
     }
 
     override fun finalize() {
@@ -197,7 +198,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                                 launch {
                                     val needPlay = player.isPlaying
                                     if (needPlay) player.pause()
-                                    inputDialog.open(initText = item.text)?.let { text ->
+                                    inputDialog.open(initText = item.text)?.then { text ->
                                         lyrics.setByData(index) { it.copy(text = text) }
                                     }
                                     if (needPlay) player.play()

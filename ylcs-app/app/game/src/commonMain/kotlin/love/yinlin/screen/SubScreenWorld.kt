@@ -50,6 +50,7 @@ import love.yinlin.cs.url
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameRank
 import love.yinlin.data.rachel.game.GameType
+import love.yinlin.extension.then
 
 @Stable
 class SubScreenWorld(parent: NavigationScreen) : SubScreen(parent) {
@@ -59,7 +60,7 @@ class SubScreenWorld(parent: NavigationScreen) : SubScreen(parent) {
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
         ) {
-            GameMapper.cast<GameMapper>(game)?.let { mapper ->
+            GameMapper.cast<GameMapper>(game)?.then { mapper ->
                 PrimaryTextButton(text = "开始", icon = Icons.Play, modifier = Modifier.fillMaxWidth(), onClick = {
                     val profile = app.config.userProfile
                     if (profile != null) with(mapper) { startGame(game, profile) }

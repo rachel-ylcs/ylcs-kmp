@@ -50,6 +50,11 @@ class InputState(initText: String = "", val maxLength: Int = Int.MAX_VALUE) {
     val isEmpty: Boolean get() = value.text.isEmpty()
 
     /**
+     * 是否内容不为空
+     */
+    val isNotEmpty: Boolean get() = value.text.isNotEmpty()
+
+    /**
      * 是否达到最大长度
      */
     val isFull: Boolean get() = value.text.length == maxLength

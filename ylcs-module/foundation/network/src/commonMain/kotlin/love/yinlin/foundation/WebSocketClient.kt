@@ -12,6 +12,7 @@ import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.coroutines.flow.consumeAsFlow
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 
 class WebSocketClient internal constructor(@PublishedApi internal val delegate: HttpClient) {
     abstract class Connection {
@@ -37,7 +38,7 @@ class WebSocketClient internal constructor(@PublishedApi internal val delegate: 
             newSession.incoming.consumeAsFlow().collect { frame ->
                 if (frame is Frame.Text) connection.onMessage(frame.readText())
             }
-        }?.let { connection.onError(it) }
+        }?.then { connection.onError(it) }
         connection.onDisconnect()
         connection.session?.close()
         connection.session = null

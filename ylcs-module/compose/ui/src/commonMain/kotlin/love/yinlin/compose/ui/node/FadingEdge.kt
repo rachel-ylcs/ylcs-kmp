@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.LayoutDirection
 import love.yinlin.compose.Colors
 import love.yinlin.compose.platform.inspector
+import love.yinlin.extension.then
 
 private class FadingEdgeNode(
     var startAlpha: Float,
@@ -63,10 +64,10 @@ private class FadingEdgeNode(
             canvas.saveLayer(Rect(0f, 0f, width, height), paint)
             drawContent()
             updateBrushesIfNeeded()
-            startBrush?.let { drawRect(it, Offset(0f, 0f), Size(left, height), blendMode = BlendMode.DstIn) }
-            endBrush?.let { drawRect(it, Offset(width - right, 0f), Size(right, height), blendMode = BlendMode.DstIn) }
-            topBrush?.let { drawRect(it, Offset(0f, 0f), Size(width, top), blendMode = BlendMode.DstIn) }
-            bottomBrush?.let { drawRect(it, Offset(0f, height - bottom), Size(width, bottom), blendMode = BlendMode.DstIn) }
+            startBrush?.then { drawRect(it, Offset(0f, 0f), Size(left, height), blendMode = BlendMode.DstIn) }
+            endBrush?.then { drawRect(it, Offset(width - right, 0f), Size(right, height), blendMode = BlendMode.DstIn) }
+            topBrush?.then { drawRect(it, Offset(0f, 0f), Size(width, top), blendMode = BlendMode.DstIn) }
+            bottomBrush?.then { drawRect(it, Offset(0f, height - bottom), Size(width, bottom), blendMode = BlendMode.DstIn) }
             canvas.restore()
         }
     }

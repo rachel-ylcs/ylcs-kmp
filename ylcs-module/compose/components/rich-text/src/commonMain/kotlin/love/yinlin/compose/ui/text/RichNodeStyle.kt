@@ -18,6 +18,7 @@ import love.yinlin.extension.Boolean
 import love.yinlin.extension.Float
 import love.yinlin.extension.Int
 import love.yinlin.extension.JsonObjectScope
+import love.yinlin.extension.then
 
 @Stable
 class RichNodeStyle @PublishedApi internal constructor(
@@ -31,8 +32,8 @@ class RichNodeStyle @PublishedApi internal constructor(
     override val type: String = RichType.Style.value
 
     override fun JsonObjectScope.children() {
-        fontSize?.let { RichArg.FontSize.value with it.value }
-        color?.let { RichArg.Color.value with it.toArgb() }
+        fontSize?.then { RichArg.FontSize.value with it.value }
+        color?.then { RichArg.Color.value with it.toArgb() }
         if (bold) RichArg.Bold.value with bold
         if (italic) RichArg.Italic.value with italic
         if (underline) RichArg.Underline.value with underline

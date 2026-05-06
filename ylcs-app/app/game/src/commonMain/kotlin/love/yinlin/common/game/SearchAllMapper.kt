@@ -43,6 +43,7 @@ import love.yinlin.data.rachel.game.info.SAResult
 import love.yinlin.extension.Int
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.json
+import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
@@ -91,7 +92,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
             catchingNull { answer.to<List<String>>() to info.to<SAResult>() }
         }
 
-        pairData?.let { (actualAnswer, actualResult) ->
+        pairData?.then { (actualAnswer, actualResult) ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "正确率: ${actualResult.correctCount} / ${actualResult.totalCount}", modifier = Modifier.idText())
@@ -225,7 +226,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.let { (_, question) ->
+            preflight?.then { (_, question) ->
                 val focusRequester = remember { FocusRequester() }
 
                 LaunchedEffect(Unit) {
@@ -262,7 +263,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
 
         @Composable
         override fun ColumnScope.Settlement() {
-            result?.let {
+            result?.then {
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = "正确率: ${it.correctCount} / ${it.totalCount}", modifier = Modifier.idText())

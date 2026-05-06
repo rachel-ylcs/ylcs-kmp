@@ -10,6 +10,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Modifier
 import love.yinlin.compose.LaunchFlag
+import love.yinlin.extension.then
 
 @Stable
 abstract class NavigationScreen : BasicScreen() {
@@ -49,7 +50,7 @@ abstract class NavigationScreen : BasicScreen() {
                 modifier = Modifier.fillMaxSize()
             ) { index ->
                 Box(modifier = Modifier.fillMaxSize()) {
-                    subScreenList.getOrNull(index)?.screen?.let { subScreen ->
+                    subScreenList.getOrNull(index)?.screen?.then { subScreen ->
                         if (subScreen.contentLoaded) {
                             subScreen.Content()
 
@@ -60,7 +61,7 @@ abstract class NavigationScreen : BasicScreen() {
             }
 
             LaunchedEffect(pageIndex) {
-                subScreenList.getOrNull(pageIndex)?.let { info ->
+                subScreenList.getOrNull(pageIndex)?.then { info ->
                     val subScreen = info.screen
                     info.flag(
                         update = {
@@ -80,7 +81,7 @@ abstract class NavigationScreen : BasicScreen() {
 
     @Composable
     final override fun Floating() {
-        subScreenList.getOrNull(pagerState.currentPage)?.screen?.let { subScreen ->
+        subScreenList.getOrNull(pagerState.currentPage)?.screen?.then { subScreen ->
             if (subScreen.contentLoaded) subScreen.SubComposedFloating()
         }
     }

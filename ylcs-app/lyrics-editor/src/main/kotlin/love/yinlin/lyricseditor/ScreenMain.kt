@@ -49,6 +49,7 @@ import love.yinlin.data.music.RhymeLyricsConfig
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.then
 
 @Stable
 class ScreenMain : BasicScreen() {
@@ -124,7 +125,7 @@ class ScreenMain : BasicScreen() {
                             lyrics = parseQrc(QrcDecrypter.decrypt(data)!!)
                         )
                     }
-                }?.let { slot.tip.error("歌曲解析错误") }
+                }?.then { slot.tip.error("歌曲解析错误") }
             }
         }
         else slot.tip.warning("未搜索到相关歌曲")
@@ -146,7 +147,7 @@ class ScreenMain : BasicScreen() {
     ) {
         Column(modifier) {
             LoadingTextButton(text = line.text, color = Theme.color.secondary, style = Theme.typography.v6.bold, onClick = {
-                inputDialog.open()?.let { text ->
+                inputDialog.open()?.then { text ->
                     val newLyrics = config.lyrics.toMutableList()
                     newLyrics[lineIndex] = line.copy(text = text)
                     rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
@@ -154,7 +155,7 @@ class ScreenMain : BasicScreen() {
             })
             ActionScope.Left.Container(modifier = Modifier.fillMaxWidth().padding(Theme.padding.value)) {
                 LoadingTextButton(text = "行开始: ${line.start}", icon = Icons.Timer, onClick = {
-                    inputDialog.open()?.let { text ->
+                    inputDialog.open()?.then { text ->
                         val newLyrics = config.lyrics.toMutableList()
                         newLyrics[lineIndex] = line.copy(start = text.toLongOrNull() ?: 0L)
                         rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
@@ -194,7 +195,7 @@ class ScreenMain : BasicScreen() {
                 Icon(tip = "复制", icon = Icons.ContentCopy, color = Theme.color.primary, onClick = {
                     copyData = line.theme
                 })
-                copyData?.let { data ->
+                copyData?.then { data ->
                     Icon(tip = "粘贴", icon = Icons.ContentPaste, color = Theme.color.primary, onClick = {
                         if (line.theme.size != data.size) slot.tip.warning("粘贴目标与源长度不同")
                         else {
@@ -221,7 +222,7 @@ class ScreenMain : BasicScreen() {
 
                         Text(text = action.end.toString(), modifier = Modifier.clickable {
                             launch {
-                                inputDialog.open()?.let { text ->
+                                inputDialog.open()?.then { text ->
                                     val newTheme = line.theme.toMutableList()
                                     when (action) {
                                         is RhymeAction.Note -> newTheme[actionIndex] = action.copy(end = text.toIntOrNull() ?: 0)

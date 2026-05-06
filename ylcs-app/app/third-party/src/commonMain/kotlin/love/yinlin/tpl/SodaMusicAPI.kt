@@ -83,11 +83,8 @@ object SodaMusicAPI : PlatformMusicAPI {
         val trackIds = getPlaylistTrackIds(playlistId) ?: return null
         val result = mutableListOf<PlatformMusicInfo>()
         for (trackId in trackIds) {
-            try {
-                fetchTrackInfo(trackId)?.let { result.add(it) }
-            } catch (e: Exception) {
-                // 单首歌曲解析失败，不影响其他歌曲
-                println("SodaMusicAPI: 解析歌曲 $trackId 失败: ${e.message}")
+            catching {
+                fetchTrackInfo(trackId)?.then { result += it }
             }
         }
         return result.ifEmpty { null }
@@ -104,7 +101,7 @@ object SodaMusicAPI : PlatformMusicAPI {
             }) { text: String -> text }
             if (html != null) {
                 val regex = Regex("""(?s)_ROUTER_DATA\s*=\s*(\{.*?\});""")
-                regex.find(html)?.let { match ->
+                regex.find(html)?.then { match ->
                     val jsonString = match.groupValues[1].replace("\\u002F", "/")
                     val routerData = Json.decodeFromString<JsonObject>(jsonString)
                     val rawUrl = routerData.obj("loaderData")
@@ -170,10 +167,8 @@ object SodaMusicAPI : PlatformMusicAPI {
         if (trackIds.isEmpty()) return null
         val result = mutableListOf<PlatformMusicInfo>()
         for (tid in trackIds) {
-            try {
-                fetchTrackInfo(tid)?.let { result.add(it) }
-            } catch (e: Exception) {
-                // 忽略单曲错误
+            catching {
+                fetchTrackInfo(tid)?.then { result += it }
             }
         }
         return result.ifEmpty { null }
@@ -195,11 +190,11 @@ object SodaMusicAPI : PlatformMusicAPI {
             // 长链接 track_id -> 例如 https://music.douyin.com/qishui/share/track?track_id=7145746290255595521
             link.contains("track_id=") -> {
                 val id = """track_id=(\d+)""".toRegex().find(link)?.groupValues?.get(1)
-                if (id != null) fetchTrackInfo(id)?.let { listOf(it) } else null
+                if (id != null) fetchTrackInfo(id)?.let(::listOf) else null
             }
             // 纯数字作为单曲 ID -> 例如 7145746290255595521
             link.matches(Regex("\\d+")) -> {
-                fetchTrackInfo(link)?.let { listOf(it) }
+                fetchTrackInfo(link)?.let(::listOf)
             }
             // 默认按搜索处理
             else -> search(link)

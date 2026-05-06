@@ -16,6 +16,7 @@ import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.extension.then
 
 @Stable
 abstract class DialogTemplate<R : Any> : Dialog<R>() {
@@ -69,7 +70,7 @@ abstract class DialogTemplate<R : Any> : Dialog<R>() {
                             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            icon?.let { Icon(icon = it) }
+                            icon?.then { Icon(icon = it) }
                             SimpleEllipsisText(text = title, style = Theme.typography.v6.bold)
                         }
                     }
@@ -87,7 +88,7 @@ abstract class DialogTemplate<R : Any> : Dialog<R>() {
                     block()
                 }
 
-                actions?.let { ActionScope.Right.Container(modifier = Modifier.align(Alignment.End), content = it) }
+                actions?.then { ActionScope.Right.Container(modifier = Modifier.align(Alignment.End), content = it) }
             }
         }
     }

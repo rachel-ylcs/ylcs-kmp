@@ -23,6 +23,8 @@ import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Visible
 import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
+import love.yinlin.extension.cast
+import love.yinlin.extension.then
 
 @Stable
 sealed class Block<BS : BlockStatus>(
@@ -93,7 +95,7 @@ sealed class Block<BS : BlockStatus>(
     val fromMapLayer: MapLayer? get() = layer as? MapLayer
 
     inline fun withMapLayer(block: (MapLayer, Int) -> Boolean) {
-        (layer as? MapLayer)?.let { mapLayer ->
+        layer.cast { mapLayer: MapLayer ->
             if (block(mapLayer, (mapLayer.momentLayer.audioPosition - time.appearance).toInt())) updateDirty()
         }
     }
@@ -142,7 +144,7 @@ sealed class Block<BS : BlockStatus>(
 
     // 画单字音符
     protected fun Drawer.drawSingleNoteFont(scale: Int, color: Color, alpha: Float) {
-        fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.let { graph ->
+        fromMapLayer?.baseNoteFontMap?.getOrNull(scale)?.then { graph ->
             val r = DEFAULT_DIMENSION
             val w = r / 3
             val h = graph.height(w)
@@ -154,7 +156,7 @@ sealed class Block<BS : BlockStatus>(
 
     // 画多字音符
     protected fun Drawer.drawMultipleNoteFont(scaleList: List<Int>, color: Color, alpha: Float) {
-        fromMapLayer?.baseNoteFontMap?.let { map ->
+        fromMapLayer?.baseNoteFontMap?.then { map ->
             val n = scaleList.size
             val r = DEFAULT_DIMENSION
             val w = if (n == 2) r / 2 else r * 2 / 3
@@ -173,7 +175,7 @@ sealed class Block<BS : BlockStatus>(
 
     // 画单字歌词
     protected fun Drawer.drawLyricsText(color: Color, scaleRatio: Float) {
-        fromMapLayer?.lyricsTextMap?.get(rhymeAction.ch)?.let { graph ->
+        fromMapLayer?.lyricsTextMap?.get(rhymeAction.ch)?.then { graph ->
             scale(scaleRatio, DefaultCenter) {
                 text(graph, TopLeft, DefaultSize, color, TextAlign.Center)
             }

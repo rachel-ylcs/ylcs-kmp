@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.extension.createElement
+import love.yinlin.extension.then
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDivElement
 import kotlin.js.ExperimentalWasmJsInterop
@@ -27,7 +28,7 @@ actual open class PAGState : PlatformView<HTMLCanvasElement>(), Releasable<HTMLC
     }
 
     override fun release(view: HTMLCanvasElement) {
-        pagView?.let {
+        pagView?.then {
             it.removeListener("onAnimationStart", null)
             it.removeListener("onAnimationEnd", null)
             it.removeListener("onAnimationCancel", null)
@@ -40,7 +41,7 @@ actual open class PAGState : PlatformView<HTMLCanvasElement>(), Releasable<HTMLC
 
     actual var progress: Double get() = stateProgress
         set(value) {
-            pagView?.let {
+            pagView?.then {
                 it.setProgress(value)
                 it.flush()
             }

@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import kotlinx.browser.window
 import kotlinx.coroutines.await
+import love.yinlin.extension.then
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.math.round
 
@@ -18,7 +19,7 @@ actual fun PAGView(
     config: PAGConfig,
 ) {
     state.HostView(modifier = modifier.onSizeChanged { size ->
-        state.host?.let {
+        state.host?.then {
             it.width = size.width
             it.height = size.height
             it.style.width = "${round(size.width / window.devicePixelRatio)}px"
@@ -28,17 +29,17 @@ actual fun PAGView(
     })
 
     state.Monitor(config, state.pagView) {
-        state.pagView?.let { pagView ->
-            config.repeatCount.let { if (pagView.repeatCount != it) pagView.setRepeatCount(it) }
-            config.scaleMode.ordinal.let { if (pagView.scaleMode() != it) pagView.setScaleMode(it) }
-            config.cachedEnabled?.let { if (pagView.cacheEnabled() != it) pagView.setCacheEnabled(it) }
-            config.cacheScale?.let { if (pagView.cacheScale() != it) pagView.setCacheScale(it) }
-            config.maxFrameRate?.let { if (pagView.maxFrameRate() != it) pagView.setMaxFrameRate(it) }
+        state.pagView?.then { pagView ->
+            config.repeatCount.then { if (pagView.repeatCount != it) pagView.setRepeatCount(it) }
+            config.scaleMode.ordinal.then { if (pagView.scaleMode() != it) pagView.setScaleMode(it) }
+            config.cachedEnabled?.then { if (pagView.cacheEnabled() != it) pagView.setCacheEnabled(it) }
+            config.cacheScale?.then { if (pagView.cacheScale() != it) pagView.setCacheScale(it) }
+            config.maxFrameRate?.then { if (pagView.maxFrameRate() != it) pagView.setMaxFrameRate(it) }
         }
     }
 
     state.Monitor(composition) { view ->
-        state.pagView?.let {
+        state.pagView?.then {
             it.removeListener("onAnimationStart", null)
             it.removeListener("onAnimationEnd", null)
             it.removeListener("onAnimationCancel", null)
@@ -67,7 +68,7 @@ actual fun PAGView(
     }
 
     state.Monitor(isPlaying, state.pagView) {
-        state.pagView?.let { pagView ->
+        state.pagView?.then { pagView ->
             if (isPlaying) {
                 if (!pagView.isPlaying) pagView.play()
             }

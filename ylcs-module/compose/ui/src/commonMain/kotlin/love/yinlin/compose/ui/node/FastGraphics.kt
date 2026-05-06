@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import love.yinlin.compose.Theme
 import love.yinlin.compose.platform.inspector
+import love.yinlin.extension.then
 import kotlin.jvm.JvmName
 
 val NullFloatProvider: GraphicsLayerScope.() -> Float? = { null }
@@ -33,7 +34,7 @@ val NullFloatProvider: GraphicsLayerScope.() -> Float? = { null }
 private class FastRotateNode(var angleProvider: () -> Float?) : Modifier.Node(), DrawModifierNode {
     override fun ContentDrawScope.draw() {
         withTransform({
-            angleProvider()?.let { rotate(degrees = it) }
+            angleProvider()?.then(::rotate)
         }) {
             this@draw.drawContent()
         }
@@ -123,7 +124,7 @@ fun Modifier.fastAnimateScale(scale: Float) = composed {
 
 private class FastRectBackgroundNode(var backgroundProvider: ContentDrawScope.() -> Color?) : Modifier.Node(), DrawModifierNode {
     override fun ContentDrawScope.draw() {
-        backgroundProvider()?.let { drawRect(it) }
+        backgroundProvider()?.then(::drawRect)
         drawContent()
     }
 }
@@ -166,7 +167,7 @@ private class FastAlphaNode(var alphaProvider: GraphicsLayerScope.() -> Float?) 
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
             placeable.placeWithLayer(0, 0) {
-                alphaProvider()?.let { alpha = it }
+                alphaProvider()?.then { alpha = it }
             }
         }
     }
@@ -210,7 +211,7 @@ private class FastClipNode(var shapeProvider: GraphicsLayerScope.() -> Shape?) :
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
             placeable.placeWithLayer(0, 0) {
-                shapeProvider()?.let {
+                shapeProvider()?.then {
                     shape = it
                     clip = true
                 }
@@ -267,8 +268,8 @@ private class FastOffsetNode(
         val placeable = measurable.measure(constraints)
         return layout(placeable.width, placeable.height) {
             placeable.placeWithLayer(0, 0) {
-                offsetXProvider()?.let { translationX = it }
-                offsetYProvider()?.let { translationY = it }
+                offsetXProvider()?.then { translationX = it }
+                offsetYProvider()?.then { translationY = it }
             }
         }
     }

@@ -34,6 +34,7 @@ import love.yinlin.data.rachel.game.info.PConfig
 import love.yinlin.data.rachel.game.info.PictionaryQuestion
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.then
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
@@ -45,7 +46,7 @@ object PictionaryMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
             catchingNull { gameDetails.question.to<PictionaryQuestion>() to gameDetails.answer.String }
         }
 
-        data?.let { (question, answer) ->
+        data?.then { (question, answer) ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Lightbulb, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "答案", style = Theme.typography.v6.bold, modifier = Modifier.idText())
@@ -144,7 +145,7 @@ object PictionaryMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.let { (question) ->
+            preflight?.then { (question) ->
                 val focusRequester = remember { FocusRequester() }
 
                 LaunchedEffect(Unit) {

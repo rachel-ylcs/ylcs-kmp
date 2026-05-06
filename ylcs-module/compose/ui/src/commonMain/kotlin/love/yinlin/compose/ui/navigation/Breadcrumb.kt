@@ -33,6 +33,7 @@ import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.TextIconAdapter
+import love.yinlin.extension.then
 
 @Composable
 fun Breadcrumb(
@@ -81,7 +82,7 @@ fun Breadcrumb(
                                 onClick = { onNavigate(index) }
                             ).pointerIcon(PointerIcon.Hand).padding(padding)
                         ) { iconId, textId ->
-                            icon?.let { Icon(icon = it, modifier = Modifier.iconId()) }
+                            icon?.then { Icon(icon = it, modifier = Modifier.iconId()) }
                             SimpleClipText(text = title, modifier = Modifier.textId(), style = LocalStyle.current.bold)
                         }
                     }

@@ -43,6 +43,7 @@ import love.yinlin.coroutines.ioContext
 import love.yinlin.data.douyin.DouyinVideo
 import love.yinlin.extension.Object
 import love.yinlin.extension.parseJson
+import love.yinlin.extension.then
 import love.yinlin.platform.Platform
 import love.yinlin.platform.platform
 import love.yinlin.tpl.DouyinAPI
@@ -85,7 +86,7 @@ class ScreenDouyin : Screen() {
             shape = Theme.shape.v5,
             shadowElevation = Theme.shadow.v3,
             onClick = {
-                item.videoUrl.getOrNull(videoIndex)?.let { url ->
+                item.videoUrl.getOrNull(videoIndex)?.then { url ->
                     navigate(::ScreenVideo, url)
                 }
             }
@@ -148,7 +149,7 @@ class ScreenDouyin : Screen() {
                         }
                     )
                     Icon(icon = Icons.Download, onClick = {
-                        item.videoUrl.getOrNull(videoIndex)?.let { url ->
+                        item.videoUrl.getOrNull(videoIndex)?.then { url ->
                             launch(ioContext) {
                                 downloadVideoDialog.downloadVideo(url)
                             }

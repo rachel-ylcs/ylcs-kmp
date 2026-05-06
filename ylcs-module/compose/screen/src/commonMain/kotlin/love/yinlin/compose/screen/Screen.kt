@@ -16,6 +16,7 @@ import love.yinlin.compose.ui.floating.Floating
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.extension.then
 
 @Stable
 abstract class Screen : BasicScreen() {
@@ -41,7 +42,7 @@ abstract class Screen : BasicScreen() {
         val immersivePadding = LocalImmersivePadding.current
 
         Column(modifier = Modifier.fillMaxSize()) {
-            title?.let { titleString ->
+            title?.then { titleString ->
                 Surface(
                     modifier = Modifier.fillMaxWidth().zIndex(Floating.Z_INDEX_COMMON),
                     contentPadding = immersivePadding.withoutBottom,

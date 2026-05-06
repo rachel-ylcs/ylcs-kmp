@@ -1,5 +1,7 @@
 package love.yinlin.collection
 
+import love.yinlin.extension.then
+
 /**
  * 依赖分析器
  *
@@ -47,7 +49,7 @@ class DependencyAnalyzer<K : Any, V>(
                 .toList()
 
             // 判断是否存在未知依赖
-            filterDependencies.find { it !in keyMap }?.let { dependentKey ->
+            filterDependencies.find { it !in keyMap }?.then { dependentKey ->
                 throw UnknownDependencyError(key.toString(), dependentKey.toString())
             }
 

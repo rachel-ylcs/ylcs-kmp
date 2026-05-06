@@ -28,7 +28,7 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
 
     override suspend fun load(rootPath: File): Boolean = catchingDefault(false) {
         val source = File(rootPath, type.resType.filename).readText()
-        lines = source?.let { LrcParser(it).lines }?.map { StaticLine(it.position, it.text) }
+        lines = source?.let(::LrcParser)?.lines?.map { StaticLine(it.position, it.text) }
         currentIndex = -1
         lines!!.isNotEmpty()
     }

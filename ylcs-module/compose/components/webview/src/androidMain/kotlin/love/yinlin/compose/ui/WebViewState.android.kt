@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.lifecycle.LifecycleOwner
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.extension.then
 
 @Stable
 actual class WebViewState actual constructor(private val initUrl: String) : PlatformView<AndroidWebView>(), Releasable<AndroidWebView> {
@@ -40,13 +41,13 @@ actual class WebViewState actual constructor(private val initUrl: String) : Plat
     actual val error: WebViewError? by derivedStateOf { stateError }
 
     actual fun goBack() {
-        host?.let {
+        host?.then {
             if (it.canGoBack()) it.goBack()
         }
     }
 
     actual fun goForward() {
-        host?.let {
+        host?.then {
             if (it.canGoForward()) it.goForward()
         }
     }
@@ -58,15 +59,15 @@ actual class WebViewState actual constructor(private val initUrl: String) : Plat
     val client = object : WebViewClient() {
         override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
-            url?.let { stateUrl = it }
+            url?.then { stateUrl = it }
             stateLoadingState = WebViewLoadingState.Loading(0f)
             stateTitle = ""
-            favicon?.let { stateIcon = BitmapPainter(it.asImageBitmap()) }
+            favicon?.then { stateIcon = BitmapPainter(it.asImageBitmap()) }
         }
 
         override fun onPageFinished(view: AndroidWebView?, url: String?) {
             super.onPageFinished(view, url)
-            url?.let { stateUrl = it }
+            url?.then { stateUrl = it }
             stateLoadingState = WebViewLoadingState.Finished
         }
 
@@ -80,19 +81,19 @@ actual class WebViewState actual constructor(private val initUrl: String) : Plat
 
         override fun onReceivedError(view: AndroidWebView?, request: WebResourceRequest?, error: WebResourceError?) {
             super.onReceivedError(view, request, error)
-            error?.let { stateError = WebViewError(it.errorCode.toLong(), it.description.toString()) }
+            error?.then { stateError = WebViewError(it.errorCode.toLong(), it.description.toString()) }
         }
     }
 
     val chromeClient = object : WebChromeClient() {
         override fun onReceivedTitle(view: AndroidWebView?, title: String?) {
             super.onReceivedTitle(view, title)
-            title?.let { stateTitle = it }
+            title?.then { stateTitle = it }
         }
 
         override fun onReceivedIcon(view: AndroidWebView?, icon: Bitmap?) {
             super.onReceivedIcon(view, icon)
-            icon?.let { stateIcon = BitmapPainter(it.asImageBitmap()) }
+            icon?.then { stateIcon = BitmapPainter(it.asImageBitmap()) }
         }
 
         override fun onProgressChanged(view: AndroidWebView?, newProgress: Int) {

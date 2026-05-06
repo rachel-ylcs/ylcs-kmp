@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import love.yinlin.extension.catching
+import love.yinlin.extension.then
 
 abstract class ComposeActivity : ComponentActivity() {
     private val instance by lazy { (application as ComposeApplication).instance }
@@ -25,8 +26,8 @@ abstract class ComposeActivity : ComponentActivity() {
             instance.initPoolLater(this)
         }
 
-        intent?.let {
-            catching { instance.onIntent(it) }
+        catching {
+            intent?.then(instance::onIntent)
         }
 
         setContent {

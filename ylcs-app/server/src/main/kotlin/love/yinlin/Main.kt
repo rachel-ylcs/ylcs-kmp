@@ -8,6 +8,7 @@ import love.yinlin.cs.user.AN
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.data.rachel.mail.MailEntry
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 
 val APIScope.callMap by lazy { buildCallBackMap<Mail.Filter, MailEntry, String>() }
 
@@ -29,7 +30,7 @@ fun main() = object : ServerEngine() {
                     val uri = request.uri
                     if (uri.startsWith("/user") || uri.startsWith("/sys") || uri.startsWith("/res"))
                         logger.debug("URL: {} IP: {}", uri, ip)
-                }?.let { err ->
+                }?.then { err ->
                     logger.error("RequestListener - {}", err.stackTraceToString())
                 }
             }

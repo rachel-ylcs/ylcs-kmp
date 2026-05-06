@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import kotlinx.coroutines.isActive
 import love.yinlin.compose.extension.rememberRefNull
+import love.yinlin.extension.then
 
 @Composable
 actual fun PAGView(
@@ -49,12 +50,12 @@ actual fun PAGView(
     }
 
     LaunchedEffect(config) {
-        config.scaleMode.let { if (player.scaleMode != it) player.scaleMode = it }
-        config.cachedEnabled?.let { if (player.cacheEnabled != it) player.cacheEnabled = it }
-        config.cacheScale?.let { if (player.cacheScale != it) player.cacheScale = it }
-        config.maxFrameRate?.let { if (player.maxFrameRate != it) player.maxFrameRate = it }
-        config.videoEnabled?.let { if (player.videoEnabled != it) player.videoEnabled = it }
-        config.useDiskCache?.let { if (player.useDiskCache != it) player.useDiskCache = it }
+        config.scaleMode.then { if (player.scaleMode != it) player.scaleMode = it }
+        config.cachedEnabled?.then { if (player.cacheEnabled != it) player.cacheEnabled = it }
+        config.cacheScale?.then { if (player.cacheScale != it) player.cacheScale = it }
+        config.maxFrameRate?.then { if (player.maxFrameRate != it) player.maxFrameRate = it }
+        config.videoEnabled?.then { if (player.videoEnabled != it) player.videoEnabled = it }
+        config.useDiskCache?.then { if (player.useDiskCache != it) player.useDiskCache = it }
     }
 
     DisposableEffect(composition) {

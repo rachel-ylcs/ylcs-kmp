@@ -39,6 +39,7 @@ import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
 import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.extension.then
 import love.yinlin.fs.File
 
 @Stable
@@ -63,9 +64,7 @@ class ScreenAddTopic : Screen() {
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)
                     true
-                }?.let {
-                    input.pics += Picture(it.path)
-                }
+                }?.then { input.pics += Picture(it.path) }
             }
         }
     }
@@ -100,7 +99,7 @@ class ScreenAddTopic : Screen() {
     override val title: String = "发表主题"
 
     override suspend fun initialize() {
-        app.config.editedTopic?.let { editedTopic ->
+        app.config.editedTopic?.then { editedTopic ->
             input.title.text = editedTopic.title
             input.content.text = editedTopic.content
             input.section = editedTopic.section

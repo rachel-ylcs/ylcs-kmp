@@ -3,6 +3,7 @@ package love.yinlin.startup
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.io.*
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.extension.then
 import love.yinlin.extension.toNSData
 import love.yinlin.io.SandboxSource
 import love.yinlin.io.Sources
@@ -52,10 +53,9 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
                     val images = mutableListOf<File>()
                     var processedImages = 0
                     results.forEach { pickerResult ->
-                        pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) {
-                                url, _ ->
+                        pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) { url, _ ->
                             val tempUrl = copyToTempDir(url)
-                            tempUrl?.path?.let { path -> images.add(File(path)) }
+                            tempUrl?.path?.then { path -> images += File(path) }
                             processedImages++
                             if (processedImages == results.size) {
                                 future.send(images)
@@ -114,7 +114,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
         Coroutines.sync { future ->
             future.catching {
                 openPicker(mimeType, filter) { url ->
-                    future.send { url?.let { SandboxSource(it).buffered() } }
+                    future.send { url?.let(::SandboxSource)?.buffered() }
                 }
             }
         }
@@ -124,7 +124,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
         Coroutines.sync { future ->
             future.catching {
                 openPicker(mimeType, filter) { url ->
-                    future.send { url?.let { SandboxUri(it) } }
+                    future.send { url?.let(::SandboxUri) }
                 }
             }
         }
@@ -157,7 +157,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
         val fileManager = NSFileManager.defaultManager
         val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(filename) ?: return null
         val url = NSURL.fileURLWithPathComponents(tempPath) ?: return null
-        val path = url.path?.let { File(it) } ?: return null
+        val path = url.path?.let(File::invoke) ?: return null
         return SaveType.Video(filename, url) to path.bufferedSink()
     }
 

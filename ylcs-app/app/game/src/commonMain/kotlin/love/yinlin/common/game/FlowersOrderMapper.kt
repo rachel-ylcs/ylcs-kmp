@@ -48,6 +48,7 @@ import love.yinlin.extension.Int
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.json
+import love.yinlin.extension.then
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 
@@ -112,7 +113,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
             catchingNull { answer.String to info.Int }
         }
 
-        pairData?.let { (actualAnswer, actualResult) ->
+        pairData?.then { (actualAnswer, actualResult) ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Lightbulb, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "本次答案", modifier = Modifier.idText())
@@ -289,7 +290,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.let { (question, answer, result, oldCharacters) ->
+            preflight?.then { (question, answer, result, oldCharacters) ->
                 val focusRequester = remember { FocusRequester() }
 
                 LaunchedEffect(Unit) {
@@ -348,7 +349,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
 
         @Composable
         override fun ColumnScope.Settlement() {
-            result?.let {
+            result?.then {
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Lightbulb, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = "本次答案", modifier = Modifier.idText())

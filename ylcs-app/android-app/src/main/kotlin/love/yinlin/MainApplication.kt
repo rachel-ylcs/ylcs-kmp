@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import love.yinlin.compose.ComposeApplication
 import love.yinlin.compose.window.DeepLink
+import love.yinlin.extension.then
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toUri
@@ -12,7 +13,7 @@ class MainApplication : ComposeApplication() {
     override fun buildInstance() = object : RachelApplication(this) {
         override fun onIntent(intent: Intent) {
             when (intent.action) {
-                Intent.ACTION_VIEW -> intent.data?.let { data ->
+                Intent.ACTION_VIEW -> intent.data?.then { data ->
                     val uri = data.toUri()
                     when (uri.scheme) {
                         Scheme.Content -> DeepLink.openUri(uri)

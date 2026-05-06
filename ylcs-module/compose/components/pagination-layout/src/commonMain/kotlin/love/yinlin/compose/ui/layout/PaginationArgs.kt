@@ -13,6 +13,6 @@ abstract class PaginationArgs<E, K, out T, out A1>(
     val arg1: A1 get() = mArg1
 
     override fun processArgs(last: E?) {
-        mArg1 = last?.let { arg1(it) } ?: default1
+        mArg1 = last?.let(::arg1) ?: default1
     }
 }

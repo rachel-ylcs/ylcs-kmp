@@ -63,6 +63,7 @@ import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.data.rachel.topic.TopicDetails
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
+import love.yinlin.extension.then
 
 @Stable
 class ScreenTopic(currentTopic: Topic) : Screen() {
@@ -124,13 +125,13 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
     }
 
     private suspend fun onMoveTopic() {
-        moveTopicDialog.open()?.let { index ->
+        moveTopicDialog.open()?.then { index ->
             val newSection = Comment.Section.MovableSection[index]
-            currentDetails?.let { oldDetails ->
+            currentDetails?.then { oldDetails ->
                 val oldSection = oldDetails.section
                 if (newSection == oldSection) {
                     slot.tip.warning("不能与原板块相同哦")
-                    return@let
+                    return@then
                 }
                 ApiTopicMoveTopic.request(app.config.userToken, topic.tid, newSection) {
                     if (DataSourceDiscovery.currentSection == oldSection) DataSourceDiscovery.page.items.removeAll { it.tid == topic.tid }
@@ -150,7 +151,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
             DataSourceDiscovery.page.items.findAssign(predicate = { it.tid == topic.tid }) {
                 it.copy(coinNum = it.coinNum + num)
             }
-            app.config.userProfile?.let {
+            app.config.userProfile?.then {
                 app.config.userProfile = it.copy(coin = it.coin - num)
             }
             slot.tip.success("投币成功")
@@ -386,7 +387,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                             currentSendComment = comment
                         })
 
-                        app.config.userProfile?.let { user ->
+                        app.config.userProfile?.then { user ->
                             if (user.canUpdateCommentTop(topic.uid)) {
                                 Menu(
                                     text = if (comment.isTop) "取消置顶" else "置顶",
@@ -465,7 +466,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                     visible = menuVisible,
                     onClose = { menuVisible = false },
                     menus = {
-                        app.config.userProfile?.let { user ->
+                        app.config.userProfile?.then { user ->
                             if (user.canDeleteComment(topic.uid, subComment.uid)) {
                                 Menu(text = "删除", icon = Icons.Delete, onClick = {
                                     launch { onDeleteSubComment(parentComment.cid, subComment.cid, onDelete) }
@@ -617,7 +618,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                 pid = args.cid,
                 cid = page.offset,
                 num = page.pageNum
-            )?.let { page.newData(it) }
+            )?.then { page.newData(it) }
         }
 
         @Composable
@@ -632,7 +633,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                         pid = args.cid,
                         cid = page.offset,
                         num = page.pageNum
-                    )?.let { page.moreData(it) }
+                    )?.then { page.moreData(it) }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) { subComment ->

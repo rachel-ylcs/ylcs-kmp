@@ -16,6 +16,7 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.lottie.Lottie
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
+import love.yinlin.extension.then
 import love.yinlin.foundation.NetClient
 
 @Stable
@@ -33,7 +34,7 @@ data object RichEmojiDrawer : RichDrawer {
         val emojiPath = emoji.showPath
         val size = if (emojiType == EmojiType.Lottie) 1.5f else 3f
         renderCompose(size, size) {
-            if (emojiType == EmojiType.Lottie) cache[emojiPath]?.let { Lottie(it, modifier = Modifier.fillMaxSize()) }
+            if (emojiType == EmojiType.Lottie) cache[emojiPath]?.then { Lottie(it, modifier = Modifier.fillMaxSize()) }
             else WebImage(uri = emojiPath, modifier = Modifier.fillMaxSize())
         }
     }

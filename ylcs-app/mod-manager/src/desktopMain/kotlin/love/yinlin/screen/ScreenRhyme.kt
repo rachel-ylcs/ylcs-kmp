@@ -127,7 +127,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
     override val title: String by derivedStateOf { name }
 
     private suspend fun saveConfig() {
-        path?.let {
+        path?.then {
             if (!slot.confirm.open(content = "替换音游配置到库")) return
             val rhymePath = File(it, ModResourceType.Rhyme.filename)
             rhymePath.writeText(prettyJson.encodeToString(rhymeConfig))
@@ -136,7 +136,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
     }
 
     private suspend fun deleteConfig() {
-        path?.let {
+        path?.then {
             if (!slot.confirm.open(content = "删除音游配置")) return
             val rhymePath = File(it, ModResourceType.Rhyme.filename)
             rhymePath.delete()
@@ -255,14 +255,14 @@ class ScreenRhyme(private val path: String?) : Screen() {
         Column(modifier) {
             ActionScope.Left.Container(modifier = Modifier.fillMaxWidth()) {
                 LoadingTextButton(text = line.text, color = Theme.color.secondary, onClick = {
-                    inputDialog.open()?.let { text ->
+                    inputDialog.open()?.then { text ->
                         val newLyrics = config.lyrics.toMutableList()
                         newLyrics[lineIndex] = line.copy(text = text)
                         rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
                     }
                 })
                 LoadingTextButton(text = line.start.toString(), icon = Icons.Timer, onClick = {
-                    inputDialog.open()?.let { text ->
+                    inputDialog.open()?.then { text ->
                         val newLyrics = config.lyrics.toMutableList()
                         newLyrics[lineIndex] = line.copy(start = text.toLongOrNull() ?: 0L)
                         rhymeConfig = rhymeConfig.copy(lyrics = newLyrics)
@@ -303,7 +303,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                 Icon(tip = "复制", icon = Icons.ContentCopy, color = Theme.color.primary, onClick = {
                     copyData = line.theme
                 })
-                copyData?.let { data ->
+                copyData?.then { data ->
                     Icon(tip = "粘贴", icon = Icons.ContentPaste, color = Theme.color.primary, onClick = {
                         if (line.theme.size != data.size) slot.tip.warning("粘贴目标与源长度不同")
                         else {
@@ -333,7 +333,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                         Text(text = action.ch, style = Theme.typography.v6.bold)
 
                         LoadingTextButton(text = action.end.toString(), onClick = {
-                            inputDialog.open()?.let { text ->
+                            inputDialog.open()?.then { text ->
                                 val newTheme = line.theme.toMutableList()
                                 when (action) {
                                     is RhymeAction.Note -> newTheme[actionIndex] = action.copy(end = text.toIntOrNull() ?: 0)
@@ -446,13 +446,13 @@ class ScreenRhyme(private val path: String?) : Screen() {
             ) {
                 Text(text = "基础信息", style = Theme.typography.v7.bold)
                 LoadingTextButton(text = "ID: ${config.id}", onClick = {
-                    inputDialog.open()?.let { text -> rhymeConfig = config.copy(id = text) }
+                    inputDialog.open()?.then { text -> rhymeConfig = config.copy(id = text) }
                 })
                 LoadingTextButton(text = "时长: ${config.duration}", onClick = {
-                    inputDialog.open()?.let { text -> rhymeConfig = config.copy(duration = text.toLongOrNull() ?: 0L) }
+                    inputDialog.open()?.then { text -> rhymeConfig = config.copy(duration = text.toLongOrNull() ?: 0L) }
                 })
                 LoadingTextButton(text = "偏移: ${config.offset}", onClick = {
-                    inputDialog.open()?.let { text -> rhymeConfig = config.copy(offset = text.toIntOrNull() ?: 0) }
+                    inputDialog.open()?.then { text -> rhymeConfig = config.copy(offset = text.toIntOrNull() ?: 0) }
                 })
 
                 Text(text = "副歌段", style = Theme.typography.v7.bold)
@@ -490,7 +490,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
     @Composable
     override fun Content() {
         Row(modifier = Modifier.fillMaxSize().onPreviewKeyEvent { keyEvent ->
-            if (keyEvent.type == KeyEventType.KeyUp) currentSelectItem?.let { onHotKey(it, keyEvent.key) }
+            if (keyEvent.type == KeyEventType.KeyUp) currentSelectItem?.then { onHotKey(it, keyEvent.key) }
             true
         }) {
             val scrollState = rememberScrollState()
@@ -513,7 +513,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                                     launch {
                                         parseQrc(QrcDecrypter.decrypt((dropResult as DropResult.File).path.first().readByteArray()!!)!!)
                                     }
-                                }?.let { slot.tip.error("解析失败") }
+                                }?.then { slot.tip.error("解析失败") }
                             }) {
                                 ContextMenuProvider({
                                     item("全选自动复制") {

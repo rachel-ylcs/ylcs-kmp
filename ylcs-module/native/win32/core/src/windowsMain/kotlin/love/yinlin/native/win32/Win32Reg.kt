@@ -4,6 +4,7 @@ package love.yinlin.native.win32
 
 import kotlinx.cinterop.*
 import love.yinlin.extension.Reference
+import love.yinlin.extension.then
 import platform.windows.*
 
 // 注册表操作
@@ -97,7 +98,7 @@ class Reg(
     }
 
     override fun close() {
-        handle?.let(::RegCloseKey)
+        handle?.then(::RegCloseKey)
         handle = null
     }
 

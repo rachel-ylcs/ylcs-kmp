@@ -5,6 +5,7 @@ import android.media.SoundPool
 import androidx.compose.ui.util.fastMap
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
+import love.yinlin.extension.then
 import love.yinlin.fs.File
 
 actual class SoundPlayer {
@@ -38,7 +39,7 @@ actual class SoundPlayer {
     }
 
     actual fun play(index: Int) {
-        caches.getOrNull(index)?.let { soundId ->
+        caches.getOrNull(index)?.then { soundId ->
             pool.play(soundId, 1f, 1f, 1, 0, 1f)
         }
     }

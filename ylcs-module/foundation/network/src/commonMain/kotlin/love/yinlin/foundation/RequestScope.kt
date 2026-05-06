@@ -1,6 +1,7 @@
 package love.yinlin.foundation
 
 import io.ktor.http.*
+import love.yinlin.extension.then
 
 class RequestScope @PublishedApi internal constructor() {
     private var contentType: ContentType = ContentType.Text.Plain
@@ -23,8 +24,8 @@ class RequestScope @PublishedApi internal constructor() {
     @PublishedApi
     internal fun buildHeaders(builder: HeadersBuilder) = builder.apply {
         appendAll(defaultHeaders)
-        headers?.let(::appendAll)
-        cookies?.let {
+        headers?.then(::appendAll)
+        cookies?.then {
             append(HttpHeaders.Cookie, it.joinToString("; ", transform = ::renderCookieHeader))
         }
     }

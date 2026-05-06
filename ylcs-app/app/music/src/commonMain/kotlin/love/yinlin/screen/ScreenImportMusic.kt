@@ -22,6 +22,7 @@ import love.yinlin.compose.ui.node.dragDrop
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.data.MimeType
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.ImplicitUri
@@ -51,7 +52,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
     }
 
     private suspend fun loadModFile() {
-        app.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.let {
+        app.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.then {
             step = Step.Prepare(it)
         }
     }
@@ -62,7 +63,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
         catchingError {
             val data = path.read { ModFactory.Preview(it).process() }
             step = Step.Preview(path, data)
-        }?.let {
+        }?.then {
             step = Step.Initial(it.message ?: "未知错误", isError = true)
         }
     }
@@ -79,7 +80,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
             player.updateMusicLibraryInfo(data.medias)
             slot.tip.success("解压成功")
             step = Step.Initial()
-        }?.let {
+        }?.then {
             step = Step.Initial(it.message ?: "未知错误", isError = true)
         }
     }
@@ -90,7 +91,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
         val uri = deeplink ?: return
         catchingError {
             step = Step.Prepare(app.implicitFileUri(uri))
-        }?.let {
+        }?.then {
             step = Step.Initial(it.message ?: "未知错误", isError = true)
         }
     }

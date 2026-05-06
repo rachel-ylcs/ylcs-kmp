@@ -177,9 +177,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
                 scanSheet.open()
             }
             CommonButton("名片", Icons.AccountBox) {
-                app.config.userProfile?.let {
-                    userCardSheet.open(it)
-                } ?: slot.tip.warning("请先登录")
+                app.config.userProfile?.let(userCardSheet::open) ?: slot.tip.warning("请先登录")
             }
             CommonButton("设置", Icons.Settings) {
                 navigate(::ScreenSettings)
@@ -189,9 +187,7 @@ class SubScreenMe(parent: NavigationScreen) : SubScreen(parent) {
             val notification = app.config.userProfile?.notification
 
             CommonButton("签到", Icons.EventAvailable, if (notification?.isSignin == false) 1 else 0) {
-                app.config.userProfile?.let {
-                    signinSheet.open(it)
-                } ?: slot.tip.warning("请先登录")
+                app.config.userProfile?.let(signinSheet::open) ?: slot.tip.warning("请先登录")
             }
             CommonButton("主题", Icons.Article) {
                 app.config.userProfile?.let {

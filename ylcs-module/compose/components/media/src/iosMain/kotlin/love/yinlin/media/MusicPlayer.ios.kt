@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.then
 import love.yinlin.foundation.PlatformContext
 import platform.AVFAudio.*
 import platform.AVFoundation.*
@@ -80,7 +81,7 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
             interruptionObserver = NSNotificationCenter.defaultCenter.addObserverForName(
                 AVAudioSessionInterruptionNotification, this, NSOperationQueue.mainQueue
             ) { notification ->
-                notification?.userInfo?.let { userInfo ->
+                notification?.userInfo?.then { userInfo ->
                     val interruptionType = userInfo[AVAudioSessionInterruptionTypeKey] as Long
                     when (interruptionType.toULong()) {
                         AVAudioSessionInterruptionTypeBegan -> handleAudioSessionInterruption(AudioSessionInterruption.Began, null)

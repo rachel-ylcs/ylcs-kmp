@@ -46,7 +46,7 @@ inline fun <T, R> Iterable<T>.findRun(predicate: (T) -> Boolean, block: (T) -> R
 
 // 若查找到元素则对这个元素执行操作并返回结果
 inline fun <T, R> MutableCollection<T>.findModify(predicate: (T) -> Boolean, block: MutableCollection<T>.(T) -> R): R? =
-    this.find(predicate = predicate)?.let { this.block(it) }
+    this.find(predicate = predicate)?.let { block(it) }
 
 // 若查找到元素则对这个元素执行操作并将结果赋值给自身
 inline fun <T> MutableList<T>.findAssign(value: T, block: (T) -> T): T? {

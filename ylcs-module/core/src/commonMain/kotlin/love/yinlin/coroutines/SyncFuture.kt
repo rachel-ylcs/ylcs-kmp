@@ -13,15 +13,15 @@ class SyncFuture<T>(private val continuation: CancellableContinuation<T?>) {
     }
 
     inline fun send(block: () -> T) {
-        catchingError {
-            send(block())
-        }?.let { send() }
+        val _ = catchingError { send(block()) } ?: return
+        send()
     }
 
     fun cancel() { continuation.cancel() }
 
     inline fun catching(block: () -> Unit) {
-        catchingError(block = block)?.let { send() }
+        val _ = catchingError(block = block) ?: return
+        send()
     }
 
     fun clean(block: (Throwable?) -> Unit) = continuation.invokeOnCancellation(block)

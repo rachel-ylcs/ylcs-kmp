@@ -14,6 +14,7 @@ import love.yinlin.compose.animation.Interpolator
 import love.yinlin.compose.game.drawer.Drawer
 import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.drawer.TextGraph
+import love.yinlin.extension.then
 import kotlin.math.abs
 import kotlin.math.sin
 
@@ -53,7 +54,7 @@ class InteractTipArea : MomentVisible(12000) {
     }
 
     override fun Drawer.onDraw() {
-        noteFontMap?.let { graphs ->
+        noteFontMap?.then { graphs ->
             val centerOffset = areaSize.center / 2f
             val textSize = areaSize / 2f
             val textColor = Colors.White.copy(alpha = alpha)

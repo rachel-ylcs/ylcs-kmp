@@ -19,6 +19,7 @@ import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.viewport.Camera
 import love.yinlin.compose.game.visible.Block
 import love.yinlin.compose.game.visible.CornerTail
+import love.yinlin.extension.then
 
 // 地图层
 @Stable
@@ -59,12 +60,12 @@ class MapLayer(
 
     override fun preUpdate(tick: Int) {
         // 检查新方块
-        blocks.getOrNull(prepareIndex + 1)?.let { nextBlock ->
+        blocks.getOrNull(prepareIndex + 1)?.then { nextBlock ->
             if (momentLayer.audioPosition >= nextBlock.time.appearance) {
                 // 到达方块出现刻
                 ++prepareIndex
                 // 生成文字
-                lyricsTextBuilder?.let { builder ->
+                lyricsTextBuilder?.then { builder ->
                     val ch = nextBlock.rhymeAction.ch
                     if (!lyricsTextMap.containsKey(ch)) lyricsTextMap[ch] = builder(ch)
                 }
@@ -75,7 +76,7 @@ class MapLayer(
 
         // 处理方块交互
         interactLayer.withInteractInfo { interactStatusList ->
-            blocks.getOrNull(currentIndex)?.let { currentBlock ->
+            blocks.getOrNull(currentIndex)?.then { currentBlock ->
                 // 只在交互状态下触发
                 when (val blockStatus = currentBlock.blockStatus) {
                     is BlockStatus.Interact -> currentBlock.onInteract(interactStatusList, blockStatus)
@@ -89,14 +90,14 @@ class MapLayer(
                             val currentLine = currentBlock.line
                             if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
                                 // 添加尾角动画
-                                currentLine.endDirection?.let { endDirection ->
+                                currentLine.endDirection?.then { endDirection ->
                                     this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
                                 }
                             }
                         }
 
                         // 检查相机跟踪
-                        blocks.getOrNull(newIndex)?.let { nextBlock ->
+                        blocks.getOrNull(newIndex)?.then { nextBlock ->
                             val boundary = camera.viewportBounds
                             val gapRatio = (1 - CAMERA_BLOCK_AREA_RATIO) / 2
                             val horizontalMargin = boundary.width * gapRatio

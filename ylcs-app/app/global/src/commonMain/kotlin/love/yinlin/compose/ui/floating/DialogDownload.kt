@@ -4,6 +4,7 @@ import kotlinx.io.Sink
 import love.yinlin.app
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.filenameOrRandom
+import love.yinlin.extension.then
 import love.yinlin.foundation.NetClient
 
 typealias DialogDownload = DialogProgress<Boolean>
@@ -28,7 +29,7 @@ suspend fun DialogDownload.download(url: String, sink: Sink, onSave: suspend (Bo
 suspend fun DialogDownload.downloadPhoto(url: String) {
     val picker = app.picker
     val filename = url.filenameOrRandom(".webp")
-    picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+    picker.prepareSavePicture(filename)?.then { (origin, sink) ->
         val result = download(url, sink) {
             if (it) picker.actualSave(filename, origin, sink)
         }
@@ -39,7 +40,7 @@ suspend fun DialogDownload.downloadPhoto(url: String) {
 suspend fun DialogDownload.downloadVideo(url: String) {
     val picker = app.picker
     val filename = url.filenameOrRandom(".mp4")
-    picker.prepareSaveVideo(filename)?.let { (origin, sink) ->
+    picker.prepareSaveVideo(filename)?.then { (origin, sink) ->
         val result = download(url, sink) {
             if (it) picker.actualSave(filename, origin, sink)
         }
@@ -55,7 +56,7 @@ suspend fun DialogDownload.downloadPhotos(pics: List<String>) {
         for (index in pics.indices) {
             val pic = pics[index]
             val filename = pic.filenameOrRandom(".webp")
-            picker.prepareSavePicture(filename)?.let { (origin, sink) ->
+            picker.prepareSavePicture(filename)?.then { (origin, sink) ->
                 sink.use {
                     NetClient.File.download(
                         url = pic,

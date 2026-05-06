@@ -19,6 +19,7 @@ import love.yinlin.compose.game.drawer.PrepareDrawer
 import love.yinlin.compose.game.drawer.TextGraph
 import love.yinlin.compose.game.traits.Dynamic
 import love.yinlin.compose.game.traits.Visible
+import love.yinlin.extension.then
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
@@ -51,11 +52,11 @@ class BackgroundRipple(
     private var skillShowTextBuilder: ((String) -> TextGraph)? = null
 
     fun updateSkill() {
-        skillShowTextBuilder?.let { builder ->
+        skillShowTextBuilder?.then { builder ->
             val newText = character.showText
             if (skillShowText != newText) {
                 skillShowText = newText
-                skillShowTextGraph = newText?.let { builder(it) }
+                skillShowTextGraph = newText?.let(builder)
             }
         }
         updateDirty()
@@ -124,14 +125,14 @@ class BackgroundRipple(
         val characterCenter = characterBounds.center
 
         clip(resonancePath) {
-            characterImage?.let { cv ->
+            characterImage?.then { cv ->
                 circle(Colors.Black, characterCenter, characterRadius)
                 scale(1f + skillAlpha * 0.5f, characterCenter) {
                     image(cv, characterBounds, alpha = skillAlpha)
                 }
             }
 
-            skillShowTextGraph?.let { graph ->
+            skillShowTextGraph?.then { graph ->
                 val h = characterRadius / 6f
                 val w = graph.width(h)
                 roundRect(Colors.Black, h, characterCenter.translate(x = -w, y = h * 2), Size(w * 2, h), alpha = 0.75f)

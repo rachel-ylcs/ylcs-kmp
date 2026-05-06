@@ -7,6 +7,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.unit.TextUnit
+import love.yinlin.extension.then
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.ExperimentalExtendedContracts
 import kotlin.contracts.InvocationKind
@@ -54,7 +55,7 @@ class RichRenderScope(
 
     fun renderList(items: List<RichObject>) {
         for (item in items) {
-            drawers[item.type]?.let { drawer ->
+            drawers[item.type]?.then { drawer ->
                 with(drawer) { render(item) }
             }
         }

@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.skiaCanvas
 import love.yinlin.annotation.NativeLibApi
+import love.yinlin.extension.then
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.LinuxVideoController
 import love.yinlin.media.MacOSVideoController
@@ -47,7 +48,7 @@ abstract class DesktopVideoController(topBar: VideoActionBar.Factory, bottomBar:
             isRelease = true
             nativeRelease(nativeHandle)
             nativeHandle = 0L
-            image?.let {
+            image?.then {
                 if (!it.isClosed) it.close()
             }
             image = null

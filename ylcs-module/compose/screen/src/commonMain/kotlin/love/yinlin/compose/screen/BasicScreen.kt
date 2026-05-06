@@ -16,6 +16,7 @@ import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.tool.NavigationBack
 import love.yinlin.extension.Array
 import love.yinlin.extension.parseJson
+import love.yinlin.extension.then
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmName
@@ -39,7 +40,7 @@ abstract class BasicScreen : ViewModel() {
         // 2. 释放数据源
         (this as? DataSource)?.onDataSourceClean()
         // 3. 注销屏幕
-        uniqueId.let { manager.unregisterScreen(it) }
+        uniqueId.then { manager.unregisterScreen(it) }
         // 4. ViewModel 回收
         super.onCleared()
     }

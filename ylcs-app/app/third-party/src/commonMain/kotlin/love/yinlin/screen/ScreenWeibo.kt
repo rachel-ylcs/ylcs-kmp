@@ -22,6 +22,7 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.data.weibo.Weibo
+import love.yinlin.extension.then
 import love.yinlin.tpl.WeiboAPI
 
 @Stable
@@ -40,7 +41,7 @@ class ScreenWeibo : Screen() {
 
                 items.clear()
                 for (id in users) {
-                    WeiboAPI.getUserWeibo(id)?.let { result ->
+                    WeiboAPI.getUserWeibo(id)?.then { result ->
                         items += result
                         items.sortDescending()
                         if (provider.isLoading) provider.status = StatefulStatus.Content

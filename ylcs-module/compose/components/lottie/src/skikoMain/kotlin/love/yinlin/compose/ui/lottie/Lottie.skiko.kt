@@ -12,6 +12,7 @@ import love.yinlin.compose.extension.rememberRefNull
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.window.rememberOffScreenWindowState
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.then
 import org.jetbrains.skia.skottie.Animation
 import org.jetbrains.skia.sksg.InvalidationController
 import kotlin.time.Duration.Companion.milliseconds
@@ -26,7 +27,7 @@ actual fun Lottie(data: String, modifier: Modifier) {
 
     LaunchedEffect(data) {
         animation = if (data.isEmpty()) null else catchingNull { Animation.makeFromString(data) }
-        animation?.let { anim ->
+        animation?.then { anim ->
             val fps = anim.fPS.let { if (it <= 0f) 60f else it }
             val duration = anim.duration
             if (duration > 0f) {
@@ -42,7 +43,7 @@ actual fun Lottie(data: String, modifier: Modifier) {
 
     Box(modifier = modifier.drawWithContent {
         if (isForeground) {
-            animation?.let { anim ->
+            animation?.then { anim ->
                 drawIntoCanvas { canvas ->
                     anim.seekFrameTime(currentTime, invalidationController)
                     anim.render(canvas.skiaCanvas, 0f, 0f, size.width, size.height)

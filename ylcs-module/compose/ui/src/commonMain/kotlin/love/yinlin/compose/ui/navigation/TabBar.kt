@@ -30,6 +30,7 @@ import love.yinlin.compose.ui.node.pointerIcon
 import love.yinlin.compose.ui.node.semantics
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.TextIconAdapter
+import love.yinlin.extension.then
 
 @Composable
 fun TabBar(
@@ -89,7 +90,7 @@ fun TabBar(
                         )
                     }.pointerIcon(PointerIcon.Hand).padding(padding)
                 ) { iconId, textId ->
-                    icon?.let { Icon(icon = it, color = contentColor, modifier = Modifier.iconId()) }
+                    icon?.then { Icon(icon = it, color = contentColor, modifier = Modifier.iconId()) }
                     SimpleClipText(text = title, modifier = Modifier.textId(), color = contentColor, style = style)
                 }
             }

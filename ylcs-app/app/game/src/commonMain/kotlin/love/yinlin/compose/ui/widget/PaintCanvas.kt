@@ -32,10 +32,11 @@ import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.data.rachel.game.info.PaintPath
+import love.yinlin.extension.then
 
 private fun DrawScope.drawPaintPath(paths: List<Long>, ratio: Float, width: Float, color: Color) {
     val path = Path().apply {
-        paths.firstOrNull()?.let { first ->
+        paths.firstOrNull()?.then { first ->
             val (x, y) = Offset(first) * ratio
             moveTo(x, y)
             for (i in 1 ..< paths.size - 1) {
@@ -126,7 +127,7 @@ private fun PaintCanvasView(
                                     currentPath.take(index + 2)
                                 }
                             }
-                            distinctPath?.let { state.paths += PaintPath(it, state.width, state.color.toArgb()) }
+                            distinctPath?.then { state.paths += PaintPath(it, state.width, state.color.toArgb()) }
                             currentPath.clear()
                         },
                         onDrag = { v, _ -> currentOffset = v.position }

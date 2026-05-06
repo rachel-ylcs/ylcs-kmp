@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.data.music.PlatformMusicType
+import love.yinlin.extension.then
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.screen.*
 import love.yinlin.startup.StartupMusicPlayer
@@ -86,12 +87,12 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             Scheme.Rachel -> {
                 when (uri.path) {
                     "/openProfile" -> {
-                        uri.params["uid"]?.toIntOrNull()?.let { uid ->
+                        uri.params["uid"]?.toIntOrNull()?.then { uid ->
                             manager.navigate(::ScreenUserCard, uid)
                         }
                     }
                     "/openSong" -> {
-                        uri.params["id"]?.let { id ->
+                        uri.params["id"]?.then { id ->
                             manager.navigate(::ScreenMusicDetails, id)
                         }
                     }

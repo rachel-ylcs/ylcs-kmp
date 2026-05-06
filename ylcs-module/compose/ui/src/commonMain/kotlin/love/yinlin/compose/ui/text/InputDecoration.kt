@@ -65,8 +65,8 @@ interface InputDecoration {
         companion object {
             val Clear = Icon(
                 icon = { Icons.Clear },
-                visible = { !it.isEmpty },
-                onClick = { it.clear() }
+                visible = InputState::isNotEmpty,
+                onClick = InputState::clear
             )
         }
     }
@@ -101,7 +101,7 @@ interface InputDecoration {
         // 文字显然比*更宽，长按时如果Input宽度增大会导致密码Icon从鼠标所在位置移开从而又触发收缩
         @Composable
         override fun Content(state: InputState) {
-            if (!state.isEmpty) {
+            if (state.isNotEmpty) {
                 val oldTransformation = remember { state.visualTransformation }
 
                 DisposableEffect(Unit) {

@@ -212,7 +212,7 @@ object MiguMusicAPI : PlatformMusicAPI {
                     val songs = when (type) {
                         "album" -> requestAlbumSongs(id)
                         "playlist" -> requestPlaylistSongs(id)
-                        "song" -> requestSongById(id)?.let { listOf(it) }
+                        "song" -> requestSongById(id)?.let(::listOf)
                         else -> null
                     } ?: return@let null
 

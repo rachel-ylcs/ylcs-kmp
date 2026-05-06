@@ -18,16 +18,23 @@ abstract class ValueState<T>(
     private var state: MutableState<T>? = null
 
     final override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        if (state == null) state = stateFactory(kvGet(property.storageKey))
-        return state!!.value
+        val currentState = state
+        return if (currentState != null) currentState.value
+        else {
+            val newState = stateFactory(kvGet(property.storageKey))
+            state = newState
+            newState.value
+        }
     }
 
     final override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        state?.let {
-            val oldValue = it.value
-            it.value = value
+        val currentState = state
+        if (currentState != null) {
+            val oldValue = currentState.value
+            currentState.value = value
             if (oldValue != value) kvSet(property.storageKey, value)
-        } ?: run {
+        }
+        else {
             state = stateFactory(value)
             kvSet(property.storageKey, value)
         }

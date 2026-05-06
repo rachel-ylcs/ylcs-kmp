@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import kotlinx.datetime.LocalDateTime
 import kotlinx.io.bytestring.buildByteString
 import love.yinlin.extension.merge64
+import love.yinlin.extension.then
 import love.yinlin.extension.toLocalDateTime
 import love.yinlin.extension.toLong
 import love.yinlin.extension.uint1
@@ -107,21 +108,21 @@ private fun File.fileTime(time: LocalDateTime, index: Int) = memScoped {
  */
 var File.createTime: LocalDateTime?
     get() = this.fileTime { it.ftCreationTime }
-    set(value) { value?.let { time -> this.fileTime(time, 0) } }
+    set(value) { value?.then { time -> this.fileTime(time, 0) } }
 
 /**
  * 文件修改时间
  */
 var File.writeTime: LocalDateTime?
     get() = this.fileTime { it.ftLastWriteTime }
-    set(value) { value?.let { time -> this.fileTime(time, 1) } }
+    set(value) { value?.then { time -> this.fileTime(time, 1) } }
 
 /**
  * 文件访问时间
  */
 var File.accessTime: LocalDateTime?
     get() = this.fileTime { it.ftLastAccessTime }
-    set(value) { value?.let { time -> this.fileTime(time, 2) } }
+    set(value) { value?.then { time -> this.fileTime(time, 2) } }
 
 /**
  * 取快捷方式目标

@@ -27,6 +27,7 @@ import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.fadingEdge
+import love.yinlin.extension.then
 
 @Stable
 internal interface TextLine {
@@ -123,9 +124,9 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
             itemKey("Placeholder2") {
                 LineItemWrapper { LinePlaceholder() }
             }
-            lines?.let { lines ->
+            lines?.then {
                 itemsIndexed(
-                    items = lines,
+                    items = it,
                     key = { _, item -> item.position }
                 ) { index, item ->
                     LineItemWrapper(onClick = {

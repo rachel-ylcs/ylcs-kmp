@@ -2,6 +2,7 @@ package love.yinlin.compose.ui
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Matrix
+import love.yinlin.extension.then
 import love.yinlin.platform.unsupportedPlatform
 import kotlin.js.ExperimentalWasmJsInterop
 
@@ -11,9 +12,9 @@ actual class PAGPlayer(private val delegate: PlatformPAGPlayer) {
     actual constructor() : this(PlatformPAGPlayer.create())
 
     actual var surface: PAGSurface? get() = delegate.getSurface()?.let(::PAGSurface)
-        set(value) { value?.delegate?.let { delegate.setSurface(it) } }
+        set(value) { value?.delegate?.then(delegate::setSurface) }
     actual var composition: PAGComposition? get() = delegate.getComposition()?.let(::PAGComposition)
-        set(value) { value?.delegate?.let { delegate.setComposition(it) } }
+        set(value) { value?.delegate?.then(delegate::setComposition) }
     actual var videoEnabled: Boolean get() = delegate.videoEnabled()
         set(value) { delegate.setVideoEnabled(value) }
     actual var cacheEnabled: Boolean get() = delegate.cacheEnabled()

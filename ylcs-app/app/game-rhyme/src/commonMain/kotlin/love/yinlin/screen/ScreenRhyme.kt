@@ -201,7 +201,7 @@ class ScreenRhyme : BasicScreen() {
                     val lyricsConfig = lyricsText.parseJsonValue<RhymeLyricsConfig>()
                     // 解析封面图片
                     val recordImage = Coroutines.io {
-                        info.path(modPath, ModResourceType.Record).readByteArray()?.let { ImageBitmap.decode(it) }
+                        info.path(modPath, ModResourceType.Record).readByteArray()?.let(ImageBitmap::decode)
                     }
                     require(recordImage != null) { "封面资源文件丢失" }
                     require(lyricsConfig.id == info.id) { "歌词资源文件与MOD不匹配" }
@@ -213,7 +213,7 @@ class ScreenRhyme : BasicScreen() {
                     require(characterFactory != null) { "未知角色" }
                     val character = characterFactory()
                     val characterImage = Coroutines.io {
-                        app.cache.loadByteArray(ServerRes.Game.Rhyme.CV.illustration(characterInfo.id).url)?.let { ImageBitmap.decode(it) }
+                        app.cache.loadByteArray(ServerRes.Game.Rhyme.CV.illustration(characterInfo.id).url)?.let(ImageBitmap::decode)
                     }
 
                     engine.plugin<RhymePlugin>().setupGame(

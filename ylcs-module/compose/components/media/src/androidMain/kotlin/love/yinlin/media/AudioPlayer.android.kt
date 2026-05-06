@@ -6,6 +6,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import love.yinlin.extension.then
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
@@ -46,7 +47,7 @@ internal class AndroidAudioPlayer(context: PlatformContext, onEndListener: () ->
     }
 
     override suspend fun load(path: File, playing: Boolean) {
-        player?.let {
+        player?.then {
             it.setMediaItem(MediaItem.fromUri(path.path))
             it.prepare()
             if (playing) it.play()
@@ -66,7 +67,7 @@ internal class AndroidAudioPlayer(context: PlatformContext, onEndListener: () ->
     }
 
     override fun seekTo(position: Long) {
-        player?.let {
+        player?.then {
             it.seekTo(position)
             if (!it.isPlaying) it.play()
         }

@@ -44,9 +44,11 @@ import love.yinlin.cs.sockets.LyricsSockets
 import love.yinlin.cs.url
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.cast
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
+import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
 import love.yinlin.foundation.WebSocketClient
@@ -87,12 +89,12 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
                 is LyricsSockets.SM.GamePrepare -> handlePreparing(data.player1, data.player2)
                 is LyricsSockets.SM.GameStart -> {
                     require(data.questions.size == LyricsSockets.QUESTION_COUNT)
-                    (currentStatus as? GLStatus.Preparing)?.let { status ->
+                    currentStatus.cast { status: GLStatus.Preparing ->
                         handlePlaying(info1 = status.info1, info2 = status.info2, questions = data.questions)
                     }
                 }
                 is LyricsSockets.SM.AnswerUpdated -> {
-                    (currentStatus as? GLStatus.Playing)?.let { status ->
+                    currentStatus.cast { status: GLStatus.Playing ->
                         currentStatus = status.copy(count1 = data.count1, count2 = data.count2)
                     }
                 }
@@ -113,11 +115,10 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
             launch {
                 for (_ in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
                     delay(1.seconds)
-                    (currentStatus as? GLStatus.InviteLoading)?.let { status ->
-                        val time = status.time - 1000L
-                        if (time <= 0L) break
-                        currentStatus = status.copy(time = time)
-                    } ?: break
+                    val status = currentStatus as? GLStatus.InviteLoading ?: break
+                    val time = status.time - 1000L
+                    if (time <= 0L) break
+                    currentStatus = status.copy(time = time)
                 }
             }
         }
@@ -135,11 +136,10 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
             launch {
                 for (_ in 0 ..< (LyricsSockets.INVITE_TIME / 1000L).toInt()) {
                     delay(1.seconds)
-                    (currentStatus as? GLStatus.InvitedLoading)?.let { status ->
-                        val time = status.time - 1000L
-                        if (time <= 0L) break
-                        currentStatus = status.copy(time = time)
-                    } ?: return@launch
+                    val status = currentStatus as? GLStatus.InvitedLoading ?: return@launch
+                    val time = status.time - 1000L
+                    if (time <= 0L) break
+                    currentStatus = status.copy(time = time)
                 }
                 currentStatus = GLStatus.Hall
             }
@@ -151,11 +151,10 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
         launch {
             for (_ in 0 ..< (LyricsSockets.PREPARE_TIME / 1000L).toInt()) {
                 delay(1.seconds)
-                (currentStatus as? GLStatus.Preparing)?.let { status ->
-                    val time = status.time - 1000L
-                    if (time <= 0L) break
-                    currentStatus = status.copy(time = time)
-                } ?: break
+                val status = currentStatus as? GLStatus.Preparing ?: break
+                val time = status.time - 1000L
+                if (time <= 0L) break
+                currentStatus = status.copy(time = time)
             }
         }
     }
@@ -165,11 +164,10 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
         launch {
             for (_ in 0 ..< (LyricsSockets.PLAYING_TIME / 1000L).toInt()) {
                 delay(1.seconds)
-                (currentStatus as? GLStatus.Playing)?.let { status ->
-                    val time = status.time - 1000L
-                    if (time <= 0L) break
-                    currentStatus = status.copy(time = time)
-                } ?: break
+                val status = currentStatus as? GLStatus.Playing ?: break
+                val time = status.time - 1000L
+                if (time <= 0L) break
+                currentStatus = status.copy(time = time)
             }
         }
     }

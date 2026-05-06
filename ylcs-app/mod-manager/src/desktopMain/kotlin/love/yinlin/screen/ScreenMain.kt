@@ -200,7 +200,7 @@ class ScreenMain : BasicScreen() {
             if (needRename) {
                 item("重命名") {
                     launch {
-                        item.path.rename(item.name)?.let { loadLibrary() }
+                        item.path.rename(item.name)?.then { loadLibrary() }
                     }
                 }
             }
@@ -257,7 +257,7 @@ class ScreenMain : BasicScreen() {
                     LoadingIcon(Icons.Refresh, tip = "刷新", onClick = ::loadLibrary)
                     if (onSearching) Icon(Icons.Clear, tip = "关闭搜索", onClick = ::closeSearch)
                     else LoadingIcon(Icons.Search, tip = "搜索", onClick = {
-                        inputDialog.open()?.let { startSearch(it) }
+                        inputDialog.open()?.then(::startSearch)
                     })
                     Icon(Icons.SelectAll, tip = if (isSelectAll) "取消全选" else "全选", onClick = {
                         val v = isSelectAll
@@ -403,7 +403,7 @@ class ScreenMain : BasicScreen() {
                             catchingError {
                                 result = paths[0].read { source -> ModFactory.Preview(source).process() }
                                 statusText = ""
-                            }?.let { statusText = it.message ?: "未知错误" }
+                            }?.then { statusText = it.message ?: "未知错误" }
                             isRunning = false
                         }
                     }
@@ -479,7 +479,7 @@ class ScreenMain : BasicScreen() {
                                         }
                                     }
                                 }
-                            }?.let { statusText = it.message ?: "未知错误" }
+                            }?.then { statusText = it.message ?: "未知错误" }
                             isRunning = false
                             close()
                             loadLibrary()
@@ -615,7 +615,7 @@ class ScreenMain : BasicScreen() {
                                             statusText = "[$index/$total] -> $name"
                                         }
                                     }
-                                }?.let { statusText = it.message ?: "未知错误" }
+                                }?.then { statusText = it.message ?: "未知错误" }
                                 isRunning = false
                                 close()
                             }

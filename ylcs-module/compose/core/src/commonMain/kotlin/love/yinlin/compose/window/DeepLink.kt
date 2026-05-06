@@ -3,6 +3,7 @@ package love.yinlin.compose.window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
+import love.yinlin.extension.then
 import love.yinlin.uri.Uri
 
 @Stable
@@ -18,7 +19,7 @@ fun interface DeepLink<M : Any> {
             set(value) {
                 field = value
                 if (value != null) {
-                    cached?.let { value.invoke(it) }
+                    cached?.then(value)
                     cached = null
                 }
             }
@@ -33,8 +34,8 @@ fun interface DeepLink<M : Any> {
 
         fun openUri(uri: Uri) {
             cached = uri
-            listener?.let {
-                it.invoke(uri)
+            listener?.then {
+                it(uri)
                 cached = null
             }
         }

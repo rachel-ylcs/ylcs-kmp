@@ -40,6 +40,7 @@ import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.data.weibo.WeiboUser
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.then
 import love.yinlin.tpl.WeiboAPI
 
 @Stable
@@ -68,7 +69,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
         supervisorScope {
             this.launch {
                 currentUser = WeiboAPI.getWeiboUser(userId)
-                currentUser?.info?.id?.let { id ->
+                currentUser?.info?.id?.then { id ->
                     provider.withLoading {
                         val newItems = mutableMapOf<String, Weibo>()
                         newItems += WeiboAPI.getUserWeibo(id)!!.associateBy { it.id }

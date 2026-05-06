@@ -12,9 +12,9 @@ data class ActivityPhoto(
     val seat: String? = null, // [座位图]
     val posters: List<String> = emptyList(), // [海报]
 ) {
-    val coverPath by lazy { cover?.let { ServerRes.Activity.activity(it) } }
+    val coverPath by lazy { cover?.let(ServerRes.Activity::activity) }
 
-    val seatPath by lazy { seat?.let { ServerRes.Activity.activity(it) } }
+    val seatPath by lazy { seat?.let(ServerRes.Activity::activity) }
 
     fun posterPath(key: String) = ServerRes.Activity.activity(key)
 }

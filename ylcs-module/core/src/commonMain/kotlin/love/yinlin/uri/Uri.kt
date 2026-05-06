@@ -2,6 +2,7 @@ package love.yinlin.uri
 
 import kotlinx.serialization.Serializable
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 
 @Serializable
 data class Uri(
@@ -59,7 +60,7 @@ data class Uri(
                 if (writePosition == 0) return
                 catchingError {
                     builder.append(decodeToStringAndReset())
-                }?.let {
+                }?.then {
                     builder.append('\uFFFD')
                 }
             }
@@ -134,7 +135,7 @@ data class Uri(
                         encoded.append(hexDigits[bytes[i].toInt() and 0xf0 shr 4])
                         encoded.append(hexDigits[bytes[i].toInt() and 0xf])
                     }
-                }?.let { return str }
+                } ?: return str
                 current = nextAllowed
             }
             return encoded.toString()

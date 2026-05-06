@@ -2,6 +2,7 @@ package love.yinlin.io
 
 import kotlinx.io.RawSource
 import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.then
 
 class Sources<S : RawSource>(private val sources: MutableList<S> = mutableListOf()) : AutoCloseable, MutableList<S> by sources {
     override fun close() {
@@ -15,7 +16,7 @@ inline fun <T, S : RawSource> Collection<T>.safeToSources(block: (T) -> S?): Sou
         sources.close()
         null
     }) {
-        for (item in this) block(item)?.let { sources += it }
+        for (item in this) block(item)?.then { sources += it }
         sources
     }
 }

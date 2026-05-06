@@ -35,6 +35,7 @@ import love.yinlin.cs.requestNull
 import love.yinlin.cs.url
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.photo.PhotoAlbum
+import love.yinlin.extension.then
 
 @Stable
 class ScreenAlbum : BasicScreen() {
@@ -142,7 +143,7 @@ class ScreenAlbum : BasicScreen() {
                 modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
                 left = OverlayAction.Sync("返回", Icons.ArrowBack, onClick = ::onBack),
                 right = OverlayAction.Async("搜索", Icons.Search) {
-                    searchDialog.open()?.let { requestNewPhotos(it) }
+                    searchDialog.open()?.then { requestNewPhotos(it) }
                 }
             )
             StatefulBox(

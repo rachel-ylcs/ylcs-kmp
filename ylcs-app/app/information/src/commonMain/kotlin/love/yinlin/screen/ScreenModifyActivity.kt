@@ -179,7 +179,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 sink.write(image.encode(quality = ImageQuality.High)!!)
                 true
             }
-        }?.let { path ->
+        }?.then { path ->
             slot.loading.open("正在更新...") {
                 ApiActivityUpdateActivityPhotos.request(app.config.userToken, aid, key, index, apiFile(path)) { newPic ->
                     activities.findAssign(predicate = { it.aid == aid }) { oldActivity ->
@@ -217,14 +217,14 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (file != null) {
-            cropDialog.open(url = file.path, aspectRatio = 2f)?.let { region ->
+            cropDialog.open(url = file.path, aspectRatio = 2f)?.then { region ->
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(region)
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)
                     true
-                }?.let { onPicAdd(it) }
+                }?.then { onPicAdd(it) }
             }
         }
     }
@@ -238,7 +238,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)
                     true
-                }?.let { path += it }
+                }?.then { path += it }
             }
             if (path.isNotEmpty()) onPicsAdd(path)
         }
@@ -269,7 +269,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             SimpleEllipsisText(text = text, style = Theme.typography.v7.bold)
             Icon(icon = Icons.Add, onClick = {
                 launch {
-                    inputDialog.open(initText())?.let {
+                    inputDialog.open(initText())?.then {
                         if (it in list) slot.tip.warning("$it 已存在")
                         else list += it
                     }
@@ -283,7 +283,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h),
             onClick = { index ->
                 launch {
-                    inputDialog.open(list[index])?.let { list[index] = it }
+                    inputDialog.open(list[index])?.then { list[index] = it }
                 }
             },
             onDelete = { list.removeAt(it) }
@@ -318,7 +318,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 onAdd = { price += ActivityPrice("票种", 0) },
                 onReplace = { index, item ->
                     launch {
-                        pairInputDialog.open(item.name, item.value.toString())?.let { (newName, newValue) ->
+                        pairInputDialog.open(item.name, item.value.toString())?.then { (newName, newValue) ->
                             price[index] = ActivityPrice(newName, newValue.toIntOrNull() ?: 0)
                         }
                     }

@@ -3,6 +3,7 @@ package org.libpag
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.extension.Destructible
 import love.yinlin.extension.RAII
+import love.yinlin.extension.then
 import love.yinlin.platform.NativeLibLoader
 
 @NativeLibApi
@@ -93,7 +94,7 @@ class PAGPlayer private constructor(constructor: () -> Long) : Destructible(RAII
 
     var composition: PAGComposition? get() = unpackLayerInfo(nativeGetComposition(nativeHandle)) as? PAGComposition
         set(value) {
-            value?.let { nativeSetComposition(nativeHandle, it.nativeHandle, it.internalLayerType) }
+            value?.then { nativeSetComposition(nativeHandle, it.nativeHandle, it.internalLayerType) }
         }
 
     var videoEnabled: Boolean get() = nativeVideoEnabled(nativeHandle)

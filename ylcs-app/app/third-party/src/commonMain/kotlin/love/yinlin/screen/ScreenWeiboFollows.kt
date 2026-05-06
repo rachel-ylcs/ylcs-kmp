@@ -33,6 +33,7 @@ import love.yinlin.data.weibo.WeiboUserInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.then
 import love.yinlin.extension.toJsonString
 import love.yinlin.tpl.WeiboAPI
 
@@ -54,7 +55,7 @@ class ScreenWeiboFollows : Screen() {
     }
 
     private suspend fun onSearchWeiboUser() {
-        searchDialog.open()?.let { key ->
+        searchDialog.open()?.then { key ->
             provider.withLoading {
                 val result = WeiboAPI.searchWeiboUser(key)!!
                 searchResult = result
@@ -169,7 +170,7 @@ class ScreenWeiboFollows : Screen() {
                                     if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
                                 }
                                 slot.tip.success("导入成功")
-                            }?.let {
+                            }?.then {
                                 slot.tip.error("导入格式错误")
                             }
                         }
@@ -180,7 +181,7 @@ class ScreenWeiboFollows : Screen() {
                         onClick = {
                             catchingError {
                                 state.text = app.config.weiboUsers.items.fastMap { WeiboUserInfo(it.id, it.name, "") }.toJsonString()
-                            }?.let {
+                            }?.then {
                                 slot.tip.error(it.message ?: "导出失败")
                             }
                         }

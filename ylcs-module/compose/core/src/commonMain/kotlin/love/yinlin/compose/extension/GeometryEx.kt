@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastRoundToInt
+import love.yinlin.extension.then
 
 fun Offset.translate(x: Float = 0f, y: Float = 0f) = this.copy(x = this.x + x, y = this.y + y)
 
@@ -37,7 +38,7 @@ fun Size.translate(x: Float = 0f, y: Float = 0f) = this.copy(width = this.width 
 fun Size.scale(dx: Float = 1f, dy: Float = 1f) = this.copy(width = this.width * dx, height = this.height * dy)
 
 fun Path(positions: Array<Offset>): Path = Path().apply {
-    positions.firstOrNull()?.let { first ->
+    positions.firstOrNull()?.then { first ->
         moveTo(first.x, first.y)
         for (i in 1 ..< positions.size) {
             val position = positions[i]

@@ -31,6 +31,7 @@ import love.yinlin.extension.toJson
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.service.Database
 import love.yinlin.cs.service.Redis
+import love.yinlin.extension.then
 import org.slf4j.Logger
 import java.io.File
 import kotlin.random.Random
@@ -52,7 +53,7 @@ abstract class APIScope internal constructor(
                     Coroutines.io {
                         call.respond(status = HttpStatusCode.OK, message = block(call))
                     }
-                }?.let { err ->
+                }?.then { err ->
                     logger.error("CallError - {}", err.stackTraceToString())
                     when (err) {
                         is UnauthorizedException -> call.respond(status = HttpStatusCode.Unauthorized, message = makeArray { })
@@ -871,7 +872,7 @@ abstract class APIScope internal constructor(
                     if (frame !is Frame.Text) continue
                     manager.onMessage(frame.readText())
                 }
-            }?.let { manager.onError(it) }
+            }?.then { manager.onError(it) }
             manager.onClose()
             this.close(CloseReason(CloseReason.Codes.NORMAL, "websockets closed"))
         }

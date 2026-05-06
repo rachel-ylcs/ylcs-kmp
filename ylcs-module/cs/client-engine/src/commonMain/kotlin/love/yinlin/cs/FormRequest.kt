@@ -33,7 +33,7 @@ fun apiFile(data: ByteArray): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: RawSource): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: Sources<RawSource>): APIFile = ClientAPIFile(value = data)
 suspend fun apiFile(data: File): APIFile = ClientAPIFile(data.rawSource())
-suspend fun apiFile(data: List<File>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let { ClientAPIFile(it) }
+suspend fun apiFile(data: List<File>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let(::ClientAPIFile)
 
 class APIFormScope {
     val formParts = mutableListOf<FormPart<*>>()

@@ -10,6 +10,7 @@ import love.yinlin.compose.ui.PlatformView
 import love.yinlin.data.MimeType
 import love.yinlin.extension.createElement
 import love.yinlin.extension.raw
+import love.yinlin.extension.then
 import love.yinlin.foundation.PlatformContext
 import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
@@ -39,7 +40,7 @@ private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
     }
 
     override fun releaseController() {
-        view.host?.let { document.removeChild(it) }
+        view.host?.then { document.removeChild(it) }
     }
 
     override fun load(path: String) {

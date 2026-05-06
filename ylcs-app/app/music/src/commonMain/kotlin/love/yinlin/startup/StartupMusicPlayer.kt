@@ -22,6 +22,7 @@ import love.yinlin.data.music.Playlist
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.then
 import love.yinlin.foundation.AsyncStartup
 import love.yinlin.foundation.AsyncStartupFactory
 import love.yinlin.foundation.StartupID
@@ -135,7 +136,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         catchingError {
             val firstEngine = LyricsEngine[app.config.lyricsEngineOrder.first()]
             if (engine != firstEngine) engine = firstEngine
-        }?.let { engine = LyricsEngine.Default }
+        }?.then { engine = LyricsEngine.Default }
         // 恢复上一次播放
         startPlaylist(app.config.lastPlaylist, app.config.lastMusic.ifEmpty { null }, false)
     }

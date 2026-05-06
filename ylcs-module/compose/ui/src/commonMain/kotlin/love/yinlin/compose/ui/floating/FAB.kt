@@ -28,6 +28,7 @@ import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.fastAnimateRectBackground
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.tool.NavigationBack
+import love.yinlin.extension.then
 
 @Stable
 open class FAB {
@@ -160,7 +161,7 @@ open class FAB {
     fun Land() {
         val scope = rememberCoroutineScope()
 
-        action?.let { mainAction ->
+        action?.then { mainAction ->
             Box(modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()

@@ -9,6 +9,7 @@ import androidx.compose.ui.node.invalidateSemantics
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.semantics.*
 import love.yinlin.compose.platform.inspector
+import love.yinlin.extension.then
 
 private class SemanticsNode(
     var role: Role?,
@@ -17,15 +18,15 @@ private class SemanticsNode(
 ) : Modifier.Node(), SemanticsModifierNode {
     override fun SemanticsPropertyReceiver.applySemantics() {
         var status = false
-        this@SemanticsNode.role?.let {
+        this@SemanticsNode.role?.then {
             this.role = it
             status = true
         }
-        this@SemanticsNode.contentType?.let {
+        this@SemanticsNode.contentType?.then {
             this.contentType = it
             status = true
         }
-        this@SemanticsNode.description?.let {
+        this@SemanticsNode.description?.then {
             this.contentDescription = it
             status = true
         }

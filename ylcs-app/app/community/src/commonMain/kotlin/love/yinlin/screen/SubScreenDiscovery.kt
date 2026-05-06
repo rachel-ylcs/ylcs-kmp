@@ -36,6 +36,7 @@ import love.yinlin.data.rachel.discovery.DiscoveryItem
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.then
 
 @Stable
 class SubScreenDiscovery(parent: NavigationScreen) : SubScreen(parent) {
@@ -63,7 +64,7 @@ class SubScreenDiscovery(parent: NavigationScreen) : SubScreen(parent) {
             DiscoveryItem.LatestComment.id -> ApiTopicGetLatestTopicsByComment.requestNull(page.offset, page.pageNum)
             DiscoveryItem.Hot.id -> ApiTopicGetHotTopics.requestNull(page.arg1, page.offset, page.pageNum)
             else -> ApiTopicGetSectionTopics.requestNull(section, page.offset, page.pageNum)
-        }?.let { page.moreData(it.o1) }
+        }?.then { page.moreData(it.o1) }
     }
 
     override suspend fun initialize() {
@@ -79,7 +80,7 @@ class SubScreenDiscovery(parent: NavigationScreen) : SubScreen(parent) {
             onClick = { navigate(::ScreenTopic, topic) }
         ) {
             Column(modifier = Modifier.fillMaxWidth().heightIn(min = Theme.size.cell4 * 0.777777f)) {
-                topic.picPath?.url?.let {
+                topic.picPath?.url?.then {
                     WebImage(
                         uri = it,
                         modifier = Modifier.fillMaxWidth().height(Theme.size.cell4 * 1.333333f),

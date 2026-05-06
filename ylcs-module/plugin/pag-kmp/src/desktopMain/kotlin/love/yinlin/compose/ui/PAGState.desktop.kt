@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
+import love.yinlin.extension.then
 
 @Stable
 actual open class PAGState {
@@ -15,7 +16,7 @@ actual open class PAGState {
 
     actual var progress: Double get() = stateProgress
         set(value) {
-            player?.let {
+            player?.then {
                 it.progress = value
                 it.flush()
             }

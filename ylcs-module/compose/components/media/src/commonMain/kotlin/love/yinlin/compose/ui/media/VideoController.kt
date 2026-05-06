@@ -15,6 +15,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.node.silentClick
+import love.yinlin.extension.then
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -79,7 +80,7 @@ abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoA
             }
 
             ThemeContainer(Colors.White) {
-                videoTopBar?.let { bar ->
+                videoTopBar?.then { bar ->
                     VideoPlayerControlBar(
                         visible = isShowControls,
                         animateOffset = { -it },
@@ -91,7 +92,7 @@ abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoA
 
                 Box(modifier = Modifier.fillMaxWidth().weight(1f).silentClick { isShowControls = !isShowControls })
 
-                videoBottomBar?.let { bar ->
+                videoBottomBar?.then { bar ->
                     VideoPlayerControlBar(
                         visible = isShowControls,
                         animateOffset = { it },

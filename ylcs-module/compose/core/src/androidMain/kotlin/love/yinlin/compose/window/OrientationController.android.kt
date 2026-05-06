@@ -15,9 +15,8 @@ actual class OrientationController {
     }
 
     actual fun rotate(context: PlatformContextProvider) {
-        context.activity?.let { activity ->
-            activity.requestedOrientation = if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-        }
+        val activity = context.activity ?: return
+        activity.requestedOrientation = if (activity.requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
 
     actual fun store(context: PlatformContextProvider) {

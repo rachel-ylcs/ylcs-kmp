@@ -25,6 +25,7 @@ import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.text.RachelRichText
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboComment
+import love.yinlin.extension.then
 import love.yinlin.tpl.WeiboAPI
 
 @Stable
@@ -119,7 +120,7 @@ class ScreenWeiboDetails : Screen() {
             itemKey("WeiboLayout") {
                 weiboInfoLayout(weibo, Modifier.fillMaxWidth(), Modifier.fillMaxWidth())
             }
-            comments?.let { weiboComments ->
+            comments?.then { weiboComments ->
                 items(
                     items = weiboComments,
                     key = { it.id }
@@ -160,12 +161,12 @@ class ScreenWeiboDetails : Screen() {
     override val title: String = "微博详情"
 
     override suspend fun initialize() {
-        currentWeibo?.let { comments = WeiboAPI.getWeiboDetails(it.id) ?: emptyList() }
+        currentWeibo?.then { comments = WeiboAPI.getWeiboDetails(it.id) ?: emptyList() }
     }
 
     @Composable
     override fun Content() {
-        currentWeibo?.let {
+        currentWeibo?.then {
             val deviceType by rememberDeviceType()
             when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait(weibo = it)

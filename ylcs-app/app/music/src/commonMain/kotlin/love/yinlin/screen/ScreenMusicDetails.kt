@@ -169,7 +169,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 // 更新状态
                 clientSong = requestClientSong()
                 slot.tip.success("安装成功")
-            }?.let { slot.tip.error("安装失败: ${it.message}") }
+            }?.then { slot.tip.error("安装失败: ${it.message}") }
         }
         else slot.tip.error("下载失败")
     }
@@ -186,7 +186,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 // 更新状态
                 clientSong = requestClientSong()
                 slot.tip.success("下载成功")
-            }?.let { slot.tip.error("下载失败: ${it.message}") }
+            }?.then { slot.tip.error("下载失败: ${it.message}") }
         }
     }
 
@@ -281,12 +281,12 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     private fun resActionReplaceImage(aspectRatio: Float) = ResourceAction("替换", Icons.Replace) { item ->
-        clientSong?.let { song ->
+        clientSong?.then { song ->
             launch {
                 app.picker.pickPicture()?.use { source ->
                     app.createTempFile { sink -> source.transferTo(sink) > 0L }
-                }?.let { src ->
-                    cropDialog.open(url = src.path, aspectRatio = aspectRatio)?.let { region ->
+                }?.then { src ->
+                    cropDialog.open(url = src.path, aspectRatio = aspectRatio)?.then { region ->
                         catchingError {
                             Coroutines.io {
                                 val image = PlatformImage.decode(src.readByteArray()!!)!!
@@ -298,7 +298,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                                 it.copy(type = it.type, size = song.clientPath(it.type).fileSize())
                             }
                             ++modifyFlag
-                        }?.let { slot.tip.error("图片载入或裁剪失败") }
+                        }?.then { slot.tip.error("图片载入或裁剪失败") }
                     }
                 }
             }
@@ -310,8 +310,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     private val resActionLyricsEditor = ResourceAction("编辑", Icons.Edit) {
-        mp?.let { player ->
-            player.library[sid]?.let {
+        mp?.then { player ->
+            player.library[sid]?.then {
                 launch { player.pause() }
                 navigate(::ScreenLyricsEditor, it)
             }
@@ -469,7 +469,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 .clickable {
                     if (remote) {
                         if (app.config.userProfile == null) slot.tip.warning("请先登录")
-                        else launch { remoteSong?.let { downloadModResource(item, it) } }
+                        else launch { remoteSong?.then { downloadModResource(item, it) } }
                     }
                 }.padding(Theme.padding.eValue),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
@@ -524,7 +524,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 text = "写歌评",
                 icon = Icons.Comment,
                 enabled = app.config.userProfile != null,
-                onClick = { commentDialog.open()?.let { onSendComment(it) } }
+                onClick = { commentDialog.open()?.then { onSendComment(it) } }
             )
         }
     }
@@ -557,7 +557,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     visible = menuVisible,
                     onClose = { menuVisible = false },
                     menus = {
-                        app.config.userProfile?.let { user ->
+                        app.config.userProfile?.then { user ->
                             if (user.uid == comment.uid || user.hasPrivilegeVIPTopic) {
                                 Menu(text = "删除", icon = Icons.Send, onClick = {
                                     launch { onDeleteComment(comment.cid) }
@@ -662,7 +662,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 ) {
                     SimpleEllipsisText(text = "MOD配置", style = Theme.typography.v6.bold)
                     PrimaryTextButton(text = "保存", icon = Icons.Check, enabled = canSubmit, onClick = {
-                        mp?.let { player ->
+                        mp?.then { player ->
                             // 更新 library
                             val newInfo = args.copy(
                                 name = name.text,

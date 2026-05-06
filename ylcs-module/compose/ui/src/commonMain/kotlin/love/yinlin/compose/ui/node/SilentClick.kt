@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.disabled
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.unit.IntSize
 import love.yinlin.compose.platform.inspector
+import love.yinlin.extension.then
 
 private class SilentClickNode(
     var enabled: Boolean,
@@ -37,7 +38,7 @@ private class SilentClickNode(
     }
 
     override fun SemanticsPropertyReceiver.applySemantics() {
-        this@SilentClickNode.role?.let { this.role = it }
+        this@SilentClickNode.role?.then { this.role = it }
         if (!enabled) this.disabled()
     }
 

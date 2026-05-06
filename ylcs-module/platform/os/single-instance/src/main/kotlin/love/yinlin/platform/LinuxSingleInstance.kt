@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import love.yinlin.extension.then
 import love.yinlin.platform.ffi.LibCLibrary
 import love.yinlin.platform.ffi.Posix
 
@@ -33,7 +34,7 @@ internal object LinuxSingleInstance : SingleInstanceImpl, LibCLibrary() {
             flock(appLockFd, Posix.LOCK_UN)
             close(appLockFd)
             appLockFd = -1
-            lockFilePath?.let { path ->
+            lockFilePath?.then { path ->
                 unlink(arena.astr(path))
                 lockFilePath = null
             }

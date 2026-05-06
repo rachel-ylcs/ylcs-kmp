@@ -13,6 +13,7 @@ import love.yinlin.cs.service.values
 import love.yinlin.cs.user.AN
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.then
 import love.yinlin.extension.toJsonString
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -81,7 +82,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
             // 超时自动拒绝
             val target = players[targetInfo.uid]
             if (target == null || target.room == null) {
-                players[uid]?.let { player ->
+                players[uid]?.then { player ->
                     if (player.inviteJob != null) {
                         player.manager.send(LyricsSockets.SM.RefuseInvitation(targetInfo))
                         player.inviteJob = null
@@ -96,8 +97,8 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
         delay(LyricsSockets.PREPARE_TIME.milliseconds)
         // 更新创建时间
         val newCreateTime = System.currentTimeMillis()
-        room.submitTime1?.let { room.submitTime1 = it - room.createTime + newCreateTime + LyricsSockets.PLAYING_TIME }
-        room.submitTime2?.let { room.submitTime2 = it - room.createTime + newCreateTime + LyricsSockets.PLAYING_TIME }
+        room.submitTime1?.then { room.submitTime1 = it - room.createTime + newCreateTime + LyricsSockets.PLAYING_TIME }
+        room.submitTime2?.then { room.submitTime2 = it - room.createTime + newCreateTime + LyricsSockets.PLAYING_TIME }
         room.createTime = newCreateTime
         val player1 = players[room.info1.uid]
         val player2 = players[room.info2.uid]
@@ -111,10 +112,10 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
         // 启动游戏计时
         delay(LyricsSockets.PLAYING_TIME.milliseconds)
         // 强制结算
-        players[room.info1.uid]?.room?.let { room1 ->
+        players[room.info1.uid]?.room?.then { room1 ->
             if (room.roomId == room1.roomId) submitAnswers(room, room.info1.uid)
         }
-        players[room.info2.uid]?.room?.let { room2 ->
+        players[room.info2.uid]?.room?.then { room2 ->
             if (room.roomId == room2.roomId) submitAnswers(room, room.info2.uid)
         }
     }
@@ -188,7 +189,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
             }
             LyricsSockets.CM.GetPlayers if currentPlayer != null -> send(LyricsSockets.SM.PlayerList(availablePlayers))
             is LyricsSockets.CM.InvitePlayer -> {
-                currentPlayer?.let { player ->
+                currentPlayer?.then { player ->
                     val target = players[data.targetUid]
                     when {
                         target == null -> send(LyricsSockets.SM.Error("对方未上线"))
@@ -205,7 +206,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
                 }
             }
             is LyricsSockets.CM.InviteResponse -> {
-                currentPlayer?.let { player ->
+                currentPlayer?.then { player ->
                     val inviter = players[data.inviterUid]
                     when {
                         inviter == null -> send(LyricsSockets.SM.Error("对方未上线"))
@@ -215,7 +216,7 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
                         else -> {
                             val info = player.info
                             val inviterInfo = inviter.info
-                            inviter.inviteJob?.let { job ->
+                            inviter.inviteJob?.then { job ->
                                 job.cancel()
                                 inviter.inviteJob = null
                                 if (data.accept) {
@@ -233,14 +234,14 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
                 }
             }
             is LyricsSockets.CM.SaveAnswer -> {
-                currentPlayer?.let { player ->
-                    player.room?.let { room ->
+                currentPlayer?.then { player ->
+                    player.room?.then { room ->
                         val triple = when (player.uid) {
                             room.info1.uid -> Triple(room.answers1, room.info2.uid, room.answers2)
                             room.info2.uid -> Triple(room.answers2, room.info1.uid, room.answers1)
                             else -> null
                         }
-                        triple?.let { (answers, otherUid, otherAnswers) ->
+                        triple?.then { (answers, otherUid, otherAnswers) ->
                             if (data.index in 0 ..< LyricsSockets.QUESTION_COUNT) {
                                 answers[data.index] = data.answer
                                 // 通知进度
@@ -257,8 +258,8 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
                 }
             }
             LyricsSockets.CM.Submit -> {
-                currentPlayer?.let { player ->
-                    player.room?.let { submitAnswers(it, player.uid) }
+                currentPlayer?.then { player ->
+                    player.room?.then { submitAnswers(it, player.uid) }
                 }
             }
             else -> {}
@@ -270,8 +271,8 @@ class LyricsSocketsManager(private val db: Database, session: Any) : SocketsMana
     }
 
     override suspend fun onClose() {
-        currentPlayer?.let { player ->
-            player.room?.let { room -> submitAnswers(room, player.uid) }
+        currentPlayer?.then { player ->
+            player.room?.then { room -> submitAnswers(room, player.uid) }
             players.remove(player.uid)
         }
         currentPlayer = null

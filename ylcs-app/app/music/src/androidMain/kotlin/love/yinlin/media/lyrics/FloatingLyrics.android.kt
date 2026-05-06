@@ -15,6 +15,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.window.FloatingView
+import love.yinlin.extension.then
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
@@ -77,7 +78,7 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
     }
 
     actual fun attach() {
-        app.activity?.let { activity ->
+        app.activity?.then { activity ->
             view.attach(activity) { app.config.enabledFloatingLyrics = false }
         }
     }

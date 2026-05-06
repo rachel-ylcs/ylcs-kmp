@@ -8,6 +8,7 @@ import love.yinlin.compose.game.drawer.LayerOrder
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.SyncFuture
 import love.yinlin.extension.replaceAll
+import love.yinlin.extension.then
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.FontResource
 
@@ -47,7 +48,7 @@ class FontPlugin private constructor(
         val newFontMap = fontResources.associateWith { FontFamily(Font(it)) }
 
         LaunchedEffect(newFontMap, initializeFuture) {
-            initializeFuture?.let { future ->
+            initializeFuture?.then { future ->
                 fontMap.replaceAll(newFontMap)
                 future.send(true)
             }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.LifecycleOwner
+import love.yinlin.extension.then
 
 @Stable
 actual open class PAGState : PlatformView<PlatformPAGView>(), Releasable<PlatformPAGView> {
@@ -32,7 +33,7 @@ actual open class PAGState : PlatformView<PlatformPAGView>(), Releasable<Platfor
 
     actual var progress: Double get() = stateProgress
         set(value) {
-            host?.let {
+            host?.then {
                 it.progress = value
                 it.flush()
             }

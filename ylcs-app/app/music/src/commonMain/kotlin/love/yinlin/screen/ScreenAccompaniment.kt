@@ -33,6 +33,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.media.buildAudioPlayer
 import love.yinlin.media.lyrics.LyricsEngine
@@ -82,7 +83,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                     }
                 }
             }
-        }?.let { slot.tip.error("播放器加载失败") }
+        }?.then { slot.tip.error("播放器加载失败") }
     }
 
     override fun finalize() {

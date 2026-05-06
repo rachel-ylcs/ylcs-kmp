@@ -8,11 +8,12 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowPosition
 import love.yinlin.app
+import love.yinlin.extension.then
 import love.yinlin.media.lyrics.LyricsEngineConfig
 
 @Composable
 actual fun ScreenLyricsSettings.PlatformContent() {
-    mp?.floatingLyrics?.let { floatingLyrics ->
+    mp?.floatingLyrics?.then { floatingLyrics ->
         DisposableEffect(Unit) {
             config = app.config.lyricsEngineConfig
             floatingLyrics.canMove = true

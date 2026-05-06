@@ -47,6 +47,7 @@ import love.yinlin.data.rachel.game.info.BTResult
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.json
+import love.yinlin.extension.then
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import kotlin.jvm.JvmInline
@@ -139,14 +140,14 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
                             suspend { hide: Boolean, index: Int, ch: Char ->
                                 if (inputMode == CharacterBlockInputMode.DISABLED) {
                                     val oldCharacter: Char? = if (ch == BTConfig.CHAR_EMPTY || ch == BTConfig.CHAR_BLOCK || ch == BTConfig.CHAR_BLANK) null else ch
-                                    onCharacterSelectedUpdate(oldCharacter)?.let { newCharacter ->
+                                    onCharacterSelectedUpdate(oldCharacter)?.then { newCharacter ->
                                         if (newCharacter != BTConfig.CHAR_EMPTY && newCharacter != BTConfig.CHAR_BLOCK) {
                                             onCharacterChangedUpdate(index, BlockCharacter(newCharacter, hide))
                                         }
                                     }
                                 }
                                 else {
-                                    onStringSelectedUpdate()?.let { newString ->
+                                    onStringSelectedUpdate()?.then { newString ->
                                         // 确定当前索引的位置
                                         val startIndex = if (inputMode == CharacterBlockInputMode.HORIZONTAL) index % blockSize else index / blockSize
                                         repeat(minOf(blockSize - startIndex, newString.length)) {
@@ -207,7 +208,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
             }
         }
 
-        answer?.let { (blockSize, data) ->
+        answer?.then { (blockSize, data) ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Lightbulb, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "答案", style = Theme.typography.v6.bold, modifier = Modifier.idText())
@@ -242,7 +243,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
             }
         }
 
-        pairData?.let { (blockSize, list, actualResult) ->
+        pairData?.then { (blockSize, list, actualResult) ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "正确率: ${actualResult.correctCount} / ${actualResult.totalCount}", modifier = Modifier.idText())
@@ -372,7 +373,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.let { (gridSize) ->
+            preflight?.then { (gridSize) ->
                 CharacterBlock(
                     blockSize = gridSize,
                     data = data,
@@ -387,7 +388,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
 
         @Composable
         override fun ColumnScope.Settlement() {
-            result?.let {
+            result?.then {
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                     SimpleEllipsisText(text = "正确率: ${it.correctCount} / ${it.totalCount}", modifier = Modifier.idText())

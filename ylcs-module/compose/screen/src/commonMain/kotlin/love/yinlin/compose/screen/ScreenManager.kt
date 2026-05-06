@@ -23,7 +23,9 @@ import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.window.DeepLink
 import love.yinlin.extension.Array
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.cast
 import love.yinlin.extension.parseJson
+import love.yinlin.extension.then
 
 @Stable
 class ScreenManager @PublishedApi internal constructor(savedBackStack: List<String>) {
@@ -123,7 +125,9 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         val target = mutableListOf<S>()
         for (route in backStack.asReversed()) {
             val (screenName, uniqueId, _) = Route.parse(route)
-            if (Route.key<S>() == screenName) (ScreenGlobal.VMMap[uniqueId] as? S)?.let { target += it }
+            if (Route.key<S>() == screenName) {
+                ScreenGlobal.VMMap[uniqueId].cast { screen: S -> target += screen }
+            }
         }
         return target
     }

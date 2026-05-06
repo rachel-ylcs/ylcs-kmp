@@ -3,6 +3,7 @@ package love.yinlin.media
 import androidx.compose.ui.util.fastMap
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
+import love.yinlin.extension.then
 import love.yinlin.fs.File
 import java.io.ByteArrayInputStream
 import javax.sound.sampled.AudioSystem
@@ -36,7 +37,7 @@ actual class SoundPlayer {
     }
 
     actual fun play(index: Int) {
-        caches.getOrNull(index)?.let { clip ->
+        caches.getOrNull(index)?.then { clip ->
             clip.framePosition = 0
             clip.start()
         }

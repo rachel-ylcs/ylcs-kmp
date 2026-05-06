@@ -40,6 +40,7 @@ import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findSelf
 import love.yinlin.extension.replaceAll
+import love.yinlin.extension.then
 import kotlin.math.abs
 
 @Stable
@@ -48,7 +49,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
 
     private val activityEvents by derivedStateOf {
         activities.asSequence().mapNotNull { activity ->
-            val date = activity.ts?.let { DateEx.Formatter.standardDate.parse(it) }
+            val date = activity.ts?.let(DateEx.Formatter.standardDate::parse)
             val title = activity.shortTitle ?: activity.title
             if (date != null && title != null) date.toEpochDays() to title
             else null
@@ -152,7 +153,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
                 onEventClick = { date ->
                     DateEx.Formatter.standardDate.format(date)
                         ?.findSelf(activities) { it.ts }
-                        ?.let { navigate(::ScreenActivityDetails, it.aid) }
+                        ?.then { navigate(::ScreenActivityDetails, it.aid) }
                 }
             )
         }
@@ -160,7 +161,7 @@ class SubScreenInformation(parent: NavigationScreen) : SubScreen(parent) {
 
     @Composable
     private fun CalendarBarItem(activity: Activity) {
-        val date = remember(activity) { activity.ts?.let { DateEx.Formatter.standardDate.parse(it) } }
+        val date = remember(activity) { activity.ts?.let(DateEx.Formatter.standardDate::parse) }
         val interval = if (date != null) DateEx.Today.until(date, DateTimeUnit.DAY) else null
         val intervalString =  when {
             interval == null -> "未知时间"

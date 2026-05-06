@@ -44,6 +44,7 @@ import love.yinlin.data.music.Playlist
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.replaceAll
+import love.yinlin.extension.then
 import love.yinlin.fs.File
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
@@ -163,7 +164,7 @@ class ScreenMusicLibrary : Screen() {
                     if (newItems.isNotEmpty()) {
                         val totalItems = oldItems + newItems
                         playlistLibrary[name] = playlist.copy(items = totalItems)
-                        mp?.let { player ->
+                        mp?.then { player ->
                             // 添加到当前播放的列表
                             val currentPlaylist = player.playlist
                             if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
@@ -214,7 +215,7 @@ class ScreenMusicLibrary : Screen() {
                 exitManagement()
                 slot.tip.success("导出MOD成功")
             }
-        }?.let { slot.tip.warning("导出MOD失败") }
+        }?.then { slot.tip.warning("导出MOD失败") }
     }
 
     override val title: String get() = if (isSearching) "搜索" else "曲库"

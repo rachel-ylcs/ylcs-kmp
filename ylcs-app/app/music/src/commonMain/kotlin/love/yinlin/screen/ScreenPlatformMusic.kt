@@ -31,6 +31,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.data.music.PlatformMusicType
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import love.yinlin.extension.toJsonString
 import love.yinlin.foundation.NetClient
 import love.yinlin.fs.*
@@ -106,14 +107,14 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
                 // 9. 更新曲库
                 mp?.updateMusicLibraryInfo(listOf(id))
                 slot.tip.success("导入 ${platformMusicInfo.name} 成功")
-            }?.let { slot.tip.warning("下载失败 ${it.message}") }
+            }?.then { slot.tip.warning("下载失败 ${it.message}") }
         }
     }
 
     override val title: String get() = platformType.description
 
     override suspend fun initialize() {
-        deeplink?.let {
+        deeplink?.then {
             val result = parseDialog.open(it.toString(), "${platformType.description}解析")
             if (result != null) parseMusic(result)
         }

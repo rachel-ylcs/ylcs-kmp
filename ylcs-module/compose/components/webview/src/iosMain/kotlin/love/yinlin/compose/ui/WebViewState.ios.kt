@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import kotlinx.cinterop.ObjCSignatureOverride
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.extension.then
 import platform.Foundation.NSError
 import platform.Foundation.NSMutableURLRequest
 import platform.Foundation.NSURL
@@ -43,16 +44,16 @@ actual class WebViewState actual constructor(private val initUrl: String) : Plat
     private val protocol: WKNavigationDelegateProtocol = object : NSObject(), WKNavigationDelegateProtocol {
         @ObjCSignatureOverride
         override fun webView(webView: WKWebView, didStartProvisionalNavigation: WKNavigation?) {
-            webView.URL?.absoluteString?.let { stateUrl = it }
+            webView.URL?.absoluteString?.then { stateUrl = it }
             stateLoadingState = WebViewLoadingState.Loading(0f)
-            webView.title?.let { stateTitle = it }
+            webView.title?.then { stateTitle = it }
         }
 
         @ObjCSignatureOverride
         override fun webView(webView: WKWebView, didFinishNavigation: WKNavigation?) {
-            webView.URL?.absoluteString?.let { stateUrl = it }
+            webView.URL?.absoluteString?.then { stateUrl = it }
             stateLoadingState = WebViewLoadingState.Finished
-            webView.title?.let { stateTitle = it }
+            webView.title?.then { stateTitle = it }
         }
 
         @ObjCSignatureOverride
@@ -67,13 +68,13 @@ actual class WebViewState actual constructor(private val initUrl: String) : Plat
     }
 
     actual fun goBack() {
-        host?.let {
+        host?.then {
             if (it.canGoBack) it.goBack()
         }
     }
 
     actual fun goForward() {
-        host?.let {
+        host?.then {
             if (it.canGoForward) it.goForward()
         }
     }

@@ -32,6 +32,7 @@ import love.yinlin.extension.Json
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.then
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 
@@ -58,8 +59,8 @@ class NetClient internal constructor(val delegate: HttpClient) {
                 scope.onRequest()
                 method = scope.method
                 url.takeFrom(scope.url)
-                scope.data?.let(::setBody)
-                scope.form?.let { form ->
+                scope.data?.then(::setBody)
+                scope.form?.then { form ->
                     setBody(FormDataContent(parameters {
                         for ((k, v) in form) append(k, v)
                     }))

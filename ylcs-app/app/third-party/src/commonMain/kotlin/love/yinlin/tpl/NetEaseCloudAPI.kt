@@ -60,7 +60,7 @@ object NetEaseCloudAPI : PlatformMusicAPI {
         }.toMutableList()
     }?.let { musicInfos ->
         musicInfos.forEachIndexed { i, info ->
-            requestLyrics(info.id)?.let { musicInfos[i] = info.copy(lyrics = it) }
+            requestLyrics(info.id)?.then { musicInfos[i] = info.copy(lyrics = it) }
         }
         musicInfos.removeAll { it.lyrics.isEmpty() }
         musicInfos.ifEmpty { null }

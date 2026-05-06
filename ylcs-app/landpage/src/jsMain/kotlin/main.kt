@@ -3,6 +3,7 @@ import kotlinx.browser.window
 import kotlinx.html.*
 import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
+import love.yinlin.extension.then
 import love.yinlin.reflect.metaSimpleClassName
 import love.yinlin.uri.Uri
 import org.w3c.dom.HTMLElement
@@ -16,7 +17,7 @@ fun navigate(pageName: String) {
         else -> MainPage
     }
 
-    document.getElementById("root")?.let { root ->
+    document.getElementById("root")?.then { root ->
         currentPage?.onDestroy()
         root.innerHTML = ""
         currentPage = page
@@ -99,7 +100,7 @@ fun TagConsumer<HTMLElement>.renderHeader() {
                 div("flex items-center space-x-5") {
                     button(classes = "p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors") {
                         onClickFunction = {
-                            document.documentElement?.classList?.let {
+                            document.documentElement?.classList?.then {
                                 if (it.contains("dark")) it.remove("dark") else it.add("dark")
                             }
                         }
@@ -163,7 +164,7 @@ fun main() {
         }
 
         window.onclick = {
-            document.getElementById("mobile-menu")?.classList?.let {
+            document.getElementById("mobile-menu")?.classList?.then {
                 if (!it.contains("hidden")) it.add("hidden")
             }
         }

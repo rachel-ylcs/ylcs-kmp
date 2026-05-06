@@ -37,6 +37,7 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
 import love.yinlin.fs.*
@@ -75,13 +76,13 @@ class ScreenCreateMusic : Screen() {
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (file != null) {
-            cropDialog.open(url = file.path, aspectRatio = aspectRatio)?.let { rect ->
+            cropDialog.open(url = file.path, aspectRatio = aspectRatio)?.then { rect ->
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(rect)
                     sink.write(image.encode(quality = ImageQuality.Full)!!)
                     true
-                }?.let { onPicAdd(it) }
+                }?.then(onPicAdd)
             }
         }
     }

@@ -16,6 +16,7 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.extension.catching
+import love.yinlin.extension.then
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toAndroidUri
@@ -100,22 +101,19 @@ abstract class FloatingView {
     }
 
     fun detach() {
-        view?.let { composeView ->
-            composeView.context.windowManager?.removeViewImmediate(composeView)
-            composeView.removeOnAttachStateChangeListener(listener)
-        }
+        val composeView = view ?: return
+        composeView.context.windowManager?.removeViewImmediate(composeView)
+        composeView.removeOnAttachStateChangeListener(listener)
         view = null
     }
 
     fun updateLayoutParams(gravity: Int, offset: Offset) {
-        view?.let { composeView ->
-            composeView.context.windowManager?.let { manager ->
-                val params = composeView.layoutParams as WindowManager.LayoutParams
-                params.gravity = gravity
-                params.x = offset.x.toInt()
-                params.y = offset.y.toInt()
-                manager.updateViewLayout(composeView, params)
-            }
-        }
+        val composeView = view ?: return
+        val manager = composeView.context.windowManager ?: return
+        val params = composeView.layoutParams as WindowManager.LayoutParams
+        params.gravity = gravity
+        params.x = offset.x.toInt()
+        params.y = offset.y.toInt()
+        manager.updateViewLayout(composeView, params)
     }
 }

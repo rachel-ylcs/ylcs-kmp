@@ -28,7 +28,7 @@ abstract class Pagination<E, K, out T>(
     fun newData(newItems: List<E>): Boolean {
         items.replaceAll(newItems)
         val last = newItems.lastOrNull()
-        mOffset = last?.let { offset(it) } ?: default
+        mOffset = last?.let(::offset) ?: default
         processArgs(last)
         canLoading = newItems.size == pageNum
         return newItems.isNotEmpty()
@@ -43,7 +43,7 @@ abstract class Pagination<E, K, out T>(
             val existingItems = items.fastMap { distinctValue(it) }.toSet()
             items += newItems.fastFilter { distinctValue(it) !in existingItems }
             val last = newItems.lastOrNull()
-            mOffset = last?.let { offset(it) } ?: default
+            mOffset = last?.let(::offset) ?: default
             processArgs(last)
         }
         canLoading = offset != default && newItems.size == pageNum

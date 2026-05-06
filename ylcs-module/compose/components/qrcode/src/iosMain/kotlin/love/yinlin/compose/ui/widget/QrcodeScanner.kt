@@ -22,6 +22,7 @@ import love.yinlin.compose.ui.image.ColorIcon
 import love.yinlin.compose.ui.rememberPlatformView
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
+import love.yinlin.extension.then
 import love.yinlin.extension.toNSData
 import platform.AVFoundation.*
 import platform.CoreGraphics.*
@@ -73,7 +74,7 @@ private class QrcodeView(private val onRectOfInterest: (CValue<CGRect>) -> Unit)
 
         if (CGRectGetWidth(scanView.scanFrame) == 0.0 && CGRectGetHeight(scanView.scanFrame) == 0.0)
             onRectOfInterest(CGRectMake(0.0, 0.0, 1.0, 1.0))
-        else previewLayer?.metadataOutputRectOfInterestForRect(scanView.scanFrame)?.let(onRectOfInterest)
+        else previewLayer?.metadataOutputRectOfInterestForRect(scanView.scanFrame)?.then(onRectOfInterest)
     }
 }
 
@@ -135,7 +136,7 @@ actual fun QrcodeScanner(
     }
 
     LaunchedEffect(wrapper.scanResult) {
-        wrapper.scanResult?.let(onResultUpdate)
+        wrapper.scanResult?.then(onResultUpdate)
     }
 
     Box(modifier = modifier) {

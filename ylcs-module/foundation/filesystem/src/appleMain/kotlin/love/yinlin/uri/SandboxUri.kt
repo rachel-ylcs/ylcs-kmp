@@ -4,6 +4,7 @@ import kotlinx.io.IOException
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
+import love.yinlin.extension.then
 import love.yinlin.io.SandboxSink
 import love.yinlin.io.SandboxSource
 import platform.Foundation.NSURL
@@ -13,7 +14,7 @@ open class SandboxUri(
     private val parentUrl: NSURL? = null
 ) : ImplicitUri {
     init {
-        parentUrl?.let {
+        parentUrl?.then {
             val canAccess = parentUrl.startAccessingSecurityScopedResource()
             if (!canAccess) throw IOException()
         }

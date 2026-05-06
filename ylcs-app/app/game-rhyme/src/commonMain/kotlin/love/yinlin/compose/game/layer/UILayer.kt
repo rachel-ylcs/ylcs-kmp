@@ -32,6 +32,7 @@ import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.ui.StarPaths
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
+import love.yinlin.extension.then
 
 @Stable
 class UILayer(
@@ -137,7 +138,7 @@ class UILayer(
         val deltaScore = reward + newCombo / comboRewardCount
         score += deltaScore // 连击奖励
 
-        strokeTextBuilder?.let { builder ->
+        strokeTextBuilder?.then { builder ->
             val resultGraph = defaultResultGraph.getOrPut(result) { builder(result.title) }
             val comboGraph = if (newCombo > 1) comboGraphMap.getOrPut(newCombo) { builder(" +$newCombo") } else null
 
@@ -174,7 +175,7 @@ class UILayer(
 
             // 更新FPS
             fpsCounter.update(tick) { fps ->
-                fpsTextBuilder?.let { builder ->
+                fpsTextBuilder?.then { builder ->
                     if (fpsCache.size >= 16) fpsCache.clear()
                     currentFpsGraph = fpsCache.getOrPut(fps) { builder(fps) }
                     isDirty = true
@@ -218,7 +219,7 @@ class UILayer(
             // 画进度
             roundRect(Colors.Green6, barRadius, barPosition, Size(viewportWidth * audioProgress, barHeight))
 
-            title?.let { graph ->
+            title?.then { graph ->
                 val textWidth = graph.width(textHeight)
                 // 画封面
                 val coverRect = Rect(Offset(barRadius, barHeight), Size(textHeight, textHeight))
@@ -239,12 +240,12 @@ class UILayer(
             }
 
             // 画FPS
-            currentFpsGraph?.let { graph ->
+            currentFpsGraph?.then { graph ->
                 text(graph, barBottom, Size(viewportWidth, textHeight * 0.75f), fpsColor, TextAlign.Center)
             }
 
             // 画结果
-            resultData?.let { data ->
+            resultData?.then { data ->
                 val resultGraph = data.resultGraph
                 val resultWidth = resultGraph.width(resultHeight)
                 val isOpen = data.isOpen
@@ -263,7 +264,7 @@ class UILayer(
                     // 画评级
                     strokeText(resultGraph, Offset.Zero, Size(resultWidth, resultHeight), mainColor, strokeColor, TextStroke)
                     // 画连击
-                    comboGraph?.let { graph ->
+                    comboGraph?.then { graph ->
                         strokeText(graph, Offset(resultWidth, 0f), Size(comboWidth, resultHeight), mainColor, strokeColor, TextStroke)
                     }
                 }
@@ -271,7 +272,7 @@ class UILayer(
         }
 
         // 画分数
-        scoreGraph?.let { graph ->
+        scoreGraph?.then { graph ->
             val scoreWidth = viewportWidth - barRadius
             strokeText(graph, barBottom, Size(scoreWidth, resultHeight), Colors.Dark, Colors.White, TextStroke, TextAlign.End)
         }

@@ -28,6 +28,7 @@ import love.yinlin.cs.request
 import love.yinlin.data.rachel.game.GamePublicDetailsWithName
 import love.yinlin.data.rachel.game.GameResult
 import love.yinlin.data.rachel.game.PreflightResult
+import love.yinlin.extension.then
 
 @Stable
 class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Screen() {
@@ -100,7 +101,7 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
                     }
                 }
                 Status.Settling -> {
-                    gameResult?.let { result ->
+                    gameResult?.then { result ->
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             shape = Theme.shape.v3,
@@ -175,7 +176,7 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
     override fun RowScope.RightActions() {
         if (status == Status.Playing) {
             LoadingIcon(icon = Icons.Check, tip = "提交", enabled = canSubmit, onClick = {
-                preflightResult?.let { preflight ->
+                preflightResult?.then { preflight ->
                     ApiGameVerifyGame.request(app.config.userToken, gameDetails.gid, preflight.rid, state.submitAnswer) {
                         gameResult = it
                         state.settle(it)

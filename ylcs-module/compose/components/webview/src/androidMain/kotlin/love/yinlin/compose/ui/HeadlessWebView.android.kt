@@ -79,7 +79,7 @@ actual abstract class HeadlessWebView actual constructor(context: PlatformContex
         addJavascriptInterface(object {
             @JavascriptInterface
             @Suppress("unused")
-            fun onUrlDetected(url: String?): Boolean = url?.let { onUrlIntercepted(it) } ?: false
+            fun onUrlDetected(url: String?): Boolean = url?.let(::onUrlIntercepted) ?: false
 
             @Suppress("unused")
             @JavascriptInterface

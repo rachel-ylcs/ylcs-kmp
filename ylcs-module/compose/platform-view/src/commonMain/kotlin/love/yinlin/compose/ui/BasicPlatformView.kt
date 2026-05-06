@@ -8,6 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.extension.cast
+import love.yinlin.extension.then
 
 /**
  * 对于 PlatformView 目前有两类模式
@@ -62,7 +64,7 @@ abstract class BasicPlatformView<T : Any> {
     }
 
     val host: T? get() = hostView
-    fun host(block: (T) -> Unit) = hostView?.let(block)
+    fun host(block: (T) -> Unit) { hostView?.then(block) }
 
     /**
      * 等同于 LaunchedEffect, 但会监听自身创建。
@@ -71,21 +73,21 @@ abstract class BasicPlatformView<T : Any> {
     @Composable
     fun Monitor(key1: Any?, block: suspend CoroutineScope.(T) -> Unit) {
         LaunchedEffect(hostView, key1) {
-            hostView?.let { block(it) }
+            hostView?.then { block(it) }
         }
     }
 
     @Composable
     fun Monitor(key1: Any?, key2: Any?, block: suspend CoroutineScope.(T) -> Unit) {
         LaunchedEffect(hostView, key1, key2) {
-            hostView?.let { block(it) }
+            hostView?.then { block(it) }
         }
     }
 
     @Composable
     fun Monitor(vararg keys: Any?, block: suspend CoroutineScope.(T) -> Unit) {
         LaunchedEffect(hostView, *keys) {
-            hostView?.let { block(it) }
+            hostView?.then { block(it) }
         }
     }
 }

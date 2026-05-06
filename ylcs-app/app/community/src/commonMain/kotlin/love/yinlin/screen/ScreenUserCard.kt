@@ -38,6 +38,7 @@ import love.yinlin.cs.*
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.extension.then
 
 @Stable
 class ScreenUserCard(private val uid: Int) : Screen() {
@@ -99,7 +100,7 @@ class ScreenUserCard(private val uid: Int) : Screen() {
             onClick = { navigate(::ScreenTopic, topic) }
         ) {
             Column(modifier = Modifier.fillMaxWidth().heightIn(min = Theme.size.cell4 * 0.777777f)) {
-                topic.picPath?.url?.let {
+                topic.picPath?.url?.then {
                     WebImage(
                         uri = it,
                         modifier = Modifier.fillMaxWidth().height(Theme.size.cell4 * 1.333333f),

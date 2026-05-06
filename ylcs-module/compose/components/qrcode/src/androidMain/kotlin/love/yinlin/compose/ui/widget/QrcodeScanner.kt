@@ -34,6 +34,7 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.ColorIcon
 import love.yinlin.compose.ui.rememberPlatformView
 import love.yinlin.coroutines.ioContext
+import love.yinlin.extension.then
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -107,7 +108,7 @@ actual fun QrcodeScanner(
     val onResultUpdate by rememberUpdatedState(onResult)
 
     LaunchedEffect(scannerWrapper.scanResult) {
-        scannerWrapper.scanResult?.let(onResultUpdate)
+        scannerWrapper.scanResult?.then(onResultUpdate)
     }
 
     Box(modifier = modifier) {
@@ -134,7 +135,7 @@ actual fun QrcodeScanner(
                     icon = Icons.FlashOn,
                     background = Colors.Dark,
                     modifier = Modifier.size(Theme.size.image9).clickable {
-                        scannerWrapper.cameraScan?.let { it.enableTorch(!it.isTorchEnabled) }
+                        scannerWrapper.cameraScan?.then { it.enableTorch(!it.isTorchEnabled) }
                     }
                 )
             }

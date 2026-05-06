@@ -21,6 +21,7 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.rememberDevice
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.compose.ui.tool.NavigationBack
+import love.yinlin.extension.then
 
 @Stable
 abstract class Floating<A : Any> {
@@ -131,7 +132,7 @@ abstract class Floating<A : Any> {
                     exit = exit(device, animationDuration),
                     modifier = Modifier.align(alignment(device)).zIndex(2f)
                 ) {
-                    currentArgs?.let { args ->
+                    currentArgs?.then { args ->
                         block(device, args)
 
                         LaunchedEffect(Unit) {

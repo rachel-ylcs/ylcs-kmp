@@ -40,7 +40,7 @@ object QQMusicAPI : PlatformMusicAPI {
         json.arr("songList").map { it.Object.obj("songInfo")["mid"].String }
     }?.let { list ->
         val items = mutableListOf<PlatformMusicInfo>()
-        for (mid in list) requestMusic(mid)?.let { items += it }
+        for (mid in list) requestMusic(mid)?.then { items += it }
         items.ifEmpty { null }
     }
     //解析短链
@@ -63,7 +63,7 @@ object QQMusicAPI : PlatformMusicAPI {
             }
             finalUrl.contains("songDetail") -> {
                 val id = finalUrl.substringAfterLast("/").substringBefore("?")
-                requestMusic(id)?.let { listOf(it) }
+                requestMusic(id)?.let(::listOf)
             }
             else -> null
         }
@@ -126,7 +126,7 @@ object QQMusicAPI : PlatformMusicAPI {
         json.arr("songlist").map { it.Object["mid"].String }
     }?.let { list ->
         val items = mutableListOf<PlatformMusicInfo>()
-        for (mid in list) requestMusic(mid)?.let { items += it }
+        for (mid in list) requestMusic(mid)?.then { items += it }
         items.ifEmpty { null }
     }
 

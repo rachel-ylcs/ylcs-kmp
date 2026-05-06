@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.LifecycleOwner
+import love.yinlin.extension.then
 
 private class PAGImageViewWrapper : PlatformView<PlatformPAGImageView>() {
     override fun build(context: Context, lifecycleOwner: LifecycleOwner, activityResultRegistry: ActivityResultRegistry?): PlatformPAGImageView = PlatformPAGImageView(context)
@@ -22,8 +23,8 @@ actual fun PAGImageView(
     wrapper.HostView(modifier = modifier)
 
     wrapper.Monitor(config) { view ->
-        config.repeatCount.let { if (view.repeatCount() != it) view.setRepeatCount(it) }
-        config.scaleMode.ordinal.let { if (view.scaleMode() != it) view.setScaleMode(it) }
+        config.repeatCount.then { if (view.repeatCount() != it) view.setRepeatCount(it) }
+        config.scaleMode.ordinal.then { if (view.scaleMode() != it) view.setScaleMode(it) }
     }
 
     wrapper.Monitor(composition) { view ->

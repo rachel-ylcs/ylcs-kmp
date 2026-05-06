@@ -55,6 +55,7 @@ import love.yinlin.extension.catchingNull
 import love.yinlin.extension.moveItem
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
+import love.yinlin.extension.then
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
@@ -86,7 +87,7 @@ class ScreenPlaylistLibrary : Screen() {
     private val library = mutableStateListOf<MusicStatusPreview>()
 
     private suspend fun addPlaylist() {
-        inputPlaylistNameDialog.open()?.let { name ->
+        inputPlaylistNameDialog.open()?.then { name ->
             if (name != Playlist.Default.name && playlistLibrary[name] == null) {
                 playlistLibrary[name] = MusicPlaylist(name, emptyList())
                 currentPage = tabs.indexOf(name)
@@ -114,7 +115,7 @@ class ScreenPlaylistLibrary : Screen() {
                 val name = tabs[index]
                 if (slot.confirm.open(content = "删除歌单\"$name\"")) {
                     // 若正在播放则停止播放器
-                    mp?.let { player ->
+                    mp?.then { player ->
                         val currentPlaylist = player.playlist
                         if (currentPlaylist is Playlist.User && currentPlaylist.name == name) player.stop()
                     }
@@ -145,7 +146,7 @@ class ScreenPlaylistLibrary : Screen() {
             val playlist = playlistLibrary[name]
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
-                mp?.let { player ->
+                mp?.then { player ->
                     val currentPlaylist = player.playlist
                     if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
                         val playingIndex = player.musicList.indexOf(musicInfo.id)
@@ -168,7 +169,7 @@ class ScreenPlaylistLibrary : Screen() {
             val newItems = playlist.items.toMutableList()
             newItems.moveItem(fromIndex, toIndex)
             playlistLibrary[name] = playlist.copy(items = newItems)
-            mp?.let { player ->
+            mp?.then { player ->
                 // 检查是否当前正在播放此歌单并移动相应媒体
                 val currentPlaylist = player.playlist
                 if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
@@ -388,7 +389,9 @@ class ScreenPlaylistLibrary : Screen() {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     PrimaryLoadingButton(text = "导出", icon = Icons.Upload, onClick = {
-                        catchingError { state.text = playlistLibrary.items.toJsonString() }?.let {
+                        catchingError {
+                            state.text = playlistLibrary.items.toJsonString()
+                        }?.then {
                             slot.tip.error(it.message ?: "导出失败")
                         }
                     })
@@ -401,7 +404,7 @@ class ScreenPlaylistLibrary : Screen() {
                                     playlistLibrary.replaceAll(items)
                                     if (items.isNotEmpty()) currentPage = 0
                                     slot.tip.success("导入成功")
-                                }?.let {
+                                }?.then {
                                     slot.tip.error("导入格式错误")
                                 }
                             }

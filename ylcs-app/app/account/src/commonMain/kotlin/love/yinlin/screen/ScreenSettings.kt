@@ -53,6 +53,7 @@ import love.yinlin.data.rachel.literal.AppPrivacyPolicy
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.extension.fileSizeString
+import love.yinlin.extension.then
 import love.yinlin.fs.File
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
@@ -76,7 +77,7 @@ class ScreenSettings : Screen() {
     }
 
     private suspend fun modifyUserAvatar() {
-        pickPicture(1f)?.let { path ->
+        pickPicture(1f)?.then { path ->
             ApiProfileUpdateAvatar.request(app.config.userToken, apiFile(path)) {
                 app.config.cacheUserAvatar = CacheState.UPDATE
             }.errorTip
@@ -84,7 +85,7 @@ class ScreenSettings : Screen() {
     }
 
     private suspend fun modifyUserWall() {
-        pickPicture(1.77777f)?.let { path ->
+        pickPicture(1.77777f)?.then { path ->
             ApiProfileUpdateWall.request(app.config.userToken, apiFile(path)) {
                 app.config.cacheUserWall = CacheState.UPDATE
             }.errorTip
@@ -92,7 +93,7 @@ class ScreenSettings : Screen() {
     }
 
     private suspend fun modifyUserId(initText: String) {
-        idModifyDialog.open(initText)?.let { text ->
+        idModifyDialog.open(initText)?.then { text ->
             val profile = app.config.userProfile
             if (profile != null && profile.coin >= UserConstraint.RENAME_COIN_COST) {
                 ApiProfileUpdateName.request(app.config.userToken, text) {
@@ -103,7 +104,7 @@ class ScreenSettings : Screen() {
     }
 
     private suspend fun modifyUserSignature(initText: String) {
-        signatureModifyDialog.open(initText)?.let { text ->
+        signatureModifyDialog.open(initText)?.then { text ->
             val profile = app.config.userProfile
             if (profile != null) {
                 ApiProfileUpdateSignature.request(app.config.userToken, text) {

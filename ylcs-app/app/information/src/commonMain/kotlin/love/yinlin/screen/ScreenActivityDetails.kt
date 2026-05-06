@@ -39,6 +39,7 @@ import love.yinlin.cs.url
 import love.yinlin.data.compose.Picture
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.findModify
+import love.yinlin.extension.then
 import love.yinlin.platform.Platform
 import love.yinlin.uri.Uri
 import love.yinlin.uri.UriGenerator
@@ -83,7 +84,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
 
     @Composable
     private fun ActivityInfoLayout(activity: Activity, modifier: Modifier = Modifier) {
-        val coverPath = activity.photo.coverPath?.url ?: activity.photo.posters.firstOrNull()?.let { activity.photo.posterPath(it) }?.url
+        val coverPath = activity.photo.coverPath?.url ?: activity.photo.posters.firstOrNull()?.let(activity.photo::posterPath)?.url
 
         Column(modifier = modifier) {
             // 封面
@@ -168,24 +169,24 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
-                    link.showstart?.ifEmpty { null }?.let { showstart ->
+                    link.showstart?.ifEmpty { null }?.then { showstart ->
                         LinkIcon("秀动", painterResource(Res.drawable.img_showstart), Colors.Unspecified) {
                             val uri = Uri.parse(showstart)
                             if (uri == null) slot.tip.warning("链接已失效")
                             else if (!app.openUri(uri)) slot.tip.warning("未安装秀动")
                         }
                     }
-                    link.damai?.ifEmpty { null }?.let { damai ->
+                    link.damai?.ifEmpty { null }?.then { damai ->
                         LinkIcon("大麦", painterResource(Res.drawable.img_damai), Colors.Unspecified) {
                             navigateScreenWebPage("https://m.damai.cn/shows/item.html?itemId=${damai}")
                         }
                     }
-                    link.maoyan?.ifEmpty { null }?.let { maoyan ->
+                    link.maoyan?.ifEmpty { null }?.then { maoyan ->
                         LinkIcon("猫眼", painterResource(Res.drawable.img_maoyan), Colors.Unspecified) {
                             navigateScreenWebPage("https://show.maoyan.com/qqw#/detail/${maoyan}")
                         }
                     }
-                    link.link?.ifEmpty { null }?.let { link ->
+                    link.link?.ifEmpty { null }?.then { link ->
                         LinkIcon("直播", rememberVectorPainter(Icons.Link)) {
                             navigateScreenWebPage(link)
                         }
@@ -193,13 +194,13 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
 
                     val qqGroupUri = Platform.use(*Platform.Phone,
                         ifTrue = {
-                            link.qqGroupPhone?.ifEmpty { null }?.let { group -> UriGenerator.qqGroup(group) }
+                            link.qqGroupPhone?.ifEmpty { null }?.let(UriGenerator::qqGroup)
                         },
                         ifFalse = {
-                            link.qqGroupLink?.ifEmpty { null }?.let { q -> UriGenerator.qqGroupLink(q) }
+                            link.qqGroupLink?.ifEmpty { null }?.let(UriGenerator::qqGroupLink)
                         }
                     )
-                    qqGroupUri?.let { uri ->
+                    qqGroupUri?.then { uri ->
                         LinkIcon("官群", rememberVectorPainter(Icons2.QQ)) {
                             if (!app.openUri(uri)) slot.tip.warning("未安装QQ")
                         }
@@ -241,7 +242,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
             }
 
             // 服务说明
-            activity.content?.ifEmpty { null }?.let { content ->
+            activity.content?.ifEmpty { null }?.then { content ->
                 Text(
                     text = "服务说明",
                     style = Theme.typography.v7.bold,
@@ -391,7 +392,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
 
     @Composable
     override fun Content() {
-        targetActivity?.let {
+        targetActivity?.then {
             val deviceType by rememberDeviceType()
             when (deviceType) {
                 Device.Type.PORTRAIT -> Portrait(it)

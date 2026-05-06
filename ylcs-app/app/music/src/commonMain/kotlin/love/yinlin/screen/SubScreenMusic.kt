@@ -68,6 +68,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catching
+import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.startup.StartupMusicPlayer
@@ -93,7 +94,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
 
     override suspend fun initialize() {
         monitor(state = { mp?.position }) { position ->
-            mp?.let { player ->
+            mp?.then { player ->
                 if (position != null) {
                     // 处理进度条
                     if (abs(position - currentDebounceTime) > 1000L - player.engine.interval) currentDebounceTime = position
@@ -144,7 +145,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
         }
 
         monitor(state = { mp?.error }) { error ->
-            error?.let { slot.tip.error(it.message) }
+            error?.then { slot.tip.error(it.message) }
         }
     }
 
@@ -432,7 +433,7 @@ class SubScreenMusic(parent: NavigationScreen) : SubScreen(parent) {
                     .fastClipCircle()
                     .background(Colors.Green5).clickable {
                         launch {
-                            mp?.let {
+                            mp?.then {
                                 if (it.isPlaying) it.pause()
                                 else it.play()
                             }

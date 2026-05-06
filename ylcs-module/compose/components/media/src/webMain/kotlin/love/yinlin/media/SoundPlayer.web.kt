@@ -8,6 +8,7 @@ import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ByteArrayCompatible
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
+import love.yinlin.extension.then
 import love.yinlin.fs.File
 import org.khronos.webgl.ArrayBuffer
 import kotlin.js.ExperimentalWasmJsInterop
@@ -44,7 +45,7 @@ actual class SoundPlayer {
     actual suspend fun loadFromPath(data: List<File>) { }
 
     actual fun play(index: Int) {
-        caches.getOrNull(index)?.let { buffer -> playAudioBuffer(context, buffer) }
+        caches.getOrNull(index)?.then { buffer -> playAudioBuffer(context, buffer) }
     }
 
     actual fun release() { }

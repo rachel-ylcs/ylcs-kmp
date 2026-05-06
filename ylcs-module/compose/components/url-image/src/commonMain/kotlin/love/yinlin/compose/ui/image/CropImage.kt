@@ -30,6 +30,7 @@ import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberRefNull
 import love.yinlin.compose.extension.translate
+import love.yinlin.extension.then
 
 @Stable
 private sealed interface TouchRegion {
@@ -51,7 +52,7 @@ private fun DrawScope.drawCorner(
     val width = 2.dp.toPx()
     val offsetFromVertex = width * 2f
     val offsetLine = width / 2f
-    rect.topLeft.translate(offsetFromVertex, offsetFromVertex).let { start ->
+    rect.topLeft.translate(offsetFromVertex, offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = -offsetLine),
             end = start.translate(x = cornerLength),
@@ -67,7 +68,7 @@ private fun DrawScope.drawCorner(
             strokeWidth = width
         )
     }
-    rect.topRight.translate(-offsetFromVertex, offsetFromVertex).let { start ->
+    rect.topRight.translate(-offsetFromVertex, offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = offsetLine),
             end = start.translate(x = -cornerLength),
@@ -83,7 +84,7 @@ private fun DrawScope.drawCorner(
             strokeWidth = width
         )
     }
-    rect.bottomLeft.translate(offsetFromVertex, -offsetFromVertex).let { start ->
+    rect.bottomLeft.translate(offsetFromVertex, -offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = -offsetLine),
             end = start.translate(x = cornerLength),
@@ -99,7 +100,7 @@ private fun DrawScope.drawCorner(
             strokeWidth = width
         )
     }
-    rect.bottomRight.translate(-offsetFromVertex, -offsetFromVertex).let { start ->
+    rect.bottomRight.translate(-offsetFromVertex, -offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = offsetLine),
             end = start.translate(x = -cornerLength),
@@ -205,7 +206,7 @@ fun CropImage(
                 onDragEnd = { touchRegion = null }
             ) { change, dragAmount ->
                 val imageRect = state.imageRect
-                touchRegion?.let {
+                touchRegion?.then {
                     state.frameRect = when (it) {
                         is TouchRegion.Vertex -> {
                             val minimumVertexDistance = tolerance * 2f
@@ -292,7 +293,7 @@ fun CropImage(
     ) {
         // 当图像、比例、容器变化时调整图像和裁剪框的大小
         LaunchedEffect(aspectRatio, imageSize, constraints) {
-            imageSize?.let { actualSize ->
+            imageSize?.then { actualSize ->
                 val canvasSize = Size(constraints.maxWidth.toFloat(), constraints.maxHeight.toFloat())
                 val newSize = Size(canvasSize.width, canvasSize.width * actualSize.height / actualSize.width.toFloat())
                 val imageSize = if (newSize.height > canvasSize.height) {

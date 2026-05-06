@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.ui.media.VideoActionBar
 import love.yinlin.compose.ui.media.DesktopVideoController
+import love.yinlin.extension.then
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType
@@ -73,7 +74,7 @@ internal class WindowsVideoController(topBar: VideoActionBar.Factory, bottomBar:
         if (width > 0 && height > 0) {
             SwingUtilities.invokeLater {
                 if (!isRelease) {
-                    image?.let {
+                    image?.then {
                         if (!it.isClosed) it.close()
                     }
                     image = Bitmap().apply {

@@ -13,6 +13,7 @@ import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.Array
 import love.yinlin.extension.Int
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import love.yinlin.extension.to
 import love.yinlin.extension.toJsonString
 
@@ -24,7 +25,7 @@ fun APIScope.gameAPI() {
         VN.throwEmpty(title)
         VN.throwIf(!GameConfig.checkReward(reward, num, cost))
         // 检查游戏数据配置
-        catchingError { type.manager(db).check(info, question, answer) }?.let { failure("数据配置非法") }
+        catchingError { type.manager(db).check(info, question, answer) }?.then { failure("数据配置非法") }
         val actualCoin = (reward * GameConfig.rewardCostRatio).toInt()
         // 新增游戏行
         db.throwTransaction {

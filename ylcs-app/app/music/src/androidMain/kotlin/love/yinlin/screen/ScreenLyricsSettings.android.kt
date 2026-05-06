@@ -11,11 +11,12 @@ import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.Switch
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.window.OffScreenWindowEffect
+import love.yinlin.extension.then
 import love.yinlin.media.lyrics.LyricsEngineConfig
 
 @Composable
 actual fun ScreenLyricsSettings.PlatformContent() {
-    mp?.floatingLyrics?.let { floatingLyrics ->
+    mp?.floatingLyrics?.then { floatingLyrics ->
         OffScreenWindowEffect { isForeground ->
             if (isForeground) floatingLyrics.check()
         }

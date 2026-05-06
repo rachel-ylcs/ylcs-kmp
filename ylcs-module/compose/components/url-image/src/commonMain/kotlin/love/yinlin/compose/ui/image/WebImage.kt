@@ -46,6 +46,7 @@ import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.roundToIntOffset
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.extension.then
 import org.jetbrains.compose.resources.imageResource
 
 internal fun buildWebImageKeyUrl(uri: String, key: Any? = null): String = when {
@@ -66,7 +67,7 @@ internal fun rememberWebImageState(
         ImageOptions.Builder().apply {
             sizeMultiplier(quality.sizeMultiplier)
             disallowAnimatedImage(!animated)
-            background?.let { placeholder(ColorPainterStateImage(it)) }
+            background?.let(::ColorPainterStateImage)?.then(::placeholder)
             if (isCrossfade) crossfade()
         }.merge(SingletonSketch.get(context).globalImageOptions).build()
     }

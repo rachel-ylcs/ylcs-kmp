@@ -21,11 +21,13 @@ data class TypographyTheme(
     internal val default = v7
 
     companion object {
-        internal val Number.style: TextStyle get() = this.toDouble().sp.let { TextStyle(
-            fontSize = it,
-            lineHeight = it * 1.3333f,
-            letterSpacing = it * 0.0125f
-        ) }
+        internal val Number.style: TextStyle get() = this.toDouble().sp.let {
+            TextStyle(
+                fontSize = it,
+                lineHeight = it * 1.3333f,
+                letterSpacing = it * 0.0125f
+            )
+        }
 
         val Default = TypographyTheme(
             v1 = 64.style,

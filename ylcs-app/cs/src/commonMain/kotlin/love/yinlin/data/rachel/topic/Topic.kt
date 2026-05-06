@@ -22,7 +22,7 @@ data class Topic(
 	val name: String, // [用户昵称]
 	val score: Double = 0.0,
 ) {
-	val picPath by lazy { pic?.let { picPath(it) } }
+	val picPath by lazy { pic?.let(::picPath) }
 
 	fun picPath(key: String) = ServerRes.Users.User(uid).Pics().pic(key)
 

@@ -13,6 +13,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.then
 import kotlin.reflect.KProperty
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -104,7 +105,7 @@ open class StartupPool(
             val id = syncStartup.id
             val dependencies = dependenciesMap[id] ?: emptyList()
             // 确保同步服务不依赖异步服务
-            dependencies.find { it !in syncStartupSet }?.let { dependentId ->
+            dependencies.find { it !in syncStartupSet }?.then { dependentId ->
                 throw IllegalStateException("sync startup $id is dependent on async startup $dependentId")
             }
             // 初始化同步服务
@@ -171,7 +172,7 @@ open class StartupPool(
                         // 继续initLater
                         val startup = startupMap[id]
                         if (startup != null) {
-                            Coroutines.catchingError { startup.initLater() }?.let { throw StartupError(id, "initLater", it) }
+                            Coroutines.catchingError { startup.initLater() }?.then { throw StartupError(id, "initLater", it) }
                         }
                     }
                 }.awaitAll()
@@ -185,7 +186,7 @@ open class StartupPool(
             val id = factory.id
             val startup = startupMap[id]
             if (startup != null) {
-                catchingError { startup.destroyBefore() }?.let { throw StartupError(id, "destroyBefore", it) }
+                catchingError { startup.destroyBefore() }?.then { throw StartupError(id, "destroyBefore", it) }
             }
         }
     }
@@ -196,7 +197,7 @@ open class StartupPool(
             val id = factory.id
             val startup = startupMap[id]
             if (startup != null) {
-                catchingError { startup.destroy() }?.let { throw StartupError(id, "destroy", it) }
+                catchingError { startup.destroy() }?.then { throw StartupError(id, "destroy", it) }
             }
         }
     }

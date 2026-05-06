@@ -15,17 +15,19 @@ actual class StartupKV actual constructor(pool: StartupPool, initPath: File): Sy
         }.toJsonString())
     }
 
-    fun getItem(key: String): String? = localStorage.getItem(key)?.let { catchingNull {
-        val arr = it.parseJson.Array
-        val time = arr[0].Int
-        val value = arr[1].String
-        val current = (DateEx.CurrentLong / 1000L).toInt()
-        if (time == KVExpire.NEVER || current <= time) value
-        else {
-            localStorage.removeItem(key)
-            null
+    fun getItem(key: String): String? = localStorage.getItem(key)?.let {
+        catchingNull {
+            val arr = it.parseJson.Array
+            val time = arr[0].Int
+            val value = arr[1].String
+            val current = (DateEx.CurrentLong / 1000L).toInt()
+            if (time == KVExpire.NEVER || current <= time) value
+            else {
+                localStorage.removeItem(key)
+                null
+            }
         }
-    } }
+    }
 
     actual fun set(key: String, value: Boolean, expire: Int) = setItem(key, value.toString(), expire)
     actual fun set(key: String, value: Int, expire: Int) = setItem(key, value.toString(), expire)

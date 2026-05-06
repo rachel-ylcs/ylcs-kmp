@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui
 
+import love.yinlin.extension.then
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -17,7 +18,7 @@ internal inline fun <T, R> T.internalCloseable(block: (T) -> R, clean: T.() -> U
         exception = e
         throw e
     } finally {
-        exception.let { cause ->
+        exception.then { cause ->
             if (cause == null) clean()
             else {
                 try {

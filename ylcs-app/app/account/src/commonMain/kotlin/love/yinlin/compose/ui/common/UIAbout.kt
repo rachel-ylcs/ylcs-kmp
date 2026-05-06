@@ -28,6 +28,7 @@ import love.yinlin.data.rachel.literal.AppContributor
 import love.yinlin.data.rachel.literal.AppContributorGroup
 import love.yinlin.data.rachel.literal.AppUpdateInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.then
 
 @Composable
 internal fun ContributorLayout(
@@ -113,7 +114,7 @@ internal fun UpdateInfoLayout(updateInfo: AppUpdateInfo, modifier: Modifier = Mo
         }
 
         Text(text = updateInfo.platform)
-        updateInfo.title?.let { title ->
+        updateInfo.title?.then { title ->
             Text(text = title, color = Theme.color.warning)
         }
 

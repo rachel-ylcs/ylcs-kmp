@@ -12,6 +12,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberNull
 import love.yinlin.compose.ui.node.condition
+import love.yinlin.extension.then
 import love.yinlin.fs.File
 
 @Composable
@@ -33,7 +34,7 @@ fun LocalFileImage(
     }
 
     Box(modifier = modifier) {
-        actualUri?.let {
+        actualUri?.then {
             AsyncImage(
                 uri = it,
                 contentDescription = null,

@@ -53,7 +53,7 @@ fun APIScope.profileAPI() {
 
     ApiProfileGetPublicProfile.response { token, uid2 ->
         VN.throwId(uid2)
-        val uid1 = token?.let { AN.throwExpireToken(it) }
+        val uid1 = token?.let(AN::throwExpireToken)
         val user = db.throwQuerySQLSingle("""
 			SELECT uid, name, signature, label, exp, follows, followers FROM user WHERE uid = ?
 		""", uid2)

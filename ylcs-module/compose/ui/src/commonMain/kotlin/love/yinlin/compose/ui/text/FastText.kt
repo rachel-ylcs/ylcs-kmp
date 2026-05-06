@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastCoerceAtLeast
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
+import love.yinlin.extension.then
 
 /**
  * 高性能 Text
@@ -41,7 +42,7 @@ fun FastFixedText(
     val style = style.merge(color = color.takeOrElse { style.color.takeOrElse { LocalColor.current } })
 
     Layout(modifier = modifier.drawWithContent {
-        textProvider()?.let { drawText(measurer, it, style = style, maxLines = 1) }
+        textProvider()?.then { drawText(measurer, it, style = style, maxLines = 1) }
     }) { _, _ ->
         val result = measurer.measure(text = placeholder, style = style, maxLines = 1)
         layout(result.size.width, result.size.height) { }
