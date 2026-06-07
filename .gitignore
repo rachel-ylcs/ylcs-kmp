@@ -20,6 +20,7 @@ work/
 xcuserdata/
 **/xcshareddata/IDEWorkspaceChecks.plist
 Pods/
+.swiftpm-locks/
 **/Version.xcconfig
 *.podspec
 

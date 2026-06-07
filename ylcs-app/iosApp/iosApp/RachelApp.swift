@@ -1,5 +1,4 @@
 import SwiftUI
-import MMKV
 import ylcs_app
 
 @main

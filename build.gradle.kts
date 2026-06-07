@@ -7,7 +7,6 @@ plugins {
             libs.plugins.kotlinMultiplatform,
             libs.plugins.kotlinSerialization,
             libs.plugins.kotlinJvm,
-            libs.plugins.kotlinCocoapods,
             libs.plugins.composeMultiplatform,
             libs.plugins.composeCompiler,
             libs.plugins.androidApplication,

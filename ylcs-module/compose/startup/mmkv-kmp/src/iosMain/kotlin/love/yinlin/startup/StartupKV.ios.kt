@@ -1,6 +1,6 @@
 package love.yinlin.startup
 
-import cocoapods.MMKV.*
+import swiftPMImport.love.yinlin.compose.startup.ylcs.module.compose.startup.mmkv.kmp.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.extension.toNSData
 import love.yinlin.extension.toByteArray
