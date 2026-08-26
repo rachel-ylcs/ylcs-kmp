@@ -2,7 +2,6 @@ plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.kotlinCocoapods,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
@@ -38,8 +37,4 @@ template(object : KotlinMultiplatformTemplate() {
 
         wasmJsMain.configure(webMain)
     }
-
-    override val cocoapodsList: List<Pod> = listOf(
-        pod("SGQRCode", libs.versions.sgQrcode),
-    )
 })

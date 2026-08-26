@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExtension
+
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.kotlinCocoapods,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
@@ -44,7 +46,12 @@ template(object : KotlinMultiplatformTemplate() {
         wasmJsMain.configure(webMain)
     }
 
-    override val cocoapodsList: List<Pod> = listOf(
-        pod("libpag", libs.versions.pag)
-    )
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    override fun SwiftPMImportExtension.swiftPMDependencies() {
+        swiftPackage(
+            url = "https://github.com/libpag/pag-ios.git",
+            version = libs.versions.pag.get(),
+            products = listOf("libpag"),
+        )
+    }
 })

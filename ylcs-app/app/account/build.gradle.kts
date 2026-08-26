@@ -24,3 +24,5 @@ template(object : KotlinMultiplatformTemplate() {
         }
     }
 })
+
+patchMMKVSwiftPackage()

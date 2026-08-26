@@ -7,6 +7,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
@@ -20,7 +21,7 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginE
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.DisableCacheInKotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCacheApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -30,14 +31,6 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 import java.io.File
-
-class Pod internal constructor(
-    val name: String,
-    val version: String? = null,
-    val moduleName: String? = null,
-    val extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
-    val source: File? = null,
-)
 
 class KotlinMultiplatformSourceSetsScope(
     p: Project,
@@ -98,24 +91,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     // iOS
     open val iosTarget: Boolean = true
     open fun KotlinNativeTarget.ios() { }
-    open val cocoapodsList: List<Pod> = emptyList()
-    open fun CocoapodsExtension.cocoapods() { }
-
-    fun pod(
-        name: String,
-        version: String? = null,
-        moduleName: String? = null,
-        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
-        source: File? = null,
-    ): Pod = Pod(name, version, moduleName, extraOpts, source)
-
-    fun pod(
-        name: String,
-        version: Provider<String>,
-        moduleName: String? = null,
-        extraOpts: List<String> = listOf("-compiler-option", "-fmodules"),
-        source: File? = null,
-    ): Pod = Pod(name, version.get(), moduleName, extraOpts, source)
+    open val iosFrameworkBaseName: String? = null
+    open val iosFrameworkIsStatic: Boolean? = null
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    open fun SwiftPMImportExtension.swiftPMDependencies() { }
 
     // Desktop
     open val desktopTarget: Boolean = true
@@ -192,8 +171,11 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             if (iosTarget) {
                 buildList {
                     add(iosArm64())
-                    if (C.platform == BuildPlatform.Mac) {
+                    // Temporarily disabled to simplify SwiftPM resolution: only build device target (iosArm64)
+                    // iosX64 and iosSimulatorArm64 may cause xcodebuild failures during fetchSyntheticImportProjectPackages
+                    if (false && C.platform == BuildPlatform.Mac) {
                         when (C.architecture) {
+                            BuildArchitecture.X86_64 -> add(iosX64())
                             BuildArchitecture.AARCH64 -> add(iosSimulatorArm64())
                             else -> { }
                         }
@@ -204,6 +186,9 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     // https://youtrack.jetbrains.com/issue/KT-80715
                     if (C.platform == BuildPlatform.Mac) {
                         target.binaries.framework {
+                            iosFrameworkBaseName?.let { baseName = it }
+                            iosFrameworkIsStatic?.let { isStatic = it }
+                            linkerOpts("-framework", "UIKit")
                             @OptIn(KotlinNativeCacheApi::class)
                             disableNativeCache(
                                 version = DisableCacheInKotlinVersion.`2_4_0`,
@@ -214,27 +199,9 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
                 }
 
-                // Use Cocoapods
-                extensions.findByType<CocoapodsExtension>()?.apply {
-                    version = C.app.versionName
-                    ios.deploymentTarget = C.ios.target
-                    podfile = C.root.app.iosApp.podfile.asFile
-
-                    xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
-                    xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
-
-                    cocoapods()
-
-                    if (C.platform == BuildPlatform.Mac) {
-                        for (item in cocoapodsList) {
-                            pod(item.name) {
-                                if (item.moduleName != null) moduleName = item.moduleName
-                                if (item.version != null) version = item.version
-                                extraOpts += item.extraOpts
-                                if (item.source != null) source = path(item.source)
-                            }
-                        }
-                    }
+                extensions.findByType<SwiftPMImportExtension>()?.apply {
+                    iosMinimumDeploymentTarget.set(C.ios.target)
+                    swiftPMDependencies()
                 }
             }
 

@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExtension
+
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.kotlinCocoapods,
         libs.plugins.androidLibraryNew,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
@@ -38,7 +40,14 @@ template(object : KotlinMultiplatformTemplate() {
         wasmJsMain.configure(webMain)
     }
 
-    override val cocoapodsList: List<Pod> = listOf(
-        pod("MMKV", libs.versions.mmkv)
-    )
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    override fun SwiftPMImportExtension.swiftPMDependencies() {
+        swiftPackage(
+            url = "https://github.com/Tencent/MMKV.git",
+            version = libs.versions.mmkv.get(),
+            products = listOf("MMKV"),
+        )
+    }
 })
+
+patchMMKVSwiftPackage()

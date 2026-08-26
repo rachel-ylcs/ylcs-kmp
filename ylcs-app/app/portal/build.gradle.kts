@@ -1,10 +1,7 @@
-import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
-
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.kotlinCocoapods,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
@@ -12,16 +9,8 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override fun CocoapodsExtension.cocoapods() {
-        name = C.app.projectName
-        summary = C.app.description
-        homepage = C.app.homepage
-
-        framework {
-            baseName = C.app.projectName
-            isStatic = true
-        }
-    }
+    override val iosFrameworkBaseName: String = C.app.projectName
+    override val iosFrameworkIsStatic: Boolean = true
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {

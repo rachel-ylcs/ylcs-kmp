@@ -155,10 +155,7 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew ylcs-app:app:portal:generateDummyFramework
-          ./gradlew ylcs-app:app:portal:podspec
-          ./gradlew ylcs-app:app:portal:podInstall
-          ./gradlew ylcs-app:app:portal:linkPodDebugFrameworkIosArm64
+          ./gradlew ylcs-app:app:portal:linkDebugFrameworkIosArm64
 
   build-desktop:
     name: Build Desktop

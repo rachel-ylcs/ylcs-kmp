@@ -10,26 +10,48 @@ import org.jetbrains.skia.ImageInfo
 import platform.CoreVideo.*
 import platform.posix.memcpy
 
-internal typealias PlatformPAG = cocoapods.libpag.PAG
-internal typealias PlatformPAGComposition = cocoapods.libpag.PAGComposition
-internal typealias PlatformPAGDiskCache = cocoapods.libpag.PAGDiskCache
-internal typealias PlatformPAGDecoder = cocoapods.libpag.PAGDecoder
-internal typealias PlatformPAGFile = cocoapods.libpag.PAGFile
-internal typealias PlatformPAGFont = cocoapods.libpag.PAGFont
-internal typealias PlatformPAGImage = cocoapods.libpag.PAGImage
-internal typealias PlatformPAGImageLayer = cocoapods.libpag.PAGImageLayer
-internal typealias PlatformPAGImageView = cocoapods.libpag.PAGImageView
-internal typealias PlatformPAGLayer = cocoapods.libpag.PAGLayer
-internal typealias PlatformPAGMarker = cocoapods.libpag.PAGMarker
-internal typealias PlatformPAGPlayer = cocoapods.libpag.PAGPlayer
-internal typealias PlatformPAGShapeLayer = cocoapods.libpag.PAGShapeLayer
-internal typealias PlatformPAGSolidLayer = cocoapods.libpag.PAGSolidLayer
-internal typealias PlatformPAGSurface = cocoapods.libpag.PAGSurface
-internal typealias PlatformPAGTextLayer = cocoapods.libpag.PAGTextLayer
-internal typealias PlatformPAGVideoDecoder = cocoapods.libpag.PAGVideoDecoder
-internal typealias PlatformPAGVideoRange = cocoapods.libpag.PAGVideoRange
-internal typealias PlatformPAGView = cocoapods.libpag.PAGView
-internal typealias PlatformPAGListener = cocoapods.libpag.PAGViewListenerProtocol
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAG
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGComposition
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGDecoder
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGDiskCache
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGFile
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGFont
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGImage
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGImageLayer
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGImageView
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGLayer
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGLayerType
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGMarker
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGPlayer
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGShapeLayer
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGSolidLayer
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGSurface
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGTextLayer
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGVideoDecoder
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGVideoRange
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGView
+import swiftPMImport.love.yinlin.plugin.ylcs.module.plugin.pag.kmp.PAGViewListenerProtocol
+
+internal typealias PlatformPAG = PAG
+internal typealias PlatformPAGComposition = PAGComposition
+internal typealias PlatformPAGDiskCache = PAGDiskCache
+internal typealias PlatformPAGDecoder = PAGDecoder
+internal typealias PlatformPAGFile = PAGFile
+internal typealias PlatformPAGFont = PAGFont
+internal typealias PlatformPAGImage = PAGImage
+internal typealias PlatformPAGImageLayer = PAGImageLayer
+internal typealias PlatformPAGImageView = PAGImageView
+internal typealias PlatformPAGLayer = PAGLayer
+internal typealias PlatformPAGMarker = PAGMarker
+internal typealias PlatformPAGPlayer = PAGPlayer
+internal typealias PlatformPAGShapeLayer = PAGShapeLayer
+internal typealias PlatformPAGSolidLayer = PAGSolidLayer
+internal typealias PlatformPAGSurface = PAGSurface
+internal typealias PlatformPAGTextLayer = PAGTextLayer
+internal typealias PlatformPAGVideoDecoder = PAGVideoDecoder
+internal typealias PlatformPAGVideoRange = PAGVideoRange
+internal typealias PlatformPAGView = PAGView
+internal typealias PlatformPAGListener = PAGViewListenerProtocol
 
 internal fun makePlatformPAGFont(fontFamily: String, fontStyle: String): PlatformPAGFont {
     val font = PlatformPAGFont()
@@ -55,14 +77,14 @@ internal fun makePlatformPAGVideoRange(startTime: Long, endTime: Long, playDurat
     return range
 }
 
-internal val Int.asPAGLayerType: cocoapods.libpag.PAGLayerType get() = when (this) {
-    1 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeNull
-    2 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeSolid
-    3 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeText
-    4 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeShape
-    5 -> cocoapods.libpag.PAGLayerType.PAGLayerTypeImage
-    6 -> cocoapods.libpag.PAGLayerType.PAGLayerTypePreCompose
-    else -> cocoapods.libpag.PAGLayerType.PAGLayerTypeUnknown
+internal val Int.asPAGLayerType: PAGLayerType get() = when (this) {
+    1 -> PAGLayerType.PAGLayerTypeNull
+    2 -> PAGLayerType.PAGLayerTypeSolid
+    3 -> PAGLayerType.PAGLayerTypeText
+    4 -> PAGLayerType.PAGLayerTypeShape
+    5 -> PAGLayerType.PAGLayerTypeImage
+    6 -> PAGLayerType.PAGLayerTypePreCompose
+    else -> PAGLayerType.PAGLayerTypeUnknown
 }
 
 internal val PAGColorType.asCVPixelFormat: UInt get() = when (this) {
