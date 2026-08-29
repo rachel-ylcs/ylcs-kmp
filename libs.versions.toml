@@ -138,7 +138,7 @@ ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref =
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 
-logback = { module = "ch.qos.logback:logback-classic", version = "1.5.32" }
+logback = { module = "ch.qos.logback:logback-classic", version = "1.6.3" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.0.2" }
-redis = { module = "redis.clients:jedis", version = "7.5.0" }
+mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.1.0" }
+redis = { module = "redis.clients:jedis", version = "8.0.1" }
