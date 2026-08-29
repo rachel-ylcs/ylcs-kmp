@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.LifecycleOwner
 import com.google.zxing.Result
+import com.king.camera.scan.AnalyzeResult
 import com.king.camera.scan.BaseCameraScan
+import com.king.camera.scan.CameraScan
 import com.king.view.viewfinderview.ViewfinderView
 import com.king.zxing.DecodeConfig
 import com.king.zxing.DecodeFormatManager
@@ -49,17 +51,19 @@ private class QrCodeScannerWrapper : PlatformView<PreviewView>(), Releasable<Pre
         val previewView = PreviewView(context)
         cameraScan = BaseCameraScan<Result>(context, lifecycleOwner, previewView).apply {
             setAnalyzer(QRCodeAnalyzer(DecodeConfig().apply {
-                hints = DecodeFormatManager.QR_CODE_HINTS
-                isFullAreaScan = false
-                areaRectRatio = 0.8f
-                areaRectHorizontalOffset = 0
-                areaRectVerticalOffset = 0
+                setHints(DecodeFormatManager.QR_CODE_HINTS)
+                setFullAreaScan(false)
+                setAreaRectRatio(0.8f)
+                setAreaRectHorizontalOffset(0)
+                setAreaRectVerticalOffset(0)
             }))
             setPlayBeep(true)
-            setOnScanResultCallback {
-                setAnalyzeImage(false)
-                scanResult = it.result.text
-            }
+            setOnScanResultCallback(object : CameraScan.OnScanResultCallback<Result> {
+                override fun onScanResultCallback(result: AnalyzeResult<Result>) {
+                    setAnalyzeImage(false)
+                    scanResult = result.result.text
+                }
+            })
             activityResultRegistry?.register(
                 key = Uuid.generateV7().toHexString(),
                 contract = ActivityResultContracts.RequestPermission()
@@ -135,7 +139,7 @@ actual fun QrcodeScanner(
                     icon = Icons.FlashOn,
                     background = Colors.Dark,
                     modifier = Modifier.size(Theme.size.image9).clickable {
-                        scannerWrapper.cameraScan?.then { it.enableTorch(!it.isTorchEnabled) }
+                        scannerWrapper.cameraScan?.then { it.enableTorch(!it.isTorchEnabled()) }
                     }
                 )
             }
