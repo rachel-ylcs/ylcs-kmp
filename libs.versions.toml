@@ -1,17 +1,17 @@
 [versions]
 
 # Plugins #
-kotlin = "2.4.0-Beta2"
+kotlin = "2.4.20-RC2"
 agp = "9.1.1"
-cmp = "1.11.0-rc01"
+cmp = "1.12.0"
 mavenPublish = "0.37.0"
 dokka = "2.2.0"
 
 # Libs #
 
 # Common
-skiko = "0.144.6"
-lifecycle = "2.11.0-beta01"
+skiko = "0.150.1"
+lifecycle = "2.11.0"
 coroutines = "1.11.0"
 ktor = "3.5.2"
 sketch = "4.7.0-alpha01"
@@ -61,8 +61,8 @@ compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
-compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.1.0-rc01" }
-compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.1.1" }
+compose-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.1.0" }
+compose-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.2.0-alpha02" }
 compose-navigation3-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 compose-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
 compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
