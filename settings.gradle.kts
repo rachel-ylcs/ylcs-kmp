@@ -97,7 +97,6 @@ include(
     "ylcs-app:app:game-guess-lyrics",
     "ylcs-app:app:game-rhyme",
     "ylcs-app:app:global",
-    "ylcs-app:app:haze-fix",
     "ylcs-app:app:information",
     "ylcs-app:app:music",
     "ylcs-app:app:portal",

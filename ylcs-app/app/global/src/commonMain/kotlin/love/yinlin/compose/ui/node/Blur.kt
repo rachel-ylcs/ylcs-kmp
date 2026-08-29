@@ -12,31 +12,29 @@ class BlurState {
     internal val hazeState = HazeState()
 
     companion object {
-        internal val Blur = HazeBlurStyle(
-            blurRadius = 10.dp,
-            backgroundColor = Color(0xFF292929),
-            colorEffect = HazeColorEffect.tint(Color(0x8C292929))
-        )
-        internal val Acrylic = HazeBlurStyle(
-            blurRadius = 10.dp,
-            backgroundColor = Color(0xDD292929),
-            colorEffect = HazeColorEffect.tint(Color(0x6C292929))
-        )
+        internal val Blur = HazeBlurStyle {
+            blurRadius(10.dp)
+            backgroundColor(Color(0xFF292929))
+            colorEffects(listOf(HazeColorEffect.tint(Color(0x8C292929))))
+        }
+        internal val Acrylic = HazeBlurStyle {
+            blurRadius(10.dp)
+            backgroundColor(Color(0xDD292929))
+            colorEffects(listOf(HazeColorEffect.tint(Color(0x6C292929))))
+        }
     }
 }
 
 fun Modifier.blurSource(state: BlurState): Modifier = this.hazeSource(state.hazeState)
 
-fun Modifier.blurTarget(state: BlurState): Modifier = this.hazeEffect(state = state.hazeState) {
-    blurEffect {
-        style = BlurState.Blur
-        inputScale = HazeInputScale.Fixed(0.66667f)
-    }
-}
+fun Modifier.blurTarget(state: BlurState): Modifier = this.hazeBlur(
+    input = HazeInput.Sources(state = state.hazeState),
+    style = BlurState.Blur,
+    performanceMode = HazePerformanceMode.Fixed(0.66667f)
+)
 
-fun Modifier.acrylicTarget(state: BlurState): Modifier = this.hazeEffect(state = state.hazeState) {
-    blurEffect {
-        style = BlurState.Acrylic
-        inputScale = HazeInputScale.Fixed(0.66667f)
-    }
-}
+fun Modifier.acrylicTarget(state: BlurState): Modifier = this.hazeBlur(
+    input = HazeInput.Sources(state = state.hazeState),
+    style = BlurState.Acrylic,
+    performanceMode = HazePerformanceMode.Fixed(0.66667f)
+)

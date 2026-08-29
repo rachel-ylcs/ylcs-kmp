@@ -15,7 +15,7 @@ lifecycle = "2.11.0-beta01"
 coroutines = "1.11.0-rc02"
 ktor = "3.4.3"
 sketch = "4.7.0-alpha01"
-haze = "2.0.0-alpha01" # 2.0.0-alpha01 存在上游旋转屏幕bug
+haze = "2.0.0-beta02"
 mmkv = "2.4.0"
 pag = "4.5.52"
 
