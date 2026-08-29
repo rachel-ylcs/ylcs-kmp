@@ -16,12 +16,12 @@ coroutines = "1.11.0-rc02"
 ktor = "3.4.3"
 sketch = "4.7.0-alpha01"
 haze = "2.0.0-beta02"
-mmkv = "2.4.0"
-pag = "4.5.52"
+mmkv = "2.4.2"
+pag = "4.5.84"
 
 # Android
 androidx-activity = "1.13.0"
-media3 = "1.10.0"
+media3 = "1.11.0"
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
