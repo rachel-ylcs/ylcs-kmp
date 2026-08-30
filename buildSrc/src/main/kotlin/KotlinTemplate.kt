@@ -95,14 +95,6 @@ abstract class KotlinSourceSetsScope(
         block()
     }
 
-    fun createNonAndroid(
-        vararg parents: KotlinSourceSet,
-        block: KotlinSourceSet.() -> Unit = {}
-    ) : KotlinSourceSet = set.create("nonAndroidMain") {
-        for (parent in parents) dependsOn(parent)
-        block()
-    }
-
     fun KotlinSourceSet.configure(
         vararg parents: KotlinSourceSet,
         block: KotlinSourceSet.() -> Unit = {}

@@ -29,21 +29,21 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val nonAndroidMain = createNonAndroid(commonMain)
+        val skikoMain = createSkiko(commonMain)
 
-        iosMain.configure(nonAndroidMain)
+        iosMain.configure(skikoMain)
 
         iosMainList.configure(iosMain)
 
-        desktopMain.configure(nonAndroidMain)
+        desktopMain.configure(skikoMain)
 
-        webMain.configure(nonAndroidMain)
+        webMain.configure(skikoMain)
 
         jsMain.configure(webMain)
 
         wasmJsMain.configure(webMain)
 
-        nativeMain.configure(nonAndroidMain)
+        nativeMain.configure(commonMain)
 
         androidNativeMain.configure(nativeMain)
 
