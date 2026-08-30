@@ -87,7 +87,6 @@ include(
     "ylcs-module:platform:os:auto-update",
     "ylcs-module:platform:os:single-instance",
     "ylcs-module:platform:os:window",
-    "ylcs-module:plugin:pag-kmp",
 
     /* -----------------  应用模块  ----------------- */
 

@@ -78,6 +78,8 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
         }.exitValue == 0
     }
 
+    fun ensureNativeBuild(inputDir: File): Boolean = inputDir.exists() && inputDir.resolve("native.ignore").exists()
+
     @TaskAction
     fun buildNative() {
         // 准备输出目录

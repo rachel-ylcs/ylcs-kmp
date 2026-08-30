@@ -1,29 +1,16 @@
 import love.yinlin.task.BuildDesktopNativeTask
 
 afterEvaluate {
-    val buildDesktopNativePAG by tasks.registering(BuildDesktopNativeTask::class) {
-        val targetProject = findProject(projects.ylcsModule.plugin.pagKmp)!!
-        val sourceDir = targetProject.desktopNativeKMPSourceDir.asFile
-        onlyIf {
-            sourceDir.exists() && sourceDir.resolve("native.ignore").exists()
-        }
-        inputDir = sourceDir
-        nativeModuleName = targetProject.name
-        nativeBuildDir = targetProject.desktopNativeBuildDir.asFile
-        // https://github.com/Tencent/libpag
-        preCommands = when (C.platform) {
-            BuildPlatform.Windows -> listOf(
-                "set \"CMAKE_MSVC_PATH=%VS_PATH%\\VC\"",
-                "npm install -g depsync",
-                "depsync --project %NATIVE_SOURCE_DIR%\\libpag",
-            )
-            BuildPlatform.Linux -> listOf(
-                "npm install -g depsync",
-                $$"depsync --project ${NATIVE_SOURCE_DIR}/libpag"
-            )
-            BuildPlatform.Mac -> listOf(
-                $$"${NATIVE_SOURCE_DIR}/libpag/sync_deps.sh"
-            )
-        }
-    }
+//    val buildDesktopNativeTemplate = tasks.register<BuildDesktopNativeTask>("buildDesktopNativeTemplate") {
+//        val targetProject = findProject(projects.ylcsModule.plugin.pagKmp)!! // 模块
+//        val sourceDir = targetProject.desktopNativeKMPSourceDir.asFile // 源代码路径
+//        onlyIf {
+//            ensureNativeBuild(sourceDir)
+//        }
+//        description = "编译Native库模板"
+//        inputDir = sourceDir
+//        nativeModuleName = targetProject.name // 目标模块名
+//        nativeBuildDir = targetProject.desktopNativeBuildDir.asFile // 编译目录
+//        preCommands = listOf("") // 预先执行的脚本
+//    }
 }
