@@ -6,6 +6,7 @@ import com.github.panpf.sketch.SingletonSketch
 import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.cache.CachePolicy
 import com.github.panpf.sketch.cache.DiskCache
+import com.github.panpf.sketch.cache.internal.ResultCacheInterceptor
 import com.github.panpf.sketch.decode.supportAnimatedWebp
 import com.github.panpf.sketch.decode.supportGif
 import com.github.panpf.sketch.fetch.ComposeResourceUriFetcher
@@ -45,6 +46,11 @@ class StartupUrlImage(
 
         supportGif()
         supportAnimatedWebp()
+
+        // TODO: 修复 sketch 与 skiko 不兼容的部分
+        // https://github.com/panpf/sketch/issues/295
+        disabledInterceptor(ResultCacheInterceptor::class)
+        add(FixedResultCacheInterceptor())
     }
 
     private val sketch: Sketch = buildSketch(pool.rawContext).apply {
