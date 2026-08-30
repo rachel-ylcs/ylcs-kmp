@@ -178,7 +178,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     // iosX64 and iosSimulatorArm64 may cause xcodebuild failures during fetchSyntheticImportProjectPackages
                     if (false && C.platform == BuildPlatform.Mac) {
                         when (C.architecture) {
-                            BuildArchitecture.X86_64 -> add(iosX64())
+                            // cmp 自 1.11 起已经停止对 iosX64 的支持
+                            // BuildArchitecture.X86_64 -> add(iosX64())
                             BuildArchitecture.AARCH64 -> add(iosSimulatorArm64())
                             else -> { }
                         }
