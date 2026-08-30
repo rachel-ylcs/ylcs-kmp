@@ -30,7 +30,7 @@ template(object : KotlinMultiplatformTemplate() {
             lib(libs.ktor.okhttp)
         }
 
-        val appleMain by create(commonMain) {
+        val appleMain = createApple(commonMain) {
             lib(libs.ktor.apple)
         }
 

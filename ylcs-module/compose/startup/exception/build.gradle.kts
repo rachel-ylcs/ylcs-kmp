@@ -24,7 +24,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         appleMain.configure(commonMain)
 
-        val jvmMain by create(commonMain)
+        val jvmMain = createJvm(commonMain)
 
         androidMain.configure(jvmMain)
 

@@ -19,7 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val skikoMain by create(commonMain)
+        val skikoMain = createSkiko(commonMain)
 
         iosMainList.configure(skikoMain)
 

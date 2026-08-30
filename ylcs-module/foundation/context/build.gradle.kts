@@ -29,7 +29,7 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val nonAndroidMain by create(commonMain)
+        val nonAndroidMain = createNonAndroid(commonMain)
 
         iosMain.configure(nonAndroidMain)
 

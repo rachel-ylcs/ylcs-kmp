@@ -3,11 +3,9 @@ import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.internal.catalog.DelegatingProjectDependency
-import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
@@ -25,7 +23,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExt
 import org.jetbrains.kotlin.gradle.plugin.mpp.DisableCacheInKotlinVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeCacheApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinWasmJsTargetDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
@@ -93,7 +90,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinNativeTarget.ios() { }
     open val iosFrameworkBaseName: String? = null
     open val iosFrameworkIsStatic: Boolean? = null
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     open fun SwiftPMImportExtension.swiftPMDependencies() { }
 
     // Desktop
@@ -191,7 +187,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                             linkerOpts("-framework", "UIKit")
                             @OptIn(KotlinNativeCacheApi::class)
                             disableNativeCache(
-                                version = DisableCacheInKotlinVersion.`2_4_0`,
+                                version = DisableCacheInKotlinVersion.`2_4_20`,
                                 reason = "cache bug",
                                 issueUrl = java.net.URI("https://youtrack.jetbrains.com/issue/KT-80715")
                             )
@@ -341,19 +337,19 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                     for (dependency in desktopProguard) {
                                         findProject(dependency)?.let { submoduleProject ->
                                             submoduleProject.desktopProguardKMPDir.asFile.let { subDir ->
-                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
                                             }
                                             submoduleProject.desktopProguardJVMDir.asFile.let { subDir ->
-                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
                                             }
                                         }
                                     }
                                     // 再添加自身
                                     desktopProguardKMPDir.asFile.let { subDir ->
-                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
                                     }
                                     desktopProguardJVMDir.asFile.let { subDir ->
-                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }
+                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
                                     }
 
                                     // 合并所有混淆规则

@@ -34,11 +34,11 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val clientMain by create(commonMain)
+        val clientMain = createClient(commonMain)
 
         nativeMain.configure(clientMain)
 
-        val jvmMain by create(clientMain) {
+        val jvmMain = createJvm(clientMain) {
             lib(
                 ExportLib,
                 libs.androidx.collection,

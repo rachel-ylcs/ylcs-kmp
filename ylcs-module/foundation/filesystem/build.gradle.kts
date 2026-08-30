@@ -26,11 +26,11 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val clientMain by create(commonMain)
+        val clientMain = createClient(commonMain)
 
         nativeMain.configure(clientMain)
 
-        val jvmMain by create(clientMain)
+        val jvmMain = createJvm(clientMain)
 
         appleMain.configure(nativeMain)
 
@@ -73,7 +73,7 @@ template(object : KotlinMultiplatformTemplate() {
 
     override fun KotlinNativeTarget.windows() {
         compilations.getByName("main") {
-            val win32 by cinterops.creating
+            cinterops.create("win32")
         }
     }
 })

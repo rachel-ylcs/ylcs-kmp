@@ -23,7 +23,7 @@ template(object : KotlinMultiplatformTemplate() {
             lib(libs.lottie.android)
         }
 
-        val skikoMain by create(commonMain)
+        val skikoMain = createSkiko(commonMain)
 
         iosMainList.configure(skikoMain)
 

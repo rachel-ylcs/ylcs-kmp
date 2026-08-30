@@ -14,9 +14,9 @@ template(object : KotlinMultiplatformTemplate() {
     override val macosTarget: Boolean = true
 
     override fun KotlinMultiplatformSourceSetsScope.source() {
-        val posixMain by create(commonMain)
+        val posixMain = createPosix(commonMain)
 
-        val jvmMain by create(commonMain)
+        val jvmMain = createJvm(commonMain)
 
         androidMain.configure(jvmMain)
 

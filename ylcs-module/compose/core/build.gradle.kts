@@ -27,7 +27,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         appleMain.configure(commonMain)
 
-        val skikoMain by create(commonMain) {
+        val skikoMain = createSkiko(commonMain) {
             lib(
                 ExportLib,
                 libs.skiko

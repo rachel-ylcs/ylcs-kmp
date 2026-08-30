@@ -4,12 +4,8 @@ import love.yinlin.task.GenerateCodeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.kotlin.dsl.NamedDomainObjectCollectionDelegateProvider
-import org.gradle.kotlin.dsl.NamedDomainObjectContainerCreatingDelegateProvider
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.getting
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaExtension
@@ -42,17 +38,67 @@ abstract class KotlinSourceSetsScope(
     private val set: NamedDomainObjectContainer<KotlinSourceSet>
 ) {
     fun find(
+        name: String,
         vararg parents: KotlinSourceSet,
         block: KotlinSourceSet.() -> Unit = {}
-    ) : NamedDomainObjectCollectionDelegateProvider<KotlinSourceSet> = set.getting {
+    ) : KotlinSourceSet = set.getByName(name) {
         for (parent in parents) dependsOn(parent)
         block()
     }
 
     fun create(
+        name: String,
         vararg parents: KotlinSourceSet,
         block: KotlinSourceSet.() -> Unit = {}
-    ) : NamedDomainObjectContainerCreatingDelegateProvider<KotlinSourceSet> = set.creating {
+    ) : KotlinSourceSet = set.create(name) {
+        for (parent in parents) dependsOn(parent)
+        block()
+    }
+
+    fun createSkiko(
+        vararg parents: KotlinSourceSet,
+        block: KotlinSourceSet.() -> Unit = {}
+    ) : KotlinSourceSet = set.create("skikoMain") {
+        for (parent in parents) dependsOn(parent)
+        block()
+    }
+
+    fun createJvm(
+        vararg parents: KotlinSourceSet,
+        block: KotlinSourceSet.() -> Unit = {}
+    ) : KotlinSourceSet = set.create("jvmMain") {
+        for (parent in parents) dependsOn(parent)
+        block()
+    }
+
+    fun createApple(
+        vararg parents: KotlinSourceSet,
+        block: KotlinSourceSet.() -> Unit = {}
+    ) : KotlinSourceSet = set.create("appleMain") {
+        for (parent in parents) dependsOn(parent)
+        block()
+    }
+
+    fun createClient(
+        vararg parents: KotlinSourceSet,
+        block: KotlinSourceSet.() -> Unit = {}
+    ) : KotlinSourceSet = set.create("clientMain") {
+        for (parent in parents) dependsOn(parent)
+        block()
+    }
+
+    fun createPosix(
+        vararg parents: KotlinSourceSet,
+        block: KotlinSourceSet.() -> Unit = {}
+    ) : KotlinSourceSet = set.create("posixMain") {
+        for (parent in parents) dependsOn(parent)
+        block()
+    }
+
+    fun createNonAndroid(
+        vararg parents: KotlinSourceSet,
+        block: KotlinSourceSet.() -> Unit = {}
+    ) : KotlinSourceSet = set.create("nonAndroidMain") {
         for (parent in parents) dependsOn(parent)
         block()
     }
