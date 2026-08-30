@@ -3,6 +3,7 @@ import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.internal.catalog.DelegatingProjectDependency
+import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
@@ -16,6 +17,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -78,6 +80,11 @@ class KotlinMultiplatformSourceSetsScope(
     val composeOSLib: String get() = extension.extensions.getByType<ComposePlugin.Dependencies>().desktop.currentOs
 }
 
+// swift 依赖包结构
+data class SwiftPackage(val url: String, val version: String, val products: List<String> = emptyList()) {
+    constructor(url: String, version: Provider<String>, products: List<String> = emptyList()) : this(url, version.get(), products)
+}
+
 abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
     // SourceSets
     open fun KotlinMultiplatformSourceSetsScope.source() { }
@@ -90,7 +97,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinNativeTarget.ios() { }
     open val iosFrameworkBaseName: String? = null
     open val iosFrameworkIsStatic: Boolean? = null
-    open fun SwiftPMImportExtension.swiftPMDependencies() { }
+    open val swiftPackages: List<SwiftPackage> = emptyList()
 
     // Desktop
     open val desktopTarget: Boolean = true
@@ -197,7 +204,11 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                 extensions.findByType<SwiftPMImportExtension>()?.apply {
                     iosMinimumDeploymentTarget.set(C.ios.target)
-                    swiftPMDependencies()
+
+                    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+                    for ((url, ver, products) in swiftPackages) {
+                        swiftPackage(url, ver, products)
+                    }
                 }
             }
 

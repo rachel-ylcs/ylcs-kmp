@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExtension
-
 plugins {
     install(
         libs.plugins.kotlinMultiplatform,
@@ -40,14 +37,9 @@ template(object : KotlinMultiplatformTemplate() {
         wasmJsMain.configure(webMain)
     }
 
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    override fun SwiftPMImportExtension.swiftPMDependencies() {
-        swiftPackage(
-            url = "https://github.com/Tencent/MMKV.git",
-            version = libs.versions.mmkv.get(),
-            products = listOf("MMKV"),
-        )
-    }
+    override val swiftPackages: List<SwiftPackage> = listOf(
+        SwiftPackage("https://github.com/Tencent/MMKV.git", libs.versions.mmkv, listOf("MMKV"))
+    )
 })
 
 patchMMKVSwiftPackage()
