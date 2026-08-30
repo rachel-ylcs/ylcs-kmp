@@ -110,6 +110,7 @@ include(
     "ylcs-app:mod",
     "ylcs-app:mod-manager",
     "ylcs-app:server",
+    "ylcs-app:server-native",
     "ylcs-app:web-app",
     "ylcs-app:weibo-picture-downloader",
 
