@@ -12,7 +12,6 @@ import kotlin.test.assertEquals
 class TestJsCore {
     inline fun <reified T1, reified T2> assertTypes() = assertEquals<KClass<*>>(T1::class, T2::class, "${T1::class.simpleName} <-> ${T2::class.simpleName}")
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     @Test
     fun testClassType() {
         // Js 类型与 Kotlin 类型映射关系

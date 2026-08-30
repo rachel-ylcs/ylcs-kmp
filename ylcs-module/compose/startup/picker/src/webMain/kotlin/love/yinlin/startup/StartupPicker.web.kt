@@ -6,8 +6,6 @@ import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.readByteArray
-import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compatible.ByteArrayCompatible
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.MimeType
 import love.yinlin.extension.cast
@@ -21,6 +19,7 @@ import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.uri.ImplicitUri
 import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.toInt8Array
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.url.URL
@@ -102,11 +101,10 @@ if (data && data instanceof FileList && data.length > 0) {
 
     actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = Unit to Buffer()
 
-    @OptIn(CompatibleRachelApi::class)
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) {
         val blob = Coroutines.io {
-            val bytes = ByteArrayCompatible((sink as Buffer).readByteArray())
-            Blob(jsArrayOf(bytes.asInt8Array).cast(), BlobPropertyBag(type = MimeType.ANY))
+            val bytes = (sink as Buffer).readByteArray()
+            Blob(jsArrayOf(bytes.toInt8Array()).cast(), BlobPropertyBag(type = MimeType.ANY))
         }
         val url = URL.createObjectURL(blob)
         createElement<HTMLAnchorElement> {

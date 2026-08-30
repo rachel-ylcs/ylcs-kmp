@@ -4,13 +4,12 @@ package love.yinlin.media
 
 import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.await
-import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.compatible.ByteArrayCompatible
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catching
 import love.yinlin.extension.then
 import love.yinlin.fs.File
 import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.toInt8Array
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 import kotlin.js.Promise
@@ -31,12 +30,11 @@ actual class SoundPlayer {
     private var caches = emptyList<JsAny>()
     private val context = newAudioContext()
 
-    @OptIn(CompatibleRachelApi::class)
     actual suspend fun loadFromByteArray(data: List<ByteArray>) {
         catching {
             caches = Coroutines.io {
                 data.fastMap { bytes ->
-                    decodeAudioData(context, ByteArrayCompatible(bytes).asInt8Array.buffer).await()
+                    decodeAudioData(context, bytes.toInt8Array().buffer).await()
                 }
             }
         }

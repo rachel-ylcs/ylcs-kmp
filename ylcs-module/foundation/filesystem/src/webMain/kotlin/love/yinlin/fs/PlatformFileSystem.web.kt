@@ -1,7 +1,6 @@
-@file:OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
+@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.fs
 
-import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.foundation.PlatformContext
 import kotlin.js.*
 

@@ -1,8 +1,6 @@
-@file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.compatible
 
 import love.yinlin.extension.*
-import kotlin.js.ExperimentalWasmJsInterop
 
 /**
  * external 互操作 Kotlin <-> Js
