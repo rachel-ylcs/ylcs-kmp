@@ -67,23 +67,23 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        // 运行 桌面程序 Debug
-        val desktopRunDebug by tasks.registering {
+        tasks.register("desktopRunDebug") {
+            description = "运行Debug桌面端"
             dependsOn(tasks.named("run"))
         }
 
-        // 运行 桌面程序 Release
-        val desktopRunRelease by tasks.registering {
+        tasks.register("desktopRunRelease") {
+            description = "运行Release桌面端"
             dependsOn(tasks.named("runRelease"))
         }
 
-        // 检查桌面模块完整性
-        val desktopCheckModules by tasks.registering {
+        tasks.register("desktopCheckModules") {
+            description = "检查桌面端模块完整性"
             dependsOn(tasks.named("suggestRuntimeModules"))
         }
 
-        // 复制桌面动态库
-        val desktopCopyNativeLib by tasks.registering(CopyDesktopNativeTask::class) {
+        val desktopCopyNativeLib = tasks.register<CopyDesktopNativeTask>("desktopCopyNativeLib") {
+            description = "复制桌面端动态库"
             dependsOn(tasks.named("desktopJar"))
         }
 
@@ -94,7 +94,8 @@ template(object : KotlinMultiplatformTemplate() {
             }
         }
 
-        val desktopArtifact by tasks.registering {
+        tasks.register("desktopArtifact") {
+            description = "桌面端打包"
             dependsOn(tasks.named("createReleaseDistributable"))
 
             doLast {
@@ -121,8 +122,8 @@ template(object : KotlinMultiplatformTemplate() {
             }
         }
 
-        // 发布桌面应用程序
-        val desktopPublish by tasks.registering {
+        tasks.register("desktopPublish") {
+            description = "发布桌面端"
             dependsOn(tasks.named("createReleaseDistributable"))
 
             doLast {

@@ -45,7 +45,8 @@ template(object : KotlinAndroidTemplate() {
     }
 
     override fun Project.actions() {
-        val androidPublish by tasks.registering {
+        tasks.register("androidPublish") {
+            description = "发布歌词编辑器安卓版"
             dependsOn(tasks.named("assembleRelease"))
 
             doLast {

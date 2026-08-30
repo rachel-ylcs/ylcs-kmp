@@ -40,12 +40,13 @@ template(object : KotlinAndroidTemplate() {
     }
 
     override fun Project.actions() {
-        // 安卓打包
-        val androidPackage by tasks.registering {
+        tasks.register("androidPackage") {
+            description = "安卓端Debug编译"
             dependsOn(tasks.named("assembleDebug"))
         }
 
-        val androidArtifact by tasks.registering {
+        tasks.register("androidArtifact") {
+            description = "安卓端Release打包"
             dependsOn(tasks.named("assembleRelease"))
 
             doLast {
@@ -57,8 +58,8 @@ template(object : KotlinAndroidTemplate() {
             }
         }
 
-        // 发布安卓安装包
-        val androidPublish by tasks.registering {
+        tasks.register("androidPublish") {
+            description = "发布安卓端安装包"
             dependsOn(tasks.named("assembleRelease"))
 
             doLast {

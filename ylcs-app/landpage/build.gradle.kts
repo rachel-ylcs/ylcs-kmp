@@ -28,11 +28,13 @@ template(object : KotlinJsTemplate() {
     }
 
     override fun Project.actions() {
-        val landpageRun by tasks.registering {
+        tasks.register("landpageRun") {
+            description = "运行落地页"
             dependsOn(tasks.named("jsBrowserDevelopmentRun"))
         }
 
-        val landpagePublish by tasks.registering {
+        tasks.register("landpagePublish") {
+            description = "发布落地页"
             dependsOn(tasks.named("jsBrowserDistribution"))
 
             doLast {

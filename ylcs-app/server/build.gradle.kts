@@ -33,12 +33,13 @@ template(object : KotlinJvmTemplate() {
     }
 
     override fun Project.actions() {
-        // 运行服务端
-        val serverRun by tasks.registering {
+        tasks.register("serverRun") {
+            description = "运行服务端"
             dependsOn(tasks.named("run"))
         }
 
-        val serverArtifact by tasks.registering {
+        tasks.register("serverArtifact") {
+            description = "打包服务端"
             dependsOn(tasks.named("buildFatJar"))
 
             doLast {
@@ -51,8 +52,8 @@ template(object : KotlinJvmTemplate() {
             }
         }
 
-        // 发布服务端
-        val serverPublish by tasks.registering {
+        tasks.register("serverPublish") {
+            description = "发布服务端"
             dependsOn(tasks.named("buildFatJar"))
 
             doLast {

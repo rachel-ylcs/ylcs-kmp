@@ -40,17 +40,18 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        // 运行 Web Js 应用程序
-        val webJsRun by tasks.registering {
+        tasks.register("webJsRun") {
+            description = "运行Web/Js网页版"
             dependsOn(tasks.named("jsBrowserDevelopmentRun"))
         }
 
-        // 运行 Web 应用程序
-        val webRun by tasks.registering {
+        tasks.register("webRun") {
+            description = "运行Web/Wasm网页版"
             dependsOn(tasks.named("wasmJsBrowserDevelopmentRun"))
         }
 
-        val webArtifact by tasks.registering {
+        tasks.register("webArtifact") {
+            description = "打包网页版"
             dependsOn(tasks.named("jsBrowserDistribution"))
             dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
@@ -72,8 +73,8 @@ template(object : KotlinMultiplatformTemplate() {
             }
         }
 
-        // 发布 Web 应用程序
-        val webPublish by tasks.registering {
+        tasks.register("webPublish") {
+            description = "发布网页版"
             dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
             doLast {

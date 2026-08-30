@@ -48,12 +48,13 @@ template(object : KotlinMultiplatformTemplate() {
     override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = {}
 
     override fun Project.actions() {
-        // 运行 桌面程序 Debug
-        val modManagerRunDebug by tasks.registering {
+        tasks.register("modManagerRunDebug") {
+            description = "运行MOD编辑器Debug桌面版"
             dependsOn(tasks.named("run"))
         }
 
-        val modManagerPublish by tasks.registering {
+        tasks.register("modManagerPublish") {
+            description = "发布MOD编辑器桌面版"
             dependsOn(tasks.named("createReleaseDistributable"))
 
             doLast {

@@ -43,13 +43,13 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        // 运行 Gallery 桌面版
-        val galleryRun by tasks.registering {
+        tasks.register("galleryRun") {
+            description = "运行Debug桌面版Gallery"
             dependsOn(tasks.named("run"))
         }
 
-        // 发布 Gallery 网页版
-        val galleryPublish by tasks.registering {
+        tasks.register("galleryPublish") {
+            description = "发布网页版Gallery"
             dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
             doLast {

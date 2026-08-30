@@ -21,11 +21,13 @@ template(object : KotlinNativeExecutableTemplate() {
     }
 
     override fun Project.actions() {
-        val weiboPictureDownloaderRun by tasks.registering {
+        tasks.register("weiboPictureDownloaderRun") {
+            description = "运行微博图片下载器Windows版"
             dependsOn(tasks.named("linkDebugExecutableWindows"))
         }
 
-        val weiboPictureDownloaderPublish by tasks.registering {
+        tasks.register("weiboPictureDownloaderPublish") {
+            description = "发布微博图片下载器Windows版"
             dependsOn(tasks.named("linkReleaseExecutableWindows"))
 
             doLast {

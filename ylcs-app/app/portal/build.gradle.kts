@@ -36,8 +36,8 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override fun Project.actions() {
-        // 生成苹果版本号配置
-        val appleGenVersionConfig by tasks.registering {
+        tasks.register("appleGenVersionConfig") {
+            description = "生成苹果版本号配置"
             val content = """
                 BUNDLE_VERSION=${C.app.version}
                 BUNDLE_SHORT_VERSION_STRING=${C.app.versionName}
