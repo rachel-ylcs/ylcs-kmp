@@ -27,4 +27,9 @@ expect object PlatformFileSystem {
      * 缓存目录
      */
     fun cachePath(context: PlatformContext, appName: String): File
+
+    /**
+     * 设置当前工作目录
+     */
+    fun setCurrentDirectory(path: File): Boolean
 }

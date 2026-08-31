@@ -19,18 +19,38 @@ private class StorageFile(private val delegate: Path) : File() {
 
     @IOCoroutine
     override suspend fun metadata(): FileMetadata? = Coroutines.io { SystemFileSystem.metadataOrNull(delegate) }
+
+    override fun metadataSync(): FileMetadata? = SystemFileSystem.metadataOrNull(delegate)
+
     @IOCoroutine
     override suspend fun delete() = Coroutines.io { SystemFileSystem.delete(delegate, mustExist = false) }
+
+    override fun deleteSync() = SystemFileSystem.delete(delegate, mustExist = false)
+
     @IOCoroutine
     override suspend fun mkdir() = Coroutines.io { SystemFileSystem.createDirectories(delegate, mustCreate = false) }
+
+    override fun mkdirSync() = SystemFileSystem.createDirectories(delegate, mustCreate = false)
+
     @IOCoroutine
     override suspend fun move(dst: File) = Coroutines.io { SystemFileSystem.atomicMove(delegate, Path(dst.path)) }
+
+    override fun moveSync(dst: File) = SystemFileSystem.atomicMove(delegate, Path(dst.path))
+
     @IOCoroutine
     override suspend fun rawSource(): RawSource = Coroutines.io { SystemFileSystem.source(delegate) }
+
+    override fun rawSourceSync(): RawSource = SystemFileSystem.source(delegate)
+
     @IOCoroutine
     override suspend fun rawSink(append: Boolean): RawSink = Coroutines.io { SystemFileSystem.sink(delegate, append) }
+
+    override fun rawSinkSync(append: Boolean): RawSink = SystemFileSystem.sink(delegate, append)
+
     @IOCoroutine
     override suspend fun list(): List<File> = Coroutines.io { SystemFileSystem.list(delegate).map(::StorageFile) }
+
+    override fun listSync(): List<File> = SystemFileSystem.list(delegate).map(::StorageFile)
 }
 
 actual fun buildFile(uri: String): File = StorageFile(Path(uri))

@@ -13,4 +13,5 @@ actual object PlatformFileSystem {
     actual fun appPath(context: PlatformContext, appName: String): File = File("$PathSeparator$appName")
     actual fun dataPath(context: PlatformContext, appName: String): File = File("$PathSeparator$appName${PathSeparator}data")
     actual fun cachePath(context: PlatformContext, appName: String): File = File("$PathSeparator$appName${PathSeparator}cache${PathSeparator}temp")
+    actual fun setCurrentDirectory(path: File): Boolean = false
 }

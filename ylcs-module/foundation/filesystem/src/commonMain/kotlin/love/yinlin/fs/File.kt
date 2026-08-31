@@ -51,11 +51,15 @@ abstract class File {
     @IOCoroutine
     abstract suspend fun metadata(): FileMetadata?
 
+    abstract fun metadataSync(): FileMetadata?
+
     /**
      * 删除文件
      */
     @IOCoroutine
     abstract suspend fun delete()
+
+    abstract fun deleteSync()
 
     /**
      * 创建文件夹，支持多级目录
@@ -63,23 +67,33 @@ abstract class File {
     @IOCoroutine
     abstract suspend fun mkdir()
 
+    abstract fun mkdirSync()
+
     /**
      * 移动
      */
     @IOCoroutine
     abstract suspend fun move(dst: File)
 
+    abstract fun moveSync(dst: File)
+
     @IOCoroutine
     abstract suspend fun rawSource(): RawSource
 
+    abstract fun rawSourceSync(): RawSource
+
     @IOCoroutine
     abstract suspend fun rawSink(append: Boolean = false): RawSink
+
+    abstract fun rawSinkSync(append: Boolean = false): RawSink
 
     /**
      * 子目录
      */
     @IOCoroutine
     abstract suspend fun list(): List<File>
+
+    abstract fun listSync(): List<File>
 
     /**
      * 路径
@@ -102,11 +116,15 @@ abstract class File {
     @IOCoroutine
     suspend fun exists(): Boolean = metadata() != null
 
+    fun existsSync(): Boolean = metadataSync() != null
+
     /**
      * 是否是普通文件
      */
     @IOCoroutine
     suspend fun isFile(): Boolean = metadata()?.isRegularFile ?: false
+
+    fun isFileSync(): Boolean = metadataSync()?.isRegularFile ?: false
 
     /**
      * 是否是目录
@@ -114,12 +132,19 @@ abstract class File {
     @IOCoroutine
     suspend fun isDirectory(): Boolean = metadata()?.isDirectory ?: false
 
+    fun isDirectorySync(): Boolean = metadataSync()?.isDirectory ?: false
+
     /**
      * 文件大小
      */
     @IOCoroutine
     suspend fun fileSize(): Long = catchingDefault(0L) {
         val fileInfo = metadata()
+        if (fileInfo?.isRegularFile == true) fileInfo.size else 0L
+    }
+
+    fun fileSizeSync(): Long = catchingDefault(0L) {
+        val fileInfo = metadataSync()
         if (fileInfo?.isRegularFile == true) fileInfo.size else 0L
     }
 
@@ -153,6 +178,30 @@ abstract class File {
         }
     }
 
+    fun sizeSync(): Long = catchingDefault(0L) {
+        val current = this
+        var size = 0L
+        val fileInfo = current.metadataSync()
+        when {
+            fileInfo == null -> {}
+            fileInfo.isRegularFile -> size += fileInfo.size
+            fileInfo.isDirectory -> {
+                val queue = ArrayDeque<File>()
+                queue.add(current)
+                while (queue.isNotEmpty()) {
+                    val front = queue.removeAt(0)
+                    val frontInfo = front.metadataSync()
+                    when {
+                        frontInfo == null -> {}
+                        frontInfo.isRegularFile -> size += frontInfo.size
+                        frontInfo.isDirectory -> queue.addAll(front.listSync())
+                    }
+                }
+            }
+        }
+        size
+    }
+
     /**
      * 删除文件或目录
      */
@@ -184,6 +233,31 @@ abstract class File {
         }
     }
 
+    fun deleteRecursivelySync(): Boolean = catchingDefault(false) {
+        val stack = ArrayDeque<File>()
+        stack.add(this)
+        while (stack.isNotEmpty()) {
+            val top = stack.last()
+            val fileInfo = top.metadataSync()
+            when {
+                fileInfo == null -> stack.removeAt(stack.lastIndex)
+                fileInfo.isRegularFile -> {
+                    top.deleteSync()
+                    stack.removeAt(stack.lastIndex)
+                }
+                fileInfo.isDirectory -> {
+                    val list = top.listSync()
+                    if (list.isEmpty()) {
+                        top.deleteSync()
+                        stack.removeAt(stack.lastIndex)
+                    }
+                    else stack.addAll(list)
+                }
+            }
+        }
+        true
+    }
+
     /**
      * 重命名
      */
@@ -195,11 +269,22 @@ abstract class File {
         newFile
     }
 
+    fun renameSync(filename: String): File? = catchingNull {
+        val current = this
+        val newFile = current.parent?.let { File(it, filename) } ?: File(filename)
+        moveSync(newFile)
+        newFile
+    }
+
     @IOCoroutine
     suspend fun bufferedSource(): Source = rawSource().buffered()
 
+    fun bufferedSourceSync(): Source = rawSourceSync().buffered()
+
     @IOCoroutine
     suspend fun bufferedSink(): Sink = rawSink().buffered()
+
+    fun bufferedSinkSync(): Sink = rawSinkSync().buffered()
 
     /**
      * 读文件
@@ -209,17 +294,23 @@ abstract class File {
         bufferedSource().use { block(it) }
     }
 
+    inline fun <R> readSync(crossinline block: (Source) -> R): R = bufferedSourceSync().use { block(it) }
+
     /**
      * 读文本文件
      */
     @IOCoroutine
     suspend fun readText(): String? = catchingNull { read { it.readString() } }
 
+    fun readTextSync(): String? = catchingNull { readSync { it.readString() } }
+
     /**
      * 读字节文件
      */
     @IOCoroutine
     suspend fun readByteArray(): ByteArray? = catchingNull { read { it.readByteArray() } }
+
+    fun readByteArraySync(): ByteArray? = catchingNull { readSync { it.readByteArray() } }
 
     /**
      * 写文件
@@ -228,6 +319,8 @@ abstract class File {
     suspend inline fun write(@IOCoroutine crossinline block: suspend (Sink) -> Unit) = Coroutines.io {
         bufferedSink().use { block(it) }
     }
+
+    inline fun writeSync(crossinline block: (Sink) -> Unit) = bufferedSinkSync().use { block(it) }
 
     /**
      * 写文本文件
@@ -238,12 +331,22 @@ abstract class File {
         true
     }
 
+    fun writeTextSync(text: String): Boolean = catchingDefault(false) {
+        writeSync { it.writeString(text) }
+        true
+    }
+
     /**
      * 写字节文件
      */
     @IOCoroutine
     suspend fun writeByteArray(data: ByteArray): Boolean = catchingDefault(false) {
         write { it.write(data) }
+        true
+    }
+
+    fun writeByteArraySync(data: ByteArray): Boolean = catchingDefault(false) {
+        writeSync { it.write(data) }
         true
     }
 
@@ -259,6 +362,15 @@ abstract class File {
         }
         true
     }
+
+    fun writeToSync(other: File): Boolean = catchingDefault(false) {
+        readSync { source ->
+            other.writeSync { sink ->
+                source.transferTo(sink)
+            }
+        }
+        true
+    }
 }
 
 expect fun buildFile(uri: String): File
@@ -269,7 +381,11 @@ suspend fun Collection<File>.safeRawSources(): Sources<RawSource>? = Coroutines.
     this@safeRawSources.safeToSources { it.rawSource() }
 }
 
+fun Collection<File>.safeRawSourcesSync(): Sources<RawSource>? = safeToSources { it.rawSourceSync() }
+
 @IOCoroutine
 suspend fun Collection<File>.safeSources(): Sources<Source>? = Coroutines.io {
     this@safeSources.safeToSources { it.rawSource().buffered() }
 }
+
+fun Collection<File>.safeSourcesSync(): Sources<Source>? = safeToSources { it.rawSourceSync().buffered() }

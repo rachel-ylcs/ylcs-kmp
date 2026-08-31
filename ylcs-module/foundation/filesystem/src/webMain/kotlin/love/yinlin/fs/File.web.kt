@@ -84,6 +84,8 @@ private class WebFile private constructor(private val uri: String, private val u
         }
     }
 
+    override fun metadataSync(): FileMetadata? = null
+
     @IOCoroutine
     override suspend fun delete() = Coroutines.io {
         val resolved = castParent() ?: return@io
@@ -91,6 +93,8 @@ private class WebFile private constructor(private val uri: String, private val u
         require(name.isNotEmpty()) { "Cannot delete root directory" }
         catchingError { parent.removeEntry(name, recursiveOption()).await() }
     }
+
+    override fun deleteSync() { }
 
     @IOCoroutine
     override suspend fun mkdir() = Coroutines.io {
@@ -100,8 +104,12 @@ private class WebFile private constructor(private val uri: String, private val u
         for (i in segments.indices) current = current.getDirectoryHandle(segments[i], createOption()).await()
     }
 
+    override fun mkdirSync() { }
+
     @IOCoroutine
     override suspend fun move(dst: File) = unsupportedPlatform()
+
+    override fun moveSync(dst: File) { }
 
     @IOCoroutine
     override suspend fun rawSource(): RawSource = Coroutines.io {
@@ -109,6 +117,8 @@ private class WebFile private constructor(private val uri: String, private val u
         val fileHandle = parent.getFileHandle(name).await()
         WebFileSource(fileHandle.getFile().await())
     }
+
+    override fun rawSourceSync(): RawSource = unsupportedPlatform()
 
     @IOCoroutine
     override suspend fun rawSink(append: Boolean): RawSink = Coroutines.io {
@@ -123,6 +133,8 @@ private class WebFile private constructor(private val uri: String, private val u
         WebFileSink(writableStream)
     }
 
+    override fun rawSinkSync(append: Boolean): RawSink = unsupportedPlatform()
+
     @IOCoroutine
     override suspend fun list(): List<File> = Coroutines.io {
         val (parent, name) = castParent() ?: return@io emptyList()
@@ -132,6 +144,8 @@ private class WebFile private constructor(private val uri: String, private val u
         val keys = awaitEnumIterator<JsString>(targetDir).await()
         keys.toList().map { key -> File("$uri/$key") }
     }
+
+    override fun listSync(): List<File> = emptyList()
 }
 
 actual fun buildFile(uri: String): File = WebFile(uri)

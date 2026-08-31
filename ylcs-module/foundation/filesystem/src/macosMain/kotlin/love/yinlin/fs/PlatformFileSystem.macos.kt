@@ -3,6 +3,7 @@ package love.yinlin.fs
 import kotlinx.cinterop.*
 import love.yinlin.foundation.PlatformContext
 import platform.Foundation.*
+import platform.posix.chdir
 import platform.posix.getcwd
 
 actual object PlatformFileSystem {
@@ -22,4 +23,6 @@ actual object PlatformFileSystem {
         val paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true)
         return File((paths.firstOrNull() as? String) ?: "", appName, "temp")
     }
+
+    actual fun setCurrentDirectory(path: File): Boolean = chdir(path.path) == 0
 }

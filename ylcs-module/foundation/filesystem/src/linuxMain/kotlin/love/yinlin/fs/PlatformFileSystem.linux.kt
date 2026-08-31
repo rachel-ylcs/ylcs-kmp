@@ -2,6 +2,7 @@ package love.yinlin.fs
 
 import kotlinx.cinterop.*
 import love.yinlin.foundation.PlatformContext
+import platform.posix.chdir
 import platform.posix.getcwd
 import platform.posix.getenv
 
@@ -26,4 +27,6 @@ actual object PlatformFileSystem {
         if (!home.isNullOrBlank()) return File(home, ".cache", appName, "temp")
         return File("/tmp", appName, "temp")
     }
+
+    actual fun setCurrentDirectory(path: File): Boolean = chdir(path.path) == 0
 }

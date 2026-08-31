@@ -24,4 +24,6 @@ actual object PlatformFileSystem {
     actual fun dataPath(context: PlatformContext, appName: String): File = File(appPath(context, appName), "data")
 
     actual fun cachePath(context: PlatformContext, appName: String): File = File(System.getProperty("java.io.tmpdir"), appName, "temp")
+
+    actual fun setCurrentDirectory(path: File): Boolean = false
 }

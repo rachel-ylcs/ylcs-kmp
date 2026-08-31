@@ -8,4 +8,5 @@ actual object PlatformFileSystem {
     actual fun appPath(context: PlatformContext, appName: String): File = File(context.dataDir.absolutePath)
     actual fun dataPath(context: PlatformContext, appName: String): File = File(context.filesDir.absolutePath)
     actual fun cachePath(context: PlatformContext, appName: String): File = File(context.cacheDir.absolutePath, "temp")
+    actual fun setCurrentDirectory(path: File): Boolean = false
 }

@@ -9,7 +9,6 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
 import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
-import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
@@ -45,9 +44,9 @@ object DateEx {
             val standardDateTime = Formatter(LocalDateTime.Format {
                 year()
                 char('-')
-                monthNumber(padding = Padding.ZERO)
+                monthNumber()
                 char('-')
-                day(padding = Padding.ZERO)
+                day()
                 char(' ')
                 hour()
                 char(':')
@@ -59,9 +58,17 @@ object DateEx {
             val standardDate = Formatter(LocalDate.Format {
                 year()
                 char('-')
-                monthNumber(padding = Padding.ZERO)
+                monthNumber()
                 char('-')
-                day(padding = Padding.ZERO)
+                day()
+            })
+
+            val standardTime = Formatter(LocalTime.Format {
+                hour()
+                char(':')
+                minute()
+                char(':')
+                second()
             })
         }
     }

@@ -3,6 +3,8 @@ plugins {
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.ktor,
+        libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 
@@ -11,13 +13,18 @@ template(object : KotlinNativeExecutableTemplate() {
     override val linuxTarget: Boolean = true
     override val macosTarget: Boolean = true
 
-    override val args: List<String> = buildList {
-        if ("serverPublish" !in currentTaskName) add("--cd=${C.root.work.server.asFile}")
-    }
-
     override fun KotlinNativeSourceSetsScope.source() {
         nativeMain.configure(commonMain) {
-            lib(projects.ylcsModule.cs.serverEngineNative)
+            lib(
+                libs.ktor.json,
+                libs.ktor.server.cio,
+                libs.ktor.server.negotiation,
+                libs.ktor.server.websockets,
+                ExportLib,
+                libs.ktor.server,
+                projects.ylcsModule.foundation.filesystem,
+                projects.ylcsModule.cs.core,
+            )
         }
 
         windowsMain.configure(nativeMain)
