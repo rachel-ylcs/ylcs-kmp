@@ -203,12 +203,14 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
                 }
 
-                extensions.findByType<SwiftPMImportExtension>()?.apply {
-                    iosMinimumDeploymentTarget.set(C.ios.target)
+                if (C.platform == BuildPlatform.Mac) {
+                    extensions.findByType<SwiftPMImportExtension>()?.apply {
+                        iosMinimumDeploymentTarget.set(C.ios.target)
 
-                    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-                    for ((url, ver, products) in swiftPackages) {
-                        swiftPackage(url, ver, products)
+                        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+                        for ((url, ver, products) in swiftPackages) {
+                            swiftPackage(url, ver, products)
+                        }
                     }
                 }
             }
