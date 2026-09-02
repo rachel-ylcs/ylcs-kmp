@@ -17,7 +17,9 @@ template(object : KotlinNativeExecutableTemplate() {
 
     override fun KotlinNativeSourceSetsScope.source() {
         nativeMain.configure(commonMain) {
-            lib(projects.ylcsModule.cs.serverEngineNative)
+            lib(
+                projects.ylcsModule.cs.serverEngineNative
+            )
         }
 
         windowsMain.configure(nativeMain)

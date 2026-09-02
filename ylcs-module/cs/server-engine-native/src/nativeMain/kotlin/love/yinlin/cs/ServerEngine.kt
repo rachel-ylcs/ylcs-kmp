@@ -1,14 +1,11 @@
 package love.yinlin.cs
 
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.install
 import io.ktor.server.application.serverConfig
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.EngineConnectorBuilder
 import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import love.yinlin.extension.Json
+import io.ktor.server.routing.routing
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
@@ -37,6 +34,11 @@ abstract class ServerEngine(cmdLine: Array<String>) {
     abstract val port: Int
 
     /**
+     * 公共目录
+     */
+    abstract val public: String
+
+    /**
      * 日志输出器
      */
     open val logger: ServerLogger = ServerLogger.Default
@@ -44,12 +46,17 @@ abstract class ServerEngine(cmdLine: Array<String>) {
     /**
      * 插件
      */
-    open val plugins: List<BaseServerPlugin<*, *>> = emptyList()
+    open val plugins: List<BasicServerPlugin> = emptyList()
 
     /**
      * 准备
      */
     protected open fun onServerPrepare() { }
+
+    /**
+     * 启动
+     */
+    protected open fun onServerStart() { }
 
     /**
      * 清理
@@ -60,6 +67,9 @@ abstract class ServerEngine(cmdLine: Array<String>) {
      * 运行
      */
     fun run() {
+        // 静态目录
+        val staticFilePath = File(currentDirectory, public)
+        if (!staticFilePath.existsSync()) staticFilePath.mkdirSync()
         // 初始准备
         onServerPrepare()
 
@@ -78,10 +88,17 @@ abstract class ServerEngine(cmdLine: Array<String>) {
             }) {
                 developmentMode = false
                 module {
-                    install(ContentNegotiation) { json(Json) }
+                    // 插件
                     for (plugin in plugins) {
-
+                        with(plugin) { onInstall() }
                     }
+
+                    // 路由
+                    routing {
+                        staticFiles(public, staticFilePath)
+                    }
+
+                    onServerStart()
                 }
             }
         ).start(wait = true)

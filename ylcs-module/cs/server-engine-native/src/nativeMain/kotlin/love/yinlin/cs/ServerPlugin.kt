@@ -1,21 +1,18 @@
 package love.yinlin.cs
 
 import io.ktor.server.application.Application
-import io.ktor.server.application.BaseApplicationPlugin
 import io.ktor.server.application.PipelineCall
-import io.ktor.server.application.PluginInstance
 import io.ktor.server.application.createApplicationPlugin
+import io.ktor.server.application.install
 
-abstract class ServerPlugin(private val name: String) : BaseServerPlugin<Unit, PluginInstance> {
-    final override fun buildPlugin(): BaseApplicationPlugin<Application, Unit, PluginInstance> = createApplicationPlugin(name) {
-        onCall {
-            this@ServerPlugin.onCall(it)
-        }
+abstract class ServerPlugin(private val name: String) : BasicServerPlugin {
+    final override fun Application.onInstall() {
+        install(createApplicationPlugin(name) {
+            onCall {
+                onPipelineCall(it)
+            }
+        })
     }
 
-    final override fun Unit.configurePlugin() = onConfigure()
-
-    open fun onConfigure() { }
-
-    abstract fun onCall(call: PipelineCall)
+    abstract fun onPipelineCall(call: PipelineCall)
 }
