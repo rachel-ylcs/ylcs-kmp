@@ -88,6 +88,8 @@ object DateEx {
     val TodayLong: Long get() = Today.toEpochDays()
 
     val TodayString: String get() = Formatter.standardDate.format(Today)!!
+
+    fun uniqueTimeId(id: Any? = null): String = "${Clock.System.now().toEpochMilliseconds()}${id}"
 }
 
 val Instant.toLocalDateTime: LocalDateTime? get() = catchingNull { this.toLocalDateTime(TimeZone.currentSystemDefault()) }

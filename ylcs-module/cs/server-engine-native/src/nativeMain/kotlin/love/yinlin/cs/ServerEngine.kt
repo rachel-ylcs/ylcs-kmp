@@ -49,6 +49,11 @@ abstract class ServerEngine(cmdLine: Array<String>) {
     open val plugins: List<BasicServerPlugin> = emptyList()
 
     /**
+     * 接口
+     */
+    protected abstract val apiScope: APIScope
+
+    /**
      * 准备
      */
     protected open fun onServerPrepare() { }
@@ -67,11 +72,16 @@ abstract class ServerEngine(cmdLine: Array<String>) {
      * 运行
      */
     fun run() {
+        // 初始准备
+        onServerPrepare()
+
         // 静态目录
         val staticFilePath = File(currentDirectory, public)
         if (!staticFilePath.existsSync()) staticFilePath.mkdirSync()
-        // 初始准备
-        onServerPrepare()
+
+        // 接口作用域
+        val scope = apiScope
+        scope.onServiceStart()
 
         // 启动服务器
         embeddedServer(
@@ -87,6 +97,7 @@ abstract class ServerEngine(cmdLine: Array<String>) {
                 log = logger
             }) {
                 developmentMode = false
+
                 module {
                     // 插件
                     for (plugin in plugins) {
@@ -95,7 +106,10 @@ abstract class ServerEngine(cmdLine: Array<String>) {
 
                     // 路由
                     routing {
+                        // 静态目录
                         staticFiles(public, staticFilePath)
+                        // 接口
+                        scope.setupAPI(this)
                     }
 
                     onServerStart()
@@ -105,6 +119,7 @@ abstract class ServerEngine(cmdLine: Array<String>) {
 
         // 清理
         onServerClose()
+        scope.onServiceClose()
         logger.close()
     }
 }

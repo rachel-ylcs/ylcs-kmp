@@ -1,6 +1,4 @@
-import love.yinlin.cs.BasicServerPlugin
-import love.yinlin.cs.ServerEngine
-import love.yinlin.cs.ServerLogger
+import love.yinlin.cs.*
 import love.yinlin.cs.plugin.JsonPlugin
 import love.yinlin.cs.plugin.WebSocketPlugin
 import love.yinlin.fs.File
@@ -10,7 +8,7 @@ import kotlin.time.Duration.Companion.seconds
 fun main(args: Array<String>) = object : ServerEngine(args) {
     override val port: Int = 1211
 
-    override val public: String = "public"
+    override val public: String = ServerRes.toString()
 
     override val logger: ServerLogger = ServerLogger(true, File(currentDirectory, "logs"))
 
@@ -24,7 +22,5 @@ fun main(args: Array<String>) = object : ServerEngine(args) {
         )
     )
 
-    override fun onServerPrepare() {
-        logger.info("hello rachel!")
-    }
+    override val apiScope: APIScope = ServerScope(this)
 }.run()
