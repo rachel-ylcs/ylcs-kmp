@@ -36,7 +36,7 @@ import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
 import kotlin.random.Random
 
-abstract class APIScope(private val engine: ServerEngine) {
+abstract class APIScope(val engine: ServerEngine) {
     /**
      * 日志输出器
      */
@@ -48,14 +48,9 @@ abstract class APIScope(private val engine: ServerEngine) {
     protected abstract fun api()
 
     /**
-     * 服务初始化
+     * 服务
      */
-    open fun onServiceStart() { }
-
-    /**
-     * 服务清理
-     */
-    open fun onServiceClose() { }
+    open val services: List<ServerService> = emptyList()
 
     private var routing: Routing? = null
 

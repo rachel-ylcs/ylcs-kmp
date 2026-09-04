@@ -6,6 +6,11 @@ import io.ktor.server.engine.EngineConnectorBuilder
 import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.routing.routing
+import kotlinx.serialization.json.JsonObject
+import love.yinlin.extension.Object
+import love.yinlin.extension.catching
+import love.yinlin.extension.makeObject
+import love.yinlin.extension.parseJson
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
@@ -27,6 +32,12 @@ abstract class ServerEngine(cmdLine: Array<String>) {
     }
 
     val currentDirectory = args["cd"]?.ifEmpty { null }?.let { File(it) } ?: PlatformFileSystem.appPath(PlatformContext.Instance, "")
+
+    /**
+     * 配置
+     */
+    var config: JsonObject = makeObject {  }
+        private set
 
     /**
      * 端口
@@ -56,32 +67,36 @@ abstract class ServerEngine(cmdLine: Array<String>) {
     /**
      * 准备
      */
-    protected open fun onServerPrepare() { }
+    protected open suspend fun onServerPrepare() { }
 
     /**
      * 启动
      */
-    protected open fun onServerStart() { }
+    protected open suspend fun onServerStart() { }
 
     /**
      * 清理
      */
-    protected open fun onServerClose() { }
+    protected open suspend fun onServerClose() { }
 
     /**
      * 运行
      */
-    fun run() {
+    suspend fun run() {
+        // 读取配置
+        val configFile = File(currentDirectory, "config.json")
+        catching { config = configFile.readText()!!.parseJson.Object }
+
         // 初始准备
         onServerPrepare()
 
         // 静态目录
         val staticFilePath = File(currentDirectory, public)
-        if (!staticFilePath.existsSync()) staticFilePath.mkdirSync()
+        if (!staticFilePath.exists()) staticFilePath.mkdir()
 
         // 接口作用域
         val scope = apiScope
-        scope.onServiceStart()
+        for (service in scope.services) service.onStart()
 
         // 启动服务器
         embeddedServer(
@@ -119,7 +134,7 @@ abstract class ServerEngine(cmdLine: Array<String>) {
 
         // 清理
         onServerClose()
-        scope.onServiceClose()
+        for (service in scope.services.asReversed()) service.onClose()
         logger.close()
     }
 }

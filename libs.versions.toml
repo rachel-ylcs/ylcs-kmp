@@ -141,3 +141,5 @@ logback = { module = "ch.qos.logback:logback-classic", version = "1.6.3" }
 mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
 mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.1.0" }
 redis = { module = "redis.clients:jedis", version = "8.1.0-beta1" }
+
+rethis = { module = "eu.vendeli:rethis", version = "0.4.4" }
