@@ -1,3 +1,4 @@
+import io.ktor.util.logging.LogLevel
 import kotlinx.coroutines.runBlocking
 import love.yinlin.cs.*
 import love.yinlin.cs.plugin.JsonPlugin
@@ -12,7 +13,11 @@ fun main(args: Array<String>) = runBlocking {
 
         override val public: String = ServerRes.toString()
 
-        override val logger: ServerLogger = ServerLogger(true, File(currentDirectory, "logs"))
+        override val logger: ServerLogger = ServerLogger(
+            console = true,
+            file = File(currentDirectory, "logs"),
+            defaultLevel = LogLevel.DEBUG
+        )
 
         override val plugins: List<BasicServerPlugin> = listOf(
             JsonPlugin,
