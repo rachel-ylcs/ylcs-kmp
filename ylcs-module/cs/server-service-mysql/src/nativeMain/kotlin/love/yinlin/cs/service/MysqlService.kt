@@ -38,8 +38,6 @@ class MysqlService(scope: APIScope) : ServerService(scope) {
         )
 
         logger.info("Mysql Started")
-
-        println(throwInsertSQLGeneratedKey("INSERT INTO test(c4) VALUES(0)"))
     }
 
     override suspend fun onClose() {

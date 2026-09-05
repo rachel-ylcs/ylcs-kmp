@@ -29,6 +29,10 @@ fun main(args: Array<String>) = runBlocking {
             )
         )
 
-        override val apiScope: APIScope = ServerScope(this)
+        override val apiScope: ServerScope = ServerScope(this)
+
+        override suspend fun onServerPrepare() {
+            apiScope.AN.init()
+        }
     }.run()
 }

@@ -18,6 +18,8 @@ template(object : KotlinNativeExecutableTemplate() {
     override fun KotlinNativeSourceSetsScope.source() {
         nativeMain.configure(commonMain) {
             lib(
+                libs.cryptography,
+                libs.cryptography.provider,
                 projects.ylcsApp.cs,
                 projects.ylcsModule.cs.serverEngineNative,
                 projects.ylcsModule.cs.serverServiceMysql,

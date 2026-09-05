@@ -17,7 +17,7 @@ ktor = "3.5.2"
 sketch = "4.7.0-alpha01"
 haze = "2.0.0-beta02"
 mmkv = "2.4.2"
-pag = "4.5.84"
+cryptography = "0.6.0"
 
 # Android
 androidx-activity = "1.13.0"
@@ -144,3 +144,5 @@ redis = { module = "redis.clients:jedis", version = "8.1.0-beta1" }
 
 rethis = { module = "eu.vendeli:rethis", version = "0.4.4" }
 sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.13.1" }
+cryptography = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "cryptography" }
+cryptography-provider = { module = "dev.whyoleg.cryptography:cryptography-provider-optimal", version.ref = "cryptography" }

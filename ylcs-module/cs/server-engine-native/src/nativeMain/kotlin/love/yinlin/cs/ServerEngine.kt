@@ -87,9 +87,6 @@ abstract class ServerEngine(cmdLine: Array<String>) {
         val configFile = File(currentDirectory, "config.json")
         catching { config = configFile.readText()!!.parseJson.Object }
 
-        // 初始准备
-        onServerPrepare()
-
         // 静态目录
         val staticFilePath = File(currentDirectory, public)
         if (!staticFilePath.exists()) staticFilePath.mkdir()
@@ -97,6 +94,9 @@ abstract class ServerEngine(cmdLine: Array<String>) {
         // 接口作用域
         val scope = apiScope
         for (service in scope.services) service.onStart()
+
+        // 初始准备
+        onServerPrepare()
 
         // 启动服务器
         embeddedServer(
