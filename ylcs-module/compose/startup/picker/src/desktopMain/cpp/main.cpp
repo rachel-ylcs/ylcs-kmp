@@ -16,6 +16,11 @@ inline std::string nfd_convert_filter(const std::string &filter)
     return result;
 }
 
+inline const char* nfd_c_str(const std::string &title)
+{
+    return title.empty() ? nullptr : title.c_str();
+}
+
 inline nfdwindowhandle_t nfd_get_window(void* handle)
 {
     nfdwindowhandle_t window{};
@@ -50,15 +55,16 @@ extern "C" {
 		auto filterStr = nfd_convert_filter(j2s(env, filter));
 
 		NFD::Guard nfdGuard;
-		NFD::UniquePath outPath;
+		nfdu8char_t* outPathPtr = nullptr;
 		nfdresult_t result;
 		if (!filterNameStr.empty() && !filterStr.empty()) {
 			nfdfilteritem_t filterItem[1] = {{filterNameStr.data(), filterStr.data()}};
-			result = NFD::OpenDialog(outPath, filterItem, 1, nullptr, nfd_get_window((void*)parent));
+			result = NFD::OpenDialog(outPathPtr, filterItem, 1, nullptr, nfd_get_window((void*)parent), nfd_c_str(titleStr));
 		} else {
-			result = NFD::OpenDialog(outPath, nullptr, 0, nullptr, nfd_get_window((void*)parent));
+			result = NFD::OpenDialog(outPathPtr, nullptr, 0, nullptr, nfd_get_window((void*)parent), nfd_c_str(titleStr));
 		}
 		if (result == NFD_OKAY) {
+			NFD::UniquePath outPath(outPathPtr);
 			auto pathStr = std::string{ outPath.get() };
 			return s2j(env, pathStr);
 		}
@@ -79,17 +85,19 @@ extern "C" {
 		auto filterStr = nfd_convert_filter(j2s(env, filter));
 
 		NFD::Guard nfdGuard;
-		NFD::UniquePathSet outPaths;
+		const nfdpathset_t* outPathsPtr = nullptr;
 		nfdresult_t result;
 		if (!filterNameStr.empty() && !filterStr.empty()) {
 			nfdfilteritem_t filterItem[1] = {{filterNameStr.data(), filterStr.data()}};
-			result = NFD::OpenDialogMultiple(outPaths, filterItem, 1, nullptr, nfd_get_window((void*)parent));
+			result = NFD::OpenDialogMultiple(outPathsPtr, filterItem, 1, nullptr, nfd_get_window((void*)parent), nfd_c_str(titleStr));
 		} else {
-			result = NFD::OpenDialogMultiple(outPaths, (nfdfilteritem_t*)nullptr, 0, nullptr, nfd_get_window((void*)parent));
+			result = NFD::OpenDialogMultiple(outPathsPtr, (nfdfilteritem_t*)nullptr, 0, nullptr, nfd_get_window((void*)parent), nfd_c_str(titleStr));
 		}
+		NFD::UniquePathSet outPaths;
 		nfdpathsetsize_t numPaths = 0;
 		if (result == NFD_OKAY) {
-			NFD::PathSet::Count(outPaths, numPaths);
+			outPaths.reset(outPathsPtr);
+			NFD::PathSet::Count(outPaths.get(), numPaths);
 		}
 		jclass cls = env->GetObjectClass(title);
 		auto arr = env->NewObjectArray((jsize)numPaths, cls, nullptr);
@@ -122,15 +130,16 @@ extern "C" {
 		auto filterNameStr = j2s(env, filterName);
 
 		NFD::Guard nfdGuard;
-		NFD::UniquePath outPath;
+		nfdu8char_t* outPathPtr = nullptr;
 		nfdresult_t result;
 		if (!filterNameStr.empty() && !extStr.empty()) {
 			nfdfilteritem_t filterItem[1] = {{filterNameStr.data(), extStr.data()}};
-			result = NFD::SaveDialog(outPath, filterItem, 1, nullptr, filenameStr.data(), nfd_get_window((void*)parent));
+			result = NFD::SaveDialog(outPathPtr, filterItem, 1, nullptr, filenameStr.data(), nfd_get_window((void*)parent), nfd_c_str(titleStr));
 		} else {
-			result = NFD::SaveDialog(outPath, nullptr, 0, nullptr, filenameStr.data(), nfd_get_window((void*)parent));
+			result = NFD::SaveDialog(outPathPtr, nullptr, 0, nullptr, filenameStr.data(), nfd_get_window((void*)parent), nfd_c_str(titleStr));
 		}
 		if (result == NFD_OKAY) {
+			NFD::UniquePath outPath(outPathPtr);
 			auto pathStr = std::string{ outPath.get() };
 			return s2j(env, pathStr);
 		}
