@@ -55,7 +55,7 @@ class MysqlService(scope: APIScope) : ServerService(scope) {
         }
     }
 
-    suspend inline fun <R> throwTransaction(crossinline block: (QueryExecutor) -> R): R = client!!.transaction {
+    suspend inline fun <R> throwTransaction(crossinline block: suspend (QueryExecutor) -> R): R = client!!.transaction {
         block(this)
     }
 
@@ -83,6 +83,12 @@ class MysqlService(scope: APIScope) : ServerService(scope) {
     // 更新失败 -> false
     suspend fun updateSQL(@Language("SQL") sql: String, vararg args: Any?): Boolean = withConnection { connection ->
         connection.updateSQL(sql, *args)
+    }
+
+    // 删除成功 -> true
+    // 删除失败 -> false
+    suspend fun deleteSQL(@Language("SQL") sql: String, vararg args: Any?): Boolean = withConnection { connection ->
+        connection.deleteSQL(sql, *args)
     }
 
     // 插入成功 -> false

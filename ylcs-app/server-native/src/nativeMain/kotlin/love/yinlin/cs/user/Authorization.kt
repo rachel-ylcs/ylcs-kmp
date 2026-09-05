@@ -39,7 +39,6 @@ class Authorization(
 
         val aesKey = aesEcb.keyDecoder().decodeFromByteArray(AES.Key.Format.RAW, key)
         cipher = aesKey.cipher()
-        logger.info("Get user token secret key successfully")
     }
 
     suspend fun throwGenerateToken(token: Token): String {

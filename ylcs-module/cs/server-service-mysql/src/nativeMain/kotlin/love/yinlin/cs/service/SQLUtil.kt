@@ -76,6 +76,8 @@ suspend fun QueryExecutor.updateSQL(@Language("SQL") sql: String, vararg args: A
     return execute(statement).getOrDefault(0L) > 0
 }
 
+suspend fun QueryExecutor.deleteSQL(@Language("SQL") sql: String, vararg args: Any?): Boolean = updateSQL(sql, *args)
+
 suspend fun QueryExecutor.throwInsertSQLDuplicateKey(@Language("SQL") sql: String, vararg args: Any?): Boolean {
     val statement = buildSQLStatement(sql, *args)
     return try {

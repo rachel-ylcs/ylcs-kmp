@@ -3,6 +3,7 @@ import kotlinx.coroutines.runBlocking
 import love.yinlin.cs.*
 import love.yinlin.cs.plugin.JsonPlugin
 import love.yinlin.cs.plugin.WebSocketPlugin
+import love.yinlin.cs.sockets.LyricsSocketsManager
 import love.yinlin.fs.File
 import kotlin.Long
 import kotlin.time.Duration.Companion.seconds
@@ -16,7 +17,7 @@ fun main(args: Array<String>) = runBlocking {
         override val logger: ServerLogger = ServerLogger(
             console = true,
             file = File(currentDirectory, "logs"),
-            defaultLevel = LogLevel.DEBUG
+            defaultLevel = LogLevel.INFO
         )
 
         override val plugins: List<BasicServerPlugin> = listOf(
@@ -32,7 +33,14 @@ fun main(args: Array<String>) = runBlocking {
         override val apiScope: ServerScope = ServerScope(this)
 
         override suspend fun onServerPrepare() {
+            // 初始化目录
+
+            // 初始化鉴权密钥
             apiScope.AN.init()
+            logger.info("Get user token secret key successfully")
+            // 初始化歌词游戏歌词表
+            val librarySize = LyricsSocketsManager.initLibrary(File(currentDirectory, "lyrics_game.json"))
+            logger.info("Lyrics game library initialized, size = $librarySize")
         }
     }.run()
 }
