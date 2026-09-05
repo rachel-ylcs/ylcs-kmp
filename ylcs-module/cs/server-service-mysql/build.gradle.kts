@@ -2,26 +2,21 @@ plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.ktor,
+        libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 
-template(object : KotlinNativeExecutableTemplate() {
+template(object : KotlinNativeLibTemplate() {
     override val windowsTarget: Boolean = true
     override val linuxTarget: Boolean = true
     override val macosTarget: Boolean = true
 
-    override val args: List<String> = buildList {
-        if ("serverPublish" !in currentTaskName) add("--cd=${C.root.work.server.asFile}")
-    }
-
     override fun KotlinNativeSourceSetsScope.source() {
         nativeMain.configure(commonMain) {
             lib(
-                projects.ylcsApp.cs,
+                libs.sqlx4k,
                 projects.ylcsModule.cs.serverEngineNative,
-                projects.ylcsModule.cs.serverServiceMysql,
-                projects.ylcsModule.cs.serverServiceRedis,
             )
         }
 

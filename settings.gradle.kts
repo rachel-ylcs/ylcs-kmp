@@ -76,6 +76,7 @@ include(
     "ylcs-module:cs:client-engine",
     "ylcs-module:cs:server-engine",
     "ylcs-module:cs:server-engine-native",
+    "ylcs-module:cs:server-service-mysql",
     "ylcs-module:cs:server-service-redis",
     "ylcs-module:foundation:context",
     "ylcs-module:foundation:filesystem",

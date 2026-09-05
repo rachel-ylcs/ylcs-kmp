@@ -19,6 +19,36 @@ class RedisService(scope: APIScope) : ServerService(scope) {
     @PublishedApi
     internal var client: ReThis? = null
 
+    override suspend fun onStart() {
+        val redisConfig: RedisConfig = catchingNull {
+            scope.engine.config[name]!!.to()
+        } ?: RedisConfig()
+
+        val logger = scope.logger
+
+        client = ReThis(
+            host = redisConfig.host,
+            port = redisConfig.port
+        ) {
+            auth(redisConfig.password.toCharArray(), redisConfig.username)
+            loggerFactory = LoggerFactory { logger }
+            maxConnections = redisConfig.maxConnection
+            connectionAcquireTimeout = redisConfig.timeoutMillis.milliseconds
+            usePooling = true
+            pool {
+                maxPendingConnections = redisConfig.maxPending
+                minIdleConnections = redisConfig.minIdle
+                maxIdleConnections = redisConfig.maxIdle
+            }
+        }
+
+        logger.info("Redis Started")
+    }
+
+    override suspend fun onClose() {
+        client?.close()
+    }
+
     suspend operator fun set(key: String, value: String) {
         client?.set(key, value)
     }
@@ -35,31 +65,5 @@ class RedisService(scope: APIScope) : ServerService(scope) {
 
     suspend inline fun pipeline(crossinline block: suspend RedisService.() -> Unit) {
         client?.pipeline { block() }
-    }
-
-    override suspend fun onStart() {
-        val redisConfig: RedisConfig = catchingNull {
-            scope.engine.config["redis"]!!.to()
-        } ?: RedisConfig()
-
-        client = ReThis(
-            host = redisConfig.host,
-            port = redisConfig.port
-        ) {
-            auth(redisConfig.password.toCharArray(), redisConfig.username)
-            loggerFactory = LoggerFactory { scope.logger }
-            maxConnections = redisConfig.maxConnection
-            connectionAcquireTimeout = redisConfig.timeoutMillis.milliseconds
-            usePooling = true
-            pool {
-                maxPendingConnections = redisConfig.maxPending
-                minIdleConnections = redisConfig.minIdle
-                maxIdleConnections = redisConfig.maxIdle
-            }
-        }
-    }
-
-    override suspend fun onClose() {
-        client?.close()
     }
 }

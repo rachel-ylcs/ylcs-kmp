@@ -143,3 +143,4 @@ mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.1.0" }
 redis = { module = "redis.clients:jedis", version = "8.1.0-beta1" }
 
 rethis = { module = "eu.vendeli:rethis", version = "0.4.4" }
+sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.13.1" }
