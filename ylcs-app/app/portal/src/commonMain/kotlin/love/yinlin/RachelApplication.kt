@@ -46,7 +46,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenPrice)
 
             // community
-            screen(::ScreenUserCard)
+            screen(::ScreenUserCard, "ScreenUserCard")
             screen(::ScreenTopic)
             screen(::ScreenAddTopic)
             screen(::ScreenFollows)
