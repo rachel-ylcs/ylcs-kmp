@@ -19,18 +19,30 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.compose.window.DeepLink
 import love.yinlin.extension.Array
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.cast
 import love.yinlin.extension.parseJson
 
+/**
+ * 页面管理器
+ *
+ * 不建议使用各种方式获取指定位置或指定谓词条件的页面。
+ * 除了最顶层页面外，如果在其他页面有获取某一页面数据的需求请使用公共数据源 [DataSource]
+ */
 @Stable
 class ScreenManager @PublishedApi internal constructor(savedBackStack: List<String>) {
     @Stable
     companion object {
+        private var ScreenUniqueId: Long = 0L
+
+        internal fun useScreenUniqueId(): Long = ScreenUniqueId++
+
+        private val VMMap = mutableMapOf<String, BasicScreen>()
+
         @PublishedApi
         internal val saver = listSaver(
             save = { it.backStack },
@@ -84,16 +96,12 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
     internal val backStack = savedBackStack.toMutableStateList()
 
     @PublishedApi
-    internal fun registerScreen(
-        map: ScreenMap,
-        route: String
-    ): NavEntry<String> = NavEntry(key = route, contentKey = route) { navRoute ->
+    internal fun registerScreen(map: ScreenMap, route: String): NavEntry<String> = NavEntry(key = route, contentKey = route) { navRoute ->
         Box {
             viewModel {
                 val (screenName, uniqueId, argsText) = Route.parse(navRoute)
-                val factory = map.screens[screenName]
-                val screen = if (factory == null) map.screen404Factory() else factory(argsText.parseJson.Array)
-                ScreenGlobal.VMMap[uniqueId] = screen
+                val screen = map.screenFactory(screenName)(argsText.parseJson.Array)
+                VMMap[uniqueId] = screen
                 screen.uniqueId = uniqueId
                 screen.manager = this@ScreenManager
                 screen.launch { screen.initialize() }
@@ -104,42 +112,13 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
 
     @PublishedApi
     internal fun unregisterScreen(id: String) {
-        ScreenGlobal.VMMap -= id
-    }
-
-    val topScreen: BasicScreen get() {
-        val last = backStack.last()
-        val (_, uniqueId, _) = Route.parse(last)
-        return ScreenGlobal.VMMap[uniqueId]!!
-    }
-
-    inline fun <reified S : BasicScreen> findScreen(): S? {
-        for (route in backStack.asReversed()) {
-            val (screenName, uniqueId, _) = Route.parse(route)
-            if (Route.key<S>() == screenName) return ScreenGlobal.VMMap[uniqueId] as? S
-        }
-        return null
-    }
-
-    inline fun <reified S : BasicScreen> findScreens(): List<S> {
-        val target = mutableListOf<S>()
-        for (route in backStack.asReversed()) {
-            val (screenName, uniqueId, _) = Route.parse(route)
-            if (Route.key<S>() == screenName) {
-                ScreenGlobal.VMMap[uniqueId].cast { screen: S -> target += screen }
-            }
-        }
-        return target
-    }
-
-    fun pop() {
-        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
+        VMMap -= id
     }
 
     private var lastNavigateTime = 0L
 
     @PublishedApi
-    internal fun navigate(dstRoute: String, navigationPolicy: NavigationPolicy) {
+    internal fun navigateRoute(dstRoute: String, navigationPolicy: NavigationPolicy) {
         // 防抖处理
         val currentTime = DateEx.CurrentLong
         if (currentTime - lastNavigateTime <= 300L) return
@@ -160,7 +139,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
                 val route = backStack[index]
                 val (screenName, uniqueId, _) = Route.parse(route)
                 if (screenName == dstScreenName) {
-                    val screen = ScreenGlobal.VMMap[uniqueId]
+                    val screen = VMMap[uniqueId]
                     if (screen != null) {
                         target = index to screen
                         break
@@ -205,23 +184,63 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         }
     }
 
+    // 导航 (按类名)
+
     @Suppress("unused")
     inline fun <reified S : BasicScreen> navigate(metaConstructor: () -> S, policy: NavigationPolicy = NavigationPolicy.New) {
-        navigate(Route<S>().build(), policy)
+        navigateRoute(Route<S>().build(), policy)
     }
 
     @Suppress("unused")
     inline fun <reified S : BasicScreen, reified A1> navigate(metaConstructor: (A1) -> S, arg1: A1, policy: NavigationPolicy = NavigationPolicy.New) {
-        navigate(Route<S>().arg(arg1).build(), policy)
+        navigateRoute(Route<S>().arg(arg1).build(), policy)
     }
 
     @Suppress("unused")
     inline fun <reified S : BasicScreen, reified A1, reified A2> navigate(metaConstructor: (A1, A2) -> S, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.New) {
-        navigate(Route<S>().arg(arg1).arg(arg2).build(), policy)
+        navigateRoute(Route<S>().arg(arg1).arg(arg2).build(), policy)
     }
 
     @Suppress("unused")
     inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3> navigate(metaConstructor: (A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.New) {
-        navigate(Route<S>().arg(arg1).arg(arg2).arg(arg3).build(), policy)
+        navigateRoute(Route<S>().arg(arg1).arg(arg2).arg(arg3).build(), policy)
+    }
+
+    // 导航 (按字符串), 如果没有设置键则 screenClassName 应当为页面类的完整类名(包含包名与类名)
+
+    @LooseTyped
+    fun navigate(key: String, policy: NavigationPolicy = NavigationPolicy.New) {
+        navigateRoute(Route.find(key).build(), policy)
+    }
+
+    @LooseTyped
+    inline fun <reified A1> navigate(key: String, arg1: A1, policy: NavigationPolicy = NavigationPolicy.New) {
+        navigateRoute(Route.find(key).arg(arg1).build(), policy)
+    }
+
+    @LooseTyped
+    inline fun <reified A1, reified A2> navigate(key: String, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.New) {
+        navigateRoute(Route.find(key).arg(arg1).arg(arg2).build(), policy)
+    }
+
+    @LooseTyped
+    inline fun <reified A1, reified A2, reified A3> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.New) {
+        navigateRoute(Route.find(key).arg(arg1).arg(arg2).arg(arg3).build(), policy)
+    }
+
+    /**
+     * 最顶层页面
+     */
+    val topScreen: BasicScreen get() {
+        val last = backStack.last()
+        val (_, uniqueId, _) = Route.parse(last)
+        return VMMap[uniqueId]!!
+    }
+
+    /**
+     * 退出页面
+     */
+    fun pop() {
+        if (backStack.size > 1) backStack.removeAt(backStack.lastIndex)
     }
 }

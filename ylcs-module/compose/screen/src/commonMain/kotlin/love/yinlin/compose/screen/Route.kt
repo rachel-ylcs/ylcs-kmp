@@ -7,16 +7,21 @@ import love.yinlin.reflect.metaClassName
 
 @Stable
 @PublishedApi
-internal class Route(private val screenKey: String) {
-    companion object {
-        const val SCREEN_404 = "404"
+internal class Route @PublishedApi internal constructor(private val screenKey: String) {
+    @PublishedApi
+    internal companion object {
+        @PublishedApi
+        internal val KeyMap = mutableMapOf<String, String>()
 
         @OptIn(CompatibleRachelApi::class)
         inline fun <reified S : BasicScreen> key(): String = metaClassName<S>()
 
         inline operator fun <reified S : BasicScreen> invoke(): Route = Route(key<S>())
 
-        fun parse(route: String): Triple<String, String, String> {
+        @PublishedApi
+        internal fun find(keyString: String): Route = Route(KeyMap[keyString] ?: keyString)
+
+        internal fun parse(route: String): Triple<String, String, String> {
             val index1 = route.indexOf('|')
             val index2 = route.indexOf('?', index1 + 1)
             val screenName = route.substring(0, index1)
@@ -26,12 +31,14 @@ internal class Route(private val screenKey: String) {
         }
     }
 
-    val items = mutableListOf<String>()
+    @PublishedApi
+    internal val items = mutableListOf<String>()
 
-    fun build(): String = buildString {
+    @PublishedApi
+    internal fun build(): String = buildString {
         append(screenKey)
         append('|')
-        append(ScreenGlobal.ScreenUniqueId++)
+        append(ScreenManager.useScreenUniqueId())
         append('?')
         items.joinTo(this, separator = ",", prefix = "[", postfix = "]")
     }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,8 +30,6 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.fastRotate
 import love.yinlin.compose.ui.text.SimpleClipText
-import love.yinlin.compose.ui.text.SimpleEllipsisText
-import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.compose.ui.text.TextIconBinder
 import org.jetbrains.compose.resources.DrawableResource
 
