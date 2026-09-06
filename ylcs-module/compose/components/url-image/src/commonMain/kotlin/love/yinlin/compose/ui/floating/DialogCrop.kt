@@ -19,6 +19,8 @@ class DialogCrop : Dialog<CropRegion>() {
     private var aspectRatio: Float by mutableFloatStateOf(0f)
     private val cropState = CropState()
 
+    override val dismissOnClickOutside: Boolean = false
+
     suspend fun open(url: String, aspectRatio: Float = 0f): CropRegion? {
         this.url = url
         this.aspectRatio = aspectRatio
