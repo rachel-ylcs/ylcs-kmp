@@ -238,13 +238,13 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:server:serverArtifact
+        run: ./gradlew ylcs-app:server:linkReleaseExecutableLinux
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: ylcs-server
-          path: outputs/ylcs-server.jar
+          path: outputs/server.kexe
 
   package-modManager:
     name: Package Mod Manager

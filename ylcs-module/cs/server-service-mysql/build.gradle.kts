@@ -16,7 +16,7 @@ template(object : KotlinNativeLibTemplate() {
         nativeMain.configure(commonMain) {
             lib(
                 libs.sqlx4k,
-                projects.ylcsModule.cs.serverEngineNative,
+                projects.ylcsModule.cs.serverEngine,
             )
         }
 

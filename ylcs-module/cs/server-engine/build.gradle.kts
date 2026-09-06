@@ -1,34 +1,33 @@
 plugins {
     install(
-        libs.plugins.kotlinJvm,
+        libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
     )
 }
 
-template(object : KotlinJvmTemplate() {
-    override fun KotlinJvmSourceSetsScope.source() {
-        main.configure {
+template(object : KotlinNativeLibTemplate() {
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
+    override fun KotlinNativeSourceSetsScope.source() {
+        nativeMain.configure(commonMain) {
             lib(
-                libs.mysql,
-                libs.mysql.pool,
-                libs.redis,
                 libs.ktor.json,
-                libs.ktor.client,
-                libs.ktor.okhttp,
-                libs.ktor.client.negotiation,
+                libs.ktor.server.cio,
                 libs.ktor.server.negotiation,
-                libs.ktor.server.netty,
-                libs.ktor.server.config,
-                libs.ktor.server.host,
                 libs.ktor.server.websockets,
                 ExportLib,
-                libs.logback,
                 libs.ktor.server,
                 projects.ylcsModule.foundation.filesystem,
                 projects.ylcsModule.cs.core,
             )
         }
+
+        windowsMain.configure(nativeMain)
+        linuxMain.configure(nativeMain)
+        macosMain.configure(nativeMain)
     }
 })

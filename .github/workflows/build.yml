@@ -241,7 +241,7 @@ jobs:
             ./**/gradle-wrapper.properties
 
       - name: Build
-        run: ./gradlew ylcs-app:server:serverPublish
+        run: ./gradlew ylcs-app:server:linkDebugExecutableLinux
 
   build-modManager:
     name: Build Mod Manager

@@ -62,7 +62,7 @@ class AppNode(val root: RootProjectNode, c: Constants) : Directory by root.dir("
     val gallery = GalleryNode(this)
 
     class ServerNode(parent: AppNode, c: Constants) : Directory by parent.dir("server") {
-        val originOutput: RegularFile = dir("build").dir("libs").file(c.server.outputName)
+        val originOutput: RegularFile = dir("build").dir("bin").dir("linux").dir("releaseExecutable").file("server.kexe")
     }
     val server = ServerNode(this, c)
 

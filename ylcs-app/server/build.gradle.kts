@@ -1,63 +1,43 @@
 plugins {
     install(
-        libs.plugins.kotlinJvm,
+        libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.ktor
     )
 }
 
-ktor {
-    fatJar {
-        archiveFileName = C.server.outputName
-    }
-}
+template(object : KotlinNativeExecutableTemplate() {
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
 
-template(object : KotlinJvmTemplate() {
-    override fun KotlinJvmSourceSetsScope.source() {
-        main.configure {
+    override val args: List<String> = buildList {
+        if ("serverPublish" !in currentTaskName) add("--cd=${C.root.work.server.asFile}")
+    }
+
+    override fun KotlinNativeSourceSetsScope.source() {
+        nativeMain.configure(commonMain) {
             lib(
+                libs.cryptography,
+                libs.cryptography.provider,
                 projects.ylcsApp.cs,
                 projects.ylcsModule.cs.serverEngine,
+                projects.ylcsModule.cs.serverServiceMysql,
+                projects.ylcsModule.cs.serverServiceRedis,
             )
         }
-    }
 
-    override val jvmName: String = C.app.name
-    override val jvmMainClass: String = C.app.mainClass
-    override val jvmArgs: List<String> = buildList {
-        if ("serverPublish" !in currentTaskName) {
-            val desktopWorkSpace = C.root.work.server.asFile
-            desktopWorkSpace.mkdirs()
-            add("-Duser.dir=$desktopWorkSpace")
-        }
+        windowsMain.configure(nativeMain)
+        linuxMain.configure(nativeMain)
+        macosMain.configure(nativeMain)
     }
 
     override fun Project.actions() {
-        tasks.register("serverRun") {
-            description = "运行服务端"
-            dependsOn(tasks.named("run"))
-        }
-
-        tasks.register("serverArtifact") {
-            description = "打包服务端"
-            dependsOn(tasks.named("buildFatJar"))
-
-            doLast {
-                delete(C.root.outputs.file(C.server.outputName))
-                copy {
-                    from(C.root.app.server.originOutput)
-                    into(C.root.outputs)
-                    rename { _ -> "ylcs-server.jar" }
-                }
-            }
-        }
-
         tasks.register("serverPublish") {
             description = "发布服务端"
-            dependsOn(tasks.named("buildFatJar"))
+            dependsOn(tasks.named("linkReleaseExecutableLinux"))
 
             doLast {
-                delete(C.root.outputs.file(C.server.outputName))
+                delete(C.root.outputs.file("${uniqueName}.kexe"))
                 copy {
                     from(C.root.app.server.originOutput)
                     into(C.root.outputs)

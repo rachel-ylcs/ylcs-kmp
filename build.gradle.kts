@@ -16,7 +16,7 @@ plugins {
             libs.plugins.dokka,
         ),
         listOf(
-            libs.plugins.ktor,
+
         )
     )
 }

@@ -113,11 +113,6 @@ class Constants(project: Project) {
         )
     )
 
-    // Server 配置
-    val server = ServerConfig(
-        outputName = "ylcs.jar"
-    )
-
     // ModManager 配置
     val modManager = ModManagerConfig(
         name = "ModManager",
@@ -183,10 +178,6 @@ data class IosConfig(
 
 class DesktopConfig(
     val modules: Array<String>
-)
-
-data class ServerConfig(
-    val outputName: String
 )
 
 data class ModManagerConfig(

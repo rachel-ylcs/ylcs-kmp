@@ -24,7 +24,7 @@
     <GradleCoverageDisabled>false</GradleCoverageDisabled>
     <method v="2" />
   </configuration>
-  <configuration default="false" name="serverPublish" type="GradleRunConfiguration" factoryName="Gradle" folderName="Server">
+  <configuration default="false" name="serverPublish" type="GradleRunConfiguration" factoryName="Gradle" folderName="Native">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />

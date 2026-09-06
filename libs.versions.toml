@@ -32,7 +32,6 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "cmp" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 androidLibraryNew = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
-ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 
@@ -130,17 +129,9 @@ ktor-windows = { module = "io.ktor:ktor-client-winhttp", version.ref = "ktor" }
 
 # Server
 ktor-server = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
-ktor-server-host = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
-ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
-ktor-server-config = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
-
-logback = { module = "ch.qos.logback:logback-classic", version = "1.6.3" }
-mysql = { module = "mysql:mysql-connector-java", version = "8.0.33" }
-mysql-pool = { module = "com.zaxxer:HikariCP", version = "7.1.0" }
-redis = { module = "redis.clients:jedis", version = "8.1.0-beta1" }
 
 rethis = { module = "eu.vendeli:rethis", version = "0.4.4" }
 sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.13.1" }

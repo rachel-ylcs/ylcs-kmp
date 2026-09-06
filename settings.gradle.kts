@@ -75,7 +75,6 @@ include(
     "ylcs-module:cs:core",
     "ylcs-module:cs:client-engine",
     "ylcs-module:cs:server-engine",
-    "ylcs-module:cs:server-engine-native",
     "ylcs-module:cs:server-service-mysql",
     "ylcs-module:cs:server-service-redis",
     "ylcs-module:foundation:context",
@@ -113,7 +112,6 @@ include(
     "ylcs-app:mod",
     "ylcs-app:mod-manager",
     "ylcs-app:server",
-    "ylcs-app:server-native",
     "ylcs-app:web-app",
     "ylcs-app:weibo-picture-downloader",
 

@@ -16,7 +16,7 @@ template(object : KotlinNativeLibTemplate() {
         nativeMain.configure(commonMain) {
             lib(
                 libs.rethis,
-                projects.ylcsModule.cs.serverEngineNative,
+                projects.ylcsModule.cs.serverEngine,
             )
         }
 
