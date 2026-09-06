@@ -15,6 +15,7 @@ internal object SQLConverter {
         return when (type) {
             "BOOLEAN" -> (value.asInt() != 0).json
             "BINARY", "BLOB", "VARBINARY" -> value.asByteArray().json
+            "LONGBLOB" -> value.asByteArray().decodeToString().json // 上游问题: sqlx4k对json解析字段的结果应该是字符串, 但实际上是LONGBLOB
             "BIT" -> (value.asChar() != Char.MIN_VALUE).json
             "INT", "TINYINT", "SMALLINT", "MEDIUMINT" -> value.asInt().json
             "INT UNSIGNED" -> value.asUInt().toJson()
