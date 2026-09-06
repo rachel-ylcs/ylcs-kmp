@@ -166,6 +166,7 @@ abstract class KotlinTemplate<T : KotlinBaseExtension> {
         freeCompilerArgs.addAll(
             "-Xexpect-actual-classes",
             "-Xreturn-value-checker=check",
+            // "-Xcollection-literals",
             *features
         )
     }
