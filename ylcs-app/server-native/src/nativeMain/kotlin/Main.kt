@@ -37,10 +37,10 @@ fun main(args: Array<String>) = runBlocking {
 
             // 初始化鉴权密钥
             apiScope.AN.init()
-            logger.info("Get user token secret key successfully")
+            logger.info("Resource | Get user token secret key successfully.")
             // 初始化歌词游戏歌词表
             val librarySize = LyricsSocketsManager.initLibrary(File(currentDirectory, "lyrics_game.json"))
-            logger.info("Lyrics game library initialized, size = $librarySize")
+            logger.info("Resource | Lyrics game library initialized, size = $librarySize.")
         }
     }.run()
 }

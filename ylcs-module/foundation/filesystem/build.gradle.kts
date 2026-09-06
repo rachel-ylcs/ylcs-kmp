@@ -26,11 +26,9 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val clientMain = createClient(commonMain)
+        val jvmMain = createJvm(commonMain)
 
-        nativeMain.configure(clientMain)
-
-        val jvmMain = createJvm(clientMain)
+        nativeMain.configure(commonMain)
 
         appleMain.configure(nativeMain)
 

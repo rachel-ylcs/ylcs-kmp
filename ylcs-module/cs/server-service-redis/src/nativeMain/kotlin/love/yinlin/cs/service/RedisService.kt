@@ -42,7 +42,7 @@ class RedisService(scope: APIScope) : ServerService(scope) {
             }
         }
 
-        logger.info("Redis Started")
+        logger.info("Service | Redis Started.")
     }
 
     override suspend fun onClose() {

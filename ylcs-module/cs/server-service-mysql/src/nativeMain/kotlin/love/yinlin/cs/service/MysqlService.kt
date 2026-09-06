@@ -37,7 +37,7 @@ class MysqlService(scope: APIScope) : ServerService(scope) {
                 .build()
         )
 
-        logger.info("Mysql Started")
+        logger.info("Service | Mysql Started.")
     }
 
     override suspend fun onClose() {

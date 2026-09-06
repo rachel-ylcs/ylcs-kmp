@@ -138,10 +138,7 @@ abstract class File {
      * 文件大小
      */
     @IOCoroutine
-    suspend fun fileSize(): Long = catchingDefault(0L) {
-        val fileInfo = metadata()
-        if (fileInfo?.isRegularFile == true) fileInfo.size else 0L
-    }
+    suspend fun fileSize(): Long = Coroutines.io { fileSizeSync() }
 
     fun fileSizeSync(): Long = catchingDefault(0L) {
         val fileInfo = metadataSync()
@@ -152,31 +149,7 @@ abstract class File {
      * 文件或目录大小
      */
     @IOCoroutine
-    suspend fun size(): Long = catchingDefault(0L) {
-        val current = this
-        Coroutines.io {
-            var size = 0L
-            val fileInfo = current.metadata()
-            when {
-                fileInfo == null -> {}
-                fileInfo.isRegularFile -> size += fileInfo.size
-                fileInfo.isDirectory -> {
-                    val queue = ArrayDeque<File>()
-                    queue.add(current)
-                    while (queue.isNotEmpty()) {
-                        val front = queue.removeAt(0)
-                        val frontInfo = front.metadata()
-                        when {
-                            frontInfo == null -> {}
-                            frontInfo.isRegularFile -> size += frontInfo.size
-                            frontInfo.isDirectory -> queue.addAll(front.list())
-                        }
-                    }
-                }
-            }
-            size
-        }
-    }
+    suspend fun size(): Long = Coroutines.io { sizeSync() }
 
     fun sizeSync(): Long = catchingDefault(0L) {
         val current = this
@@ -206,32 +179,7 @@ abstract class File {
      * 删除文件或目录
      */
     @IOCoroutine
-    suspend fun deleteRecursively(): Boolean = catchingDefault(false) {
-        val stack = ArrayDeque<File>()
-        stack.add(this)
-        Coroutines.io {
-            while (stack.isNotEmpty()) {
-                val top = stack.last()
-                val fileInfo = top.metadata()
-                when {
-                    fileInfo == null -> stack.removeAt(stack.lastIndex)
-                    fileInfo.isRegularFile -> {
-                        top.delete()
-                        stack.removeAt(stack.lastIndex)
-                    }
-                    fileInfo.isDirectory -> {
-                        val list = top.list()
-                        if (list.isEmpty()) {
-                            top.delete()
-                            stack.removeAt(stack.lastIndex)
-                        }
-                        else stack.addAll(list)
-                    }
-                }
-            }
-            true
-        }
-    }
+    suspend fun deleteRecursively(): Boolean = Coroutines.io { deleteRecursivelySync() }
 
     fun deleteRecursivelySync(): Boolean = catchingDefault(false) {
         val stack = ArrayDeque<File>()
@@ -262,12 +210,7 @@ abstract class File {
      * 重命名
      */
     @IOCoroutine
-    suspend fun rename(filename: String): File? = catchingNull {
-        val current = this
-        val newFile = current.parent?.let { File(it, filename) } ?: File(filename)
-        move(newFile)
-        newFile
-    }
+    suspend fun rename(filename: String): File? = Coroutines.io { renameSync(filename) }
 
     fun renameSync(filename: String): File? = catchingNull {
         val current = this
@@ -294,13 +237,13 @@ abstract class File {
         bufferedSource().use { block(it) }
     }
 
-    inline fun <R> readSync(crossinline block: (Source) -> R): R = bufferedSourceSync().use { block(it) }
+    inline fun <R> readSync(@IOCoroutine crossinline block: (Source) -> R): R = bufferedSourceSync().use { block(it) }
 
     /**
      * 读文本文件
      */
     @IOCoroutine
-    suspend fun readText(): String? = catchingNull { read { it.readString() } }
+    suspend fun readText(): String? = Coroutines.io { readTextSync() }
 
     fun readTextSync(): String? = catchingNull { readSync { it.readString() } }
 
@@ -308,7 +251,7 @@ abstract class File {
      * 读字节文件
      */
     @IOCoroutine
-    suspend fun readByteArray(): ByteArray? = catchingNull { read { it.readByteArray() } }
+    suspend fun readByteArray(): ByteArray? = Coroutines.io { readByteArraySync() }
 
     fun readByteArraySync(): ByteArray? = catchingNull { readSync { it.readByteArray() } }
 
@@ -320,16 +263,13 @@ abstract class File {
         bufferedSink().use { block(it) }
     }
 
-    inline fun writeSync(crossinline block: (Sink) -> Unit) = bufferedSinkSync().use { block(it) }
+    inline fun writeSync(@IOCoroutine crossinline block: (Sink) -> Unit) = bufferedSinkSync().use { block(it) }
 
     /**
      * 写文本文件
      */
     @IOCoroutine
-    suspend fun writeText(text: String): Boolean = catchingDefault(false) {
-        write { it.writeString(text) }
-        true
-    }
+    suspend fun writeText(text: String): Boolean = Coroutines.io { writeTextSync(text) }
 
     fun writeTextSync(text: String): Boolean = catchingDefault(false) {
         writeSync { it.writeString(text) }
@@ -340,10 +280,7 @@ abstract class File {
      * 写字节文件
      */
     @IOCoroutine
-    suspend fun writeByteArray(data: ByteArray): Boolean = catchingDefault(false) {
-        write { it.write(data) }
-        true
-    }
+    suspend fun writeByteArray(data: ByteArray): Boolean = Coroutines.io { writeByteArraySync(data) }
 
     fun writeByteArraySync(data: ByteArray): Boolean = catchingDefault(false) {
         writeSync { it.write(data) }
@@ -354,14 +291,7 @@ abstract class File {
      * 写入文件
      */
     @IOCoroutine
-    suspend fun writeTo(other: File): Boolean = catchingDefault(false) {
-        read { source ->
-            other.write { sink ->
-                source.transferTo(sink)
-            }
-        }
-        true
-    }
+    suspend fun writeTo(other: File): Boolean = Coroutines.io { writeToSync(other) }
 
     fun writeToSync(other: File): Boolean = catchingDefault(false) {
         readSync { source ->

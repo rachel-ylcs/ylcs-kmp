@@ -83,13 +83,20 @@ abstract class ServerEngine(cmdLine: Array<String>) {
      * 运行
      */
     suspend fun run() {
+        // 日志目录
+        val logPath = File(currentDirectory, "logs")
+        if (!logPath.exists()) logPath.mkdir()
+        logger.info("Server is running in $currentDirectory")
+
         // 读取配置
         val configFile = File(currentDirectory, "config.json")
         catching { config = configFile.readText()!!.parseJson.Object }
+        logger.info("Config file is loaded.")
 
         // 静态目录
         val staticFilePath = File(currentDirectory, public)
         if (!staticFilePath.exists()) staticFilePath.mkdir()
+        logger.info("static file path is created.")
 
         // 接口作用域
         val scope = apiScope
