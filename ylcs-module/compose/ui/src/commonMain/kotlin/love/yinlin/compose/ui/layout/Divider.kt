@@ -20,7 +20,7 @@ import love.yinlin.compose.Theme
 @NonRestartableComposable
 fun VerticalDivider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline.copy(alpha = 0.5f),
+    color: Color = Theme.color.outline.copy(alpha = 0.25f),
     modifier: Modifier = Modifier,
 ) {
     Layout(modifier = modifier.fillMaxHeight().width(thickness).drawWithContent {
@@ -39,7 +39,7 @@ fun VerticalDivider(
 @NonRestartableComposable
 fun RowScope.Divider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline.copy(alpha = 0.5f),
+    color: Color = Theme.color.outline.copy(alpha = 0.25f),
     modifier: Modifier = Modifier,
 ) {
     VerticalDivider(thickness, color, modifier)
@@ -49,7 +49,7 @@ fun RowScope.Divider(
 @NonRestartableComposable
 fun HorizontalDivider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline.copy(alpha = 0.5f),
+    color: Color = Theme.color.outline.copy(alpha = 0.25f),
     modifier: Modifier = Modifier,
 ) {
     Layout(modifier = modifier.fillMaxWidth().height(thickness).drawWithContent {
@@ -68,7 +68,7 @@ fun HorizontalDivider(
 @NonRestartableComposable
 fun ColumnScope.Divider(
     thickness: Dp = Theme.border.v7,
-    color: Color = Theme.color.outline.copy(alpha = 0.5f),
+    color: Color = Theme.color.outline.copy(alpha = 0.25f),
     modifier: Modifier = Modifier,
 ) {
     HorizontalDivider(thickness, color, modifier)
