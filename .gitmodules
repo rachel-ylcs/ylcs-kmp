@@ -1,7 +1,7 @@
-[submodule "ylcs-module/startup/picker/src/desktopMain/cpp/nativefiledialog"]
+[submodule "nativefiledialog"]
 	path = ylcs-module/compose/startup/picker/src/desktopMain/cpp/nativefiledialog
 	url = https://github.com/btzy/nativefiledialog-extended.git
-[submodule "ylcs-module/startup/mmkv-kmp/src/desktopMain/cpp/mmkv"]
+[submodule "mmkv"]
 	path = ylcs-module/compose/startup/mmkv-kmp/src/desktopMain/cpp/mmkv
 	url = https://github.com/Tencent/MMKV.git
 	ignore = all
