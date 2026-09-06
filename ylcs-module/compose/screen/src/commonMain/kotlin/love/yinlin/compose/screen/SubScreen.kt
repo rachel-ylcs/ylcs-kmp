@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.compose.ui.floating.BasicSheet
 import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.floating.FAB
@@ -91,32 +92,40 @@ abstract class SubScreen(val parent: NavigationScreen) {
      */
     fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = parent.launch(context = context, block = block)
 
+    // 导航 (按类名)
+
+    inline fun <reified S : BasicScreen> navigate(metaConstructor: () -> S, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(metaConstructor, policy)
+
+    inline fun <reified S : BasicScreen, reified A1> navigate(metaConstructor: (A1) -> S, arg1: A1, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(metaConstructor, arg1, policy)
+
+    inline fun <reified S : BasicScreen, reified A1, reified A2> navigate(metaConstructor: (A1, A2) -> S, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(metaConstructor, arg1, arg2, policy)
+
+    inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3> navigate(metaConstructor: (A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(metaConstructor, arg1, arg2, arg3, policy)
+
+    // 导航 (按字符串), 如果没有设置键则 screenClassName 应当为页面类的完整类名(包含包名与类名)
+
+    @LooseTyped
+    fun navigate(key: String, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(key, policy)
+
+    @LooseTyped
+    inline fun <reified A1> navigate(key: String, arg1: A1, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(key, arg1, policy)
+
+    @LooseTyped
+    inline fun <reified A1, reified A2> navigate(key: String, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(key, arg1, arg2, policy)
+
+    @LooseTyped
+    inline fun <reified A1, reified A2, reified A3> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.New) =
+        parent.navigate(key, arg1, arg2, arg3, policy)
+
     /**
      * 弹出导航栈顶层页面
      */
     fun pop() = parent.pop()
-
-    /**
-     * 导航切换页面
-     */
-    inline fun <reified S : BasicScreen> navigate(metaConstructor: () -> S, policy: NavigationPolicy = NavigationPolicy.New) =
-        parent.navigate(metaConstructor, policy)
-
-    /**
-     * 导航切换页面
-     */
-    inline fun <reified S : BasicScreen, reified A1> navigate(metaConstructor: (A1) -> S, arg1: A1, policy: NavigationPolicy = NavigationPolicy.New) =
-        parent.navigate(metaConstructor, arg1, policy)
-
-    /**
-     * 导航切换页面
-     */
-    inline fun <reified S : BasicScreen, reified A1, reified A2> navigate(metaConstructor: (A1, A2) -> S, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.New) =
-        parent.navigate(metaConstructor, arg1, arg2, policy)
-
-    /**
-     * 导航切换页面
-     */
-    inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3> navigate(metaConstructor: (A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.New) =
-        parent.navigate(metaConstructor, arg1, arg2, arg3, policy)
 }

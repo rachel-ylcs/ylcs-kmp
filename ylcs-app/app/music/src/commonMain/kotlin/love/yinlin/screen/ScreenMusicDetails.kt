@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
@@ -541,7 +542,10 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 time = comment.ts,
                 label = comment.label,
                 level = comment.level,
-                onAvatarClick = { navigate(::ScreenUserCard, comment.uid) }
+                onAvatarClick = {
+                    @OptIn(LooseTyped::class)
+                    navigate("ScreenUserCard", comment.uid)
+                }
             )
             SelectionBox {
                 Text(text = comment.content, modifier = Modifier.fillMaxWidth())

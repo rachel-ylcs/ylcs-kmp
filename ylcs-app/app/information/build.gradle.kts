@@ -14,8 +14,8 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.compose.resources,
                 projects.ylcsApp.app.global,
-                projects.ylcsApp.app.viewer,
                 projects.ylcsApp.app.thirdParty,
+                projects.ylcsApp.app.viewer,
                 projects.ylcsModule.compose.components.paginationLayout
             )
         }

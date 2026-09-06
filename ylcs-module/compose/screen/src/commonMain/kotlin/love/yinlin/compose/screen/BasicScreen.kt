@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonArray
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.compose.ui.floating.BasicSheet
 import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.floating.FAB
@@ -146,38 +147,50 @@ abstract class BasicScreen : ViewModel() {
      */
     fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(context = context, block = block)
 
-    /**
-     * 弹出导航栈顶层页面
-     */
-    fun pop() = manager.pop()
+    // 导航 (按类名)
 
-    /**
-     * 导航切换页面
-     */
     inline fun <reified S : BasicScreen> navigate(metaConstructor: () -> S, policy: NavigationPolicy = NavigationPolicy.New) {
         manager.navigate(metaConstructor, policy)
     }
 
-    /**
-     * 导航切换页面
-     */
     inline fun <reified S : BasicScreen, reified A1> navigate(metaConstructor: (A1) -> S, arg1: A1, policy: NavigationPolicy = NavigationPolicy.New) {
         manager.navigate(metaConstructor, arg1, policy)
     }
 
-    /**
-     * 导航切换页面
-     */
     inline fun <reified S : BasicScreen, reified A1, reified A2> navigate(metaConstructor: (A1, A2) -> S, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.New) {
         manager.navigate(metaConstructor, arg1, arg2, policy)
     }
 
-    /**
-     * 导航切换页面
-     */
     inline fun <reified S : BasicScreen, reified A1, reified A2, reified A3> navigate(metaConstructor: (A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.New) {
         manager.navigate(metaConstructor, arg1, arg2, arg3, policy)
     }
+
+    // 导航 (按字符串), 如果没有设置键则 screenClassName 应当为页面类的完整类名(包含包名与类名)
+
+    @LooseTyped
+    fun navigate(key: String, policy: NavigationPolicy = NavigationPolicy.New) {
+        manager.navigate(key, policy)
+    }
+
+    @LooseTyped
+    inline fun <reified A1> navigate(key: String, arg1: A1, policy: NavigationPolicy = NavigationPolicy.New) {
+        manager.navigate(key, arg1, policy)
+    }
+
+    @LooseTyped
+    inline fun <reified A1, reified A2> navigate(key: String, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.New) {
+        manager.navigate(key, arg1, arg2, policy)
+    }
+
+    @LooseTyped
+    inline fun <reified A1, reified A2, reified A3> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.New) {
+        manager.navigate(key, arg1, arg2, arg3, policy)
+    }
+
+    /**
+     * 弹出导航栈顶层页面
+     */
+    fun pop() = manager.pop()
 
     /**
      * 唤醒回调
