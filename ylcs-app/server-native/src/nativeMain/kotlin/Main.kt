@@ -33,8 +33,6 @@ fun main(args: Array<String>) = runBlocking {
         override val apiScope: ServerScope = ServerScope(this)
 
         override suspend fun onServerPrepare() {
-            // 初始化目录
-
             // 初始化鉴权密钥
             apiScope.AN.init()
             logger.info("Resource | Get user token secret key successfully.")
