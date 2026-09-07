@@ -1,7 +1,9 @@
 import love.yinlin.project.Constants
 import org.gradle.api.Project
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.file.Directory
 import org.gradle.api.internal.catalog.DelegatingProjectDependency
+import kotlin.collections.forEach
 
 enum class BuildEnvironment { Dev, Prod }
 
@@ -59,4 +61,20 @@ val Project.desktopNativeJVMSourceDir: Directory get() = layout.projectDirectory
 // KMP 资源
 val Project.hasKMPResources: Boolean get() = layout.projectDirectory.dir("src").asFile.listFiles {
     it.isDirectory && (it.resolve("composeResources").isDirectory || it.resolve("res").isDirectory)
-}.isNotEmpty()
+}?.isNotEmpty() ?: false
+
+// 获取所有子模块(包含自身)的Selector
+val Project.enumSubModules: List<String> get() {
+    val moduleList = mutableSetOf<String>()
+    configurations.forEach { config ->
+        if (config.isCanBeResolved) {
+            runCatching {
+                for (result in config.incoming.resolutionResult.allComponents) {
+                    val id = result.id as? ProjectComponentIdentifier ?: continue
+                    moduleList += id.projectPath
+                }
+            }
+        }
+    }
+    return moduleList.toList()
+}
