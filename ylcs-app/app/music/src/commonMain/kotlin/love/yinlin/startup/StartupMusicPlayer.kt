@@ -144,7 +144,10 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     private fun fetchCurrentPlaylist(list: Playlist): List<String> = when (list) {
         is Playlist.None -> emptyList()
         is Playlist.Default -> library.values.map { it.id }
-        is Playlist.User -> app.config.playlistLibrary[list.name]?.items?.fastFilter { it in library } ?: emptyList()
+        is Playlist.User -> app.config.playlistLibrary[list.name]?.items
+            ?.fastFilter { it in library }
+            ?.distinct()
+            ?: emptyList()
     }
 
     suspend fun updateMusicLibraryInfo(ids: List<String>) {

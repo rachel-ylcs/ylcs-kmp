@@ -226,22 +226,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
     } ?: Unit
 
     override suspend fun updateNewMedias(medias: List<String>) = withMainPlayer {
-        var oldIndex = 0
-        val oldList: List<String> = musicList
-
-        // 遍历目标列表
-        for (newIndex in medias.indices) {
-            val newItem = medias[newIndex]
-
-            // 如果旧列表还没遍历完, 并且当前的新旧 item 匹配
-            // 说明这个媒体是老媒体, 且就在当前位置, 不需要做任何操作
-            if (oldIndex < oldList.size && newItem == oldList[oldIndex]) ++oldIndex
-            else {
-                // 如果不匹配, 或者旧列表已经遍历完了, 说明这是一个全新插入的媒体
-                val newMediaItem = buildMediaItem(newItem)
-                if (newMediaItem != null) it.addMediaItem(newIndex, newMediaItem)
-            }
-        }
+        it.replaceMediaItems(0, it.mediaItemCount, medias.mapNotNull(::buildMediaItem))
     } ?: Unit
 
     override suspend fun removeMedia(index: Int) = withMainPlayer {
