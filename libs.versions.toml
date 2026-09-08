@@ -15,7 +15,7 @@ lifecycle = "2.11.0"
 coroutines = "1.11.0"
 ktor = "3.5.2"
 sketch = "4.7.0-alpha01"
-haze = "2.0.0-beta02"
+haze = "2.0.0-beta03"
 mmkv = "2.4.2"
 cryptography = "0.6.0"
 
