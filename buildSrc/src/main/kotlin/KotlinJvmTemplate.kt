@@ -54,7 +54,7 @@ abstract class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
                 // 检查是否需要编译 Desktop Native
                 val sourceDir = desktopNativeJVMSourceDir.asFile
                 onlyIf {
-                    sourceDir.exists() && !sourceDir.resolve("native.ignore").exists()
+                    ensureNativeBuild(sourceDir)
                 }
                 inputDir.set(sourceDir)
             }

@@ -2,6 +2,7 @@ package love.yinlin.task
 
 import BuildPlatform
 import C
+import defaultNativeModuleName
 import desktopNativeBuildDir
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -50,9 +51,9 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
     abstract val execOperations: ExecOperations
 
     init {
-        nativeModuleName.convention(project.name) // 非当前项目的 Task 需要显式传递 nativeModuleName
+        nativeModuleName.convention(defaultNativeModuleName(project.path)) // 非当前项目的 Task 需要显式传递 nativeModuleName
         outputFile.convention(nativeModuleName.map { newName ->
-            project.C.root.artifacts.desktopNative.file(System.mapLibraryName(newName.replace('-', '_')))
+            project.C.root.artifacts.desktopNative.file(System.mapLibraryName(newName))
         })
         nativePlatform.convention(project.C.platform)
         nativeBuildDir.convention(project.desktopNativeBuildDir.asFile) // 非当前项目的 Task 需要显式传递 nativeBuildDir
@@ -78,7 +79,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
         }.exitValue == 0
     }
 
-    fun ensureNativeBuild(inputDir: File): Boolean = inputDir.exists() && inputDir.resolve("native.ignore").exists()
+    fun ensureNativeBuild(inputDir: File): Boolean = inputDir.exists() && !inputDir.resolve("native.ignore").exists()
 
     @TaskAction
     fun buildNative() {
@@ -98,7 +99,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
             add("CMAKE_BUILD_TYPE" to "Release")
             add("NATIVE_JNI_DIR" to "\"${nativeJniDir.get().absolutePath}\"")
             add("NATIVE_OUTPUT_DIR" to "\"${libOutputDir.absolutePath}\"")
-            add("NATIVE_OUTPUT_NAME" to nativeModuleName.get().replace('-', '_'))
+            add("NATIVE_OUTPUT_NAME" to nativeModuleName.get())
             if (currentPlatform == BuildPlatform.Windows) {
                 add("CMAKE_SHARED_LINKER_FLAGS" to "\"/NOEXP /NOIMPLIB\"")
             }

@@ -64,6 +64,7 @@ val Project.hasKMPResources: Boolean get() = layout.projectDirectory.dir("src").
 }?.isNotEmpty() ?: false
 
 // 获取所有子模块(包含自身)的Selector
+// 形如 :ylcs-module:compose:app
 val Project.enumSubModules: List<String> get() {
     val moduleList = mutableSetOf<String>()
     configurations.forEach { config ->
@@ -78,3 +79,6 @@ val Project.enumSubModules: List<String> get() {
     }
     return moduleList.toList()
 }
+
+// 获取模块对应的动态链接库名称
+fun defaultNativeModuleName(path: String): String = path.removePrefix(":").replace(':', '.')

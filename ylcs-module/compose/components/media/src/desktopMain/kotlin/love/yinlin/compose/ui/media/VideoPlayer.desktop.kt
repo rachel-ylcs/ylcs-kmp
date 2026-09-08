@@ -26,7 +26,7 @@ import org.jetbrains.skia.SamplingMode
 abstract class DesktopVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     companion object {
         init {
-            NativeLibLoader.resource("media")
+            NativeLibLoader.resource("ylcs-module.compose.components.media")
         }
     }
 

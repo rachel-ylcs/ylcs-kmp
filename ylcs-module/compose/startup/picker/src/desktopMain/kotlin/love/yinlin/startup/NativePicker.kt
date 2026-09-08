@@ -6,7 +6,7 @@ import love.yinlin.platform.NativeLibLoader
 @NativeLibApi
 internal object NativePicker {
     init {
-        NativeLibLoader.resource("picker")
+        NativeLibLoader.resource("ylcs-module.compose.startup.picker")
     }
 
     @JvmStatic

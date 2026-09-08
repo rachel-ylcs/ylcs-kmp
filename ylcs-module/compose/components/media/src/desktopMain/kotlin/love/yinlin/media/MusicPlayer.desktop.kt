@@ -10,7 +10,7 @@ import love.yinlin.platform.platform
 @NativeLibApi
 internal object DesktopMusicController {
     init {
-        NativeLibLoader.resource("media")
+        NativeLibLoader.resource("ylcs-module.compose.components.media")
     }
 
     fun build(fetcher: MediaMetadataFetcher): MusicPlayer = when (platform) {

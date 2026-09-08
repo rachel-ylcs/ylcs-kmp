@@ -7,7 +7,7 @@ import love.yinlin.platform.NativeLibLoader
 class MMKV(path: String) {
     companion object {
         init {
-            NativeLibLoader.resource("mmkv_kmp")
+            NativeLibLoader.resource("ylcs-module.compose.startup.mmkv-kmp")
         }
 
         @JvmStatic

@@ -1,6 +1,7 @@
 package love.yinlin.task
 
 import C
+import defaultNativeModuleName
 import enumSubModules
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
@@ -22,7 +23,7 @@ abstract class CopyDesktopNativeTask : DefaultTask() {
         // 复制 native 库
         val libOutputList = mutableListOf<String>()
         for (subModuleSelector in project.enumSubModules) {
-            val moduleName = System.mapLibraryName(subModuleSelector.substringAfterLast(':').replace('-', '_'))
+            val moduleName = System.mapLibraryName(defaultNativeModuleName(subModuleSelector))
             val libFile = libSourceDir.resolve(moduleName)
             val outputFile = targetResourcesDir.resolve(moduleName)
             if (libFile.exists()) {

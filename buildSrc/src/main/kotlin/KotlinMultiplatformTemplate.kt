@@ -427,7 +427,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 // 检查是否需要编译 Desktop Native
                 val sourceDir = desktopNativeKMPSourceDir.asFile
                 onlyIf {
-                    sourceDir.exists() && !sourceDir.resolve("native.ignore").exists()
+                    ensureNativeBuild(sourceDir)
                 }
                 inputDir.set(sourceDir)
             }
