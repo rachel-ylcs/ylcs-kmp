@@ -162,10 +162,7 @@ class ScreenCreateMusic : Screen() {
 
     @Composable
     override fun RowScope.RightActions() {
-        LoadingIcon(icon = Icons.Check, tip = "创建", enabled = input.canSubmit, onClick = {
-            if (mp?.isReady == true) slot.tip.warning("请先停止播放器")
-            else submit()
-        })
+        LoadingIcon(icon = Icons.Check, tip = "创建", enabled = input.canSubmit, onClick = ::submit)
     }
 
     @Composable

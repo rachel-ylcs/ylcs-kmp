@@ -230,8 +230,9 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
 
     /**
      * 最顶层页面
+     * (目前不适合给外部调用, 如后续确实不需要使用就删除)
      */
-    val topScreen: BasicScreen get() {
+    private val topScreen: BasicScreen get() {
         val last = backStack.last()
         val (_, uniqueId, _) = Route.parse(last)
         return VMMap[uniqueId]!!

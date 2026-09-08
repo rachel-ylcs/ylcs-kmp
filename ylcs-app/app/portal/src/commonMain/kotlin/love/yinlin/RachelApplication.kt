@@ -80,10 +80,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
 
     override fun onDeepLink(manager: ScreenManager, uri: Uri) {
         when (uri.scheme) {
-            Scheme.File, Scheme.Content -> {
-                if (mp?.isReady != true) manager.navigate(::ScreenImportMusic, uri)
-                else manager.topScreen.slot.tip.warning("请先停止播放器")
-            }
+            Scheme.File, Scheme.Content -> manager.navigate(::ScreenImportMusic, uri)
             Scheme.Rachel -> {
                 when (uri.path) {
                     "/openProfile" -> {
@@ -98,14 +95,8 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
                     }
                 }
             }
-            Scheme.QQMusic -> {
-                if (mp?.isReady == true) manager.topScreen.slot.tip.warning("请先停止播放器")
-                else manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.QQMusic)
-            }
-            Scheme.NetEaseCloud -> {
-                if (mp?.isReady == true) manager.topScreen.slot.tip.warning("请先停止播放器")
-                else manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.NetEaseCloud)
-            }
+            Scheme.QQMusic -> manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.QQMusic)
+            Scheme.NetEaseCloud -> manager.navigate(::ScreenPlatformMusic, uri.copy(scheme = Scheme.Https), PlatformMusicType.NetEaseCloud)
         }
     }
 }

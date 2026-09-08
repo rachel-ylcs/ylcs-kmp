@@ -70,7 +70,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
 
     private suspend fun processMod(path: ImplicitUri) {
         val player = mp ?: return
-        if (player.isReady) slot.tip.warning("请先停止播放器")
+        if (player.isReady) slot.tip.warning("导入 MOD 请先停止播放器")
         else catchingError {
             val data = path.read { source ->
                 ModFactory.Release(source, app.modPath).process { current, total, id ->

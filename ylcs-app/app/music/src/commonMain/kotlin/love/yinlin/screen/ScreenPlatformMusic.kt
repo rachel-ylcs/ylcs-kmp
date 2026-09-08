@@ -71,7 +71,11 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
         slot.loading.open {
             catchingError {
                 val id = "${platformType.prefix}${platformMusicInfo.id}"
+                val ids = listOf(id)
                 Coroutines.io {
+                    // 0. 检查是否正在播放当前曲目
+                    val existItem = mp?.checkMusicIsInCurrentPlaylist(ids)
+                    require(existItem == null) { "\"$existItem\"在播放列表中, 请先停止播放器" }
                     // 1. 下载音频
                     val audioFile = app.createTempFile { NetClient.File.download(platformMusicInfo.audioUrl, it) }
                     // 2. 下载封面
@@ -105,7 +109,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
                     info.path(modPath, ModResourceType.LineLyrics).writeText(platformMusicInfo.lyrics)
                 }
                 // 9. 更新曲库
-                mp?.updateMusicLibraryInfo(listOf(id))
+                mp?.updateMusicLibraryInfo(ids)
                 slot.tip.success("导入 ${platformMusicInfo.name} 成功")
             }?.then { slot.tip.warning("下载失败 ${it.message}") }
         }

@@ -182,9 +182,10 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun onMusicDelete() {
+        // 检查待删除歌曲是否已经在当前播放列表中
         val deleteItems = selectIdList
-        val currentList = mp?.musicList ?: emptyList()
-        if (deleteItems.any { it in currentList }) slot.tip.warning("请先停止播放器")
+        val existItem = mp?.checkMusicIsInCurrentPlaylist(deleteItems)
+        if (existItem != null) slot.tip.warning("\"$existItem\"在播放列表中, 请先停止播放器")
         else if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
             val source = mp?.library
             if (source == null) slot.tip.error("播放器初始化失败")

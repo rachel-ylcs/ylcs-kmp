@@ -141,6 +141,9 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         startPlaylist(app.config.lastPlaylist, app.config.lastMusic.ifEmpty { null }, false)
     }
 
+    // 检查歌曲是否在当前播放列表中
+    fun checkMusicIsInCurrentPlaylist(items: List<String>): String? = items.firstOrNull { it in musicList }
+
     private fun fetchCurrentPlaylist(list: Playlist): List<String> = when (list) {
         is Playlist.None -> emptyList()
         is Playlist.Default -> library.values.map { it.id }
