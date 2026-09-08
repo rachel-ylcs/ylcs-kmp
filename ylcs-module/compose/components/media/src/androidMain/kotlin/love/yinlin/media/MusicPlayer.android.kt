@@ -225,21 +225,33 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
         else it.prepare()
     } ?: Unit
 
-    override suspend fun updateNewMedias(medias: List<String>) = withMainPlayer {
-        var oldIndex = 0
-        val oldList: List<String> = musicList
+    override suspend fun updateNewMedias(medias: List<String>) = withMainPlayer { player ->
+        // 1. 先倒序删除所有已经不存在于新列表中的旧 MediaItem
+        for (index in (player.mediaItemCount - 1) downTo 0) {
+            val id = player.getMediaItemAt(index).mediaId
+            if (id !in medias) player.removeMediaItem(index)
+        }
 
-        // 遍历目标列表
-        for (newIndex in medias.indices) {
-            val newItem = medias[newIndex]
+        // 2. 逐个把当前位置调整成目标列表中的 MediaItem
+        for (targetIndex in medias.indices) {
+            val targetId = medias[targetIndex]
+            // 已经正确，无需操作
+            if (targetIndex < player.mediaItemCount && player.getMediaItemAt(targetIndex).mediaId == targetId) continue
 
-            // 如果旧列表还没遍历完, 并且当前的新旧 item 匹配
-            // 说明这个媒体是老媒体, 且就在当前位置, 不需要做任何操作
-            if (oldIndex < oldList.size && newItem == oldList[oldIndex]) ++oldIndex
+            // 在当前列表剩余部分中寻找 targetId
+            var existingIndex = -1
+            for (index in targetIndex until player.mediaItemCount) {
+                if (player.getMediaItemAt(index).mediaId == targetId) {
+                    existingIndex = index
+                    break
+                }
+            }
+            // 已经存在：只移动，不重新构造 MediaItem
+            if (existingIndex >= 0) player.moveMediaItem(existingIndex, targetIndex)
             else {
-                // 如果不匹配, 或者旧列表已经遍历完了, 说明这是一个全新插入的媒体
-                val newMediaItem = buildMediaItem(newItem)
-                if (newMediaItem != null) it.addMediaItem(newIndex, newMediaItem)
+                // 全新：创建新的 MediaItem 并插入目标位置
+                val mediaItem = buildMediaItem(targetId)
+                if (mediaItem != null) player.addMediaItem(targetIndex, mediaItem)
             }
         }
     } ?: Unit
