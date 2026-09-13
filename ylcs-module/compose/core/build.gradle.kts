@@ -38,9 +38,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         iosMainList.configure(iosMain)
 
-        desktopMain.configure(skikoMain) {
-            lib(composeOSLib)
-        }
+        desktopMain.configure(skikoMain)
 
         webMain.configure(skikoMain)
 

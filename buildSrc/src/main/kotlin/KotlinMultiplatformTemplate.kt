@@ -5,10 +5,8 @@ import org.gradle.api.Project
 import org.gradle.api.internal.catalog.DelegatingProjectDependency
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.compose.ComposeExtension
-import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
@@ -76,8 +74,6 @@ class KotlinMultiplatformSourceSetsScope(
     val linuxTest: KotlinSourceSet by lazy { set.getByName("linuxTest") }
     val macosMain: KotlinSourceSet by lazy { set.getByName("macosMain") }
     val macosTest: KotlinSourceSet by lazy { set.getByName("macosTest") }
-
-    val composeOSLib: String get() = extension.extensions.getByType<ComposePlugin.Dependencies>().desktop.currentOs
 }
 
 // swift 依赖包结构
