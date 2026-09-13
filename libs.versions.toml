@@ -3,7 +3,7 @@
 # Plugins #
 kotlin = "2.4.20"
 agp = "9.1.1"
-cmp = "1.12.0"
+cmp = "1.13.0-alpha01"
 mavenPublish = "0.37.0"
 dokka = "2.2.0"
 
@@ -21,7 +21,7 @@ cryptography = "0.6.0"
 
 # Android
 androidx-activity = "1.13.0"
-media3 = "1.11.0"
+media3 = "1.11.1"
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
