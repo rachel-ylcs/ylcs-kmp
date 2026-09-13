@@ -148,6 +148,7 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun onMusicAdd() {
+        val player = mp ?: return
         val names = playlistLibrary.map { key, _ -> key }
         if (names.isNotEmpty()) {
             val result = addMusicDialog.openSuspend(names)
@@ -164,12 +165,10 @@ class ScreenMusicLibrary : Screen() {
                     if (newItems.isNotEmpty()) {
                         val totalItems = oldItems + newItems
                         playlistLibrary[name] = playlist.copy(items = totalItems)
-                        mp?.then { player ->
-                            // 添加到当前播放的列表
-                            val currentPlaylist = player.playlist
-                            if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
-                                player.updateNewMedias(totalItems)
-                            }
+                        // 添加到当前播放的列表
+                        val currentPlaylist = player.playlist
+                        if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
+                            player.reloadPlaylist(totalItems)
                         }
                         slot.tip.success("已添加${newItems.size}首歌曲")
                     }
@@ -182,20 +181,23 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun onMusicDelete() {
-        // 检查待删除歌曲是否已经在当前播放列表中
-        val deleteItems = selectIdList
-        val existItem = mp?.checkMusicIsInCurrentPlaylist(deleteItems)
-        if (existItem != null) slot.tip.warning("\"$existItem\"在播放列表中, 请先停止播放器")
-        else if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
-            val source = mp?.library
-            if (source == null) slot.tip.error("播放器初始化失败")
-            else {
-                for (item in deleteItems) {
-                    val removeItem = source.remove(item)
-                    removeItem?.path(app.modPath)?.deleteRecursively()
-                }
-                resetLibrary()
+        val player = mp ?: return
+        if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
+            val deleteItems = selectIdList
+            val checkData = player.checkReloadPlaylistByDelete(deleteItems)
+            if (checkData == null) {
+                slot.tip.warning("\"${player.currentMusic?.name}\"正在播放, 请先停止播放器")
+                return
             }
+            // 先处理播放列表
+            player.reloadPlaylistByDelete(checkData)
+            // 再处理媒体存储
+            val sourceLibrary = player.library
+            for (item in deleteItems) {
+                val removeItem = sourceLibrary.remove(item)
+                removeItem?.path(app.modPath)?.deleteRecursively()
+            }
+            resetLibrary()
         }
     }
 

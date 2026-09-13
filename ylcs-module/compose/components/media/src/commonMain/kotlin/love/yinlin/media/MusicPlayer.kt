@@ -131,14 +131,23 @@ abstract class MusicPlayer(protected val fetcher: MediaMetadataFetcher) {
     abstract suspend fun prepareMedias(medias: List<String>, startIndex: Int?, playing: Boolean)
 
     /**
-     * 更新媒体
-     *
-     * 在播放过程中增加新的媒体，实现需要维持新的顺序。
-     * 调用方必须保证旧媒体列表是新媒体列表的子集。
-     *
-     * @param medias 媒体ID列表与新增加媒体ID列表的总体，新增加的媒体可能安插在原列表的任何位置
+     * 替换媒体
      */
-    abstract suspend fun updateNewMedias(medias: List<String>)
+    abstract suspend fun replaceMedia(index: Int)
+
+    /**
+     * 添加媒体
+     *
+     * 加入到末尾
+     */
+    abstract suspend fun addMedia(media: String)
+
+    /**
+     * 添加媒体
+     *
+     * 添加到position对应媒体的位置
+     */
+    abstract suspend fun addMedia(media: String, index: Int)
 
     /**
      * 移除媒体
@@ -146,9 +155,21 @@ abstract class MusicPlayer(protected val fetcher: MediaMetadataFetcher) {
     abstract suspend fun removeMedia(index: Int)
 
     /**
-     * 移动媒体(应当是不影响当前播放的实现)
+     * 移除媒体(严格要求medias不能删除正在播放的)
+     */
+    abstract suspend fun removeMedias(medias: List<String>)
+
+    /**
+     * 移动媒体
      */
     abstract suspend fun moveMedia(fromIndex: Int, toIndex: Int)
+
+    /**
+     * 重置媒体
+     *
+     * 将列表重置为 medias, 但内部实现不应当中断播放和影响相对顺序
+     */
+    abstract suspend fun resetMedias(medias: List<String>)
 }
 
 expect fun buildMusicPlayer(fetcher: MediaMetadataFetcher): MusicPlayer

@@ -225,7 +225,43 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
         else it.prepare()
     } ?: Unit
 
-    override suspend fun updateNewMedias(medias: List<String>) = withMainPlayer { player ->
+    override suspend fun replaceMedia(index: Int) = withMainPlayer {
+        val media = musicList.getOrNull(index)
+        if (media != null) {
+            val item = buildMediaItem(media)
+            if (item != null) it.replaceMediaItem(index, item)
+        }
+    } ?: Unit
+
+    override suspend fun addMedia(media: String) = withMainPlayer {
+        val item = buildMediaItem(media)
+        if (item != null) it.addMediaItem(item)
+    } ?: Unit
+
+    override suspend fun addMedia(media: String, index: Int) = withMainPlayer {
+        val item = buildMediaItem(media)
+        if (item != null) {
+            if (index == -1) it.addMediaItem(item)
+            else it.addMediaItem(index, item)
+        }
+    } ?: Unit
+
+    override suspend fun removeMedia(index: Int) = withMainPlayer {
+        it.removeMediaItem(index)
+    } ?: Unit
+
+    override suspend fun removeMedias(medias: List<String>) = withMainPlayer { player ->
+        val mediaItems = player.currentTimeline.extractMediaItems.map { it.mediaId }
+        for (i in player.mediaItemCount - 1 downTo 0) {
+            if (mediaItems[i] in medias) player.removeMediaItem(i)
+        }
+    } ?: Unit
+
+    override suspend fun moveMedia(fromIndex: Int, toIndex: Int) = withMainPlayer {
+        it.moveMediaItem(fromIndex, toIndex)
+    } ?: Unit
+
+    override suspend fun resetMedias(medias: List<String>) = withMainPlayer { player ->
         // 1. 先倒序删除所有已经不存在于新列表中的旧 MediaItem
         for (index in (player.mediaItemCount - 1) downTo 0) {
             val id = player.getMediaItemAt(index).mediaId
@@ -254,14 +290,6 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
                 if (mediaItem != null) player.addMediaItem(targetIndex, mediaItem)
             }
         }
-    } ?: Unit
-
-    override suspend fun removeMedia(index: Int) = withMainPlayer {
-        it.removeMediaItem(index)
-    } ?: Unit
-
-    override suspend fun moveMedia(fromIndex: Int, toIndex: Int) = withMainPlayer {
-        it.moveMediaItem(fromIndex, toIndex)
     } ?: Unit
 }
 

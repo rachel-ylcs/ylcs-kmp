@@ -69,15 +69,20 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
     }
 
     private suspend fun processMod(path: ImplicitUri) {
+        // 导入 MOD 前难以知道包含了哪些歌曲, 简单起见必须先停止播放器
         val player = mp ?: return
-        if (player.isReady) slot.tip.warning("导入 MOD 请先停止播放器")
-        else catchingError {
+        if (player.isReady) {
+            slot.tip.warning("导入 MOD 请先停止播放器")
+            return
+        }
+        catchingError {
             val data = path.read { source ->
                 ModFactory.Release(source, app.modPath).process { current, total, id ->
                     step = Step.Processing(message = "解压中... [$id] $current / $total")
                 }
             }
-            player.updateMusicLibraryInfo(data.medias)
+            player.library.putAll(player.reloadMusicInfoMap(data.medias))
+            player.reloadPlaylist(data.medias)
             slot.tip.success("解压成功")
             step = Step.Initial()
         }?.then {

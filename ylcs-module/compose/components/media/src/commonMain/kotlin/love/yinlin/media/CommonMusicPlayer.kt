@@ -41,6 +41,9 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         } else -1
     }
 
+    /**
+     * 将随机播放列表重置为 size 长度, 并指定 start 为起始
+     */
     protected fun reshuffled(size: Int? = null, start: Int? = null): Int {
         shuffledList = ShuffledOrder(size = size ?: shuffledList.indices.size, start = start)
         return shuffledList.begin
@@ -102,16 +105,21 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         }
     }
 
-    final override suspend fun updateNewMedias(medias: List<String>) {
-        val currentPlayingId = musicList.getOrNull(currentIndex) ?: return
-        val newIndex = medias.indexOf(currentPlayingId)
-        // 自己维护的列表可以直接替换
-        musicList.replaceAll(medias)
-        // 更新当前媒体索引
-        currentIndex = newIndex
-        // 重置随机索引列表
-        reshuffled(size = medias.size, start = newIndex)
+    final override suspend fun replaceMedia(index: Int) { } // 不需要做任何事情
+
+    final override suspend fun addMedia(media: String) {
+        val rest = shuffledList.indices.toMutableList()
+        rest += musicList.size
+        shuffledList.internalSet(rest)
+        musicList += media
     }
+
+    final override suspend fun addMedia(media: String, index: Int) {
+        if (index == -1) musicList += media
+        else musicList.add(index, media)
+        reshuffled(size = musicList.size, start = shuffledList.begin)
+    }
+
 
     final override suspend fun removeMedia(index: Int) {
         if (isReady) {
@@ -142,6 +150,13 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         }
     }
 
+    final override suspend fun removeMedias(medias: List<String>) {
+        if (isReady) {
+            musicList.removeAll(medias)
+            reshuffled(size = musicList.size, start = currentIndex)
+        }
+    }
+
     final override suspend fun moveMedia(fromIndex: Int, toIndex: Int) {
         if (isReady) {
             // 移动媒体只需要移动媒体列表后并更新当前索引即可
@@ -163,5 +178,16 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
                 shuffledList.internalSet(newIndices, start)
             }
         }
+    }
+
+    final override suspend fun resetMedias(medias: List<String>) {
+        val currentPlayingId = musicList.getOrNull(currentIndex) ?: return
+        val newIndex = medias.indexOf(currentPlayingId)
+        // 自己维护的列表可以直接替换
+        musicList.replaceAll(medias)
+        // 更新当前媒体索引
+        currentIndex = newIndex
+        // 重置随机索引列表
+        reshuffled(size = medias.size, start = newIndex)
     }
 }

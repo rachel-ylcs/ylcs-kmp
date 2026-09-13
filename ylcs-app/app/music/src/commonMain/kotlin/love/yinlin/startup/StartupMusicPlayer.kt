@@ -104,7 +104,6 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     suspend fun gotoNext() = controller.gotoNext()
     suspend fun gotoIndex(index: Int) = controller.gotoIndex(index)
     suspend fun seekTo(position: Long) = controller.seekTo(position)
-    suspend fun updateNewMedias(medias: List<String>) = controller.updateNewMedias(medias)
     suspend fun removeMedia(index: Int) = controller.removeMedia(index)
     suspend fun moveMedia(fromIndex: Int, toIndex: Int) = controller.moveMedia(fromIndex, toIndex)
 
@@ -117,13 +116,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         val items = Coroutines.io {
             app.modPath.list().mapNotNull {
                 val configPath = File(app.modPath, it.name, ModResourceType.Config.filename)
-                try {
-                    configPath.readText()!!.parseJsonValue<MusicInfo>()
-                }
-                catch (e: Exception) {
-                    e.printStackTrace()
-                    null
-                }
+                catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
             }
         }
         for (item in items) library[item.id] = item
@@ -141,31 +134,122 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         startPlaylist(app.config.lastPlaylist, app.config.lastMusic.ifEmpty { null }, false)
     }
 
-    // 检查歌曲是否在当前播放列表中
-    fun checkMusicIsInCurrentPlaylist(items: List<String>): String? = items.firstOrNull { it in musicList }
-
+    /**
+     * 提取当前播放列表的媒体
+     *
+     * 可能会随着媒体变动从而更新与当前播放的列表不一致的结果
+     */
     private fun fetchCurrentPlaylist(list: Playlist): List<String> = when (list) {
         is Playlist.None -> emptyList()
         is Playlist.Default -> library.values.map { it.id }
         is Playlist.User -> app.config.playlistLibrary[list.name]?.items?.fastFilter { it in library } ?: emptyList()
     }
 
-    suspend fun updateMusicLibraryInfo(ids: List<String>) {
-        // 更新曲库
-        val newInfoList = Coroutines.io {
-            buildMap {
-                for (id in ids) {
-                    val modification = library[id]?.modification ?: 0
-                    val configPath = File(app.modPath, id, ModResourceType.Config.filename)
-                    val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
-                    if (info != null) put(id, info.copy(modification = modification + 1))
-                }
+    /**
+     * 载入指定媒体的配置 并更新修改标记
+     */
+    suspend fun reloadMusicInfo(id: String): MusicInfo? {
+        val modification = library[id]?.modification ?: 0
+        val configPath = File(app.modPath, id, ModResourceType.Config.filename)
+        val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
+        return info?.copy(modification = modification + 1)
+    }
+
+    /**
+     * 载入所有指定媒体的配置 并更新修改标记
+     */
+    suspend fun reloadMusicInfoMap(ids: Iterable<String>): Map<String, MusicInfo> = Coroutines.io {
+        buildMap {
+            for (id in ids) {
+                val info = reloadMusicInfo(id)
+                if (info != null) put(id, info)
             }
         }
-        library.putAll(newInfoList)
-        // 更新当前播放列表
+    }
+
+    /**
+     * 重载歌单
+     *
+     * 因为可能存在已经被删除的媒体, 但歌单中仍然保留。
+     * 若此时歌曲被导入则当前歌单需要更新当前列表
+     */
+    suspend fun reloadPlaylist(ids: Iterable<String>) {
         val actualMusicList = fetchCurrentPlaylist(playlist)
-        if (actualMusicList.isNotEmpty()) updateNewMedias(actualMusicList)
+        if (actualMusicList.isNotEmpty() && ids.any { it in actualMusicList }) {
+            controller.resetMedias(actualMusicList)
+        }
+    }
+
+    sealed interface ReloadAddData {
+        data object None : ReloadAddData
+        data object Playing : ReloadAddData
+        data class Replace(val index: Int) : ReloadAddData
+        data class Restore(val index: Int?) : ReloadAddData
+    }
+
+    /**
+     * 检查是否需要因添加而重载歌单
+     */
+    fun checkReloadPlaylistByAdd(id: String): ReloadAddData {
+        val actualMusicList = fetchCurrentPlaylist(playlist)
+        val rawIndex = actualMusicList.indexOf(id)
+        if (actualMusicList.isNotEmpty() && rawIndex != -1) {
+            val index = musicList.indexOf(id)
+            if (index != -1) { // 在当前播放列表
+                // 是当前播放的歌曲立即阻止更新, 否则替换对应 Item
+                return if (id == currentId) ReloadAddData.Playing else ReloadAddData.Replace(index)
+            }
+            else { // 恢复已删除的媒体到歌单
+                var insertIndex: Int? = null
+                // 遍历原始歌单找到待恢复歌曲往后最先遇到的且在播放列表里的歌曲
+                for (i in rawIndex + 1 ..< actualMusicList.size) {
+                    val targetIndex = musicList.indexOf(actualMusicList[i])
+                    if (targetIndex != -1) {
+                        insertIndex = targetIndex
+                        break
+                    }
+                }
+                return ReloadAddData.Restore(insertIndex)  // 将待恢复歌曲插入到此位置上
+            }
+        }
+        return ReloadAddData.None // 无事发生
+    }
+
+    /**
+     * 因添加而重载歌单
+     */
+    suspend fun reloadPlaylistByAdd(id: String, data: ReloadAddData) = when (data) {
+        ReloadAddData.None, ReloadAddData.Playing -> { }
+        is ReloadAddData.Replace -> controller.replaceMedia(data.index)
+        is ReloadAddData.Restore -> {
+            val index = data.index
+            if (index != null) controller.addMedia(id, index)
+            else controller.addMedia(id)
+        }
+    }
+
+    /**
+     * 检查是否需要因删除而重载歌单
+     *
+     * 返回值是当前歌单中包含待删除的ID组
+     */
+    fun checkReloadPlaylistByDelete(ids: List<String>): List<String>? {
+        val currentMusicList = musicList
+        if (currentMusicList.isEmpty()) return emptyList()
+        val useList = mutableListOf<String>()
+        for (id in ids) {
+            when (id) {
+                currentId -> return null // 正在播放, 立即阻止更新
+                in currentMusicList -> useList += id // 在当前播放列表里
+                else -> { } // 不在播放列表里
+            }
+        }
+        return useList
+    }
+
+    suspend fun reloadPlaylistByDelete(useList: List<String>) {
+        if (useList.isEmpty()) return
+        controller.removeMedias(useList)
     }
 
     suspend fun startPlaylist(newPlaylist: Playlist, startId: String? = null, playing: Boolean) {

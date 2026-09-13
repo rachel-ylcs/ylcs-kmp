@@ -148,13 +148,13 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     private suspend fun downloadMod() {
-        // 检查 MOD 是否在 当前播放列表
-        val ids = listOf(sid)
-        val existItem = mp?.checkMusicIsInCurrentPlaylist(ids)
-        if (existItem != null) {
-            slot.tip.warning("\"$existItem\"在播放列表中, 请先停止播放器")
+        val player = mp ?: return
+        val checkData = player.checkReloadPlaylistByAdd(sid)
+        if (checkData is StartupMusicPlayer.ReloadAddData.Playing) {
+            slot.tip.warning("\"${player.currentMusic?.name}\"正在播放, 请先停止播放器")
             return
         }
+
         // 下载MOD
         val path = Coroutines.io {
             app.createTempFile { sink ->
@@ -172,8 +172,9 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     }
                     path.delete() // 删除临时文件
                 }
-                // 通知
-                mp?.updateMusicLibraryInfo(ids)
+                // 更新曲库
+                player.reloadMusicInfo(sid)?.let { player.library[sid] = it }
+                player.reloadPlaylistByAdd(sid, checkData)
                 // 更新状态
                 clientSong = requestClientSong()
                 slot.tip.success("安装成功")
@@ -183,12 +184,11 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     private suspend fun downloadModResource(item: ResourceItem, song: Song) {
+        val player = mp ?: return
         if (slot.confirm.open(content = "下载资源: ${item.type.description}?")) {
-            // 检查 MOD 是否在 当前播放列表
-            val ids = listOf(sid)
-            val existItem = mp?.checkMusicIsInCurrentPlaylist(ids)
-            if (existItem != null) {
-                slot.tip.warning("\"$existItem\"在播放列表中, 请先停止播放器")
+            val checkData = player.checkReloadPlaylistByAdd(sid)
+            if (checkData is StartupMusicPlayer.ReloadAddData.Playing) {
+                slot.tip.warning("\"${player.currentMusic?.name}\"正在播放, 请先停止播放器")
                 return
             }
             // 下载资源
@@ -196,8 +196,9 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 File(app.modPath, sid, item.type.filename).write { sink ->
                     require(downloadDialog.download(song.remotePath(item.type), sink) { })
                 }
-                // 通知
-                mp?.updateMusicLibraryInfo(ids)
+                // 更新曲库
+                player.reloadMusicInfo(sid)?.let { player.library[sid] = it }
+                player.reloadPlaylistByAdd(sid, checkData)
                 // 更新状态
                 clientSong = requestClientSong()
                 slot.tip.success("下载成功")

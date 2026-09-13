@@ -107,6 +107,7 @@ class ScreenCreateMusic : Screen() {
     }
 
     private suspend fun submit() {
+        // 能够确定新加入的歌曲不会与所有现有ID重复, 所以不需要重载及播放判断
         val player = mp ?: return
         slot.loading.open {
             catchingError {
@@ -122,23 +123,25 @@ class ScreenCreateMusic : Screen() {
                 val recordFile = input.record
                 val backgroundFile = input.background
                 require(audioFile != null && recordFile != null && backgroundFile != null) { "资源文件异常" }
+
+                val info = MusicInfo(
+                    version = "1.0",
+                    author = input.author.text,
+                    id = id,
+                    name = name,
+                    singer = input.singer.text,
+                    lyricist = input.lyricist.text,
+                    composer = input.composer.text,
+                    album = input.album.text,
+                    chorus = null
+                )
+
                 Coroutines.io {
                     // 4. 生成目录
                     val modPath = app.modPath
                     val musicPath = File(modPath, id)
                     musicPath.mkdir()
                     // 5. 写入配置
-                    val info = MusicInfo(
-                        version = "1.0",
-                        author = input.author.text,
-                        id = id,
-                        name = name,
-                        singer = input.singer.text,
-                        lyricist = input.lyricist.text,
-                        composer = input.composer.text,
-                        album = input.album.text,
-                        chorus = null
-                    )
                     info.path(modPath, ModResourceType.Config).writeText(info.toJsonString())
                     // 6. 写入音频
                     info.path(modPath, ModResourceType.Audio).write { sink ->
@@ -152,7 +155,8 @@ class ScreenCreateMusic : Screen() {
                     info.path(modPath, ModResourceType.LineLyrics).writeText(lyrics.toString())
                 }
                 // 10. 更新曲库
-                player.updateMusicLibraryInfo(listOf(id))
+                player.library[id] = info // 一定是新歌, 不需要reloadMusicInfo
+                player.reloadPlaylistByAdd(id, player.checkReloadPlaylistByAdd(id))
                 pop()
             }.warningTip
         }

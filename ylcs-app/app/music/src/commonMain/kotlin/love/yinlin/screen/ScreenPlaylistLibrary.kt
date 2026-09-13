@@ -141,18 +141,17 @@ class ScreenPlaylistLibrary : Screen() {
     }
 
     private suspend fun deleteMusicFromPlaylist(index: Int) {
+        val player = mp ?: return
         val name = tabs[currentPage]
         val musicInfo = library[index]
         if (slot.confirm.open(title = "删除", content = "从歌单\"$name\"中删除\"${musicInfo.name}\"")) {
             val playlist = playlistLibrary[name]
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
-                mp?.then { player ->
-                    val currentPlaylist = player.playlist
-                    if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
-                        val playingIndex = player.musicList.indexOf(musicInfo.id)
-                        if (playingIndex != -1) player.removeMedia(playingIndex)
-                    }
+                val currentPlaylist = player.playlist
+                if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
+                    val playingIndex = player.musicList.indexOf(musicInfo.id)
+                    if (playingIndex != -1) player.removeMedia(playingIndex)
                 }
 
                 val newItems = playlist.items.toMutableList()
@@ -392,6 +391,7 @@ class ScreenPlaylistLibrary : Screen() {
                         }
                     })
                     PrimaryLoadingButton(text = "导入", icon = Icons.Download, enabled = state.isSafe, onClick = {
+                        // TODO: 替换歌曲
                         if (mp?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
                         else {
                             if (slot.confirm.open(content = "导入会覆盖整个本地歌单且无法撤销!")) {
@@ -427,6 +427,7 @@ class ScreenPlaylistLibrary : Screen() {
                         }
                     })
                     SecondaryLoadingButton(text = "云恢复", icon = Icons.CloudDownload, onClick = {
+                        // TODO: 替换歌曲
                         if (playlists.isNotEmpty()) {
                             if (mp?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
                             else {
