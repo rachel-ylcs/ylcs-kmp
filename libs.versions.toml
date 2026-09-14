@@ -10,7 +10,7 @@ dokka = "2.2.0"
 # Libs #
 
 # Common
-skiko = "0.150.1"
+skiko = "0.152.0-alpha02"
 lifecycle = "2.11.0"
 coroutines = "1.11.0"
 ktor = "3.5.2"
@@ -51,6 +51,7 @@ gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", vers
 test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
+skiko-lottie = { module = "org.jetbrains.skiko:skiko-skottie", version.ref = "skiko" }
 
 androidx-annotation = { module = "androidx.annotation:annotation", version = "1.10.0" }
 androidx-collection = { module = "androidx.collection:collection", version = "1.6.0" }
@@ -95,6 +96,8 @@ tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.1.0"
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+
+skiko-lottie-jvm = { module = "org.jetbrains.skiko:skiko-skottie-awt-runtime-all", version.ref = "skiko" }
 
 # Android
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }

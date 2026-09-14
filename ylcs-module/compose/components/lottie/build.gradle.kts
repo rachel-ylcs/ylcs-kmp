@@ -23,11 +23,15 @@ template(object : KotlinMultiplatformTemplate() {
             lib(libs.lottie.android)
         }
 
-        val skikoMain = createSkiko(commonMain)
+        val skikoMain = createSkiko(commonMain) {
+            lib(libs.skiko.lottie)
+        }
 
         iosMainList.configure(skikoMain)
 
-        desktopMain.configure(skikoMain)
+        desktopMain.configure(skikoMain) {
+            lib(libs.skiko.lottie.jvm)
+        }
 
         webMain.configure(skikoMain)
 
