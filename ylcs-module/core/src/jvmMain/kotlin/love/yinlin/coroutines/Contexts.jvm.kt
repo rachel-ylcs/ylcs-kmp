@@ -1,7 +1,6 @@
 package love.yinlin.coroutines
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.NonCancellable
 import kotlin.coroutines.CoroutineContext
 

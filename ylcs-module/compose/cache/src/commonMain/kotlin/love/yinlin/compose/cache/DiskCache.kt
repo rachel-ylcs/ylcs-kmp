@@ -1,5 +1,6 @@
 package love.yinlin.compose.cache
 
+import kotlinx.coroutines.ensureActive
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.concurrent.Mutex
@@ -44,6 +45,7 @@ class DiskCache<S : Any>(
                         else error("")
                     } catch (_: Throwable) {
                         temp.delete()
+                        ensureActive()
                         null
                     }
                 }

@@ -40,7 +40,7 @@ class NoteBlock(
     ) : BlockTime
 
     sealed interface Status : BlockStatus {
-        class Prepare : Status, BlockStatus.Prepare()
+        data object Prepare : Status, BlockStatus.Prepare()
         class Interact : Status, BlockStatus.Interact {
             var progress: Float = 0f
             var result: BlockResult = BlockResult.PERFECT
@@ -86,7 +86,7 @@ class NoteBlock(
     private val isCharacterLiDiShiGongFenA = character is CharacterLiDiShiGongFenA
     private val isCharacterLiDiShiGongFenB = character is CharacterLiDiShiGongFenB
 
-    override fun prepareStatus(): Status = Status.Prepare()
+    override fun prepareStatus(): Status = Status.Prepare
 
     override fun onInteract(interactStatusList: List<InteractStatus?>, currentStatus: BlockStatus.Interact) {
         val mapLayer = fromMapLayer ?: return

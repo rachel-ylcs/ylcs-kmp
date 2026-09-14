@@ -40,15 +40,15 @@ internal fun ContributorLayout(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(Theme.padding.v7),
     ) {
-        for (contributorGroup in contributors) {
-            key(contributorGroup.title) {
+        for ((title, icon, color, names) in contributors) {
+            key(title) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ThemeContainer(contributorGroup.color) {
-                        Icon(icon = contributorGroup.icon)
-                        SimpleEllipsisText(text = contributorGroup.title, style = Theme.typography.v6.bold)
+                    ThemeContainer(color) {
+                        Icon(icon = icon)
+                        SimpleEllipsisText(text = title, style = Theme.typography.v6.bold)
                     }
                 }
                 FlowRow(
@@ -57,7 +57,7 @@ internal fun ContributorLayout(
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
                     maxItemsInEachRow = 3
                 ) {
-                    for (contributor in contributorGroup.names) {
+                    for (contributor in names) {
                         key(contributor.uid) {
                             Box(
                                 modifier = Modifier.fillMaxWidth(0.3f).clip(Theme.shape.v7).clickable { onClick(contributor) },
@@ -118,25 +118,25 @@ internal fun UpdateInfoLayout(updateInfo: AppUpdateInfo, modifier: Modifier = Mo
             Text(text = title, color = Theme.color.warning)
         }
 
-        for (group in updateInfo.groups) {
-            key(group.type) {
-                if (group.records.isNotEmpty()) {
+        for ((type, icon, color, background, records) in updateInfo.groups) {
+            key(type) {
+                if (records.isNotEmpty()) {
                     Surface(modifier = Modifier.fillMaxWidth(), shape = Theme.shape.v5) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().background(group.background.copy(alpha = 0.2f)).padding(Theme.padding.value9),
+                            modifier = Modifier.fillMaxWidth().background(background.copy(alpha = 0.2f)).padding(Theme.padding.value9),
                             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
                         ) {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                ThemeContainer(group.color) {
-                                    Icon(icon = group.icon)
-                                    SimpleEllipsisText(text = group.type, style = Theme.typography.v6.bold)
+                                ThemeContainer(color) {
+                                    Icon(icon = icon)
+                                    SimpleEllipsisText(text = type, style = Theme.typography.v6.bold)
                                 }
                             }
 
-                            for (record in group.records) {
+                            for (record in records) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)

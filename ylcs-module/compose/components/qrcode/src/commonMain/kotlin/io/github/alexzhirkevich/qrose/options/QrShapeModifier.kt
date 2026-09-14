@@ -1,7 +1,6 @@
 package io.github.alexzhirkevich.qrose.options
 
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathFillType.Companion.EvenOdd
 
 fun interface QrShapeModifier {
 

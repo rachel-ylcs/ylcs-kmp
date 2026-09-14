@@ -48,7 +48,6 @@ import love.yinlin.extension.cast
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
-import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
 import love.yinlin.foundation.WebSocketClient

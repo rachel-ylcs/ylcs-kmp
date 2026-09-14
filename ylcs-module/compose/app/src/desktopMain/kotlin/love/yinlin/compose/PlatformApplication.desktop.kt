@@ -146,9 +146,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
                 Fixup.swingWindowMinimize(this, minSize)
 
-                val useRoundedCorner by rememberDerivedState {
-                    if (controller.maximize) false else controller.roundedCorner
-                }
+                val useRoundedCorner by rememberDerivedState { !controller.maximize && controller.roundedCorner }
 
                 ComposedLayout(modifier = Modifier.fillMaxSize().condition(useRoundedCorner) { clip(Theme.shape.v1) }) {
                     Column(modifier = Modifier.fillMaxSize()) {

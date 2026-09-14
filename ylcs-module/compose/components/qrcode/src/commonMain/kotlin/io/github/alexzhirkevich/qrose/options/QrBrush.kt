@@ -16,7 +16,7 @@ import io.github.alexzhirkevich.qrose.options.QrBrushMode.Separate
 import io.github.alexzhirkevich.qrose.toImageBitmap
 import kotlin.random.Random
 
-public enum class QrBrushMode {
+enum class QrBrushMode {
 
     /**
      * If applied to QR code pattern, the whole pattern will be combined to the single [Path]
@@ -42,29 +42,29 @@ public enum class QrBrushMode {
  * Color [Brush] factory for a QR code part.
  * */
 @Stable
-public interface QrBrush  {
+interface QrBrush  {
 
     /**
      * Brush [mode] indicates the way this brush is applied to the QR code part.
      * */
-    public val mode: QrBrushMode
+    val mode: QrBrushMode
 
     /**
      * Factory method of the [Brush] for the element with given [size] and [neighbors].
      * */
-    public fun brush(size: Float, neighbors: Neighbors): Brush
+    fun brush(size: Float, neighbors: Neighbors): Brush
 
-    public companion object {
+    companion object {
 
         /**
          * Delegates painting to other most suitable brush
          * */
-        public val Unspecified : QrBrush = solid(Color.Unspecified)
+        val Unspecified : QrBrush = solid(Color.Unspecified)
 
         /**
          * Default solid black brush
          * */
-        public val Default : QrBrush = solid(Color.Black)
+        val Default : QrBrush = solid(Color.Black)
     }
 }
 
@@ -72,20 +72,20 @@ public interface QrBrush  {
 /**
  * Check if this brush is not specified
  * */
-public val QrBrush.isUnspecified: Boolean
+val QrBrush.isUnspecified: Boolean
     get() = this === QrBrush.Unspecified || this is Solid && this.color.isUnspecified
 
 /**
  * Check if this brush is specified
  * */
-public val QrBrush.isSpecified : Boolean
+val QrBrush.isSpecified : Boolean
     get() = !isUnspecified
 
 /**
  * [SolidColor] brush from [color]
  * */
 @Stable
-public fun QrBrush.Companion.solid(color: Color) : QrBrush = Solid(color)
+fun QrBrush.Companion.solid(color: Color) : QrBrush = Solid(color)
 
 /**
  * Any Compose brush constructed in [builder] with specific QR code part size.
@@ -103,7 +103,7 @@ public fun QrBrush.Companion.solid(color: Color) : QrBrush = Solid(color)
  * ```
  * */
 @Stable
-public fun QrBrush.Companion.brush(
+fun QrBrush.Companion.brush(
     mode: QrBrushMode = Join,
     builder: (size : Float) -> Brush
 ) : QrBrush = BrushColor(mode, builder)
@@ -124,7 +124,7 @@ public fun QrBrush.Companion.brush(
  * */
 
 @Stable
-public fun QrBrush.Companion.random(
+fun QrBrush.Companion.random(
     vararg probabilities: Pair<Float, Color>,
     random: Random = Random(13)
 ) : QrBrush = Random(probabilities.toList(), random)
@@ -134,7 +134,7 @@ public fun QrBrush.Companion.random(
  * [painter] resolution should be square for better result.
  * */
 @Stable
-public fun QrBrush.Companion.image(
+fun QrBrush.Companion.image(
     painter: Painter,
     alpha : Float = 1f,
     colorFilter: ColorFilter? = null
@@ -149,8 +149,7 @@ private class Image(
     private val colorFilter: ColorFilter? = null
 ) : QrBrush {
 
-    override val mode: QrBrushMode
-        get() = QrBrushMode.Join
+    override val mode: QrBrushMode get() = Join
 
     private var cachedBrush: Brush? = null
     private var cachedSize: Int = -1
@@ -189,8 +188,8 @@ private class Image(
     override fun hashCode(): Int {
         var result = painter.hashCode()
         result = 31 * result + alpha.hashCode()
-        result = 31 * result + (colorFilter?.hashCode() ?: 0)
-        result = 31 * result + (cachedBrush?.hashCode() ?: 0)
+        result = 31 * result + colorFilter.hashCode()
+        result = 31 * result + cachedBrush.hashCode()
         result = 31 * result + cachedSize
         return result
     }
@@ -203,7 +202,7 @@ private class Solid(val color: Color) : QrBrush by BrushColor(builder = { SolidC
 
 @Stable
 private class BrushColor(
-    override val mode: QrBrushMode = QrBrushMode.Join,
+    override val mode: QrBrushMode = Join,
     private val builder: (size : Float) -> Brush
 ) : QrBrush {
 

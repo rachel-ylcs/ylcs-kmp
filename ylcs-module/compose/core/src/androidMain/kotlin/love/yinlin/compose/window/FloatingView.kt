@@ -16,7 +16,6 @@ import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.extension.catching
-import love.yinlin.extension.then
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toAndroidUri
@@ -94,7 +93,7 @@ abstract class FloatingView {
                     if (result) attach(activity, onPermissionFailed)
                     else onPermissionFailed()
                 }.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
-                    setData(Uri(scheme = Scheme.Package, host = activity.packageName).toAndroidUri())
+                    data = Uri(scheme = Scheme.Package, host = activity.packageName).toAndroidUri()
                 })
             }
         }

@@ -10,7 +10,7 @@ class SandboxSource(val url: NSURL) : RawSource {
     val source: RawSource
 
     init {
-        val canAccess = url.startAccessingSecurityScopedResource()
+        url.startAccessingSecurityScopedResource()
         // 应用沙箱内部的文件调用该接口会返回false
         // if (!canAccess) {
         //     throw IOException()

@@ -1,7 +1,6 @@
 package love.yinlin.media.lyrics
 
 import androidx.compose.runtime.Stable
-import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.startup.StartupMusicPlayer
 
 @Stable

@@ -60,7 +60,7 @@ internal object QRCodeSetup {
                     isLeftRightColSquare(row, col, probeSize) ||
                     isMidSquare(row, col, probeSize)
 
-                val region = findSquareRegion(row, col, probeSize)
+                findSquareRegion(row, col, probeSize)
 
                 modules[row + rowOffset][col + colOffset] = QRCodeSquare(
                     dark = isDark
@@ -243,7 +243,7 @@ internal object QRCodeSetup {
                 }
 
                 row += inc
-                if (row < 0 || moduleCount <= row) {
+                if (row !in 0 ..< moduleCount) {
                     row -= inc
                     inc = -inc
                     break

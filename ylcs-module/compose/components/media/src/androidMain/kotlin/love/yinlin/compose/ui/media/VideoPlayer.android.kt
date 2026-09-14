@@ -54,7 +54,7 @@ private class AndroidVideoController(context: PlatformContext, topBar: VideoActi
             isPlayingFlow.collectLatest { value ->
                 isPlaying = value
                 if (value) {
-                    while (isActive) {
+                    while (this@launch.isActive) {
                         position = exoPlayer.currentPosition
                         delay(100.milliseconds)
                     }

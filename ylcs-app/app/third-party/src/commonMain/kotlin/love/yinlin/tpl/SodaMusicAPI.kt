@@ -1,6 +1,8 @@
 package love.yinlin.tpl
 
 import androidx.compose.runtime.Stable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.coroutines.Coroutines
@@ -146,7 +148,8 @@ object SodaMusicAPI : PlatformMusicAPI {
                 audioUrl = audioUrl,
                 lyrics = lyrics
             )
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
+            currentCoroutineContext().ensureActive()
             // 任何异常都导致该歌曲解析失败，返回 null
             null
         }

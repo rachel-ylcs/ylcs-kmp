@@ -113,7 +113,7 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
             isPlayingFlow.collectLatest { value ->
                 isPlaying = value
                 if (value) {
-                    while (isActive) {
+                    while (this@launch.isActive) {
                         position = controller?.currentPosition ?: 0L
                         delay(fetcher.interval.milliseconds)
                     }

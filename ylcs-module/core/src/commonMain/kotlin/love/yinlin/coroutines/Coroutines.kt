@@ -62,6 +62,8 @@ object Coroutines {
         contract {
             callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         }
+
+        @Suppress("SuppressedCancellationException")
         try { block() }
         catch (e: CancellationException) { throw e }
         catch (_: Throwable) { }
@@ -71,6 +73,8 @@ object Coroutines {
         contract {
             callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         }
+
+        @Suppress("SuppressedCancellationException")
         return try {
             block()
             null
@@ -83,6 +87,8 @@ object Coroutines {
         contract {
             callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         }
+
+        @Suppress("SuppressedCancellationException")
         return try { block() }
         catch (e: CancellationException) { throw e }
         catch (_: Throwable) { null }
@@ -92,6 +98,8 @@ object Coroutines {
         contract {
             callsInPlace(block, InvocationKind.AT_MOST_ONCE)
         }
+
+        @Suppress("SuppressedCancellationException")
         return try { block() }
         catch (e: CancellationException) { throw e }
         catch (_: Throwable) { default }

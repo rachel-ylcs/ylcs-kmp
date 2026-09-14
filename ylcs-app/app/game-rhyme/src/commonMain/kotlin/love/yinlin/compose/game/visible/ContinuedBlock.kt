@@ -41,7 +41,7 @@ class ContinuedBlock(
     ) : BlockTime
 
     sealed interface Status : BlockStatus {
-        class Prepare : Status, BlockStatus.Prepare()
+        data object Prepare : Status, BlockStatus.Prepare()
         class InteractStart : Status, BlockStatus.Interact {
             var progress: Float = 0f
         }
@@ -93,7 +93,7 @@ class ContinuedBlock(
     private val isCharacterLiDiShiGongFenA = character is CharacterLiDiShiGongFenA
     private val isCharacterLiDiShiGongFenB = character is CharacterLiDiShiGongFenB
 
-    override fun prepareStatus(): Status = Status.Prepare()
+    override fun prepareStatus(): Status = Status.Prepare
 
     private fun MapLayer.updateCustomResult(startProgress: Float, endProgress: Float) {
         val progress = endProgress - startProgress

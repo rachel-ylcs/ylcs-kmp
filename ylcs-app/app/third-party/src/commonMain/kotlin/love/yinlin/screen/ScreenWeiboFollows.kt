@@ -166,8 +166,8 @@ class ScreenWeiboFollows : Screen() {
                             catchingError {
                                 val localUsers = app.config.weiboUsers
                                 val items = state.text.parseJsonValue<List<WeiboUserInfo>>()
-                                for (item in items) {
-                                    if (!localUsers.contains { it.id == item.id }) localUsers += WeiboUserInfo(item.id, item.name, "")
+                                for ((id, name) in items) {
+                                    if (!localUsers.contains { it.id == id }) localUsers += WeiboUserInfo(id, name, "")
                                 }
                                 slot.tip.success("导入成功")
                             }?.then {

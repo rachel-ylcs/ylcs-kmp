@@ -1,5 +1,3 @@
-import love.yinlin.task.BuildDesktopNativeTask
-
 afterEvaluate {
 //    tasks.register<BuildDesktopNativeTask>("buildDesktopNativeTemplate") {
 //        description = "编译Native库模板"

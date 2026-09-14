@@ -29,7 +29,7 @@ class QrCodeMatrix(val size : Int, initialFill : PixelType =  PixelType.Backgrou
         return types[i + j * size]
     }
 
-    public operator fun set(i: Int, j: Int, type: PixelType) {
+    operator fun set(i: Int, j: Int, type: PixelType) {
 
         val outOfBound = when {
             i !in 0 until size -> i

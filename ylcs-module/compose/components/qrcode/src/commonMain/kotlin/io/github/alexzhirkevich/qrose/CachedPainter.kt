@@ -34,7 +34,7 @@ abstract class CachedPainter : Painter() {
         return true
     }
 
-    public abstract fun DrawScope.onCache()
+    abstract fun DrawScope.onCache()
 
     private val block : DrawScope.() -> Unit = { onCache() }
 

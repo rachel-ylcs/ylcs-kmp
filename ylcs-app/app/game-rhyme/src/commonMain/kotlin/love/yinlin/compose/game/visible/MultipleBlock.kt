@@ -47,7 +47,7 @@ class MultipleBlock(
     ) : BlockTime
 
     sealed interface Status : BlockStatus {
-        class Prepare : Status, BlockStatus.Prepare()
+        data object Prepare : Status, BlockStatus.Prepare()
         class Interact(size: Int) : Status, BlockStatus.Interact {
             var progress: Float = 0f
             var noteProgressList = MutableList<Float?>(size) { null }
@@ -120,7 +120,7 @@ class MultipleBlock(
     private val isCharacterLiDiShiGongFenB = character is CharacterLiDiShiGongFenB
     private val isCharacterSaTuoGe = character is CharacterSaTuoGe
 
-    override fun prepareStatus(): Status = Status.Prepare()
+    override fun prepareStatus(): Status = Status.Prepare
 
     private fun MapLayer.updateCustomResult(lastProgress: Float, noteProgressList: List<Float?>) {
         val num = noteProgressList.count { it != null }

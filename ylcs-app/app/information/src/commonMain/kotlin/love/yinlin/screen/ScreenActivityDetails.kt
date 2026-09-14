@@ -129,7 +129,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                         modifier = Modifier.horizontalScroll(state),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        for (item in activity.price) {
+                        for ((name, value) in activity.price) {
                             Surface(
                                 modifier = Modifier.padding(horizontal = Theme.padding.h / 2),
                                 shape = Theme.shape.v5,
@@ -143,11 +143,11 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                                 ) {
                                     Text(
-                                        text = "￥${item.value}",
+                                        text = "￥$value",
                                         style = Theme.typography.v5,
                                         color = Theme.color.primary
                                     )
-                                    Text(text = item.name)
+                                    Text(text = name)
                                 }
                             }
                         }

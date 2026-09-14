@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.extension.cast
 import love.yinlin.extension.then
 
 /**

@@ -142,11 +142,11 @@ class ScreenMain : BasicScreen() {
             )
         }
         else { // 多MOD分开打包
-            for (item in selectedLibrary) {
-                if (item.enabled) {
+            for ((_, name, path, enabled) in selectedLibrary) {
+                if (enabled) {
                     mergeSingleMod(
-                        filename = "${item.name}.${ModResourceType.MOD_EXT}",
-                        paths = listOf(item.path),
+                        filename = "$name.${ModResourceType.MOD_EXT}",
+                        paths = listOf(path),
                         filters = filters,
                         onProcess = onProcess
                     )
@@ -161,17 +161,17 @@ class ScreenMain : BasicScreen() {
                 val modPath = app.modPath
                 modPath.deleteRecursively()
                 modPath.mkdir()
-                for (item in items) {
-                    val itemPath = File(modPath, item.id)
+                for ((id, _, path) in items) {
+                    val itemPath = File(modPath, id)
                     itemPath.mkdir()
                     // 复制基础资源
-                    for (resPath in item.path.list()) {
+                    for (resPath in path.list()) {
                         val type = ModResourceType.fromType(resPath.nameWithoutExtension)!!
                         if (type in ModResourceType.DEPLOYMENT) resPath.writeTo(File(itemPath, resPath.name))
                     }
                     // 基础资源打包
                     File(itemPath, ModResourceType.BASE_RES).write { sink ->
-                        ModFactory.Merge(listOf(item.path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
+                        ModFactory.Merge(listOf(path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
                     }
                 }
             }
@@ -184,7 +184,7 @@ class ScreenMain : BasicScreen() {
     }
 
     @Composable
-    private fun ModCard(modifier: Modifier = Modifier.Companion, item: ModItem) {
+    private fun ModCard(modifier: Modifier = Modifier, item: ModItem) {
         val needRename = item.path.name != item.name
 
         ContextMenu(menus = {

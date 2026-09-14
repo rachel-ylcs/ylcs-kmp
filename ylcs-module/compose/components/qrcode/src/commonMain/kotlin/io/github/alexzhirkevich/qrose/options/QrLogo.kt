@@ -34,7 +34,7 @@ class QrLogo(
     }
 
     override fun hashCode(): Int {
-        var result = painter?.hashCode() ?: 0
+        var result = painter.hashCode()
         result = 31 * result + size.hashCode()
         result = 31 * result + padding.hashCode()
         result = 31 * result + shape.hashCode()

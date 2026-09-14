@@ -3,6 +3,7 @@ package love.yinlin.fs
 
 import kotlinx.browser.window
 import kotlinx.coroutines.await
+import kotlinx.coroutines.ensureActive
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.files.FileMetadata
@@ -78,6 +79,7 @@ private class WebFile private constructor(private val uri: String, private val u
             )
         } catch (_: Throwable) {
             catchingNull {
+                ensureActive()
                 parent.getDirectoryHandle(name).await()
                 FileMetadata(isRegularFile = false, isDirectory = true)
             }

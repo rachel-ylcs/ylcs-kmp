@@ -1,16 +1,14 @@
 package love.yinlin.startup
 
 import swiftPMImport.love.yinlin.compose.startup.ylcs.module.compose.startup.mmkv.kmp.*
-import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.extension.toNSData
 import love.yinlin.extension.toByteArray
 import love.yinlin.foundation.StartupPool
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.fs.File
 
-@OptIn(ExperimentalForeignApi::class)
 actual class StartupKV actual constructor(pool: StartupPool, initPath: File): SyncStartup(pool) {
-    // MMKV initialized in swift code
+    // MMKV initialized in Swift code
     val mmkv: MMKV = run {
         MMKV.initializeMMKV(null, 4UL) // MMKVLogLevel.LevelNone
         MMKV.defaultMMKV()!!

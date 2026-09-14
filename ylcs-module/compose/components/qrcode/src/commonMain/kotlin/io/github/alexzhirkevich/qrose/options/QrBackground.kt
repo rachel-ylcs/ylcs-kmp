@@ -26,13 +26,13 @@ class QrBackground(
     }
 
     override fun hashCode(): Int {
-        var result = painter?.hashCode() ?: 0
-        result = 31 * result + (fill?.hashCode() ?: 0)
+        var result = painter.hashCode()
+        result = 31 * result + fill.hashCode()
         result = 31 * result + shape.hashCode()
         return result
     }
 
-    public fun copy(
+    fun copy(
         painter: Painter? = this.painter,
         brush: Brush? = this.fill,
         shape: Shape = this.shape,

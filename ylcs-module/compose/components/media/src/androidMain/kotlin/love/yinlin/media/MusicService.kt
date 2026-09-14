@@ -85,7 +85,7 @@ abstract class MusicService : MediaSessionService() {
                 PendingIntent.getActivity(
                     context,
                     0,
-                    Intent().apply { setComponent(ComponentName(context, activityClass.java)) },
+                    Intent().apply { component = ComponentName(context, activityClass.java) },
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_IMMUTABLE else PendingIntent.FLAG_ONE_SHOT
                 )
             ).build()

@@ -198,15 +198,15 @@ private class Hexagon(
         val px2 = z * 0.5088190451
         val py2 = z * 0.8592582628
 
-        val p_angle_01 = -x * (py1 - y) - x * y
-        val p_angle_20 = -y * (px2 - x) + x * (py2 - y)
-        val p_angle_03 = y * z
-        val p_angle_12 = -x * (py2 - y) - (px2 - x) * (py1 - y)
-        val p_angle_32 = (z - x) * (py2 - y) + y * (px2 - x)
-        val is_inside_1 = (p_angle_01 * p_angle_12 >= 0) && (p_angle_12 * p_angle_20 >= 0)
-        val is_inside_2 = (p_angle_03 * p_angle_32 >= 0) && (p_angle_32 * p_angle_20 >= 0)
+        val pAngle01 = -x * (py1 - y) - x * y
+        val pAngle20 = -y * (px2 - x) + x * (py2 - y)
+        val pAngle03 = y * z
+        val pAngle12 = -x * (py2 - y) - (px2 - x) * (py1 - y)
+        val pAngle32 = (z - x) * (py2 - y) + y * (px2 - x)
+        val isInside1 = (pAngle01 * pAngle12 >= 0) && (pAngle12 * pAngle20 >= 0)
+        val isInside2 = (pAngle03 * pAngle32 >= 0) && (pAngle32 * pAngle20 >= 0)
 
-        return is_inside_1 || is_inside_2;
+        return isInside1 || isInside2
     }
 
     private val rad = rotationDegree * 0.0174533

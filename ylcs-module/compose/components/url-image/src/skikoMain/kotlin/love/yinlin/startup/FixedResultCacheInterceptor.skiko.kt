@@ -46,7 +46,7 @@ private fun Image.decode(config: DecodeConfig? = null): Bitmap {
     )
     val newColorType = config?.colorType ?: colorType
     val newColorSpace = config?.colorSpace ?: colorSpace
-    val newImageInfo = org.jetbrains.skia.ImageInfo(
+    val newImageInfo = ImageInfo(
         width = bitmapSize.width,
         height = bitmapSize.height,
         colorType = newColorType,

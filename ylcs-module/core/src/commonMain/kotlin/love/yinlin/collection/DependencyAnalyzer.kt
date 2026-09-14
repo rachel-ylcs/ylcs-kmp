@@ -18,7 +18,7 @@ class DependencyAnalyzer<K : Any, V>(
     keyProvider: (V) -> K,
     dependenciesProvider: (V) -> Iterable<K>
 ) {
-    class UnknownDependencyError(val key: String, val dependentKey: String) : Exception("$key needs an unknown dependency on $dependentKey")
+    class UnknownDependencyError(val key: String, dependentKey: String) : Exception("$key needs an unknown dependency on $dependentKey")
     class LoopDependencyError : Exception("loop dependency error")
 
     /**
