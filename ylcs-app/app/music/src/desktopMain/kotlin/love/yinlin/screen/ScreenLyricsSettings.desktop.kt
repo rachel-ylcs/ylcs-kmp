@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowPosition
 import love.yinlin.app
 import love.yinlin.extension.then
 import love.yinlin.media.lyrics.LyricsEngineConfig
@@ -40,6 +40,6 @@ actual fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfi
     val desktopConfig = newConfig.desktop
     mp?.floatingLyrics?.updateWindowState(
         size = DpSize(desktopConfig.width.dp, desktopConfig.height.dp),
-        position = WindowPosition(desktopConfig.x.dp, desktopConfig.y.dp)
+        position = DpOffset(desktopConfig.x.dp, desktopConfig.y.dp)
     )
 }

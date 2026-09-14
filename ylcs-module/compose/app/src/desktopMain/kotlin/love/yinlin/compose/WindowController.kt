@@ -5,18 +5,23 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.v2.WindowBoundsProvider
+import androidx.compose.ui.window.v2.WindowPositionProvider
+import androidx.compose.ui.window.v2.WindowSizeProvider
+import androidx.compose.ui.window.v2.WindowState
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.ui.icon.Icons
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Stable
+@OptIn(ExperimentalComposeUiApi::class)
 class WindowController(
     placement: WindowPlacement,
     isMinimized: Boolean,
@@ -26,7 +31,17 @@ class WindowController(
     initIcon: DrawableResource?,
     initRoundedCorner: Boolean,
 ) {
-    internal val rawState = WindowState(placement, isMinimized, position, initSize)
+    internal val rawState = WindowState(
+        initialPlacement = placement,
+        initialBoundsProvider = WindowBoundsProvider(
+            positionProvider = when (position) {
+                is WindowPosition.Absolute -> WindowPositionProvider.Absolute(position.x, position.y)
+                is WindowPosition.Aligned -> WindowPositionProvider.AlignedToScreen(position.alignment)
+            },
+            sizeProvider = WindowSizeProvider.Fixed(initSize)
+        ),
+        initiallyMinimized = isMinimized
+    )
 
     private var maximizeState: MaximizeState by mutableRefStateOf(MaximizeState.Normal)
 
@@ -43,7 +58,9 @@ class WindowController(
     /**
      * 设置窗口最小化状态
      */
-    var minimize: Boolean by rawState::isMinimized
+    var minimize: Boolean
+        get() = rawState.isInitialized && rawState.isMinimized
+        set(value) { rawState.requestMinimized(value) }
 
     /**
      * 切换窗口最大化状态

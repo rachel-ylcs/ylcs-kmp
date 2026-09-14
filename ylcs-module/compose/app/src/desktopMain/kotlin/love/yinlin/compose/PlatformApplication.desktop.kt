@@ -2,12 +2,14 @@ package love.yinlin.compose
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import androidx.compose.ui.window.v2.Window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import love.yinlin.compose.extension.rememberDerivedState
@@ -29,6 +31,7 @@ import java.awt.datatransfer.StringSelection
 import kotlin.system.exitProcess
 
 @Stable
+@OptIn(ExperimentalComposeUiApi::class)
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
     self: BaseLazyReference<A>,
     context: PlatformContext,
@@ -131,10 +134,11 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 title = controller.title,
                 icon = controller.iconPainter,
                 visible = controller.visible,
-                undecorated = true,
+                decoration = WindowDecoration.Undecorated(),
                 resizable = !controller.maximize,
                 transparent = true,
                 alwaysOnTop = controller.alwaysOnTop,
+                minSize = minSize,
                 state = controller.rawState,
             ) {
                 LaunchedEffect(Unit) {
@@ -143,8 +147,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
                     windowStarter { initPoolLater(this) }
                 }
-
-                Fixup.swingWindowMinimize(this, minSize)
 
                 val useRoundedCorner by rememberDerivedState { !controller.maximize && controller.roundedCorner }
 
