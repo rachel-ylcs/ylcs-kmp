@@ -166,14 +166,30 @@ class ScreenPlaylistLibrary : Screen() {
         val name = tabs[currentPage]
         val playlist = playlistLibrary[name]
         if (playlist != null) {
-            val newItems = playlist.items.toMutableList()
+            val rawItems = playlist.items
+            val newItems = rawItems.toMutableList()
             newItems.moveItem(fromIndex, toIndex)
             playlistLibrary[name] = playlist.copy(items = newItems)
-            mp?.then { player ->
-                // 检查是否当前正在播放此歌单并移动相应媒体
-                val currentPlaylist = player.playlist
-                if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
-                    launch { player.moveMedia(fromIndex, toIndex) }
+
+            val player = mp ?: return
+            // 检查是否当前正在播放此歌单并移动相应媒体
+            val currentPlaylist = player.playlist
+            if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
+                val musicList = player.musicList
+                // 先获取待移动歌曲的ID
+                val fromId = rawItems[fromIndex]
+                val actualFromIndex = musicList.indexOf(fromId)
+                if (actualFromIndex == -1) return // 移动起始端如果被删除了，移动到任意位置都不改变内部媒体的顺序
+                var actualToIndex = 0
+                var remaining = toIndex
+                for (i in rawItems.indices) {
+                    if (i == fromIndex) continue
+                    if (remaining == 0) break
+                    if (musicList.indexOf(rawItems[i]) != -1) ++actualToIndex
+                    --remaining
+                }
+                if (actualFromIndex != actualToIndex) {
+                    launch { player.moveMedia(actualFromIndex, actualToIndex) }
                 }
             }
         }
@@ -391,7 +407,6 @@ class ScreenPlaylistLibrary : Screen() {
                         }
                     })
                     PrimaryLoadingButton(text = "导入", icon = Icons.Download, enabled = state.isSafe, onClick = {
-                        // TODO: 替换歌曲
                         if (mp?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
                         else {
                             if (slot.confirm.open(content = "导入会覆盖整个本地歌单且无法撤销!")) {
@@ -427,7 +442,6 @@ class ScreenPlaylistLibrary : Screen() {
                         }
                     })
                     SecondaryLoadingButton(text = "云恢复", icon = Icons.CloudDownload, onClick = {
-                        // TODO: 替换歌曲
                         if (playlists.isNotEmpty()) {
                             if (mp?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
                             else {

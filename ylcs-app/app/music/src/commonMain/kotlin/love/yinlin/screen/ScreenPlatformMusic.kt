@@ -71,7 +71,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
         val player = mp ?: return
         val id = "${platformType.prefix}${platformMusicInfo.id}"
         val checkData = player.checkReloadPlaylistByAdd(id)
-        if (checkData is StartupMusicPlayer.ReloadAddData.Playing) {
+        if (checkData == StartupMusicPlayer.ReloadAddData.Playing) {
             slot.tip.warning("\"${player.currentMusic?.name}\"正在播放, 请先停止播放器")
             return
         }

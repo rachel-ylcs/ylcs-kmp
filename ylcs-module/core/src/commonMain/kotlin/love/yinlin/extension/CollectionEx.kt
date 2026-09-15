@@ -17,8 +17,9 @@ fun <K, V> MutableMap<K, V>.setAll(value: V) {
 //  ----------  Data Change  ----------
 
 fun <T> MutableList<T>.moveItem(fromIndex: Int, toIndex: Int) {
-    if (fromIndex in indices && toIndex in indices) {
-        add(toIndex, removeAt(fromIndex))
+    if (fromIndex in indices && toIndex in 0 .. size) {
+        val item = removeAt(fromIndex)
+        add(toIndex.coerceAtMost(size), item)
     }
 }
 

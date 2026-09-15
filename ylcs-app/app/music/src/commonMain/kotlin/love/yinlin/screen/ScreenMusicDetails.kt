@@ -150,7 +150,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private suspend fun downloadMod() {
         val player = mp ?: return
         val checkData = player.checkReloadPlaylistByAdd(sid)
-        if (checkData is StartupMusicPlayer.ReloadAddData.Playing) {
+        if (checkData == StartupMusicPlayer.ReloadAddData.Playing) {
             slot.tip.warning("\"${player.currentMusic?.name}\"正在播放, 请先停止播放器")
             return
         }
@@ -187,7 +187,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         val player = mp ?: return
         if (slot.confirm.open(content = "下载资源: ${item.type.description}?")) {
             val checkData = player.checkReloadPlaylistByAdd(sid)
-            if (checkData is StartupMusicPlayer.ReloadAddData.Playing) {
+            if (checkData == StartupMusicPlayer.ReloadAddData.Playing) {
                 slot.tip.warning("\"${player.currentMusic?.name}\"正在播放, 请先停止播放器")
                 return
             }

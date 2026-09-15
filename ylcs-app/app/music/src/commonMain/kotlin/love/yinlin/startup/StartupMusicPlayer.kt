@@ -180,26 +180,45 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         }
     }
 
-    sealed interface ReloadAddData {
-        data object None : ReloadAddData
-        data object Playing : ReloadAddData
-        data class Replace(val index: Int) : ReloadAddData
-        data class Restore(val index: Int?) : ReloadAddData
+    enum class ReloadAddData {
+        None, // 空列表
+        Playing, // 正在播放
+        Replace, // 替换原 Item
+        Restore, // 存储新 Item
+        DefaultPlaylist, // 默认歌单
     }
 
     /**
      * 检查是否需要因添加而重载歌单
      */
     fun checkReloadPlaylistByAdd(id: String): ReloadAddData {
+        if (playlist == Playlist.Default) return ReloadAddData.DefaultPlaylist
         val actualMusicList = fetchCurrentPlaylist(playlist)
         val rawIndex = actualMusicList.indexOf(id)
         if (actualMusicList.isNotEmpty() && rawIndex != -1) {
             val index = musicList.indexOf(id)
-            if (index != -1) { // 在当前播放列表
+            return if (index != -1) { // 在当前播放列表
                 // 是当前播放的歌曲立即阻止更新, 否则替换对应 Item
-                return if (id == currentId) ReloadAddData.Playing else ReloadAddData.Replace(index)
+                if (id == currentId) ReloadAddData.Playing else ReloadAddData.Replace
+            } else ReloadAddData.Restore
+        }
+        return ReloadAddData.None // 无事发生
+    }
+
+    /**
+     * 因添加而重载歌单
+     */
+    suspend fun reloadPlaylistByAdd(id: String, data: ReloadAddData) {
+        // 重新获取防止默认歌单未更新
+        val actualMusicList = fetchCurrentPlaylist(playlist)
+        val rawIndex = actualMusicList.indexOf(id)
+        when (data) {
+            ReloadAddData.None, ReloadAddData.Playing -> { }
+            ReloadAddData.Replace -> {
+                val index = musicList.indexOf(id)
+                if (index != -1) controller.replaceMedia(index)
             }
-            else { // 恢复已删除的媒体到歌单
+            ReloadAddData.DefaultPlaylist, ReloadAddData.Restore -> { // 加入默认歌单 or 恢复已删除的媒体到歌单
                 var insertIndex: Int? = null
                 // 遍历原始歌单找到待恢复歌曲往后最先遇到的且在播放列表里的歌曲
                 for (i in rawIndex + 1 ..< actualMusicList.size) {
@@ -209,22 +228,10 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
                         break
                     }
                 }
-                return ReloadAddData.Restore(insertIndex)  // 将待恢复歌曲插入到此位置上
+                // 将待恢复歌曲插入到此位置上
+                if (insertIndex != null) controller.addMedia(id, insertIndex)
+                else controller.addMedia(id)
             }
-        }
-        return ReloadAddData.None // 无事发生
-    }
-
-    /**
-     * 因添加而重载歌单
-     */
-    suspend fun reloadPlaylistByAdd(id: String, data: ReloadAddData) = when (data) {
-        ReloadAddData.None, ReloadAddData.Playing -> { }
-        is ReloadAddData.Replace -> controller.replaceMedia(data.index)
-        is ReloadAddData.Restore -> {
-            val index = data.index
-            if (index != null) controller.addMedia(id, index)
-            else controller.addMedia(id)
         }
     }
 
