@@ -8,6 +8,7 @@ import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.desktop.DesktopExtension
+import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
@@ -364,6 +365,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                                     // 合并所有混淆规则
                                     configurationFiles.from(*proguardFiles.toTypedArray())
+                                }
+
+                                aot {
+                                    mode = AotMode.AotPrebuild
+                                    logging = false
+                                    exitAppOnAotFailure = true
                                 }
                             }
                         }
