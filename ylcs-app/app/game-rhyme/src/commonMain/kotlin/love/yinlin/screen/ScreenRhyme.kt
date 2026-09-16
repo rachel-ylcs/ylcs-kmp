@@ -263,7 +263,7 @@ class ScreenRhyme : BasicScreen() {
         if (!engine.initialize()) gameError = true
     }
 
-    override fun finalize() {
+    override fun uninitialize() {
         engine.release()
     }
 

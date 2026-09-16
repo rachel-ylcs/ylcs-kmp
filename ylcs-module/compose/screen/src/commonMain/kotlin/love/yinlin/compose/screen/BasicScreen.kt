@@ -37,7 +37,7 @@ abstract class BasicScreen : ViewModel() {
 
     final override fun onCleared() {
         // 1. 清理回调
-        finalize()
+        uninitialize()
         // 2. 释放数据源
         (this as? DataSource)?.onDataSourceClean()
         // 3. 注销屏幕
@@ -59,7 +59,7 @@ abstract class BasicScreen : ViewModel() {
     /**
      * 页面销毁时的清理事件
      */
-    protected open fun finalize() { }
+    protected open fun uninitialize() { }
 
     /**
      * 返回事件

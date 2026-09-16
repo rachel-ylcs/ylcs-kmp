@@ -22,7 +22,7 @@ class ScreenVideo(val url: String) : BasicScreen() {
         controller.load(url)
     }
 
-    override fun finalize() {
+    override fun uninitialize() {
         controller.release()
     }
 
