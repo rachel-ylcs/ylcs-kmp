@@ -2,18 +2,13 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.internal.catalog.DelegatingProjectDependency
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.AotMode
-import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
-import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
-import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -99,15 +94,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     // Desktop
     open val desktopTarget: Boolean = true
     open fun KotlinJvmTarget.desktop() { }
-    open val desktopPackageName: String? = null
-    open val desktopMainClass: String? = null
-    open val desktopJvmArgs: List<String> = emptyList()
-    open val desktopModules: List<String> = emptyList()
-    open val desktopProguard: List<DelegatingProjectDependency> = emptyList()
-    open val windowsDistributions: (WindowsPlatformSettings.() -> Unit)? = null
-    open val linuxDistributions: (LinuxPlatformSettings.() -> Unit)? = null
-    open val macOSDistributions: (JvmMacOSPlatformSettings.() -> Unit)? = null
-    open fun JvmApplicationDistributions.desktopPackage() { }
+    open val desktopPackage: DesktopPackage? = null
 
     // Web
     open val webTarget: Boolean = true
@@ -322,12 +309,11 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             }
 
             this.extensions.findByType<DesktopExtension>()?.apply {
-                val packageDistributions = windowsDistributions != null || linuxDistributions != null || macOSDistributions != null
-                if (packageDistributions) {
+                val dpkg = desktopPackage
+                if (dpkg != null && dpkg.usePlatformPackage()) {
                     application {
-                        mainClass = desktopMainClass
-
-                        jvmArgs += desktopJvmArgs
+                        mainClass = dpkg.mainClass
+                        jvmArgs += dpkg.jvmArgs
                         jvmArgs += "--enable-native-access=ALL-UNNAMED"
                         jvmArgs += "-XX:+UseCompactObjectHeaders"
 
@@ -345,7 +331,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                      * 手动解析依赖
                                      */
                                     val proguardFiles = mutableListOf<File>()
-                                    for (dependency in desktopProguard) {
+                                    for (dependency in dpkg.proguard) {
                                         findProject(dependency)?.let { submoduleProject ->
                                             submoduleProject.desktopProguardKMPDir.asFile.let { subDir ->
                                                 if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
@@ -367,56 +353,58 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                                     configurationFiles.from(*proguardFiles.toTypedArray())
                                 }
 
-                                aot {
-                                    mode = AotMode.AotPrebuild
-                                    logging = false
-                                    exitAppOnAotFailure = true
+                                if (dpkg.useAOT) {
+                                    aot {
+                                        mode = AotMode.AotPrebuild
+                                        logging = false
+                                        exitAppOnAotFailure = true
+                                    }
                                 }
                             }
                         }
 
                         nativeDistributions {
-                            packageName = desktopPackageName
+                            packageName = dpkg.packageName
                             packageVersion = C.app.versionName
                             description = C.app.description
                             copyright = C.app.copyright
                             vendor = C.app.vendor
                             licenseFile.set(C.root.license)
 
-                            modules(*desktopModules.toTypedArray())
+                            modules(*dpkg.jvmModules.toTypedArray())
 
                             appResourcesRootDir.set(project.packageResourcesDir)
 
                             val targetList = mutableListOf<TargetFormat>()
 
-                            windowsDistributions?.let { settings ->
+                            if (dpkg is DesktopPackage.Windows) {
                                 targetList += TargetFormat.Exe
                                 windows {
                                     console = false
                                     exePackageVersion = C.app.versionName
-                                    settings()
+                                    dpkg.onSettings(this)
                                 }
                             }
 
-                            linuxDistributions?.let { settings ->
+                            if (dpkg is DesktopPackage.Linux) {
                                 targetList += TargetFormat.Deb
                                 linux {
                                     debPackageVersion = C.app.versionName
-                                    settings()
+                                    dpkg.onSettings(this)
                                 }
                             }
 
-                            macOSDistributions?.let { settings ->
+                            if (dpkg is DesktopPackage.MacOS) {
                                 targetList += TargetFormat.Pkg
                                 macOS {
                                     pkgPackageVersion = C.app.versionName
-                                    settings()
+                                    dpkg.onSettings(this)
                                 }
                             }
 
                             targetFormats(*targetList.toTypedArray())
 
-                            desktopPackage()
+                            with(dpkg) { onPackage() }
                         }
                     }
                 }

@@ -29,9 +29,11 @@ template(object : KotlinMultiplatformTemplate() {
         wasmJsMain.configure(commonMain)
     }
 
-    override val desktopPackageName: String get() = uniqueSafeName
-    override val desktopMainClass: String = C.app.mainClass
-    override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = { }
+    override val desktopPackage = object : DesktopPackage(), DesktopPackage.Windows {
+        override val packageName: String get() = uniqueSafeName
+        override val mainClass: String = C.app.mainClass
+        override fun onSettings(settings: WindowsPlatformSettings) { }
+    }
 
     override fun KotlinWebpackConfig.webpack() {
         outputFileName = "$uniqueSafeModuleName.js"

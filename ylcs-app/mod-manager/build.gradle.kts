@@ -28,24 +28,26 @@ template(object : KotlinMultiplatformTemplate() {
         }
     }
 
-    override val desktopPackageName: String = C.modManager.name
-    override val desktopMainClass: String = C.modManager.mainClass
-    override val desktopJvmArgs: List<String> = buildList {
-        if ("modManagerRun" in currentTaskName) {
-            val desktopWorkSpace = C.root.work.modManager.asFile
-            desktopWorkSpace.mkdirs()
-            add("-Duser.dir=$desktopWorkSpace")
+    override val desktopPackage = object : DesktopPackage(), DesktopPackage.Windows {
+        override val packageName: String = C.modManager.name
+        override val mainClass: String = C.modManager.mainClass
+        override val jvmArgs: List<String> = buildList {
+            if ("modManagerRun" in currentTaskName) {
+                val desktopWorkSpace = C.root.work.modManager.asFile
+                desktopWorkSpace.mkdirs()
+                add("-Duser.dir=$desktopWorkSpace")
+            }
         }
+        override val jvmModules: List<String> = C.desktop.modules.toList()
+        override val proguard: List<DelegatingProjectDependency> = listOf(
+            projects.ylcsModule.core,
+            projects.ylcsModule.cs.core,
+            projects.ylcsModule.foundation.network,
+            projects.ylcsModule.compose.core,
+            projects.ylcsModule.compose.components.urlImage,
+        )
+        override fun onSettings(settings: WindowsPlatformSettings) { }
     }
-    override val desktopModules: List<String> = C.desktop.modules.toList()
-    override val desktopProguard: List<DelegatingProjectDependency> = listOf(
-        projects.ylcsModule.core,
-        projects.ylcsModule.cs.core,
-        projects.ylcsModule.foundation.network,
-        projects.ylcsModule.compose.core,
-        projects.ylcsModule.compose.components.urlImage,
-    )
-    override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = {}
 
     override fun Project.actions() {
         tasks.register("modManagerRunDebug") {
@@ -58,14 +60,14 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("createReleaseDistributable"))
 
             doLast {
-                val outputAppDir = C.root.outputs.dir(desktopPackageName)
-                delete(outputAppDir)
-                copy {
-                    from(C.root.app.modManager.originOutput)
-                    into(C.root.outputs)
-                }
-                zip(outputAppDir, C.root.outputs.file("$desktopPackageName.zip"))
-                delete(outputAppDir)
+//                val outputAppDir = C.root.outputs.dir(desktopPackageName)
+//                delete(outputAppDir)
+//                copy {
+//                    from(C.root.app.modManager.originOutput)
+//                    into(C.root.outputs)
+//                }
+//                zip(outputAppDir, C.root.outputs.file("$desktopPackageName.zip"))
+//                delete(outputAppDir)
             }
         }
     }

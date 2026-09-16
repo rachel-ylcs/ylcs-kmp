@@ -33,37 +33,39 @@ template(object : KotlinMultiplatformTemplate() {
         }
     }
 
-    override val desktopPackageName: String = C.app.name
-    override val desktopMainClass: String = C.app.mainClass
-    override val desktopJvmArgs: List<String> = buildList {
-        if ("desktopRun" in currentTaskName) {
-            val desktopWorkSpace = C.root.work.desktop.asFile
-            desktopWorkSpace.mkdirs()
-            add("-Duser.dir=$desktopWorkSpace")
-            // 不使用资源方式加载 native 库
-            add("-Dnative.library.resource.disabled=true")
-            add("-Djava.library.path=${C.root.artifacts.desktopNative}")
+    override val desktopPackage = object : DesktopPackage(), DesktopPackage.Windows, DesktopPackage.Linux, DesktopPackage.MacOS {
+        override val packageName: String = C.app.name
+        override val mainClass: String = C.app.mainClass
+        override val jvmArgs: List<String> = buildList {
+            if ("desktopRun" in currentTaskName) {
+                val desktopWorkSpace = C.root.work.desktop.asFile
+                desktopWorkSpace.mkdirs()
+                add("-Duser.dir=$desktopWorkSpace")
+                // 不使用资源方式加载 native 库
+                add("-Dnative.library.resource.disabled=true")
+                add("-Djava.library.path=${C.root.artifacts.desktopNative}")
+            }
         }
-    }
-    override val desktopModules: List<String> = C.desktop.modules.toList()
-    override val desktopProguard: List<DelegatingProjectDependency> = listOf(
-        projects.ylcsModule.core,
-        projects.ylcsModule.cs.core,
-        projects.ylcsModule.foundation.network,
-        projects.ylcsModule.platform.ffi.core,
-        projects.ylcsModule.platform.os.singleInstance,
-        projects.ylcsModule.compose.core,
-        projects.ylcsModule.compose.components.urlImage,
-        projects.ylcsModule.compose.components.media,
-    )
-    override val windowsDistributions: (WindowsPlatformSettings.() -> Unit) = {
-        iconFile.set(C.root.app.config.icon)
-    }
-    override val linuxDistributions: (LinuxPlatformSettings.() -> Unit) = {
-        iconFile.set(C.root.app.config.icon)
-    }
-    override val macOSDistributions: (JvmMacOSPlatformSettings.() -> Unit) = {
-        iconFile.set(C.root.app.config.icon)
+        override val jvmModules: List<String> = C.desktop.modules.toList()
+        override val proguard: List<DelegatingProjectDependency> = listOf(
+            projects.ylcsModule.core,
+            projects.ylcsModule.cs.core,
+            projects.ylcsModule.foundation.network,
+            projects.ylcsModule.platform.ffi.core,
+            projects.ylcsModule.platform.os.singleInstance,
+            projects.ylcsModule.compose.core,
+            projects.ylcsModule.compose.components.urlImage,
+            projects.ylcsModule.compose.components.media,
+        )
+        override fun onSettings(settings: WindowsPlatformSettings) {
+            settings.iconFile.set(C.root.app.config.icon)
+        }
+        override fun onSettings(settings: LinuxPlatformSettings) {
+            settings.iconFile.set(C.root.app.config.icon)
+        }
+        override fun onSettings(settings: JvmMacOSPlatformSettings) {
+            settings.iconFile.set(C.root.app.config.icon)
+        }
     }
 
     override fun Project.actions() {
