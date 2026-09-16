@@ -86,7 +86,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
         }?.then { slot.tip.error("播放器加载失败") }
     }
 
-    override fun finalize() {
+    override fun uninitialize() {
         player.release()
     }
 
