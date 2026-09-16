@@ -61,6 +61,7 @@ include(
     "ylcs-module:compose:components:url-image",
     "ylcs-module:compose:components:webview",
     "ylcs-module:compose:core",
+    "ylcs-module:compose:data-source",
     "ylcs-module:compose:game:core",
     "ylcs-module:compose:icons",
     "ylcs-module:compose:platform-view",
