@@ -17,6 +17,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.v2.Window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
@@ -34,6 +35,7 @@ import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Stable
@@ -118,6 +120,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         if (composeSwingRenderOnGraphics) System.setProperty("compose.swing.render.on.graphics", "true")
         if (composeInteropBlending) System.setProperty("compose.interop.blending", "true")
 
+        val isAOTMode = System.getProperty("compose.aot.training-run") == "true"
+
         // 配置 macOS 超链接
         Platform.use(Platform.MacOS) {
             Desktop.getDesktop().setOpenURIHandler { event ->
@@ -131,6 +135,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             val onMainWindowClose = {
                 destroyPoolBefore()
                 exitApplication()
+            }
+
+            if (isAOTMode) {
+                LaunchedEffect(Unit) {
+                    controller.title = "AOT Running"
+                    delay(10.seconds)
+                    onMainWindowClose()
+                }
             }
 
             // 主窗口
