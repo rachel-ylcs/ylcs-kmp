@@ -424,7 +424,8 @@ class ScreenMain : BasicScreen() {
             modifier = Modifier
                 .padding(LocalImmersivePadding.current)
                 .fillMaxSize()
-                .padding(Theme.padding.value9),
+                .padding(Theme.padding.value9)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
             headerLayout(Modifier.fillMaxWidth())

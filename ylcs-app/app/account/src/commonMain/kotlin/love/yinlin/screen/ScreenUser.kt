@@ -82,14 +82,14 @@ class ScreenUser : BasicScreen() {
         DataSourceAccount.updateUserProfile()
     }
 
-    private val userProfileCard = movableComposable { profile: UserProfile, modifier: Modifier ->
+    private val userProfileCard = movableComposable { profile: UserProfile, innerPadding: PaddingValues, modifier: Modifier ->
         UserProfileCard(
             profile = profile.publicProfile,
             modifier = modifier,
             onLevelClick = { onLevelClick(profile) }
         ) {
             ActionScope.SplitContainer(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
+                modifier = Modifier.padding(innerPadding).fillMaxWidth().padding(Theme.padding.eValue9),
                 left = {
                     Icon(icon = Icons.Settings, onClick = { navigate(::ScreenSettings) })
                 },
@@ -188,7 +188,7 @@ class ScreenUser : BasicScreen() {
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
-            userProfileCard(profile, Modifier.fillMaxWidth())
+            userProfileCard(profile, LocalImmersivePadding.current.withoutBottom, Modifier.fillMaxWidth())
             userPropertyCard(profile, Modifier.fillMaxWidth())
             buttonContainer()
         }
@@ -198,7 +198,7 @@ class ScreenUser : BasicScreen() {
     private fun Landscape(profile: UserProfile) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
             Column(modifier = Modifier.width(Theme.size.cell1 * 1.25f).fillMaxHeight()) {
-                userProfileCard(profile, Modifier.fillMaxWidth())
+                userProfileCard(profile, PaddingValues.Zero, Modifier.fillMaxWidth())
                 userPropertyCard(profile, Modifier.fillMaxWidth())
             }
             Column(modifier = Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState())) {
