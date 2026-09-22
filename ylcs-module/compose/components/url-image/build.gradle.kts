@@ -29,15 +29,13 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        val skikoMain = createSkiko(commonMain)
-
-        iosMain.configure(skikoMain)
+        iosMain.configure(commonMain)
 
         iosMainList.configure(iosMain)
 
-        desktopMain.configure(skikoMain)
+        desktopMain.configure(commonMain)
 
-        webMain.configure(skikoMain)
+        webMain.configure(commonMain)
 
         jsMain.configure(webMain)
 
