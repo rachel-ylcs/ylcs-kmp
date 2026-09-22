@@ -9,12 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import love.yinlin.app
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
@@ -31,12 +31,9 @@ import love.yinlin.cs.*
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.rachel.song.SongFilter
 import love.yinlin.data.rachel.song.SongPreview
-import love.yinlin.startup.StartupMusicPlayer
 
 @Stable
 class ScreenModCenter : Screen() {
-    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
-
     private val provider = RachelStatefulProvider()
 
     private val pageSongs = object : Pagination<SongPreview, String, String>(
@@ -137,7 +134,7 @@ class ScreenModCenter : Screen() {
                 onLoading = ::requestMoreData,
                 modifier = Modifier.fillMaxSize()
             ) { song ->
-                SongCard(song = song, status = mp?.library?.let { song.sid in it } ?: false, onClick = {
+                SongCard(song = song, status = song.sid in DataSourceMusic.library, onClick = {
                     navigate(::ScreenMusicDetails, song.sid)
                 })
             }

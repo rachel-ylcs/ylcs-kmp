@@ -7,23 +7,17 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
@@ -33,6 +27,7 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.animation.AnimationVisibility
+import love.yinlin.compose.ui.animation.WaveLoading
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.keepSize
@@ -166,6 +161,19 @@ fun Banner(
                         scope.launch { state.animateScrollToPage(state.currentPage + 1) }
                     }
                 )
+            }
+        }
+        else {
+            val contentColor = Theme.color.onSurfaceVariant
+            val brush = remember(contentColor) {
+                Brush.horizontalGradient(listOf(Color.Transparent, contentColor.copy(alpha = 0.2f), Color.Transparent))
+            }
+
+            Box(
+                modifier = Modifier.fillMaxSize().background(Theme.color.surface).rotate(-15f).background(brush),
+                contentAlignment = Alignment.Center
+            ) {
+                WaveLoading.Content(contentColor)
             }
         }
     }

@@ -13,7 +13,6 @@ import love.yinlin.common.game.RhymeMapper
 import love.yinlin.common.game.SearchAllMapper
 import love.yinlin.compose.Theme
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.screen.SubScreen
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameType
@@ -27,7 +26,7 @@ abstract class GameMapper {
 
     open val useRanking: Boolean = true
 
-    open fun SubScreen.startGame(game: Game, profile: UserProfile) {
+    open fun BasicScreen.startGame(game: Game, profile: UserProfile) {
         navigate(::ScreenGameHall, game)
     }
 

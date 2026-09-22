@@ -20,6 +20,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogChoice
@@ -64,7 +65,7 @@ class ScreenMusicLibrary : Screen() {
 
     private fun MusicInfoPreview.path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
 
-    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val musicPlayer by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val playlistLibrary = app.config.playlistLibrary
     private var library = mutableStateListOf<MusicInfoPreview>()
@@ -79,7 +80,7 @@ class ScreenMusicLibrary : Screen() {
     private val gridState = LazyGridState()
 
     private fun resetLibrary() {
-        library.replaceAll(mp?.library?.map { MusicInfoPreview(it.value) } ?: emptyList())
+        library.replaceAll(DataSourceMusic.library.map { MusicInfoPreview(it.value) })
     }
 
     private fun selectAll() {
@@ -95,8 +96,8 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun openSearch() {
-        val rawLibrary = mp?.library
-        if (rawLibrary.isNullOrEmpty()) {
+        val rawLibrary = DataSourceMusic.library
+        if (rawLibrary.isEmpty()) {
             slot.tip.warning("曲库没有歌曲哦")
             return
         }
@@ -113,8 +114,8 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun openSearchFilter() {
-        val rawLibrary = mp?.library
-        if (rawLibrary.isNullOrEmpty()) {
+        val rawLibrary = DataSourceMusic.library
+        if (rawLibrary.isEmpty()) {
             slot.tip.warning("曲库没有歌曲哦")
             return
         }
@@ -148,7 +149,7 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun onMusicAdd() {
-        val player = mp ?: return
+        val player = musicPlayer ?: return
         val names = playlistLibrary.map { key, _ -> key }
         if (names.isNotEmpty()) {
             val result = addMusicDialog.openSuspend(names)
@@ -166,7 +167,7 @@ class ScreenMusicLibrary : Screen() {
                         val totalItems = oldItems + newItems
                         playlistLibrary[name] = playlist.copy(items = totalItems)
                         // 添加到当前播放的列表
-                        val currentPlaylist = player.playlist
+                        val currentPlaylist = DataSourceMusic.playlist
                         if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
                             player.reloadPlaylist(totalItems)
                         }
@@ -181,7 +182,7 @@ class ScreenMusicLibrary : Screen() {
     }
 
     private suspend fun onMusicDelete() {
-        val player = mp ?: return
+        val player = musicPlayer ?: return
         if (slot.confirm.open(content = "彻底删除曲库中这些歌曲吗")) {
             val deleteItems = selectIdList
             val checkData = player.checkReloadPlaylistByDelete(deleteItems)
@@ -192,7 +193,7 @@ class ScreenMusicLibrary : Screen() {
             // 先处理播放列表
             player.reloadPlaylistByDelete(checkData)
             // 再处理媒体存储
-            val sourceLibrary = player.library
+            val sourceLibrary = DataSourceMusic.library
             for (item in deleteItems) {
                 val removeItem = sourceLibrary.remove(item)
                 removeItem?.path(app.modPath)?.deleteRecursively()
@@ -207,9 +208,8 @@ class ScreenMusicLibrary : Screen() {
             slot.loading.open {
                 Coroutines.io {
                     app.picker.savePath("${DateEx.CurrentLong}.rachel", MimeType.BINARY, "*.rachel")?.write { sink ->
-                        val player = mp!!
                         ModFactory.Merge(
-                            mediaPaths = packageItems.fastMapNotNull { player.library[it]?.path(app.modPath) },
+                            mediaPaths = packageItems.fastMapNotNull { DataSourceMusic.library[it]?.path(app.modPath) },
                             sink = sink,
                             info = ModInfo(author = app.config.userProfile?.name ?: "无名")
                         ).process(filters = ModResourceType.ALL) { _, _, _ -> }
@@ -225,7 +225,7 @@ class ScreenMusicLibrary : Screen() {
 
     override suspend fun initialize() {
         resetLibrary()
-        monitor(state = { mp?.library }) {
+        monitor(state = { DataSourceMusic.library }) {
             if (isManaging) exitManagement()
             if (!isSearching) resetLibrary()
         }
@@ -311,7 +311,7 @@ class ScreenMusicLibrary : Screen() {
                     SimpleEllipsisText(text = musicInfo.name, style = Theme.typography.v7.bold)
                     SimpleEllipsisText(text = musicInfo.singer, style = Theme.typography.v8)
                     LoadingIcon(icon = Icons.PlayArrow, tip = "试听", onClick = {
-                        mp?.startPlaylist(Playlist.Default, musicInfo.id, true)
+                        musicPlayer?.startPlaylist(Playlist.Default, musicInfo.id, true)
                         pop()
                     })
                 }

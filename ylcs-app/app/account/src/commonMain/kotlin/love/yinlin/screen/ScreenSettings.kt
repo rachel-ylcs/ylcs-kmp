@@ -12,10 +12,9 @@ import love.yinlin.Local
 import love.yinlin.app
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.img_logo
-import love.yinlin.common.DataSourceAccount
 import love.yinlin.compose.*
-import love.yinlin.compose.config.CacheState
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ds.DataSourceAccount
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberNull
@@ -44,7 +43,8 @@ import love.yinlin.compose.ui.node.fastClipCircle
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.*
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.cs.*
+import love.yinlin.cs.url
+import love.yinlin.data.Data
 import love.yinlin.data.config.AnimationSpeedConfig
 import love.yinlin.data.config.FontScaleConfig
 import love.yinlin.data.rachel.literal.AppAbout
@@ -76,80 +76,6 @@ class ScreenSettings : Screen() {
         }
     }
 
-    private suspend fun modifyUserAvatar() {
-        pickPicture(1f)?.then { path ->
-            ApiProfileUpdateAvatar.request(app.config.userToken, apiFile(path)) {
-                app.config.cacheUserAvatar = CacheState.UPDATE
-            }.errorTip
-        }
-    }
-
-    private suspend fun modifyUserWall() {
-        pickPicture(1.77777f)?.then { path ->
-            ApiProfileUpdateWall.request(app.config.userToken, apiFile(path)) {
-                app.config.cacheUserWall = CacheState.UPDATE
-            }.errorTip
-        }
-    }
-
-    private suspend fun modifyUserId(initText: String) {
-        idModifyDialog.open(initText)?.then { text ->
-            val profile = app.config.userProfile
-            if (profile != null && profile.coin >= UserConstraint.RENAME_COIN_COST) {
-                ApiProfileUpdateName.request(app.config.userToken, text) {
-                    app.config.userProfile = profile.copy(name = text, coin = profile.coin - UserConstraint.RENAME_COIN_COST)
-                }.errorTip
-            }
-        }
-    }
-
-    private suspend fun modifyUserSignature(initText: String) {
-        signatureModifyDialog.open(initText)?.then { text ->
-            val profile = app.config.userProfile
-            if (profile != null) {
-                ApiProfileUpdateSignature.request(app.config.userToken, text) {
-                    app.config.userProfile = profile.copy(signature = text)
-                }.errorTip
-            }
-        }
-    }
-
-    private suspend fun modifyPassword(oldPwd: String, newPwd: String) {
-        val token = app.config.userToken
-        if (token.isNotEmpty()) {
-            ApiAccountChangePassword.request(token, oldPwd, newPwd) {
-                DataSourceAccount.cleanUserToken()
-                slot.tip.success("修改密码成功, 请重新登录")
-            }.errorTip
-        }
-    }
-
-    private suspend fun resetPicture() {
-        val token = app.config.userToken
-        if (token.isNotEmpty()) {
-            if (slot.confirm.open(content = "重置默认头像与背景墙")) {
-                ApiProfileResetPicture.request(token) {
-                    app.config.cacheUserAvatar = CacheState.UPDATE
-                    app.config.cacheUserWall = CacheState.UPDATE
-                }.errorTip
-            }
-        }
-    }
-
-    private suspend fun sendFeedback(content: String) {
-        ApiCommonSendFeedback.request(app.config.userToken, content) {
-            feedbackSheet.close()
-        }.errorTip
-    }
-
-    private suspend fun checkUpdate() {
-        ApiCommonGetServerStatus.request { status ->
-            if (status.targetVersion > Local.info.version) slot.tip.warning("新版本${status.targetVersion}可用")
-            else if (status.minVersion > Local.info.version) slot.tip.error("当前不满足最低兼容版本${status.minVersion}")
-            else slot.tip.success("当前已是最新版本")
-        }.errorTip
-    }
-
     override val title: String = "设置"
 
     @Composable
@@ -175,7 +101,11 @@ class ScreenSettings : Screen() {
                 Item(
                     title = "头像",
                     onClick = {
-                        launch { modifyUserAvatar() }
+                        launch {
+                            pickPicture(1f)?.then { path ->
+                                DataSourceAccount.updateAvatar(path).errorTip
+                            }
+                        }
                     }
                 ) {
                     WebImage(
@@ -190,7 +120,11 @@ class ScreenSettings : Screen() {
                     title = "ID",
                     text = profile.name,
                     onClick = {
-                        launch { modifyUserId(profile.name) }
+                        launch {
+                            idModifyDialog.open(profile.name)?.then { text ->
+                                DataSourceAccount.updateUserName(text).errorTip
+                            }
+                        }
                     }
                 )
                 ItemText(
@@ -198,13 +132,21 @@ class ScreenSettings : Screen() {
                     text = profile.signature,
                     maxLines = 2,
                     onClick = {
-                        launch { modifyUserSignature(profile.signature) }
+                        launch {
+                            signatureModifyDialog.open(profile.signature)?.then { text ->
+                                DataSourceAccount.updateUserSignature(text).errorTip
+                            }
+                        }
                     }
                 )
                 Item(
                     title = "背景墙",
                     onClick = {
-                        launch { modifyUserWall() }
+                        launch {
+                            pickPicture(1.77777f)?.then { path ->
+                                DataSourceAccount.updateWall(path).errorTip
+                            }
+                        }
                     }
                 ) {
                     WebImage(
@@ -225,14 +167,20 @@ class ScreenSettings : Screen() {
                 ItemExpanderSuspend(
                     title = "重置默认图片",
                     icon = Icons.ResetPicture,
-                    onClick = ::resetPicture
+                    onClick = {
+                        if (slot.confirm.open(content = "重置默认头像与背景墙")) {
+                            DataSourceAccount.resetPicture().errorTip
+                        }
+                    }
                 )
                 ItemExpanderSuspend(
                     title = "退出登录",
                     icon = Icons.Logout,
                     hasDivider = false,
                     onClick = {
-                        if (slot.confirm.open(content = "退出登录")) DataSourceAccount.logoff()
+                        if (slot.confirm.open(content = "退出登录")) {
+                            DataSourceAccount.logoff()
+                        }
                     }
                 )
             }
@@ -364,7 +312,19 @@ class ScreenSettings : Screen() {
                 title = "检查更新",
                 icon = Icons.RocketLaunch,
                 text = Local.info.versionName,
-                onClick = ::checkUpdate
+                onClick = {
+                    when (val result = DataSourceAccount.checkUpdate()) {
+                        is Data.Success -> {
+                            val status = result.data
+                            when {
+                                status.targetVersion > Local.info.version -> slot.tip.warning("新版本${status.targetVersion}可用")
+                                status.minVersion > Local.info.version -> slot.tip.error("当前不满足最低兼容版本${status.minVersion}")
+                                else -> slot.tip.success("当前已是最新版本")
+                            }
+                        }
+                        is Data.Failure -> result.throwable.errorTip
+                    }
+                }
             )
 
             ItemExpander(
@@ -477,7 +437,11 @@ class ScreenSettings : Screen() {
                         text = "提交",
                         icon = Icons.Check,
                         enabled = state.isSafe,
-                        onClick = { sendFeedback(state.text) }
+                        onClick = {
+                            val throwable = DataSourceAccount.sendFeedback(state.text)
+                            if (throwable != null) close()
+                            else throwable.errorTip
+                        }
                     )
                 }
                 Input(
@@ -566,7 +530,9 @@ class ScreenSettings : Screen() {
                 ContributorLayout(
                     contributors = AppAbout.contributors,
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { navigate(::ScreenUserCard, it.uid) }
+                    onClick = {
+                        navigate(::ScreenUserCard, it.uid)
+                    }
                 )
             }
         }
@@ -577,7 +543,7 @@ class ScreenSettings : Screen() {
             if (newPwd1 != newPwd2) slot.tip.warning("两次输入密码不同")
             else if (oldPwd == newPwd1) slot.tip.warning("旧密码与新密码相同")
             else if (!UserConstraint.checkPassword(oldPwd, newPwd1)) slot.tip.warning("密码不合法")
-            else modifyPassword(oldPwd, newPwd1)
+            else DataSourceAccount.updatePassword(oldPwd, newPwd1).errorTipOrSuccess("修改密码成功, 请重新登录")
         }
 
         @Composable

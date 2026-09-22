@@ -22,6 +22,7 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.Screen
@@ -79,7 +80,7 @@ class ScreenPlaylistLibrary : Screen() {
         fun path(type: ModResourceType) = File(app.modPath, this.id, type.filename)
     }
 
-    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val musicPlayer by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val playlistLibrary = app.config.playlistLibrary
     private val tabs by derivedStateOf { playlistLibrary.keys }
@@ -116,8 +117,8 @@ class ScreenPlaylistLibrary : Screen() {
                 val name = tabs[index]
                 if (slot.confirm.open(content = "删除歌单\"$name\"")) {
                     // 若正在播放则停止播放器
-                    mp?.then { player ->
-                        val currentPlaylist = player.playlist
+                    musicPlayer?.then { player ->
+                        val currentPlaylist = DataSourceMusic.playlist
                         if (currentPlaylist is Playlist.User && currentPlaylist.name == name) player.stop()
                     }
 
@@ -133,7 +134,7 @@ class ScreenPlaylistLibrary : Screen() {
         val playlist = playlistLibrary[name]
         if (playlist != null) {
             if (playlist.items.isNotEmpty()) {
-                mp?.startPlaylist(Playlist.User(name), startId, true)
+                musicPlayer?.startPlaylist(Playlist.User(name), startId, true)
                 pop()
             }
             else slot.tip.warning("歌单中还没有添加歌曲哦")
@@ -141,14 +142,14 @@ class ScreenPlaylistLibrary : Screen() {
     }
 
     private suspend fun deleteMusicFromPlaylist(index: Int) {
-        val player = mp ?: return
+        val player = musicPlayer ?: return
         val name = tabs[currentPage]
         val musicInfo = library[index]
         if (slot.confirm.open(title = "删除", content = "从歌单\"$name\"中删除\"${musicInfo.name}\"")) {
             val playlist = playlistLibrary[name]
             if (playlist != null) {
                 // 若当前列表中有此歌曲则删除
-                val currentPlaylist = player.playlist
+                val currentPlaylist = DataSourceMusic.playlist
                 if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
                     val playingIndex = player.musicList.indexOf(musicInfo.id)
                     if (playingIndex != -1) player.removeMedia(playingIndex)
@@ -171,9 +172,9 @@ class ScreenPlaylistLibrary : Screen() {
             newItems.moveItem(fromIndex, toIndex)
             playlistLibrary[name] = playlist.copy(items = newItems)
 
-            val player = mp ?: return
+            val player = musicPlayer ?: return
             // 检查是否当前正在播放此歌单并移动相应媒体
-            val currentPlaylist = player.playlist
+            val currentPlaylist = DataSourceMusic.playlist
             if (currentPlaylist is Playlist.User && currentPlaylist.name == name) {
                 val musicList = player.musicList
                 // 先获取待移动歌曲的ID
@@ -199,7 +200,7 @@ class ScreenPlaylistLibrary : Screen() {
 
     private fun decodePlaylist(map: Map<String, MusicPlaylist>): Map<String, List<PlaylistPreviewItem>> {
         return map.mapValues { (_, playlist) ->
-            playlist.items.fastMap { id -> PlaylistPreviewItem(id, mp?.library[id]?.name ?: "未知[id=$id]") }
+            playlist.items.fastMap { id -> PlaylistPreviewItem(id, DataSourceMusic.library[id]?.name ?: "未知[id=$id]") }
         }
     }
 
@@ -252,7 +253,7 @@ class ScreenPlaylistLibrary : Screen() {
                 val playlist = playlistLibrary[tabs[currentPage]]
                 if (playlist != null) {
                     library.replaceAll(playlist.items.fastMap {
-                        val musicInfo = mp?.library[it]
+                        val musicInfo = DataSourceMusic.library[it]
                         if (musicInfo != null) MusicStatusPreview(musicInfo) else MusicStatusPreview(it)
                     })
                 }
@@ -281,9 +282,9 @@ class ScreenPlaylistLibrary : Screen() {
             ) {
                 itemsIndexed(
                     items = library,
-                    key = { _, item -> item.id }
+                    key = { _, item -> item.id to item.isDeleted }
                 ) { index, item ->
-                    ReorderableItem(state = reorderState, key = item.id) {
+                    ReorderableItem(state = reorderState, key = item.id to item.isDeleted) {
                         Row(
                             modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).longPressDraggableHandle(
                                 onDragStarted = {
@@ -407,7 +408,7 @@ class ScreenPlaylistLibrary : Screen() {
                         }
                     })
                     PrimaryLoadingButton(text = "导入", icon = Icons.Download, enabled = state.isSafe, onClick = {
-                        if (mp?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
+                        if (musicPlayer?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
                         else {
                             if (slot.confirm.open(content = "导入会覆盖整个本地歌单且无法撤销!")) {
                                 catchingError {
@@ -443,7 +444,7 @@ class ScreenPlaylistLibrary : Screen() {
                     })
                     SecondaryLoadingButton(text = "云恢复", icon = Icons.CloudDownload, onClick = {
                         if (playlists.isNotEmpty()) {
-                            if (mp?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
+                            if (musicPlayer?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
                             else {
                                 if (slot.confirm.open(content = "云恢复会用云端歌单覆盖整个本地歌单且无法撤销!")) {
                                     val items = playlists.mapValues { (name, value) ->

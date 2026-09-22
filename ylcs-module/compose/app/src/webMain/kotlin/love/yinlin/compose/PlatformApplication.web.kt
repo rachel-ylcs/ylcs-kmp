@@ -2,7 +2,6 @@ package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -27,7 +26,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     protected open val enableAccessibility: Boolean = true
 
-    @OptIn(ExperimentalComposeUiApi::class)
     fun run() {
         val mainScope = MainScope()
         initApplication(scope = mainScope)

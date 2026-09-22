@@ -17,16 +17,19 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.compose.resources,
                 ExportLib,
+                projects.ylcsApp.app.global,
                 projects.ylcsApp.app.account,
+                projects.ylcsApp.app.activity,
                 projects.ylcsApp.app.community,
                 projects.ylcsApp.app.game,
                 projects.ylcsApp.app.gameGuessLyrics,
                 projects.ylcsApp.app.gameRhyme,
-                projects.ylcsApp.app.global,
-                projects.ylcsApp.app.information,
+//                projects.ylcsApp.app.information,
                 projects.ylcsApp.app.music,
+                projects.ylcsApp.app.photo,
                 projects.ylcsApp.app.thirdParty,
                 projects.ylcsApp.app.viewer,
+                projects.ylcsApp.app.world,
             )
         }
 

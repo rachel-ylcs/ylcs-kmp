@@ -15,6 +15,7 @@ import love.yinlin.common.DataBin
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.Surface
@@ -36,7 +37,7 @@ import love.yinlin.extension.toJsonString
 import love.yinlin.foundation.NetClient
 import love.yinlin.fs.*
 import love.yinlin.startup.StartupMusicPlayer
-import love.yinlin.tpl.PlatformMusicAPI
+import love.yinlin.tpl.music.PlatformMusicAPI
 import love.yinlin.uri.Uri
 
 @Stable
@@ -111,7 +112,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
                     info.path(modPath, ModResourceType.LineLyrics).writeText(platformMusicInfo.lyrics)
                 }
                 // 9. 更新曲库
-                player.reloadMusicInfo(id)?.let { player.library[id] = it }
+                DataSourceMusic.reloadMusicInfo(id)?.let { DataSourceMusic.library[id] = it }
                 player.reloadPlaylistByAdd(id, checkData)
                 slot.tip.success("导入 ${platformMusicInfo.name} 成功")
             }?.then { slot.tip.warning("下载失败 ${it.message}") }

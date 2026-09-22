@@ -22,7 +22,7 @@ import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.BoxText
 import love.yinlin.compose.ui.common.PortraitValue
-import love.yinlin.compose.ui.common.UserProfileInfoColumn
+import love.yinlin.compose.ui.common.UserProfileCard
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -82,10 +82,10 @@ class ScreenUserCard(private val uid: Int) : Screen() {
 
     override suspend fun initialize() {
         supervisorScope {
-            this.launch {
+            launch {
                 ApiProfileGetPublicProfile.request(app.config.userToken.ifEmpty { null }, uid) { currentProfile = it }
             }
-            this.launch {
+            launch {
                 ApiTopicGetTopics.request(uid, page.default1, page.default, page.pageNum) { page.newData(it) }
             }
         }
@@ -97,7 +97,9 @@ class ScreenUserCard(private val uid: Int) : Screen() {
             modifier = modifier,
             shape = Theme.shape.v3,
             shadowElevation = Theme.shadow.v3,
-            onClick = { navigate(::ScreenTopic, topic) }
+            onClick = {
+                navigate(::ScreenTopic, topic)
+            }
         ) {
             Column(modifier = Modifier.fillMaxWidth().heightIn(min = Theme.size.cell4 * 0.777777f)) {
                 topic.picPath?.url?.then {
@@ -160,7 +162,7 @@ class ScreenUserCard(private val uid: Int) : Screen() {
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
             ) {
-                UserProfileInfoColumn(profile = profile, onLevelClick = null)
+                UserProfileCard(profile = profile, modifier = Modifier.fillMaxWidth())
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -231,7 +233,7 @@ class ScreenUserCard(private val uid: Int) : Screen() {
     @Composable
     private fun Landscape(profile: UserPublicProfile) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            userProfileCard(profile, Modifier.width(Theme.size.cell1).fillMaxHeight())
+            userProfileCard(profile, Modifier.width(Theme.size.cell1 * 1.25f).fillMaxHeight())
             if (profile.status.canShowTopics) topicListLayout(profile, false, Modifier.weight(1f).fillMaxHeight())
         }
     }

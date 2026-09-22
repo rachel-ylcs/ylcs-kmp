@@ -14,7 +14,7 @@ object RhymeMapper : GameMapper() {
     override val gameCreator: ((BasicScreen) -> CreateGameState)? = null
     override val useRanking: Boolean = false
 
-    override fun SubScreen.startGame(game: Game, profile: UserProfile) {
+    override fun BasicScreen.startGame(game: Game, profile: UserProfile) {
         navigate(::ScreenRhyme)
     }
 }

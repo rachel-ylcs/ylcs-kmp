@@ -10,11 +10,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastCoerceAtLeast
 import kotlinx.io.readByteArray
 import love.yinlin.app
-import love.yinlin.common.DataSourceDiscovery
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ds.DataSourceDiscovery
 import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
