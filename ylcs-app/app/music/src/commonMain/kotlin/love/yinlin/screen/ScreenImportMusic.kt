@@ -9,6 +9,7 @@ import love.yinlin.app
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
@@ -31,8 +32,6 @@ import love.yinlin.uri.Uri
 
 @Stable
 class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
-    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
-
     @Stable
     private sealed interface Step {
         @Stable
@@ -70,7 +69,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
 
     private suspend fun processMod(path: ImplicitUri) {
         // 导入 MOD 前难以知道包含了哪些歌曲, 简单起见必须先停止播放器
-        val player = mp ?: return
+        val player = app.requireClassOrNull<StartupMusicPlayer>() ?: return
         if (player.isReady) {
             slot.tip.warning("导入 MOD 请先停止播放器")
             return
@@ -81,7 +80,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
                     step = Step.Processing(message = "解压中... [$id] $current / $total")
                 }
             }
-            player.library.putAll(player.reloadMusicInfoMap(data.medias))
+            DataSourceMusic.library.putAll(DataSourceMusic.reloadMusicInfoMap(data.medias))
             player.reloadPlaylist(data.medias)
             slot.tip.success("解压成功")
             step = Step.Initial()

@@ -1,33 +1,32 @@
 package love.yinlin.startup
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.util.fastFilter
+import androidx.compose.runtime.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import love.yinlin.annotation.LooseTyped
 import love.yinlin.app
+import love.yinlin.common.SleepTimer
 import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.ioContext
 import love.yinlin.coroutines.mainContext
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.Playlist
 import love.yinlin.extension.catchingError
-import love.yinlin.extension.catchingNull
-import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.then
 import love.yinlin.foundation.AsyncStartup
 import love.yinlin.foundation.AsyncStartupFactory
 import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
-import love.yinlin.fs.File
 import love.yinlin.media.MediaMetadataFetcher
 import love.yinlin.media.MusicPlayerListener
 import love.yinlin.media.buildMusicPlayer
@@ -35,6 +34,7 @@ import love.yinlin.media.lyrics.FloatingLyrics
 import love.yinlin.media.lyrics.LyricsEngine
 import love.yinlin.media.lyrics.LyricsEngineHost
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 
 @Stable
 class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
@@ -45,44 +45,20 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         override fun build(pool: StartupPool): StartupMusicPlayer = StartupMusicPlayer(pool)
     }
 
-    private fun MusicInfo.path(type: ModResourceType) = this.path(app.modPath, type)
-
     // 外部数据提取器
     val fetcher = object : MediaMetadataFetcher {
         override val audioFocus: Boolean get() = app.config.audioFocus
         override val interval: Long get() = engine.interval
 
-        override fun extractAudioUri(id: String): String? = library[id]?.path(ModResourceType.Audio)?.path
-        override fun extractCoverUri(id: String): String? = library[id]?.path(ModResourceType.Record)?.path
-        override fun extractMetadata(id: String): MediaInfo? = library[id]
+        override fun extractAudioUri(id: String): String? = DataSourceMusic.library[id]?.path(app.modPath, ModResourceType.Audio)?.path
+        override fun extractCoverUri(id: String): String? = DataSourceMusic.library[id]?.path(app.modPath, ModResourceType.Record)?.path
+        override fun extractMetadata(id: String): MediaInfo? = DataSourceMusic.library[id]
 
         @LooseTyped
         override val androidMusicServiceClassName: String = "love.yinlin.RachelMusicService"
     }
 
-    // 数据仓库
-    var playlist: Playlist by mutableStateOf(Playlist.None)
-        private set
-    val library = mutableStateMapOf<String, MusicInfo>()
-
-    // 回调监听器
-    val listener = object : MusicPlayerListener {
-        override fun onMusicChanged(id: String?) {
-            val lastPlaylist = playlist
-            app.config.lastPlaylist = lastPlaylist
-            app.config.lastMusic = if (lastPlaylist is Playlist.None) "" else id ?: ""
-        }
-
-        override fun onPlayModeChanged(mode: MediaPlayMode) {
-            app.config.musicPlayMode = mode
-        }
-
-        override fun onPlayerStop() {
-            playlist = Playlist.None
-            app.config.lastPlaylist = Playlist.None
-            app.config.lastMusic = ""
-        }
-    }
+    private val scope = CoroutineScope(SupervisorJob() + mainContext)
 
     // 媒体控制器
     private val controller = buildMusicPlayer(fetcher)
@@ -95,7 +71,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     val duration: Long get() = controller.duration
     val musicList: List<String> get() = controller.musicList
     val currentId: String? get() = controller.currentId
-    val currentMusic: MusicInfo? get() = controller.currentId?.let { library[it] }
+    val currentMusic: MusicInfo? get() = controller.currentId?.let { DataSourceMusic.library[it] }
     val error: Throwable? get() = controller.error
     suspend fun play() = controller.play()
     suspend fun pause() = controller.pause()
@@ -110,18 +86,95 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     // 歌词引擎
     val engineHost = LyricsEngineHost { controller.seekTo(it) }
     var engine by mutableRefStateOf(LyricsEngine.Default)
+        private set
     val floatingLyrics: FloatingLyrics = FloatingLyrics(this)
 
-    private suspend fun initLibrary() {
-        val items = Coroutines.io {
-            app.modPath.list().mapNotNull {
-                val configPath = File(app.modPath, it.name, ModResourceType.Config.filename)
-                catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
-            }
+    // 显控属性
+    var showCurrentTime: Long by mutableLongStateOf(0L)
+        private set
+
+    // 歌曲属性
+    var currentHasAnimation by mutableStateOf(false)
+        private set
+    var currentHasVideo by mutableStateOf(false)
+        private set
+    var currentHasAccompaniment by mutableStateOf(false)
+        private set
+    var currentUseAnimationBackground by mutableRefStateOf(false)
+
+    // 睡眠定时器
+    val sleepTimer = SleepTimer(scope, ::stop)
+
+    // 回调监听器
+    val listener = object : MusicPlayerListener {
+        override fun onPositionChanged(position: Long) {
+            // 处理进度条
+            if (abs(position - showCurrentTime) > 1000L - engine.interval) showCurrentTime = position
+            // 处理歌词
+            engine.update(position)
         }
-        for (item in items) library[item.id] = item
+
+        override fun onMusicChanged(id: String?) {
+            // 更新配置
+            val config = app.config
+            val lastPlaylist = DataSourceMusic.playlist
+            if (config.lastPlaylist.name != lastPlaylist.name) config.lastPlaylist = lastPlaylist
+            config.lastMusic = if (lastPlaylist is Playlist.None) "" else id ?: ""
+
+            // 重置引擎
+            engine.reset()
+
+            val modPath = app.modPath
+            val music = if (id != null) DataSourceMusic.library[id] else null
+            if (music != null) {
+                scope.launch(ioContext) {
+                    Coroutines.catchingNull {
+                        // 按引擎顺序依次检查是否成功加载
+                        val rootPath = music.path(modPath)
+                        var currentEngine = engine
+                        for (engineType in app.config.lyricsEngineOrder) {
+                            val newEngine = LyricsEngine[engineType]
+                            if (newEngine.load(rootPath)) {
+                                currentEngine = newEngine
+                                break
+                            }
+                        }
+                        // 更新引擎
+                        engine = currentEngine
+                        // 更新状态标志
+                        currentHasAnimation = music.path(modPath, ModResourceType.Animation).isFile()
+                        currentHasVideo = music.path(modPath,ModResourceType.Video).isFile()
+                        currentHasAccompaniment = music.path(modPath,ModResourceType.Accompaniment).isFile()
+                    }
+                }
+            }
+            else {
+                // 重置状态
+                currentHasAnimation = false
+                currentHasVideo = false
+                currentHasAccompaniment = false
+                // 结束睡眠模式
+                sleepTimer.stop()
+            }
+
+            // 更新动画状态
+            if (currentUseAnimationBackground && !currentHasAnimation) currentUseAnimationBackground = false
+        }
+
+        override fun onPlayModeChanged(mode: MediaPlayMode) {
+            app.config.musicPlayMode = mode
+        }
+
+        override fun onPlayerStop() {
+            DataSourceMusic.updatePlaylist(Playlist.None)
+            app.config.lastPlaylist = Playlist.None
+            app.config.lastMusic = ""
+        }
     }
 
+    /**
+     * 载入上一次播放状态
+     */
     private suspend fun initLastStatus() {
         // 更新播放模式
         controller.updatePlayMode(app.config.musicPlayMode)
@@ -135,46 +188,13 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     }
 
     /**
-     * 提取当前播放列表的媒体
-     *
-     * 可能会随着媒体变动从而更新与当前播放的列表不一致的结果
-     */
-    private fun fetchCurrentPlaylist(list: Playlist): List<String> = when (list) {
-        is Playlist.None -> emptyList()
-        is Playlist.Default -> library.values.map { it.id }
-        is Playlist.User -> app.config.playlistLibrary[list.name]?.items?.fastFilter { it in library } ?: emptyList()
-    }
-
-    /**
-     * 载入指定媒体的配置 并更新修改标记
-     */
-    suspend fun reloadMusicInfo(id: String): MusicInfo? {
-        val modification = library[id]?.modification ?: 0
-        val configPath = File(app.modPath, id, ModResourceType.Config.filename)
-        val info = catchingNull { configPath.readText()!!.parseJsonValue<MusicInfo>() }
-        return info?.copy(modification = modification + 1)
-    }
-
-    /**
-     * 载入所有指定媒体的配置 并更新修改标记
-     */
-    suspend fun reloadMusicInfoMap(ids: Iterable<String>): Map<String, MusicInfo> = Coroutines.io {
-        buildMap {
-            for (id in ids) {
-                val info = reloadMusicInfo(id)
-                if (info != null) put(id, info)
-            }
-        }
-    }
-
-    /**
      * 重载歌单
      *
      * 因为可能存在已经被删除的媒体, 但歌单中仍然保留。
      * 若此时歌曲被导入则当前歌单需要更新当前列表
      */
     suspend fun reloadPlaylist(ids: Iterable<String>) {
-        val actualMusicList = fetchCurrentPlaylist(playlist)
+        val actualMusicList = DataSourceMusic.fetchCurrentPlaylist(DataSourceMusic.playlist)
         if (actualMusicList.isNotEmpty() && ids.any { it in actualMusicList }) {
             controller.resetMedias(actualMusicList)
         }
@@ -192,8 +212,8 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
      * 检查是否需要因添加而重载歌单
      */
     fun checkReloadPlaylistByAdd(id: String): ReloadAddData {
-        if (playlist == Playlist.Default) return ReloadAddData.DefaultPlaylist
-        val actualMusicList = fetchCurrentPlaylist(playlist)
+        if (DataSourceMusic.playlist == Playlist.Default) return ReloadAddData.DefaultPlaylist
+        val actualMusicList = DataSourceMusic.fetchCurrentPlaylist(DataSourceMusic.playlist)
         val rawIndex = actualMusicList.indexOf(id)
         if (actualMusicList.isNotEmpty() && rawIndex != -1) {
             val index = musicList.indexOf(id)
@@ -210,7 +230,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
      */
     suspend fun reloadPlaylistByAdd(id: String, data: ReloadAddData) {
         // 重新获取防止默认歌单未更新
-        val actualMusicList = fetchCurrentPlaylist(playlist)
+        val actualMusicList = DataSourceMusic.fetchCurrentPlaylist(DataSourceMusic.playlist)
         val rawIndex = actualMusicList.indexOf(id)
         when (data) {
             ReloadAddData.None, ReloadAddData.Playing -> { }
@@ -261,7 +281,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
 
     suspend fun startPlaylist(newPlaylist: Playlist, startId: String? = null, playing: Boolean) {
         if (!controller.isInit || newPlaylist is Playlist.None) return
-        if (playlist == newPlaylist) {
+        if (DataSourceMusic.playlist == newPlaylist) {
             // 切换本歌单的其他歌曲
             if (currentId != startId && startId != null) {
                 val targetIndex = musicList.indexOf(startId)
@@ -270,10 +290,10 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
         }
         else {
             // 切换其他歌单
-            val actualMusicList = fetchCurrentPlaylist(newPlaylist)
+            val actualMusicList = DataSourceMusic.fetchCurrentPlaylist(newPlaylist)
             if (actualMusicList.isNotEmpty()) {
                 controller.stop()
-                playlist = newPlaylist
+                DataSourceMusic.updatePlaylist(newPlaylist)
                 val index = if (startId != null) actualMusicList.indexOf(startId) else -1
                 controller.prepareMedias(actualMusicList, if (index != -1) index else null, playing)
             }
@@ -287,11 +307,15 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     override suspend fun init() {
         coroutineScope {
             awaitAll(
-                async { initLibrary() },
+                // 初始化曲库
+                async { DataSourceMusic.initLibrary() },
+                // 初始化播放器
                 async { controller.init(pool.rawContext) }
             )
             if (controller.isInit) {
+                // 设置监听器
                 controller.listener = listener
+                // 载入上次播放状态
                 initLastStatus()
             }
         }
@@ -304,5 +328,6 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     override fun destroy() {
         controller.listener = null
         controller.release()
+        scope.cancel()
     }
 }

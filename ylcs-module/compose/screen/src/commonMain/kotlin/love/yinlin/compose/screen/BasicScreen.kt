@@ -38,8 +38,6 @@ abstract class BasicScreen : ViewModel() {
     final override fun onCleared() {
         // 1. 清理回调
         uninitialize()
-        // 2. 释放数据源
-        (this as? DataSource)?.onDataSourceClean()
         // 3. 注销屏幕
         uniqueId.then { manager.unregisterScreen(it) }
         // 4. ViewModel 回收
@@ -105,7 +103,23 @@ abstract class BasicScreen : ViewModel() {
     val slot = ScreenSlot(viewModelScope)
 
     val Throwable?.warningTip: Throwable? get() = this?.also { slot.tip.warning(it.message) }
+    fun Throwable?.warningTipOrPop() {
+        if (this == null) pop()
+        else slot.tip.warning(this.message)
+    }
+    fun Throwable?.warningTipOrSuccess(ok: String) {
+        if (this == null) slot.tip.success(ok)
+        else slot.tip.warning(this.message)
+    }
     val Throwable?.errorTip: Throwable? get() = this?.also { slot.tip.error(it.message) }
+    fun Throwable?.errorTipOrPop() {
+        if (this == null) pop()
+        else slot.tip.error(this.message)
+    }
+    fun Throwable?.errorTipOrSuccess(ok: String) {
+        if (this == null) slot.tip.success(ok)
+        else slot.tip.error(this.message)
+    }
 
     @Composable
     internal fun ComposedUI() {

@@ -64,8 +64,7 @@ class ScreenLogin : Screen() {
             app.config.userShortToken = DateEx.CurrentLong
             app.config.userToken = token
             ApiProfileGetProfile.request(token) { app.config.userProfile = it }
-            pop()
-        }.errorTip
+        }.errorTipOrPop()
     }
 
     private suspend fun register() {
@@ -89,8 +88,7 @@ class ScreenLogin : Screen() {
             mode = Mode.Login
             loginId.text = id
             loginPwd.text = ""
-            slot.tip.success("提交申请成功, 请等待管理员审核")
-        }.errorTip
+        }.errorTipOrSuccess("提交申请成功, 请等待管理员审核")
     }
 
     private suspend fun forgotPassword() {
@@ -104,8 +102,7 @@ class ScreenLogin : Screen() {
             mode = Mode.Login
             loginId.text = id
             loginPwd.text = ""
-            slot.tip.success("提交申请成功, 请等待管理员审核")
-        }.errorTip
+        }.errorTipOrSuccess("提交申请成功, 请等待管理员审核")
     }
 
     override val title: String get() = mode.title

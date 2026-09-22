@@ -16,7 +16,7 @@ import love.yinlin.media.lyrics.LyricsEngineConfig
 
 @Composable
 actual fun ScreenLyricsSettings.PlatformContent() {
-    mp?.floatingLyrics?.then { floatingLyrics ->
+    musicPlayer?.floatingLyrics?.then { floatingLyrics ->
         OffScreenWindowEffect { isForeground ->
             if (isForeground) floatingLyrics.check()
         }

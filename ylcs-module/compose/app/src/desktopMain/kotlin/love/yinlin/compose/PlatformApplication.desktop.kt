@@ -1,11 +1,14 @@
 package love.yinlin.compose
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.registerSkikoComposeImplementation
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
@@ -19,7 +22,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import love.yinlin.compose.extension.rememberDerivedState
-import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.compose.window.DeepLink
 import love.yinlin.extension.BaseLazyReference
@@ -120,6 +122,9 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         if (composeSwingRenderOnGraphics) System.setProperty("compose.swing.render.on.graphics", "true")
         if (composeInteropBlending) System.setProperty("compose.interop.blending", "true")
 
+        @OptIn(InternalComposeUiApi::class)
+        registerSkikoComposeImplementation()
+
         val isAOTMode = System.getProperty("compose.aot.training-run") == "true"
 
         // 配置 macOS 超链接
@@ -167,8 +172,11 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 Fixup.swingWindowMinimize(this, minSize)
 
                 val useRoundedCorner by rememberDerivedState { !controller.maximize && controller.roundedCorner }
+                val borderWidth = Theme.border.v10 / 2
+                val borderColor = Theme.color.outline.copy(alpha = 0.5f)
+                val borderShape = if (useRoundedCorner) Theme.shape.v1 else Theme.shape.rectangle
 
-                ComposedLayout(modifier = Modifier.fillMaxSize().condition(useRoundedCorner) { clip(Theme.shape.v1) }) {
+                ComposedLayout(modifier = Modifier.fillMaxSize().clip(borderShape).border(borderWidth, borderColor, borderShape)) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         DragArea(
                             enabled = !controller.maximize,

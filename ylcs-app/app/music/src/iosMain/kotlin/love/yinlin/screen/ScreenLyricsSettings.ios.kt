@@ -11,7 +11,7 @@ import love.yinlin.media.lyrics.LyricsEngineConfig
 // 涉及到 view、初始化、布局、attach 等等都放在原生上
 @Composable
 actual fun ScreenLyricsSettings.PlatformContent() {
-    mp?.floatingLyrics?.then { floatingLyrics ->
+    musicPlayer?.floatingLyrics?.then { floatingLyrics ->
         LyricsSwitch(modifier = Modifier.fillMaxWidth(), onCheckedChange = {
             app.config.enabledFloatingLyrics = it
             floatingLyrics.check()

@@ -13,43 +13,51 @@ import love.yinlin.uri.Uri
 
 @Stable
 abstract class RachelApplication(context: PlatformContext) : AbstractRachelApplication(context) {
-    val mp by startupLazy(StartupMusicPlayer.Factory())
+    val musicPlayer by startupLazy(StartupMusicPlayer.Factory())
 
     @Composable
     override fun Content() {
         ScreenManager.Navigation<ScreenMain>(deeplink = this) {
-            // common
+            // portal
             screen(::ScreenMain)
-
-            // music
-            screen(::ScreenMusicLibrary)
-            screen(::ScreenPlaylistLibrary)
-            screen(::ScreenLyricsSettings)
-            screen(::ScreenMusicDetails)
-            screen(::ScreenModCenter)
-            screen(::ScreenCreateMusic)
-            screen(::ScreenImportMusic)
-            screen(::ScreenPlatformMusic)
-            screen(::ScreenAccompaniment)
-            screen(::ScreenLyricsEditor)
-
-            // information
-            screen(::ScreenAlbum)
-            screen(::ScreenActivityDetails)
-            screen(::ScreenModifyActivity)
-            screen(::ScreenActivityLink)
 
             // account
             screen(::ScreenSettings)
             screen(::ScreenLogin)
+            screen(::ScreenUser)
             screen(::ScreenMail)
             screen(::ScreenPrice)
 
+            // activity
+            screen(::ScreenActivityDetails)
+            screen(::ScreenActivityLink)
+            screen(::ScreenModifyActivity)
+
+            // music
+            screen(::ScreenAccompaniment)
+            screen(::ScreenCreateMusic)
+            screen(::ScreenImportMusic)
+            screen(::ScreenLyricsEditor)
+            screen(::ScreenLyricsSettings)
+            screen(::ScreenModCenter)
+            screen(::ScreenMusic)
+            screen(::ScreenMusicDetails)
+            screen(::ScreenMusicLibrary)
+            screen(::ScreenPlatformMusic)
+            screen(::ScreenPlaylistLibrary)
+
+            // photo
+            screen(::ScreenPhotoAlbum)
+
             // community
-            screen(::ScreenUserCard, "ScreenUserCard")
-            screen(::ScreenTopic)
             screen(::ScreenAddTopic)
+            screen(::ScreenCommunity)
             screen(::ScreenFollows)
+            screen(::ScreenTopic)
+            screen(::ScreenUserCard, "ScreenUserCard")
+
+            // world
+            screen(::ScreenWorld)
 
             // game
             screen(::ScreenCreateGame)
@@ -61,14 +69,13 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenGuessLyrics)
             screen(::ScreenRhyme)
 
-            // third-party
-            screen(::ScreenWeibo)
-            screen(::ScreenWeiboAlbum)
-            screen(::ScreenWeiboDetails)
-            screen(::ScreenWeiboFollows)
-            screen(::ScreenWeiboUser)
-            screen(::ScreenChaohua)
-            screen(::ScreenDouyin)
+//            screen(::ScreenWeibo)
+//            screen(::ScreenWeiboAlbum)
+//            screen(::ScreenWeiboDetails)
+//            screen(::ScreenWeiboFollows)
+//            screen(::ScreenWeiboUser)
+//            screen(::ScreenChaohua)
+//            screen(::ScreenDouyin)
 
             // viewer
             screen(::ScreenTest)

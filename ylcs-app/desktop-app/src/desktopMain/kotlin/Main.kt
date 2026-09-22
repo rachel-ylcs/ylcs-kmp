@@ -7,6 +7,7 @@ import androidx.compose.ui.window.ApplicationScope
 import kotlinx.coroutines.launch
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.img_logo
+import love.yinlin.compose.Colors
 import love.yinlin.compose.DefaultTopBar
 import love.yinlin.compose.DefaultTopBarActions
 import love.yinlin.compose.Theme
@@ -28,7 +29,7 @@ fun main() {
         override val icon: DrawableResource = Res.drawable.img_logo
 
         @Composable
-        override fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit) {
+        override fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit, Colors.Transparent) {
             if (config.userProfile?.hasPrivilegeVIPCalendar == true) {
                 Icon(
                     icon = Icons.CleaningServices,
@@ -61,7 +62,7 @@ fun main() {
 
         @Composable
         override fun ApplicationScope.MultipleWindow() {
-            mp?.floatingLyrics?.Content()
+            musicPlayer?.floatingLyrics?.Content()
         }
     }.run()
 }

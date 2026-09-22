@@ -64,6 +64,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         musicList.clear()
         duration = 0L
         currentId = null
+        listener?.onMusicChanged(null)
         currentIndex = -1
         resetShuffled()
         innerStop()

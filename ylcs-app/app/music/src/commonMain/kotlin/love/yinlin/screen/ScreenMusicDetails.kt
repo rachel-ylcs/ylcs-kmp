@@ -22,6 +22,7 @@ import love.yinlin.annotation.LooseTyped
 import love.yinlin.app
 import love.yinlin.compose.*
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberDerivedState
@@ -81,7 +82,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private fun Song.remotePath(type: ModResourceType): String = ServerRes.Mod.Song(sid).res(type.filename).url
     private val remoteModPath: String get() = ServerRes.Mod.Song(sid).res(ModResourceType.BASE_RES).url
 
-    private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
+    private val musicPlayer by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
     private val clientResources = mutableStateListOf<ResourceItem>()
     private val remoteResources = mutableStateListOf<ResourceItem>()
@@ -103,7 +104,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private val listState = LazyListState()
 
     private suspend fun requestClientSong(): Song? {
-        val musicInfo = mp?.library[sid]
+        val musicInfo = DataSourceMusic.library[sid]
         return if (musicInfo != null) {
             val items = ModResourceType.entries.associateWith { musicInfo.path(app.modPath, it).fileSize() }
             clientResources.replaceAll(items.asSequence().filter { it.value > 0 }.map { ResourceItem(it.key, it.value) }.toList())
@@ -148,7 +149,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     private suspend fun downloadMod() {
-        val player = mp ?: return
+        val player = musicPlayer ?: return
         val checkData = player.checkReloadPlaylistByAdd(sid)
         if (checkData == StartupMusicPlayer.ReloadAddData.Playing) {
             slot.tip.warning("\"${player.currentMusic?.name}\"正在播放, 请先停止播放器")
@@ -173,7 +174,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     path.delete() // 删除临时文件
                 }
                 // 更新曲库
-                player.reloadMusicInfo(sid)?.let { player.library[sid] = it }
+                DataSourceMusic.reloadMusicInfo(sid)?.let { DataSourceMusic.library[sid] = it }
                 player.reloadPlaylistByAdd(sid, checkData)
                 // 更新状态
                 clientSong = requestClientSong()
@@ -184,7 +185,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     private suspend fun downloadModResource(item: ResourceItem, song: Song) {
-        val player = mp ?: return
+        val player = musicPlayer ?: return
         if (slot.confirm.open(content = "下载资源: ${item.type.description}?")) {
             val checkData = player.checkReloadPlaylistByAdd(sid)
             if (checkData == StartupMusicPlayer.ReloadAddData.Playing) {
@@ -197,7 +198,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                     require(downloadDialog.download(song.remotePath(item.type), sink) { })
                 }
                 // 更新曲库
-                player.reloadMusicInfo(sid)?.let { player.library[sid] = it }
+                DataSourceMusic.reloadMusicInfo(sid)?.let { DataSourceMusic.library[sid] = it }
                 player.reloadPlaylistByAdd(sid, checkData)
                 // 更新状态
                 clientSong = requestClientSong()
@@ -309,7 +310,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                                 image.crop(region)
                                 song.clientPath(item.type).writeByteArray(image.encode(quality = ImageQuality.Full)!!)
                             }
-                            mp?.library?.findAssign(sid) { it.copy(modification = it.modification + 1) }
+                            DataSourceMusic.library.findAssign(sid) { it.copy(modification = it.modification + 1) }
                             clientResources.findAssign(item) {
                                 it.copy(type = it.type, size = song.clientPath(it.type).fileSize())
                             }
@@ -322,15 +323,13 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     private val resActionConfigEditor = ResourceAction("修改", Icons.Edit) {
-        mp?.library?.get(sid)?.let(configSheet::open)
+        DataSourceMusic.library[sid]?.let(configSheet::open)
     }
 
     private val resActionLyricsEditor = ResourceAction("编辑", Icons.Edit) {
-        mp?.then { player ->
-            player.library[sid]?.then {
-                launch { player.pause() }
-                navigate(::ScreenLyricsEditor, it)
-            }
+        DataSourceMusic.library[sid]?.then { info ->
+            launch { musicPlayer?.pause() }
+            navigate(::ScreenLyricsEditor, info)
         }
     }
 
@@ -681,25 +680,23 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 ) {
                     SimpleEllipsisText(text = "MOD配置", style = Theme.typography.v6.bold)
                     PrimaryTextButton(text = "保存", icon = Icons.Check, enabled = canSubmit, onClick = {
-                        mp?.then { player ->
-                            // 更新 library
-                            val newInfo = args.copy(
-                                name = name.text,
-                                singer = singer.text,
-                                lyricist = lyricist.text,
-                                composer = composer.text,
-                                album = album.text,
-                                modification = args.modification + 1
-                            )
-                            player.library.findAssign(sid) { newInfo }
-                            ++modifyFlag
-                            // 写入文件
-                            launch {
-                                catching { newInfo.path(app.modPath, ModResourceType.Config).writeText(newInfo.toJsonString()) }
-                            }
-                            // 关闭 sheet
-                            close()
+                        // 更新 library
+                        val newInfo = args.copy(
+                            name = name.text,
+                            singer = singer.text,
+                            lyricist = lyricist.text,
+                            composer = composer.text,
+                            album = album.text,
+                            modification = args.modification + 1
+                        )
+                        DataSourceMusic.library.findAssign(sid) { newInfo }
+                        ++modifyFlag
+                        // 写入文件
+                        launch {
+                            catching { newInfo.path(app.modPath, ModResourceType.Config).writeText(newInfo.toJsonString()) }
                         }
+                        // 关闭 sheet
+                        close()
                     })
                 }
                 Input(state = name, hint = "歌曲名", modifier = Modifier.fillMaxWidth())

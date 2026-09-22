@@ -96,3 +96,5 @@ private data class FadingEdgeElement(
 @Stable
 fun Modifier.fadingEdge(startAlpha: Float = 1f, endAlpha: Float = 0f, padding: PaddingValues): Modifier =
     this then FadingEdgeElement(startAlpha, endAlpha, padding)
+
+

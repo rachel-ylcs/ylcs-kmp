@@ -18,12 +18,12 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import love.yinlin.app
-import love.yinlin.common.DataSourceDiscovery
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceDiscovery
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse

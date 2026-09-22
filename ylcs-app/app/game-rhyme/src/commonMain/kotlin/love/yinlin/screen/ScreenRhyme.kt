@@ -30,6 +30,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.game.Engine
 import love.yinlin.compose.game.character.Character
@@ -87,7 +88,6 @@ import love.yinlin.data.rachel.rhyme.RhymeUploadResult
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.parseJsonValue
-import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
@@ -245,13 +245,11 @@ class ScreenRhyme : BasicScreen() {
 
     override suspend fun initialize() {
         // 初始化曲库
-        val rawLibrary = app.requireClassOrNull<StartupMusicPlayer>()?.library?.values
-        if (rawLibrary != null) {
-            Coroutines.io {
-                val modPath = app.modPath
-                rawLibrary.mapNotNullTo(library) { info ->
-                    if (info.path(modPath, ModResourceType.Rhyme).exists()) info else null
-                }
+        val rawLibrary = DataSourceMusic.library.values
+        Coroutines.io {
+            val modPath = app.modPath
+            rawLibrary.mapNotNullTo(library) { info ->
+                if (info.path(modPath, ModResourceType.Rhyme).exists()) info else null
             }
         }
         // 初始化仓库

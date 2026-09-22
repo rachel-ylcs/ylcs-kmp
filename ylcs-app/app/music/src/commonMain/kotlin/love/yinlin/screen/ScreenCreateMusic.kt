@@ -15,6 +15,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.crop
@@ -114,7 +115,7 @@ class ScreenCreateMusic : Screen() {
                 // 1. 检查ID
                 val id = input.id.text
                 val name = input.name.text
-                require(id !in player.library) { "ID已存在" }
+                require(id !in DataSourceMusic.library) { "ID已存在" }
                 require(id.all { it.isLetterOrDigit() }) { "ID仅能由字母或数字构成" }
                 // 2. 检查歌词
                 val lyrics = Coroutines.cpu { prepareLyrics(input.lyrics.text) }
@@ -155,7 +156,7 @@ class ScreenCreateMusic : Screen() {
                     info.path(modPath, ModResourceType.LineLyrics).writeText(lyrics.toString())
                 }
                 // 10. 更新曲库
-                player.library[id] = info // 一定是新歌, 不需要reloadMusicInfo
+                DataSourceMusic.library[id] = info // 一定是新歌, 不需要reloadMusicInfo
                 player.reloadPlaylistByAdd(id, player.checkReloadPlaylistByAdd(id))
                 pop()
             }.warningTip

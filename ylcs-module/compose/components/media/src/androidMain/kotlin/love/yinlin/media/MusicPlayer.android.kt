@@ -81,8 +81,10 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
                         musicList.clear()
                         isPlayingFlow.value = false
                         position = 0L
+                        listener?.onPositionChanged(0L)
                         duration = 0L
                         currentId = null
+                        listener?.onMusicChanged(null)
                         listener?.onPlayerStop()
                     }
                 }
@@ -114,7 +116,9 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
                 isPlaying = value
                 if (value) {
                     while (this@launch.isActive) {
-                        position = controller?.currentPosition ?: 0L
+                        val pos = controller?.currentPosition ?: 0L
+                        position = pos
+                        listener?.onPositionChanged(pos)
                         delay(fetcher.interval.milliseconds)
                     }
                 }
@@ -186,7 +190,9 @@ class AndroidMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fetcher) {
     }
 
     private fun updateDuration(player: Player) {
-        position = player.currentPosition.let { if (it == C.TIME_UNSET) 0L else it }
+        val pos = player.currentPosition.let { if (it == C.TIME_UNSET) 0L else it }
+        position = pos
+        listener?.onPositionChanged(pos)
         duration = player.duration.let { if (it == C.TIME_UNSET) 0L else it }
     }
 

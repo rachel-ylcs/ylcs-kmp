@@ -39,7 +39,9 @@ internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMus
                 isPlaying = value
                 if (value) {
                     while (this@launch.isActive && !isRelease) {
-                        position = nativeGetPosition(nativeHandle)
+                        val pos = nativeGetPosition(nativeHandle)
+                        position = pos
+                        listener?.onPositionChanged(pos)
                         delay(fetcher.interval.milliseconds)
                     }
                 }

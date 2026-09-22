@@ -61,7 +61,6 @@ include(
     "ylcs-module:compose:components:url-image",
     "ylcs-module:compose:components:webview",
     "ylcs-module:compose:core",
-    "ylcs-module:compose:data-source",
     "ylcs-module:compose:game:core",
     "ylcs-module:compose:icons",
     "ylcs-module:compose:platform-view",
@@ -93,17 +92,20 @@ include(
 
     /* -----------------  应用模块  ----------------- */
 
+    "ylcs-app:app:global",
+    "ylcs-app:app:portal",
     "ylcs-app:app:account",
+    "ylcs-app:app:activity",
     "ylcs-app:app:community",
     "ylcs-app:app:game",
     "ylcs-app:app:game-guess-lyrics",
     "ylcs-app:app:game-rhyme",
-    "ylcs-app:app:global",
-    "ylcs-app:app:information",
+//    "ylcs-app:app:information",
     "ylcs-app:app:music",
-    "ylcs-app:app:portal",
+    "ylcs-app:app:photo",
     "ylcs-app:app:third-party",
     "ylcs-app:app:viewer",
+    "ylcs-app:app:world",
 
     "ylcs-app:android-app",
     "ylcs-app:cs",

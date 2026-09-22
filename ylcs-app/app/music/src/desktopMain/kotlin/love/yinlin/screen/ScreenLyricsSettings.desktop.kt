@@ -13,7 +13,7 @@ import love.yinlin.media.lyrics.LyricsEngineConfig
 
 @Composable
 actual fun ScreenLyricsSettings.PlatformContent() {
-    mp?.floatingLyrics?.then { floatingLyrics ->
+    musicPlayer?.floatingLyrics?.then { floatingLyrics ->
         DisposableEffect(Unit) {
             config = app.config.lyricsEngineConfig
             floatingLyrics.canMove = true
@@ -38,7 +38,7 @@ actual fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfi
 
     // 触发桌面悬浮歌词修改窗口尺寸和位置
     val desktopConfig = newConfig.desktop
-    mp?.floatingLyrics?.updateWindowState(
+    musicPlayer?.floatingLyrics?.updateWindowState(
         size = DpSize(desktopConfig.width.dp, desktopConfig.height.dp),
         position = DpOffset(desktopConfig.x.dp, desktopConfig.y.dp)
     )
