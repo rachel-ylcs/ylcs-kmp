@@ -14,7 +14,7 @@ skiko = "0.152.0-alpha02"
 lifecycle = "2.11.0"
 coroutines = "1.11.0"
 ktor = "3.6.0"
-sketch = "4.7.0-alpha01"
+sketch = "4.7.0-beta01"
 haze = "2.0.0"
 mmkv = "2.4.2"
 cryptography = "0.6.0"
@@ -88,7 +88,7 @@ sketch-resources = { module = "io.github.panpf.sketch4:sketch-compose-resources"
 sketch-gif = { module = "io.github.panpf.sketch4:sketch-animated-gif", version.ref = "sketch" }
 sketch-webp = { module = "io.github.panpf.sketch4:sketch-animated-webp", version.ref = "sketch" }
 sketch-extensions-compose = { module = "io.github.panpf.sketch4:sketch-extensions-compose", version.ref = "sketch" }
-sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.7.0-alpha01" }
+sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", version = "1.7.0-beta01" }
 
 tool-haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 tool-haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
