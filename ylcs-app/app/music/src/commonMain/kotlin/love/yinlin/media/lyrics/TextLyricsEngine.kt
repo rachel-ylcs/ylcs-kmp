@@ -17,7 +17,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastCoerceAtLeast
 import kotlinx.coroutines.launch
 import love.yinlin.compose.Theme
@@ -26,8 +25,15 @@ import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.container.itemKey
 import love.yinlin.compose.ui.layout.Space
 import love.yinlin.compose.ui.node.condition
-import love.yinlin.compose.ui.node.fadingEdge
+import love.yinlin.compose.ui.node.verticalFade
 import love.yinlin.extension.then
+
+private val FadeLyrics = listOf(
+    0.0f to 0f,
+    0.2f to 1f,
+    0.6f to 1f,
+    1f to 0f
+)
 
 @Stable
 internal interface TextLine {
@@ -116,7 +122,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
             state = listState,
             modifier = Modifier.fillMaxSize()
                 .onSizeChanged { containerSize = it }
-                .fadingEdge(padding = PaddingValues(top = 75.dp, bottom = 75.dp))
+                .verticalFade(FadeLyrics)
         ) {
             itemKey("Placeholder1") {
                 LineItemWrapper { LinePlaceholder() }
