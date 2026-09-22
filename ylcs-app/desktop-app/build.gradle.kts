@@ -34,6 +34,7 @@ template(object : KotlinMultiplatformTemplate() {
     }
 
     override val desktopPackage = object : DesktopPackage(), DesktopPackage.Windows, DesktopPackage.Linux, DesktopPackage.MacOS {
+        override val useAOT: Boolean = true
         override val packageName: String = C.app.name
         override val mainClass: String = C.app.mainClass
         override val jvmArgs: List<String> = buildList {
