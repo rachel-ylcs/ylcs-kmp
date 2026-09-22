@@ -1,34 +1,88 @@
-文件上传和普通的`HTTP`请求类似，也是通过在公共模块中定义接口清单。
+# 服务端文件上传
+
+`API.form` 的 multipart 解析器把普通值和文件按索引恢复为共享声明中的参数。文件先流式写入服务端缓存目录，再以 `APIFile` 交给接口实现。
+
+## 接收上传
+
+共享声明：
 
 ```kotlin
-val ApiProfileUpdateAvatar by API.form.i<String, APIFile>().o()
+val ApiProfileUpdateAvatar by
+    API.form.i<String, APIFile>().o<String>()
 ```
 
-你可以将文件作为一种参数类型与其他数据类型放在一起传递，这同时适用于客户端与服务端。
-
-!!! Tip
-    因为`APIFile`是一个接口，用于约束编译器检查参数类型安全，但运行时它在客户端和服务端有着不同的实现。
-    在客户端的实现为`ClientFile`，其可以通过`ByteArray`、`File`、`Channel`等方式构造，在服务端的实现为`ServerRes`(见资源章节)。
-
-在此例中，定义了实际路径为`/profile/updateAvatar`的接口，其中需要传递一个字符串参数和**一份文件**，不需要响应返回值。
-
-### APIFile
-
-注意所说的**一份文件**，这里的`APIFile`它可以指代一个或多个文件，通常它的方法不区分具体的个数。
-它取决于你的业务逻辑保证，即调用时你可以对一个`APIFile`对象调用适用于单文件的方法或者多文件的方法，只是调用错了类型会抛出异常而已。
-
-下面来看如何写客户端上传文件的响应请求：
+服务端实现：
 
 ```kotlin
-ApiProfileUpdateAvatar.response { uid, avatar ->
-    avatar.copy(ServerRes.Users.User(uid).avatar)
+ApiProfileUpdateAvatar.response { token, file ->
+    val uid = auth.throwExpireToken(token)
+    if (file.isEmpty) failure("没有收到文件")
+
+    val target = ServerRes.Users.User(uid).avatar
+    validateImage(file[0])
+    file[0].copy(target)
+
+    result(target.toString())
 }
 ```
 
-我们可以看出，文件和数据类型具有相同的地位，与常规`HTTP`请求写起来并无二样。
+可空 `APIFile?` 由客户端的 `#index` 占位恢复为空；多文件按 `index:subindex` 排序后成为一个 `APIFile`。
 
-我们可以直接从`lambda`的参数处获取`String`类型的`uid`，以及`APIFile`类型的`avatar`。
+## 临时文件位置
 
-此时客户端上传的文件会被存储为临时文件，`avatar`对应的便是这份文件。
+解析器使用：
 
-此时我们接口由业务保证了上传一定是单张图片，所以我们可以直接使用`APIFile`的拓展函数`copy`将这个临时文件拷贝到我们用户头像所在的静态目录下（参见资源章节）。
+```text
+PlatformFileSystem.cachePath(PlatformContext.Instance, "ServerNative")
+```
+
+每个成功写入的 part 获得随机数、参数索引和唯一时间组成的临时名。`APIFile.files` 存这些路径。
+
+当前实现没有在请求结束时自动删除临时文件。接口无论成功、业务失败还是处理异常，都应安排清理；还需要进程启动时/定时清除过期临时文件，防止磁盘持续增长。复制到正式目录不会删除源文件。
+
+## APIFile 工具
+
+| API | 行为 |
+| --- | --- |
+| `file.isEmpty` | 是否没有任何路径 |
+| `file.num` | 文件数量 |
+| `file[index]` | 取单个文件的新 APIFile 包装 |
+| `file.copy(target)` | 第一个源同步复制到第一个目标，返回目标 File |
+| `file.delete()` | 递归删除包装中的所有路径 |
+| `file.mkdir()` | 为第一个路径创建目录 |
+
+多文件要逐项处理：
+
+```kotlin
+try {
+    repeat(files.num) { index ->
+        val source = files[index]
+        val target = APIRes(albumRoot, "$index.webp")
+        source.copy(target)
+    }
+} finally {
+    files.delete()
+}
+```
+
+这些 helper 使用同步文件操作；请求处理已位于 I/O 上下文，但大型转码、解压或扫描仍应分离成受控任务，并设置并发上限。
+
+## 请求大小现状
+
+multipart 解析直接使用请求的 `Content-Length` 作为 field limit；缺少长度时回退为 5 MiB。这里没有独立的可信“最大上传大小”，客户端可以声明很大的长度。生产环境必须在反向代理和应用层同时限制总大小、part 数量与单文件大小。
+
+不要依赖客户端 `filename` 或 Content-Type；当前客户端本来也只发送通用文件名。根据魔数/解析结果验证真实内容，并限制图片像素、压缩包展开量、媒体时长等资源消耗。
+
+## 安全落盘流程
+
+推荐顺序：
+
+1. 鉴权并检查资源归属。
+2. 检查文件数与已写入大小。
+3. 在临时区识别并完整解析格式。
+4. 对图片/媒体重编码，去除不需要的元数据。
+5. 使用服务端生成的安全文件名写临时目标。
+6. 原子替换正式文件或提交数据库记录。
+7. `finally` 删除请求临时文件。
+
+不要把上传内容直接放进公开目录后再验证；静态路由可能在验证完成前就把它提供给外部。

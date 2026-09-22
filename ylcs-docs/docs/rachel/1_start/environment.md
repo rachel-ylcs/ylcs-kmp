@@ -1,68 +1,107 @@
-## 通用
+# 环境与工程结构
 
-我们建议你使用`IntelliJ IDEA`作为开发集成环境，当然你也可以使用`VS Code`甚至命令行工具来完成开发。
+Rachel 的构建脚本本身也是工程的一部分。版本、目标平台和打包规则集中在根目录的版本目录与 `buildSrc` 中；阅读某个模块时，应同时查看它的 `build.gradle.kts`，不要假设每个模块支持同一组平台。
 
-!!! Tip
-    `IntelliJ IDEA`官网: [https://www.jetbrains.com.cn/idea/](https://www.jetbrains.com.cn/idea/)
+## 当前基线
 
-如果你使用`IDEA`可以获得实时调试、热重载、在线预览、Android部署等体验。
+| 项目 | 版本或约束 |
+| --- | --- |
+| Gradle Wrapper | 9.7.1 |
+| Kotlin | 2.4.20 |
+| Compose Multiplatform | 1.13.0-alpha01 |
+| Android Gradle Plugin | 9.1.1 |
+| Ktor | 3.5.2 |
+| Coroutines | 1.11.0 |
+| JDK / JVM target | 25 |
+| Android | minSdk 29，compileSdk / targetSdk 37 |
+| Android NDK | 29.0.14206865，仅 `arm64-v8a` |
+| iOS deployment target | 26.0 |
+| 应用版本 | 3.7.0（versionCode 370） |
 
-`IDEA`的版本建议使用最新版本，因为框架使用到的`Kotlin`或`AGP`版本可能依赖于最新的`IDEA`版本，
-在开发前请在插件市场中安装以下插件来完善你的开发体验：
+不要用本机安装的 Gradle 替代 Wrapper。IDE 的 Gradle JVM 也必须指向 JDK 25；只把项目源码语言级别设为 25 仍不足以运行构建进程。
 
-|                      插件                       |          插件          |
-|:---------------------------------------------:|:--------------------:|
-|                    Android                    |         Ktor         |
-|             Compose Multiplatform             | Kotlin Multiplatform |
-| Compose Multiplatform for Desktop IDE Support |                      |
+## 主机要求
 
-然后你需要为构建系统准备`Gradle`，参考版本：`9.4.0`。
+- Android、JVM Desktop 与 Web 可以在常见桌面系统构建。
+- iOS 与 macOS Native 需要 macOS/Xcode 工具链；当前模板只启用设备 `iosArm64`，模拟器目标被注释。
+- Windows Native 由 `mingwX64` 构建，Linux Native 由 `linuxX64` 构建，macOS Native 由 `macosArm64` 构建。跨主机构建能力受 Kotlin/Native 工具链限制。
+- Android 原生组件固定使用 arm64 ABI。仓库内预置的本地库也按这个约束组织。
 
-!!! Tip
-    `Gradle`下载链接: [https://services.gradle.org/distributions/gradle-9.4.0-all.zip](https://services.gradle.org/distributions/gradle-9.1.0-all.zip)
-    
-    如果你的网络状态较差可以单独下载或从其他镜像源下载然后手动拷贝到`.gradle`目录。
+## 目录地图
 
-除此之外，你还需要准备`Java SDK`，其中桌面开发最低版本为`JDK 25`，Android开发最低版本为`JDK 25`。
-然后设置好JDK的环境变量，并将你项目结构中使用的SDK设置为此JDK。
+```text
+ylcs-kmp/
+├─ buildSrc/                    # 统一的 KMP、Android、打包与发布模板
+├─ ylcs-module/
+│  ├─ core/                    # 与 UI 无关的通用 Kotlin 能力
+│  ├─ foundation/              # context、filesystem、network、startup
+│  ├─ compose/                 # app、theme、ui、screen、组件与启动服务
+│  ├─ cs/                      # 共享协议、客户端、原生服务端和服务插件
+│  ├─ platform/                # OS、FFI、动态库加载
+│  └─ native/                  # Win32 等原生封装
+├─ ylcs-app/
+│  ├─ app/                     # 按领域拆分的共享业务页面
+│  ├─ android-app/             # Android 壳
+│  ├─ desktop-app/             # Desktop 壳
+│  ├─ web-app/                 # JS/Wasm 壳
+│  ├─ server/                  # Kotlin/Native 服务端
+│  ├─ gallery/                 # UI 展厅
+│  └─ mod-manager/             # MOD 桌面工具
+└─ ylcs-docs/                  # MkDocs 与 Dokka 站点
+```
 
-!!! Tip
-    `JDK`下载链接: [https://www.oracle.com/java/technologies/downloads/](https://www.oracle.com/java/technologies/downloads/)
+## 源集约定
 
-## Android开发
+模板不仅有标准的 `commonMain` 与平台源集，还会按能力建立中间源集：
 
-`Rachel`目前推荐版本是`Android 10` (`SDK 31`)，在更低版本上开发不保证完全的兼容性。
+| 源集 | 用途 |
+| --- | --- |
+| `commonMain` | 完全共享的声明与实现 |
+| `clientMain` | Android、iOS、Desktop、Web 等客户端共有代码 |
+| `webMain` | JS 与 WasmJS 共有实现 |
+| `appleMain` / `iosMain` | Apple / iOS 共有实现 |
+| `jvmMain` / `desktopMain` | JVM 或 Compose Desktop 实现 |
+| `posixMain` / `nativeMain` | POSIX 或 Kotlin/Native 共有实现 |
+| `skikoMain` | 依赖 Skiko 的 Compose 平台实现 |
 
-准备真机或模拟器，开启USB调试后连接。然后完成编译、安装、测试。
+先把代码放在能够真实编译的最上层公共源集；只有平台 API 不同才下沉到 `expect/actual`。不要为了“以后可能不同”提前复制实现。
 
-## iOS开发
+## 模块坐标
 
-在iOS商店中安装`Xcode 16.3`。
+发布坐标由 Gradle 项目路径自动生成：父路径变成 group，最后一段变成 artifact。
 
-## 桌面开发
+```text
+:ylcs-module:compose:app       -> love.yinlin.compose:app:3.7.0
+:ylcs-module:foundation:network -> love.yinlin.foundation:network:3.7.0
+:ylcs-module:cs:client-engine -> love.yinlin.cs:client-engine:3.7.0
+```
 
-`Rachel`框架部分模块需要使用到Native库，如果你有使用到还需要安装相应的Native编译器。
+模块使用 `ExportLib` 分隔私有实现依赖与向消费者暴露的 API 依赖。使用者仍应显式声明自己直接调用的模块；这能在内部导出关系改变时保持构建稳定。
 
-#### Windows
+## 常用任务
 
-下载最新版本的`Visual Studio 2026`，选择`MSVC v145`或以上版本的编译器，建议安装`Windows 10 SDK` 或 `Windows 11 SDK`。
+```powershell
+# 展厅桌面版
+.\gradlew.bat :ylcs-app:gallery:galleryRun
 
-!!! Tip
-    Visual Studio下载链接: [https://visualstudio.microsoft.com/](https://visualstudio.microsoft.com/)
+# 完整桌面应用 Debug
+.\gradlew.bat :ylcs-app:desktop-app:desktopRunDebug
 
-#### Linux / macOS
+# Wasm Web 开发服务器
+.\gradlew.bat :ylcs-app:web-app:webRun
 
-下载使用`g++ 13`或以上版本的编译器。
+# Android Debug 包
+.\gradlew.bat :ylcs-app:android-app:androidPackage
 
-## Web开发
+# 查询某个模块的实际任务
+.\gradlew.bat :ylcs-app:server:tasks --all
+```
 
-使用支持`WebAssembly`的主流浏览器，例如`Chrome(>=119)`, `Edge(>=119)`, `Firefox(>=120)`, `Safari(>=18.2)`。
+Linux/macOS 将 `gradlew.bat` 换成 `./gradlew`。原生目标的任务名会包含目标名和构建类型，先查询任务比把某台机器上的名称硬编码进脚本更可靠。
 
-!!! Tip
-    具体兼容性文档参见: [https://kotlinlang.org/docs/wasm-configuration.html#wasm-proposals-support](https://kotlinlang.org/docs/wasm-configuration.html#wasm-proposals-support)
+## 构建配置的两个注意点
 
-## 服务器开发
+1. `buildSrc` 会根据当前操作系统和 CPU 架构选择打包行为。构建产物不一定能在另一主机上原样复现全部目标。
+2. 根配置当前是生产环境，API 地址和发布路径会随 `BuildEnvironment` 变化。不要在业务源码中再维护一份环境判断；统一从生成配置或应用配置读取。
 
-准备本地机器或部署在云服务器。
-
-如果你需要使用数据库服务，请按需安装`Mysql`或`Redis`服务。
+遇到奇怪的源集解析问题时，依次确认 Wrapper、JDK、宿主支持的 Native 目标，再查看具体模块是否关闭了目标。多数问题并不是共享代码本身，而是把某个模块不存在的目标当成了全仓库默认值。

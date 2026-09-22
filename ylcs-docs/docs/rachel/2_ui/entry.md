@@ -1,119 +1,138 @@
-一个`Rachel`客户端应用程序分为逻辑入口与实际入口。
+# 应用入口与生命周期
 
-实际入口是指程序启动调用的`main`函数，当然在某些平台可能是其他入口，例如`Android`的`Application`或`Activity`，
-而逻辑入口是指你需要定义`MyApplication`应用程序类，并继承自`PlatformApplication`类。
+`PlatformApplication` 把共享的 Compose 根节点接到各平台宿主。共享应用只描述内容、主题和启动服务；平台壳负责创建实例、提供系统上下文、接收外部链接并在正确时机清理。
 
-下面是快速开始中的示例:
+## 两阶段启动
+
+应用初始化故意分成两段：
+
+| 阶段 | 发生时机 | 适合的工作 |
+| --- | --- | --- |
+| `initApplication` | 应用实例创建后 | 建立自引用、解析启动图、同步服务初始化、发起异步服务 |
+| `initPoolLater` | Activity、窗口或 UIViewController 已就绪 | 权限/选择器注册、依赖 UI 宿主的准备工作 |
+
+对应的关闭也分成 `destroyPoolBefore` 和 `destroyPool`。前者在 UI 宿主消失前运行，后者在整个应用退出时运行。服务的调用顺序均与依赖拓扑相反。
+
+## 共享应用
 
 ```kotlin
-private val mApp = LazyStateReference<MyApplication>()
-val app: MyApplication by mApp
+class MainApplication(
+    context: PlatformContext
+) : PlatformApplication<MainApplication>(appReference, context) {
+    override val themeMode = ThemeMode.SYSTEM
 
-class MyApplication : PlatformApplication<MyApplication>(mApp, PlatformContext.Instance) {
     @Composable
     override fun Content() {
-        Text("hello world!")
+        ScreenManager.Navigation<ScreenHome> {
+            screen(::ScreenHome)
+            screen(::ScreenSettings)
+        }
     }
 }
-
-fun main() = MyApplicaiton().run()
 ```
 
-## 逻辑入口
+`ComposedLayout` 会安装 `Theme`、背景和 `LocalPlatformContext`，平台入口通常不应绕开它直接调用 `Content()`。
 
-为什么需要逻辑入口？因为你的应用程序是跨平台的，它们在不同平台上可能有独立实现的部分，
-例如Android上需要绑定设备硬件、桌面上需要设置窗口标题栏或托盘等等。
+## Android
 
-但是除了这些平台特定的配置外，更多的是公共配置代码，所以我们需要定义一个公共的基类`MyApplication`，继承自`PlatformApplication<MyApplication>`。
-
-如果你不需要编写平台侧的特定代码，`MyApplication`可以是普通`class`。否则将它修改为`abstract class`，然后在平台侧分别创建对应的平台应用程序子类。
-
-你需要传递一个自引用实例和平台上下文用于构建`MyApplication`。
-
-#### 自引用实例：
-```kotlin
-private val mApp = LazyStateReference<RachelApplication>()
-val app: RachelApplication by mApp
-```
-
-为什么需要自引用实例？因为你的业务代码可能发生在其他地方，为了能够在任意位置获取到你的应用程序实例和服务，我们有必要维护一个全局字段。
-这个全局字段由`mApp`交付给`MyApplication`委托，而你只需要使用`app`在全局引用即可。
-
-平台上下文请参看下一节。
-
-随后在真正的实际入口处启动你的应用程序即可。
-
-## 实际入口
-
-### Android
-
-在`Android`中，你需要创建一个`MainApplication`类和`MainActivity`类，这是原生安卓要求的，与框架无关。
-
-你必须将它们分别继承自`ComposeApplication`和`ComposeActivity`，然后在`AndroidManifest.xml`中注册。
-
-这样你的`Activity`便交给框架托管，你不需要写任何其他代码。
+Android 使用框架提供的 `ComposeApplication` 和 `ComposeActivity`：
 
 ```kotlin
-// MainActivity.kt
+class AndroidApplication : ComposeApplication() {
+    override fun buildInstance() = MainApplication(this)
+}
+
 class MainActivity : ComposeActivity()
 ```
 
-而在`MainApplication`中是真正的入口，你只需要将你的`MyApplication`重写instance便交给框架托管，不需要写任何其他代码。
+Manifest 必须把二者设为实际的 application/activity。`ComposeApplication` 在 `onCreate` 中完成第一阶段；`ComposeActivity` 设置当前 Activity、启用 edge-to-edge、执行第二阶段并安装 Compose 内容。
+
+外部 `Intent` 应在应用实例覆写的 `onIntent` 中转换成公共 `Uri`，再交给 `DeepLink.openUri`。启动 Intent 和 `onNewIntent` 都会走同一入口。不要把 Activity 保存到业务单例；`PlatformContextProvider.activity` 会随宿主更新。
+
+Android 的 `Application.onTerminate` 在真实设备上并非可靠的进程退出通知，因此持久数据应在修改时提交，不能只依赖最终 `destroy()`。
+
+## Desktop
+
+Desktop 可以直接构造并运行：
 
 ```kotlin
-// MainApplication.kt
-class MainApplication : ComposeApplication() {
-    override fun buildInstance() = object : MyApplication(this) { }
+fun main() {
+    object : MainApplication(PlatformContext.Instance) {
+        override val title = "My App"
+        override val initSize = DpSize(1200.dp, 700.dp)
+        override val minSize = DpSize(360.dp, 640.dp)
+    }.run()
 }
 ```
 
-!!! Warning
-    注意，只有Android与其他平台不同，你不需要主动调用Application的run方法，只需要作为instance的值即可。
+可覆写项包括图标、初始/最小尺寸、圆角、标题栏、Compose/Swing 混合参数和 `ApplicationScope.MultipleWindow`。动态窗口状态通过 `controller` 修改，例如 `title`、`alwaysOnTop`、最大化、最小化和托盘；构造属性只表示初值。
 
-启动`Android`程序后会首先创建`MainApplication`并构造`MyApplication`，然后创建`MainActivity`展示UI。
+框架使用无装饰窗口并在 `TopBar` 中实现拖动和窗口操作。主窗口第一次真正进入组合时执行第二阶段初始化；关闭时先清理 UI 相关服务，再退出窗口循环，最后销毁应用服务和主协程域。
 
-### iOS
+## Web
 
-定义函数`MainViewController`并将结果返回到swift代码中(此处可以参看KMP的官方iOS项目示例)。
-
-而`MainViewController`便是实际入口。
+JS 与 WasmJS 共用入口：
 
 ```kotlin
-// MainViewController.kt
-fun MainViewController() = MyApplication(PlatformContext.Instance).run()
+fun main() = MainApplication(PlatformContext.Instance).run()
 ```
 
-### Desktop
+`run()` 通过 `ComposeViewport` 渲染，页面装载后进入第二阶段。浏览器刷新就是完整的新应用生命周期；需要跨刷新保留的数据必须写入 Web 平台持久化实现，而不是只放在应用对象中。
 
-定义main函数便是实际入口。
+## iOS
+
+Kotlin 侧暴露一个可由 Swift 持有的实例：
 
 ```kotlin
-// main.kt
-fun main() = MyApplication(PlatformContext.Instance).run()
+class IOSDelegateApplication : MainApplication(PlatformContext.Instance) {
+    fun onIOSDeepLink(uri: NSURL) = DeepLink.openUri(uri.toUri())
+}
 ```
 
-### Web
+SwiftUI 侧先启动实例，再创建控制器：
 
-定义main函数便是实际入口。
+```swift
+@main
+struct MyApp: App {
+    let instance: IOSDelegateApplication
 
-```kotlin
-// main.kt
-fun main() = MyApplication(PlatformContext.Instance).run()
+    init() {
+        let app = IOSDelegateApplication()
+        instance = app
+        app.run()
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ComposeView(instance: instance)
+                .ignoresSafeArea(.all)
+                .onOpenURL { instance.onIOSDeepLink(uri: $0) }
+        }
+    }
+}
 ```
 
-## 平台侧代码
+`ComposeView` 的 `makeUIViewController` 返回 `instance.buildUIViewController()`。必须一直持有同一个 Kotlin 实例；每次 SwiftUI 更新都新建应用会重复启动服务并丢失全局状态。
 
-如果你有需要重写平台侧的配置，那么将`MyApplication`定义成抽象类，然后只需要将平台侧的调用改为`object`继承即可。
+## 公共平台操作
 
-以桌面端为例，我需要设置一些标题栏、窗口配置、托盘等信息。
+`PlatformApplication` 统一提供：
 
-```kotlin
-// main.kt
-fun main() = object : MyApplication(PlatformContext.Instance) {
-    // 重写后便可以设置平台特定的配置
-    override val title: String = "MyApplication"
-    override val icon: DrawableResource = Res.drawable.img_logo
-    override val actionAlwaysOnTop: Boolean = true
-    override val tray: Boolean = true
-}.run()
-```
+- `backHome()`：Android 回桌面，Desktop 最小化；其他平台按实际实现。
+- `openUri(uri)`：交给系统打开链接。
+- `copyText(text)`：写入剪贴板。
+- `implicitFileUri(uri)`：把公共 URI 包装成平台可解释的文件 URI。
+
+它们返回布尔值时要处理失败，不要假设系统一定存在浏览器、剪贴板或对应协议处理器。
+
+## 生命周期归属
+
+| 状态或工作 | 正确归属 |
+| --- | --- |
+| 应用级数据库、配置、网络引擎 | `Startup` |
+| 页面首次加载和页面任务 | `Screen.initialize` / `viewModelScope` |
+| 已存在页面重新置顶 | `Screen.resume` |
+| 组合可见期间的副作用 | `LaunchedEffect` / `DisposableEffect` |
+| 平台宿主句柄 | `PlatformContextProvider` |
+
+把工作放在正确生命周期，是多平台行为一致的前提。最常见的问题来自在 Composable 重组时创建服务，或在应用启动时访问尚未存在的 Activity/UIViewController。

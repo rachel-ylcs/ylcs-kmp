@@ -1,164 +1,128 @@
-## Core 模块
+# 核心库
 
-核心模块封装了大部分工具函数与操作，对一些特定情景提供了`DSL`范式方便编写代码，如无特殊说明，大部分函数均是异常安全的，发生错误时仅返回空值。
+`ylcs-module/core` 放置不依赖 Compose 的通用能力；`foundation` 在其上加入平台上下文、文件系统、网络与启动编排。它们可以被 UI、命令行工具和 Kotlin/Native 服务端共同使用。
 
-### (1) 平台 love.yinlin.platform.Platform
+## 平台模型
 
-核心提供了全局字段`platform`用于判断当前环境处于哪个平台, 并提供了平台`DSL`语法来允许函数仅在某些平台上调用。
-
-平台列表如下：
-
-- Android
-- IOS
-- Windows
-- Linux
-- MacOS
-- WebJs
-- WebWasm
-- AndroidNative
-- WindowsNative
-- LinuxNative
-- MacOSNative
-
-其中`Android`, `IOS`还归属于`Phone`，`Windows`, `Linux`, `MacOS`归属于`Desktop`。
-
-例如如果你希望只在`Android`上输出`hello world`则可以这样写：
+`platform` 是当前运行目标的 `Platform` 值：
 
 ```kotlin
-Platform.use(Platform.Android) {
-    println("hello world")
+enum class Platform {
+    Android, IOS,
+    Windows, Linux, MacOS,
+    WebWasm, WebJs,
+    AndroidNative, WindowsNative, LinuxNative, MacOSNative
 }
 ```
 
-### (2) 协程 love.yinlin.platform.Coroutines
-
-核心封装了`kotlinx-coroutines`库，并提供一系列协程`DSL`方便开发使用。
-
-其中对每个平台的协程上下文都以`main`、`io`、`cpu`、`wait`做区分, 如果平台不存在该上下文则会默认使用`cpu`。
-
-`main`协程上下文主要用于UI更新，`io`主要用于外部读写，`cpu`主要用于大量计算，`wait`创建的协程将不会被取消。
-
-1. 协程上下文全局字段
-
-    `mainContext`, `cpuContext`, `ioContext`, `waitContext`
-
-2. 协程作用域启动新协程
-
-    `main`, `cpu`, `io`, `wait`
-
-3. 协程上下文切换
-
-    `with`
-
-核心还提供了一种将异步回调修改为协程同步调用的方式，例如某些外部或第三方库函数可能要求你提供若干个回调函数，
-它们实现了功能并返回结果是发生在异步回调中的，你不知道回调什么时候触发，但当前线程上无法等待这个回调停止。
-
-此时便可以使用`sync`同步转化，例子如下。
+框架还定义了 `Phone`、`Desktop`、`DesktopNative`、`Web`、`Native` 等平台组。可以用集合判断，也可以让代码只在目标平台运行：
 
 ```kotlin
-
-// 回调形式
-fun someOuterFunction() {
-    someOuterVariable.setListener(object : someListener {
-        override fun onSuccess(someResult: String) {
-            println("我不知道什么时候返回 $someResult")
-        }
-        override fun onError() {
-            println("我不知道什么时候发生错误")
-        }
-    })
-    
-    println("此处我无法获取回调结果，我需要在回调中继续处理，层层嵌套会产生回调地狱")
+Platform.Web.use {
+    // WebJs 或 WebWasm
 }
 
-// 同步形式
-fun someOuterFunction() {
-    val result = Coroutines.sync { future ->
-        someOuterVariable.setListener(object : someListener {
-            override fun onSuccess(someResult: String) {
-                future.send(someResult) // return someResult
-            }
-            override fun onError() {
-                future.send() // return null
-            }
-        })
-    }
-    // 一直等到回调触发future.send，result的类型是结果的可空类型，当使用send()时返回null
-    println(result)
+Platform.Desktop.useNot {
+    // 非 JVM Desktop
 }
 ```
 
-!!! Warning
-    有时候在回调中可能发生异常，如果你没有对future使用send，那么协程将一直阻塞在此处消耗资源，为了防止这种情况出现应该使用future.catching包裹确保至少使用send。
+平台判断适合小范围行为差异。只要需要平台类型、生命周期或系统 API，就应使用 `expect/actual`，避免在共享代码里堆叠分支。
 
-### (3) URI love.yinlin.uri.Uri
+## 协程约定
 
-核心提供了跨平台的URI实现，并提供了与各平台原生的URI类互相转换方法。
-
-同时定义了ImplicitUri隐式接口对需要权限包装或沙盒引用的Android Content Uri或iOS Sandbox Uri等类做了包装。
-
-### (4) 语言拓展 love.yinlin.extension.KotlinEx
-
-核心将常规异常处理操作封装成`catching`系列函数，对于大部分不关心异常的场景可以极简化代码。
-
-### (5) 集合拓展 love.yinlin.extension.CollectionEx
-
-核心提供了若干集合自身操作的拓展函数。
-
-### (6) 日期时间拓展 love.yinlin.extension.DateEx
-
-核心提供了日期、时间、时间戳整数三者间互相转化的拓展函数，并提供了获取当前时间或日期的方法。
-
-Formatter类可以快速将日期时间与字符串间互相转换。
-
-### (8) 文件拓展 love.yinlin.extension.PathEx
-
-核心封装了`kotlinx-io`库，并为基础的路径`Path`类提供了一系列拓展函数方便文件信息读取、位置操作、读写等。
-
-### (8) Json拓展 love.yinlin.extension.JsonEx
-
-核心封装了`kotlinx-json`库，提供了`Serializable Object`、`String`、`JsonElement`三者之间互相的转换, 它们全部由拓展函数实现。
-
-你无需关心隐藏在后面的Json层，例如：
+`Coroutines` 统一了项目中的上下文切换和异常处理：
 
 ```kotlin
-@Serializable
-data class Student(
-    val name: String,
-    val age: Int
-)
+val value = Coroutines.io { readFromDisk() }
+val parsed = Coroutines.cpu { parse(value) }
+Coroutines.main { state.value = parsed }
 
-val student = Student("Alice", 18)
-val text = student.toJsonString() // 转成Json文本
-println(text.parseJsonValue<Student>()) // 转回对象
-val json = text.parseJson // 转换JsonElement
-println(json.to<Student>()) // 转回对象
+Coroutines.timeout(3_000) {
+    fetchSomething()
+}
 ```
 
-核心还提供了快速构建Json数组或Json对象的`DSL`，例如：
+常用能力包括：
+
+- `with(context)`、`main`、`cpu`、`io`：切换到约定调度器。
+- `timeout(milliseconds)`：使用毫秒整数作为超时。
+- `isActive`、`requireActive`：显式检查取消状态。
+- `sync(SyncFuture)`：等待框架的单结果同步对象。
+- `catching*`：把普通异常转为值或回调，同时保留 `CancellationException` 的传播。
+
+最后一点很重要：取消不是业务失败。自己写 `catch (Throwable)` 时也必须重新抛出取消异常，否则页面离开或应用关闭后，旧任务仍可能继续工作。
+
+## JSON
+
+全局 `Json` 配置启用了 `ignoreUnknownKeys`，协议演进时客户端可以忽略新增字段。扩展函数把序列化和 `JsonElement` 转换简化为：
 
 ```kotlin
-val myArray = makeArray {
-    add(2)
-    add("hello")
-    arr {
-        add("child array")
-    }
-    obj {
-        "name" with "Alice"
-        "age" with 18
-    }
-}
+val text = profile.toJsonString()
+val profile = text.parseJsonValue<Profile>()
+val element = profile.toJson()
+val restored = element.to<Profile>()
+```
 
-val myObject = makeObject {
-    "enabled" with true
-    arr("keywords") {
-        add(2)
-        add("world")
-    }
-    obj("data") {
-        "name" with "Alice"
-        "age" with 18
-    }
+`makeObject` 和 `makeArray` 用于构造协议数据。C/S 引擎正是用 JSON 数组保持参数顺序。对持久化数据仍建议显式加默认值并规划版本迁移；忽略未知字段不能解决字段被删除或类型被改变的问题。
+
+## URI
+
+`Uri` 是可序列化的跨平台结构：
+
+```kotlin
+val uri = Uri.parse("rachel://app/openSong?id=demo")
+val id = uri?.params?.get("id")
+
+val encoded = Uri.encodeUri("https://example.com/a b")
+val decoded = Uri.decodeUri(encoded)
+```
+
+结构字段包含 `scheme`、`host`、`port`、`path` 和 `query`，`params` 从查询串派生。解析器要求完整的 `scheme://` 形式；应用内部深链也应遵守这一点。`Scheme` 收录常用协议名，文件模块还提供平台 URI 转换。
+
+## 文件系统
+
+跨平台 `File` 同时提供挂起和同步操作：
+
+```kotlin
+val cacheFile = File(PlatformFileSystem.cachePath, "payload.json")
+
+cacheFile.writeText(payload.toJsonString())
+val restored = cacheFile.readText()
+
+if (cacheFile.exists()) {
+    cacheFile.rename("payload.old.json")
 }
 ```
+
+主要能力包括元数据、`mkdir`、`list`、移动、重命名、递归删除、字节/文本读写，以及基于 `kotlinx-io` 的 `rawSource`、`rawSink`、`read`、`write`。大文件应通过 Source/Sink 流式处理，不要先整体读成 `ByteArray`。
+
+`PlatformFileSystem` 暴露：
+
+- `appPath`：应用/可执行文件相关位置。
+- `dataPath`：需要跨运行保留的数据。
+- `cachePath`：可重新生成的缓存。
+- 当前目录、路径分隔符和设置当前目录的能力。
+
+URI 分三类：普通路径用 `RegularUri`；Android 文档提供器使用 `ContentUri`；iOS 沙盒路径使用 `SandboxUri`。`ImplicitUri` 表示“由平台解释”的输入，不应在共享代码里假设它总能转换成本地绝对路径。
+
+## 依赖分析
+
+`DependencyAnalyzer` 接受项目、键和依赖列表，输出拓扑排序结果及传递依赖表。它会区分：
+
+- `UnknownDependencyError`：引用了不存在的键。
+- `LoopDependencyError`：依赖图存在环。
+
+启动系统在初始化之前使用它，因此错误会尽早暴露，而不是在某个服务读取空值时才失败。相同工具也适合插件、流水线阶段和任务编排。
+
+## 常用小工具
+
+核心库还包含几组贯穿项目的辅助类型：
+
+- `LazyReference` / `BaseLazyReference`：只能初始化一次的延迟引用。
+- 原子值包装与 `Mutex`：屏蔽平台实现差异。
+- 日期格式和 `DateEx` 当前时间辅助。
+- 集合增删、批量替换和空值处理扩展。
+- `Data.Success` / `Data.Failure`：显式承载成功值或异常。
+
+这些工具的目标是统一语义，不是隐藏所有平台差异。涉及安全边界、文件权限、时钟精度或线程亲和性时，仍应阅读对应平台的 `actual` 实现。
