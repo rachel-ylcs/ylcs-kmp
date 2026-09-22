@@ -1,15 +1,12 @@
 package love.yinlin.cs
 
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.cio.CIOMultipartDataBase
 import io.ktor.http.content.MultiPartData
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
-import io.ktor.server.request.contentLength
 import io.ktor.server.request.receive
-import io.ktor.server.request.receiveChannel
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.request.uri
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
@@ -17,7 +14,6 @@ import io.ktor.server.routing.Routing
 import io.ktor.server.routing.RoutingCall
 import io.ktor.server.routing.route
 import io.ktor.server.websocket.webSocket
-import io.ktor.utils.io.InternalAPI
 import io.ktor.utils.io.asByteWriteChannel
 import io.ktor.utils.io.copyAndClose
 import io.ktor.websocket.CloseReason
@@ -35,7 +31,6 @@ import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.then
 import love.yinlin.extension.to
 import love.yinlin.extension.toJson
-import love.yinlin.extension.toJsonString
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
@@ -521,22 +516,9 @@ abstract class APIScope(val engine: ServerEngine) {
         inline operator fun <reified I> invoke(): I = if (I::class == APIFile::class) fileList[fileIndex++] as I else dataList[dataIndex++].parseJsonValue()
     }
 
-    @OptIn(InternalAPI::class)
     inline fun API<out APIType>.internalResponseForm(crossinline block: suspend (FormResult) -> JsonElement) {
-        internalResponse { call ->
-            val request = call.request
-            // TODO: 等待上游修复
-            // https://github.com/ktorio/ktor/issues/5694
-            // https://youtrack.jetbrains.com/issue/KTOR-7361/CIO-native-receiveMultipart-throw-CannotTransformContentToTypeException
-            val contentLength = request.contentLength()
-            val parts = CIOMultipartDataBase(
-                coroutineContext = call.coroutineContext,
-                channel = call.receiveChannel(),
-                contentType = request.headers[HttpHeaders.ContentType]!!,
-                contentLength = contentLength,
-                formFieldLimit = contentLength ?: (5L * 1024 * 1024)
-            )
-            val formResult = FormResult(parts)
+        internalResponse {
+            val formResult = FormResult(it.receiveMultipart())
             formResult.parse()
             block(formResult)
         }
