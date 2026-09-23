@@ -140,6 +140,7 @@ open class Layer(
         return null
     }
 
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     internal fun triggerVisibleLayer(event: Event): Boolean = when (event) {
         // 检查是否是指针事件 拦截
         is Event.Pointer -> {
