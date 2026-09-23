@@ -9,7 +9,6 @@ plugins {
 }
 
 template(object : KotlinMultiplatformTemplate() {
-    override val androidNativeTarget: Boolean = true
     override val windowsTarget: Boolean = true
     override val linuxTarget: Boolean = true
     override val macosTarget: Boolean = true
@@ -44,8 +43,6 @@ template(object : KotlinMultiplatformTemplate() {
         wasmJsMain.configure(webMain)
 
         nativeMain.configure(commonMain)
-
-        androidNativeMain.configure(nativeMain)
 
         windowsMain.configure(nativeMain)
 
