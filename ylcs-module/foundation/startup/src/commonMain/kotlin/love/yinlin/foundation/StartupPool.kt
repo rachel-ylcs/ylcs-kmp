@@ -30,10 +30,10 @@ open class StartupPool(
     @PublishedApi
     internal var isClean = false
     @PublishedApi
-    internal val factoryList = mutableListOf<StartupFactory<*>>()
+    internal val factoryList: MutableList<StartupFactory<*>> = []
 
     private var dependenciesMap = emptyMap<String, List<String>>()
-    private var dependenciesList = emptyList<StartupFactory<*>>()
+    private var dependenciesList: List<StartupFactory<*>> = []
     private val taskMap = mutableMapOf<String, Deferred<Unit>>()
 
     inline fun <reified S : Startup, F : StartupFactory<S>> startup(factory: F): StartupDelegate<S> {
@@ -51,14 +51,14 @@ open class StartupPool(
     @OptIn(ExperimentalUuidApi::class)
     inline fun sync(
         id: String = Uuid.generateV7().toString(),
-        dependencies: List<String> = emptyList(),
+        dependencies: List<String> = [],
         crossinline block: () -> Unit
     ): StartupDelegate<Startup> = startup(StartupFactory.sync(id, dependencies, block))
 
     @OptIn(ExperimentalUuidApi::class)
     inline fun async(
         id: String = Uuid.generateV7().toString(),
-        dependencies: List<String> = emptyList(),
+        dependencies: List<String> = [],
         crossinline block: suspend () -> Unit
     ): StartupDelegate<Startup> = startup(StartupFactory.async(id, dependencies, block))
 
@@ -99,11 +99,11 @@ open class StartupPool(
 
         // 同步服务
         val syncStartupList = dependenciesList.filter { it.dispatcher == null }
-        val syncStartupSet = syncStartupList.mapTo(mutableSetOf()) { it.id } // 同步服务集合
+        val syncStartupSet: MutableSet<String> = syncStartupList.mapTo([]) { it.id } // 同步服务集合
 
         for (syncStartup in syncStartupList) {
             val id = syncStartup.id
-            val dependencies = dependenciesMap[id] ?: emptyList()
+            val dependencies = dependenciesMap[id] ?: []
             // 确保同步服务不依赖异步服务
             dependencies.find { it !in syncStartupSet }?.then { dependentId ->
                 throw IllegalStateException("sync startup $id is dependent on async startup $dependentId")
@@ -124,7 +124,7 @@ open class StartupPool(
                 // 遍历依赖表
                 dependenciesList.mapNotNull { factory ->
                     val id = factory.id
-                    val dependencies = dependenciesMap[id] ?: emptyList()
+                    val dependencies = dependenciesMap[id] ?: []
                     val dispatcher = factory.dispatcher
 
                     if (dispatcher != null) {

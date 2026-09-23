@@ -11,10 +11,10 @@ data class WeiboUserInfo(
 	val avatar: String = "", // 头像
 ) {
 	companion object {
-		val Default = listOf(
-			WeiboUserInfo("2266537042", "银临Rachel"),
-			WeiboUserInfo("7802114712", "银临-欢银光临"),
-			WeiboUserInfo("3965226022", "银临的小银库")
-		)
+		val Default = [
+            WeiboUserInfo("2266537042", "银临Rachel"),
+            WeiboUserInfo("7802114712", "银临-欢银光临"),
+            WeiboUserInfo("3965226022", "银临的小银库")
+        ]
 	}
 }

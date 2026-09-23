@@ -33,9 +33,7 @@ data class Comment(
 		const val ACTIVITY = 3
 		const val DISCUSSION = 4
 
-		val MovableSection = listOf(
-			NOTIFICATION, WATER, ACTIVITY, DISCUSSION
-		)
+		val MovableSection = [NOTIFICATION, WATER, ACTIVITY, DISCUSSION]
 
 		fun sectionName(section: Int): String = when (section) {
 			LATEST_TOPIC -> "最新"

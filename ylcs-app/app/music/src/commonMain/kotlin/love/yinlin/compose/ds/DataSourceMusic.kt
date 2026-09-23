@@ -42,9 +42,9 @@ object DataSourceMusic {
      * 可能会随着媒体变动从而更新与当前播放的列表不一致的结果
      */
     fun fetchCurrentPlaylist(list: Playlist): List<String> = when (list) {
-        is Playlist.None -> emptyList()
+        is Playlist.None -> []
         is Playlist.Default -> library.values.map { it.id }
-        is Playlist.User -> app.config.playlistLibrary[list.name]?.items?.fastFilter { it in library } ?: emptyList()
+        is Playlist.User -> app.config.playlistLibrary[list.name]?.items?.fastFilter { it in library } ?: []
     }
 
     /**

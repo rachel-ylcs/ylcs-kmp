@@ -183,7 +183,7 @@ private fun HelpLayout4() {
                 val w = size.width
                 val h = size.height
                 val centerX = w / 2f
-                val angles = listOf(-45f, 0f, 45f)
+                val angles = [-45f, 0f, 45f]
 
                 translate(left = centerX, top = h) {
                     angles.forEach { angle ->

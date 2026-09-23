@@ -124,7 +124,7 @@ class Reg(
 
     // 枚举项
     val allItems: List<String> get() = withMemory { hKey ->
-        val container = mutableListOf<String>()
+        val container: MutableList<String> = []
         val buffer = allocArray<UShortVar>(MAX_PATH)
         while (true) {
             val result = RegEnumKeyW(hKey, container.size.convert(), buffer, MAX_PATH.convert())
@@ -132,7 +132,7 @@ class Reg(
             container += buffer.toKString()
         }
         return@withMemory container
-    } ?: emptyList()
+    } ?: []
 
     // 是否有键
     operator fun contains(key: String): Boolean = withMemory { hKey ->
@@ -161,8 +161,8 @@ class Reg(
                 if (result == ERROR_SUCCESS) return@withMemory buffer
             }
         }
-        return@withMemory byteArrayOf()
-    } ?: byteArrayOf()
+        return@withMemory []
+    } ?: []
 
     // 取数字值
     fun numberValue(key: String): ULong = withMemory { hKey ->
@@ -251,7 +251,7 @@ class Reg(
 
     // 枚举键值
     val allKeys: List<Pair<String, KeyType>> get() = withMemory { hKey ->
-        val container = mutableListOf<Pair<String, KeyType>>()
+        val container: MutableList<Pair<String, KeyType>> = []
         val pMaxKeySize = alloc<UIntVar>()
         val pMaxValueSize = alloc<UIntVar>()
         if (RegQueryInfoKeyW(hKey, null, null, null, null, null, null, null, pMaxKeySize.ptr, pMaxValueSize.ptr, null, null) == ERROR_SUCCESS) {
@@ -265,7 +265,7 @@ class Reg(
             }
         }
         return@withMemory container
-    } ?: emptyList()
+    } ?: []
 
     // 刷新环境变量
     companion object {

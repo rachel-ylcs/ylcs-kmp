@@ -344,7 +344,7 @@ open class RichEditorState(maxLength: Int) {
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
                     ActionScope.Right.Container(modifier = Modifier.fillMaxWidth()) {
-                        val enableList by rememberDerivedState { listOf(true, useEmoji, useImage, useLink, useTopic, useAt) }
+                        val enableList by rememberDerivedState { [true, useEmoji, useImage, useLink, useTopic, useAt] }
                         RichEditorPage.entries.fastForEachIndexed { index, editorPage ->
                             val isActive = currentPage == editorPage
                             Icon(

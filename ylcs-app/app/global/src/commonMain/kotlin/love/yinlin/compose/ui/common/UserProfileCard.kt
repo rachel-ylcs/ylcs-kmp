@@ -21,7 +21,7 @@ import love.yinlin.cs.url
 import love.yinlin.data.rachel.profile.UserPublicProfile
 import love.yinlin.extension.DateEx
 
-private val FadeWallImage = listOf(
+private val FadeWallImage = [
     0.0f to 1f,
     0.6f to 0.9f,
     0.7f to 0.8f,
@@ -29,9 +29,9 @@ private val FadeWallImage = listOf(
     0.9f to 0.2f,
     0.95f to 0.05f,
     1.0f to 0f
-)
+]
 
-private val FadeWallImageWithTopBar = listOf(
+private val FadeWallImageWithTopBar = [
     0.0f to 0f,
     0.05f to 0.4f,
     0.1f to 0.5f,
@@ -43,7 +43,7 @@ private val FadeWallImageWithTopBar = listOf(
     0.9f to 0.2f,
     0.95f to 0.05f,
     1.0f to 0f
-)
+]
 
 @Composable
 fun UserProfileCard(

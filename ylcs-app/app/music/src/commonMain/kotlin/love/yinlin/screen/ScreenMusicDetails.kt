@@ -257,16 +257,16 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     }
 
     val resBrush = ModResourceType.entries.associateWith {
-        Brush.linearGradient(when (it) {
-            ModResourceType.Config -> listOf(Colors.Yellow5, Colors.Yellow6)
-            ModResourceType.Audio -> listOf(Colors.Pink4, Colors.Pink5)
-            ModResourceType.Record -> listOf(Colors.Purple4, Colors.Purple5)
-            ModResourceType.Background -> listOf(Colors.Blue5, Colors.Blue6)
-            ModResourceType.LineLyrics -> listOf(Colors.Green7, Colors.Green8)
-            ModResourceType.Animation -> listOf(Colors.Orange5, Colors.Orange6)
-            ModResourceType.Video -> listOf(Colors.Green5, Colors.Green6)
-            ModResourceType.Rhyme -> listOf(Colors.Cyan5, Colors.Cyan6)
-            ModResourceType.Accompaniment -> listOf(Colors.Red4, Colors.Red5)
+        Brush.linearGradient(colors = when (it) {
+            ModResourceType.Config -> [Colors.Yellow5, Colors.Yellow6]
+            ModResourceType.Audio -> [Colors.Pink4, Colors.Pink5]
+            ModResourceType.Record -> [Colors.Purple4, Colors.Purple5]
+            ModResourceType.Background -> [Colors.Blue5, Colors.Blue6]
+            ModResourceType.LineLyrics -> [Colors.Green7, Colors.Green8]
+            ModResourceType.Animation -> [Colors.Orange5, Colors.Orange6]
+            ModResourceType.Video -> [Colors.Green5, Colors.Green6]
+            ModResourceType.Rhyme -> [Colors.Cyan5, Colors.Cyan6]
+            ModResourceType.Accompaniment -> [Colors.Red4, Colors.Red5]
         })
     }
 
@@ -335,15 +335,15 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
 
     private val resAction = ModResourceType.entries.associateWith {
         when (it) {
-            ModResourceType.Config -> listOf(resActionConfigEditor)
-            ModResourceType.Audio -> emptyList()
-            ModResourceType.Record -> listOf(resActionReplaceImage(1f))
-            ModResourceType.Background -> listOf(resActionReplaceImage(0.5625f))
-            ModResourceType.LineLyrics -> listOf(resActionLyricsEditor)
-            ModResourceType.Animation -> listOf(resActionDelete)
-            ModResourceType.Video -> listOf(resActionDelete)
-            ModResourceType.Rhyme -> listOf(resActionDelete)
-            ModResourceType.Accompaniment -> listOf(resActionDelete)
+            ModResourceType.Config -> [resActionConfigEditor]
+            ModResourceType.Audio -> []
+            ModResourceType.Record -> [resActionReplaceImage(1f)]
+            ModResourceType.Background -> [resActionReplaceImage(0.5625f)]
+            ModResourceType.LineLyrics -> [resActionLyricsEditor]
+            ModResourceType.Animation -> [resActionDelete]
+            ModResourceType.Video -> [resActionDelete]
+            ModResourceType.Rhyme -> [resActionDelete]
+            ModResourceType.Accompaniment -> [resActionDelete]
         }
     }
 

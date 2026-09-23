@@ -62,7 +62,7 @@ object SodaMusicAPI : PlatformMusicAPI {
     // ---------- KRC 转 LRC ----------
     private fun convertKrcToLrc(content: String): String {
         val lines = content.split("\n")
-        val lrcLines = mutableListOf<String>()
+        val lrcLines: MutableList<String> = []
         val lineRegex = Regex("""\[(\d+),(\d+)](.*)""")
         val tagRegex = Regex("""<[^>]+>""")
         for (line in lines) {
@@ -84,7 +84,7 @@ object SodaMusicAPI : PlatformMusicAPI {
     // ---------- 获取完整歌单（单首歌失败不影响其他）----------
     private suspend fun fetchPlaylist(playlistId: String): List<PlatformMusicInfo>? {
         val trackIds = getPlaylistTrackIds(playlistId) ?: return null
-        val result = mutableListOf<PlatformMusicInfo>()
+        val result: MutableList<PlatformMusicInfo> = []
         for (trackId in trackIds) {
             catching {
                 fetchTrackInfo(trackId)?.then { result += it }
@@ -166,10 +166,10 @@ object SodaMusicAPI : PlatformMusicAPI {
         val trackIds = json.arr("result_groups").firstOrNull()?.Object
             ?.arr("data")?.mapNotNull { item ->
                 item.Object.obj("entity").obj("track")["id"]?.String
-            } ?: emptyList()
+            } ?: []
 
         if (trackIds.isEmpty()) return null
-        val result = mutableListOf<PlatformMusicInfo>()
+        val result: MutableList<PlatformMusicInfo> = []
         for (tid in trackIds) {
             catching {
                 fetchTrackInfo(tid)?.then { result += it }

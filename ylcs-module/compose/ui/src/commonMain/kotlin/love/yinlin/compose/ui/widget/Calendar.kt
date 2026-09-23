@@ -50,27 +50,21 @@ private val solarFestivalTable = mapOf(
 )
 
 @Stable
-private val lunarDayTable = arrayOf(
-    "", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"
-)
+private val lunarDayTable: Array<String> = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 
 @Stable
-private val lunarDaysTable = arrayOf(
-    "初", "十", "廿", "三"
-)
+private val lunarDaysTable: Array<String> = ["初", "十", "廿", "三"]
 
 @Stable
-private val lunarMonthTable = arrayOf(
-    "", "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"
-)
+private val lunarMonthTable: Array<String> = ["", "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"]
 
 @Stable
-private val solarTermTable = arrayOf(
+private val solarTermTable: Array<String> = [
     "小寒", "大寒", "立春", "雨水", "惊蛰", "春分",
     "清明", "谷雨", "立夏", "小满", "芒种", "夏至",
     "小暑", "大暑", "立秋", "处暑", "白露", "秋分",
     "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"
-)
+]
 
 @Stable
 private object LunarLoader {

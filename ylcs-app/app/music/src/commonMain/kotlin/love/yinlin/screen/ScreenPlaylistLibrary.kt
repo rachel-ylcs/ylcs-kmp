@@ -90,7 +90,7 @@ class ScreenPlaylistLibrary : Screen() {
     private suspend fun addPlaylist() {
         inputPlaylistNameDialog.open()?.then { name ->
             if (name != Playlist.Default.name && playlistLibrary[name] == null) {
-                playlistLibrary[name] = MusicPlaylist(name, emptyList())
+                playlistLibrary[name] = MusicPlaylist(name, [])
                 currentPage = tabs.indexOf(name)
             }
             else slot.tip.warning("歌单已存在")
@@ -491,6 +491,6 @@ class ScreenPlaylistLibrary : Screen() {
     private val inputPlaylistNameDialog = this land DialogInput(hint = "歌单名", maxLength = 16)
 
     private val processPlaylistDialog = this land DialogChoice.fromIconItems(
-        items = listOf("播放" to Icons.PlayArrow, "重命名" to Icons.Edit, "删除" to Icons.Delete)
+        items = ["播放" to Icons.PlayArrow, "重命名" to Icons.Edit, "删除" to Icons.Delete]
     )
 }

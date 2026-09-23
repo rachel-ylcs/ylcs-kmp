@@ -56,14 +56,14 @@ sealed class Block<BS : BlockStatus>(
         protected val InnerBottomRight = Offset(DEFAULT_DIMENSION - INNER_RADIUS, DEFAULT_DIMENSION - INNER_RADIUS)
 
         protected val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-        protected val BounceBorderStroke = arrayOf(Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f))
-        protected val BounceBorderAlpha = floatArrayOf(0.2f, 0.5f, 0.9f, 0.4f, 0.8f)
+        protected val BounceBorderStroke: Array<Stroke> = [Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f)]
+        protected val BounceBorderAlpha: FloatArray = [0.2f, 0.5f, 0.9f, 0.4f, 0.8f]
 
         protected const val LYRICS_TEXT_SCALE = 0.5f
 
         protected const val PRESS_TOLERANCE = 200
 
-        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Cyan4, Colors.Yellow4)
+        val ScaleColorList: Array<Color> = [Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Cyan4, Colors.Yellow4]
         protected val TextColor = Colors.Ghost
         protected val MissingColor = Colors.Gray6
 
@@ -74,12 +74,12 @@ sealed class Block<BS : BlockStatus>(
             RhymeDifficulty.Extreme to 1000
         )
 
-        val NoteScaleFontMap = arrayOf(
+        val NoteScaleFontMap: Array<Char> = [
             '9',
             '1', '2', '3', '4', '5', '6', '7',
             '\uF021', '@', '#', '$', '\u00A7', '\u00A8', '\u00A9',
             '\u0086', '\u0087', '\u0088', '*', '%', '^', '&',
-        )
+        ]
     }
 
     abstract val rhymeAction: RhymeAction // 音符操作

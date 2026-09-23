@@ -12,10 +12,7 @@ class ServerScope(engine: ServerEngine) : APIScope(engine) {
     val mysql: MysqlService = MysqlService(this)
     val redis: RedisService = RedisService(this)
 
-    override val services: List<ServerService> = listOf(
-        mysql,
-        redis
-    )
+    override val services: List<ServerService> = [mysql, redis]
 
     override fun api() {
         accountAPI()

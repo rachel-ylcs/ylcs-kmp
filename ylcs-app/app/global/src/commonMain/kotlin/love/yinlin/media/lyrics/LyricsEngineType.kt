@@ -31,6 +31,6 @@ enum class LyricsEngineType(
     );
 
     companion object {
-        val DefaultOrder = listOf(Rhyme, Line)
+        val DefaultOrder = [Rhyme, Line]
     }
 }

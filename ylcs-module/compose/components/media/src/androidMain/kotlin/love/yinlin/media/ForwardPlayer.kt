@@ -17,7 +17,7 @@ fun mergePlayMode(repeatMode: Int, shuffleModeEnabled: Boolean): MediaPlayMode =
 }
 
 val Timeline.extractMediaItems: List<MediaItem> get() {
-    val items = mutableListOf<MediaItem>()
+    val items: MutableList<MediaItem> = []
     val window = Timeline.Window()
     for (index in 0 ..< windowCount) {
         getWindow(index, window)

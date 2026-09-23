@@ -13,7 +13,7 @@ class SoundPlugin(engine: Engine, private val soundList: List<File>) : Plugin(en
         override fun build(engine: Engine): Plugin = SoundPlugin(engine, soundList)
     }
 
-    override val dependencies: List<KClass<out Plugin>> = listOf(ScenePlugin::class)
+    override val dependencies: List<KClass<out Plugin>> = [ScenePlugin::class]
 
     private val player = SoundPlayer()
 

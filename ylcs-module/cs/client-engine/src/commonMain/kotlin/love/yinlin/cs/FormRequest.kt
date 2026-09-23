@@ -25,7 +25,7 @@ import love.yinlin.io.Sources
 import love.yinlin.reflect.metaClassName
 
 class ClientAPIFile internal constructor(val value: Any) : APIFile {
-    override val files: List<String> = emptyList()
+    override val files: List<String> = []
 }
 
 fun apiFile(data: String): APIFile = ClientAPIFile(value = data.encodeToByteArray())
@@ -36,7 +36,7 @@ suspend fun apiFile(data: File): APIFile = ClientAPIFile(data.rawSource())
 suspend fun apiFile(data: List<File>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let(::ClientAPIFile)
 
 class APIFormScope {
-    val formParts = mutableListOf<FormPart<*>>()
+    val formParts: MutableList<FormPart<*>> = []
     var index = 0
     val sources = Sources<RawSource>()
 

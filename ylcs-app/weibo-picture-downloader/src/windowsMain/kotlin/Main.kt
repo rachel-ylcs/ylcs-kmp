@@ -25,7 +25,7 @@ suspend fun getUserWeibo(uid: String, extraHeaders: Map<String, String>): List<W
         headers = headers { appendAll(extraHeaders) }
     }) { json: JsonObject ->
         val cards = json.obj("data").arr("cards")
-        val items = mutableListOf<Weibo>()
+        val items: MutableList<Weibo> = []
         for (item in cards) {
             val card = item.Object
             if (card["card_type"].Int != 9) continue  // 非微博类型
@@ -33,14 +33,14 @@ suspend fun getUserWeibo(uid: String, extraHeaders: Map<String, String>): List<W
             val time = weiboTime(blogs["created_at"].String)
             val text = blogs["text"].String
             blogs = blogs["retweeted_status"]?.Object ?: blogs // 转发微博
-            val pictures = mutableListOf<String>()
+            val pictures: MutableList<String> = []
             if ("pics" in blogs) {
                 for (picItem in blogs.arr("pics")) pictures += picItem.Object.obj("large")["url"].String.replace("mw2000", "large")
             }
             if (pictures.isNotEmpty()) items += Weibo(DateEx.Formatter.standardDateTime.format(time)!!, text, pictures)
         }
         items
-    } ?: emptyList()
+    } ?: []
 }
 
 @OptIn(ExperimentalForeignApi::class)

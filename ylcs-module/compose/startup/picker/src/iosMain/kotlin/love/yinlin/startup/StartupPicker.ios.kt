@@ -50,7 +50,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
                 }
                 val picker = PHPickerViewController(configuration)
                 val onImagesPicked: (List<PHPickerResult>) -> Unit = { results ->
-                    val images = mutableListOf<File>()
+                    val images: MutableList<File> = []
                     var processedImages = 0
                     results.forEach { pickerResult ->
                         pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) { url, _ ->
@@ -71,7 +71,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
                 }
                 phPickerDismissDelegate = object : NSObject(), UIAdaptivePresentationControllerDelegateProtocol {
                     override fun presentationControllerDidDismiss(presentationController: UIPresentationController) {
-                        onImagesPicked(emptyList())
+                        onImagesPicked([])
                     }
                 }
                 picker.delegate = phPickerDelegate
@@ -92,7 +92,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
                         UTType.typeWithMIMEType(it)
                     }
                 }
-                .ifEmpty { listOf(UTTypeContent) }
+                .ifEmpty { [UTTypeContent] }
         ).apply {
             allowsMultipleSelection = false
         }
@@ -133,7 +133,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
     actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = Coroutines.main {
         Coroutines.sync { future ->
             future.catching {
-                val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeFolder))
+                val picker = UIDocumentPickerViewController(forOpeningContentTypes = [UTTypeFolder])
                 documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
                     override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
                         val fileUrl = didPickDocumentAtURL.URLByAppendingPathComponent(filename)

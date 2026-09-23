@@ -98,7 +98,7 @@ object TextPage : Page() {
                     Switch(isStrikethrough, { isStrikethrough = it })
                 }
 
-                val styles = listOf(
+                val styles = [
                     Theme.typography.v1,
                     Theme.typography.v2,
                     Theme.typography.v3,
@@ -109,7 +109,7 @@ object TextPage : Page() {
                     Theme.typography.v8,
                     Theme.typography.v9,
                     Theme.typography.v10
-                )
+                ]
 
                 styles.fastForEachIndexed { index, style ->
                     var textStyle = style
@@ -135,7 +135,7 @@ object TextPage : Page() {
 
             Component("RichText") {
                 val fontSize = LocalStyle.current.fontSize * 2f
-                val emojiList = listOf(Icons.Home, Icons.Clear, Icons.Token)
+                val emojiList = [Icons.Home, Icons.Clear, Icons.Token]
 
                 val richText = remember {
                     buildRichString {
@@ -159,7 +159,7 @@ object TextPage : Page() {
                 val decodeText = remember { RichParser.Default.parse(encodedText) }
 
                 val renderer = rememberRichRenderer({
-                    listOf(
+                    [
                         object : RichDrawer {
                             override val type: String = RichType.Emoji.value
                             override fun RichRenderScope.render(item: RichObject) = item.cast<RichNodeEmoji> {
@@ -168,7 +168,7 @@ object TextPage : Page() {
                                 }
                             }
                         }
-                    )
+                    ]
                 })
 
                 ExampleRow {

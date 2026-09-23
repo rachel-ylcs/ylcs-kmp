@@ -11,7 +11,7 @@ import platform.Foundation.NSURL
 
 @OptIn(ExperimentalForeignApi::class)
 actual class SoundPlayer {
-    private var caches = emptyList<AVAudioPlayer>()
+    private var caches: List<AVAudioPlayer> = []
 
     init {
         AVAudioSession.sharedInstance().apply {

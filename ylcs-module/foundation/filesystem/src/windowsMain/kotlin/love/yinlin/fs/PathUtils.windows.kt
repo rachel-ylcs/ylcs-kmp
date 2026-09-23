@@ -54,7 +54,7 @@ data class DriverInfo(
     companion object {
         internal fun getDriversBitmap(): List<Char> {
             var value = GetLogicalDrives()
-            val bm = mutableListOf<Char>()
+            val bm: MutableList<Char> = []
             for (i in 0 ..< 26) {
                 if ((value and 1U) == 1U) bm += 'A' + i
                 value = value shr 1

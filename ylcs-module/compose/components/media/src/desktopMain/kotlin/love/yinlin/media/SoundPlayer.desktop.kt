@@ -10,7 +10,7 @@ import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 
 actual class SoundPlayer {
-    private var caches = emptyList<Clip>()
+    private var caches: List<Clip> = []
 
     actual suspend fun loadFromByteArray(data: List<ByteArray>) {
         catching {
@@ -48,6 +48,6 @@ actual class SoundPlayer {
             clip.stop()
             clip.close()
         }
-        caches = emptyList()
+        caches = []
     }
 }

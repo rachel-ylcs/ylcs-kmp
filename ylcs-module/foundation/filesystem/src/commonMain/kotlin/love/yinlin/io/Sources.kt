@@ -4,7 +4,7 @@ import kotlinx.io.RawSource
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.then
 
-class Sources<S : RawSource>(private val sources: MutableList<S> = mutableListOf()) : AutoCloseable, MutableList<S> by sources {
+class Sources<S : RawSource>(private val sources: MutableList<S> = []) : AutoCloseable, MutableList<S> by sources {
     override fun close() {
         for (source in sources) source.close()
     }

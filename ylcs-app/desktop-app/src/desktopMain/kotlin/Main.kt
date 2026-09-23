@@ -44,7 +44,7 @@ fun main() {
                 tip = "加载更新包",
                 onClick = {
                     mainScope.launch(ioContext) {
-                        picker.pickPath(mimeType = listOf(MimeType.ZIP), filter = listOf("*.zip"))?.path?.let(AutoUpdate::start)
+                        picker.pickPath(mimeType = [MimeType.ZIP], filter = ["*.zip"])?.path?.let(AutoUpdate::start)
                     }
                 },
                 modifier = Modifier.size(Theme.size.smallIcon)

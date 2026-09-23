@@ -79,23 +79,23 @@ class MultipleBlock(
         private const val INNER_MAIN_ALPHA = 0.8f
         private val InnerProgressTipColor = Colors.White
 
-        private val DefaultPath = Path(arrayOf(TopCenter, CenterRight, BottomCenter, CenterLeft))
-        private val InnerPath2 = listOf(
-            Path(arrayOf(TopCenter, CenterLeft, CenterRight)),
-            Path(arrayOf(BottomCenter, CenterLeft, CenterRight))
-        )
-        private val InnerPath3 = listOf(
-            Path(arrayOf(CenterLeft, InnerTopLeft, InnerBottomLeft)),
-            Path(arrayOf(TopCenter, InnerTopLeft, InnerBottomLeft, BottomCenter, InnerBottomRight, InnerTopRight)),
-            Path(arrayOf(CenterRight, InnerTopRight, InnerBottomRight))
-        )
-        private val InnerPath4 = listOf(
-            Path(arrayOf(TopCenter, DefaultCenter, CenterLeft)),
-            Path(arrayOf(TopCenter, DefaultCenter, CenterRight)),
-            Path(arrayOf(BottomCenter, DefaultCenter, CenterRight)),
-            Path(arrayOf(BottomCenter, DefaultCenter, CenterLeft))
-        )
-        private val InnerPaths = listOf(emptyList(), emptyList(), InnerPath2, InnerPath3, InnerPath4)
+        private val DefaultPath = Path([TopCenter, CenterRight, BottomCenter, CenterLeft])
+        private val InnerPath2 = [
+            Path([TopCenter, CenterLeft, CenterRight]),
+            Path([BottomCenter, CenterLeft, CenterRight])
+        ]
+        private val InnerPath3 = [
+            Path([CenterLeft, InnerTopLeft, InnerBottomLeft]),
+            Path([TopCenter, InnerTopLeft, InnerBottomLeft, BottomCenter, InnerBottomRight, InnerTopRight]),
+            Path([CenterRight, InnerTopRight, InnerBottomRight])
+        ]
+        private val InnerPath4 = [
+            Path([TopCenter, DefaultCenter, CenterLeft]),
+            Path([TopCenter, DefaultCenter, CenterRight]),
+            Path([BottomCenter, DefaultCenter, CenterRight]),
+            Path([BottomCenter, DefaultCenter, CenterLeft])
+        ]
+        private val InnerPaths = [[], [], InnerPath2, InnerPath3, InnerPath4]
 
         fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long, extraPrepareRatio: Float): Time {
             val rawPrepare = PrepareDurationMap[difficulty]!!

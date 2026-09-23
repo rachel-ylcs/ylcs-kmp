@@ -13,7 +13,7 @@ import androidx.compose.ui.util.fastForEach
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 
 internal val StarPaths by lazy {
-    listOf(
+    [
         Path().apply {
             moveTo(539.457f, 110.815f)
             lineTo(418.568f, 355.852f)
@@ -84,7 +84,7 @@ internal val StarPaths by lazy {
             lineTo(539.457f, 483.457f)
             close()
         } to Color(0xFF6ADDD6)
-    )
+    ]
 }
 
 @Composable

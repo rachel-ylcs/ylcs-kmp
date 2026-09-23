@@ -40,7 +40,7 @@ open class Layer(
             }
         }
 
-    private val removeCacheSet = mutableSetOf<Visible>()
+    private val removeCacheSet: MutableSet<Visible> = []
 
     /**
      * 移除Visible

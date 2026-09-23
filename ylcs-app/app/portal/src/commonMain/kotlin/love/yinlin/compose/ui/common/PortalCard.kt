@@ -31,35 +31,35 @@ data class PortalCardItem(
     private val onClick: () -> Unit
 ) {
     private val lightBackgroundBrush = Brush.linearGradient(
-        colors = listOf(
+        colors = [
             lightColors[0].copy(alpha = 0.22f),
             lightColors[1].copy(alpha = 0.96f),
             lightColors[2].copy(alpha = 0.98f)
-        )
+        ]
     )
 
     private val darkBackgroundBrush = Brush.linearGradient(
-        colors = listOf(
+        colors = [
             darkColors[0].copy(alpha = 0.22f),
             darkColors[1].copy(alpha = 0.96f),
             darkColors[2].copy(alpha = 0.98f)
-        )
+        ]
     )
 
     private val lightBorderBrush = Brush.linearGradient(
-        colors = listOf(
+        colors = [
             lightColors[0].copy(alpha = 0.75f),
             Colors.Dark.copy(alpha = 0.25f),
             Colors.Transparent
-        )
+        ]
     )
 
     private val darkBorderBrush = Brush.linearGradient(
-        colors = listOf(
+        colors = [
             darkColors[0].copy(alpha = 0.75f),
             Colors.White.copy(alpha = 0.25f),
             Colors.Transparent
-        )
+        ]
     )
 
     @Composable

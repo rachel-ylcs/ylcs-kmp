@@ -23,19 +23,19 @@ class BlockMapGenerator private constructor(
     private val audioOffset = lyricsConfig.offset
     private val difficulty = playConfig.difficulty
 
-    private val occupiedSet = mutableSetOf<Offset>()
-    private val result = mutableListOf<List<Offset>>()
+    private val occupiedSet: MutableSet<Offset> = []
+    private val result: MutableList<List<Offset>> = []
 
     private fun isPosValid(pos: Offset, prevBlock: Offset): Boolean {
         if (occupiedSet.contains(pos)) return false
 
         // 检查上下左右四个相邻 block
-        val neighbors = listOf(
+        val neighbors = [
             Offset(pos.x + blockDimension, pos.y),
             Offset(pos.x - blockDimension, pos.y),
             Offset(pos.x, pos.y + blockDimension),
             Offset(pos.x, pos.y - blockDimension)
-        )
+        ]
 
         for (neighbor in neighbors) {
             // 如果邻居被占用，它必须是紧挨着的上一个 block
@@ -52,10 +52,10 @@ class BlockMapGenerator private constructor(
         val segmentData = line.theme
 
         // 尝试方向, 初始下转，贪心优先左转，尝试右转
-        val directions = if (segmentIndex == 0) listOf(Offset(dx, dy)) else listOf(Offset(-dy, dx), Offset(dy, -dx))
+        val directions = if (segmentIndex == 0) [Offset(dx, dy)] else [Offset(-dy, dx), Offset(dy, -dx)]
 
         for ((currentDx, currentDy) in directions) {
-            val currentSegmentPoints = mutableListOf<Offset>()
+            val currentSegmentPoints: MutableList<Offset> = []
             var tempX = lastX
             var tempY = lastY
             var canPlace = true
@@ -100,7 +100,7 @@ class BlockMapGenerator private constructor(
         val extraPrepareRatio = if (character is CharacterChiChi) character.range else 0f
 
         // 生成地图位置
-        val blockPositionMap = if (solve(0, -blockDimension, 0f, blockDimension, 0f)) result else emptyList()
+        val blockPositionMap: List<List<Offset>> = if (solve(0, -blockDimension, 0f, blockDimension, 0f)) result else []
         val lineCount = blockPositionMap.size
         var rawIndex = -1
 

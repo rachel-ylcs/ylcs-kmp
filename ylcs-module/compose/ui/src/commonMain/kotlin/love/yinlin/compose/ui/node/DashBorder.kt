@@ -29,7 +29,7 @@ private class DashBorderNode(
         val strokeWidthPx = width.toPx()
         val stroke = cachedStroke ?: Stroke(
             width = strokeWidthPx,
-            pathEffect = PathEffect.dashPathEffect(intervals = floatArrayOf(strokeWidthPx * 4, strokeWidthPx * 2), phase = 0f)
+            pathEffect = PathEffect.dashPathEffect(intervals = [strokeWidthPx * 4, strokeWidthPx * 2], phase = 0f)
         ).also { cachedStroke = it }
         when (val outline = shape.createOutline(size, layoutDirection, this)) {
             is Outline.Rounded -> {

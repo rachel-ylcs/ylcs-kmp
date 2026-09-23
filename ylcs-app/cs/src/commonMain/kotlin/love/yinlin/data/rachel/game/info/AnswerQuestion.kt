@@ -35,7 +35,7 @@ sealed class AQQuestion {
     @Stable
     @Serializable
     @SerialName("Choice")
-    data class Choice(override val title: String, val options: List<String> = emptyList()) : AQQuestion() {
+    data class Choice(override val title: String, val options: List<String> = []) : AQQuestion() {
         override val name: String = "单选"
     }
 
@@ -43,7 +43,7 @@ sealed class AQQuestion {
     @Stable
     @Serializable
     @SerialName("MultiChoice")
-    data class MultiChoice(override val title: String, val options: List<String> = emptyList()) : AQQuestion() {
+    data class MultiChoice(override val title: String, val options: List<String> = []) : AQQuestion() {
         override val name: String = "多选"
     }
 
@@ -78,7 +78,7 @@ sealed class AQAnswer {
     @Stable
     @Serializable
     @SerialName("MultiChoice")
-    data class MultiChoice(val value: List<Int> = emptyList()) : AQAnswer() {
+    data class MultiChoice(val value: List<Int> = []) : AQAnswer() {
         override fun matchQuestion(config: AQConfig, question: AQQuestion) {
             require(question is AQQuestion.MultiChoice)
             require(question.title.isNotBlank())
@@ -93,7 +93,7 @@ sealed class AQAnswer {
     @Stable
     @Serializable
     @SerialName("Blank")
-    data class Blank(val value: List<String> = emptyList()) : AQAnswer() {
+    data class Blank(val value: List<String> = []) : AQAnswer() {
         override fun matchQuestion(config: AQConfig, question: AQQuestion) {
             require(question is AQQuestion.Blank)
             require(value.size in config.minAnswerCount .. config.maxAnswerCount)
@@ -120,7 +120,7 @@ sealed class AQUserAnswer {
     @Stable
     @Serializable
     @SerialName("MultiChoice")
-    data class MultiChoice(val value: List<Int> = emptyList()) : AQUserAnswer() {
+    data class MultiChoice(val value: List<Int> = []) : AQUserAnswer() {
         override fun verifyAnswer(answer: AQAnswer): Boolean = answer is AQAnswer.MultiChoice &&
                 value.size == answer.value.size &&
                 answer.value.groupingBy { it }.eachCount() == value.groupingBy { it }.eachCount()

@@ -32,7 +32,7 @@ object NavigationPage : Page() {
             }
 
             Component("Breadcrumb") {
-                var items by rememberState { listOf("Home", "Documents", "Code", "Kotlin", "Compose") }
+                var items by rememberState { ["Home", "Documents", "Code", "Kotlin", "Compose"] }
 
                 Breadcrumb(
                     size = items.size,

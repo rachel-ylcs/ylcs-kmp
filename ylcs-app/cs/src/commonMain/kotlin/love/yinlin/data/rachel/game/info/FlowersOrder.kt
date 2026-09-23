@@ -26,7 +26,7 @@ enum class FOType {
     INCORRECT; // 错误
 
     companion object {
-        private val symbol = setOf('，', '。', '：', '！', '？')
+        private val symbol: Set<Char> = ['，', '。', '：', '！', '？']
 
         fun check(ch: Char): Boolean = ch.code !in 0 .. 127 && ch !in symbol
 

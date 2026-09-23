@@ -162,11 +162,11 @@ class ScreenGameRecordHistory : Screen() {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
             ) {
                 val (answers, results) = remember(args) {
-                    catchingDefault({ makeArray { } to emptyList() }) {
+                    catchingDefault({ makeArray { } to [] }) {
                         val (results, answers) = when (val tmp = args.result) {
-                            null -> emptyList<GameResult>() to emptyList()
+                            null -> emptyList<GameResult>() to []
                             is JsonArray -> tmp.map { it.to<GameResult>() } to args.answer.Array
-                            else -> listOf(tmp.to<GameResult>()) to listOf(args.answer!!)
+                            else -> [tmp.to<GameResult>()] to [args.answer!!]
                         }
                         require(answers.size == results.size)
                         answers to results

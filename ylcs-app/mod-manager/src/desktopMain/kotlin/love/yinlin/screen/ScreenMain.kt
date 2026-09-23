@@ -146,7 +146,7 @@ class ScreenMain : BasicScreen() {
                 if (enabled) {
                     mergeSingleMod(
                         filename = "$name.${ModResourceType.MOD_EXT}",
-                        paths = listOf(path),
+                        paths = [path],
                         filters = filters,
                         onProcess = onProcess
                     )
@@ -171,7 +171,7 @@ class ScreenMain : BasicScreen() {
                     }
                     // 基础资源打包
                     File(itemPath, ModResourceType.BASE_RES).write { sink ->
-                        ModFactory.Merge(listOf(path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
+                        ModFactory.Merge([path], sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
                     }
                 }
             }

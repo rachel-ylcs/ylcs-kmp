@@ -43,7 +43,7 @@ data class PageItem(
     val content: (@Composable () -> Unit)? = null
 ) {
     companion object {
-        val entries = listOf(
+        val entries = [
             PageItem(Icons.Theme, "主题", page = ThemePage),
             PageItem(Icons.TextFields, "文本", page = TextPage),
             PageItem(Icons.CheckBox, "输入", page = InputPage),
@@ -60,7 +60,7 @@ data class PageItem(
                     onCheckedChange = { darkMode = it }
                 )
             }),
-        )
+        ]
     }
 }
 

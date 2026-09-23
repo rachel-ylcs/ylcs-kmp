@@ -27,7 +27,7 @@ private fun playAudioBuffer(context: JsAny, audioBuffer: JsAny): JsAny = js("""
 """)
 
 actual class SoundPlayer {
-    private var caches = emptyList<JsAny>()
+    private var caches: List<JsAny> = []
     private val context = newAudioContext()
 
     actual suspend fun loadFromByteArray(data: List<ByteArray>) {

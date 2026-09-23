@@ -13,7 +13,7 @@ open class APIRes private constructor(name: String?, parent: APIRes?) : APIFile 
         else -> "$parent/${this.metaSimpleClassName.lowercase()}"
     }
 
-    override val files: List<String> = listOf(path)
+    override val files: List<String> = [path]
 
     override fun toString(): String = path
 }

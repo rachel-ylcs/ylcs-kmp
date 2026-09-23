@@ -121,11 +121,11 @@ object ContainerPage : Page() {
             }
 
             Component("ReplaceableBox") {
-                val colorList = listOf(
+                val colorList = [
                     Theme.color.primaryContainer,
                     Theme.color.secondaryContainer,
                     Theme.color.tertiaryContainer
-                )
+                ]
                 var index: Int? by rememberNull()
 
                 ReplaceableBox(
@@ -143,12 +143,12 @@ object ContainerPage : Page() {
             }
 
             Component("AdderBox") {
-                val colorList = listOf(
+                val colorList = [
                     Theme.color.primaryContainer,
                     Theme.color.secondaryContainer,
                     Theme.color.tertiaryContainer,
                     Theme.color.surface
-                )
+                ]
                 val items = remember { mutableStateListOf<Color>() }
 
                 AdderBox(
@@ -164,12 +164,12 @@ object ContainerPage : Page() {
             }
 
             Component("Banner") {
-                val imgRes = listOf(
+                val imgRes = [
                     Res.drawable.img0,
                     Res.drawable.img1,
                     Res.drawable.img2,
                     Res.drawable.img3
-                )
+                ]
 
                 Banner(
                     size = imgRes.size,

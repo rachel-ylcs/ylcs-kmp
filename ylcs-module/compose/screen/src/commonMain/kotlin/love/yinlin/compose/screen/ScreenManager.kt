@@ -50,7 +50,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         )
 
         @PublishedApi
-        internal inline fun <reified Main : BasicScreen> build(): ScreenManager = ScreenManager(listOf(Route<Main>().build()))
+        internal inline fun <reified Main : BasicScreen> build(): ScreenManager = ScreenManager([Route<Main>().build()])
 
         @PublishedApi
         @Composable
@@ -82,10 +82,10 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
                     modifier = modifier,
                     transitionSpec = transitionSpecProvider,
                     popTransitionSpec = transitionSpecProvider,
-                    entryDecorators = listOf(
+                    entryDecorators = [
                         rememberSaveableStateHolderNavEntryDecorator(),
                         rememberViewModelStoreNavEntryDecorator(),
-                    ),
+                    ],
                     entryProvider = { manager.registerScreen(map, it) }
                 )
             }

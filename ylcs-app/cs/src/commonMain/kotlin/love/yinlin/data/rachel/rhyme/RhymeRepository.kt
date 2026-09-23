@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Stable
 data class RhymeRepository(
-    val characters: List<Int> = emptyList(), // 角色数据
+    val characters: List<Int> = [], // 角色数据
 )

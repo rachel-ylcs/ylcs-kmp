@@ -9,7 +9,7 @@ import love.yinlin.extension.then
 import love.yinlin.fs.File
 
 actual class SoundPlayer {
-    private var caches = emptyList<Int>()
+    private var caches: List<Int> = []
     private val pool = SoundPool.Builder()
         .setMaxStreams(16)
         .setAudioAttributes(

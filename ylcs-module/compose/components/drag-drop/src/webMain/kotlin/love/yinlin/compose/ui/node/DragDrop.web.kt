@@ -43,7 +43,7 @@ actual fun Modifier.dragDrop(
                         else if ("files" in types) {
                             val files = transferData.files
                             val len = files.length
-                            val paths = mutableListOf<File>()
+                            val paths: MutableList<File> = []
                             for (i in 0 ..< len) paths += File(files[i]?.name ?: "")
                             onDropFunc(DropResult.File(paths))
                             return true

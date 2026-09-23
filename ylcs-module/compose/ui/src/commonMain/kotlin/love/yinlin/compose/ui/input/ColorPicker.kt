@@ -35,7 +35,7 @@ private fun ValueSlider(
     onValueChange: (Float) -> Unit,
     onFinished: () -> Unit
 ) {
-    val brush = remember(hsv) { Brush.verticalGradient(colors = listOf(hsv.copy(value = 1f).color, Colors.Black)) }
+    val brush = remember(hsv) { Brush.verticalGradient(colors = [hsv.copy(value = 1f).color, Colors.Black]) }
 
     Layout(modifier = Modifier.pointerInput(Unit) {
         detectDragGestures(
@@ -72,7 +72,7 @@ private fun SpectrumArea(
         Brush.horizontalGradient(colors = List(7) { i -> HSV(i * 60f, 1f, 1f).color })
     }
     val saturationBrush = remember {
-        Brush.verticalGradient(colors = listOf(Colors.Transparent, Colors.White))
+        Brush.verticalGradient(colors = [Colors.Transparent, Colors.White])
     }
 
     Layout(modifier = Modifier.pointerInput(Unit) {
@@ -114,7 +114,7 @@ private fun AlphaSlider(
     onAlphaChange: (Float) -> Unit,
     onFinished: () -> Unit
 ) {
-    val brush = remember(color) { Brush.verticalGradient(colors = listOf(color.copy(alpha = 1f), Colors.Transparent)) }
+    val brush = remember(color) { Brush.verticalGradient(colors = [color.copy(alpha = 1f), Colors.Transparent]) }
     val disabledContainer = Theme.color.disabledContainer
 
     Layout(modifier = Modifier.pointerInput(enabled) {

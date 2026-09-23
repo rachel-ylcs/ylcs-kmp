@@ -87,8 +87,8 @@ internal class DialogModFilter : DialogTemplate<DialogModFilter.ModFilter>() {
             raw.asSequence().map { FilterInfo(it.key, it.value, false) }.sortedByDescending(FilterInfo::num).toList()
         }
 
-        val InfoSetChain = { raw: List<FilterInfo> ->
-            raw.asSequence().filter { it.selected }.mapTo(mutableSetOf(), FilterInfo::name)
+        val InfoSetChain: (List<FilterInfo>) -> MutableSet<String> = { raw: List<FilterInfo> ->
+            raw.asSequence().filter { it.selected }.mapTo([], FilterInfo::name)
         }
     }
 
@@ -149,7 +149,7 @@ internal class DialogModFilter : DialogTemplate<DialogModFilter.ModFilter>() {
             val lyricistSet = InfoSetChain(lyricistList)
             val composerSet = InfoSetChain(composerList)
 
-            val filters = mutableListOf<ModFilter>()
+            val filters: MutableList<ModFilter> = []
             if (albumSet.isNotEmpty()) filters += NameModFilter(albumSet, MusicInfo::album)
             if (singerSet.isNotEmpty()) filters += MultiNameModFilter(singerSet, MusicInfo::singer)
             if (lyricistSet.isNotEmpty()) filters += MultiNameModFilter(lyricistSet, MusicInfo::lyricist)

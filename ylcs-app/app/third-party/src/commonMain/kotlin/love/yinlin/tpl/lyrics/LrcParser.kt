@@ -14,7 +14,7 @@ data class LrcLine(val position: Long, val text: String) : Comparable<LrcLine> {
 class LrcParser(val lines: List<LrcLine>?) {
     companion object {
         private fun parse(source: String): List<LrcLine>? {
-            val newLines = mutableListOf<LrcLine>()
+            val newLines: MutableList<LrcLine> = []
             val pattern = "\\[(\\d{2}):(\\d{2})\\.(\\d{2,3})](.*)".toRegex()
             val items = source.split("\\r?\\n".toRegex())
             for (item in items) {

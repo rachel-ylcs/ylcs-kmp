@@ -42,8 +42,8 @@ class BackgroundConstellation(override val layerOrder: Int) : Visible(), Dynamic
 
     var backgroundSize = Size.Zero
     var linkState = LinkState.IDLE
-    var boxes = emptyList<BoxNode>()
-    val pathNodes = mutableListOf<BoxNode>()
+    var boxes: List<BoxNode> = []
+    val pathNodes: MutableList<BoxNode> = []
     var currentTarget: BoxNode? = null
     var linkProgress = 0f
     var fadeAlpha = 1f

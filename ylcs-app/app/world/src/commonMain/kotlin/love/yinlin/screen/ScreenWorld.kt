@@ -200,7 +200,7 @@ class ScreenWorld : BasicScreen() {
     }
 
     private val rankingSheet = this land object : SheetContent<Game>() {
-        private var items by mutableRefStateOf(emptyList<GameRank>())
+        private var items: List<GameRank> by mutableRefStateOf([])
 
         override suspend fun initialize(args: Game) {
             ApiGameGetGameRank.request(args) { items = it }

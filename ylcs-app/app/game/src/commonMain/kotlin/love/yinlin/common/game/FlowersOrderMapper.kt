@@ -215,8 +215,8 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
                     answer = answer,
                     result = result,
                     oldCharacters = buildAnnotatedString {
-                        val correctSet = mutableSetOf<Char>()
-                        val incorrectSet = mutableSetOf<Char>()
+                        val correctSet: MutableSet<Char> = []
+                        val incorrectSet: MutableSet<Char> = []
                         for (i in answer.indices.reversed()) {
                             val v = FOType.decode(result[i])
                             answer[i].forEachIndexed { index, ch ->

@@ -69,7 +69,7 @@ class DependencyAnalyzer<K : Any, V>(
             if (degree == 0) queue += key
         }
 
-        val rawResult = mutableListOf<V>()
+        val rawResult: MutableList<V> = []
 
         // BFS
         while (queue.isNotEmpty()) {

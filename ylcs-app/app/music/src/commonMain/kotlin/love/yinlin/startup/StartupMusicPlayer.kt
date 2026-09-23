@@ -40,7 +40,7 @@ import kotlin.math.abs
 class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     class Factory : AsyncStartupFactory<StartupMusicPlayer>() {
         override val id: String = StartupID<StartupMusicPlayer>()
-        override val dependencies: List<String> = listOf(StartupID<StartupAppConfig>())
+        override val dependencies: List<String> = [StartupID<StartupAppConfig>()]
         override val dispatcher: CoroutineContext = mainContext
         override fun build(pool: StartupPool): StartupMusicPlayer = StartupMusicPlayer(pool)
     }
@@ -262,8 +262,8 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
      */
     fun checkReloadPlaylistByDelete(ids: List<String>): List<String>? {
         val currentMusicList = musicList
-        if (currentMusicList.isEmpty()) return emptyList()
-        val useList = mutableListOf<String>()
+        if (currentMusicList.isEmpty()) return []
+        val useList: MutableList<String> = []
         for (id in ids) {
             when (id) {
                 currentId -> return null // 正在播放, 立即阻止更新

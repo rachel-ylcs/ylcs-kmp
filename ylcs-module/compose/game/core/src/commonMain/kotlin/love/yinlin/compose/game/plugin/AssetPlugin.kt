@@ -42,13 +42,13 @@ class AssetPlugin private constructor(
                         if (loader.parallel) { // 并行
                             for (assetID in loader.assetIDList) {
                                 add(async {
-                                    listOf(assetID to loader.load(assetID))
+                                    [assetID to loader.load(assetID)]
                                 })
                             }
                         }
                         else {
                             add(async {
-                                val assetList = mutableListOf<Pair<Any, Asset>>()
+                                val assetList: MutableList<Pair<Any, Asset>> = []
                                 for (assetID in loader.assetIDList) {
                                     ensureActive()
                                     assetList += assetID to loader.load(assetID)

@@ -88,7 +88,7 @@ class ContinuedBlock(
     private val scaleLevel: Int = (rawNoteScale - 1) / 7
     private val mainColor: Color = ScaleColorList[scaleIndex]
 
-    override val colorList: List<Color> = listOf(mainColor)
+    override val colorList: List<Color> = [mainColor]
 
     private val isCharacterLiDiShiGongFenA = character is CharacterLiDiShiGongFenA
     private val isCharacterLiDiShiGongFenB = character is CharacterLiDiShiGongFenB

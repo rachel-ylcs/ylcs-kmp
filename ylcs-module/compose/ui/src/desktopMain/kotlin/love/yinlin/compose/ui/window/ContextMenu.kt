@@ -8,7 +8,7 @@ import androidx.compose.runtime.Stable
 
 @Stable
 class ContextMenuScope {
-    private val menus = mutableListOf<ContextMenuItem>()
+    private val menus: MutableList<ContextMenuItem> = []
 
     fun item(text: String, onClick: () -> Unit) {
         menus += ContextMenuItem(text, onClick)

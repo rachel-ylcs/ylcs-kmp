@@ -91,7 +91,7 @@ abstract class DialogChoice : Dialog<Int>() {
 
     @Stable
     open class ByDynamicList : ByList() {
-        private var items: List<String> = emptyList()
+        private var items: List<String> = []
         override val num: Int get() = items.size
         override fun nameFactory(index: Int): String = items[index]
         override fun iconFactory(index: Int): ImageVector = Icons.KeyboardArrowRight

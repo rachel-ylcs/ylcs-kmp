@@ -158,8 +158,7 @@ class FfmpegAudioDecoder(
         private const val AUDIO_DECODER_ERROR_OTHER = -2
 
         // FLAC parsing constants
-        private val flacStreamMarker =
-            byteArrayOf('f'.code.toByte(), 'L'.code.toByte(), 'a'.code.toByte(), 'C'.code.toByte())
+        private val flacStreamMarker: ByteArray = ['f'.code.toByte(), 'L'.code.toByte(), 'a'.code.toByte(), 'C'.code.toByte()]
         private const val FLAC_METADATA_TYPE_STREAM_INFO = 0
         private const val FLAC_METADATA_BLOCK_HEADER_SIZE = 4
         private const val FLAC_STREAM_INFO_DATA_SIZE = 34

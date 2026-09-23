@@ -166,7 +166,7 @@ fun Banner(
         else {
             val contentColor = Theme.color.onSurfaceVariant
             val brush = remember(contentColor) {
-                Brush.horizontalGradient(listOf(Color.Transparent, contentColor.copy(alpha = 0.2f), Color.Transparent))
+                Brush.horizontalGradient([Color.Transparent, contentColor.copy(alpha = 0.2f), Color.Transparent])
             }
 
             Box(

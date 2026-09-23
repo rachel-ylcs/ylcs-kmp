@@ -6,7 +6,7 @@ import love.yinlin.extension.*
 suspend fun MysqlService.queryRelationship(uid1: Int, uid2: Int): Pair<Boolean?, Boolean?> {
     val follow = querySQL("""
             SELECT uid1, isBlocked FROM follows WHERE (uid1 = ? AND uid2 = ?) OR (uid1 = ? AND uid2 = ?)
-        """, uid1, uid2, uid2, uid1)?.map { it.Object } ?: emptyList()
+        """, uid1, uid2, uid2, uid1)?.map { it.Object } ?: []
     val relationship1 = follow.find { it["uid1"].Int == uid1 }?.get("isBlocked")?.Boolean
     val relationship2 = follow.find { it["uid1"].Int == uid2 }?.get("isBlocked")?.Boolean
     return relationship1 to relationship2

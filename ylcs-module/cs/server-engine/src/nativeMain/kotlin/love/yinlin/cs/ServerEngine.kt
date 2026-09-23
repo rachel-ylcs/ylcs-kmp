@@ -57,7 +57,7 @@ abstract class ServerEngine(cmdLine: Array<String>) {
     /**
      * 插件
      */
-    open val plugins: List<BasicServerPlugin> = emptyList()
+    open val plugins: List<BasicServerPlugin> = []
 
     /**
      * 接口

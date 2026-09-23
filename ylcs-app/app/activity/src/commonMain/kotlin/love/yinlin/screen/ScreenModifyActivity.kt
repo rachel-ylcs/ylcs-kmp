@@ -216,7 +216,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
 
     suspend fun pickPictures(currentSize: Int, onPicsAdd: suspend (List<File>) -> Unit) {
         app.picker.pickPicture((9 - currentSize).fastCoerceAtLeast(1))?.use { sources ->
-            val path = mutableListOf<File>()
+            val path: MutableList<File> = []
             for (source in sources) {
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(source.readByteArray())!!

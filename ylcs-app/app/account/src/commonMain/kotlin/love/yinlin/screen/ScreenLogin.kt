@@ -37,7 +37,7 @@ class ScreenLogin : Screen() {
         ForgotPassword("忘记密码");
     }
 
-    private var inviters by mutableStateOf(emptyList<String>())
+    private var inviters: List<String> by mutableStateOf([])
 
     private var mode: Mode by mutableStateOf(Mode.Login)
     private val loginId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH)

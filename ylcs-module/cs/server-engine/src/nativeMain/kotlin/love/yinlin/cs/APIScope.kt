@@ -50,7 +50,7 @@ abstract class APIScope(val engine: ServerEngine) {
     /**
      * 服务
      */
-    open val services: List<ServerService> = emptyList()
+    open val services: List<ServerService> = []
 
     private var routing: Routing? = null
 
@@ -472,18 +472,18 @@ abstract class APIScope(val engine: ServerEngine) {
         private val tempDir = PlatformFileSystem.cachePath(PlatformContext.Instance, "ServerNative")
         @PublishedApi internal var dataIndex = 0
         @PublishedApi internal var fileIndex = 0
-        @PublishedApi internal var dataList = emptyList<String>()
-        @PublishedApi internal var fileList = emptyList<APIFile?>()
+        @PublishedApi internal var dataList: List<String> = []
+        @PublishedApi internal var fileList: List<APIFile?> = []
 
         suspend fun parse() {
-            val dataItems = mutableListOf<Pair<Int, String>>()
+            val dataItems: MutableList<Pair<Int, String>> = []
             val fileItems = mutableMapOf<Int, MutableList<Pair<Int, String>>>()
             multipartData.forEachPart { part ->
                 catching {
                     val name: String = part.name ?: return@catching
                     when (part) {
                         is PartData.FormItem -> {
-                            if (name.startsWith('#')) fileItems[name.removePrefix("#").toInt()] = mutableListOf() // APIFile?
+                            if (name.startsWith('#')) fileItems[name.removePrefix("#").toInt()] = [] // APIFile?
                             else dataItems += name.toInt() to part.value // Normal body data
                         }
                         is PartData.FileItem -> {
@@ -497,7 +497,7 @@ abstract class APIScope(val engine: ServerEngine) {
                             val tempFile = File(tempDir, tempFilename)
                             val tempSink = tempFile.bufferedSink()
                             if (part.provider().copyAndClose(tempSink.asByteWriteChannel()) > 0) {
-                                val oldItems = fileItems.getOrPut(index) { mutableListOf() }
+                                val oldItems = fileItems.getOrPut(index, ::mutableListOf)
                                 oldItems += fileIndex to tempFile.path
                             }
                         }

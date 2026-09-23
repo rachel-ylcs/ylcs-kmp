@@ -89,7 +89,7 @@ class Engine(
                             val id = plugin.id
                             // 并行加载
                             val task = async {
-                                val dependencies = pluginDependencyMap[id] ?: emptyList()
+                                val dependencies = pluginDependencyMap[id] ?: []
                                 // 等待依赖插件完成
                                 for (dependentId in dependencies) {
                                     val dependencyTask = taskMap[dependentId]

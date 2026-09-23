@@ -50,7 +50,7 @@ fun DefaultTopBar(
 ) {
     val bgBrush = remember(backgroundColor) {
         if (backgroundColor == Colors.Transparent) SolidColor(backgroundColor)
-        else Brush.verticalGradient(colors = listOf(backgroundColor.copy(alpha = 0.75f), backgroundColor))
+        else Brush.verticalGradient(colors = [backgroundColor.copy(alpha = 0.75f), backgroundColor])
     }
 
     Row(

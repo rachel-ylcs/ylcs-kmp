@@ -17,11 +17,11 @@ enum class Platform {
     MacOSNative;
 
     companion object {
-        val Phone = arrayOf(Android, IOS)
-        val Desktop = arrayOf(Windows, Linux, MacOS)
-        val DesktopNative = arrayOf(WindowsNative, LinuxNative, MacOSNative)
-        val Web = arrayOf(WebJs, WebWasm)
-        val Native = arrayOf(AndroidNative, *DesktopNative)
+        val Phone: Array<Platform> = [Android, IOS]
+        val Desktop: Array<Platform> = [Windows, Linux, MacOS]
+        val DesktopNative: Array<Platform> = [WindowsNative, LinuxNative, MacOSNative]
+        val Web: Array<Platform> = [WebJs, WebWasm]
+        val Native: Array<Platform> = arrayOf(AndroidNative, *DesktopNative)
 
         fun contains(vararg filter: Platform): Boolean = platform in filter
         inline fun use(vararg filter: Platform, block: () -> Unit) = if (platform in filter) block() else Unit

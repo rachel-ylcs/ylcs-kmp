@@ -159,7 +159,7 @@ private fun ResultDivider(modifier: Modifier = Modifier) {
 
         drawRect(
             brush = Brush.linearGradient(
-                colors = listOf(mainColor, Color.Transparent),
+                colors = [mainColor, Color.Transparent],
                 start = Offset(lineStartX, centerY),
                 end = Offset(canvasWidth, centerY)
             ),
@@ -169,7 +169,7 @@ private fun ResultDivider(modifier: Modifier = Modifier) {
 
         drawRect(
             brush = Brush.linearGradient(
-                colors = listOf(mainColor, Color.Transparent),
+                colors = [mainColor, Color.Transparent],
                 start = Offset(lineEndX, centerY),
                 end = Offset(0f, centerY)
             ),

@@ -74,7 +74,7 @@ fun ServerScope.activityAPI() {
         val user = VN.throwGetUser(uid, "privilege")
         if (!UserPrivilege.vipCalendar(user["privilege"].Int)) failure("无权限")
         val photo = mysql.throwQuerySQLSingle("SELECT photo FROM activity WHERE aid = ?", aid)["photo"].Object.toMutableMap()
-        val oldPics = photo[key]?.to<MutableList<String>>() ?: mutableListOf()
+        val oldPics = photo[key]?.to<MutableList<String>>() ?: []
         VN.throwIf(pics.isEmpty, oldPics.size + pics.num > 9)
         oldPics += ngp.actualPics
         photo[key] = oldPics.toJson()

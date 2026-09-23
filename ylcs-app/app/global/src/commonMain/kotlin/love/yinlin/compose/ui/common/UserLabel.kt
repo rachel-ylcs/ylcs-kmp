@@ -28,14 +28,14 @@ import love.yinlin.extension.DateEx
 
 @Stable
 private object UserLabelMeta {
-    private val labelNameFromLevel = arrayOf("BUG",
+    private val labelNameFromLevel: Array<String> = ["BUG",
         "风露婆娑", "剑心琴魄", "梦外篝火", "日暮入旧",
         "烈火胜情爱", "青山撞入怀", "雨久苔如海", "曾吻过秋槐",
         "明雪澄岚", "春风韵尾", "银河万顷", "山川蝴蝶",
         "薄暮忽晚", "沧流彼岸", "清荷玉盏", "风月顽冥",
         "颜如舜华", "逃奔风月", "自在盈缺", "青鸟遁烟",
         "天生妙罗帷", "梦醒般惊蜕", "韶华的结尾", "满袖皆月色"
-    )
+    ]
 
     fun label(level: Int): String = labelNameFromLevel.getOrNull(level) ?: labelNameFromLevel[0]
 

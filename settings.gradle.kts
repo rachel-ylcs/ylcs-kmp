@@ -117,6 +117,4 @@ include(
     "ylcs-app:server",
     "ylcs-app:web-app",
     "ylcs-app:weibo-picture-downloader",
-
-    "ylcs-app:lyrics-editor",
 )
