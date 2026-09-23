@@ -211,10 +211,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 @OptIn(ExperimentalWasmDsl::class)
                 wasmJs {
                     compilerOptions {
-                        target.set("es2015")
-                        useLanguageFeature(
-                            "-Xes-long-as-bigint"
-                        )
+                        target.set("es2020")
                     }
 
                     browser {
@@ -241,10 +238,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                 js {
                     compilerOptions {
-                        target.set("es2015")
-                        useLanguageFeature(
-                            "-Xes-long-as-bigint"
-                        )
+                        target.set("es2020")
                     }
 
                     browser {
