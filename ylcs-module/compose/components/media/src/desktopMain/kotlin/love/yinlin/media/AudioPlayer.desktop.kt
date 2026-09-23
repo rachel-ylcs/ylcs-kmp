@@ -16,8 +16,7 @@ internal object DesktopAudioController {
 
     fun build(context: PlatformContext, onEndListener: () -> Unit): AudioPlayer = when (platform) {
         Platform.Windows -> WindowsAudioController(context, onEndListener)
-        Platform.MacOS -> MacOSAudioController(context, onEndListener)
-        else -> LinuxAudioController(context, onEndListener)
+        else -> MiniaudioAudioController(context, onEndListener)
     }
 }
 
