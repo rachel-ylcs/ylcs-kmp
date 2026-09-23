@@ -15,8 +15,7 @@ internal object DesktopMusicController {
 
     fun build(fetcher: MediaMetadataFetcher): MusicPlayer = when (platform) {
         Platform.Windows -> WindowsMusicController(fetcher)
-        Platform.MacOS -> MacOSMusicController(fetcher)
-        else -> LinuxMusicController(fetcher)
+        else -> MiniaudioMusicController(fetcher)
     }
 }
 

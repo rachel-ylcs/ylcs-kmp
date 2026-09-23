@@ -28,30 +28,41 @@ if(NOT Java_FOUND)
 endif()
 find_package(JNI REQUIRED)
 
-set(PLATFORM_NAME "")
 if(WIN32 OR CYGWIN)
-    set(PLATFORM_NAME "windows")
+    set(PLAYER_SOURCES windows.cpp)
 elseif(APPLE)
-    set(PLATFORM_NAME "macos")
+    set(PLAYER_SOURCES miniaudio_jni.cpp miniaudio/miniaudio.c)
 elseif(UNIX AND NOT APPLE)
-    set(PLATFORM_NAME "linux")
+    set(PLAYER_SOURCES miniaudio_jni.cpp miniaudio/miniaudio.c)
 else()
     message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
 endif()
 
 add_library(player SHARED
-    ${PLATFORM_NAME}.cpp
+    ${PLAYER_SOURCES}
 )
 
 target_include_directories(player PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/miniaudio
     ${JNI_INCLUDE_DIRS}
     ${NATIVE_JNI_DIR}
 )
 
-target_link_libraries(player
+target_link_libraries(player PRIVATE
     ${JNI_LIBRARIES}
 )
+
+if(UNIX)
+    find_package(Threads REQUIRED)
+    target_link_libraries(player PRIVATE Threads::Threads)
+    if(CMAKE_DL_LIBS)
+        target_link_libraries(player PRIVATE ${CMAKE_DL_LIBS})
+    endif()
+    if(NOT APPLE)
+        target_link_libraries(player PRIVATE m)
+    endif()
+endif()
 
 if(WIN32)
     target_compile_definitions(player PRIVATE UNICODE _UNICODE)
