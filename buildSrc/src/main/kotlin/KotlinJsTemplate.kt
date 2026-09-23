@@ -43,6 +43,7 @@ abstract class KotlinJsTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
                 generateTypeScriptDefinitions()
                 compilerOptions {
                     target.set("es2020")
+                    useLanguageFeature()
                 }
 
                 js()

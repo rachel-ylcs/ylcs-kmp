@@ -212,6 +212,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 wasmJs {
                     compilerOptions {
                         target.set("es2020")
+                        useLanguageFeature()
                     }
 
                     browser {
@@ -239,6 +240,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 js {
                     compilerOptions {
                         target.set("es2020")
+                        useLanguageFeature()
                     }
 
                     browser {
