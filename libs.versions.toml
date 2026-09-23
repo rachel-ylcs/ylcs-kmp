@@ -1,7 +1,7 @@
 [versions]
 
 # Plugins #
-kotlin = "2.4.20"
+kotlin = "2.5.0-Beta1"
 agp = "9.1.1"
 cmp = "1.13.0-alpha01"
 mavenPublish = "0.37.0"
