@@ -53,7 +53,7 @@ fun ServerScope.profileAPI() {
         val status: FollowStatus = if (uid1 == null) FollowStatus.UNAUTHORIZE
         else if (uid1 == uid2) FollowStatus.SELF
         else {
-            val (relationship1, relationship2) = mysql.queryRelationship(uid1, uid2)
+            val [relationship1, relationship2] = mysql.queryRelationship(uid1, uid2)
             if (relationship2 != true) when (relationship1) {
                 null -> FollowStatus.UNFOLLOW
                 true -> FollowStatus.BLOCKED

@@ -191,7 +191,7 @@ class ScreenWorld : BasicScreen() {
                 right = OverlayAction.Sync("历史", Icons.History) { navigate(::ScreenGameRecordHistory) }
             )
 
-            for ((type, group) in GameMapper.Groups) {
+            for ([type, group] in GameMapper.Groups) {
                 key(type) {
                     GameGroupLayout(type = type, group = group, modifier = Modifier.fillMaxWidth())
                 }

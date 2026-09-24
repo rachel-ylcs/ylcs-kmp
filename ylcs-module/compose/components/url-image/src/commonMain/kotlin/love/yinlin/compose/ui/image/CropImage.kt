@@ -232,7 +232,7 @@ fun CropImage(
                                     }
                                 }
                                 else {
-                                    val (a, b) = when (it) {
+                                    val [a, b] = when (it) {
                                         TouchRegion.Vertex.TOP_LEFT, TouchRegion.Vertex.BOTTOM_RIGHT -> (bottom - top) / (right - left) to (right * top - left * bottom) / (right - left)
                                         else -> (top - bottom) / (right - left) to (right * bottom - left * top) / (right - left)
                                     }

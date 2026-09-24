@@ -51,7 +51,7 @@ class BackgroundConstellation(override val layerOrder: Int) : Visible(), Dynamic
     val largeStroke = Stroke(8f, cap = StrokeCap.Round)
 
     override fun onUpdate(tick: Int) {
-        val (w, h) = backgroundSize
+        val [w, h] = backgroundSize
         if (w == 0f || h == 0f || boxes.isEmpty()) return
 
         boxes.fastForEach { box ->
@@ -113,7 +113,7 @@ class BackgroundConstellation(override val layerOrder: Int) : Visible(), Dynamic
     }
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
-        val (w, h) = viewportSize
+        val [w, h] = viewportSize
         backgroundSize = viewportSize
         if (boxes.isEmpty()) boxes = List(20) { BoxNode(x = Random.nextFloat() * w, y = Random.nextFloat() * h) }
     }

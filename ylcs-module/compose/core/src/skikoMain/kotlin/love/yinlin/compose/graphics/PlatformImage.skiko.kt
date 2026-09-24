@@ -91,7 +91,7 @@ actual fun PlatformImage.crop(rect: CropRegion) = catching {
 }
 
 actual fun PlatformImage.thumbnail(longImageThreshold: Float, maxSizeNormal: Int, minSizeLong: Int) = catching {
-    val (thumbWidth, thumbHeight, scale) = calculateThumbnailScale(image.width, image.height, longImageThreshold, maxSizeNormal, minSizeLong)
+    val [thumbWidth, thumbHeight, scale] = calculateThumbnailScale(image.width, image.height, longImageThreshold, maxSizeNormal, minSizeLong)
     if (scale) {
         val thumbBitmap = Bitmap()
         thumbBitmap.allocPixels(ImageInfo(image.colorInfo, thumbWidth, thumbHeight))

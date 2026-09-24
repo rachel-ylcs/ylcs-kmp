@@ -19,7 +19,7 @@ data class RhymeRankItem(
 ) {
     companion object {
         fun parse(rankList: List<RhymeRank>): Map<RhymeDifficulty, List<RhymeRankItem>> {
-            return rankList.groupBy { RhymeDifficulty.fromInt(it.result.difficulty) }.mapValues { (_, items) ->
+            return rankList.groupBy { RhymeDifficulty.fromInt(it.result.difficulty) }.mapValues { [_, items] ->
                 items.asSequence().sortedByDescending { it.result.score }.map { item ->
                     val result = item.result
                     val uid = item.uid

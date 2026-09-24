@@ -180,7 +180,7 @@ class ScreenMain : BasicScreen() {
                         state = state,
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.e)
                     ) {
-                        items(DataSourceActivity.spanActivities) { (date, activity) ->
+                        items(DataSourceActivity.spanActivities) { [date, activity] ->
                             val itemWidth = if (activity != null) Theme.size.cell7 else Theme.size.cell10
                             val itemBackground = when {
                                 date == today -> Theme.color.secondaryContainer.copy(alpha = 0.75f)

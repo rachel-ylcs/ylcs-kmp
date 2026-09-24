@@ -142,7 +142,7 @@ class ScreenMain : BasicScreen() {
             )
         }
         else { // 多MOD分开打包
-            for ((_, name, path, enabled) in selectedLibrary) {
+            for ([_, name, path, enabled] in selectedLibrary) {
                 if (enabled) {
                     mergeSingleMod(
                         filename = "$name.${ModResourceType.MOD_EXT}",
@@ -161,7 +161,7 @@ class ScreenMain : BasicScreen() {
                 val modPath = app.modPath
                 modPath.deleteRecursively()
                 modPath.mkdir()
-                for ((id, _, path) in items) {
+                for ([id, _, path] in items) {
                     val itemPath = File(modPath, id)
                     itemPath.mkdir()
                     // 复制基础资源

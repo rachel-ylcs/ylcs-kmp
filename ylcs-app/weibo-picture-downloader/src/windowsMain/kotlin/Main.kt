@@ -81,7 +81,7 @@ fun main() = runBlocking {
         cookies.filter { it.name.equals("XSRF-TOKEN", ignoreCase = true) }.first { !it.value.equals("deleted", ignoreCase = true) }.value
     } ?: "fku"
 
-    val (sub, subp) = NetClient.Common.request({
+    val [sub, subp] = NetClient.Common.request({
         url = "https://visitor.passport.weibo.cn/visitor/genvisitor2"
         method = HttpMethod.Post
         form = mapOf("cb" to "visitor_gray_callback")

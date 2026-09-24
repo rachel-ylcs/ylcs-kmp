@@ -121,7 +121,7 @@ class ScreenRhyme : BasicScreen() {
     private val library: MutableList<MusicInfo> = []
     private var repository: RhymeRepository? by mutableStateOf(null)
     private val illustrationList by derivedStateOf {
-        CharacterInfo.Pool.map { (id, info) ->
+        CharacterInfo.Pool.map { [id, info] ->
             RhymeIllustration(
                 info = info,
                 url = ServerRes.Game.Rhyme.CV.illustration(id).url,
@@ -289,7 +289,7 @@ class ScreenRhyme : BasicScreen() {
             LaunchedEffect(Unit) {
                 while (true) {
                     delay(1.seconds)
-                    val (index1, index2) = rotateValues.indices.shuffled().take(2)
+                    val [index1, index2] = rotateValues.indices.shuffled().take(2)
                     rotateValues[index1] += 45f
                     rotateValues[index2] -= 45f
                 }

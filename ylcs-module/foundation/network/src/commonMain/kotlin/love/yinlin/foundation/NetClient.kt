@@ -62,7 +62,7 @@ class NetClient internal constructor(val delegate: HttpClient) {
                 scope.data?.then(::setBody)
                 scope.form?.then { form ->
                     setBody(FormDataContent(parameters {
-                        for ((k, v) in form) append(k, v)
+                        for ([k, v] in form) append(k, v)
                     }))
                 }
                 scope.buildHeaders(headers)

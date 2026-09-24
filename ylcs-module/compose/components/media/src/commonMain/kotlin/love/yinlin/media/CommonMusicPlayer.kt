@@ -136,7 +136,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
                             val rest = shuffledList.indices.toMutableList()
                             rest.removeAll { it == index }
                             // 随机序中超过被删除索引的索引都要自减1
-                            for ((i, item) in rest.withIndex()) {
+                            for ([i, item] in rest.withIndex()) {
                                 if (item > index) rest[i] -= 1
                             }
                             shuffledList.internalSet(rest, if (shuffledList.begin == index) currentIndex else null)

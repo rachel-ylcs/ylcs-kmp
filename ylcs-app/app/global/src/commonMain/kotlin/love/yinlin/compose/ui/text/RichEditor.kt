@@ -253,7 +253,7 @@ open class RichEditorState(maxLength: Int) {
     protected open fun AtLayout(modifier: Modifier) {}
 
     private val inputLayout = movableComposable { pair: Pair<String?, ImeAction>, onImeClick: (KeyboardActionScope.() -> Unit)?, modifier: Modifier ->
-        val (hint, imeAction) = pair
+        val [hint, imeAction] = pair
         val iconColor by rememberUpdatedState(if (enablePreview) Theme.color.primary else LocalColor.current)
         Input(
             state = inputState,

@@ -36,7 +36,7 @@ object QQMusicAPI : PlatformMusicAPI {
             }
         }
     }) { body: JsonObject ->
-        val (json) = decodeData(1, body)
+        val [json] = decodeData(1, body)
         json.arr("songList").map { it.Object.obj("songInfo")["mid"].String }
     }?.let { list ->
         val items: MutableList<PlatformMusicInfo> = []
@@ -93,7 +93,7 @@ object QQMusicAPI : PlatformMusicAPI {
             }
         }
     }) { body: JsonObject ->
-        val (json1, json2, json3) = decodeData(3, body)
+        val [json1, json2, json3] = decodeData(3, body)
         val trackInfo = json1.obj("track_info")
         val lyricsBase64 = json2["lyric"].String
         val midUrlInfo = json3.arr("midurlinfo")[0].Object
@@ -122,7 +122,7 @@ object QQMusicAPI : PlatformMusicAPI {
             }
         }
     }) { body: JsonObject ->
-        val (json) = decodeData(1, body)
+        val [json] = decodeData(1, body)
         json.arr("songlist").map { it.Object["mid"].String }
     }?.let { list ->
         val items: MutableList<PlatformMusicInfo> = []

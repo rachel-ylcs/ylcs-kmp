@@ -113,7 +113,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
             catchingNull { answer.String to info.Int }
         }
 
-        pairData?.then { (actualAnswer, actualResult) ->
+        pairData?.then { [actualAnswer, actualResult] ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Lightbulb, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "本次答案", modifier = Modifier.idText())
@@ -167,7 +167,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
 
     override val gameCreator: (BasicScreen) -> CreateGameState = ::FOCreateGameState
 
-    private val CommonDictionary = """
+    private const val COMMON_DICTIONARY = """
 不人月天江春无山花风夜日一
 来云水上长见有生城飞处流尽
 下百时声中万落君秋相此色心
@@ -228,7 +228,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
                         val correct = StringBuilder()
                         val incorrect = StringBuilder()
                         var charState = 0
-                        for (ch in CommonDictionary) {
+                        for (ch in COMMON_DICTIONARY) {
                             when (ch) {
                                 in correctSet -> {
                                     when (charState) {
@@ -290,7 +290,7 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.then { (question, answer, result, oldCharacters) ->
+            preflight?.then { [question, answer, result, oldCharacters] ->
                 val focusRequester = remember { FocusRequester() }
 
                 LaunchedEffect(Unit) {

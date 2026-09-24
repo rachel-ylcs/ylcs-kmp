@@ -48,7 +48,7 @@ private fun ValueSlider(
             onFinished()
         }
     }.drawWithContent {
-        val (w, h) = size
+        val [w, h] = size
         val height = h * 0.05f
 
         drawRect(brush)
@@ -132,7 +132,7 @@ private fun AlphaSlider(
             }
         }
     }.drawWithContent {
-        val (w, h) = size
+        val [w, h] = size
         val height = h * 0.05f
         val tipSize = height / 2
         val tipBounds = Size(tipSize, tipSize)

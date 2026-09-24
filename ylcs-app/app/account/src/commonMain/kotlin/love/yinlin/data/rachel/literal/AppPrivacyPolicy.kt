@@ -1,6 +1,6 @@
 package love.yinlin.data.rachel.literal
 
-val AppPrivacyPolicy = """
+const val AppPrivacyPolicy = """
 银临茶舍是银临粉丝自制的 App，一个集资讯、听歌、美图、论坛、社交于一体的小银子聚集地。
 我们非常重视用户的隐私保护，银临茶舍绝不会在未经您允许的情景下收集您的任何隐私内容。
 如果您不同意以下隐私政策，您应立即停止使用或访问我们的产品和服务。

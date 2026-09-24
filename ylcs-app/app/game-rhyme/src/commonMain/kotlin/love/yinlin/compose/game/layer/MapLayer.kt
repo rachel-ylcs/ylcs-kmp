@@ -108,7 +108,7 @@ class MapLayer(
                             val limitTop = boundary.top + verticalMargin
                             val limitBottom = boundary.bottom - verticalMargin
 
-                            val (halfWidth, halfHeight) = nextBlock.size / 2f
+                            val [halfWidth, halfHeight] = nextBlock.size / 2f
                             val center = nextBlock.position
 
                             val blockLeft = center.x - halfWidth

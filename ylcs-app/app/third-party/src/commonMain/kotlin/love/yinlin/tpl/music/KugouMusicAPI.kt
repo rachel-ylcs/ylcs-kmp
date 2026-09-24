@@ -8,7 +8,6 @@ import love.yinlin.foundation.NetClient
 import love.yinlin.tpl.lyrics.LrcParser
 import love.yinlin.uri.Uri
 import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Stable
 @Suppress("HttpUrlsUsage")
@@ -83,7 +82,6 @@ object KugouMusicAPI : PlatformMusicAPI {
     /**
      * 公开歌词获取
      */
-    @OptIn(ExperimentalEncodingApi::class)
     suspend fun getLyrics(hash: String): String? {
         val searchResponse = NetClient.Common.request({
             url = "$LYRIC_SEARCH_API?keyword=%20-%20&ver=1&hash=$hash&client=mobi&man=yes"
@@ -97,7 +95,7 @@ object KugouMusicAPI : PlatformMusicAPI {
             }
         } ?: return null
 
-        val (lyricId, accessKey) = searchResponse
+        val [lyricId, accessKey] = searchResponse
         if (lyricId.isNullOrEmpty() || accessKey.isNullOrEmpty()) return null
 
         return NetClient.Common.request({

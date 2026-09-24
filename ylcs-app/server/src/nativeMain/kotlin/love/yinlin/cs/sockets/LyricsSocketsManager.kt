@@ -246,7 +246,7 @@ class LyricsSocketsManager(
                             room.info2.uid -> Triple(room.answers2, room.info1.uid, room.answers1)
                             else -> null
                         }
-                        triple?.then { (answers, otherUid, otherAnswers) ->
+                        triple?.then { [answers, otherUid, otherAnswers] ->
                             if (data.index in 0 ..< LyricsSockets.QUESTION_COUNT) {
                                 answers[data.index] = data.answer
                                 // 通知进度

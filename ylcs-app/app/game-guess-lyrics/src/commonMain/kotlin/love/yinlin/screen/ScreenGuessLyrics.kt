@@ -359,7 +359,7 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
             })
         }
 
-        val (question, answerLength) = status.questions[index]
+        val [question, answerLength] = status.questions[index]
         SimpleEllipsisText(text = "上句: $question")
         SimpleEllipsisText(text = "下句: ${status.answers[index] ?: ""}", color = Theme.color.primary)
         Input(

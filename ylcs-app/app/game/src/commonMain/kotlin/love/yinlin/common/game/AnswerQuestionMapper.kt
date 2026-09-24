@@ -79,7 +79,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
             }
         }
 
-        data?.then { (questions, answers) ->
+        data?.then { [questions, answers] ->
             var currentIndex by rememberValueState(0)
             val question = questions[currentIndex]
             val answer = answers[currentIndex]
@@ -159,7 +159,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
             }
         }
 
-        pairData?.then { (totalAnswer, actualResult) ->
+        pairData?.then { [totalAnswer, actualResult] ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "正确率: ${actualResult.correctCount} / ${actualResult.totalCount}", modifier = Modifier.idText())
@@ -537,7 +537,7 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.then { (_, questions) ->
+            preflight?.then { [_, questions] ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

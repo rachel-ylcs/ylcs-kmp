@@ -124,7 +124,7 @@ class ScreenMusicLibrary : Screen() {
         if (result != null) {
             library.replaceAll(Coroutines.cpu {
                 val newLibrary: MutableList<MusicInfoPreview> = []
-                for ((_, info) in rawLibrary) {
+                for ([_, info] in rawLibrary) {
                     if (result.checkSuspend(info)) newLibrary += MusicInfoPreview(info)
                 }
                 newLibrary

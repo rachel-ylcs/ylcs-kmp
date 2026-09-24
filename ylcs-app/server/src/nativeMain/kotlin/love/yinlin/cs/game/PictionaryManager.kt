@@ -16,7 +16,7 @@ class PictionaryManager(mysql: MysqlService) : RankGameManager(mysql) {
     override val config: PConfig = PConfig
 
     override suspend fun check(info: JsonElement, question: JsonElement, answer: JsonElement) {
-        val (actualQuestion, length) = question.to<PictionaryQuestion>()
+        val [actualQuestion, length] = question.to<PictionaryQuestion>()
         val actualAnswer = answer.String
         require(actualQuestion.isNotEmpty())
         require(length == actualAnswer.length)

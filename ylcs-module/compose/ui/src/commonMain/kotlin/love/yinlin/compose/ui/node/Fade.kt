@@ -14,7 +14,7 @@ fun Modifier.verticalFade(stops: List<Pair<Float, Float>>): Modifier = this.grap
     compositingStrategy = CompositingStrategy.Offscreen
 }.drawWithCache {
     val brush = Brush.verticalGradient(
-        colorStops = stops.map { (pos, alpha) ->
+        colorStops = stops.map { [pos, alpha] ->
             pos to Colors.White.copy(alpha = alpha)
         }.toTypedArray()
     )
@@ -29,7 +29,7 @@ fun Modifier.horizontalFade(stops: List<Pair<Float, Float>>): Modifier = this.gr
     compositingStrategy = CompositingStrategy.Offscreen
 }.drawWithCache {
     val brush = Brush.horizontalGradient(
-        colorStops = stops.map { (pos, alpha) ->
+        colorStops = stops.map { [pos, alpha] ->
             pos to Colors.White.copy(alpha = alpha)
         }.toTypedArray()
     )

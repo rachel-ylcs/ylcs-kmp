@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.ColorMatrixColorFilter
 @Stable
 object SolidColorFilter {
     operator fun invoke(color: Color): ColorMatrixColorFilter {
-        val (r, g, b) = color
+        val [r, g, b] = color
         return ColorMatrixColorFilter(ColorMatrix([
             0.21f * r, 0.71f * r, 0.07f * r, 0f, 0f,
             0.21f * g, 0.71f * g, 0.07f * g, 0f, 0f,

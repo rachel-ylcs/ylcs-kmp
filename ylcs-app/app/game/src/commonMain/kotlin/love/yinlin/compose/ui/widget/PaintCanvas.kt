@@ -38,10 +38,10 @@ import love.yinlin.extension.then
 private fun DrawScope.drawPaintPath(paths: List<Long>, ratio: Float, width: Float, color: Color) {
     val path = Path().apply {
         paths.firstOrNull()?.then { first ->
-            val (x, y) = Offset(first) * ratio
+            val [x, y] = Offset(first) * ratio
             moveTo(x, y)
             for (i in 1 ..< paths.size - 1) {
-                val (nx, ny) = Offset(paths[i]) * ratio
+                val [nx, ny] = Offset(paths[i]) * ratio
                 lineTo(nx, ny)
             }
         }
@@ -188,7 +188,7 @@ fun PaintCanvas(
                     }
                 }
                 PaintCanvasTool {
-                    PaintCanvasState.widths.forEach { (width, icon) ->
+                    PaintCanvasState.widths.forEach { [width, icon] ->
                         Icon(
                             icon = icon,
                             onClick = { state.width = width },

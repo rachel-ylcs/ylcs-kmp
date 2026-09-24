@@ -99,7 +99,7 @@ internal fun DifficultyStar(
                 translate(index * h)
                 scale(h / 1024f, Offset.Zero)
             }) {
-                StarPaths.fastForEach { (path, color) -> drawPath(path, color) }
+                StarPaths.fastForEach { [path, color] -> drawPath(path, color) }
             }
         }
     })

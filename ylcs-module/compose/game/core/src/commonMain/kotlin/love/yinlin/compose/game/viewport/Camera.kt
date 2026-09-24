@@ -143,7 +143,7 @@ class Camera internal constructor(private val config: Config) {
     }
 
     internal fun updateViewport(size: IntSize, viewport: Viewport) {
-        val (newSize, newScale) = viewport.applyCanvasBounds(size)
+        val [newSize, newScale] = viewport.applyCanvasBounds(size)
         rawViewportScale = newScale
         viewportSize = newSize
     }
@@ -156,8 +156,8 @@ class Camera internal constructor(private val config: Config) {
     internal fun transformLayerRelative(scope: GraphicsLayerScope, size: Size) {
         val _ = dirtyValue
         val totalScale = rawViewportScale * scale
-        val (centerX, centerY) = size / 2f
-        val (cameraX, cameraY) = position * totalScale
+        val [centerX, centerY] = size / 2f
+        val [cameraX, cameraY] = position * totalScale
 
         scope.transformOrigin = TransformOrigin(0f, 0f)
         scope.scaleX = totalScale
@@ -182,8 +182,8 @@ class Camera internal constructor(private val config: Config) {
 
     private fun updateDirty() {
         val boundSize = viewportSize / scale
-        val (x, y) = position
-        val (w, h) = boundSize
+        val [x, y] = position
+        val [w, h] = boundSize
         viewportBoundSize = boundSize
         viewportBounds = Rect(left = x - w / 2, top = y - h / 2, right = x + w / 2, bottom = y + h / 2)
         ++dirtyValue

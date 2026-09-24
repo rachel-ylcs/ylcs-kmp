@@ -248,7 +248,7 @@ private fun SettlingResult(
                 } + Triple("COMBO+", Colors.Yellow4, result.maxCombo)).reversed()
             }
 
-            countList.fastForEach { (title, color, count) ->
+            countList.fastForEach { [title, color, count] ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h9),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -270,7 +270,7 @@ internal fun GameSettlingLayout(
     onBack: () -> Unit,
     onSubmit: () -> Unit
 ) {
-    val (info, config, result) = state
+    val [info, config, result] = state
     val device by rememberDeviceType()
 
     Box(modifier = Modifier.fillMaxSize()) {

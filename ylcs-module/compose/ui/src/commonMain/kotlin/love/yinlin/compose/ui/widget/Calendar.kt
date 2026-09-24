@@ -155,7 +155,7 @@ private fun CalendarHeader(
     val dayTextStyle = LocalCalendarDayTextStyle.current
     val headerStyle = dayTextStyle.scaleSize(1.6f, true)
 
-    val (_, _, totalWidth) = rememberCalendarSize()
+    val [_, _, totalWidth] = rememberCalendarSize()
 
     Row(
         modifier = Modifier.width(totalWidth),
@@ -176,7 +176,7 @@ private fun CalendarWeekGrid() {
     val dayTextStyle = LocalCalendarDayTextStyle.current
     val headerStyle = dayTextStyle.scaleSize(1.4f, true)
 
-    val (_, cellPadding, totalWidth) = rememberCalendarSize()
+    val [_, cellPadding, totalWidth] = rememberCalendarSize()
 
     Row(modifier = Modifier.width(totalWidth)) {
         "一二三四五六日".forEach {
@@ -196,7 +196,7 @@ private fun CalendarDayGrid(
     events: Map<Long, String>,
     onEventClick: (LocalDate) -> Unit,
 ) {
-    val (cellSize, cellPadding, totalWidth) = rememberCalendarSize()
+    val [cellSize, cellPadding, totalWidth] = rememberCalendarSize()
 
     HorizontalScrollContainer(state = state, modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12)) {
         HorizontalPager(

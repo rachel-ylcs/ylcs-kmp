@@ -234,7 +234,7 @@ class UILayer(
                         translate(textWidth + (index + 2) * textHeight, barHeight)
                         scale(textHeight / 1024f, Offset.Zero)
                     }) {
-                        StarPaths.fastForEach { (path, color) -> path(color, path) }
+                        StarPaths.fastForEach { [path, color] -> path(color, path) }
                     }
                 }
             }

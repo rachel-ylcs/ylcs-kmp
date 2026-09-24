@@ -66,7 +66,7 @@ private class WebFile private constructor(private val uri: String, private val u
 
     @IOCoroutine
     override suspend fun metadata(): FileMetadata? = Coroutines.io {
-        val (parent, name) = castParent() ?: return@io null
+        val [parent, name] = castParent() ?: return@io null
 
         if (name.isEmpty()) FileMetadata(isRegularFile = false, isDirectory = true)
         else try {
@@ -91,7 +91,7 @@ private class WebFile private constructor(private val uri: String, private val u
     @IOCoroutine
     override suspend fun delete() = Coroutines.io {
         val resolved = castParent() ?: return@io
-        val (parent, name) = resolved
+        val [parent, name] = resolved
         require(name.isNotEmpty()) { "Cannot delete root directory" }
         catchingError { parent.removeEntry(name, recursiveOption()).await() }
     }
@@ -115,7 +115,7 @@ private class WebFile private constructor(private val uri: String, private val u
 
     @IOCoroutine
     override suspend fun rawSource(): RawSource = Coroutines.io {
-        val (parent, name) = castParent() ?: error("File not found: $uri")
+        val [parent, name] = castParent() ?: error("File not found: $uri")
         val fileHandle = parent.getFileHandle(name).await()
         WebFileSource(fileHandle.getFile().await())
     }
@@ -124,7 +124,7 @@ private class WebFile private constructor(private val uri: String, private val u
 
     @IOCoroutine
     override suspend fun rawSink(append: Boolean): RawSink = Coroutines.io {
-        val (parent, name) = castParent() ?: error("Parent dir not found: $uri")
+        val [parent, name] = castParent() ?: error("Parent dir not found: $uri")
         val fileHandle = parent.getFileHandle(name, createOption()).await()
         val writeOptions = if (append) keepExistingDataOption() else emptyOption()
         val writableStream = fileHandle.createWritable(writeOptions).await()
@@ -139,7 +139,7 @@ private class WebFile private constructor(private val uri: String, private val u
 
     @IOCoroutine
     override suspend fun list(): List<File> = Coroutines.io {
-        val (parent, name) = castParent() ?: return@io []
+        val [parent, name] = castParent() ?: return@io []
 
         val targetDir = if (name.isEmpty()) parent else catchingNull { parent.getDirectoryHandle(name).await() } ?: return@io []
 

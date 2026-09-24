@@ -335,7 +335,7 @@ class QrCodePainter(
 
             prepareLogo(pixelSize)
 
-            val (dark, light) = createMainElements(pixelSize)
+            val [dark, light] = createMainElements(pixelSize)
 
             if (shouldSeparateDarkPixels || shouldSeparateLightPixels) {
                 drawSeparatePixels(pixelSize)
@@ -442,7 +442,7 @@ class QrCodePainter(
                 .takeIf { it.isFinite() && it.absoluteValue > Float.MIN_VALUE }
                 ?: 1f
 
-            val (logoX, logoY) = if (aspectRatio > 1f){
+            val [logoX, logoY] = if (aspectRatio > 1f){
                 (logoPixels * aspectRatio).roundToInt() to logoPixels
             } else {
                 logoPixels to (logoPixels / aspectRatio).roundToInt()

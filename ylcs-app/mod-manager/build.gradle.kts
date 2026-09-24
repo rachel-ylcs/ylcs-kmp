@@ -60,14 +60,14 @@ template(object : KotlinMultiplatformTemplate() {
             dependsOn(tasks.named("createReleaseDistributable"))
 
             doLast {
-//                val outputAppDir = C.root.outputs.dir(desktopPackageName)
-//                delete(outputAppDir)
-//                copy {
-//                    from(C.root.app.modManager.originOutput)
-//                    into(C.root.outputs)
-//                }
-//                zip(outputAppDir, C.root.outputs.file("$desktopPackageName.zip"))
-//                delete(outputAppDir)
+                val outputAppDir = C.root.outputs.dir(desktopPackage.packageName)
+                delete(outputAppDir)
+                copy {
+                    from(C.root.app.modManager.originOutput)
+                    into(C.root.outputs)
+                }
+                zip(outputAppDir, C.root.outputs.file("${desktopPackage.packageName}.zip"))
+                delete(outputAppDir)
             }
         }
     }

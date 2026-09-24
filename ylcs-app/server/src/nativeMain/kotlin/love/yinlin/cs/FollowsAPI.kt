@@ -16,7 +16,7 @@ fun ServerScope.followsAPI() {
     ApiFollowsFollowUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) failure("不能关注自己哦")
-        val (relationship1, relationship2) = mysql.queryRelationship(uid1, uid2)
+        val [relationship1, relationship2] = mysql.queryRelationship(uid1, uid2)
         when (relationship1) {
             null if relationship2 != true -> mysql.throwTransaction {
                 it.throwInsertSQLGeneratedKey("INSERT INTO follows(uid1, uid2) ${values(2)}", uid1, uid2)
@@ -37,7 +37,7 @@ fun ServerScope.followsAPI() {
     ApiFollowsUnfollowUser.response { token, uid2 ->
         val uid1 = AN.throwExpireToken(token)
         if (uid1 == uid2) failure("不能关注自己哦")
-        val (relationship1, relationship2) = mysql.queryRelationship(uid1, uid2)
+        val [relationship1, relationship2] = mysql.queryRelationship(uid1, uid2)
         if (relationship1 == false && relationship2 != true) mysql.throwTransaction {
             it.throwExecuteSQL("DELETE FROM follows WHERE uid1 = ? AND uid2 = ?", uid1, uid2)
             it.throwExecuteSQL("""

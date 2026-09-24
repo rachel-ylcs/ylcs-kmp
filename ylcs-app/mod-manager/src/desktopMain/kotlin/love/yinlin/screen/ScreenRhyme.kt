@@ -146,7 +146,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
 
     override suspend fun initialize() {
         catchingError {
-            val (musicName, musicConfig) = Coroutines.io {
+            val [musicName, musicConfig] = Coroutines.io {
                 path?.let {
                     val musicInfo = File(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
                     val rhymePath = File(it, ModResourceType.Rhyme.filename)
@@ -186,7 +186,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
     )
 
     private fun onHotKey(currentItem: Pair<Int, Int>, key: Key) {
-        val (lineIndex, actionIndex) = currentItem
+        val [lineIndex, actionIndex] = currentItem
         val lineNum = rhymeConfig.lyrics.size
         val line = rhymeConfig.lyrics.getOrNull(lineIndex) ?: return
         val action = line.theme.getOrNull(actionIndex) ?: return
@@ -321,7 +321,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                 }
             }
             FlowRow(modifier = Modifier.fillMaxWidth()) {
-                for ((actionIndex, action) in line.theme.withIndex()) {
+                for ([actionIndex, action] in line.theme.withIndex()) {
                     val background = if (currentSelectItem?.first == lineIndex && currentSelectItem?.second == actionIndex) {
                         if (isHotKeyAddMode) Colors.Red4.copy(alpha = 0.2f) else Colors.Steel4.copy(alpha = 0.2f)
                     } else Colors.Transparent
@@ -425,7 +425,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
             itemsIndexed(
                 items = lyrics,
                 key = { _, item -> item.key }
-            ) { index, (line) ->
+            ) { index, [line] ->
                 LyricsLineEditor(
                     modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Colors.Black),
                     config = config,

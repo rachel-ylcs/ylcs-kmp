@@ -303,7 +303,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 onAdd = { price += ActivityPrice("票种", 0) },
                 onReplace = { index, item ->
                     launch {
-                        pairInputDialog.open(item.name, item.value.toString())?.then { (newName, newValue) ->
+                        pairInputDialog.open(item.name, item.value.toString())?.then { [newName, newValue] ->
                             price[index] = ActivityPrice(newName, newValue.toIntOrNull() ?: 0)
                         }
                     }

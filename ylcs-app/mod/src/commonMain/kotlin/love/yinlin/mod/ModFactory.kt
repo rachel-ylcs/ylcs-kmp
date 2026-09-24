@@ -81,7 +81,7 @@ object ModFactory {
                 writeInt(resourcePaths.size) // 写资源数
 
                 // 写资源
-                for ((path, type) in resourcePaths) {
+                for ([path, type] in resourcePaths) {
                     writeResource(path, type)
                 }
             }
@@ -92,7 +92,7 @@ object ModFactory {
             @MainCoroutine onProcess: (index: Int, total: Int, name: String) -> Unit
         ) {
             sink.writeMetadata()
-            for ((index, mediaPath) in mediaPaths.withIndex()) {
+            for ([index, mediaPath] in mediaPaths.withIndex()) {
                 sink.writeMedia(mediaPath, filters)
                 Coroutines.main {
                     onProcess(index, mediaPaths.size, mediaPath.name)
@@ -225,7 +225,7 @@ object ModFactory {
             val resources: MutableList<ResourceItem> = []
             var mainConfig: MusicInfo? = null
             repeat(resourceNum) {
-                val (resource, config) = previewResource()
+                val [resource, config] = previewResource()
                 resources += resource
                 if (config != null) mainConfig = config
             }

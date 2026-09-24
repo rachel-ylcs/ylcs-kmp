@@ -161,9 +161,9 @@ class ScreenGameRecordHistory : Screen() {
                 modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
             ) {
-                val (answers, results) = remember(args) {
+                val [answers, results] = remember(args) {
                     catchingDefault({ makeArray { } to [] }) {
-                        val (results, answers) = when (val tmp = args.result) {
+                        val [results, answers] = when (val tmp = args.result) {
                             null -> emptyList<GameResult>() to []
                             is JsonArray -> tmp.map { it.to<GameResult>() } to args.answer.Array
                             else -> [tmp.to<GameResult>()] to [args.answer!!]

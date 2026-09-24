@@ -70,7 +70,7 @@ class BackgroundRipple(
     }
 
     override fun onUpdate(tick: Int) {
-        val (centerX, centerY) = backgroundSize.center
+        val [centerX, centerY] = backgroundSize.center
         if (centerX == 0f || centerY == 0f) return
 
         resonanceTime += tick * 0.01f

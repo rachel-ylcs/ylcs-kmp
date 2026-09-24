@@ -54,7 +54,7 @@ class BlockMapGenerator private constructor(
         // 尝试方向, 初始下转，贪心优先左转，尝试右转
         val directions = if (segmentIndex == 0) [Offset(dx, dy)] else [Offset(-dy, dx), Offset(dy, -dx)]
 
-        for ((currentDx, currentDy) in directions) {
+        for ([currentDx, currentDy] in directions) {
             val currentSegmentPoints: MutableList<Offset> = []
             var tempX = lastX
             var tempY = lastY

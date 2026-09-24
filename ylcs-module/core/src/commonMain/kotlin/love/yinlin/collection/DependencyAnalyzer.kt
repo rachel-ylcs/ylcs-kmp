@@ -65,7 +65,7 @@ class DependencyAnalyzer<K : Any, V>(
 
         // 初始化队列
         val queue = ArrayDeque<K>()
-        for ((key, degree) in inDegree) {
+        for ([key, degree] in inDegree) {
             if (degree == 0) queue += key
         }
 

@@ -209,7 +209,7 @@ object MiguMusicAPI : PlatformMusicAPI {
     override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = Coroutines.io {
         when {
             link.contains("c.migu.cn") -> {
-                resolveLink(link)?.let { (type, id) ->
+                resolveLink(link)?.let { [type, id] ->
                     val songs = when (type) {
                         "album" -> requestAlbumSongs(id)
                         "playlist" -> requestPlaylistSongs(id)

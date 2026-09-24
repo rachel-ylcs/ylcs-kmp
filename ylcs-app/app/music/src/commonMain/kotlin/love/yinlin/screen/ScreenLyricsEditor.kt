@@ -174,7 +174,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
             itemsIndexed(
                 items = lyrics,
                 key = { _, item -> item.key }
-            ) { index, (item) ->
+            ) { index, [item] ->
                 val isCurrent = currentIndex == index
                 val backgroundColor = if (isCurrent) Theme.color.primaryContainer.copy(alpha = 0.5f) else Theme.color.background
                 val contentColor = if (isCurrent) Theme.color.onContainer else Theme.color.onBackground
