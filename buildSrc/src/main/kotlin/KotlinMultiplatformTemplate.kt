@@ -73,8 +73,18 @@ class KotlinMultiplatformSourceSetsScope(
 }
 
 // swift 依赖包结构
-data class SwiftPackage(val url: String, val version: String, val products: List<String> = emptyList()) {
-    constructor(url: String, version: Provider<String>, products: List<String> = emptyList()) : this(url, version.get(), products)
+sealed interface SwiftPackage {
+    data class Remote(
+        val url: String,
+        val version: String,
+        val products: List<String>
+    ) : SwiftPackage
+
+    data class Local(
+        val directory: String,
+        val products: List<String>,
+        val importedClangModules: List<String> = emptyList()
+    ) : SwiftPackage
 }
 
 abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
@@ -192,8 +202,15 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                         iosMinimumDeploymentTarget.set(C.ios.target)
 
                         @OptIn(ExperimentalKotlinGradlePluginApi::class)
-                        for ((url, ver, products) in swiftPackages) {
-                            swiftPackage(url, ver, products)
+                        for (pkg in swiftPackages) {
+                            when (pkg) {
+                                is SwiftPackage.Remote -> swiftPackage(pkg.url, pkg.version, pkg.products)
+                                is SwiftPackage.Local -> localSwiftPackage(
+                                    layout.projectDirectory.dir(pkg.directory),
+                                    pkg.products,
+                                    importedClangModules = pkg.importedClangModules,
+                                )
+                            }
                         }
                     }
                 }
