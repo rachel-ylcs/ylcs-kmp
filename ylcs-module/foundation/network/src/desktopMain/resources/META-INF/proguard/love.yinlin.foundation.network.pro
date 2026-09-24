@@ -1,8 +1,3 @@
-# ----------------------------------------- ktor ---------------------------------------------- #
-
--keep class io.ktor.** { *; }
--keepclassmembers class io.ktor.** { volatile <fields>; }
-
 # ----------------------------------------- OkHttp ---------------------------------------------- #
 
 -dontwarn okhttp3.internal.platform.**
