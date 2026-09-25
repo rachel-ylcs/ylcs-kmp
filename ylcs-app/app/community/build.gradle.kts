@@ -19,5 +19,3 @@ template(object : KotlinMultiplatformTemplate() {
         }
     }
 })
-
-patchMMKVSwiftPackage()

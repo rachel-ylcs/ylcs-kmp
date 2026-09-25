@@ -2,7 +2,6 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.compose.ComposeExtension
@@ -71,8 +70,17 @@ class KotlinMultiplatformSourceSetsScope(
 }
 
 // swift 依赖包结构
-data class SwiftPackage(val url: String, val version: String, val products: List<String> = emptyList()) {
-    constructor(url: String, version: Provider<String>, products: List<String> = emptyList()) : this(url, version.get(), products)
+sealed interface SwiftPackage {
+    data class Remote(
+        val url: String,
+        val version: String,
+        val products: List<String>
+    ) : SwiftPackage
+
+    data class Local(
+        val name: String,
+        val importedClangModules: List<String> = emptyList()
+    ) : SwiftPackage
 }
 
 abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
@@ -187,9 +195,18 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     extensions.findByType<SwiftPMImportExtension>()?.apply {
                         iosMinimumDeploymentTarget.set(C.ios.target)
 
+                        val localSPMDir = iosLocalSPMDir
+
                         @OptIn(ExperimentalKotlinGradlePluginApi::class)
-                        for ((url, ver, products) in swiftPackages) {
-                            swiftPackage(url, ver, products)
+                        for (pkg in swiftPackages) {
+                            when (pkg) {
+                                is SwiftPackage.Remote -> swiftPackage(pkg.url, pkg.version, pkg.products)
+                                is SwiftPackage.Local -> localSwiftPackage(
+                                    directory = localSPMDir.dir(pkg.name),
+                                    products = listOf(pkg.name),
+                                    importedClangModules = pkg.importedClangModules,
+                                )
+                            }
                         }
                     }
                 }

@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package love.yinlin.startup
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import swiftPMImport.love.yinlin.compose.startup.ylcs.module.compose.startup.mmkv.kmp.*
 import love.yinlin.extension.toNSData
 import love.yinlin.extension.toByteArray

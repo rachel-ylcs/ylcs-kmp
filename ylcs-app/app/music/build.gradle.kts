@@ -39,5 +39,3 @@ template(object : KotlinMultiplatformTemplate() {
         wasmJsMain.configure(webMain)
     }
 })
-
-patchMMKVSwiftPackage()
