@@ -349,7 +349,7 @@ class ScreenMain : BasicScreen() {
             lightColors = [Color(0xFF52D9E8), Color(0xFF80E1EC), Color(0xFFADEBF2)],
             darkColors = [Color(0xFF52D9E8), Color(0xFF17323A), Color(0xFF151B20)],
             onClick = {
-
+                navigate(::ScreenInformation)
             }
         ),
         PortalCardItem(

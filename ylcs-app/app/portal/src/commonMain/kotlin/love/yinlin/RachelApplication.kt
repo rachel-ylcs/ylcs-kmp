@@ -33,6 +33,17 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenActivityLink)
             screen(::ScreenModifyActivity)
 
+            // information
+            screen(::ScreenInformation)
+
+//            screen(::ScreenWeibo)
+//            screen(::ScreenWeiboAlbum)
+//            screen(::ScreenWeiboDetails)
+//            screen(::ScreenWeiboFollows)
+//            screen(::ScreenWeiboUser)
+//            screen(::ScreenChaohua)
+//            screen(::ScreenDouyin)
+
             // music
             screen(::ScreenAccompaniment)
             screen(::ScreenCreateMusic)
@@ -68,14 +79,6 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
 
             screen(::ScreenGuessLyrics)
             screen(::ScreenRhyme)
-
-//            screen(::ScreenWeibo)
-//            screen(::ScreenWeiboAlbum)
-//            screen(::ScreenWeiboDetails)
-//            screen(::ScreenWeiboFollows)
-//            screen(::ScreenWeiboUser)
-//            screen(::ScreenChaohua)
-//            screen(::ScreenDouyin)
 
             // viewer
             screen(::ScreenTest)
