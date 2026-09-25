@@ -337,11 +337,11 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                         unique = true,
                         modifier = Modifier.fillMaxWidth(),
                         onImageClick = { index, _ -> onImageClick(pics, index) }
-                    ) { isSingle, pic, onClick ->
+                    ) { contentScale, pic, onClick ->
                         WebImage(
                             uri = pic.image,
-                            contentScale = if (isSingle) ContentScale.Inside else ContentScale.Crop,
-                            modifier = Modifier.fillMaxWidth().condition(!isSingle) { fillMaxHeight() },
+                            contentScale = contentScale,
+                            modifier = Modifier.fillMaxWidth().condition(contentScale == ContentScale.Crop) { fillMaxHeight() },
                             onClick = onClick
                         )
                     }
