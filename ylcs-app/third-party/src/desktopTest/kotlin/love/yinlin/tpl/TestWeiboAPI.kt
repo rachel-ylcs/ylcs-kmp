@@ -56,8 +56,11 @@ class TestWeiboAPI {
         assertEquals(findUser[0].id, userInfo.id)
 
         // 超话
-        val chaohua = WeiboAPI.requestChaohua(0, cookie)
-        assertNotNull(chaohua)
-        assertTrue { chaohua.isNotEmpty() }
+        val chaohua1 = WeiboAPI.requestChaohua(1, cookie)
+        assertNotNull(chaohua1)
+        assertTrue { chaohua1.isNotEmpty() }
+        val chaohua2 = WeiboAPI.requestChaohua(2, cookie)
+        assertNotNull(chaohua2)
+        assertTrue { chaohua2.isNotEmpty() }
     }
 }
