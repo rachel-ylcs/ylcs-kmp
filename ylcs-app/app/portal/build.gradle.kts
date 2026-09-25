@@ -24,7 +24,7 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsApp.app.game,
                 projects.ylcsApp.app.gameGuessLyrics,
                 projects.ylcsApp.app.gameRhyme,
-//                projects.ylcsApp.app.information,
+                projects.ylcsApp.app.information,
                 projects.ylcsApp.app.music,
                 projects.ylcsApp.app.photo,
                 projects.ylcsApp.app.viewer,

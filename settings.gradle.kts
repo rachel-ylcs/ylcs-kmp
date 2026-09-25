@@ -100,7 +100,7 @@ include(
     "ylcs-app:app:game",
     "ylcs-app:app:game-guess-lyrics",
     "ylcs-app:app:game-rhyme",
-//    "ylcs-app:app:information",
+    "ylcs-app:app:information",
     "ylcs-app:app:music",
     "ylcs-app:app:photo",
     "ylcs-app:app:viewer",
