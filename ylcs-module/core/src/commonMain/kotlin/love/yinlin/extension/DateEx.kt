@@ -4,11 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.UtcOffset
-import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.DateTimeFormat
-import kotlinx.datetime.format.DayOfWeekNames
-import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
@@ -18,29 +14,11 @@ import kotlin.time.Instant
 
 object DateEx {
     @JvmInline
-    value class Formatter<T> private constructor(private val factory: DateTimeFormat<T>) {
+    value class Formatter<T>(private val factory: DateTimeFormat<T>) {
         fun parse(input: CharSequence): T? = factory.parseOrNull(input)
         fun format(value: T): String? = catchingNull { factory.format(value) }
 
         companion object {
-            val weiboDateTime = Formatter(DateTimeComponents.Format {
-                dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
-                char(' ')
-                monthName(MonthNames.ENGLISH_ABBREVIATED)
-                char(' ')
-                day()
-                char(' ')
-                hour()
-                char(':')
-                minute()
-                char(':')
-                second()
-                char(' ')
-                offset(UtcOffset.Formats.FOUR_DIGITS)
-                char(' ')
-                year()
-            })
-
             val standardDateTime = Formatter(LocalDateTime.Format {
                 year()
                 char('-')

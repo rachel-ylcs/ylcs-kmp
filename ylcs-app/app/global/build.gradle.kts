@@ -23,6 +23,7 @@ template(object : KotlinMultiplatformTemplate() {
 
                 projects.ylcsApp.cs,
                 projects.ylcsApp.mod,
+                projects.ylcsApp.thirdParty,
 
                 projects.ylcsModule.cs.clientEngine,
 

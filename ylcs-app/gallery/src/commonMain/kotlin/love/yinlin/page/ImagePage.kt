@@ -3,6 +3,7 @@ package love.yinlin.page
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -25,6 +26,7 @@ import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.data.compose.Picture
 import love.yinlin.gallery.resources.*
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
@@ -90,73 +92,60 @@ object ImagePage : Page() {
                     Res.drawable.img3
                 ]
 
-                val imageBlock = @Composable { isSingle: Boolean, pic: Picture, onClick: () -> Unit ->
+                val imageBlock = @Composable { contentScale: ContentScale, pic: Picture, onClick: () -> Unit ->
                     Image(
                         res = imgRes[pic.image.toInt()],
-                        modifier = Modifier.condition(!isSingle) { fillMaxSize() }.clickable(onClick = onClick),
-                        contentScale = if (isSingle) ContentScale.Inside else ContentScale.Crop,
+                        modifier = Modifier.fillMaxWidth().condition(contentScale == ContentScale.Crop) { fillMaxHeight() }.clickable(onClick = onClick),
+                        contentScale = contentScale,
                     )
                 }
 
-                ExampleRow {
-                    Example("Single DefaultSize") {
-                        NineGrid(pics = remember { [Picture("0")] }, content = imageBlock)
-                    }
+                val buildPictures = { num: Int ->
+                    List(num) { Picture(Random.nextInt(0, 4).toString()) }
+                }
 
-                    Example("Single fillMaxWidth", modifier = Modifier.weight(1f)) {
-                        NineGrid(
-                            pics = remember { [Picture("2")] },
-                            modifier = Modifier.fillMaxWidth(),
-                            content = imageBlock
-                        )
+                ExampleRow {
+                    Example("p1 Picture", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { [Picture("0")] }, content = imageBlock)
+                    }
+                    Example("p1 Video", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { [Picture("0", video = "0")] }, content = imageBlock)
                     }
                 }
 
                 ExampleRow {
-                    Example("Single Portrait") {
-                        NineGrid(pics = remember { [Picture("1")] }, content = imageBlock)
+                    Example("p2", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(2) }, content = imageBlock)
                     }
-
-                    Example("Video", modifier = Modifier.weight(1f)) {
-                        NineGrid(
-                            pics = remember { [Picture("0", video = "0")] },
-                            modifier = Modifier.fillMaxWidth(),
-                            content = imageBlock
-                        )
+                    Example("p3", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(3) }, content = imageBlock)
                     }
                 }
 
                 ExampleRow {
-                    Example("2 Picture", modifier = Modifier.weight(1f)) {
-                        NineGrid(
-                            pics = remember { [Picture("0"), Picture("1")] },
-                            modifier = Modifier.fillMaxWidth(),
-                            content = imageBlock
-                        )
+                    Example("p4", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(4) }, content = imageBlock)
                     }
-                    Example("3 Picture", modifier = Modifier.weight(1f)) {
-                        NineGrid(
-                            pics = remember { [Picture("0"), Picture("1"), Picture("3")] },
-                            modifier = Modifier.fillMaxWidth(),
-                            content = imageBlock
-                        )
+                    Example("p5", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(5) }, content = imageBlock)
                     }
                 }
 
                 ExampleRow {
-                    Example("5 Picture, Fixed Width") {
-                        NineGrid(
-                            pics = remember { [Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")] },
-                            modifier = Modifier.width(Theme.size.cell1),
-                            content = imageBlock
-                        )
+                    Example("p6", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(6) }, content = imageBlock)
                     }
-                    Example("9 Picture", modifier = Modifier.weight(1f)) {
-                        NineGrid(
-                            pics = remember { [Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")] },
-                            modifier = Modifier.fillMaxWidth(),
-                            content = imageBlock
-                        )
+                    Example("p7", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(7) }, content = imageBlock)
+                    }
+                }
+
+                ExampleRow {
+                    Example("p8", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(8) }, content = imageBlock)
+                    }
+                    Example("p9", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(9) }, content = imageBlock)
                     }
                 }
             }

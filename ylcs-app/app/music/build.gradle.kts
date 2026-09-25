@@ -14,7 +14,6 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.compose.resources,
 
-                projects.ylcsApp.thirdParty,
                 projects.ylcsApp.app.global,
                 projects.ylcsApp.app.viewer,
 
