@@ -18,6 +18,7 @@ import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.data.music.PlatformMusicType
@@ -93,8 +94,20 @@ class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
                         ModFactoryItem(
                             result = ModResult.FromPlatform(type),
                             text = type.description,
-                            textColor = type.color,
-                            icon = type.icon,
+                            textColor = when (type) {
+                                PlatformMusicType.QQMusic -> Colors.Yellow4
+                                PlatformMusicType.NetEaseCloud -> Colors.Red4
+                                PlatformMusicType.Kugou -> Colors.Blue4
+                                PlatformMusicType.Soda -> Colors.Green4
+                                PlatformMusicType.Migu -> Colors.Pink4
+                            },
+                            icon = when (type) {
+                                PlatformMusicType.QQMusic -> Icons2.QQMusic
+                                PlatformMusicType.NetEaseCloud -> Icons2.NetEaseCloudMusic
+                                PlatformMusicType.Kugou -> Icons2.KugouMusic
+                                PlatformMusicType.Soda -> Icons2.SodaMusic
+                                PlatformMusicType.Migu -> Icons2.MiguMusic
+                            },
                             iconColor = Colors.Unspecified
                         )
                     }

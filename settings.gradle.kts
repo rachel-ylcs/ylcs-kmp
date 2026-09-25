@@ -103,7 +103,6 @@ include(
 //    "ylcs-app:app:information",
     "ylcs-app:app:music",
     "ylcs-app:app:photo",
-    "ylcs-app:app:third-party",
     "ylcs-app:app:viewer",
     "ylcs-app:app:world",
 
@@ -115,6 +114,7 @@ include(
     "ylcs-app:mod",
     "ylcs-app:mod-manager",
     "ylcs-app:server",
+    "ylcs-app:third-party",
     "ylcs-app:web-app",
     "ylcs-app:weibo-picture-downloader",
 )

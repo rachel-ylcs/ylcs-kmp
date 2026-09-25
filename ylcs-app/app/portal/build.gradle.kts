@@ -17,6 +17,7 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.compose.resources,
                 ExportLib,
+                projects.ylcsApp.thirdParty,
                 projects.ylcsApp.app.global,
                 projects.ylcsApp.app.account,
                 projects.ylcsApp.app.activity,
@@ -27,7 +28,6 @@ template(object : KotlinMultiplatformTemplate() {
 //                projects.ylcsApp.app.information,
                 projects.ylcsApp.app.music,
                 projects.ylcsApp.app.photo,
-                projects.ylcsApp.app.thirdParty,
                 projects.ylcsApp.app.viewer,
                 projects.ylcsApp.app.world,
             )
