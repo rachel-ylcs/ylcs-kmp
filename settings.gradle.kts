@@ -116,5 +116,4 @@ include(
     "ylcs-app:server",
     "ylcs-app:third-party",
     "ylcs-app:web-app",
-    "ylcs-app:weibo-picture-downloader",
 )

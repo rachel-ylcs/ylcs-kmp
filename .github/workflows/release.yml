@@ -311,35 +311,6 @@ jobs:
           name: ylcs-landpage
           path: outputs/landpage.zip
 
-  package-weiboPictureDownloader:
-    name: Package Weibo Picture Downloader
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup JDK
-        uses: actions/setup-java@v6
-        with:
-          distribution: oracle
-          java-version: 25
-          cache: gradle
-          cache-dependency-path: |
-            ./*.gradle*
-            ./**/gradle-wrapper.properties
-
-      - name: Build
-        run: |
-          ./gradlew ylcs-app:weibo-picture-downloader:weiboPictureDownloaderPublish
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-weibo-picture-downloader
-          path: outputs/weiboPictureDownloader.zip
-
   publish-release:
     name: Publish Release
     needs: [
@@ -351,8 +322,7 @@ jobs:
       package-web,
       package-server,
       package-modManager,
-      package-landpage,
-      package-weiboPictureDownloader
+      package-landpage
     ]
     runs-on: ubuntu-latest
     permissions:
@@ -429,6 +399,5 @@ jobs:
             artifacts/ylcs-server/*
             artifacts/ylcs-mod-manager/*
             artifacts/ylcs-landpage/*
-            artifacts/ylcs-weibo-picture-downloader/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
