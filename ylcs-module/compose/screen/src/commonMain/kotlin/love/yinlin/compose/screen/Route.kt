@@ -32,7 +32,7 @@ internal class Route @PublishedApi internal constructor(private val screenKey: S
     }
 
     @PublishedApi
-    internal val items = mutableListOf<String>()
+    internal val items: MutableList<String> = []
 
     @PublishedApi
     internal fun build(): String = buildString {

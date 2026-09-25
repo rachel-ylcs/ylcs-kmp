@@ -1,5 +1,5 @@
 data class QA(val question: String, val answer: String) {
-    companion object : List<QA> by listOf(
+    companion object : List<QA> by [
         QA(
             "什么是银临茶舍APP？",
             "银临茶舍APP是基于Rachel框架开发的集资讯、听歌、美图、论坛、社交于一体的小银子聚集地应用程序"
@@ -236,5 +236,5 @@ data class QA(val question: String, val answer: String) {
                 随机模式：从歌单中随机选取歌曲播放。
             """.trimIndent()
         ),
-    )
+    ]
 }

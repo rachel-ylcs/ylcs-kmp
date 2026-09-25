@@ -2,14 +2,14 @@ package love.yinlin.crypto
 
 class MD5(private val is16Bit: Boolean = false, private val isUppercase: Boolean = false) : Digest {
     companion object {
-        private val S = intArrayOf(
+        private val S: IntArray = [
             7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
             5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
             4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
             6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
-        )
+        ]
 
-        private val T = intArrayOf(
+        private val T: IntArray = [
             -680876936, -389564586, 606105819, -1044525330,
             -176418897, 1200080426, -1473231341, -45705983,
             1770035416, -1958414417, -42063, -1990404162,
@@ -26,7 +26,7 @@ class MD5(private val is16Bit: Boolean = false, private val isUppercase: Boolean
             1700485571, -1894986606, -1051523, -2054922799,
             1873313359, -30611744, -1560198380, 1309151649,
             -145523070, -1120210379, 718787259, -343485551,
-        )
+        ]
 
         private const val HEX_CHARS_LOWER = "0123456789abcdef"
         private const val HEX_CHARS_UPPER = "0123456789ABCDEF"

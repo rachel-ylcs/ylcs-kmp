@@ -25,7 +25,7 @@ import love.yinlin.io.Sources
 import love.yinlin.reflect.metaClassName
 
 class ClientAPIFile internal constructor(val value: Any) : APIFile {
-    override val files: List<String> = emptyList()
+    override val files: List<String> = []
 }
 
 fun apiFile(data: String): APIFile = ClientAPIFile(value = data.encodeToByteArray())
@@ -36,7 +36,7 @@ suspend fun apiFile(data: File): APIFile = ClientAPIFile(data.rawSource())
 suspend fun apiFile(data: List<File>): APIFile? = if (data.isEmpty()) null else data.safeRawSources()?.let(::ClientAPIFile)
 
 class APIFormScope {
-    val formParts = mutableListOf<FormPart<*>>()
+    val formParts: MutableList<FormPart<*>> = []
     var index = 0
     val sources = Sources<RawSource>()
 
@@ -136,7 +136,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> 
 suspend inline fun <reified I1, reified O1> API11<APIType.Form, I1, O1>.request(i1: I1, crossinline block: suspend (O1) -> Unit) = internalFormCallback(factory = {
     add(i1)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     block(o1.to())
 }
 
@@ -144,7 +144,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Form, I1, 
     add(i1)
     add(i2)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     block(o1.to())
 }
 
@@ -153,7 +153,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
     add(i2)
     add(i3)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     block(o1.to())
 }
 
@@ -163,7 +163,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
     add(i3)
     add(i4)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     block(o1.to())
 }
 
@@ -174,14 +174,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     block(o1.to())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Form, I1, O1, O2>.request(i1: I1, crossinline block: suspend (O1, O2) -> Unit) = internalFormCallback(factory = {
     add(i1)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     block(o1.to(), o2.to())
 }
 
@@ -189,7 +189,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
     add(i1)
     add(i2)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     block(o1.to(), o2.to())
 }
 
@@ -198,7 +198,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     block(o1.to(), o2.to())
 }
 
@@ -208,7 +208,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     block(o1.to(), o2.to())
 }
 
@@ -219,14 +219,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     block(o1.to(), o2.to())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Form, I1, O1, O2, O3>.request(i1: I1, crossinline block: suspend (O1, O2, O3) -> Unit) = internalFormCallback(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to())
 }
 
@@ -234,7 +234,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to())
 }
 
@@ -243,7 +243,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to())
 }
 
@@ -253,7 +253,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to())
 }
 
@@ -264,14 +264,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Form, I1, O1, O2, O3, O4>.request(i1: I1, crossinline block: suspend (O1, O2, O3, O4) -> Unit) = internalFormCallback(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to())
 }
 
@@ -279,7 +279,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to())
 }
 
@@ -288,7 +288,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to())
 }
 
@@ -298,7 +298,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to())
 }
 
@@ -309,14 +309,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Form, I1, O1, O2, O3, O4, O5>.request(i1: I1, crossinline block: suspend (O1, O2, O3, O4, O5) -> Unit) = internalFormCallback(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
 }
 
@@ -324,7 +324,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
 }
 
@@ -333,7 +333,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
 }
 
@@ -343,7 +343,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
 }
 
@@ -354,7 +354,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
 }
 
@@ -397,7 +397,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> 
 suspend inline fun <reified I1, reified O1> API11<APIType.Form, I1, O1>.request(i1: I1) = internalFormReturn(factory = {
     add(i1)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -405,7 +405,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Form, I1, 
     add(i1)
     add(i2)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -414,7 +414,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
     add(i2)
     add(i3)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -424,7 +424,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
     add(i3)
     add(i4)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -435,14 +435,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Form, I1, O1, O2>.request(i1: I1) = internalFormReturn(factory = {
     add(i1)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -450,7 +450,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
     add(i1)
     add(i2)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -459,7 +459,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -469,7 +469,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -480,14 +480,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Form, I1, O1, O2, O3>.request(i1: I1) = internalFormReturn(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -495,7 +495,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -504,7 +504,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -514,7 +514,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -525,14 +525,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Form, I1, O1, O2, O3, O4>.request(i1: I1) = internalFormReturn(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -540,7 +540,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -549,7 +549,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -559,7 +559,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -570,14 +570,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Form, I1, O1, O2, O3, O4, O5>.request(i1: I1) = internalFormReturn(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -585,7 +585,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -594,7 +594,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -604,7 +604,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -615,7 +615,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -658,7 +658,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5> 
 suspend inline fun <reified I1, reified O1> API11<APIType.Form, I1, O1>.requestNull(i1: I1) = internalFormReturnNull(factory = {
     add(i1)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -666,7 +666,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Form, I1, 
     add(i1)
     add(i2)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -675,7 +675,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
     add(i2)
     add(i3)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -685,7 +685,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
     add(i3)
     add(i4)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
@@ -696,14 +696,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1) = it.body<JsonArray>()
+    val [o1] = it.body<JsonArray>()
     APIResult1(o1.to<O1>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Form, I1, O1, O2>.requestNull(i1: I1) = internalFormReturnNull(factory = {
     add(i1)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -711,7 +711,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
     add(i1)
     add(i2)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -720,7 +720,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -730,7 +730,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
@@ -741,14 +741,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2) = it.body<JsonArray>()
+    val [o1, o2] = it.body<JsonArray>()
     APIResult2(o1.to<O1>(), o2.to<O2>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APIType.Form, I1, O1, O2, O3>.requestNull(i1: I1) = internalFormReturnNull(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -756,7 +756,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -765,7 +765,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -775,7 +775,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
@@ -786,14 +786,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3) = it.body<JsonArray>()
+    val [o1, o2, o3] = it.body<JsonArray>()
     APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> API14<APIType.Form, I1, O1, O2, O3, O4>.requestNull(i1: I1) = internalFormReturnNull(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -801,7 +801,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -810,7 +810,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -820,7 +820,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
@@ -831,14 +831,14 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3, o4) = it.body<JsonArray>()
+    val [o1, o2, o3, o4] = it.body<JsonArray>()
     APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
 }
 
 suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, reified O5> API15<APIType.Form, I1, O1, O2, O3, O4, O5>.requestNull(i1: I1) = internalFormReturnNull(factory = {
     add(i1)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -846,7 +846,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
     add(i1)
     add(i2)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -855,7 +855,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
     add(i2)
     add(i3)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -865,7 +865,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
     add(i3)
     add(i4)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }
 
@@ -876,6 +876,6 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
     add(i4)
     add(i5)
 }) {
-    val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+    val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
     APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
 }

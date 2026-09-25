@@ -20,7 +20,7 @@ fun main(args: Array<String>) = runBlocking {
             defaultLevel = LogLevel.INFO
         )
 
-        override val plugins: List<BasicServerPlugin> = listOf(
+        override val plugins: List<BasicServerPlugin> = [
             JsonPlugin,
             WebSocketPlugin(
                 socketPingPeriod = 15.seconds,
@@ -28,7 +28,7 @@ fun main(args: Array<String>) = runBlocking {
                 socketMaxFrameSize = Long.MAX_VALUE,
                 socketMasking = false
             )
-        )
+        ]
 
         override val apiScope: ServerScope = ServerScope(this)
 

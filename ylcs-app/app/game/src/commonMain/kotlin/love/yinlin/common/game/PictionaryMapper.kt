@@ -46,7 +46,7 @@ object PictionaryMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
             catchingNull { gameDetails.question.to<PictionaryQuestion>() to gameDetails.answer.String }
         }
 
-        data?.then { (question, answer) ->
+        data?.then { [question, answer] ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Lightbulb, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "答案", style = Theme.typography.v6.bold, modifier = Modifier.idText())

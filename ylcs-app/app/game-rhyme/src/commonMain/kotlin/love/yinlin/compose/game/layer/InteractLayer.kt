@@ -83,7 +83,7 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
         // 1   7
         // 2   6
         // 3 4 5
-        val (x, y) = point
+        val [x, y] = point
         return when {
             x < w0 -> null
             x < w1 -> when {
@@ -174,7 +174,7 @@ class InteractLayer : Layer(layerOrder = 3, layerType = LayerType.Absolute) {
     override fun PrepareDrawer.prePrepareDraw(viewportSize: Size, viewportBounds: Rect) {
         if (lastViewportSize != viewportSize) {
             lastViewportSize = viewportSize
-            val (w, h) = viewportSize
+            val [w, h] = viewportSize
             w1 = w / 3
             w2 = w * 2 / 3
             w3 = w

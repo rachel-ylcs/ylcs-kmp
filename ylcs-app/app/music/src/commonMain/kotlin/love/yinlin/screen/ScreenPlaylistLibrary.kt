@@ -90,7 +90,7 @@ class ScreenPlaylistLibrary : Screen() {
     private suspend fun addPlaylist() {
         inputPlaylistNameDialog.open()?.then { name ->
             if (name != Playlist.Default.name && playlistLibrary[name] == null) {
-                playlistLibrary[name] = MusicPlaylist(name, emptyList())
+                playlistLibrary[name] = MusicPlaylist(name, [])
                 currentPage = tabs.indexOf(name)
             }
             else slot.tip.warning("歌单已存在")
@@ -199,7 +199,7 @@ class ScreenPlaylistLibrary : Screen() {
     private data class PlaylistPreviewItem(val id: String, val name: String)
 
     private fun decodePlaylist(map: Map<String, MusicPlaylist>): Map<String, List<PlaylistPreviewItem>> {
-        return map.mapValues { (_, playlist) ->
+        return map.mapValues { [_, playlist] ->
             playlist.items.fastMap { id -> PlaylistPreviewItem(id, DataSourceMusic.library[id]?.name ?: "未知[id=$id]") }
         }
     }
@@ -447,7 +447,7 @@ class ScreenPlaylistLibrary : Screen() {
                             if (musicPlayer?.isReady == true) slot.tip.warning("导入歌单需要先停止播放器")
                             else {
                                 if (slot.confirm.open(content = "云恢复会用云端歌单覆盖整个本地歌单且无法撤销!")) {
-                                    val items = playlists.mapValues { (name, value) ->
+                                    val items = playlists.mapValues { [name, value] ->
                                         MusicPlaylist(name, value.fastMap { it.id })
                                     }
                                     playlistLibrary.replaceAll(items)
@@ -463,7 +463,7 @@ class ScreenPlaylistLibrary : Screen() {
                         modifier = Modifier.fillMaxWidth().weight(1f).horizontalScroll(rememberScrollState()).verticalScroll(rememberScrollState()),
                         indent = Dp.Hairline
                     ) {
-                        for ((name, playlist) in playlists) {
+                        for ([name, playlist] in playlists) {
                             key(name) {
                                 TreeNode(text = name) {
                                     for (id in playlist) {
@@ -491,6 +491,6 @@ class ScreenPlaylistLibrary : Screen() {
     private val inputPlaylistNameDialog = this land DialogInput(hint = "歌单名", maxLength = 16)
 
     private val processPlaylistDialog = this land DialogChoice.fromIconItems(
-        items = listOf("播放" to Icons.PlayArrow, "重命名" to Icons.Edit, "删除" to Icons.Delete)
+        items = ["播放" to Icons.PlayArrow, "重命名" to Icons.Edit, "删除" to Icons.Delete]
     )
 }

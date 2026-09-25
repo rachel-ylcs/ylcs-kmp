@@ -35,7 +35,7 @@ data object Ripple : IndicationNodeFactory {
 
     class StateLayer {
         val animatedAlpha = Animatable(0f)
-        val interactions: MutableList<Interaction> = mutableListOf()
+        val interactions: MutableList<Interaction> = []
         var currentInteraction: Interaction? = null
 
         fun handleInteraction(interaction: Interaction, scope: CoroutineScope) {
@@ -150,7 +150,7 @@ data object Ripple : IndicationNodeFactory {
 
     class RippleNode(private val interactionSource: InteractionSource) : Modifier.Node(), LayoutAwareModifierNode, CompositionLocalConsumerModifierNode, DrawModifierNode {
         var targetRadius: Float = 0f
-        val pendingInteractions = mutableListOf<PressInteraction>()
+        val pendingInteractions: MutableList<PressInteraction> = []
         val ripples = MutableScatterMap<PressInteraction.Press, RippleAnimation>()
         val stateLayer: StateLayer = StateLayer()
         var hasValidSize: Boolean = false

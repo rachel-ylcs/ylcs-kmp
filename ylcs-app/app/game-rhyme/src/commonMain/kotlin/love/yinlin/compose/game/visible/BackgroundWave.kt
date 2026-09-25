@@ -31,7 +31,7 @@ class BackgroundWave(
     val wavePath = Path()
 
     override fun onUpdate(tick: Int) {
-        val (w, h) = backgroundSize
+        val [w, h] = backgroundSize
         if (w == 0f || h == 0f) return
 
         val hy = h / 2

@@ -142,11 +142,11 @@ class ScreenMain : BasicScreen() {
             )
         }
         else { // 多MOD分开打包
-            for ((_, name, path, enabled) in selectedLibrary) {
+            for ([_, name, path, enabled] in selectedLibrary) {
                 if (enabled) {
                     mergeSingleMod(
                         filename = "$name.${ModResourceType.MOD_EXT}",
-                        paths = listOf(path),
+                        paths = [path],
                         filters = filters,
                         onProcess = onProcess
                     )
@@ -161,7 +161,7 @@ class ScreenMain : BasicScreen() {
                 val modPath = app.modPath
                 modPath.deleteRecursively()
                 modPath.mkdir()
-                for ((id, _, path) in items) {
+                for ([id, _, path] in items) {
                     val itemPath = File(modPath, id)
                     itemPath.mkdir()
                     // 复制基础资源
@@ -171,7 +171,7 @@ class ScreenMain : BasicScreen() {
                     }
                     // 基础资源打包
                     File(itemPath, ModResourceType.BASE_RES).write { sink ->
-                        ModFactory.Merge(listOf(path), sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
+                        ModFactory.Merge([path], sink).process(filters = ModResourceType.BASE) { _, _, _ -> }
                     }
                 }
             }

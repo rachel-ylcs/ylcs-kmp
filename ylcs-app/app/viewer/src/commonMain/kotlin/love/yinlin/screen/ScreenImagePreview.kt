@@ -83,7 +83,7 @@ class ScreenImagePreview(rawImages: List<Picture>, initIndex: Int) : Screen() {
                 itemsIndexed(
                     items = images,
                     key = { _, item -> item.key },
-                ) { index, (item) ->
+                ) { index, [item] ->
                     WebImage(
                         uri = item.image,
                         contentScale = ContentScale.Crop,

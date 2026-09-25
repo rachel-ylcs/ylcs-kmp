@@ -83,12 +83,12 @@ object ImagePage : Page() {
             }
 
             Component("NineGrid") {
-                val imgRes = listOf(
+                val imgRes = [
                     Res.drawable.img0,
                     Res.drawable.img1,
                     Res.drawable.img2,
                     Res.drawable.img3
-                )
+                ]
 
                 val imageBlock = @Composable { isSingle: Boolean, pic: Picture, onClick: () -> Unit ->
                     Image(
@@ -100,12 +100,12 @@ object ImagePage : Page() {
 
                 ExampleRow {
                     Example("Single DefaultSize") {
-                        NineGrid(pics = remember { listOf(Picture("0")) }, content = imageBlock)
+                        NineGrid(pics = remember { [Picture("0")] }, content = imageBlock)
                     }
 
                     Example("Single fillMaxWidth", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { listOf(Picture("2")) },
+                            pics = remember { [Picture("2")] },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
@@ -114,12 +114,12 @@ object ImagePage : Page() {
 
                 ExampleRow {
                     Example("Single Portrait") {
-                        NineGrid(pics = remember { listOf(Picture("1")) }, content = imageBlock)
+                        NineGrid(pics = remember { [Picture("1")] }, content = imageBlock)
                     }
 
                     Example("Video", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { listOf(Picture("0", video = "0")) },
+                            pics = remember { [Picture("0", video = "0")] },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
@@ -129,14 +129,14 @@ object ImagePage : Page() {
                 ExampleRow {
                     Example("2 Picture", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { listOf(Picture("0"), Picture("1")) },
+                            pics = remember { [Picture("0"), Picture("1")] },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
                     }
                     Example("3 Picture", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { listOf(Picture("0"), Picture("1"), Picture("3")) },
+                            pics = remember { [Picture("0"), Picture("1"), Picture("3")] },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )
@@ -146,14 +146,14 @@ object ImagePage : Page() {
                 ExampleRow {
                     Example("5 Picture, Fixed Width") {
                         NineGrid(
-                            pics = remember { listOf(Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")) },
+                            pics = remember { [Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")] },
                             modifier = Modifier.width(Theme.size.cell1),
                             content = imageBlock
                         )
                     }
                     Example("9 Picture", modifier = Modifier.weight(1f)) {
                         NineGrid(
-                            pics = remember { listOf(Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")) },
+                            pics = remember { [Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0"), Picture("1"), Picture("2"), Picture("3"), Picture("0")] },
                             modifier = Modifier.fillMaxWidth(),
                             content = imageBlock
                         )

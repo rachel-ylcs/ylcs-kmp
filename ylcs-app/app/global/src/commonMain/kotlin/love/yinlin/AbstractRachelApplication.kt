@@ -57,7 +57,7 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     val exceptionHandler by startup(StartupExceptionHandler.Factory("crash_key") { key, e, error ->
         kv.set(key, "${DateEx.CurrentString}\n${error}")
         println(e.stackTraceToString())
-    }, dependencies = listOf(StartupID<StartupKV>()))
+    }, dependencies = [StartupID<StartupKV>()])
 
     override val themeMode: ThemeMode get() = config.themeMode
     override val fontScale: Float get() = config.fontScale.value

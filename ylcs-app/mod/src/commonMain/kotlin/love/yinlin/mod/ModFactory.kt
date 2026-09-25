@@ -34,7 +34,7 @@ object ModFactory {
             }
         }
 
-        constructor(mediaPath: File, sink: Sink) : this(listOf(mediaPath), sink)
+        constructor(mediaPath: File, sink: Sink) : this([mediaPath], sink)
 
         private suspend fun Sink.writeMetadata() {
             Coroutines.io {
@@ -71,7 +71,7 @@ object ModFactory {
                 val musicInfo = configPath.readText()!!.parseJsonValue<MusicInfo>()
                 writeLengthString(musicInfo.id) // 写媒体ID
 
-                val resourcePaths = mutableListOf<Pair<File, ModResourceType>>()
+                val resourcePaths: MutableList<Pair<File, ModResourceType>> = []
                 for (path in mediaPath.list()) {
                     val type = ModResourceType.fromType(path.nameWithoutExtension)
                     if (path.extension == ModResourceType.RES_EXT && type != null && type in filters) {
@@ -81,7 +81,7 @@ object ModFactory {
                 writeInt(resourcePaths.size) // 写资源数
 
                 // 写资源
-                for ((path, type) in resourcePaths) {
+                for ([path, type] in resourcePaths) {
                     writeResource(path, type)
                 }
             }
@@ -92,7 +92,7 @@ object ModFactory {
             @MainCoroutine onProcess: (index: Int, total: Int, name: String) -> Unit
         ) {
             sink.writeMetadata()
-            for ((index, mediaPath) in mediaPaths.withIndex()) {
+            for ([index, mediaPath] in mediaPaths.withIndex()) {
                 sink.writeMedia(mediaPath, filters)
                 Coroutines.main {
                     onProcess(index, mediaPaths.size, mediaPath.name)
@@ -167,7 +167,7 @@ object ModFactory {
 
         suspend fun process(@MainCoroutine onProcess: (index: Int, total: Int, id: String) -> Unit): ReleaseResult {
             val metadata = source.readMetadata()
-            val ids = mutableListOf<String>()
+            val ids: MutableList<String> = []
             repeat(metadata.mediaNum) { index ->
                 val id = source.readMedia()
                 ids += id
@@ -222,10 +222,10 @@ object ModFactory {
         private suspend fun Source.previewMedia(): MediaItem = Coroutines.io {
             val id = readLengthString() // 读媒体ID
             val resourceNum = readInt() // 读资源数
-            val resources = mutableListOf<ResourceItem>()
+            val resources: MutableList<ResourceItem> = []
             var mainConfig: MusicInfo? = null
             repeat(resourceNum) {
-                val (resource, config) = previewResource()
+                val [resource, config] = previewResource()
                 resources += resource
                 if (config != null) mainConfig = config
             }
@@ -234,7 +234,7 @@ object ModFactory {
 
         suspend fun process(): PreviewResult {
             val metadata = source.readMetadata()
-            val medias = mutableListOf<MediaItem>()
+            val medias: MutableList<MediaItem> = []
             repeat(metadata.mediaNum) {
                 medias += source.previewMedia()
             }

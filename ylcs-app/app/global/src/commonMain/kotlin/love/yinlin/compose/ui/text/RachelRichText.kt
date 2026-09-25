@@ -76,7 +76,7 @@ fun RachelRichText(
     val onAtClickUpdate by rememberUpdatedState(onAtClick)
 
     val renderer = rememberRichRenderer(
-        drawerProvider = { listOf(RichEmojiDrawer, RichImageDrawer) }
+        drawerProvider = { [RichEmojiDrawer, RichImageDrawer] }
     ) {
         when (it) {
             is RichNodeLink -> onLinkClickUpdate?.invoke(it.uri)

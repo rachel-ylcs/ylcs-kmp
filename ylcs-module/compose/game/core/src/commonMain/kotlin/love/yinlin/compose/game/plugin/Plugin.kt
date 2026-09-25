@@ -18,7 +18,7 @@ abstract class Plugin(val engine: Engine) : Identifiable<String> {
     /**
      * 前置依赖插件
      */
-    open val dependencies: List<KClass<out Plugin>> = emptyList()
+    open val dependencies: List<KClass<out Plugin>> = []
 
     /**
      * 初始化

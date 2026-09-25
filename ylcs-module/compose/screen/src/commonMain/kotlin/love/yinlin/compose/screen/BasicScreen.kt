@@ -82,10 +82,10 @@ abstract class BasicScreen : ViewModel() {
     protected open val fab: FAB = FAB.Empty
 
     // 对话框槽
-    private val dialogList = mutableListOf<Dialog<*>>()
+    private val dialogList: MutableList<Dialog<*>> = []
 
     // 面板槽
-    private val sheetList = mutableListOf<BasicSheet<*>>()
+    private val sheetList: MutableList<BasicSheet<*>> = []
 
     protected infix fun <D : Dialog<*>> land(instance: D): D {
         dialogList += instance

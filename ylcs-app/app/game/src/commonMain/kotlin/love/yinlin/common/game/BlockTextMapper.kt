@@ -208,7 +208,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
             }
         }
 
-        answer?.then { (blockSize, data) ->
+        answer?.then { [blockSize, data] ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Lightbulb, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "答案", style = Theme.typography.v6.bold, modifier = Modifier.idText())
@@ -243,7 +243,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
             }
         }
 
-        pairData?.then { (blockSize, list, actualResult) ->
+        pairData?.then { [blockSize, list, actualResult] ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "正确率: ${actualResult.correctCount} / ${actualResult.totalCount}", modifier = Modifier.idText())

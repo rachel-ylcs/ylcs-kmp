@@ -9,7 +9,7 @@ import love.yinlin.extension.toJsonString
 @RichStringDsl
 abstract class RichList : RichValue() {
     @PublishedApi
-    internal val items = mutableListOf<RichObject>()
+    internal val items: MutableList<RichObject> = []
 
     final override val json: JsonElement by lazy {
         makeObject {

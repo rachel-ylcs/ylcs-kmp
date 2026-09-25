@@ -16,7 +16,7 @@ data class Uri(
 
     val params: Map<String, String> by lazy {
         val map = mutableMapOf<String, String>()
-        val items = query?.split('&') ?: emptyList()
+        val items = query?.split('&') ?: []
         for (item in items) {
             val key = item.substringBefore('=')
             val value = item.substringAfter('=')
@@ -38,8 +38,8 @@ data class Uri(
 
         fun parse(uri: String): Uri? = parseUri(uri)
 
-        private val hexDigits = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
-        private val defaultSet = charArrayOf('_', '-', '!', '.', '~', '\'', '(', ')', '*')
+        private val hexDigits: CharArray = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+        private val defaultSet: CharArray = ['_', '-', '!', '.', '~', '\'', '(', ')', '*']
         private fun isAllowed(c: Char): Boolean = c in 'a'..'z' || c in 'A'..'Z' || c in '0'..'9' || c in defaultSet
 
         private class ByteBuffer(private val size: Int) {

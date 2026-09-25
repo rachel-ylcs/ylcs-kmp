@@ -83,10 +83,10 @@ interface BasicTextGraph {
                     letterSpacing = if (letterSpacing <= 0f) TextUnit.Unspecified else BaselineTextFontSize * letterSpacing,
                     platformStyle = DefaultPlatformTextStyle,
                 ),
-                annotations = emptyList(),
+                annotations = [],
                 density = density,
                 fontFamilyResolver = fontFamilyResolver,
-                placeholders = emptyList()
+                placeholders = []
             )
             return Paragraph(
                 paragraphIntrinsics = intrinsics,

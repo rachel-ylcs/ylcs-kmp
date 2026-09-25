@@ -42,10 +42,8 @@ abstract class KotlinJsTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
                 binaries.executable()
                 generateTypeScriptDefinitions()
                 compilerOptions {
-                    target.set("es2015")
-                    useLanguageFeature(
-                        "-Xes-long-as-bigint"
-                    )
+                    target.set("es2020")
+                    useLanguageFeature()
                 }
 
                 js()

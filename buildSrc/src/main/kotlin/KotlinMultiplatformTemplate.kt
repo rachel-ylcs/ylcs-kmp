@@ -62,8 +62,6 @@ class KotlinMultiplatformSourceSetsScope(
     val wasmJsMain: KotlinSourceSet by lazy { with(extension) { set.wasmJsMain.get() } }
     val wasmJsTest: KotlinSourceSet by lazy { with(extension) { set.wasmJsTest.get() } }
 
-    val androidNativeMain: KotlinSourceSet by lazy { set.getByName("androidNativeMain") }
-    val androidNativeTest: KotlinSourceSet by lazy { set.getByName("androidNativeTest") }
     val windowsMain: KotlinSourceSet by lazy { set.getByName("windowsMain") }
     val windowsTest: KotlinSourceSet by lazy { set.getByName("windowsTest") }
     val linuxMain: KotlinSourceSet by lazy { set.getByName("linuxMain") }
@@ -114,11 +112,9 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open fun KotlinWebpackConfig.webpack() { }
 
     // DesktopNative
-    open val androidNativeTarget: Boolean = false
     open val windowsTarget: Boolean = false
     open val linuxTarget: Boolean = false
     open val macosTarget: Boolean = false
-    open fun KotlinNativeTarget.androidNative() { }
     open fun KotlinNativeTarget.windows() { }
     open fun KotlinNativeTarget.linux() { }
     open fun KotlinNativeTarget.macos() { }
@@ -189,7 +185,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                             linkerOpts("-framework", "UIKit")
                             @OptIn(KotlinNativeCacheApi::class)
                             disableNativeCache(
-                                version = DisableCacheInKotlinVersion.`2_4_20`,
+                                version = DisableCacheInKotlinVersion.`2_5_0`,
                                 reason = "cache bug",
                                 issueUrl = java.net.URI("https://youtrack.jetbrains.com/issue/KT-80715")
                             )
@@ -232,10 +228,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 @OptIn(ExperimentalWasmDsl::class)
                 wasmJs {
                     compilerOptions {
-                        target.set("es2015")
-                        useLanguageFeature(
-                            "-Xes-long-as-bigint"
-                        )
+                        target.set("es2020")
+                        useLanguageFeature()
                     }
 
                     browser {
@@ -262,10 +256,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
                 js {
                     compilerOptions {
-                        target.set("es2015")
-                        useLanguageFeature(
-                            "-Xes-long-as-bigint"
-                        )
+                        target.set("es2020")
+                        useLanguageFeature()
                     }
 
                     browser {
@@ -292,7 +284,6 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
 
             // DesktopNative
             buildList {
-                if (androidNativeTarget) add(androidNativeArm64("androidNative") { androidNative() })
                 if (windowsTarget) add(mingwX64("windows") { windows() })
                 if (linuxTarget) add(linuxX64("linux") { linux() })
                 if (macosTarget) add(macosArm64("macos") { macos() })

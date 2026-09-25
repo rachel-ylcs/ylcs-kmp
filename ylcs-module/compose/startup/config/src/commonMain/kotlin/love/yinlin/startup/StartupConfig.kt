@@ -20,7 +20,7 @@ open class StartupConfig(pool: StartupPool) : SyncStartup(pool) {
     companion object {
         inline fun <reified S : StartupConfig> custom(crossinline factory: (StartupPool) -> S): StartupFactory<S> = object : SyncStartupFactory<S>() {
             override val id: String = StartupID<S>()
-            override val dependencies: List<String> = listOf(StartupID<StartupKV>())
+            override val dependencies: List<String> = [StartupID<StartupKV>()]
             override fun build(pool: StartupPool): S = factory(pool)
         }
     }
@@ -99,7 +99,7 @@ open class StartupConfig(pool: StartupPool) : SyncStartup(pool) {
 
     inline fun <reified T> listState(
         version: String? = null,
-        noinline defaultFactory: () -> List<T> = { emptyList() }
+        noinline defaultFactory: () -> List<T> = { [] }
     ) = lazyName { name ->
         ListState(
             kv = kv,

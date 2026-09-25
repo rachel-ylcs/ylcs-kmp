@@ -13,12 +13,12 @@ class TestDigest {
 
     @Test
     fun testXXHash64() {
-        listOf(
+        [
             "hello world",
             "hello world!",
             "love.yinlin",
             "XXHash64XXHash64XXHash64XXHash64XXHash64XXHash64XXHash64",
-        ).forEach {
+        ].forEach {
             println("$it -> ${XXHash64.encodeToString(it)}")
         }
     }

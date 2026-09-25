@@ -56,7 +56,7 @@ abstract class GameMapper {
                 GameType.EXPLORATION, GameType.SPEED -> Theme.color.secondary
                 GameType.SINGLE, GameType.BATTLE -> Theme.color.tertiary
             }
-            return remember(type) { Brush.horizontalGradient(listOf(startColor, endColor)) }
+            return remember(type) { Brush.horizontalGradient([startColor, endColor]) }
         }
 
         inline fun <reified T> cast(game: Game): T? = when (game) {

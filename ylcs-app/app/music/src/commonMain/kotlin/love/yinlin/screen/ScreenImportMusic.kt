@@ -51,7 +51,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
     }
 
     private suspend fun loadModFile() {
-        app.picker.pickPath(mimeType = listOf(MimeType.BINARY), filter = listOf("*.rachel"))?.then {
+        app.picker.pickPath(mimeType = [MimeType.BINARY], filter = ["*.rachel"])?.then {
             step = Step.Prepare(it)
         }
     }

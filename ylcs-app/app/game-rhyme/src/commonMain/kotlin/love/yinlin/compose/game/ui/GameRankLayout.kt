@@ -47,7 +47,7 @@ internal fun GameRankLayout(
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v5)
         ) {
             var difficulty by rememberState { RhymePlayConfig.Default.difficulty }
-            val items = map[difficulty] ?: emptyList()
+            val items = map[difficulty] ?: []
 
             RhymeMusicCard(info = info, modifier = Modifier.fillMaxWidth()) {
                 DifficultyStar(difficulty, modifier = Modifier.fillMaxWidth().height(Theme.size.icon))

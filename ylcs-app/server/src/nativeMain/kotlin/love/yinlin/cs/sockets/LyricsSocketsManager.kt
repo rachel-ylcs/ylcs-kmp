@@ -29,7 +29,7 @@ class LyricsSocketsManager(
     session: Any
 ) : SocketsManager(session) {
     companion object {
-        private var library: List<Lyrics> = emptyList()
+        private var library: List<Lyrics> = []
 
         suspend fun initLibrary(file: File): Int {
             library = file.readText()!!.parseJsonValue<List<Lyrics>>()
@@ -57,7 +57,7 @@ class LyricsSocketsManager(
 
     private class Room(val info1: LyricsSockets.PlayerInfo, val info2: LyricsSockets.PlayerInfo) {
         private val lyrics = run {
-            val set = mutableSetOf<Int>()
+            val set: MutableSet<Int> = []
             val random = Random(DateEx.CurrentLong)
             for (i in library.size - LyricsSockets.QUESTION_COUNT until library.size) {
                 val randomIndex = random.nextInt(i + 1)
@@ -246,7 +246,7 @@ class LyricsSocketsManager(
                             room.info2.uid -> Triple(room.answers2, room.info1.uid, room.answers1)
                             else -> null
                         }
-                        triple?.then { (answers, otherUid, otherAnswers) ->
+                        triple?.then { [answers, otherUid, otherAnswers] ->
                             if (data.index in 0 ..< LyricsSockets.QUESTION_COUNT) {
                                 answers[data.index] = data.answer
                                 // 通知进度

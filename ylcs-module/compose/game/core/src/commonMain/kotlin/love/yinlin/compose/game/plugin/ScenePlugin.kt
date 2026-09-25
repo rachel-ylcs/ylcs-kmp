@@ -135,7 +135,7 @@ class ScenePlugin private constructor(
                                     // 根据层类型转换坐标
                                     val transformPosition = camera.transformPointer(isAbsolute, position, eventSize)
                                     // 构造受击检测
-                                    val (visible, arg) = layer.hitTestVisibleLayer(isAbsolute, transformPosition) ?: continue
+                                    val [visible, arg] = layer.hitTestVisibleLayer(isAbsolute, transformPosition) ?: continue
                                     // 消费完成
                                     val event = Event.Pointer.Down(id, transformPosition, layer, visible, arg)
                                     pointerMap[id] = event

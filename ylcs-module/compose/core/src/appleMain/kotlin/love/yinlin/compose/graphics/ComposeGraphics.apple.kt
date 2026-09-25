@@ -46,12 +46,12 @@ fun CValue<CGRect>.asComposeRect(): Rect = this.useContents { asComposeRect() }
 
 fun Rect.asCGRect(): CValue<CGRect> = CGRectMake(this.left.toDouble(), this.top.toDouble(), this.width.toDouble(), this.height.toDouble())
 
-fun CGAffineTransform.asComposeMatrix(): Matrix = Matrix(floatArrayOf(
+fun CGAffineTransform.asComposeMatrix(): Matrix = Matrix([
     this.a.toFloat(), this.b.toFloat(), 0f, 0f, // Column 0: ScaleX, SkewY, 0, Persp0
     this.c.toFloat(), this.d.toFloat(), 0f, 0f, // Column 1: SkewX, ScaleY, 0, Persp1
     0f, 0f, 1f, 0f,   // Column 2: 0, 0, ScaleZ, 0
     this.tx.toFloat(), this.ty.toFloat(), 0f, 1f  // Column 3: TransX, TransY, 0, Persp2
-))
+])
 
 fun CValue<CGAffineTransform>.asComposeMatrix(): Matrix = this.useContents { asComposeMatrix() }
 

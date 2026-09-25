@@ -53,7 +53,7 @@ fun AdaptiveTwoBox(
             layoutWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else (w1 + w2)
             layoutHeight = maxOf(h1, h2).fastCoerceIn(constraints.minHeight, constraints.maxHeight)
             with(horizontalArrangement) {
-                arrange(layoutWidth, intArrayOf(w1, w2), layoutDirection, outX)
+                arrange(layoutWidth, [w1, w2], layoutDirection, outX)
             }
             outY[0] = verticalAlignment.align(h1, layoutHeight)
             outY[1] = verticalAlignment.align(h2, layoutHeight)
@@ -62,7 +62,7 @@ fun AdaptiveTwoBox(
             layoutWidth = maxOf(w1, w2).fastCoerceIn(constraints.minWidth, constraints.maxWidth)
             layoutHeight = if (constraints.hasBoundedHeight) constraints.maxHeight else (h1 + h2)
             with(verticalArrangement) {
-                arrange(layoutHeight, intArrayOf(h1, h2), outY)
+                arrange(layoutHeight, [h1, h2], outY)
             }
             outX[0] = horizontalAlignment.align(w1, layoutWidth, layoutDirection)
             outX[1] = horizontalAlignment.align(w2, layoutWidth, layoutDirection)

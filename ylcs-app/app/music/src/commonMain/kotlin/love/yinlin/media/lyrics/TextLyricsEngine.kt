@@ -28,12 +28,12 @@ import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.verticalFade
 import love.yinlin.extension.then
 
-private val FadeLyrics = listOf(
+private val FadeLyrics = [
     0.0f to 0f,
     0.2f to 1f,
     0.6f to 1f,
     1f to 0f
-)
+]
 
 @Stable
 internal interface TextLine {

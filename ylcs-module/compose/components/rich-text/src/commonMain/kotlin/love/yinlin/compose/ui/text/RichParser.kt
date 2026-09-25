@@ -34,6 +34,6 @@ class RichParser(converters: List<RichConverter>) {
     }
 
     companion object {
-        val Default = RichParser(emptyList())
+        val Default = RichParser([])
     }
 }

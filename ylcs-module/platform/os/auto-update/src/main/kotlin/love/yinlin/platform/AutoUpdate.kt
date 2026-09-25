@@ -40,14 +40,14 @@ object AutoUpdate {
         }
     }
 
-    private fun windowsScript(newName: String) = arrayOf(
+    private fun windowsScript(newName: String): Array<String> = [
         "cmd", "/c", "start", "\"\"", "/B", "cmd", "/c",
         "ping -n 3 localhost >nul 2>&1 & (if exist $newName (rmdir /s /q app && ren $newName app))"
-    )
+    ]
 
-    private fun unixScript(currentDir: Path, newName: String) = arrayOf(
+    private fun unixScript(currentDir: Path, newName: String): Array<String> = [
         "sh", "-c", "sleep 3 && cd $currentDir && (if [ -d $newName ]; then rm -rf app && mv $newName app; fi)"
-    )
+    ]
 
     private fun startScript(currentDir: Path, newName: String) {
         ProcessBuilder(*Platform.use(

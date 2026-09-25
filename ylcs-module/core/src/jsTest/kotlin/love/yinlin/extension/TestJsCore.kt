@@ -28,15 +28,15 @@ class TestJsCore {
     @Test
     fun testJsArrayOf() {
         val arr1 = jsArrayOf(0.0.raw, "Alice".raw, false.raw)
-        assertContentEquals(arrayOf(0.0.raw, "Alice".raw, false.raw), arr1.toArray())
+        assertContentEquals([0.0.raw, "Alice".raw, false.raw], arr1.toArray())
 
         val arr2 = jsArrayOf(2, 3.0, 5L)
-        assertContentEquals(arrayOf(2.0.raw, 3.0.raw, 5.0.raw), arr2.toArray())
+        assertContentEquals([2.0.raw, 3.0.raw, 5.0.raw], arr2.toArray())
 
         val arr3 = jsArrayOf("hello", "world")
-        assertContentEquals(arrayOf("hello".raw, "world".raw), arr3.toArray())
+        assertContentEquals(["hello".raw, "world".raw], arr3.toArray())
 
         val arr4 = jsArrayOf("hello".encodeToByteArray(), "world".encodeToByteArray()) { it.toInt8Array() }
-        assertContentEquals(arrayOf("hello", "world"), arr4.asArray { v: Int8Array -> v.toByteArray().decodeToString() })
+        assertContentEquals(["hello", "world"], arr4.asArray { v: Int8Array -> v.toByteArray().decodeToString() })
     }
 }

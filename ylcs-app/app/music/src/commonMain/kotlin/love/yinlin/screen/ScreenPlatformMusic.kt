@@ -46,7 +46,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
 
     private val mp by derivedStateOf { app.requireClassOrNull<StartupMusicPlayer>() }
 
-    private var items by mutableRefStateOf(emptyList<PlatformMusicInfo>())
+    private var items: List<PlatformMusicInfo> by mutableRefStateOf([])
 
     private val gridState = LazyGridState()
 
@@ -196,7 +196,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
     override fun RowScope.LeftActions() {
         if (items.isNotEmpty()) {
             Icon(icon = Icons.Clear, tip = "刷新", onClick = {
-                items = emptyList()
+                items = []
             })
         }
     }

@@ -172,7 +172,7 @@ class APIDelegate<A : API<out APIType>> internal constructor(private val factory
     private lateinit var api: A
 
     private fun parseAPIRoute(name: String): String = name.replace("Api([A-Z])([a-z]*)([A-Z].*)".toRegex()) {
-        val (_, v1, v2, v3) = it.groupValues
+        val [_, v1, v2, v3] = it.groupValues
         "/${v1.lowercase()}$v2/${v3.replaceFirstChar { c -> c.lowercase() }}"
     }
 

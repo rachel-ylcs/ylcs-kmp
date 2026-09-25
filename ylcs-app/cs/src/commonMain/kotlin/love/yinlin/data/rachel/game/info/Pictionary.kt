@@ -45,7 +45,7 @@ data class PaintPath(
 
         @OptIn(UnsafeIoApi::class)
         override fun deserialize(decoder: Decoder): PaintPath = decoder.beginStructure(descriptor).run {
-            val paths = mutableListOf<Long>()
+            val paths: MutableList<Long> = []
             var width = 1f
             var color = 0
             val buffer = Buffer()

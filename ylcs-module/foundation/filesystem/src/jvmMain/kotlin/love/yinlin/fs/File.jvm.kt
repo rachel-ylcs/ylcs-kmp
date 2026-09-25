@@ -68,7 +68,7 @@ private class JvmFile(private val delegate: JFile) : File() {
 
     override fun listSync(): List<File> {
         val fileList = if (delegate.isDirectory) delegate.list() else null
-        return fileList?.map { File(this, it) } ?: emptyList()
+        return fileList?.map { File(this, it) } ?: []
     }
 }
 

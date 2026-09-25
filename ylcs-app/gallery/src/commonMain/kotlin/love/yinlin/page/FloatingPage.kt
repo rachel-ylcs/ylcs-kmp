@@ -35,7 +35,7 @@ object FloatingPage : Page() {
 
     val dialogInput = DialogInput(hint = "Input something here", trailing = InputDecoration.Icon.Clear)
 
-    val dialogChoiceSingle = DialogChoice.fromItems(listOf("Single"))
+    val dialogChoiceSingle = DialogChoice.fromItems(["Single"])
 
     val dialogChoice = DialogChoice.fromItems(List(10) { "Item $it" })
 
@@ -94,7 +94,7 @@ object FloatingPage : Page() {
         }
 
         override val expandable: Boolean by derivedStateOf { canFabExpand }
-        override val menus: List<FABAction> = listOf(
+        override val menus: List<FABAction> = [
             FABAction(
                 iconProvider = { Icons.Check },
                 onClick = { tip.success("Success") }
@@ -107,7 +107,7 @@ object FloatingPage : Page() {
                 iconProvider = { Icons.Error },
                 onClick = { tip.error("Error") }
             )
-        )
+        ]
     }
 
     @Composable

@@ -162,11 +162,11 @@ private class Hexagon(
 
         val newMatrix = QrCodeMatrix(newSize)
 
-        val (x1, y1) = rotate(newSize / 2, newSize / 2)
+        val [x1, y1] = rotate(newSize / 2, newSize / 2)
 
         repeat(newSize) { i ->
             repeat(newSize) { j ->
-                val (x, y) = rotate(i, j)
+                val [x, y] = rotate(i, j)
 
                 val inLarge = isInHexagon(x, y, x1, y1, a)
 

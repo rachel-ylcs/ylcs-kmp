@@ -31,8 +31,8 @@ suspend fun QueryExecutor.throwQuerySQL(@Language("SQL") sql: String, vararg arg
     val resultSet = fetchAll(statement).getOrThrow()
     val metadata = resultSet.metadata
     val colCount = metadata.getColumnCount()
-    val colNames = mutableListOf<String>()
-    val colTypes = mutableListOf<String>()
+    val colNames: MutableList<String> = []
+    val colTypes: MutableList<String> = []
 
     repeat(colCount) { index ->
         val column = metadata.getColumn(index)

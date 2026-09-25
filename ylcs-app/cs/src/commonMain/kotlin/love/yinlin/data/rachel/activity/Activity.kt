@@ -14,12 +14,12 @@ data class Activity(
 	val shortTitle: String? = null, // [活动短标题]
 	val title: String? = null, // [活动标题]
 	val content: String? = null, // [活动内容]
-	val price: List<ActivityPrice> = emptyList(), // [活动票价]
-	val saleTime: List<String> = emptyList(), // [开售时间]
-	val lineup: List<String> = emptyList(), // [演出阵容]
+	val price: List<ActivityPrice> = [], // [活动票价]
+	val saleTime: List<String> = [], // [开售时间]
+	val lineup: List<String> = [], // [演出阵容]
 	val photo: ActivityPhoto = ActivityPhoto(), // [活动照片]
 	val link: ActivityLink = ActivityLink(), // [活动链接]
-	val playlist: List<String> = emptyList(), // [歌单]
+	val playlist: List<String> = [], // [歌单]
 	val hide: Boolean = false, // [私密活动]
 ) : Comparable<Activity> {
 	override fun compareTo(other: Activity): Int {

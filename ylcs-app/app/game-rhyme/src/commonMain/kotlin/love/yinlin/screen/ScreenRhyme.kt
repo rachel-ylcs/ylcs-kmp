@@ -107,7 +107,7 @@ class ScreenRhyme : BasicScreen() {
             cameraConfig = Camera.Config(),
             extraModifier = Modifier.blurSource(blurState)
         ),
-        SoundPlugin.Factory(listOf()),
+        SoundPlugin.Factory([]),
         RhymePlugin.Factory(
             context = app.rawContext,
             blurState = blurState,
@@ -118,10 +118,10 @@ class ScreenRhyme : BasicScreen() {
     private var gameState: RhymeState by mutableStateOf(RhymeState.Start)
     private var gameError: Boolean by mutableStateOf(false)
 
-    private val library = mutableListOf<MusicInfo>()
+    private val library: MutableList<MusicInfo> = []
     private var repository: RhymeRepository? by mutableStateOf(null)
     private val illustrationList by derivedStateOf {
-        CharacterInfo.Pool.map { (id, info) ->
+        CharacterInfo.Pool.map { [id, info] ->
             RhymeIllustration(
                 info = info,
                 url = ServerRes.Game.Rhyme.CV.illustration(id).url,
@@ -283,13 +283,13 @@ class ScreenRhyme : BasicScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            val rotateColors = remember { listOf(Colors.Green4, Colors.Red4, Colors.Orange4, Colors.Pink4, Colors.Purple4) }
+            val rotateColors = remember { [Colors.Green4, Colors.Red4, Colors.Orange4, Colors.Pink4, Colors.Purple4] }
             val rotateValues = remember { mutableStateListOf(0f, 0f, 0f, 0f, 0f) }
 
             LaunchedEffect(Unit) {
                 while (true) {
                     delay(1.seconds)
-                    val (index1, index2) = rotateValues.indices.shuffled().take(2)
+                    val [index1, index2] = rotateValues.indices.shuffled().take(2)
                     rotateValues[index1] += 45f
                     rotateValues[index2] -= 45f
                 }

@@ -191,7 +191,7 @@ class ScreenWorld : BasicScreen() {
                 right = OverlayAction.Sync("历史", Icons.History) { navigate(::ScreenGameRecordHistory) }
             )
 
-            for ((type, group) in GameMapper.Groups) {
+            for ([type, group] in GameMapper.Groups) {
                 key(type) {
                     GameGroupLayout(type = type, group = group, modifier = Modifier.fillMaxWidth())
                 }
@@ -200,7 +200,7 @@ class ScreenWorld : BasicScreen() {
     }
 
     private val rankingSheet = this land object : SheetContent<Game>() {
-        private var items by mutableRefStateOf(emptyList<GameRank>())
+        private var items: List<GameRank> by mutableRefStateOf([])
 
         override suspend fun initialize(args: Game) {
             ApiGameGetGameRank.request(args) { items = it }

@@ -253,7 +253,7 @@ open class RichEditorState(maxLength: Int) {
     protected open fun AtLayout(modifier: Modifier) {}
 
     private val inputLayout = movableComposable { pair: Pair<String?, ImeAction>, onImeClick: (KeyboardActionScope.() -> Unit)?, modifier: Modifier ->
-        val (hint, imeAction) = pair
+        val [hint, imeAction] = pair
         val iconColor by rememberUpdatedState(if (enablePreview) Theme.color.primary else LocalColor.current)
         Input(
             state = inputState,
@@ -344,7 +344,7 @@ open class RichEditorState(maxLength: Int) {
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
                     ActionScope.Right.Container(modifier = Modifier.fillMaxWidth()) {
-                        val enableList by rememberDerivedState { listOf(true, useEmoji, useImage, useLink, useTopic, useAt) }
+                        val enableList by rememberDerivedState { [true, useEmoji, useImage, useLink, useTopic, useAt] }
                         RichEditorPage.entries.fastForEachIndexed { index, editorPage ->
                             val isActive = currentPage == editorPage
                             Icon(

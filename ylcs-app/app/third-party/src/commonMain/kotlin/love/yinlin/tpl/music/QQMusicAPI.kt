@@ -16,7 +16,7 @@ object QQMusicAPI : PlatformMusicAPI {
         "https://u.y.qq.com/cgi-bin/musicu.fcg?data=${Uri.encodeUri(makeObject(data).toJsonString())}"
 
     private fun decodeData(num: Int, json: JsonObject): List<JsonObject> {
-        val arr = mutableListOf<JsonObject>()
+        val arr: MutableList<JsonObject> = []
         repeat(num) {
             arr += json.obj("req_$it").obj("data")
         }
@@ -36,10 +36,10 @@ object QQMusicAPI : PlatformMusicAPI {
             }
         }
     }) { body: JsonObject ->
-        val (json) = decodeData(1, body)
+        val [json] = decodeData(1, body)
         json.arr("songList").map { it.Object.obj("songInfo")["mid"].String }
     }?.let { list ->
-        val items = mutableListOf<PlatformMusicInfo>()
+        val items: MutableList<PlatformMusicInfo> = []
         for (mid in list) requestMusic(mid)?.then { items += it }
         items.ifEmpty { null }
     }
@@ -93,7 +93,7 @@ object QQMusicAPI : PlatformMusicAPI {
             }
         }
     }) { body: JsonObject ->
-        val (json1, json2, json3) = decodeData(3, body)
+        val [json1, json2, json3] = decodeData(3, body)
         val trackInfo = json1.obj("track_info")
         val lyricsBase64 = json2["lyric"].String
         val midUrlInfo = json3.arr("midurlinfo")[0].Object
@@ -122,10 +122,10 @@ object QQMusicAPI : PlatformMusicAPI {
             }
         }
     }) { body: JsonObject ->
-        val (json) = decodeData(1, body)
+        val [json] = decodeData(1, body)
         json.arr("songlist").map { it.Object["mid"].String }
     }?.let { list ->
-        val items = mutableListOf<PlatformMusicInfo>()
+        val items: MutableList<PlatformMusicInfo> = []
         for (mid in list) requestMusic(mid)?.then { items += it }
         items.ifEmpty { null }
     }

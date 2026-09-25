@@ -48,7 +48,7 @@ fun ServerScope.songAPI() {
     }
 
     ApiSongSearchFilter.response { filter ->
-        val args = mutableListOf<Any>()
+        val args: MutableList<Any> = []
         val sql = buildString {
             append("SELECT sid, version, name FROM song WHERE 1=1")
 
@@ -90,10 +90,7 @@ fun ServerScope.songAPI() {
             append(" ORDER BY sid ASC")
         }
 
-        val songs: List<SongPreview> = if (args.isEmpty() && !filter.useAnimation && !filter.useVideo && !filter.useRhyme && !filter.useAccompaniment) {
-            emptyList()
-        }
-        else mysql.throwQuerySQL(sql, *args.toTypedArray()).to()
+        val songs: List<SongPreview> = if (args.isEmpty() && !filter.useAnimation && !filter.useVideo && !filter.useRhyme && !filter.useAccompaniment) [] else mysql.throwQuerySQL(sql, *args.toTypedArray()).to()
 
         result(songs)
     }

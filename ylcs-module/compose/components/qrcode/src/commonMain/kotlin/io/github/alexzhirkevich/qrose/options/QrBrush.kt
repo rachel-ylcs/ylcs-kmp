@@ -233,13 +233,13 @@ private class Random(
     private val random : Random
 ) : QrBrush {
 
-    private val _probabilities = mutableListOf<Pair<ClosedFloatingPointRange<Float>,Color>>()
+    private val _probabilities: MutableList<Pair<ClosedFloatingPointRange<Float>,Color>> = []
 
     init {
         require(probabilities.isNotEmpty()) {
             "Random color list can't be empty"
         }
-        val _ = (listOf(0f) + probabilities.map { it.first }).reduceIndexed { index, sum, i ->
+        val _ = ([0f] + probabilities.map { it.first }).reduceIndexed { index, sum, i ->
             _probabilities.add(sum..(sum + i) to probabilities[index - 1].second)
             sum + i
         }

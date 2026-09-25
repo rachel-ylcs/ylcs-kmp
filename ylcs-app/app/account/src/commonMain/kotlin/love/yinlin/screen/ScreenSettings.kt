@@ -204,7 +204,7 @@ class ScreenSettings : Screen() {
                 },
                 onClick = null
             ) {
-                val themeText = arrayOf(Theme.value.systemThemeText, Theme.value.lightThemeText, Theme.value.darkThemeText)
+                val themeText = [Theme.value.systemThemeText, Theme.value.lightThemeText, Theme.value.darkThemeText]
 
                 Filter(
                     size = ThemeMode.entries.size,

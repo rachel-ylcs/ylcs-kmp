@@ -6,12 +6,12 @@ import kotlin.reflect.KClass
 
 @Stable
 open class PointerEventListener : EventListener {
-    final override val target: Array<KClass<out Event>> = arrayOf(
+    final override val target: Array<KClass<out Event>> = [
         Event.Pointer::class,
         Event.Pointer.Down::class,
         Event.Pointer.Up::class,
         Event.Pointer.Move::class
-    )
+    ]
 
     open fun onPointerDown(event: Event.Pointer.Down) { }
     open fun onPointerUp(event: Event.Pointer.Up) { }

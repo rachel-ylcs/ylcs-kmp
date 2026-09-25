@@ -151,7 +151,7 @@ class ScreenMain : BasicScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val monthText = remember {
-                        val table = arrayOf("", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二")
+                        val table = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"]
                         "${table[today.month.number]}月"
                     }
 
@@ -180,7 +180,7 @@ class ScreenMain : BasicScreen() {
                         state = state,
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.e)
                     ) {
-                        items(DataSourceActivity.spanActivities) { (date, activity) ->
+                        items(DataSourceActivity.spanActivities) { [date, activity] ->
                             val itemWidth = if (activity != null) Theme.size.cell7 else Theme.size.cell10
                             val itemBackground = when {
                                 date == today -> Theme.color.secondaryContainer.copy(alpha = 0.75f)
@@ -340,14 +340,14 @@ class ScreenMain : BasicScreen() {
         }
     }
 
-    private val cardList = listOf(
+    private val cardList = [
         PortalCardItem(
             eyebrow = "INFORMATION",
             title = "资讯",
             subtitle = "漫游与新鲜现场",
             drawable = Res.drawable.card_information,
-            lightColors = listOf(Color(0xFF52D9E8), Color(0xFF80E1EC), Color(0xFFADEBF2)),
-            darkColors = listOf(Color(0xFF52D9E8), Color(0xFF17323A), Color(0xFF151B20)),
+            lightColors = [Color(0xFF52D9E8), Color(0xFF80E1EC), Color(0xFFADEBF2)],
+            darkColors = [Color(0xFF52D9E8), Color(0xFF17323A), Color(0xFF151B20)],
             onClick = {
 
             }
@@ -357,8 +357,8 @@ class ScreenMain : BasicScreen() {
             title = "图集",
             subtitle = "定格与闪耀瞬间",
             drawable = Res.drawable.card_photo,
-            lightColors = listOf(Color(0xFFA593FF), Color(0xFFB8A9FF), Color(0xFFCFC4FF)),
-            darkColors = listOf(Color(0xFFA593FF), Color(0xFF2A2340), Color(0xFF181B23)),
+            lightColors = [Color(0xFFA593FF), Color(0xFFB8A9FF), Color(0xFFCFC4FF)],
+            darkColors = [Color(0xFFA593FF), Color(0xFF2A2340), Color(0xFF181B23)],
             onClick = {
                 navigate(::ScreenPhotoAlbum)
             }
@@ -368,8 +368,8 @@ class ScreenMain : BasicScreen() {
             title = "社区",
             subtitle = "分享与热爱共鸣",
             drawable = Res.drawable.card_community,
-            lightColors = listOf(Color(0xFFFF7C68), Color(0xFFFF9B88), Color(0xFFFFBBAA)),
-            darkColors = listOf(Color(0xFFFF7C68), Color(0xFF3A231F), Color(0xFF1D191A)),
+            lightColors = [Color(0xFFFF7C68), Color(0xFFFF9B88), Color(0xFFFFBBAA)],
+            darkColors = [Color(0xFFFF7C68), Color(0xFF3A231F), Color(0xFF1D191A)],
             onClick = {
                 navigate(::ScreenCommunity)
             }
@@ -379,13 +379,13 @@ class ScreenMain : BasicScreen() {
             title = "世界",
             subtitle = "探索与无限可能",
             drawable = Res.drawable.card_world,
-            lightColors = listOf(Color(0xFFD9FF63), Color(0xFFE1FF83), Color(0xFFE9FFA6)),
-            darkColors = listOf(Color(0xFFD9FF63), Color(0xFF29301A), Color(0xFF181C16)),
+            lightColors = [Color(0xFFD9FF63), Color(0xFFE1FF83), Color(0xFFE9FFA6)],
+            darkColors = [Color(0xFFD9FF63), Color(0xFF29301A), Color(0xFF181C16)],
             onClick = {
                 navigate(::ScreenWorld)
             }
         )
-    )
+    ]
 
     private val cardLayout = movableComposable { modifier: Modifier ->
         FlowRow(

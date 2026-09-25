@@ -3,13 +3,13 @@ package love.yinlin.cs
 import love.yinlin.fs.File
 
 val EmptyAPIFile = object : APIFile {
-    override val files: List<String> = emptyList()
+    override val files: List<String> = []
 
     override fun toString(): String = "[]"
 }
 
 private class SingleAPIFile(path: String) : APIFile {
-    override val files: List<String> = listOf(path)
+    override val files: List<String> = [path]
 
     override fun toString(): String = files.joinToString(prefix = "[", postfix = "]")
 }

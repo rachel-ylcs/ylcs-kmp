@@ -44,7 +44,7 @@ class RichNodeStyle @PublishedApi internal constructor(
         override val type: String = RichType.Style.value
 
         override fun RichRenderScope.render(item: RichObject) = item.cast<RichNodeStyle> {
-            val textDecorations = mutableListOf<TextDecoration>()
+            val textDecorations: MutableList<TextDecoration> = []
             if (item.underline) textDecorations += TextDecoration.Underline
             if (item.strikethrough) textDecorations += TextDecoration.LineThrough
             builder.withStyle(SpanStyle(

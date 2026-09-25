@@ -93,7 +93,7 @@ suspend inline fun <reified O1> API01<APIType.Post, O1>
     internalRequestCallback({ setBody(makeArray {
 
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         block(o1.to())
     }
 
@@ -102,7 +102,7 @@ suspend inline fun <reified I1, reified O1> API11<APIType.Post, I1, O1>
     internalRequestCallback({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         block(o1.to())
     }
 
@@ -112,7 +112,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Post, I1, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         block(o1.to())
     }
 
@@ -123,7 +123,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         block(o1.to())
     }
 
@@ -135,7 +135,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         block(o1.to())
     }
 
@@ -148,7 +148,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         block(o1.to())
     }
 
@@ -157,7 +157,7 @@ suspend inline fun <reified O1, reified O2> API02<APIType.Post, O1, O2>
     internalRequestCallback({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         block(o1.to(), o2.to())
     }
 
@@ -166,7 +166,7 @@ suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Post, I1, 
     internalRequestCallback({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         block(o1.to(), o2.to())
     }
 
@@ -176,7 +176,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         block(o1.to(), o2.to())
     }
 
@@ -187,7 +187,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         block(o1.to(), o2.to())
     }
 
@@ -199,7 +199,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         block(o1.to(), o2.to())
     }
 
@@ -212,7 +212,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         block(o1.to(), o2.to())
     }
 
@@ -221,7 +221,7 @@ suspend inline fun <reified O1, reified O2, reified O3> API03<APIType.Post, O1, 
     internalRequestCallback({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to())
     }
 
@@ -230,7 +230,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APITyp
     internalRequestCallback({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to())
     }
 
@@ -240,7 +240,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to())
     }
 
@@ -251,7 +251,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to())
     }
 
@@ -263,7 +263,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to())
     }
 
@@ -276,7 +276,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to())
     }
 
@@ -285,7 +285,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4> API04<APITyp
     internalRequestCallback({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to())
     }
 
@@ -294,7 +294,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> 
     internalRequestCallback({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to())
     }
 
@@ -304,7 +304,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to())
     }
 
@@ -315,7 +315,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to())
     }
 
@@ -327,7 +327,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to())
     }
 
@@ -340,7 +340,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to())
     }
 
@@ -349,7 +349,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4, reified O5> 
     internalRequestCallback({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
     }
 
@@ -358,7 +358,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, 
     internalRequestCallback({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
     }
 
@@ -368,7 +368,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
     }
 
@@ -379,7 +379,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
     }
 
@@ -391,7 +391,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
     }
 
@@ -404,7 +404,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         block(o1.to(), o2.to(), o3.to(), o4.to(), o5.to())
     }
 
@@ -463,7 +463,7 @@ suspend inline fun <reified O1> API01<APIType.Post, O1>
     internalRequestReturn({ setBody(makeArray {
 
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -472,7 +472,7 @@ suspend inline fun <reified I1, reified O1> API11<APIType.Post, I1, O1>
     internalRequestReturn({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -482,7 +482,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Post, I1, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -493,7 +493,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -505,7 +505,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -518,7 +518,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -527,7 +527,7 @@ suspend inline fun <reified O1, reified O2> API02<APIType.Post, O1, O2>
     internalRequestReturn({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -536,7 +536,7 @@ suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Post, I1, 
     internalRequestReturn({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -546,7 +546,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -557,7 +557,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -569,7 +569,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -582,7 +582,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -591,7 +591,7 @@ suspend inline fun <reified O1, reified O2, reified O3> API03<APIType.Post, O1, 
     internalRequestReturn({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -600,7 +600,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APITyp
     internalRequestReturn({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -610,7 +610,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -621,7 +621,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -633,7 +633,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -646,7 +646,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -655,7 +655,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4> API04<APITyp
     internalRequestReturn({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -664,7 +664,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> 
     internalRequestReturn({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -674,7 +674,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -685,7 +685,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -697,7 +697,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -710,7 +710,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -719,7 +719,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4, reified O5> 
     internalRequestReturn({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -728,7 +728,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, 
     internalRequestReturn({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -738,7 +738,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -749,7 +749,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -761,7 +761,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -774,7 +774,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -833,7 +833,7 @@ suspend inline fun <reified O1> API01<APIType.Post, O1>
     internalRequestReturnNull({ setBody(makeArray {
 
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -842,7 +842,7 @@ suspend inline fun <reified I1, reified O1> API11<APIType.Post, I1, O1>
     internalRequestReturnNull({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -852,7 +852,7 @@ suspend inline fun <reified I1, reified I2, reified O1> API21<APIType.Post, I1, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -863,7 +863,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1> API31<APITyp
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -875,7 +875,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1> 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -888,7 +888,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1) = it.body<JsonArray>()
+        val [o1] = it.body<JsonArray>()
         APIResult1(o1.to<O1>())
     }
 
@@ -897,7 +897,7 @@ suspend inline fun <reified O1, reified O2> API02<APIType.Post, O1, O2>
     internalRequestReturnNull({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -906,7 +906,7 @@ suspend inline fun <reified I1, reified O1, reified O2> API12<APIType.Post, I1, 
     internalRequestReturnNull({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -916,7 +916,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2> API22<APITyp
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -927,7 +927,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2> 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -939,7 +939,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -952,7 +952,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2) = it.body<JsonArray>()
+        val [o1, o2] = it.body<JsonArray>()
         APIResult2(o1.to<O1>(), o2.to<O2>())
     }
 
@@ -961,7 +961,7 @@ suspend inline fun <reified O1, reified O2, reified O3> API03<APIType.Post, O1, 
     internalRequestReturnNull({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -970,7 +970,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3> API13<APITyp
     internalRequestReturnNull({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -980,7 +980,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3> 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -991,7 +991,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -1003,7 +1003,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -1016,7 +1016,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3) = it.body<JsonArray>()
+        val [o1, o2, o3] = it.body<JsonArray>()
         APIResult3(o1.to<O1>(), o2.to<O2>(), o3.to<O3>())
     }
 
@@ -1025,7 +1025,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4> API04<APITyp
     internalRequestReturnNull({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -1034,7 +1034,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4> 
     internalRequestReturnNull({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -1044,7 +1044,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -1055,7 +1055,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -1067,7 +1067,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -1080,7 +1080,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3, o4) = it.body<JsonArray>()
+        val [o1, o2, o3, o4] = it.body<JsonArray>()
         APIResult4(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>())
     }
 
@@ -1089,7 +1089,7 @@ suspend inline fun <reified O1, reified O2, reified O3, reified O4, reified O5> 
     internalRequestReturnNull({ setBody(makeArray {
 
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -1098,7 +1098,7 @@ suspend inline fun <reified I1, reified O1, reified O2, reified O3, reified O4, 
     internalRequestReturnNull({ setBody(makeArray {
         add(i1.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -1108,7 +1108,7 @@ suspend inline fun <reified I1, reified I2, reified O1, reified O2, reified O3, 
         add(i1.toJson())
         add(i2.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -1119,7 +1119,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified O1, reified O2, 
         add(i2.toJson())
         add(i3.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -1131,7 +1131,7 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified O1, 
         add(i3.toJson())
         add(i4.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }
 
@@ -1144,6 +1144,6 @@ suspend inline fun <reified I1, reified I2, reified I3, reified I4, reified I5, 
         add(i4.toJson())
         add(i5.toJson())
     }) }) {
-        val (o1, o2, o3, o4, o5) = it.body<JsonArray>()
+        val [o1, o2, o3, o4, o5] = it.body<JsonArray>()
         APIResult5(o1.to<O1>(), o2.to<O2>(), o3.to<O3>(), o4.to<O4>(), o5.to<O5>())
     }

@@ -48,7 +48,7 @@ object Icons {
             close()
         }
         path(brush = ComposeBrush.radialGradient(
-            colorStops = arrayOf(0f to Color(0xff5383ec), 0.867f to Color(0xff7f52ff)),
+            colorStops = [0f to Color(0xff5383ec), 0.867f to Color(0xff7f52ff)],
             center = Offset(23.131f, 18.441f),
             radius = 42.132f
         )) {
@@ -61,7 +61,7 @@ object Icons {
             close()
         }
         path(brush = ComposeBrush.linearGradient(
-            colorStops = arrayOf(0f to Color(0xff33c3ff), 0.878f to Color(0xff5383ec)),
+            colorStops = [0f to Color(0xff33c3ff), 0.878f to Color(0xff5383ec)],
             start = Offset(44.172f, 4.377f),
             end = Offset(17.973f, 34.035f)
         )) {

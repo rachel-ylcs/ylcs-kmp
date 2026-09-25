@@ -19,7 +19,7 @@ private class NativeFile(private val delegate: Path) : File() {
     override val name: String get() {
         val path = delegate.toString()
         if (path.isEmpty()) return ""
-        val lastSlash = if (platform == Platform.WindowsNative) path.lastIndexOfAny(charArrayOf('\\', '/')) else path.lastIndexOf('/')
+        val lastSlash = if (platform == Platform.WindowsNative) path.lastIndexOfAny(['\\', '/']) else path.lastIndexOf('/')
         return if (lastSlash != -1) path.substring(lastSlash + 1) else path
     }
 
@@ -34,7 +34,7 @@ private class NativeFile(private val delegate: Path) : File() {
         val path = delegate.toString()
         if (path.isEmpty()) return null
 
-        val lastSlash = if (platform == Platform.WindowsNative) path.lastIndexOfAny(charArrayOf('\\', '/')) else path.lastIndexOf('/')
+        val lastSlash = if (platform == Platform.WindowsNative) path.lastIndexOfAny(['\\', '/']) else path.lastIndexOf('/')
         if (lastSlash != -1) {
             val parentPath = if (platform == Platform.WindowsNative && lastSlash == 2 && path[1] == ':') path.substring(0, 3)
             else if (lastSlash == 0) path.substring(0, 1)

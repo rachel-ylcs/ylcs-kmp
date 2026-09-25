@@ -80,7 +80,7 @@ fun ModPreviewLayout(modifier: Modifier = Modifier, result: PreviewResult) {
                         style = Theme.typography.v6.bold,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
-                    for ((resource, length) in mediaItem.resources) {
+                    for ([resource, length] in mediaItem.resources) {
                         key(resource) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Theme.color.outline).padding(Theme.padding.value),

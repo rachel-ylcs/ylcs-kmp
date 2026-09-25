@@ -10,7 +10,7 @@ import kotlin.getValue
 data class ActivityPhoto(
     val cover: String? = null, // [活动封面]
     val seat: String? = null, // [座位图]
-    val posters: List<String> = emptyList(), // [海报]
+    val posters: List<String> = [], // [海报]
 ) {
     val coverPath by lazy { cover?.let(ServerRes.Activity::activity) }
 

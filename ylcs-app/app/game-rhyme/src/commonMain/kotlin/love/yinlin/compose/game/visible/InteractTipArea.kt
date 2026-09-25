@@ -30,7 +30,7 @@ class InteractTipArea : MomentVisible(12000) {
     }
 
     override fun PrepareDrawer.prepareDraw(viewportSize: Size, viewportBounds: Rect) {
-        val (w, h) = viewportSize
+        val [w, h] = viewportSize
         val w0 = 0f
         val w1 = w / 3
         val w2 = w * 2 / 3

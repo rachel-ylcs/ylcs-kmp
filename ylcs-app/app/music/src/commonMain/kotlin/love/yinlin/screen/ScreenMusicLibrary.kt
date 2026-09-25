@@ -123,8 +123,8 @@ class ScreenMusicLibrary : Screen() {
         val result = searchFilterDialog.open(rawLibrary.values)
         if (result != null) {
             library.replaceAll(Coroutines.cpu {
-                val newLibrary = mutableListOf<MusicInfoPreview>()
-                for ((_, info) in rawLibrary) {
+                val newLibrary: MutableList<MusicInfoPreview> = []
+                for ([_, info] in rawLibrary) {
                     if (result.checkSuspend(info)) newLibrary += MusicInfoPreview(info)
                 }
                 newLibrary
@@ -159,7 +159,7 @@ class ScreenMusicLibrary : Screen() {
                 if (playlist != null) {
                     val addItems = selectIdList
                     val oldItems = playlist.items
-                    val newItems = mutableListOf<String>()
+                    val newItems: MutableList<String> = []
                     for (item in addItems) {
                         if (item !in oldItems) newItems += item
                     }

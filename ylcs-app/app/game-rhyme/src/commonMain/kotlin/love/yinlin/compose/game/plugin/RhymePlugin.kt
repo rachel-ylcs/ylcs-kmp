@@ -50,7 +50,7 @@ class RhymePlugin(
         override fun build(engine: Engine): Plugin = RhymePlugin(context, blurState, endListener, engine)
     }
 
-    override val dependencies: List<KClass<out Plugin>> = listOf(ScenePlugin::class, SoundPlugin::class)
+    override val dependencies: List<KClass<out Plugin>> = [ScenePlugin::class, SoundPlugin::class]
 
     private lateinit var scene: ScenePlugin
 
@@ -73,7 +73,7 @@ class RhymePlugin(
             val uiLayer = UILayer(character, playInfo, momentLayer)
             val mapLayer = MapLayer(scene.camera, character, playInfo, momentLayer, backgroundLayer, interactLayer, uiLayer)
             // 先更新交互结果再处理地图
-            scene += listOf(backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer)
+            scene += [backgroundLayer, momentLayer, interactLayer, mapLayer, uiLayer]
         }
     }
 

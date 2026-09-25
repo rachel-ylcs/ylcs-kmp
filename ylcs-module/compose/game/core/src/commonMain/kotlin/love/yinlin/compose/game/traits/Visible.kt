@@ -102,7 +102,7 @@ abstract class Visible(
         // 如果没变化使用缓存值
         if (isDirty) {
             // 视口剔除
-            val (x, y) = position
+            val [x, y] = position
             // 更新缓存值
             culling.enabled = if (!visible) true else { // 不可视直接剔除
                 // 计算包围盒半径 弱条件

@@ -72,7 +72,7 @@ import kotlin.collections.plusAssign
 @Stable
 class ScreenRhyme(private val path: String?) : Screen() {
     private val prettyJson = Json { prettyPrint = true }
-    private val defaultConfig = RhymeLyricsConfig(id = "", duration = 0L, chorus = emptyList(), lyrics = emptyList(), offset = 0)
+    private val defaultConfig = RhymeLyricsConfig(id = "", duration = 0L, chorus = [], lyrics = [], offset = 0)
 
     private val useFile by derivedStateOf { path != null }
     private var name by mutableStateOf("未知歌曲")
@@ -96,7 +96,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
         val lyrics = qrc.substringAfter("LyricContent=\"").substringBeforeLast("\"/>")
         val lines = lyrics.split("\n")
 
-        val rhymeLines = mutableListOf<RhymeLine>()
+        val rhymeLines: MutableList<RhymeLine> = []
         val headerRegex = "\\[\\s*(\\d+),\\s*(\\d+)\\s*](.*)".toRegex()
         val bodyRegex = "([^()]+?)\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)".toRegex()
         for (line in lines) {
@@ -105,7 +105,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
             val rawBody = headerMatch.groupValues[3]
             val matches = bodyRegex.findAll(rawBody)
 
-            val theme = mutableListOf<RhymeAction>()
+            val theme: MutableList<RhymeAction> = []
             val lineText = StringBuilder()
             for (match in matches) {
                 val ch = match.groupValues[1]
@@ -146,15 +146,15 @@ class ScreenRhyme(private val path: String?) : Screen() {
 
     override suspend fun initialize() {
         catchingError {
-            val (musicName, musicConfig) = Coroutines.io {
+            val [musicName, musicConfig] = Coroutines.io {
                 path?.let {
                     val musicInfo = File(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
                     val rhymePath = File(it, ModResourceType.Rhyme.filename)
                     val newConfig = RhymeLyricsConfig(
                         id = musicInfo.id,
                         duration = 0L,
-                        chorus = musicInfo.chorus?.map { v -> Chorus(v, v) } ?: emptyList(),
-                        lyrics = emptyList(),
+                        chorus = musicInfo.chorus?.map { v -> Chorus(v, v) } ?: [],
+                        lyrics = [],
                         offset = 0,
                     )
                     if (!rhymePath.exists()) rhymePath.writeText(prettyJson.encodeToString(newConfig))
@@ -172,12 +172,12 @@ class ScreenRhyme(private val path: String?) : Screen() {
         LoadingIcon(Icons.Delete, enabled = useFile, onClick = ::deleteConfig)
     }
 
-    private val scaleTable = arrayOf(
+    private val scaleTable: Array<String> = [
         "9",
         "1", "2", "3", "4", "5", "6", "7",
         "\uF021", "@", "#", "$", "\u00A7", "\u00A8", "\u00A9",
         "\u0086", "\u0087", "\u0088", "*", "%", "^", "&",
-    )
+    ]
 
     val scaleKeyMap = mapOf(
         Key.Q to 1, Key.W to 2, Key.E to 3, Key.R to 4, Key.T to 5, Key.Y to 6, Key.U to 7,
@@ -186,7 +186,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
     )
 
     private fun onHotKey(currentItem: Pair<Int, Int>, key: Key) {
-        val (lineIndex, actionIndex) = currentItem
+        val [lineIndex, actionIndex] = currentItem
         val lineNum = rhymeConfig.lyrics.size
         val line = rhymeConfig.lyrics.getOrNull(lineIndex) ?: return
         val action = line.theme.getOrNull(actionIndex) ?: return
@@ -235,7 +235,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
         val newScaleValue = resultScale.toByte()
         val newTheme = line.theme.toMutableList()
         val currentScale = when (action) {
-            is RhymeAction.Note -> listOf(action.scale)
+            is RhymeAction.Note -> [action.scale]
             is RhymeAction.Slur -> action.scale
         }
         newTheme[actionIndex] = if (isHotKeyAddMode) RhymeAction.Slur(action.ch, action.end, currentScale.toMutableList().also { it += newScaleValue })
@@ -321,7 +321,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                 }
             }
             FlowRow(modifier = Modifier.fillMaxWidth()) {
-                for ((actionIndex, action) in line.theme.withIndex()) {
+                for ([actionIndex, action] in line.theme.withIndex()) {
                     val background = if (currentSelectItem?.first == lineIndex && currentSelectItem?.second == actionIndex) {
                         if (isHotKeyAddMode) Colors.Red4.copy(alpha = 0.2f) else Colors.Steel4.copy(alpha = 0.2f)
                     } else Colors.Transparent
@@ -349,7 +349,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
                         var isOpen by rememberFalse()
 
                         val currentScale = when (action) {
-                            is RhymeAction.Note -> listOf(action.scale)
+                            is RhymeAction.Note -> [action.scale]
                             is RhymeAction.Slur -> action.scale
                         }
 
@@ -425,7 +425,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
             itemsIndexed(
                 items = lyrics,
                 key = { _, item -> item.key }
-            ) { index, (line) ->
+            ) { index, [line] ->
                 LyricsLineEditor(
                     modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Colors.Black),
                     config = config,
@@ -496,7 +496,7 @@ class ScreenRhyme(private val path: String?) : Screen() {
             val scrollState = rememberScrollState()
 
             Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
-                val tabs = remember { listOf("歌词", "简谱") }
+                val tabs = remember { ["歌词", "简谱"] }
 
                 Filter(
                     size = tabs.size,

@@ -29,10 +29,10 @@ fun InteractionSource.collectState(
     val state = rememberState { InteractionState() }
 
     LaunchedEffect(useFocused, useHovered, usePressed, useDragged) {
-        val focusInteractions = mutableListOf<FocusInteraction.Focus>()
-        val hoverInteractions = mutableListOf<HoverInteraction.Enter>()
-        val pressInteractions = mutableListOf<PressInteraction.Press>()
-        val dragInteractions = mutableListOf<DragInteraction.Start>()
+        val focusInteractions: MutableList<FocusInteraction.Focus> = []
+        val hoverInteractions: MutableList<HoverInteraction.Enter> = []
+        val pressInteractions : MutableList<PressInteraction.Press> = []
+        val dragInteractions: MutableList<DragInteraction.Start> = []
 
         interactions.collect { interaction ->
             when (interaction) {

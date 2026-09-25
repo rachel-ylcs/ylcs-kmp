@@ -92,20 +92,20 @@ fun Matrix.asSkiaMatrix44(): Matrix44 {
 
 fun Matrix33.asComposeMatrix(): Matrix {
     val s = this.mat
-    return Matrix(floatArrayOf(
+    return Matrix([
         s[0], s[3], 0f, s[6], // Col 0: ScaleX, SkewY, 0, Persp0
         s[1], s[4], 0f, s[7], // Col 1: SkewX, ScaleY, 0, Persp1
         0f,   0f,   1f, 0f,   // Col 2: 0, 0, 1, 0 (Identity Z)
         s[2], s[5], 0f, s[8]  // Col 3: TransX, TransY, 0, Persp2
-    ))
+    ])
 }
 
 fun Matrix44.asComposeMatrix(): Matrix {
     val s = this.mat
-    return Matrix(floatArrayOf(
+    return Matrix([
         s[0], s[4], s[8],  s[12], // Compose Col 0
         s[1], s[5], s[9],  s[13], // Compose Col 1
         s[2], s[6], s[10], s[14], // Compose Col 2
         s[3], s[7], s[11], s[15]  // Compose Col 3
-    ))
+    ])
 }

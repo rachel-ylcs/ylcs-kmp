@@ -15,12 +15,12 @@ class BlurState {
         internal val Blur = HazeBlurStyle {
             blurRadius(10.dp)
             backgroundColor(Color(0xFF292929))
-            colorEffects(listOf(HazeColorEffect.tint(Color(0x8C292929))))
+            colorEffects([HazeColorEffect.tint(Color(0x8C292929))])
         }
         internal val Acrylic = HazeBlurStyle {
             blurRadius(10.dp)
             backgroundColor(Color(0xDD292929))
-            colorEffects(listOf(HazeColorEffect.tint(Color(0x6C292929))))
+            colorEffects([HazeColorEffect.tint(Color(0x6C292929))])
         }
     }
 }

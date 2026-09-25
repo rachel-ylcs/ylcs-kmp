@@ -57,7 +57,7 @@ open class FAB {
     /**
      * FAB 的菜单
      */
-    protected open val menus: List<FABAction> = emptyList()
+    protected open val menus: List<FABAction> = []
 
     /**
      * FAB 的大小

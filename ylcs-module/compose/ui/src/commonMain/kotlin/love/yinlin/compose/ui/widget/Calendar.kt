@@ -50,27 +50,21 @@ private val solarFestivalTable = mapOf(
 )
 
 @Stable
-private val lunarDayTable = arrayOf(
-    "", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"
-)
+private val lunarDayTable: Array<String> = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 
 @Stable
-private val lunarDaysTable = arrayOf(
-    "初", "十", "廿", "三"
-)
+private val lunarDaysTable: Array<String> = ["初", "十", "廿", "三"]
 
 @Stable
-private val lunarMonthTable = arrayOf(
-    "", "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"
-)
+private val lunarMonthTable: Array<String> = ["", "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"]
 
 @Stable
-private val solarTermTable = arrayOf(
+private val solarTermTable: Array<String> = [
     "小寒", "大寒", "立春", "雨水", "惊蛰", "春分",
     "清明", "谷雨", "立夏", "小满", "芒种", "夏至",
     "小暑", "大暑", "立秋", "处暑", "白露", "秋分",
     "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"
-)
+]
 
 @Stable
 private object LunarLoader {
@@ -161,7 +155,7 @@ private fun CalendarHeader(
     val dayTextStyle = LocalCalendarDayTextStyle.current
     val headerStyle = dayTextStyle.scaleSize(1.6f, true)
 
-    val (_, _, totalWidth) = rememberCalendarSize()
+    val [_, _, totalWidth] = rememberCalendarSize()
 
     Row(
         modifier = Modifier.width(totalWidth),
@@ -182,7 +176,7 @@ private fun CalendarWeekGrid() {
     val dayTextStyle = LocalCalendarDayTextStyle.current
     val headerStyle = dayTextStyle.scaleSize(1.4f, true)
 
-    val (_, cellPadding, totalWidth) = rememberCalendarSize()
+    val [_, cellPadding, totalWidth] = rememberCalendarSize()
 
     Row(modifier = Modifier.width(totalWidth)) {
         "一二三四五六日".forEach {
@@ -202,7 +196,7 @@ private fun CalendarDayGrid(
     events: Map<Long, String>,
     onEventClick: (LocalDate) -> Unit,
 ) {
-    val (cellSize, cellPadding, totalWidth) = rememberCalendarSize()
+    val [cellSize, cellPadding, totalWidth] = rememberCalendarSize()
 
     HorizontalScrollContainer(state = state, modifier = Modifier.keepSize().size(totalWidth, cellSize * 6 + cellPadding * 12)) {
         HorizontalPager(

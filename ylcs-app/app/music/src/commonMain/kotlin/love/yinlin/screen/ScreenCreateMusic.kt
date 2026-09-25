@@ -269,8 +269,8 @@ class ScreenCreateMusic : Screen() {
                 onReplace = {
                     launch {
                         input.audioUri = app.picker.pickPath(
-                            mimeType = listOf(MimeType.AUDIO),
-                            filter = listOf("*.mp3", "*.flac", "*.m4a", "*.wav")
+                            mimeType = [MimeType.AUDIO],
+                            filter = ["*.mp3", "*.flac", "*.m4a", "*.wav"]
                         )
                     }
                 },

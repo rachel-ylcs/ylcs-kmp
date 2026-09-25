@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.util.fastForEach
 import love.yinlin.compose.Colors
@@ -37,10 +38,10 @@ import love.yinlin.extension.then
 private fun DrawScope.drawPaintPath(paths: List<Long>, ratio: Float, width: Float, color: Color) {
     val path = Path().apply {
         paths.firstOrNull()?.then { first ->
-            val (x, y) = Offset(first) * ratio
+            val [x, y] = Offset(first) * ratio
             moveTo(x, y)
             for (i in 1 ..< paths.size - 1) {
-                val (nx, ny) = Offset(paths[i]) * ratio
+                val [nx, ny] = Offset(paths[i]) * ratio
                 lineTo(nx, ny)
             }
         }
@@ -53,23 +54,23 @@ private fun DrawScope.drawPaintPath(paths: List<Long>, ratio: Float, width: Floa
 }
 
 @Stable
-class PaintCanvasState(basePaths: List<PaintPath> = emptyList()) {
+class PaintCanvasState(basePaths: List<PaintPath> = []) {
     companion object {
         val defaultColor = Colors.Black
         val defaultBackground = Colors.White
-        val colors1 = arrayOf(
+        val colors1: Array<Color> = [
             Colors.Black, Colors.White, Colors.Gray4, Colors.Steel4,
             Colors.Pink4
-        )
-        val colors2 = arrayOf(
+        ]
+        val colors2: Array<Color> = [
             Colors.Red4, Colors.Orange4, Colors.Yellow4, Colors.Green4,
             Colors.Cyan4, Colors.Blue4, Colors.Purple4
-        )
-        val widths = arrayOf(
+        ]
+        val widths: Array<Pair<Float, ImageVector>> = [
             1f to Icons2.k1, 3f to Icons2.k2, 5f to Icons2.k3,
             7f to Icons2.k4, 9f to Icons2.k5, 11f to Icons2.k6,
             13f to Icons2.k7,
-        )
+        ]
     }
 
     val paths = basePaths.toMutableStateList()
@@ -119,7 +120,7 @@ private fun PaintCanvasView(
                         onDragEnd = {
                             val distinctPath = when (currentPath.size) {
                                 in 0 .. 1 -> null
-                                2 -> listOf(currentPath[0], currentPath[1])
+                                2 -> [currentPath[0], currentPath[1]]
                                 else -> {
                                     val last = currentPath.last()
                                     var index = currentPath.size - 2
@@ -187,7 +188,7 @@ fun PaintCanvas(
                     }
                 }
                 PaintCanvasTool {
-                    PaintCanvasState.widths.forEach { (width, icon) ->
+                    PaintCanvasState.widths.forEach { [width, icon] ->
                         Icon(
                             icon = icon,
                             onClick = { state.width = width },

@@ -80,7 +80,7 @@ fun TabBar(
                         },
                         onLongClick = { onLongClick?.invoke(i) }
                     ).drawBehind {
-                        val (boxWidth, boxHeight) = this.size
+                        val [boxWidth, boxHeight] = this.size
                         val indicatorHeight = boxHeight * 0.05f
                         val startRatio = (1 - indicatorRatio) / 2
                         drawRect(

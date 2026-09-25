@@ -120,7 +120,7 @@ private class QrcodeScannerWrapper : PlatformView<QrcodeView>(), Releasable<Qrco
         if (qrcodeView.captureSession.canAddOutput(metadataOutput)) {
             qrcodeView.captureSession.addOutput(metadataOutput)
             metadataOutput.setMetadataObjectsDelegate(metadataObjectsDelegate, queue = dispatch_get_main_queue())
-            metadataOutput.metadataObjectTypes = listOf(AVMetadataObjectTypeQRCode)
+            metadataOutput.metadataObjectTypes = [AVMetadataObjectTypeQRCode]
             qrcodeView.onRectOfInterestChanged = { metadataOutput.rectOfInterest = it.readValue() }
             metadataOutput.rectOfInterest = qrcodeView.rectOfInterest().readValue()
         }

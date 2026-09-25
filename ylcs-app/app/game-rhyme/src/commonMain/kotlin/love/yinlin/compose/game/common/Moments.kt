@@ -4,7 +4,7 @@ import love.yinlin.compose.game.traits.Visible
 
 class Moments(momentBuilder: Scope.() -> Unit) {
     class Scope internal constructor() {
-        internal val moments = mutableListOf<Pair<Long, () -> Visible>>()
+        internal val moments: MutableList<Pair<Long, () -> Visible>> = []
 
         fun moment(start: Long, builder: () -> Visible) { moments += start to builder }
     }

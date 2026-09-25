@@ -25,6 +25,7 @@ import love.yinlin.data.music.RhymeAction
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.extension.cast
 import love.yinlin.extension.then
+import kotlin.jvm.JvmField
 
 @Stable
 sealed class Block<BS : BlockStatus>(
@@ -40,33 +41,38 @@ sealed class Block<BS : BlockStatus>(
         const val INNER_RADIUS = DEFAULT_RADIUS / 2
         val DefaultSize = Size(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
         protected const val DEFAULT_SCALE = 0.9f
+        @JvmField
         protected val DefaultRect = Rect(Offset.Zero, DefaultSize)
-        protected val TopLeft = Offset.Zero
-        protected val TopCenter = Offset(DEFAULT_RADIUS, 0f)
-        protected val TopRight = Offset(DEFAULT_DIMENSION, 0f)
-        protected val CenterLeft = Offset(0f, DEFAULT_RADIUS)
-        protected val DefaultCenter = Offset(DEFAULT_RADIUS, DEFAULT_RADIUS)
-        protected val CenterRight = Offset(DEFAULT_DIMENSION, DEFAULT_RADIUS)
-        protected val BottomLeft = Offset(0f, DEFAULT_DIMENSION)
-        protected val BottomCenter = Offset(DEFAULT_RADIUS, DEFAULT_DIMENSION)
-        protected val BottomRight = Offset(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
-        protected val InnerTopLeft = Offset(INNER_RADIUS, INNER_RADIUS)
-        protected val InnerTopRight = Offset(DEFAULT_DIMENSION - INNER_RADIUS, INNER_RADIUS)
-        protected val InnerBottomLeft = Offset(INNER_RADIUS, DEFAULT_DIMENSION - INNER_RADIUS)
-        protected val InnerBottomRight = Offset(DEFAULT_DIMENSION - INNER_RADIUS, DEFAULT_DIMENSION - INNER_RADIUS)
+        val TopLeft = Offset.Zero
+        val TopCenter = Offset(DEFAULT_RADIUS, 0f)
+        val TopRight = Offset(DEFAULT_DIMENSION, 0f)
+        val CenterLeft = Offset(0f, DEFAULT_RADIUS)
+        val DefaultCenter = Offset(DEFAULT_RADIUS, DEFAULT_RADIUS)
+        val CenterRight = Offset(DEFAULT_DIMENSION, DEFAULT_RADIUS)
+        val BottomLeft = Offset(0f, DEFAULT_DIMENSION)
+        val BottomCenter = Offset(DEFAULT_RADIUS, DEFAULT_DIMENSION)
+        val BottomRight = Offset(DEFAULT_DIMENSION, DEFAULT_DIMENSION)
+        val InnerTopLeft = Offset(INNER_RADIUS, INNER_RADIUS)
+        val InnerTopRight = Offset(DEFAULT_DIMENSION - INNER_RADIUS, INNER_RADIUS)
+        val InnerBottomLeft = Offset(INNER_RADIUS, DEFAULT_DIMENSION - INNER_RADIUS)
+        val InnerBottomRight = Offset(DEFAULT_DIMENSION - INNER_RADIUS, DEFAULT_DIMENSION - INNER_RADIUS)
 
+        @JvmField
         protected val PrepareStroke = Stroke(width = 10f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-        protected val BounceBorderStroke = arrayOf(Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f))
-        protected val BounceBorderAlpha = floatArrayOf(0.2f, 0.5f, 0.9f, 0.4f, 0.8f)
+        @JvmField
+        protected val BounceBorderStroke: Array<Stroke> = [Stroke(22f), Stroke(16f), Stroke(10f), Stroke(6f), Stroke(2f)]
+        @JvmField
+        protected val BounceBorderAlpha: FloatArray = [0.2f, 0.5f, 0.9f, 0.4f, 0.8f]
 
         protected const val LYRICS_TEXT_SCALE = 0.5f
 
         protected const val PRESS_TOLERANCE = 200
 
-        val ScaleColorList = arrayOf(Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Cyan4, Colors.Yellow4)
-        protected val TextColor = Colors.Ghost
-        protected val MissingColor = Colors.Gray6
+        val ScaleColorList: Array<Color> = [Colors.Transparent, Colors.Red5, Colors.Green4, Colors.Blue5, Colors.Orange4, Colors.Purple4, Colors.Cyan4, Colors.Yellow4]
+        val TextColor = Colors.Ghost
+        val MissingColor = Colors.Gray6
 
+        @JvmField
         protected val PrepareDurationMap = mapOf(
             RhymeDifficulty.Easy to 2500,
             RhymeDifficulty.Medium to 2000,
@@ -74,12 +80,12 @@ sealed class Block<BS : BlockStatus>(
             RhymeDifficulty.Extreme to 1000
         )
 
-        val NoteScaleFontMap = arrayOf(
+        val NoteScaleFontMap: Array<Char> = [
             '9',
             '1', '2', '3', '4', '5', '6', '7',
             '\uF021', '@', '#', '$', '\u00A7', '\u00A8', '\u00A9',
             '\u0086', '\u0087', '\u0088', '*', '%', '^', '&',
-        )
+        ]
     }
 
     abstract val rhymeAction: RhymeAction // 音符操作

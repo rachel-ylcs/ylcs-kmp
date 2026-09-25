@@ -92,7 +92,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
             catchingNull { answer.to<List<String>>() to info.to<SAResult>() }
         }
 
-        pairData?.then { (actualAnswer, actualResult) ->
+        pairData?.then { [actualAnswer, actualResult] ->
             TextIconAdapter { idIcon, idText ->
                 Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
                 SimpleEllipsisText(text = "正确率: ${actualResult.correctCount} / ${actualResult.totalCount}", modifier = Modifier.idText())
@@ -226,7 +226,7 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
 
         @Composable
         override fun ColumnScope.Content() {
-            preflight?.then { (_, question) ->
+            preflight?.then { [_, question] ->
                 val focusRequester = remember { FocusRequester() }
 
                 LaunchedEffect(Unit) {

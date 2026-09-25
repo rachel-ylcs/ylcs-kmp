@@ -31,7 +31,7 @@ import love.yinlin.extension.parseJson
  * 页面管理器
  *
  * 不建议使用各种方式获取指定位置或指定谓词条件的页面。
- * 除了最顶层页面外，如果在其他页面有获取某一页面数据的需求请使用公共数据源 [DataSource]
+ * 除了最顶层页面外，如果在其他页面有获取某一页面数据的需求请使用公共数据源
  */
 @Stable
 class ScreenManager @PublishedApi internal constructor(savedBackStack: List<String>) {
@@ -50,7 +50,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         )
 
         @PublishedApi
-        internal inline fun <reified Main : BasicScreen> build(): ScreenManager = ScreenManager(listOf(Route<Main>().build()))
+        internal inline fun <reified Main : BasicScreen> build(): ScreenManager = ScreenManager([Route<Main>().build()])
 
         @PublishedApi
         @Composable
@@ -82,10 +82,10 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
                     modifier = modifier,
                     transitionSpec = transitionSpecProvider,
                     popTransitionSpec = transitionSpecProvider,
-                    entryDecorators = listOf(
+                    entryDecorators = [
                         rememberSaveableStateHolderNavEntryDecorator(),
                         rememberViewModelStoreNavEntryDecorator(),
-                    ),
+                    ],
                     entryProvider = { manager.registerScreen(map, it) }
                 )
             }
@@ -99,7 +99,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
     internal fun registerScreen(map: ScreenMap, route: String): NavEntry<String> = NavEntry(key = route, contentKey = route) { navRoute ->
         Box {
             viewModel {
-                val (screenName, uniqueId, argsText) = Route.parse(navRoute)
+                val [screenName, uniqueId, argsText] = Route.parse(navRoute)
                 val screen = map.screenFactory(screenName)(argsText.parseJson.Array)
                 VMMap[uniqueId] = screen
                 screen.uniqueId = uniqueId
@@ -124,20 +124,20 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
         if (currentTime - lastNavigateTime <= 300L) return
         lastNavigateTime = currentTime
 
-        val (createPolicy, clearPolicy) = navigationPolicy
+        val [createPolicy, clearPolicy] = navigationPolicy
 
         if (createPolicy == CreatePolicy.New) {
             // 新页面直接创建
             backStack += dstRoute
         }
         else {
-            val (dstScreenName, _, dstArgs) = Route.parse(dstRoute)
+            val [dstScreenName, _, dstArgs] = Route.parse(dstRoute)
             var target: Pair<Int, BasicScreen>? = null
 
             // 查找最晚加入导航栈的同类页面
             for (index in backStack.indices.reversed()) {
                 val route = backStack[index]
-                val (screenName, uniqueId, _) = Route.parse(route)
+                val [screenName, uniqueId, _] = Route.parse(route)
                 if (screenName == dstScreenName) {
                     val screen = VMMap[uniqueId]
                     if (screen != null) {
@@ -234,7 +234,7 @@ class ScreenManager @PublishedApi internal constructor(savedBackStack: List<Stri
      */
     private val topScreen: BasicScreen get() {
         val last = backStack.last()
-        val (_, uniqueId, _) = Route.parse(last)
+        val [_, uniqueId, _] = Route.parse(last)
         return VMMap[uniqueId]!!
     }
 
