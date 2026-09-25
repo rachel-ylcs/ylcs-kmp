@@ -86,7 +86,8 @@ interface BasicTextGraph {
                 annotations = [],
                 density = density,
                 fontFamilyResolver = fontFamilyResolver,
-                placeholders = []
+                placeholders = [],
+                softWrap = false
             )
             return Paragraph(
                 paragraphIntrinsics = intrinsics,

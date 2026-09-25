@@ -29,14 +29,15 @@ abstract class MusicService : MediaSessionService() {
     private var musicSession: MediaSession? = null
 
     private val listener = object : MediaSession.Callback {
-        override fun onConnect(session: MediaSession, controller: MediaSession.ControllerInfo): MediaSession.ConnectionResult = MediaSession.ConnectionResult.AcceptedResultBuilder(session).apply {
-            if (session.isMediaNotificationController(controller) ||
-                session.isAutomotiveController(controller) ||
-                session.isAutoCompanionController(controller)) {
-                setAvailablePlayerCommands(MediaCommands.NotificationPlayerCommands)
-            }
-            setAvailableSessionCommands(MediaCommands.SessionCommands)
-        }.build()
+        override fun onConnect(session: MediaSession, controller: MediaSession.ControllerInfo): MediaSession.ConnectionResult =
+            MediaSession.ConnectionResult.AcceptedResultBuilder(session, controller).apply {
+                if (session.isMediaNotificationController(controller) ||
+                    session.isAutomotiveController(controller) ||
+                    session.isAutoCompanionController(controller)) {
+                    setAvailablePlayerCommands(MediaCommands.NotificationPlayerCommands)
+                }
+                setAvailableSessionCommands(MediaCommands.SessionCommands)
+            }.build()
 
         override fun onCustomCommand(session: MediaSession, controller: MediaSession.ControllerInfo, customCommand: SessionCommand, args: Bundle): ListenableFuture<SessionResult> {
             val player = exoPlayer ?: return Futures.immediateFuture(SessionResult(SessionError.ERROR_SESSION_DISCONNECTED))
