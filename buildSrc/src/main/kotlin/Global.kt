@@ -47,6 +47,9 @@ val Project.generateSourceDir: Directory get() = layout.buildDirectory.get().dir
 val Project.androidProguardKMPDir: Directory get() = layout.projectDirectory.dir("src").dir("androidMain").dir("resources").dir("META-INF").dir("proguard")
 val Project.androidProguardAndroidDir: Directory get() = layout.projectDirectory.dir("src").dir("main").dir("resources").dir("META-INF").dir("proguard")
 
+// iOS Local SPM 目录
+val Project.iosLocalSPMDir: Directory get() = layout.projectDirectory.dir("src").dir("iosMain").dir("spm")
+
 // Desktop Proguard 目录
 val Project.desktopProguardKMPDir: Directory get() = layout.projectDirectory.dir("src").dir("desktopMain").dir("resources").dir("META-INF").dir("proguard")
 val Project.desktopProguardJVMDir: Directory get() = layout.projectDirectory.dir("src").dir("main").dir("resources").dir("META-INF").dir("proguard")

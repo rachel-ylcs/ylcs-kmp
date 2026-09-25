@@ -2,7 +2,6 @@ import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import love.yinlin.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.register
 import org.jetbrains.compose.ComposeExtension
@@ -79,8 +78,7 @@ sealed interface SwiftPackage {
     ) : SwiftPackage
 
     data class Local(
-        val directory: String,
-        val products: List<String>,
+        val name: String,
         val importedClangModules: List<String> = emptyList()
     ) : SwiftPackage
 }
@@ -197,13 +195,15 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     extensions.findByType<SwiftPMImportExtension>()?.apply {
                         iosMinimumDeploymentTarget.set(C.ios.target)
 
+                        val localSPMDir = iosLocalSPMDir
+
                         @OptIn(ExperimentalKotlinGradlePluginApi::class)
                         for (pkg in swiftPackages) {
                             when (pkg) {
                                 is SwiftPackage.Remote -> swiftPackage(pkg.url, pkg.version, pkg.products)
                                 is SwiftPackage.Local -> localSwiftPackage(
-                                    layout.projectDirectory.dir(pkg.directory),
-                                    pkg.products,
+                                    directory = localSPMDir.dir(pkg.name),
+                                    products = listOf(pkg.name),
                                     importedClangModules = pkg.importedClangModules,
                                 )
                             }

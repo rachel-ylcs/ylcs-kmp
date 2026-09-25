@@ -39,6 +39,6 @@ template(object : KotlinMultiplatformTemplate() {
 
     override val swiftPackages: List<SwiftPackage> = listOf(
         SwiftPackage.Remote("https://github.com/Tencent/MMKV.git", libs.versions.mmkv.get(), listOf("MMKV")),
-        SwiftPackage.Local("spm/Dummy", listOf("Dummy")),
+        SwiftPackage.Local("Dummy"),
     )
 })
