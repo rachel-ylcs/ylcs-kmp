@@ -9,7 +9,7 @@ import love.yinlin.data.information.UnifiedUserInfo
 data class WeiboUserInfo(
     override val id: String, // ID
     override val name: String, // 昵称
-    val avatar: String = "", // 头像
+    override val avatar: String = "", // 头像
 ) : UnifiedUserInfo {
     companion object {
         val Default = [

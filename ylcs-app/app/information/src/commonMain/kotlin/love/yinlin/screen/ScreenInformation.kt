@@ -2,36 +2,55 @@ package love.yinlin.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
 import love.yinlin.common.MessageManager
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
+import love.yinlin.compose.ui.container.RachelStatefulProvider
+import love.yinlin.compose.ui.container.StatefulBox
+import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.floating.SheetContent
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 
 @Stable
 class ScreenInformation : BasicScreen() {
+    private val provider = RachelStatefulProvider()
+    private var currentManager: MessageManager<*> by mutableStateOf(DataSourceInformation.managers[0])
+    private var isNavigating by mutableStateOf(false)
+
+    private fun flushContent() {
+        if (provider.isLoading) provider.status = StatefulStatus.Content
+    }
+
+    private suspend fun requestNewData(manager: MessageManager<*>) {
+        isNavigating = true
+        provider.withLoading { manager.requestNewData(::flushContent) }
+        isNavigating = false
+    }
+
+    private suspend fun requestMoreData(manager: MessageManager<*>) {
+        isNavigating = true
+        manager.requestMoreData(::flushContent)
+        isNavigating = false
+    }
+
+    override suspend fun initialize() {
+        requestNewData(currentManager)
+    }
+
     @Composable
     override fun BasicContent() {
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
@@ -45,46 +64,70 @@ class ScreenInformation : BasicScreen() {
                     LazyRow(
                         modifier = Modifier.fillMaxWidth().background(Theme.color.surface),
                         state = state,
-                        contentPadding = Theme.padding.value9,
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                        contentPadding = Theme.padding.value,
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         items(items = DataSourceInformation.managers, key = { it::class }) { manager ->
-                            Column(
+                            val isSelected = currentManager == manager
+
+                            Icon(
+                                icon = manager.icon,
+                                color = Colors.Unspecified,
                                 modifier = Modifier.clip(Theme.shape.v7)
-                                    .clickable { settingsSheet.open(manager) }
-                                    .padding(Theme.padding.eValue),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
-                            ) {
-                                Icon(icon = manager.icon, color = Colors.Unspecified, modifier = Modifier.size(Theme.size.image9))
-                                SimpleEllipsisText(text = manager.name, style = Theme.typography.v7.bold)
-                            }
+                                    .background(if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent)
+                                    .clickable(enabled = !isNavigating) {
+                                        if (currentManager == manager) {
+                                            with(manager) { openSettings() }
+                                        }
+                                        else {
+                                            // 防止正在切换
+                                            if (!isNavigating) {
+                                                currentManager = manager
+                                                // 检查是否有数据需要更新
+                                                if (manager.items.isEmpty()) {
+                                                    launch { requestNewData(manager) }
+                                                }
+                                            }
+                                        }
+                                    }.padding(Theme.padding.g2).size(Theme.size.image9)
+                            )
                         }
                     }
                 }
             }
-        }
-    }
 
-    private val settingsSheet = this land object : SheetContent<MessageManager>() {
-        override suspend fun initialize(args: MessageManager) {
-            args.onSettingsOpen()
-        }
-
-        @Composable
-        override fun Content(args: MessageManager) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
+            StatefulBox(
+                provider = provider,
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
-                SimpleEllipsisText(
-                    text = "${args.name}设置",
-                    style = Theme.typography.v6.bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                with(args) { SettingsLayout() }
+                PaginationStaggeredGrid(
+                    items = currentManager.items,
+                    key = { it.id },
+                    columns = StaggeredGridCells.Adaptive(Theme.size.cell1),
+                    state = currentManager.gridState,
+                    canRefresh = true,
+                    canLoading = currentManager.canLoading,
+                    onRefresh = {
+                        // 防止正在切换
+                        if (!isNavigating) {
+                            launch { requestNewData(currentManager) }
+                        }
+                    },
+                    onLoading = {
+                        if (!isNavigating) {
+                            launch { requestMoreData(currentManager) }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = Theme.padding.eValue,
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                    verticalItemSpacing = Theme.padding.e
+                ) { message ->
+                    with(currentManager) {
+                        MessageLayout(modifier = Modifier.fillMaxWidth(), message = message)
+                    }
+                }
             }
         }
     }

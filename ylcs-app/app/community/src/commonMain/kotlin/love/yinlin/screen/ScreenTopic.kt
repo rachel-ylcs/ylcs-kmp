@@ -45,7 +45,6 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.layout.Pagination
 import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.compose.ui.layout.PaginationColumn
-import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.RachelRichParser
 import love.yinlin.compose.ui.text.RachelRichText
 import love.yinlin.compose.ui.text.RichEditor
@@ -341,7 +340,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                         WebImage(
                             uri = pic.image,
                             contentScale = contentScale,
-                            modifier = Modifier.fillMaxWidth().condition(contentScale == ContentScale.Crop) { fillMaxHeight() },
+                            modifier = Modifier.fillMaxSize(),
                             onClick = onClick
                         )
                     }

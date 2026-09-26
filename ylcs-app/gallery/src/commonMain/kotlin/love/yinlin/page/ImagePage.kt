@@ -3,11 +3,9 @@ package love.yinlin.page
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -23,7 +21,6 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.NineGrid
-import love.yinlin.compose.ui.node.condition
 import love.yinlin.data.compose.Picture
 import love.yinlin.gallery.resources.*
 import kotlin.random.Random
@@ -95,8 +92,8 @@ object ImagePage : Page() {
                 val imageBlock = @Composable { contentScale: ContentScale, pic: Picture, onClick: () -> Unit ->
                     Image(
                         res = imgRes[pic.image.toInt()],
-                        modifier = Modifier.fillMaxWidth().condition(contentScale == ContentScale.Crop) { fillMaxHeight() }.clickable(onClick = onClick),
-                        contentScale = contentScale,
+                        modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
+                        contentScale = contentScale
                     )
                 }
 

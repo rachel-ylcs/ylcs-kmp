@@ -9,4 +9,5 @@ import androidx.compose.runtime.Stable
 interface UnifiedUserInfo {
     val id: String // ID
     val name: String // 昵称
+    val avatar: String // 头像
 }

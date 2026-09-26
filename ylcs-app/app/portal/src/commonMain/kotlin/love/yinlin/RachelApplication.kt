@@ -35,6 +35,8 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
 
             // information
             screen(::ScreenInformation)
+            screen(::ScreenWeiboSettings)
+            screen(::ScreenChaohuaSettings)
 
 //            screen(::ScreenWeibo)
 //            screen(::ScreenWeiboAlbum)

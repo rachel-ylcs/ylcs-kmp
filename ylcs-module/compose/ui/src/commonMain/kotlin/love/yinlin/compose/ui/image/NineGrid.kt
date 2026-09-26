@@ -173,13 +173,13 @@ fun NineGrid(
 
     // 默认图片最小宽度
     val density = LocalDensity.current
-    val minPicWidthPx = with(density) { Theme.size.image2.toPx().toInt() }
+    val defaultWidthPx = with(density) { Theme.size.image2.toPx().toInt() }
     val spacePx = with(density) { space.toPx().toInt().fastCoerceAtLeast(0) }
 
     Layout(
         modifier = modifier.clipToBounds(),
         content = {
-            val contentScale = if (picSize == 1) ContentScale.Inside else ContentScale.Crop
+            val contentScale = if (picSize == 1) ContentScale.Fit else ContentScale.Crop
 
             for (index in 0 ..< picSize) {
                 val pic = pics[index]
@@ -201,27 +201,15 @@ fun NineGrid(
             }
         }
     ) { measurables, constraints ->
-        val targetWidth = if (constraints.hasFixedWidth) constraints.maxWidth else constraints.constrainWidth(minPicWidthPx)
+        val targetWidth = if (constraints.hasFixedWidth) constraints.maxWidth else constraints.constrainWidth(defaultWidthPx)
 
         if (picSize == 1) {
             // 单张
-            val measurable = measurables.first()
-            val pic = pics[0]
-
-            val maxHeight = if (pic.isVideo) {
-                if (constraints.hasBoundedHeight) constraints.maxHeight else Constraints.Infinity
-            } else {
-                if (constraints.hasBoundedHeight) minOf(targetWidth, constraints.maxHeight) else targetWidth
-            }
-
-            val placeable = measurable.measure(
-                Constraints(minWidth = targetWidth, maxWidth = targetWidth, minHeight = 0, maxHeight = maxHeight)
-            )
-
-            val layoutHeight = constraints.constrainHeight(placeable.height)
-
-            layout(targetWidth, layoutHeight) {
-                placeable.placeRelative(0, 0)
+            val expectedHeight = (targetWidth.toLong() * 9L / 16L).toInt()
+            val targetHeight = constraints.constrainHeight(expectedHeight)
+            val placeable = measurables.first().measure(Constraints.fixed(width = targetWidth, height = targetHeight))
+            layout(width = targetWidth, height = targetHeight) {
+                placeable.placeRelative(x = 0, y = 0)
             }
         }
         else {

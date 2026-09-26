@@ -5,7 +5,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 import love.yinlin.data.information.UnifiedMessage
 import love.yinlin.data.information.UnifiedPicture
-import love.yinlin.extension.DateEx
 
 @Stable
 @Serializable
@@ -22,6 +21,4 @@ data class Weibo(
     override val pictures: List<UnifiedPicture>, // 图片集
 ) : UnifiedMessage {
     override fun compareTo(other: UnifiedMessage): Int = this.time.compareTo(other.time)
-
-    val timeString: String = DateEx.Formatter.standardDateTime.format(time) ?: ""
 }

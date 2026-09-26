@@ -28,7 +28,6 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.SelectionBox
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
@@ -300,7 +299,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     WebImage(
                         uri = pic.image,
                         contentScale = contentScale,
-                        modifier = Modifier.fillMaxWidth().condition(contentScale == ContentScale.Crop) { fillMaxHeight() },
+                        modifier = Modifier.fillMaxSize(),
                         onClick = onClick
                     )
                 }

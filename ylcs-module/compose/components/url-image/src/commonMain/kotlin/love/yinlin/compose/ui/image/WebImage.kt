@@ -130,14 +130,14 @@ internal fun rememberWebImageIndicator(): WebImageIndicator {
     }
 }
 
-private fun calcHitBox(size: DpSize, rawSize: DpSize): Modifier {
+private fun Modifier.calcHitBox(size: DpSize, rawSize: DpSize): Modifier {
     if (size.width <= Dp.Hairline || size.height <= Dp.Hairline || rawSize.width <= Dp.Hairline || rawSize.height <= Dp.Hairline) return Modifier
     val scale = minOf(size.width / rawSize.width, size.height / rawSize.height, 1f)
     val contentWidth = rawSize.width * scale
     val contentHeight = rawSize.height * scale
     val offsetX = (size.width - contentWidth) / 2
     val offsetY = (size.height - contentHeight) / 2
-    return Modifier.offset(offsetX, offsetY).size(contentWidth, contentHeight)
+    return this.offset(offsetX, offsetY).size(contentWidth, contentHeight)
 }
 
 @Composable
@@ -172,10 +172,10 @@ internal fun WebImage(
         // asyncImage库目前没法解决的问题, 暂时只能把可点击区域固定到实际图片区域
         val density = LocalDensity.current
         val hitBox by rememberDerivedState {
-            if (contentScale == ContentScale.Inside) {
+            if (contentScale == ContentScale.Fit) {
                 val size = with(density) { state.size?.toSize()?.toDpSize() }
                 val rawSize = with(density) { state.result?.image?.size?.toSize()?.toDpSize() }
-                if (size != null && rawSize != null) calcHitBox(size, rawSize) else Modifier
+                if (size != null && rawSize != null) Modifier.calcHitBox(size, rawSize) else Modifier
             }
             else Modifier.matchParentSize()
         }

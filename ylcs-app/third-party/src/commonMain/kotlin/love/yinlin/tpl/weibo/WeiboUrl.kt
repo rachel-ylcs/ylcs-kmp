@@ -5,7 +5,7 @@ import love.yinlin.common.TPProxy
 import love.yinlin.uri.Uri
 
 @Stable
-internal object WeiboUrl {
+object WeiboUrl {
     fun searchUser(key: String): String = TPProxy.proxy("https://m.weibo.cn/api/container/getIndex?containerid=100103type%3D3%26q=${Uri.encodeUri(key)}&page_type=searchall")
     fun searchTopic(name: String): String = TPProxy.proxy("https://m.weibo.cn/search?containerid=231522type=1&q=$name")
     fun userDetails(uid: String): String = TPProxy.proxy("https://m.weibo.cn/api/container/getIndex?type=uid&value=$uid&containerid=107603$uid")
