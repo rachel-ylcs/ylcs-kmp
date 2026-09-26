@@ -2,7 +2,7 @@
 
 # Plugins #
 kotlin = "2.5.0-Beta1"
-agp = "9.1.1"
+agp = "9.2.1"
 cmp = "1.13.0-alpha01"
 mavenPublish = "0.37.0"
 dokka = "2.3.0-Beta"
@@ -53,7 +53,7 @@ test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 skiko-lottie = { module = "org.jetbrains.skiko:skiko-skottie", version.ref = "skiko" }
 
-androidx-annotation = { module = "androidx.annotation:annotation", version = "1.10.0" }
+androidx-annotation = { module = "androidx.annotation:annotation", version = "1.11.0" }
 androidx-collection = { module = "androidx.collection:collection", version = "1.6.0" }
 
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }

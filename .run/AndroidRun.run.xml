@@ -23,7 +23,6 @@
     <option name="DEBUGGER_TYPE" value="Java" />
     <Java>
       <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
-      <option name="DEBUG_SANDBOX_SDK" value="false" />
     </Java>
     <Profilers>
       <option name="ADVANCED_PROFILING_ENABLED" value="false" />
@@ -66,7 +65,6 @@
     <option name="DEBUGGER_TYPE" value="Java" />
     <Java>
       <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
-      <option name="DEBUG_SANDBOX_SDK" value="false" />
     </Java>
     <Profilers>
       <option name="ADVANCED_PROFILING_ENABLED" value="false" />
@@ -109,7 +107,6 @@
     <option name="DEBUGGER_TYPE" value="Java" />
     <Java>
       <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
-      <option name="DEBUG_SANDBOX_SDK" value="false" />
     </Java>
     <Profilers>
       <option name="ADVANCED_PROFILING_ENABLED" value="false" />

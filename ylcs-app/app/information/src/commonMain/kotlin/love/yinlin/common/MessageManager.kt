@@ -15,10 +15,13 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.data.information.UnifiedMessage
 import love.yinlin.data.information.UnifiedUserInfo
 import love.yinlin.extension.DateEx
@@ -107,6 +110,33 @@ sealed class MessageManager<T : UnifiedMessage> {
     }
 
     @Composable
+    private fun MessageDataBar(modifier: Modifier, message: UnifiedMessage) {
+        Row(
+            modifier = modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            TextIconAdapter { idIcon, idText ->
+                Icon(icon = Icons.ThumbUp, modifier = Modifier.idIcon())
+                SimpleEllipsisText(text = message.likeNum.toString(), modifier = Modifier.idText())
+            }
+            TextIconAdapter { idIcon, idText ->
+                Icon(icon = Icons.Comment, modifier = Modifier.idIcon())
+                SimpleEllipsisText(text = message.commentNum.toString(), modifier = Modifier.idText())
+            }
+            TextIconAdapter { idIcon, idText ->
+                Icon(icon = Icons.Share, modifier = Modifier.idIcon())
+                SimpleEllipsisText(text = message.repostNum.toString(), modifier = Modifier.idText())
+            }
+        }
+    }
+
+    open fun checkExtraData(message: UnifiedMessage): Boolean = false
+
+    @Composable
+    open fun BasicScreen.MessageExtraLayout(modifier: Modifier, message: UnifiedMessage) { }
+
+    @Composable
     fun BasicScreen.MessageLayout(modifier: Modifier, message: UnifiedMessage) {
         Surface(
             modifier = modifier,
@@ -119,7 +149,7 @@ sealed class MessageManager<T : UnifiedMessage> {
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v10)
+                verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
                 // 用户信息
                 MessageUserLayout(modifier = Modifier.fillMaxWidth(), message = message)
@@ -154,6 +184,14 @@ sealed class MessageManager<T : UnifiedMessage> {
                             onClick = onClick
                         )
                     }
+                }
+
+                // 数据条
+                MessageDataBar(modifier = Modifier.fillMaxWidth(), message = message)
+
+                // 拓展栏
+                if (checkExtraData(message)) {
+                    MessageExtraLayout(modifier = Modifier.fillMaxWidth(), message = message)
                 }
             }
         }
