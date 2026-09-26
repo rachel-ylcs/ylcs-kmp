@@ -283,7 +283,12 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
             }
         }
         else {
-            Box(contentAlignment = Alignment.Center) { CircleLoading.Content() }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircleLoading.Content()
+            }
         }
     }
 }
