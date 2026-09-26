@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import love.yinlin.common.BasicWeiboManager
 import love.yinlin.common.MessageManager
+import love.yinlin.common.MessageType
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
@@ -24,13 +26,16 @@ import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
-import love.yinlin.reflect.metaSimpleClassName
 
 @Stable
 class ScreenInformation : BasicScreen() {
     private val provider = RachelStatefulProvider()
-    private var currentManager: MessageManager<*> by mutableStateOf(DataSourceInformation.managers[0])
+    private var currentManager: MessageManager<*> by mutableStateOf(DataSourceInformation.managers[MessageType.Default]!!)
     private var isNavigating by mutableStateOf(false)
+
+    init {
+        land(BasicWeiboManager.CommonDownloadDialog)
+    }
 
     private fun flushContent() {
         if (provider.isLoading) provider.status = StatefulStatus.Content
@@ -69,7 +74,8 @@ class ScreenInformation : BasicScreen() {
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(items = DataSourceInformation.managers, key = { it.metaSimpleClassName }) { manager ->
+                        items(items = MessageType.entries, key = { it }) { type ->
+                            val manager = DataSourceInformation.managers[type]!!
                             val isSelected = currentManager == manager
 
                             Icon(
