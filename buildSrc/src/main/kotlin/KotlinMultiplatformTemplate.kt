@@ -141,6 +141,10 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                     }
                 }
 
+                withHostTest {
+
+                }
+
                 @Suppress("UnstableApiUsage")
                 optimization {
                     val proguardDir = androidProguardKMPDir.asFile
@@ -162,9 +166,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             if (iosTarget) {
                 buildList {
                     add(iosArm64())
-                    // Temporarily disabled to simplify SwiftPM resolution: only build device target (iosArm64)
-                    // iosX64 and iosSimulatorArm64 may cause xcodebuild failures during fetchSyntheticImportProjectPackages
-                    if (false && C.platform == BuildPlatform.Mac) {
+                    if (C.platform == BuildPlatform.Mac) {
                         when (C.architecture) {
                             // cmp 自 1.11 起已经停止对 iosX64 的支持
                             // BuildArchitecture.X86_64 -> add(iosX64())
