@@ -24,6 +24,7 @@ import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
+import love.yinlin.reflect.metaSimpleClassName
 
 @Stable
 class ScreenInformation : BasicScreen() {
@@ -68,7 +69,7 @@ class ScreenInformation : BasicScreen() {
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(items = DataSourceInformation.managers, key = { it::class }) { manager ->
+                        items(items = DataSourceInformation.managers, key = { it.metaSimpleClassName }) { manager ->
                             val isSelected = currentManager == manager
 
                             Icon(
