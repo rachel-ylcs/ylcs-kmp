@@ -15,16 +15,16 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
-import love.yinlin.compose.ui.text.TextIconAdapter
+import love.yinlin.data.information.UnifiedData
 import love.yinlin.data.information.UnifiedMessage
 import love.yinlin.data.information.UnifiedUserInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.screen.ScreenImagePreview
+import love.yinlin.screen.ScreenVideo
 
 @Stable
 sealed class MessageManager<T : UnifiedMessage> {
@@ -34,6 +34,7 @@ sealed class MessageManager<T : UnifiedMessage> {
 
     abstract fun BasicScreen.openSettings() // 打开设置
 
+    open fun BasicScreen.onMessageClick(message: UnifiedMessage) { } // 点击卡片
     open fun BasicScreen.onAvatarClick(user: UnifiedUserInfo) { } // 点击头像
 
     var items: List<T> by mutableRefStateOf([])
@@ -110,26 +111,7 @@ sealed class MessageManager<T : UnifiedMessage> {
     }
 
     @Composable
-    private fun MessageDataBar(modifier: Modifier, message: UnifiedMessage) {
-        Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            TextIconAdapter { idIcon, idText ->
-                Icon(icon = Icons.ThumbUp, modifier = Modifier.idIcon())
-                SimpleEllipsisText(text = message.likeNum.toString(), modifier = Modifier.idText())
-            }
-            TextIconAdapter { idIcon, idText ->
-                Icon(icon = Icons.Comment, modifier = Modifier.idIcon())
-                SimpleEllipsisText(text = message.commentNum.toString(), modifier = Modifier.idText())
-            }
-            TextIconAdapter { idIcon, idText ->
-                Icon(icon = Icons.Share, modifier = Modifier.idIcon())
-                SimpleEllipsisText(text = message.repostNum.toString(), modifier = Modifier.idText())
-            }
-        }
-    }
+    open fun MessageDataBar(modifier: Modifier, data: UnifiedData) { }
 
     open fun checkExtraData(message: UnifiedMessage): Boolean = false
 
@@ -143,9 +125,7 @@ sealed class MessageManager<T : UnifiedMessage> {
             shape = Theme.shape.v3,
             contentPadding = Theme.padding.eValue,
             shadowElevation = Theme.shadow.v3,
-            onClick = {
-
-            }
+            onClick = { onMessageClick(message) }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -171,10 +151,10 @@ sealed class MessageManager<T : UnifiedMessage> {
                         modifier = Modifier.fillMaxWidth(),
                         unique = true,
                         onImageClick = { index, _ ->
-
+                            navigate(::ScreenImagePreview, message.pictures.asPicture, index)
                         },
-                        onVideoClick = {
-
+                        onVideoClick = { pic ->
+                            navigate(::ScreenVideo, pic.video)
                         }
                     ) { contentScale, pic, onClick ->
                         WebImage(
@@ -187,7 +167,9 @@ sealed class MessageManager<T : UnifiedMessage> {
                 }
 
                 // 数据条
-                MessageDataBar(modifier = Modifier.fillMaxWidth(), message = message)
+                message.data?.let { data ->
+                    MessageDataBar(modifier = Modifier.fillMaxWidth(), data = data)
+                }
 
                 // 拓展栏
                 if (checkExtraData(message)) {

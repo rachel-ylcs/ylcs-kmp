@@ -19,5 +19,12 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.components.paginationLayout,
             )
         }
+
+        desktopTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test,
+            )
+        }
     }
 })

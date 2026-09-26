@@ -14,8 +14,6 @@ interface UnifiedMessage : Comparable<UnifiedMessage> {
     val location: String // 定位
     val title: String // 标题
     val content: String // 内容
-    val commentNum: Int // 评论数
-    val likeNum: Int // 点赞数
-    val repostNum: Int // 转发数
+    val data: UnifiedData? // 数据
     val pictures: List<UnifiedPicture> // 图片集
 }

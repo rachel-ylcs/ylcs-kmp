@@ -13,12 +13,11 @@ data class Weibo(
     override val user: WeiboUserInfo, // 用户信息
     override val time: LocalDateTime, // 时间
     override val location: String, // 定位
-    override val title: String, // 标题
     override val content: String, // 内容
-    override val commentNum: Int, // 评论数
-    override val likeNum: Int, // 点赞数
-    override val repostNum: Int, // 转发数
+    override val data: WeiboData, // 数据
     override val pictures: List<UnifiedPicture>, // 图片集
 ) : UnifiedMessage {
+    override val title: String = "" // 微博暂不支持标题
+
     override fun compareTo(other: UnifiedMessage): Int = this.time.compareTo(other.time)
 }

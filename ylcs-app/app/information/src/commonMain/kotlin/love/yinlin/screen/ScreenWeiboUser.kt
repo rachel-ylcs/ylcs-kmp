@@ -4,9 +4,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -47,7 +48,6 @@ import love.yinlin.tpl.weibo.WeiboAPI
 class ScreenWeiboUser(private val userId: String) : Screen() {
     private val provider = RachelStatefulProvider()
     private var items: List<Weibo> by mutableRefStateOf([])
-    private val listState = LazyStaggeredGridState()
     private var currentWeiboUser: WeiboUser? by mutableRefStateOf(null)
     private var albums: List<WeiboAlbum>? by mutableRefStateOf(null)
 
@@ -64,14 +64,14 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     }
 
     private fun onAlbumClick(album: WeiboAlbum) {
-        // navigate(::ScreenWeiboAlbum, album.containerId, album.title)
+        navigate(::ScreenWeiboAlbum, album.containerId, album.title)
     }
 
     override val title: String get() = currentWeiboUser?.user?.name ?: ""
 
     override suspend fun initialize() {
         supervisorScope {
-            val cookie = WeiboAPI.generateCookie()
+            val cookie = DataSourceInformation.fetchWeiboCookie()
 
             // 请求微博
             this.launch {
@@ -251,12 +251,22 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
                 provider = provider,
                 modifier = Modifier.weight(1f).fillMaxHeight()
             ) {
-//                WeiboGrid(
-//                    state = listState,
-//                    modifier = Modifier.fillMaxSize(),
-//                    items = items,
-//                    downloadDialog = downloadDialog
-//                )
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Adaptive(Theme.size.cell1),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = Theme.padding.eValue,
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                    verticalItemSpacing = Theme.padding.e
+                ) {
+                    items(items = items, key = { it.id }) { weibo ->
+                        with(manager) {
+                            MessageLayout(
+                                modifier = Modifier.fillMaxWidth(),
+                                message = weibo
+                            )
+                        }
+                    }
+                }
             }
         }
     }

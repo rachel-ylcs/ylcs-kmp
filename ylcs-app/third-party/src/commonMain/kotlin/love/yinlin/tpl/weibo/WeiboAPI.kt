@@ -7,13 +7,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.common.TPProxy
 import love.yinlin.data.information.UnifiedPicture
-import love.yinlin.data.weibo.Weibo
-import love.yinlin.data.weibo.WeiboAlbum
-import love.yinlin.data.weibo.WeiboAlbumPics
-import love.yinlin.data.weibo.WeiboComment
-import love.yinlin.data.weibo.WeiboSubComment
-import love.yinlin.data.weibo.WeiboUser
-import love.yinlin.data.weibo.WeiboUserInfo
+import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.uri.Uri
@@ -84,11 +78,8 @@ object WeiboAPI {
                 user = userInfo,
                 time = time,
                 location = location,
-                title = "",
                 content = content,
-                commentNum = commentNum,
-                likeNum = likeNum,
-                repostNum = repostNum,
+                data = WeiboData(commentNum, likeNum, repostNum),
                 pictures = pictures
             )
         }
@@ -104,14 +95,14 @@ object WeiboAPI {
             // 提取内容
             val content = card["text"].String
             // 带图片
-            val pic = if ("pic" in card) {
+            val pictures = if ("pic" in card) {
                 card.obj("pic").let {
-                    UnifiedPicture(
+                    [UnifiedPicture(
                         image = TPProxy.proxyRes(it["url"].String),
                         source = TPProxy.proxyRes(it.obj("large")["url"].String)
-                    )
+                    )]
                 }
-            } else null
+            } else []
             // 楼中楼
             val subComments: MutableList<WeiboSubComment> = []
             val comments = card["comments"]
@@ -120,7 +111,7 @@ object WeiboAPI {
                     val subCardObj = subCard.Object
                     subComments += WeiboSubComment(
                         id = subCardObj["id"].String,
-                        info = extractUserInfo(subCardObj.obj("user")),
+                        user = extractUserInfo(subCardObj.obj("user")),
                         time = WeiboDate.convert(subCardObj["created_at"].String),
                         location = subCardObj["source"]?.StringNull?.removePrefix("来自") ?: "IP未知",
                         content = subCardObj["text"].String
@@ -129,11 +120,11 @@ object WeiboAPI {
             }
             return WeiboComment(
                 id = commentId,
-                info = userInfo,
+                user = userInfo,
                 time = time,
                 location = location,
                 content = content,
-                pic = pic,
+                pictures = pictures,
                 subComments = subComments
             )
         }
