@@ -29,8 +29,7 @@ object WeiboAPI {
             )
         }
 
-        fun extractWeibo(rawBlog: JsonObject): Weibo {
-            var blog = rawBlog
+        private fun extractWeiboHeader(blog: JsonObject): Weibo {
             // 提取ID
             val blogId = blog["id"].String
             val userInfo = extractUserInfo(blog.obj("user"))
@@ -47,24 +46,41 @@ object WeiboAPI {
             val commentNum = blog["comments_count"].Int
             val likeNum = blog["attitudes_count"].Int
             val repostNum = blog["reposts_count"].Int
-            blog = blog["retweeted_status"]?.Object ?: blog // 转发微博
-            // 图片微博
+            return Weibo(
+                id = blogId,
+                user = userInfo,
+                time = time,
+                location = location,
+                content = content,
+                data = WeiboData(commentNum, likeNum, repostNum),
+                pictures = []
+            )
+        }
+
+        private fun extractWeiboPictures(rawBlog: JsonObject): List<UnifiedPicture> {
+            val blog = rawBlog["retweeted_status"]?.Object ?: rawBlog // 转发微博
+
             val pictures: MutableList<UnifiedPicture> = []
-            if ("pics" in blog) {
-                for (picItem in blog.arr("pics")) {
+            val pics = blog["pics"].ArrayEmpty
+            if (pics.isNotEmpty()) { // 图片微博
+                for (picItem in pics) {
                     val pic = picItem.Object
+                    val imageUrl = pic["url"].String
+                    val sourceUrl = pic["large"].ObjectNull?.get("url")?.StringNull ?: imageUrl
                     pictures += UnifiedPicture(
-                        image = TPProxy.proxyRes(pic["url"].String),
-                        source = TPProxy.proxyRes(pic.obj("large")["url"].String)
+                        image = TPProxy.proxyRes(imageUrl),
+                        source = TPProxy.proxyRes(sourceUrl)
                     )
                 }
-            } else if ("page_info" in blog) {
+            } else if ("page_info" in blog) { // 视频微博
                 val pageInfo = blog.obj("page_info")
                 if (pageInfo["type"].String == "video") {
                     val urls = pageInfo.obj("urls")
-                    val videoUrl = if ("mp4_720p_mp4" in urls) urls["mp4_720p_mp4"].String
-                    else if ("mp4_hd_mp4" in urls) urls["mp4_hd_mp4"].String
-                    else urls["mp4_ld_mp4"].String
+                    val videoUrl = urls[when {
+                        "mp4_720p_mp4" in urls -> "mp4_720p_mp4"
+                        "mp4_hd_mp4" in urls -> "mp4_hd_mp4"
+                        else -> "mp4_ld_mp4"
+                    }].String
                     val videoPicUrl = pageInfo.obj("page_pic")["url"].String
                     pictures += UnifiedPicture(
                         image = TPProxy.proxyRes(videoPicUrl),
@@ -73,16 +89,57 @@ object WeiboAPI {
                     )
                 }
             }
-            return Weibo(
-                id = blogId,
-                user = userInfo,
-                time = time,
-                location = location,
-                content = content,
-                data = WeiboData(commentNum, likeNum, repostNum),
-                pictures = pictures
-            )
+            return pictures
         }
+
+        private fun extractChaohuaPictures(blog: JsonObject): List<UnifiedPicture> {
+            val pictures: MutableList<UnifiedPicture> = []
+            val pics = blog["pic_infos"].ObjectEmpty
+            if (pics.isNotEmpty()) { // 图片微博
+                for ([_, picItem] in pics) {
+                    val pic = picItem.Object
+                    val imageUrl = pic[when {
+                        "large" in pic -> "large"
+                        "bmiddle" in pic -> "bmiddle"
+                        else -> "thumbnail"
+                    }].Object["url"].String
+                    val sourceUrl = pic[when {
+                        "original" in pic -> "original"
+                        "largest" in pic -> "largest"
+                        "mw2000" in pic -> "mw2000"
+                        "large" in pic -> "large"
+                        "bmiddle" in pic -> "bmiddle"
+                        else -> "thumbnail"
+                    }].Object["url"].String
+                    pictures += UnifiedPicture(
+                        image = TPProxy.proxyRes(imageUrl),
+                        source = TPProxy.proxyRes(sourceUrl)
+                    )
+                }
+            }
+            else if ("page_info" in blog) { // 视频微博
+                val pageInfo = blog.obj("page_info")
+                if (pageInfo["object_type"].String == "video") {
+                    val mediaInfo = pageInfo.obj("media_info")
+                    val videoUrl = mediaInfo[when {
+                        "mp4_720p_mp4" in mediaInfo -> "mp4_720p_mp4"
+                        "mp4_hd_url" in mediaInfo -> "mp4_hd_url"
+                        else -> "mp4_sd_url"
+                    }].String
+                    val videoPicUrl = pageInfo["url"].String
+                    pictures += UnifiedPicture(
+                        image = TPProxy.proxyRes(videoPicUrl),
+                        source = TPProxy.proxyRes(videoPicUrl),
+                        video = TPProxy.proxyRes(videoUrl)
+                    )
+                }
+            }
+            return pictures
+        }
+
+        fun extractWeibo(blog: JsonObject): Weibo = extractWeiboHeader(blog).copy(pictures = extractWeiboPictures(blog))
+
+        fun extractChaohua(blog: JsonObject): Weibo = extractWeiboHeader(blog).copy(pictures = extractChaohuaPictures(blog))
 
         fun extractComment(card: JsonObject): WeiboComment {
             val commentId = card["id"].String
@@ -318,7 +375,7 @@ object WeiboAPI {
                 val card = item.Object
                 val category = card["category"].String
                 if (category == "feed") {
-                    val weibo = Fetcher.extractWeibo(card["data"].Object)
+                    val weibo = Fetcher.extractChaohua(card["data"].Object)
                     weibos += weibo
                 }
             }
