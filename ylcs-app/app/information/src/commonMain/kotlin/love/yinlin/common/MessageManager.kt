@@ -31,6 +31,7 @@ sealed class MessageManager<T : UnifiedMessage> {
     abstract val name: String // 名称
     abstract val icon: ImageVector // 图标
     abstract suspend fun onNewData(flushContent: () -> Unit): Boolean // 新数据
+    abstract suspend fun onMoreData(): Boolean // 更多数据
 
     abstract fun BasicScreen.openSettings() // 打开设置
 
@@ -41,7 +42,7 @@ sealed class MessageManager<T : UnifiedMessage> {
         protected set
     val gridState = LazyStaggeredGridState()
     var canLoading by mutableStateOf(false)
-        protected set
+        private set
 
     suspend fun requestNewData(flushContent: () -> Unit): Boolean {
         canLoading = false
@@ -50,8 +51,8 @@ sealed class MessageManager<T : UnifiedMessage> {
         return items.isNotEmpty()
     }
 
-    suspend fun requestMoreData(flushContent: () -> Unit) {
-
+    suspend fun requestMoreData() {
+        canLoading = onMoreData()
     }
 
     @Composable

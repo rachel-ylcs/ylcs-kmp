@@ -35,5 +35,7 @@ class WeiboManager : BasicWeiboManager() {
         return false
     }
 
+    override suspend fun onMoreData(): Boolean = false // 不支持
+
     override fun BasicScreen.openSettings() = navigate(::ScreenWeiboSettings)
 }

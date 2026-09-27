@@ -26,5 +26,16 @@ class ChaohuaManager : BasicWeiboManager() {
         return true
     }
 
+    override suspend fun onMoreData(): Boolean {
+        val cookie = DataSourceInformation.fetchWeiboCookie()
+
+        val newPage = currentPage + 1
+        val result = WeiboAPI.requestChaohua(newPage, cookie)
+        require(result != null) { DataSourceInformation.resetWeiboCookies() }
+        currentPage = newPage
+        items = items + result
+        return true
+    }
+
     override fun BasicScreen.openSettings() = navigate(::ScreenChaohuaSettings)
 }

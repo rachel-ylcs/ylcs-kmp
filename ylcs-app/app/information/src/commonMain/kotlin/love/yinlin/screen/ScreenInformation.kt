@@ -41,6 +41,22 @@ class ScreenInformation : BasicScreen() {
         if (provider.isLoading) provider.status = StatefulStatus.Content
     }
 
+    private fun onNavigate(manager: BasicWeiboManager) {
+        if (currentManager == manager) {
+            with(manager) { openSettings() }
+        }
+        else {
+            // 防止正在切换
+            if (!isNavigating) {
+                currentManager = manager
+                // 检查是否有数据需要更新
+                if (manager.items.isEmpty()) {
+                    launch { requestNewData(manager) }
+                }
+            }
+        }
+    }
+
     private suspend fun requestNewData(manager: MessageManager<*>) {
         isNavigating = true
         provider.withLoading { manager.requestNewData(::flushContent) }
@@ -49,7 +65,7 @@ class ScreenInformation : BasicScreen() {
 
     private suspend fun requestMoreData(manager: MessageManager<*>) {
         isNavigating = true
-        manager.requestMoreData(::flushContent)
+        manager.requestMoreData()
         isNavigating = false
     }
 
@@ -77,27 +93,14 @@ class ScreenInformation : BasicScreen() {
                         items(items = MessageType.entries, key = { it }) { type ->
                             val manager = DataSourceInformation.managers[type]!!
                             val isSelected = currentManager == manager
+                            val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent
 
                             Icon(
                                 icon = manager.icon,
                                 color = Colors.Unspecified,
                                 modifier = Modifier.clip(Theme.shape.v7)
-                                    .background(if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent)
-                                    .clickable(enabled = !isNavigating) {
-                                        if (currentManager == manager) {
-                                            with(manager) { openSettings() }
-                                        }
-                                        else {
-                                            // 防止正在切换
-                                            if (!isNavigating) {
-                                                currentManager = manager
-                                                // 检查是否有数据需要更新
-                                                if (manager.items.isEmpty()) {
-                                                    launch { requestNewData(manager) }
-                                                }
-                                            }
-                                        }
-                                    }.padding(Theme.padding.g2).size(Theme.size.image9)
+                                    .background(background)
+                                    .clickable(enabled = !isNavigating) { onNavigate(manager) }.padding(Theme.padding.g2).size(Theme.size.image9)
                             )
                         }
                     }
@@ -117,14 +120,10 @@ class ScreenInformation : BasicScreen() {
                     canLoading = currentManager.canLoading,
                     onRefresh = {
                         // 防止正在切换
-                        if (!isNavigating) {
-                            launch { requestNewData(currentManager) }
-                        }
+                        if (!isNavigating) requestNewData(currentManager)
                     },
                     onLoading = {
-                        if (!isNavigating) {
-                            launch { requestMoreData(currentManager) }
-                        }
+                        if (!isNavigating) requestMoreData(currentManager)
                     },
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = Theme.padding.eValue,
