@@ -4,7 +4,7 @@ import io.ktor.http.*
 import love.yinlin.extension.then
 
 class RequestScope @PublishedApi internal constructor() {
-    private var contentType: ContentType = ContentType.Text.Plain
+    var contentType: ContentType = ContentType.Text.Plain
     private val defaultHeaders: Headers get() = headers {
         append(HttpHeaders.ContentType, contentType.toString())
         append(HttpHeaders.Accept, ContentType.Any.toString())

@@ -1,6 +1,6 @@
 package love.yinlin.crypto
 
-class MD5(private val is16Bit: Boolean = false, private val isUppercase: Boolean = false) : Digest {
+class MD5(private val mini: Boolean = false) : ByteDigest() {
     companion object {
         private val S: IntArray = [
             7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
@@ -27,9 +27,6 @@ class MD5(private val is16Bit: Boolean = false, private val isUppercase: Boolean
             1873313359, -30611744, -1560198380, 1309151649,
             -145523070, -1120210379, 718787259, -343485551,
         ]
-
-        private const val HEX_CHARS_LOWER = "0123456789abcdef"
-        private const val HEX_CHARS_UPPER = "0123456789ABCDEF"
 
         private fun calculate(input: ByteArray): ByteArray {
             val oldLen = input.size
@@ -117,25 +114,11 @@ class MD5(private val is16Bit: Boolean = false, private val isUppercase: Boolean
             return result
         }
 
-        private fun formatResult(digest: ByteArray, is16Bit: Boolean, isUppercase: Boolean): String {
-            val hexTable = if (isUppercase) HEX_CHARS_UPPER else HEX_CHARS_LOWER
-            val start = if (is16Bit) 4 else 0
-            val end = if (is16Bit) 12 else 16
-            return buildString(if (is16Bit) 16 else 32) {
-                for (i in start ..< end) {
-                    val b = digest[i].toInt() and 0xFF
-                    append(hexTable[b ushr 4])
-                    append(hexTable[b and 0x0F])
-                }
-            }
-        }
-
         val Default = MD5()
     }
 
-    override fun encode(data: ByteArray): ByteArray = calculate(data)
-
-    override fun encodeToString(data: ByteArray): String = formatResult(calculate(data), is16Bit, isUppercase)
-
-    override fun encodeToString(data: String): String = formatResult(calculate(data.encodeToByteArray()), is16Bit, isUppercase)
+    override fun encode(data: ByteArray): ByteArray {
+        val rawData = calculate(data)
+        return if (mini) rawData.copyOfRange(4, 12) else rawData
+    }
 }

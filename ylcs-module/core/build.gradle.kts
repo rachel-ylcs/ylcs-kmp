@@ -26,13 +26,6 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        commonTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test
-            )
-        }
-
         val clientMain = createClient(commonMain)
 
         nativeMain.configure(clientMain)
@@ -67,6 +60,13 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 ExportLib,
                 libs.kotlinx.coroutines.swing
+            )
+        }
+
+        desktopTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test
             )
         }
 

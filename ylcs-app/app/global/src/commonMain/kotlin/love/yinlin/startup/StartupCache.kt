@@ -18,7 +18,7 @@ class StartupCache(pool: StartupPool, cachePath: File) : SyncStartup(pool) {
         override fun build(pool: StartupPool): StartupCache = StartupCache(pool, cachePath)
     }
 
-    private val diskCache = DiskCache<String>(cachePath = cachePath, key = XXHash64::encodeToString) { source, sink ->
+    private val diskCache = DiskCache<String>(cachePath = cachePath, key = XXHash64::encode) { source, sink ->
         Coroutines.io { NetClient.File.download(source, sink) }
     }
 

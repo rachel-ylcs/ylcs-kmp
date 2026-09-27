@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import love.yinlin.common.BasicWeiboManager
 import love.yinlin.common.MessageManager
 import love.yinlin.common.MessageType
 import love.yinlin.compose.Colors
@@ -34,14 +33,14 @@ class ScreenInformation : BasicScreen() {
     private var isNavigating by mutableStateOf(false)
 
     init {
-        land(BasicWeiboManager.CommonDownloadDialog)
+        land(DataSourceInformation.CommonDownloadDialog)
     }
 
     private fun flushContent() {
         if (provider.isLoading) provider.status = StatefulStatus.Content
     }
 
-    private fun onNavigate(manager: BasicWeiboManager) {
+    private fun onNavigate(manager: MessageManager<*>) {
         if (currentManager == manager) {
             with(manager) { openSettings() }
         }

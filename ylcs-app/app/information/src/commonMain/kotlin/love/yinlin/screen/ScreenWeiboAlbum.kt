@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import love.yinlin.common.asPicture
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.UUIDKey
@@ -42,7 +41,7 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
             provider.withLoading {
                 val cookie = DataSourceInformation.fetchWeiboCookie()
                 val [data, count] = WeiboAPI.requestUserAlbumPics(containerId, page, WeiboAlbum.DEFAULT_LIMIT, cookie)!!
-                caches[page] = AlbumCache(count, data.map { UUIDKey(it.asPicture) })
+                caches[page] = AlbumCache(count, data.map { UUIDKey(Picture(it.image, it.source)) })
                 true
             }
         }

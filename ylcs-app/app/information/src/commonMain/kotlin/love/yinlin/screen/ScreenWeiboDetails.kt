@@ -32,7 +32,7 @@ class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
     private var comments: List<WeiboComment>? by mutableRefStateOf(null)
 
     init {
-        land(BasicWeiboManager.CommonDownloadDialog)
+        land(DataSourceInformation.CommonDownloadDialog)
     }
 
     @Composable
@@ -140,7 +140,7 @@ class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
     @Composable
     override fun Content() {
         val deviceType by rememberDeviceType()
-        val manager = DataSourceInformation.managers[MessageType.Weibo]!!
+        val manager = DataSourceInformation.managers[MessageType.Weibo] as BasicWeiboManager
         when (deviceType) {
             Device.Type.PORTRAIT -> Portrait(manager = manager)
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(manager = manager)

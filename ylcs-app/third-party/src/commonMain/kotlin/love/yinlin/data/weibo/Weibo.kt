@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 import love.yinlin.data.information.UnifiedMessage
-import love.yinlin.data.information.UnifiedPicture
 
 @Stable
 @Serializable
@@ -15,7 +14,7 @@ data class Weibo(
     override val location: String, // 定位
     override val content: String, // 内容
     override val data: WeiboData, // 数据
-    override val pictures: List<UnifiedPicture>, // 图片集
+    override val medias: List<WeiboMedia>, // 图片集
 ) : UnifiedMessage {
     override val title: String = "" // 微博暂不支持标题
 

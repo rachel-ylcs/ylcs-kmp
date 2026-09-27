@@ -1,6 +1,6 @@
 package love.yinlin.crypto
 
-object XXHash64 : Digest {
+object XXHash64 : StringDigest() {
     private const val ALPHABET = "abcdefghijklmnopqrstuvwxyz"
 
     private val SEEDS: LongArray = [
@@ -17,10 +17,10 @@ object XXHash64 : Digest {
 
     private val LENGTHS: IntArray = [11, 11, 10] // 11 + 11 + 10 = 32
 
-    private fun hash(input: String): String = buildString(32) {
+    override fun encode(data: String): String = buildString(32) {
         repeat(3) { index ->
             var h = SEEDS[index]
-            for (char in input) {
+            for (char in data) {
                 h = h xor (char.code.toLong() * MASKS[index])
                 h = h.rotateLeft(31)
                 h *= 0xbf58476d1ce4e5b9uL.toLong()
@@ -38,10 +38,4 @@ object XXHash64 : Digest {
             }
         }
     }
-
-    override fun encode(data: ByteArray): ByteArray = hash(data.decodeToString()).encodeToByteArray()
-
-    override fun encodeToString(data: ByteArray): String = hash(data.decodeToString())
-
-    override fun encodeToString(data: String): String = hash(data)
 }

@@ -12,19 +12,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.image.NineGrid
+import love.yinlin.compose.ui.floating.downloadPhotos
+import love.yinlin.compose.ui.floating.downloadVideo
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.PrimaryTextButton
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.coroutines.ioContext
 import love.yinlin.data.information.UnifiedData
+import love.yinlin.data.information.UnifiedMedia
 import love.yinlin.data.information.UnifiedMessage
 import love.yinlin.data.information.UnifiedUserInfo
+import love.yinlin.data.weibo.WeiboMedia
 import love.yinlin.extension.DateEx
-import love.yinlin.screen.ScreenImagePreview
-import love.yinlin.screen.ScreenVideo
 
 @Stable
 sealed class MessageManager<T : UnifiedMessage> {
@@ -112,7 +117,10 @@ sealed class MessageManager<T : UnifiedMessage> {
     }
 
     @Composable
-    open fun MessageDataBar(modifier: Modifier, data: UnifiedData) { }
+    open fun BasicScreen.MessageMediaLayout(modifier: Modifier, medias: List<UnifiedMedia>) { }
+
+    @Composable
+    open fun BasicScreen.MessageDataBar(modifier: Modifier, data: UnifiedData) { }
 
     open fun checkExtraData(message: UnifiedMessage): Boolean = false
 
@@ -145,26 +153,9 @@ sealed class MessageManager<T : UnifiedMessage> {
                     MessageTextRender(modifier = Modifier.fillMaxWidth(), text = message.content, style = Theme.typography.v7)
                 }
 
-                // 图片集
-                if (message.pictures.isNotEmpty()) {
-                    NineGrid(
-                        pics = remember(message) { message.pictures.asPicture },
-                        modifier = Modifier.fillMaxWidth(),
-                        unique = true,
-                        onImageClick = { index, _ ->
-                            navigate(::ScreenImagePreview, message.pictures.asPicture, index)
-                        },
-                        onVideoClick = { pic ->
-                            navigate(::ScreenVideo, pic.video)
-                        }
-                    ) { contentScale, pic, onClick ->
-                        WebImage(
-                            uri = pic.image,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = contentScale,
-                            onClick = onClick
-                        )
-                    }
+                // 媒体集
+                if (message.medias.isNotEmpty()) {
+                    MessageMediaLayout(modifier = Modifier.fillMaxWidth(), medias = message.medias)
                 }
 
                 // 数据条
@@ -178,5 +169,27 @@ sealed class MessageManager<T : UnifiedMessage> {
                 }
             }
         }
+    }
+
+    @Composable
+    protected fun BasicScreen.MediaDownloadButton(message: UnifiedMessage) {
+        PrimaryTextButton(
+            text = "下载",
+            icon = Icons.Download,
+            onClick = {
+                val medias = message.medias
+                launch(ioContext) {
+                    val first = medias[0]
+                    if (medias.size == 1 && first is WeiboMedia.Video) DataSourceInformation.CommonDownloadDialog.downloadVideo(first.video)
+                    else DataSourceInformation.CommonDownloadDialog.downloadPhotos(medias.map { media ->
+                        when (media) {
+                            is WeiboMedia.Image -> media.source
+                            is WeiboMedia.Video -> media.cover
+                            else -> ""
+                        }
+                    })
+                }
+            }
+        )
     }
 }

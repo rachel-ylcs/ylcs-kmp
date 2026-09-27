@@ -52,7 +52,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     private var albums: List<WeiboAlbum>? by mutableRefStateOf(null)
 
     init {
-        land(BasicWeiboManager.CommonDownloadDialog)
+        land(DataSourceInformation.CommonDownloadDialog)
     }
 
     private fun onFollowClick(weiboUser: WeiboUser, isFollow: Boolean) {
@@ -274,7 +274,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     @Composable
     override fun Content() {
         val weiboUser = currentWeiboUser
-        val manager = DataSourceInformation.managers[MessageType.Weibo]!!
+        val manager = DataSourceInformation.managers[MessageType.Weibo] as BasicWeiboManager
         if (weiboUser != null) {
             val deviceType by rememberDeviceType()
             when (deviceType) {

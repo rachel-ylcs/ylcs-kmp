@@ -19,7 +19,7 @@ class ChaohuaManager : BasicWeiboManager() {
         val cookie = DataSourceInformation.fetchWeiboCookie()
 
         val result = WeiboAPI.requestChaohua(1, cookie)
-        require(result != null) { DataSourceInformation.resetWeiboCookies() }
+        require(!result.isNullOrEmpty()) { DataSourceInformation.resetWeiboCookies() }
         currentPage = 1
         items = result
         // 超话始终都能加载新的内容

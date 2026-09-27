@@ -15,5 +15,5 @@ interface UnifiedMessage : Comparable<UnifiedMessage> {
     val title: String // 标题
     val content: String // 内容
     val data: UnifiedData? // 数据
-    val pictures: List<UnifiedPicture> // 图片集
+    val medias: List<UnifiedMedia> // 媒体
 }

@@ -28,7 +28,7 @@ data class RhymeUploadResult(
             duration: Long,
             score: Int,
             statistics: List<Int>
-        ): String = XXHash64.encodeToString(buildString {
+        ): String = XXHash64.encode(buildString {
             append(uid)
             append(sid)
             append(ts)

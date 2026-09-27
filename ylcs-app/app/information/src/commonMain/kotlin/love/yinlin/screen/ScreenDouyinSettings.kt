@@ -5,8 +5,8 @@ import androidx.compose.runtime.Stable
 import love.yinlin.compose.screen.Screen
 
 @Stable
-class ScreenChaohuaSettings : Screen() {
-    override val title: String = "超话设置"
+class ScreenDouyinSettings : Screen() {
+    override val title: String = "抖音设置"
 
     @Composable
     override fun Content() {
