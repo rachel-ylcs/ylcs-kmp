@@ -15,6 +15,7 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             kotlin.srcDir(generateSourceDir)
             lib(
+                projects.ylcsModule.foundation.cryptography,
                 ExportLib,
                 projects.ylcsModule.cs.core,
                 libs.compose.runtime,

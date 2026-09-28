@@ -78,6 +78,7 @@ include(
     "ylcs-module:cs:server-service-mysql",
     "ylcs-module:cs:server-service-redis",
     "ylcs-module:foundation:context",
+    "ylcs-module:foundation:cryptography",
     "ylcs-module:foundation:filesystem",
     "ylcs-module:foundation:network",
     "ylcs-module:foundation:startup",

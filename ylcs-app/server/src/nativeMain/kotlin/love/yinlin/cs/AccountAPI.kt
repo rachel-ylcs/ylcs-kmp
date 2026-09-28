@@ -1,11 +1,11 @@
 package love.yinlin.cs
 
-import love.yinlin.crypto.MD5
 import love.yinlin.cs.service.values
 import love.yinlin.cs.user.Token
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.data.rachel.profile.UserPrivilege
 import love.yinlin.extension.*
+import love.yinlin.foundation.cryptography.MD5
 
 fun ServerScope.accountAPI() {
     ApiAccountGetInviters.response {

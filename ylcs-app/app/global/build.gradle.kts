@@ -25,6 +25,8 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsApp.mod,
                 projects.ylcsApp.thirdParty,
 
+                projects.ylcsModule.foundation.cryptography,
+
                 projects.ylcsModule.cs.clientEngine,
 
                 projects.ylcsModule.compose.startup.picker,

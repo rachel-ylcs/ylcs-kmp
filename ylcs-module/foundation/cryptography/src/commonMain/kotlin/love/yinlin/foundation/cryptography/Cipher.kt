@@ -1,6 +1,6 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
-abstract class Cipher {
+abstract class Cipher : Cryptography {
     abstract fun encode(data: ByteArray): ByteArray
     abstract fun decode(data: ByteArray): ByteArray
 

@@ -1,4 +1,4 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
 class MD5(private val mini: Boolean = false) : ByteDigest() {
     companion object {

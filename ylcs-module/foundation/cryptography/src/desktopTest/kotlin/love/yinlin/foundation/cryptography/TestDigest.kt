@@ -1,4 +1,4 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

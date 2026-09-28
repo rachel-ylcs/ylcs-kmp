@@ -1,4 +1,4 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
 class SM3 : ByteDigest() {
     private companion object {

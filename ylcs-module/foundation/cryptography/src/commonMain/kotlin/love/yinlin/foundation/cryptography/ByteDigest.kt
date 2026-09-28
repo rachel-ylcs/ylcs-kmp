@@ -1,4 +1,4 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
 abstract class ByteDigest : Digest {
     abstract fun encode(data: ByteArray): ByteArray

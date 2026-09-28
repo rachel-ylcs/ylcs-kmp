@@ -3,12 +3,12 @@ package love.yinlin.startup
 import androidx.compose.runtime.Stable
 import love.yinlin.compose.cache.DiskCache
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.crypto.XXHash64
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.foundation.SyncStartupFactory
+import love.yinlin.foundation.cryptography.XXHash64
 import love.yinlin.fs.File
 
 @Stable

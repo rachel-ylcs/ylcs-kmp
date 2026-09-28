@@ -1,4 +1,4 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
 object XXHash64 : StringDigest() {
     private const val ALPHABET = "abcdefghijklmnopqrstuvwxyz"

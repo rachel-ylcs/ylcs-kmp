@@ -2,27 +2,29 @@ plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.composeMultiplatform,
-        libs.plugins.composeCompiler,
         libs.plugins.androidLibraryNew,
+        libs.plugins.mavenPublish,
+        libs.plugins.dokka,
     )
 }
 
 template(object : KotlinMultiplatformTemplate() {
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                projects.ylcsModule.foundation.cryptography,
-                projects.ylcsModule.foundation.network,
-
-                libs.compose.runtime,
+                ExportLib,
+                projects.ylcsModule.core,
             )
         }
 
         desktopTest.configure {
             lib(
                 libs.test,
-                libs.kotlinx.coroutines.test,
+                libs.kotlinx.coroutines.test
             )
         }
     }

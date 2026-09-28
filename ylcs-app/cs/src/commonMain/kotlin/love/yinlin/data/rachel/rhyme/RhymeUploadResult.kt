@@ -2,8 +2,8 @@ package love.yinlin.data.rachel.rhyme
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
-import love.yinlin.crypto.XXHash64
 import love.yinlin.extension.DateEx
+import love.yinlin.foundation.cryptography.XXHash64
 
 @Serializable
 @Stable

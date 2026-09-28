@@ -3,10 +3,10 @@ package love.yinlin.tpl.douyin
 import androidx.compose.runtime.Stable
 import io.ktor.http.encodeURLParameter
 import io.ktor.http.formUrlEncode
-import love.yinlin.crypto.RC4
-import love.yinlin.crypto.SM3
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.mapString
+import love.yinlin.foundation.cryptography.RC4
+import love.yinlin.foundation.cryptography.SM3
 import kotlin.io.encoding.Base64
 import kotlin.random.Random
 

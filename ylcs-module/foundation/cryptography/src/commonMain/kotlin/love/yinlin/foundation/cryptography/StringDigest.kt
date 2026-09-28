@@ -1,4 +1,4 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
 abstract class StringDigest : Digest {
     abstract fun encode(data: String): String

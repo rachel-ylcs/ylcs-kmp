@@ -20,6 +20,9 @@ template(object : KotlinNativeExecutableTemplate() {
                 libs.cryptography,
                 libs.cryptography.provider,
                 projects.ylcsApp.cs,
+
+                projects.ylcsModule.foundation.cryptography,
+
                 projects.ylcsModule.cs.serverEngine,
                 projects.ylcsModule.cs.serverServiceMysql,
                 projects.ylcsModule.cs.serverServiceRedis,

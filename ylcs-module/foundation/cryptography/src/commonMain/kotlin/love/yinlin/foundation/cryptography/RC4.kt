@@ -1,4 +1,4 @@
-package love.yinlin.crypto
+package love.yinlin.foundation.cryptography
 
 class RC4(private val key: ByteArray): SymmetricCipher() {
     constructor(key: String) : this(key.encodeToByteArray())
