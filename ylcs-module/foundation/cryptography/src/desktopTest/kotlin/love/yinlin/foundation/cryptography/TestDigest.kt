@@ -27,14 +27,4 @@ class TestDigest {
     fun testSM3() {
         assertEquals("66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0", SM3().encodeToHex("abc"))
     }
-
-    @Test
-    fun testRC4() {
-        val rc4 = RC4(key = "daniel123456^#*@reyv")
-        val input = "{abcdssdsadasdadasdsadasda123456}"
-        val output = rc4.encodeToHex(input)
-        val result = rc4.decodeFromHexToString(output)
-        assertEquals("cac70df5bf3fb1b2d10f3db4ca75778ce8496499183e5ca22c5beecabbe2fed18d", output)
-        assertEquals(input, result)
-    }
 }

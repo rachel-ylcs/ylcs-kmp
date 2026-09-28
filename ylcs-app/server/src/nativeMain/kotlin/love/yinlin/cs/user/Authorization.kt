@@ -1,16 +1,12 @@
 package love.yinlin.cs.user
 
-import dev.whyoleg.cryptography.CryptographyProvider
-import dev.whyoleg.cryptography.DelicateCryptographyApi
-import dev.whyoleg.cryptography.algorithms.AES
-import dev.whyoleg.cryptography.operations.Cipher
 import love.yinlin.cs.ServerLogger
 import love.yinlin.cs.UnauthorizedException
 import love.yinlin.cs.service.RedisService
+import love.yinlin.foundation.cryptography.AES
 import kotlin.io.encoding.Base64
 import kotlin.time.Duration.Companion.days
 
-@OptIn(DelicateCryptographyApi::class)
 class Authorization(
     private val logger: ServerLogger,
     private val redis: RedisService
@@ -19,8 +15,7 @@ class Authorization(
         const val TOKEN_SECRET_KEY = "TokenSecretKey"
     }
 
-    private val aesEcb = CryptographyProvider.Default.get(AES.ECB)
-    private lateinit var cipher: Cipher
+    private lateinit var cipher: AES
 
     suspend fun init() {
         // 查询是否保存密钥
@@ -31,18 +26,16 @@ class Authorization(
         }
         else {
             // 创建密钥
-            val newKey = aesEcb.keyGenerator().generateKey()
-            val bytes = newKey.encodeToByteArray(AES.Key.Format.RAW)
+            val bytes = AES.generateKey()
             redis[TOKEN_SECRET_KEY] = Base64.encode(bytes)
             bytes
         }
 
-        val aesKey = aesEcb.keyDecoder().decodeFromByteArray(AES.Key.Format.RAW, key)
-        cipher = aesKey.cipher()
+        cipher = AES(key, mode = AES.Mode.ECB, padding = AES.Padding.PKCS7)
     }
 
     suspend fun throwGenerateToken(token: Token): String {
-        val encryptedBytes = cipher.encrypt(token.bytes)
+        val encryptedBytes = cipher.encode(token.bytes)
         val tokenString = Base64.encode(encryptedBytes)
         redis.setex(token.key, tokenString, 30.days)
         return tokenString
@@ -50,7 +43,7 @@ class Authorization(
 
     private suspend fun parseToken(tokenString: String): Token {
         val encryptedBytes = Base64.decode(tokenString)
-        val bytes = cipher.decrypt(encryptedBytes)
+        val bytes = cipher.decode(encryptedBytes)
         return Token.fromBytes(bytes)!!
     }
 

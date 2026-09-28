@@ -21,10 +21,36 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        appleMain.configure(commonMain)
+
+        val jvmMain = createJvm(commonMain)
+
+        androidMain.configure(jvmMain)
+
+        iosMain.configure(appleMain)
+
+        iosMainList.configure(iosMain)
+
+        desktopMain.configure(jvmMain)
+
+        webMain.configure(commonMain)
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
+
+        nativeMain.configure(commonMain)
+
+        windowsMain.configure(nativeMain)
+
+        linuxMain.configure(nativeMain)
+
+        macosMain.configure(appleMain)
+
         desktopTest.configure {
             lib(
                 libs.test,
-                libs.kotlinx.coroutines.test
+                libs.kotlinx.coroutines.test,
             )
         }
     }
