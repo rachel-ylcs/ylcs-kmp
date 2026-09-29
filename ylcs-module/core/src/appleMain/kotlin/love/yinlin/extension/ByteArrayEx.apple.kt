@@ -11,10 +11,12 @@ import platform.posix.memcpy
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 fun ByteArray.toNSData(): NSData = usePinned {
-    NSData.create(bytes = it.addressOf(0), length = this@toNSData.size.toULong())
+    NSData.create(bytes = it.addressOf(0), length = size.toULong())
 }
 
 @OptIn(ExperimentalForeignApi::class)
-fun NSData.toByteArray(): ByteArray = ByteArray(this@toByteArray.length.toInt()).apply {
-    memcpy(this.refTo(0), this@toByteArray.bytes, this@toByteArray.length)
+fun NSData.toByteArray(): ByteArray {
+    val data = ByteArray(length.toInt())
+    memcpy(data.refTo(0), bytes, length)
+    return data
 }
