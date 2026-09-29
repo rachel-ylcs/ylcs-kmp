@@ -1,5 +1,8 @@
 package love.yinlin.foundation.cryptography
 
+import love.yinlin.io.ByteArrayIO
+import love.yinlin.io.Endian
+
 class AES(
     key: ByteArray,
     val mode: Mode = Mode.ECB,
@@ -25,7 +28,7 @@ class AES(
 
         private const val BLOCK_SIZE = 16
 
-        private val SBOX = intArrayOf(
+        private val SBOX: IntArray = [
             0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
             0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
             0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
@@ -42,7 +45,7 @@ class AES(
             0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
             0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
             0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
-        )
+        ]
 
         private val INVERSE_SBOX = IntArray(256).also { inverse ->
             for (i in SBOX.indices) inverse[SBOX[i]] = i
@@ -78,19 +81,6 @@ class AES(
             return result
         }
 
-        private fun readWord(bytes: ByteArray, offset: Int): Int =
-            ((bytes[offset].toInt() and 0xff) shl 24) or
-                    ((bytes[offset + 1].toInt() and 0xff) shl 16) or
-                    ((bytes[offset + 2].toInt() and 0xff) shl 8) or
-                    (bytes[offset + 3].toInt() and 0xff)
-
-        private fun writeWord(bytes: ByteArray, offset: Int, word: Int) {
-            bytes[offset] = (word ushr 24).toByte()
-            bytes[offset + 1] = (word ushr 16).toByte()
-            bytes[offset + 2] = (word ushr 8).toByte()
-            bytes[offset + 3] = word.toByte()
-        }
-
         private fun substituteWord(word: Int): Int =
             (SBOX[word ushr 24] shl 24) or
                     (SBOX[(word ushr 16) and 0xff] shl 16) or
@@ -123,11 +113,13 @@ class AES(
     }
 
     private val encryptionKeys = IntArray((rounds + 1) * 4).also { words ->
+        val io = ByteArrayIO(key)
         val keyWords = key.size / 4
-        for (i in 0 until keyWords) words[i] = readWord(key, i * 4)
+
+        for (i in 0 ..< keyWords) words[i] = io.readInt(i * 4, Endian.BIG)
 
         var rcon = 1
-        for (i in keyWords until words.size) {
+        for (i in keyWords ..< words.size) {
             var previous = words[i - 1]
             if (i % keyWords == 0) {
                 previous = substituteWord((previous shl 8) or (previous ushr 24)) xor (rcon shl 24)
@@ -211,10 +203,12 @@ class AES(
     }
 
     private fun encryptBlock(input: ByteArray, inputOffset: Int, output: ByteArray, outputOffset: Int) {
-        var s0 = readWord(input, inputOffset) xor encryptionKeys[0]
-        var s1 = readWord(input, inputOffset + 4) xor encryptionKeys[1]
-        var s2 = readWord(input, inputOffset + 8) xor encryptionKeys[2]
-        var s3 = readWord(input, inputOffset + 12) xor encryptionKeys[3]
+        val io = ByteArrayIO(input)
+        val endian = Endian.BIG
+        var s0 = io.readInt(inputOffset, endian) xor encryptionKeys[0]
+        var s1 = io.readInt(inputOffset + 4, endian) xor encryptionKeys[1]
+        var s2 = io.readInt(inputOffset + 8, endian) xor encryptionKeys[2]
+        var s3 = io.readInt(inputOffset + 12, endian) xor encryptionKeys[3]
 
         for (round in 1 until rounds) {
             val keyOffset = round * 4
@@ -229,17 +223,21 @@ class AES(
         }
 
         val keyOffset = rounds * 4
-        writeWord(output, outputOffset, finalWord(s0, s1, s2, s3, SBOX) xor encryptionKeys[keyOffset])
-        writeWord(output, outputOffset + 4, finalWord(s1, s2, s3, s0, SBOX) xor encryptionKeys[keyOffset + 1])
-        writeWord(output, outputOffset + 8, finalWord(s2, s3, s0, s1, SBOX) xor encryptionKeys[keyOffset + 2])
-        writeWord(output, outputOffset + 12, finalWord(s3, s0, s1, s2, SBOX) xor encryptionKeys[keyOffset + 3])
+        ByteArrayIO(output).write {
+            writeInt(outputOffset, finalWord(s0, s1, s2, s3, SBOX) xor encryptionKeys[keyOffset], endian)
+            writeInt(outputOffset + 4, finalWord(s1, s2, s3, s0, SBOX) xor encryptionKeys[keyOffset + 1], endian)
+            writeInt(outputOffset + 8, finalWord(s2, s3, s0, s1, SBOX) xor encryptionKeys[keyOffset + 2], endian)
+            writeInt(outputOffset + 12, finalWord(s3, s0, s1, s2, SBOX) xor encryptionKeys[keyOffset + 3], endian)
+        }
     }
 
     private fun decryptBlock(input: ByteArray, inputOffset: Int, output: ByteArray, outputOffset: Int) {
-        var s0 = readWord(input, inputOffset) xor decryptionKeys[0]
-        var s1 = readWord(input, inputOffset + 4) xor decryptionKeys[1]
-        var s2 = readWord(input, inputOffset + 8) xor decryptionKeys[2]
-        var s3 = readWord(input, inputOffset + 12) xor decryptionKeys[3]
+        val io = ByteArrayIO(input)
+        val endian = Endian.BIG
+        var s0 = io.readInt(inputOffset, endian) xor decryptionKeys[0]
+        var s1 = io.readInt(inputOffset + 4, endian) xor decryptionKeys[1]
+        var s2 = io.readInt(inputOffset + 8, endian) xor decryptionKeys[2]
+        var s3 = io.readInt(inputOffset + 12, endian) xor decryptionKeys[3]
 
         for (round in 1 until rounds) {
             val keyOffset = round * 4
@@ -254,10 +252,12 @@ class AES(
         }
 
         val keyOffset = rounds * 4
-        writeWord(output, outputOffset, finalWord(s0, s3, s2, s1, INVERSE_SBOX) xor decryptionKeys[keyOffset])
-        writeWord(output, outputOffset + 4, finalWord(s1, s0, s3, s2, INVERSE_SBOX) xor decryptionKeys[keyOffset + 1])
-        writeWord(output, outputOffset + 8, finalWord(s2, s1, s0, s3, INVERSE_SBOX) xor decryptionKeys[keyOffset + 2])
-        writeWord(output, outputOffset + 12, finalWord(s3, s2, s1, s0, INVERSE_SBOX) xor decryptionKeys[keyOffset + 3])
+        ByteArrayIO(output).write {
+            writeInt(outputOffset, finalWord(s0, s3, s2, s1, INVERSE_SBOX) xor decryptionKeys[keyOffset], endian)
+            writeInt(outputOffset + 4, finalWord(s1, s0, s3, s2, INVERSE_SBOX) xor decryptionKeys[keyOffset + 1], endian)
+            writeInt(outputOffset + 8, finalWord(s2, s1, s0, s3, INVERSE_SBOX) xor decryptionKeys[keyOffset + 2], endian)
+            writeInt(outputOffset + 12, finalWord(s3, s2, s1, s0, INVERSE_SBOX) xor decryptionKeys[keyOffset + 3], endian)
+        }
     }
 
     override fun encode(data: ByteArray): ByteArray = when (mode) {

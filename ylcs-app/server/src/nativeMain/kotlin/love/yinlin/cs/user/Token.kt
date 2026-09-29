@@ -2,6 +2,9 @@ package love.yinlin.cs.user
 
 import kotlinx.cinterop.*
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.catchingNull
+import love.yinlin.io.ByteArrayIO
+import love.yinlin.io.Endian
 import love.yinlin.platform.Platform
 
 @OptIn(ExperimentalForeignApi::class)
@@ -14,38 +17,26 @@ data class Token(
     companion object {
         const val MAGIC = 19911211
 
-        fun fromBytes(bytes: ByteArray): Token? = bytes.usePinned { pinned ->
-            val ptr = pinned.addressOf(0)
-
-            val intPtr = ptr.reinterpret<IntVar>()
-            val uid = intPtr[0]
-            val magic = intPtr[1]
-            val platform = Platform.entries.getOrNull(intPtr[2])
-
-            val longPtr = (ptr + 3 * sizeOf<IntVar>())!!.reinterpret<LongVar>()
-            val timestamp = longPtr[0]
-
-            return if (uid > 0 && magic == MAGIC && timestamp in 1727755860000..1917058260000 && platform != null)
-                Token(uid = uid, platform = platform, timestamp = timestamp) else null
+        fun fromBytes(bytes: ByteArray): Token? = catchingNull {
+            val io = ByteArrayIO(bytes)
+            val uid = io.readInt(0, Endian.LITTLE)
+            val magic = io.readInt(4, Endian.LITTLE)
+            val platform = io.readEnum<Platform>(8, Endian.LITTLE)
+            val timestamp = io.readLong(12, Endian.LITTLE)
+            require(uid > 0 && magic == MAGIC && timestamp in 1727755860000..1917058260000)
+            return Token(uid = uid, platform = platform, timestamp = timestamp)
         }
 
         fun keys(uid: Int): List<String> = Platform.entries.map { "token/${it.ordinal}/$uid" }
     }
 
     val bytes: ByteArray by lazy {
-        val data = ByteArray((sizeOf<IntVar>() * 3 + sizeOf<LongVar>()).toInt())
-        data.usePinned { pinned ->
-            val ptr = pinned.addressOf(0)
-
-            val intPtr = ptr.reinterpret<IntVar>()
-            intPtr[0] = uid
-            intPtr[1] = 19911211
-            intPtr[2] = platform.ordinal
-
-            val longPtr = (ptr + 3 * sizeOf<IntVar>())!!.reinterpret<LongVar>()
-            longPtr[0] = timestamp
+        ByteArrayIO((sizeOf<IntVar>() * 3 + sizeOf<LongVar>()).toInt()).write {
+            writeInt(0, uid, Endian.LITTLE)
+            writeInt(4, 19911211, Endian.LITTLE)
+            writeEnum(8, platform, Endian.LITTLE)
+            writeLong(12, timestamp, Endian.LITTLE)
         }
-        data
     }
 
     val key: String = "token/${platform.ordinal}/$uid"
