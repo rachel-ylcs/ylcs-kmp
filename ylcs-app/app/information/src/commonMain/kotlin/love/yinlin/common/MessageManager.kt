@@ -19,11 +19,15 @@ import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.floating.downloadPhotos
 import love.yinlin.compose.ui.floating.downloadVideo
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.coroutines.ioContext
+import love.yinlin.data.information.DataValue
 import love.yinlin.data.information.UnifiedData
 import love.yinlin.data.information.UnifiedMedia
 import love.yinlin.data.information.UnifiedMessage
@@ -128,6 +132,23 @@ sealed class MessageManager<T : UnifiedMessage> {
     open fun BasicScreen.MessageExtraLayout(modifier: Modifier, message: UnifiedMessage) { }
 
     @Composable
+    fun MessageDataFlow(modifier: Modifier, values: List<DataValue>) {
+        FlowRow(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
+            maxItemsInEachRow = 3
+        ) {
+            for ([title, value, icon] in values) {
+                TextIconAdapter { idIcon, idText ->
+                    Icon(icon = icon, modifier = Modifier.idIcon())
+                    SimpleEllipsisText(text = "$title $value", modifier = Modifier.idText())
+                }
+            }
+        }
+    }
+
+    @Composable
     fun BasicScreen.MessageLayout(modifier: Modifier, message: UnifiedMessage) {
         Surface(
             modifier = modifier,
@@ -160,6 +181,7 @@ sealed class MessageManager<T : UnifiedMessage> {
 
                 // 数据条
                 message.data?.let { data ->
+                    Divider()
                     MessageDataBar(modifier = Modifier.fillMaxWidth(), data = data)
                 }
 

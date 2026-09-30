@@ -53,4 +53,9 @@ val Long.timeString: String get() {
     }
 }
 
-fun String.filenameOrRandom(ext: String): String = this.substringAfterLast('/').substringBefore('?').ifEmpty { "${DateEx.CurrentLong}$ext" }
+fun String.filenameOrRandom(ext: String): String = this
+    .substringAfterLast('/')
+    .substringBefore('?')
+    .substringBefore('#')
+    .replace("""[<>:"/\\|?*\u0000-\u001F]""".toRegex(), "")
+    .ifBlank { "${DateEx.CurrentLong}$ext" }

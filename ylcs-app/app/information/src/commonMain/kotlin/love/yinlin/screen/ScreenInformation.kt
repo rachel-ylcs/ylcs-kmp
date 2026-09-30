@@ -34,6 +34,7 @@ class ScreenInformation : BasicScreen() {
 
     init {
         land(DataSourceInformation.CommonDownloadDialog)
+        land(DataSourceInformation.ChoiceDialog)
     }
 
     private fun flushContent() {

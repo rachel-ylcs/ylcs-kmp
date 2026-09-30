@@ -1,27 +1,22 @@
 package love.yinlin.common
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.RachelRichText
-import love.yinlin.compose.ui.text.SimpleEllipsisText
-import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.compose.Picture
+import love.yinlin.data.information.DataValue
 import love.yinlin.data.information.UnifiedData
 import love.yinlin.data.information.UnifiedMedia
 import love.yinlin.data.information.UnifiedMessage
@@ -114,24 +109,16 @@ abstract class BasicWeiboManager : MessageManager<Weibo>() {
     @Composable
     override fun BasicScreen.MessageDataBar(modifier: Modifier, data: UnifiedData) {
         if (data is WeiboData) {
-            Row(
+            MessageDataFlow(
                 modifier = modifier,
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                TextIconAdapter { idIcon, idText ->
-                    Icon(icon = Icons.ThumbUp, modifier = Modifier.idIcon())
-                    SimpleEllipsisText(text = data.likeNum.toString(), modifier = Modifier.idText())
+                values = remember(data) {
+                    [
+                        DataValue(title = "点赞", value = data.likeNum.toString(), icon = Icons.ThumbUp),
+                        DataValue(title = "评论", value = data.commentNum.toString(), icon = Icons.Comment),
+                        DataValue(title = "转发", value = data.repostNum.toString(), icon = Icons.Share),
+                    ]
                 }
-                TextIconAdapter { idIcon, idText ->
-                    Icon(icon = Icons.Comment, modifier = Modifier.idIcon())
-                    SimpleEllipsisText(text = data.commentNum.toString(), modifier = Modifier.idText())
-                }
-                TextIconAdapter { idIcon, idText ->
-                    Icon(icon = Icons.Share, modifier = Modifier.idIcon())
-                    SimpleEllipsisText(text = data.repostNum.toString(), modifier = Modifier.idText())
-                }
-            }
+            )
         }
     }
 
