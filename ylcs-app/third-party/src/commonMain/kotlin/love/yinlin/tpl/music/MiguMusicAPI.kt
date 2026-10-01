@@ -1,12 +1,13 @@
 package love.yinlin.tpl.music
 
 import androidx.compose.runtime.Stable
-import io.ktor.http.headers
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
+import love.yinlin.foundation.http.NetHeader
 import love.yinlin.tpl.lyrics.LrcParser
 import love.yinlin.uri.Uri
 
@@ -18,10 +19,10 @@ object MiguMusicAPI : PlatformMusicAPI {
     private const val ALBUM_SONGLIST_API = "https://app.c.nf.migu.cn/MIGUM3.0/resource/album/song/v2.0"
     private const val PLAYLIST_SONGLIST_API = "https://app.c.nf.migu.cn/MIGUM3.0/resource/playlist/song/v2.0"
 
-    private val defaultHeaders = headers {
-        append("channel", "0146921")
-        append("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36")
-    }
+    private val defaultHeaders: NetHeader = [
+        "channel" to "0146921",
+        HttpHeaders.UserAgent to NetHeader.UserAgentDesktop
+    ]
 
     data class MiguSearchResult(
         val contentId: String,

@@ -15,6 +15,7 @@ actual fun buildCommonNetClient(timeout: Long): NetClient = NetClient(HttpClient
     useRedirect()
     useEngine()
     useJson()
+    useEncoding()
     useTimeout(timeout)
 })
 
@@ -22,9 +23,11 @@ actual fun buildFileClient(timeout: Long): NetClient = NetClient(HttpClient(Js) 
     useRedirect()
     useEngine()
     useJson()
+    useEncoding()
     useTimeout(timeout)
 })
 
 actual fun buildSocketClient(): WebSocketClient = WebSocketClient(HttpClient(Js) {
+    useEncoding()
     useWebSockets()
 })

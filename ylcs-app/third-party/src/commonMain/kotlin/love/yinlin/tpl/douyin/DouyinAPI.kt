@@ -11,6 +11,7 @@ import love.yinlin.data.douyin.DouyinMedia
 import love.yinlin.data.douyin.DouyinUserInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
+import love.yinlin.foundation.http.NetHeader
 
 @Stable
 object DouyinAPI {
@@ -116,10 +117,10 @@ object DouyinAPI {
 
     suspend fun requestUserDouyin(id: String, cookie: DouyinCookie): List<Douyin>? = NetClient.Common.request({
         url = DouyinEncoder.buildUrl(id, cookie)
-        headers = TPProxy.proxyHeader(mapOf(
-            HttpHeaders.UserAgent to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36",
+        headers = [
+            HttpHeaders.UserAgent to NetHeader.UserAgentDesktop,
             HttpHeaders.Referrer to "${DouyinUrl.BASE_URL}/"
-        ))
+        ]
         cookies = cookie.asCookies
     }) { json: JsonObject ->
         val awemeList = json.arr("aweme_list")

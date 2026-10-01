@@ -1,7 +1,7 @@
 package love.yinlin.tpl.music
 
 import androidx.compose.runtime.Stable
-import io.ktor.http.headers
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
@@ -10,6 +10,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
+import love.yinlin.foundation.http.NetHeader
 import love.yinlin.tpl.lyrics.LrcParser
 import love.yinlin.uri.Uri
 
@@ -21,13 +22,13 @@ object SodaMusicAPI : PlatformMusicAPI {
     private const val TRACK_SHARE_PAGE = "https://music.douyin.com/qishui/share/track"
 
     // 统一请求头，模拟真实浏览器，解决手机端无法解析的问题
-    private val defaultHeaders = headers {
-        append("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
-        append("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
-        append("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
-        append("Origin", "https://music.douyin.com")
-        append("Referer", "https://music.douyin.com/")
-    }
+    private val defaultHeaders: NetHeader = [
+        HttpHeaders.UserAgent to NetHeader.UserAgentDesktop,
+        HttpHeaders.Accept to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        HttpHeaders.AcceptLanguage to NetHeader.AcceptLanguage,
+        HttpHeaders.Origin to "https://music.douyin.com",
+        HttpHeaders.Referrer to "https://music.douyin.com/",
+    ]
 
     // ---------- 短链接解析 ----------
     private suspend fun extractPlaylistIdFromShortLink(shortUrl: String): String? {

@@ -18,6 +18,7 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.ktor.json,
                 libs.ktor.client.negotiation,
+                libs.ktor.client.encoding,
                 libs.ktor.client.websockets,
                 ExportLib,
                 libs.ktor.client,

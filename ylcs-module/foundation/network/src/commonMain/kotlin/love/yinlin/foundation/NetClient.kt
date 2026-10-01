@@ -5,13 +5,13 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.plugins.HttpRedirect
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.forms.FormDataContent
-import io.ktor.client.request.headers
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpStatement
@@ -21,6 +21,7 @@ import io.ktor.client.statement.request
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.toMap
 import io.ktor.utils.io.asByteWriteChannel
 import io.ktor.utils.io.copyAndClose
 import kotlinx.coroutines.currentCoroutineContext
@@ -33,6 +34,7 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.then
+import love.yinlin.foundation.http.NetHeader
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 
@@ -69,13 +71,13 @@ class NetClient internal constructor(val delegate: HttpClient) {
             }.execute { response ->
                 val status = response.status
                 val url = response.request.url.toString()
-                val headers = response.headers
+                val headers = response.headers.toMap()
                 val cookies = response.setCookie()
                 val rawBody = response.bodyAsBytes()
                 val scope = object : ResponseScope<Body> {
                     override val status: HttpStatusCode = status
                     override val url: String = url
-                    override val headers: Headers = headers
+                    override val headers: NetHeader = NetHeader(headers)
                     override val cookies: List<Cookie> = cookies
                     override val rawBody: ByteArray = rawBody
                     override val bodyString: String get() = this.rawBody.decodeToString()
@@ -107,11 +109,18 @@ class NetClient internal constructor(val delegate: HttpClient) {
         crossinline onResponse: suspend (JsonObject) -> Output
     ): Output? = request<JsonObject, Output>(onRequest) { onResponse(body) }
 
+    @PublishedApi
+    internal fun HeadersBuilder.appendDefaultHeaders(): HeadersBuilder {
+        append(HttpHeaders.ContentType, ContentType.Any.toString())
+        append(HttpHeaders.Accept, ContentType.Any.toString())
+        return this
+    }
+
     @IOCoroutine
     suspend inline fun download(
         url: String,
         sink: Sink,
-        crossinline headers: HeadersBuilder.() -> Unit = {},
+        headers: NetHeader = NetHeader.Empty,
         crossinline isCancel: suspend () -> Boolean,
         crossinline onGetSize: suspend (Long) -> Unit,
         crossinline onTick: suspend (Long, Long) -> Unit,
@@ -120,10 +129,7 @@ class NetClient internal constructor(val delegate: HttpClient) {
         var totalBytes = 0L
         Coroutines.io {
             internalPrepareStatement(HttpMethod.Get, url) {
-                this.headers {
-                    append(HttpHeaders.ContentType, ContentType.Any.toString())
-                    headers()
-                }
+                this.headers.appendDefaultHeaders().appendAll(headers)
                 onDownload { current, total ->
                     if (isCancel()) throw CancellationException()
                     if (current - downloadedBytes > 1024 * 64L) {
@@ -145,9 +151,7 @@ class NetClient internal constructor(val delegate: HttpClient) {
     suspend inline fun download(url: String, sink: Sink): Boolean = catchingDefault(false) {
         Coroutines.io {
             internalPrepareStatement(HttpMethod.Get, url) {
-                this.headers {
-                    append(HttpHeaders.ContentType, ContentType.Any.toString())
-                }
+                this.headers.appendDefaultHeaders()
             }.execute { response ->
                 response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
             }
@@ -158,9 +162,7 @@ class NetClient internal constructor(val delegate: HttpClient) {
     suspend inline fun download(url: String): ByteArray? = catchingNull {
         Coroutines.io {
             internalPrepareStatement(HttpMethod.Get, url) {
-                this.headers {
-                    append(HttpHeaders.ContentType, ContentType.Any.toString())
-                }
+                this.headers.appendDefaultHeaders()
             }.execute { response ->
                 response.bodyAsBytes()
             }
@@ -173,6 +175,13 @@ internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useRedirect() {
 
     install(HttpRedirect) {
         allowHttpsDowngrade = true
+    }
+}
+
+internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useEncoding() {
+    install(ContentEncoding) {
+        deflate(1.0F)
+        gzip(0.9F)
     }
 }
 

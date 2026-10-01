@@ -2,13 +2,10 @@ package love.yinlin.foundation
 
 import io.ktor.http.*
 import love.yinlin.extension.then
+import love.yinlin.foundation.http.NetHeader
 
 class RequestScope @PublishedApi internal constructor() {
     var contentType: ContentType = ContentType.Text.Plain
-    private val defaultHeaders: Headers get() = headers {
-        append(HttpHeaders.ContentType, contentType.toString())
-        append(HttpHeaders.Accept, ContentType.Any.toString())
-    }
 
     var method: HttpMethod = HttpMethod.Get
     var url: String = ""
@@ -18,12 +15,14 @@ class RequestScope @PublishedApi internal constructor() {
             field = value
             contentType = if (value == null) ContentType.Text.Plain else ContentType.Application.FormUrlEncoded
         }
-    var headers: Headers? = null
+    var headers: NetHeader? = null
     var cookies: List<Cookie>? = null
 
     @PublishedApi
     internal fun buildHeaders(builder: HeadersBuilder) = builder.apply {
-        appendAll(defaultHeaders)
+        append(HttpHeaders.ContentType, contentType.toString())
+        append(HttpHeaders.Accept, ContentType.Any.toString())
+        append(HttpHeaders.Connection, NetHeader.KeepAlive)
         headers?.then(::appendAll)
         cookies?.then {
             append(HttpHeaders.Cookie, it.joinToString("; ", transform = ::renderCookieHeader))

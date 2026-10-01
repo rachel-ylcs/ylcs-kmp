@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import love.yinlin.common.ChaohuaManager
 import love.yinlin.common.DouyinManager
 import love.yinlin.common.MessageType
+import love.yinlin.common.RedBookManager
 import love.yinlin.common.WeiboManager
 import love.yinlin.compose.ui.floating.DialogChoice
 import love.yinlin.compose.ui.floating.DialogDownload
@@ -16,6 +17,7 @@ object DataSourceInformation {
         MessageType.Weibo to WeiboManager(),
         MessageType.Chaohua to ChaohuaManager(),
         MessageType.Douyin to DouyinManager(),
+        MessageType.RedBook to RedBookManager()
     )
 
     // 公共下载窗口

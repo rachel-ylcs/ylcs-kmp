@@ -9,6 +9,7 @@ import love.yinlin.common.TPProxy
 import love.yinlin.data.weibo.*
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
+import love.yinlin.foundation.http.NetHeader
 import love.yinlin.uri.Uri
 
 @Stable
@@ -144,15 +145,13 @@ object WeiboAPI {
             // 提取内容
             val content = card["text"].String
             // 带图片
-            val medias = if ("pic" in card) {
+            val picture = if ("pic" in card) {
                 val pic = card.obj("pic")
-                [
-                    WeiboMedia.Image(
-                        image = TPProxy.proxyRes(pic["url"].String),
-                        source = TPProxy.proxyRes(pic.obj("large")["url"].String)
-                    )
-                ]
-            } else []
+                WeiboMedia.Image(
+                    image = TPProxy.proxyRes(pic["url"].String),
+                    source = TPProxy.proxyRes(pic.obj("large")["url"].String)
+                )
+            } else null
             // 楼中楼
             val subComments: MutableList<WeiboSubComment> = []
             val comments = card["comments"]
@@ -174,7 +173,7 @@ object WeiboAPI {
                 time = time,
                 location = location,
                 content = content,
-                medias = medias,
+                picture = picture,
                 subComments = subComments
             )
         }
@@ -183,12 +182,12 @@ object WeiboAPI {
     private suspend inline fun <reified R : Any> weiboRequest(
         url: String,
         cookie: WeiboCookie,
-        headers: Array<Pair<String, String>> = [HttpHeaders.Referrer to "https://m.weibo.cn"],
+        header: NetHeader = [HttpHeaders.Referrer to "https://m.weibo.cn"],
         crossinline onRequest: () -> Unit = {},
         crossinline onResponse: suspend (JsonObject) -> R
     ): R? = NetClient.Common.request({
         this.url = url
-        this.headers = TPProxy.proxyHeader(mapOf(*headers))
+        this.headers = header
         this.cookies = cookie.asCookies
         onRequest()
     }, onResponse)
@@ -363,7 +362,7 @@ object WeiboAPI {
     suspend fun requestChaohua(page: Int, cookie: WeiboCookie): List<Weibo>? = weiboRequest(
         url = WeiboUrl.chaohua(page),
         cookie = cookie,
-        headers = [HttpHeaders.Referrer to "https://weibo.com", "X-Requested-With" to "XMLHttpRequest"]
+        header = [HttpHeaders.Referrer to "https://weibo.com", "X-Requested-With" to "XMLHttpRequest"]
     ) { json: JsonObject ->
         val items = json.arr("items")
         val weibos: MutableList<Weibo> = []
