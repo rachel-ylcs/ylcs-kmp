@@ -120,8 +120,8 @@ object Theme {
 
     @Composable
     fun ThemeModeWrapper(isDarkMode: Boolean, content: @Composable () -> Unit) {
-        val colorSystem = LocalColorSystem.current
-        val colorTheme = if (isDarkMode) colorSystem.dark else colorSystem.light
+        (val light, val dark) = LocalColorSystem.current
+        val colorTheme = if (isDarkMode) dark else light
         val primaryColor = colorTheme.primary
         val selectionColors = remember(primaryColor) {
             TextSelectionColors(primaryColor, primaryColor.copy(alpha = 0.4f))

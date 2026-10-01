@@ -110,16 +110,16 @@ internal class DialogModFilter : DialogTemplate<DialogModFilter.ModFilter>() {
             val tmpLyricist = mutableMapOf<String, Int>()
             val tempComposer = mutableMapOf<String, Int>()
 
-            for (info in library) {
+            for ((val singer, val lyricist, val composer, val album) in library) {
                 Coroutines.catching {
                     // 专辑
-                    tmpAlbum[info.album] = (tmpAlbum[info.album] ?: 0) + 1
+                    tmpAlbum[album] = (tmpAlbum[album] ?: 0) + 1
                     // 歌手
-                    for (singer in SplitChain(info.singer)) tmpSinger[singer] = (tmpSinger[singer] ?: 0) + 1
+                    for (singer in SplitChain(singer)) tmpSinger[singer] = (tmpSinger[singer] ?: 0) + 1
                     // 作词
-                    for (lyricist in SplitChain(info.lyricist)) tmpLyricist[lyricist] = (tmpLyricist[lyricist] ?: 0) + 1
+                    for (lyricist in SplitChain(lyricist)) tmpLyricist[lyricist] = (tmpLyricist[lyricist] ?: 0) + 1
                     // 作曲
-                    for (composer in SplitChain(info.composer)) tempComposer[composer] = (tempComposer[composer] ?: 0) + 1
+                    for (composer in SplitChain(composer)) tempComposer[composer] = (tempComposer[composer] ?: 0) + 1
                 }
             }
 
@@ -192,8 +192,8 @@ internal class DialogModFilter : DialogTemplate<DialogModFilter.ModFilter>() {
                     size = items.size,
                     selectedProvider = { items[it].selected },
                     titleProvider = {
-                        val item = items[it]
-                        "${item.name}(${item.num})"
+                        (val name, val num) = items[it]
+                        "$name($num)"
                     },
                     key = { items[it].name },
                     onClick = { index, selected ->

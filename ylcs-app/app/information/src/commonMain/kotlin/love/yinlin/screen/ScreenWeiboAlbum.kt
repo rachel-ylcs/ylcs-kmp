@@ -41,7 +41,7 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
             provider.withLoading {
                 val cookie = DataSourceInformation.fetchWeiboCookie()
                 val [data, count] = WeiboAPI.requestUserAlbumPics(containerId, page, WeiboAlbum.DEFAULT_LIMIT, cookie)!!
-                caches[page] = AlbumCache(count, data.map { UUIDKey(Picture(it.image, it.source)) })
+                caches[page] = AlbumCache(count, data.map { (val image, val source) -> UUIDKey(Picture(image, source)) })
                 true
             }
         }

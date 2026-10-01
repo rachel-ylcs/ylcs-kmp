@@ -457,9 +457,9 @@ class ScreenRhyme(private val path: String?) : Screen() {
 
                 Text(text = "副歌段", style = Theme.typography.v7.bold)
                 Space()
-                config.chorus.fastForEachIndexed { index, chorus ->
+                config.chorus.fastForEachIndexed { index, (val start, val end) ->
                     Text(
-                        text = "[${index + 1}] ${chorus.start} -> ${chorus.end}",
+                        text = "[${index + 1}] $start -> $end",
                         color = Theme.color.primary,
                         modifier = Modifier.clickable {
                             launch {

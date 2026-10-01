@@ -88,8 +88,8 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
                 is LyricsSockets.SM.GamePrepare -> handlePreparing(data.player1, data.player2)
                 is LyricsSockets.SM.GameStart -> {
                     require(data.questions.size == LyricsSockets.QUESTION_COUNT)
-                    currentStatus.cast { status: GLStatus.Preparing ->
-                        handlePlaying(info1 = status.info1, info2 = status.info2, questions = data.questions)
+                    currentStatus.cast { (val info1, val info2): GLStatus.Preparing ->
+                        handlePlaying(info1 = info1, info2 = info2, questions = data.questions)
                     }
                 }
                 is LyricsSockets.SM.AnswerUpdated -> {

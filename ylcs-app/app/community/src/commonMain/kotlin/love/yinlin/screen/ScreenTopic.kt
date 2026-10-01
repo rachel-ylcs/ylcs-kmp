@@ -242,7 +242,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
         override val useAt: Boolean = true
 
         private val userList by derivedStateOf {
-            (pageComments.items.asSequence().map { AtInfo(it.uid, it.name) }
+            (pageComments.items.asSequence().map { (val uid, val name) -> AtInfo(uid, name) }
                     + AtInfo(topic.uid, topic.name) // 添加楼主
                     - AtInfo(app.config.userProfile?.uid ?: 0, "")) // 去除自己
                 .distinct().toList() // 去重回复

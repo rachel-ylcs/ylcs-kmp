@@ -309,13 +309,13 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                     }
                 },
                 onDelete = { index, _ -> price.removeAt(index) }
-            ) { _, item ->
+            ) { _, (val name, val value) ->
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
-                    SimpleEllipsisText(text = item.value.toString(), style = Theme.typography.v5.bold, color = Theme.color.primary)
-                    SimpleEllipsisText(text = item.name)
+                    SimpleEllipsisText(text = value.toString(), style = Theme.typography.v5.bold, color = Theme.color.primary)
+                    SimpleEllipsisText(text = name)
                 }
             }
 

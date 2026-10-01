@@ -101,7 +101,7 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
                     }
                 }
                 Status.Settling -> {
-                    gameResult?.then { result ->
+                    gameResult?.then { (val isCompleted, val reward, val rank) ->
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             shape = Theme.shape.v3,
@@ -118,19 +118,19 @@ class ScreenPlayGame(private val gameDetails: GamePublicDetailsWithName) : Scree
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    ThemeContainer(if (result.isCompleted) Colors.Green5 else Colors.Red5) {
+                                    ThemeContainer(if (isCompleted) Colors.Green5 else Colors.Red5) {
                                         TextIconAdapter { idIcon, idText ->
-                                            Icon(icon = if (result.isCompleted) Icons.Check else Icons.Error, modifier = Modifier.idIcon())
-                                            SimpleEllipsisText(text = if (result.isCompleted) "成功" else "失败", style = Theme.typography.v7.bold, modifier = Modifier.idText())
+                                            Icon(icon = if (isCompleted) Icons.Check else Icons.Error, modifier = Modifier.idIcon())
+                                            SimpleEllipsisText(text = if (isCompleted) "成功" else "失败", style = Theme.typography.v7.bold, modifier = Modifier.idText())
                                         }
                                     }
                                     TextIconAdapter { idIcon, idText ->
                                         Icon(icon = Icons.Diamond, modifier = Modifier.idIcon())
-                                        SimpleEllipsisText(text = "奖励 ${result.reward}", modifier = Modifier.idText())
+                                        SimpleEllipsisText(text = "奖励 $reward", modifier = Modifier.idText())
                                     }
                                     TextIconAdapter { idIcon, idText ->
                                         Icon(icon = Icons.FormatListNumbered, modifier = Modifier.idIcon())
-                                        SimpleEllipsisText(text = "名次 ${result.rank}", modifier = Modifier.idText())
+                                        SimpleEllipsisText(text = "名次 $rank", modifier = Modifier.idText())
                                     }
                                 }
 

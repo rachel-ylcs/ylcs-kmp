@@ -41,7 +41,7 @@ class Authorization(
         return tokenString
     }
 
-    private suspend fun parseToken(tokenString: String): Token {
+    private fun parseToken(tokenString: String): Token {
         val encryptedBytes = Base64.decode(tokenString)
         val bytes = cipher.decode(encryptedBytes)
         return Token.fromBytes(bytes)!!

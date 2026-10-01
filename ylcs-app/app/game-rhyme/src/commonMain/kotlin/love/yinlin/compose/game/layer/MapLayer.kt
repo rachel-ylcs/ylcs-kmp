@@ -87,11 +87,11 @@ class MapLayer(
 
                         // --  边角判定  --
                         if (character !is CharacterLiDiShiGongFenB) {
-                            val currentLine = currentBlock.line
-                            if (currentBlock.rawIndex == currentLine.lastRawIndex) { // 检查是否是末尾
+                            (val lastRawIndex, val startDirection, val endDirection) = currentBlock.line
+                            if (currentBlock.rawIndex == lastRawIndex) { // 检查是否是末尾
                                 // 添加尾角动画
-                                currentLine.endDirection?.then { endDirection ->
-                                    this += CornerTail.build(currentBlock, currentLine.startDirection, endDirection)
+                                endDirection?.then { endDirection ->
+                                    this += CornerTail.build(currentBlock, startDirection, endDirection)
                                 }
                             }
                         }

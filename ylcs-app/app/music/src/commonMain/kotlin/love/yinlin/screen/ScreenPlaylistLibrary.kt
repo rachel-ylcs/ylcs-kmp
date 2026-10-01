@@ -282,7 +282,7 @@ class ScreenPlaylistLibrary : Screen() {
             ) {
                 itemsIndexed(
                     items = library,
-                    key = { _, item -> item.id to item.isDeleted }
+                    key = { _, (val id, val isDeleted) -> id to isDeleted }
                 ) { index, item ->
                     ReorderableItem(state = reorderState, key = item.id to item.isDeleted) {
                         Row(

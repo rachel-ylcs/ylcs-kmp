@@ -14,8 +14,8 @@ class CharacterDuanWei : Character() {
 
     override fun modifyResult(musicInfo: MusicInfo, config: RhymePlayConfig, block: Block<*>, result: BlockResult): RhymeSkillResult {
         // 检查是否达到断尾时刻
-        val line = block.line
-        return if (line.index == line.lineCount - 1) {
+        (val lineCount, val index) = block.line
+        return if (index == lineCount - 1) {
             val active = result != BlockResult.PERFECT
             if (active) showText = "+${++count}"
             RhymeSkillResult(BlockResult.PERFECT, active)

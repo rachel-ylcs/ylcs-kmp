@@ -10,7 +10,6 @@ fun interface QrShapeModifier {
      * Receiver path is empty and reused for optimization.
      * Most benefit this optimization gives when the shape is used for pixels with [QrBrushMode.Separate].
      *
-     * Note: parent path has [EvenOdd] fill type! And this path will inherit it.
      * */
     fun Path.path(size : Float, neighbors: Neighbors) : Path
 }

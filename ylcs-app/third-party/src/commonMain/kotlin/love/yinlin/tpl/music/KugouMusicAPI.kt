@@ -83,7 +83,7 @@ object KugouMusicAPI : PlatformMusicAPI {
      * 公开歌词获取
      */
     suspend fun getLyrics(hash: String): String? {
-        val searchResponse = NetClient.Common.request({
+        val [lyricId, accessKey] = NetClient.Common.request({
             url = "$LYRIC_SEARCH_API?keyword=%20-%20&ver=1&hash=$hash&client=mobi&man=yes"
         }) { json: JsonObject ->
             val candidates = json.arr("candidates")
@@ -95,7 +95,6 @@ object KugouMusicAPI : PlatformMusicAPI {
             }
         } ?: return null
 
-        val [lyricId, accessKey] = searchResponse
         if (lyricId.isNullOrEmpty() || accessKey.isNullOrEmpty()) return null
 
         return NetClient.Common.request({
@@ -117,7 +116,7 @@ object KugouMusicAPI : PlatformMusicAPI {
 
     override suspend fun search(keyword: String): List<PlatformMusicInfo>? {
         val searchResult = searchSongs(keyword) ?: return null
-        return searchResult.mapNotNull { song -> requestMusic(song.hash, song.coverUrl) }.ifEmpty { null }
+        return searchResult.mapNotNull { (val hash, val coverUrl) -> requestMusic(hash, coverUrl) }.ifEmpty { null }
     }
 
     override suspend fun parseLink(link: String): List<PlatformMusicInfo>? = null

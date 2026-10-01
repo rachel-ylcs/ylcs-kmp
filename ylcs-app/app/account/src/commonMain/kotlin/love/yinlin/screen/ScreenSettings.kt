@@ -315,10 +315,10 @@ class ScreenSettings : Screen() {
                 onClick = {
                     when (val result = DataSourceAccount.checkUpdate()) {
                         is Data.Success -> {
-                            val status = result.data
+                            (val targetVersion, val minVersion) = result.data
                             when {
-                                status.targetVersion > Local.info.version -> slot.tip.warning("新版本${status.targetVersion}可用")
-                                status.minVersion > Local.info.version -> slot.tip.error("当前不满足最低兼容版本${status.minVersion}")
+                                targetVersion > Local.info.version -> slot.tip.warning("新版本${targetVersion}可用")
+                                minVersion > Local.info.version -> slot.tip.error("当前不满足最低兼容版本$minVersion")
                                 else -> slot.tip.success("当前已是最新版本")
                             }
                         }

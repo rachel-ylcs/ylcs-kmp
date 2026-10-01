@@ -69,9 +69,9 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
 
     private val items by derivedStateOf {
         when (tab) {
-            FollowTabItem.Follows -> pageFollows.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
-            FollowTabItem.Followers -> pageFollowers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
-            FollowTabItem.BlockUsers -> pageBlockUsers.items.fastMap { FollowItem(it.fid, it.uid, it.name) }
+            FollowTabItem.Follows -> pageFollows.items.fastMap { (val fid, val uid, val name) -> FollowItem(fid, uid, name) }
+            FollowTabItem.Followers -> pageFollowers.items.fastMap { (val fid, val uid, val name) -> FollowItem(fid, uid, name) }
+            FollowTabItem.BlockUsers -> pageBlockUsers.items.fastMap { (val fid, val uid, val name) -> FollowItem(fid, uid, name) }
         }
     }
 

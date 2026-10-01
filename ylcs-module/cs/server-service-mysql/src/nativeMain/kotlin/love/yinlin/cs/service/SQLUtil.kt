@@ -35,9 +35,9 @@ suspend fun QueryExecutor.throwQuerySQL(@Language("SQL") sql: String, vararg arg
     val colTypes: MutableList<String> = []
 
     repeat(colCount) { index ->
-        val column = metadata.getColumn(index)
-        colNames += column.name
-        colTypes += column.type
+        (val name, val type) = metadata.getColumn(index)
+        colNames += name
+        colTypes += type
     }
 
     return makeArray {

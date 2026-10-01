@@ -38,9 +38,8 @@ internal class RhymeLyricsEngine : TextLyricsEngine<DynamicLine>() {
         val config = File(rootPath, type.resType.filename).readText()!!.parseJsonValue<RhymeLyricsConfig>()
         // 偏移校准
         val offset = config.offset
-        lines = config.lyrics.map { rhymeLine ->
-            val lineStart = rhymeLine.start + offset
-            val theme = rhymeLine.theme
+        lines = config.lyrics.map { (val start, val theme) ->
+            val lineStart = start + offset
             DynamicLine(
                 position = lineStart,
                 text = theme.fastJoinToString(separator = "") { it.ch },

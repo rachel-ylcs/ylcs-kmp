@@ -53,12 +53,12 @@ class SearchAllManager(mysql: MysqlService) : SpeedGameManager(mysql) {
     }
 
     override suspend fun generateResult(details: GameDetails, record: GameRecord, userAnswer: JsonElement): GameResult {
-        val info = details.info.to<SAInfo>()
+        (val threshold, val timeLimit) = details.info.to<SAInfo>()
         val startTime = DateEx.Formatter.standardDateTime.parse(record.ts)!!.toInstant(TimeZone.UTC).toEpochMilliseconds()
         val endTime = DateEx.CurrentLong
         val duration = ((endTime - startTime) / 1000).toInt()
         val saResult = verifyAnswer(details.answer, userAnswer, duration)
-        val isCompleted = saResult.correctCount.toFloat() / saResult.totalCount >= info.threshold && duration <= info.timeLimit
+        val isCompleted = saResult.correctCount.toFloat() / saResult.totalCount >= threshold && duration <= timeLimit
         return GameResult(
             isCompleted = isCompleted,
             reward = if (isCompleted) details.reward / details.num else 0,

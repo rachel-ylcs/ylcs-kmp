@@ -90,8 +90,7 @@ private class WebFile private constructor(private val uri: String, private val u
 
     @IOCoroutine
     override suspend fun delete() = Coroutines.io {
-        val resolved = castParent() ?: return@io
-        val [parent, name] = resolved
+        val [parent, name] = castParent() ?: return@io
         require(name.isNotEmpty()) { "Cannot delete root directory" }
         catchingError { parent.removeEntry(name, recursiveOption()).await() }
     }

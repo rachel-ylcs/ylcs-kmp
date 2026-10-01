@@ -25,7 +25,7 @@ import love.yinlin.mod.ModFactory.Preview.PreviewResult
 fun ModPreviewLayout(modifier: Modifier = Modifier, result: PreviewResult) {
     LazyColumn(modifier = modifier) {
         itemKey("Metadata") {
-            val metadata = result.metadata
+            (val version, val mediaNum, val info) = result.metadata
             Surface(
                 modifier = Modifier.padding(vertical = Theme.padding.v9).fillMaxWidth(),
                 contentPadding = Theme.padding.value9,
@@ -36,19 +36,19 @@ fun ModPreviewLayout(modifier: Modifier = Modifier, result: PreviewResult) {
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
                     Text(
-                        text = "MOD v${metadata.version}",
+                        text = "MOD v$version",
                         style = Theme.typography.v6.bold,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
-                    Text(text = "媒体数: ${metadata.mediaNum}")
-                    Text(text = "作者: ${metadata.info.author}")
+                    Text(text = "媒体数: $mediaNum")
+                    Text(text = "作者: ${info.author}")
                 }
             }
         }
         items(
             items = result.medias,
             key = { it.id }
-        ) { mediaItem ->
+        ) { (val config, val resources) ->
             Surface(
                 modifier = Modifier.padding(vertical = Theme.padding.v9).fillMaxWidth(),
                 contentPadding = Theme.padding.value9,
@@ -58,7 +58,6 @@ fun ModPreviewLayout(modifier: Modifier = Modifier, result: PreviewResult) {
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
                 ) {
-                    val config = mediaItem.config
                     if (config != null) {
                         Text(
                             text = config.name,
@@ -80,7 +79,7 @@ fun ModPreviewLayout(modifier: Modifier = Modifier, result: PreviewResult) {
                         style = Theme.typography.v6.bold,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
-                    for ([resource, length] in mediaItem.resources) {
+                    for ([resource, length] in resources) {
                         key(resource) {
                             Row(
                                 modifier = Modifier.fillMaxWidth().border(Theme.border.v7, Theme.color.outline).padding(Theme.padding.value),

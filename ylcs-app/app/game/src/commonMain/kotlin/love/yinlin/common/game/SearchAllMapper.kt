@@ -263,14 +263,14 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
 
         @Composable
         override fun ColumnScope.Settlement() {
-            result?.then {
+            result?.then { (val correctCount, val totalCount, val duration) ->
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Flaky, modifier = Modifier.idIcon())
-                    SimpleEllipsisText(text = "正确率: ${it.correctCount} / ${it.totalCount}", modifier = Modifier.idText())
+                    SimpleEllipsisText(text = "正确率: $correctCount / $totalCount", modifier = Modifier.idText())
                 }
                 TextIconAdapter { idIcon, idText ->
                     Icon(icon = Icons.Timer, modifier = Modifier.idIcon())
-                    SimpleEllipsisText(text = "用时: ${(it.duration.toLong() * 1000).timeString}", modifier = Modifier.idText())
+                    SimpleEllipsisText(text = "用时: ${(duration.toLong() * 1000).timeString}", modifier = Modifier.idText())
                 }
             }
         }

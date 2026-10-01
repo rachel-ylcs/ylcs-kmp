@@ -13,9 +13,9 @@ class Moments(momentBuilder: Scope.() -> Unit) {
 
     inline fun check(tick: Long, crossinline block: (Visible) -> Unit) {
         if (items.isEmpty()) return
-        items.removeAll { moment ->
-            if (tick >= moment.first) {
-                block(moment.second())
+        items.removeAll { [momentTick, visible] ->
+            if (tick >= momentTick) {
+                block(visible())
                 true
             }
             else false
