@@ -39,6 +39,8 @@ import love.yinlin.extension.DateEx
 sealed class MessageManager<T : UnifiedMessage> {
     abstract val name: String // 名称
     abstract val icon: ImageVector // 图标
+    abstract val level: APILevel // API级别
+
     abstract suspend fun onNewData(flushContent: () -> Unit): Boolean // 新数据
     abstract suspend fun onMoreData(): Boolean // 更多数据
 

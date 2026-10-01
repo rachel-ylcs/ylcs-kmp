@@ -33,6 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 class DouyinManager : MessageManager<Douyin>() {
     override val name: String = "抖音"
     override val icon: ImageVector = Icons2.Douyin
+    override val level: APILevel = APILevel.Alpha
 
     override suspend fun onNewData(flushContent: () -> Unit): Boolean {
         val cookie = DouyinAPI.generateCookie()

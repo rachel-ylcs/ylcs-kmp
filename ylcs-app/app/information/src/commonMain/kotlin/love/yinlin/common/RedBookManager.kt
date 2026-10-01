@@ -27,6 +27,7 @@ import love.yinlin.tpl.redbook.RedBookAPI
 class RedBookManager : MessageManager<RedBook>() {
     override val name: String = "小红书"
     override val icon: ImageVector = Icons2.RedBook
+    override val level: APILevel = APILevel.Alpha
 
     override suspend fun onNewData(flushContent: () -> Unit): Boolean {
         val rachel = RedBookUserInfo.Default[0].id

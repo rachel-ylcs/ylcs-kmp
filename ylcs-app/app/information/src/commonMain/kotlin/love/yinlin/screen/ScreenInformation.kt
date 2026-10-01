@@ -93,11 +93,13 @@ class ScreenInformation : BasicScreen() {
                         items(items = MessageType.entries, key = { it }) { type ->
                             val manager = DataSourceInformation.managers[type]!!
                             val isSelected = currentManager == manager
-                            val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent
+                            val alpha = ((manager.level.value + 1) / 2).coerceIn(0f, 1f)
+                            val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = alpha) else Colors.Transparent
 
                             Icon(
                                 icon = manager.icon,
                                 color = Colors.Unspecified,
+                                tip = manager.level.name,
                                 modifier = Modifier.clip(Theme.shape.v7)
                                     .background(background)
                                     .clickable(enabled = !isNavigating) { onNavigate(manager) }.padding(Theme.padding.g2).size(Theme.size.image9)
