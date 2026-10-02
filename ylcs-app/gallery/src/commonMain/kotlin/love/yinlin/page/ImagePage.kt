@@ -21,13 +21,28 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.LoadingIcon
 import love.yinlin.compose.ui.image.NineGrid
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.Picture
 import love.yinlin.gallery.resources.*
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
 object ImagePage : Page() {
+    @Stable
+    abstract class TagPicture(val tag: Int) : Picture {
+        final override val image: String = tag.toString()
+    }
+
+    @Stable
+    class TagImage(tag: Int) : TagPicture(tag) {
+        override val isVideo: Boolean = false
+    }
+
+    @Stable
+    class TagVideo(tag: Int) : TagPicture(tag) {
+        override val isVideo: Boolean = true
+    }
+
     @Composable
     override fun Content() {
         ComponentColumn {
@@ -89,24 +104,24 @@ object ImagePage : Page() {
                     Res.drawable.img3
                 ]
 
-                val imageBlock = @Composable { contentScale: ContentScale, pic: Picture, onClick: () -> Unit ->
+                val imageBlock = @Composable { contentScale: ContentScale, pic: TagPicture, onClick: () -> Unit ->
                     Image(
-                        res = imgRes[pic.image.toInt()],
+                        res = imgRes[pic.tag],
                         modifier = Modifier.fillMaxSize().clickable(onClick = onClick),
                         contentScale = contentScale
                     )
                 }
 
                 val buildPictures = { num: Int ->
-                    List(num) { Picture(Random.nextInt(0, 4).toString()) }
+                    List(num) { TagImage(Random.nextInt(0, 4)) }
                 }
 
                 ExampleRow {
                     Example("p1 Picture", modifier = Modifier.weight(1f)) {
-                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { [Picture("0")] }, content = imageBlock)
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { [TagImage(0)] }, content = imageBlock)
                     }
                     Example("p1 Video", modifier = Modifier.weight(1f)) {
-                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { [Picture("0", video = "0")] }, content = imageBlock)
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { [TagVideo(0)] }, content = imageBlock)
                     }
                 }
 

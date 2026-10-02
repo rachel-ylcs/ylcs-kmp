@@ -6,8 +6,9 @@ import androidx.compose.runtime.Stable
 enum class MessageType {
     Weibo,
     Chaohua,
-    Douyin,
-    RedBook;
+    Bilibili,
+    RedBook,
+    Douyin;
 
     companion object {
         val Default = Weibo

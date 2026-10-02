@@ -82,7 +82,7 @@ object WeiboAPI {
                     val videoUrl = urls["mp4_720p_mp4"].StringNull ?: urls["mp4_hd_mp4"].StringNull ?: urls["mp4_ld_mp4"].String
                     val videoPicUrl = pageInfo.obj("page_pic")["url"].String
                     medias += WeiboMedia.Video(
-                        cover = TPProxy.proxyRes(videoPicUrl),
+                        image = TPProxy.proxyRes(videoPicUrl),
                         video = TPProxy.proxyRes(videoUrl)
                     )
                 }
@@ -122,7 +122,7 @@ object WeiboAPI {
                     val videoUrl = mediaInfo["mp4_720p_mp4"].StringNull ?: mediaInfo["mp4_hd_url"].StringNull ?: mediaInfo["mp4_sd_url"].String
                     val videoPicUrl = pageInfo["url"].String
                     medias += WeiboMedia.Video(
-                        cover = TPProxy.proxyRes(videoPicUrl),
+                        image = TPProxy.proxyRes(videoPicUrl),
                         video = TPProxy.proxyRes(videoUrl)
                     )
                 }
@@ -203,9 +203,7 @@ object WeiboAPI {
         val xsrfToken = NetClient.Common.request<ByteArray, String>({
             url = WeiboUrl.xsrfConfig
         }) {
-            cookies.first { [name, value] ->
-                name.equals("XSRF-TOKEN", ignoreCase = true) && !value.equals("deleted", ignoreCase = true)
-            }.value
+            cookies["XSRF-TOKEN"]!!.value
         } ?: DEFAULT_XSRF_TOKEN
 
         val [sub, subp] = NetClient.Common.request({

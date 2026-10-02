@@ -3,7 +3,6 @@ package love.yinlin.common
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.app
-import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.extension.then
@@ -20,7 +19,7 @@ class WeiboManager : BasicWeiboManager() {
         val users = app.config.weiboUsers.map { it.id }
         if (users.isEmpty()) return false
 
-        val cookie = DataSourceInformation.fetchWeiboCookie()
+        val cookie = fetchWeiboCookie()
 
         // 批量更新
         items = []
@@ -31,7 +30,7 @@ class WeiboManager : BasicWeiboManager() {
             }
             gridState.requestScrollToItem(0)
         }
-        require(items.isNotEmpty()) { DataSourceInformation.resetWeiboCookies() }
+        require(items.isNotEmpty()) { resetWeiboCookies() }
         // 微博只能加载一页，不能Loading
         return false
     }

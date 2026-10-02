@@ -12,12 +12,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
-import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.floating.downloadPhotos
-import love.yinlin.compose.ui.floating.downloadVideo
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
@@ -26,13 +23,11 @@ import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.TextIconAdapter
-import love.yinlin.coroutines.ioContext
 import love.yinlin.data.information.DataValue
 import love.yinlin.data.information.UnifiedData
 import love.yinlin.data.information.UnifiedMedia
 import love.yinlin.data.information.UnifiedMessage
 import love.yinlin.data.information.UnifiedUserInfo
-import love.yinlin.data.weibo.WeiboMedia
 import love.yinlin.extension.DateEx
 
 @Stable
@@ -196,23 +191,12 @@ sealed class MessageManager<T : UnifiedMessage> {
     }
 
     @Composable
-    protected fun BasicScreen.MediaDownloadButton(message: UnifiedMessage) {
+    protected inline fun <reified M : UnifiedMessage> BasicScreen.MediaDownloadButton(message: UnifiedMessage, crossinline onClick: BasicScreen.(M) -> Unit) {
         PrimaryTextButton(
             text = "下载",
             icon = Icons.Download,
             onClick = {
-                val medias = message.medias
-                launch(ioContext) {
-                    val first = medias[0]
-                    if (medias.size == 1 && first is WeiboMedia.Video) DataSourceInformation.CommonDownloadDialog.downloadVideo(first.video)
-                    else DataSourceInformation.CommonDownloadDialog.downloadPhotos(medias.map { media ->
-                        when (media) {
-                            is WeiboMedia.Image -> media.source
-                            is WeiboMedia.Video -> media.cover
-                            else -> ""
-                        }
-                    })
-                }
+                (message as? M)?.let { onClick(it) }
             }
         )
     }

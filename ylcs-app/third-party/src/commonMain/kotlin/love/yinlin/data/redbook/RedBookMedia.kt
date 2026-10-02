@@ -9,9 +9,13 @@ import love.yinlin.data.information.UnifiedMedia
 sealed interface RedBookMedia : UnifiedMedia {
     @Stable
     @Serializable
-    data class Image(val image: String, val source: String) : RedBookMedia
+    data class Image(override val image: String) : RedBookMedia {
+        override val isVideo: Boolean = false
+    }
 
     @Stable
     @Serializable
-    data class Video(val cover: String, val video: String) : RedBookMedia
+    data class Video(override val image: String) : RedBookMedia {
+        override val isVideo: Boolean = true
+    }
 }

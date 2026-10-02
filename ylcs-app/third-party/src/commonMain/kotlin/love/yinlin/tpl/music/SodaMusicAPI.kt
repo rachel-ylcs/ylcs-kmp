@@ -25,7 +25,7 @@ object SodaMusicAPI : PlatformMusicAPI {
     private val defaultHeaders: NetHeader = [
         HttpHeaders.UserAgent to NetHeader.UserAgentDesktop,
         HttpHeaders.Accept to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        HttpHeaders.AcceptLanguage to NetHeader.AcceptLanguage,
+        HttpHeaders.AcceptLanguage to NetHeader.AcceptLanguageDefault,
         HttpHeaders.Origin to "https://music.douyin.com",
         HttpHeaders.Referrer to "https://music.douyin.com/",
     ]

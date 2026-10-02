@@ -4,16 +4,8 @@ import androidx.compose.runtime.Stable
 import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.data.redbook.RedBook
-import love.yinlin.data.redbook.RedBookData
-import love.yinlin.data.redbook.RedBookMedia
-import love.yinlin.data.redbook.RedBookUserInfo
-import love.yinlin.extension.Array
-import love.yinlin.extension.Long
-import love.yinlin.extension.Object
-import love.yinlin.extension.String
-import love.yinlin.extension.parseJson
-import love.yinlin.extension.toLocalDateTime
+import love.yinlin.data.redbook.*
+import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.http.NetHeader
 
@@ -83,10 +75,10 @@ object RedBookAPI {
             val cover = noteCard["cover"].Object
             val defaultUrl = cover["urlDefault"].String
             val picture = if (type == "video") {
-                RedBookMedia.Video(cover = defaultUrl, video = "")
+                RedBookMedia.Video(image = defaultUrl)
             }
             else {
-                RedBookMedia.Image(image = defaultUrl, source = defaultUrl)
+                RedBookMedia.Image(image = defaultUrl)
             }
 
             return RedBook(
@@ -111,7 +103,7 @@ object RedBookAPI {
         url = RedBookUrl.userProfile(id)
         headers = [
             HttpHeaders.UserAgent to NetHeader.UserAgentDesktop,
-            HttpHeaders.AcceptEncoding to NetHeader.AcceptEncoding
+            HttpHeaders.AcceptEncoding to NetHeader.AcceptEncodingDefault
         ]
     }) { html: String ->
         val json = html.substringAfterLast("window.__INITIAL_STATE__=").substringBeforeLast("</script>")

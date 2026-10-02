@@ -34,6 +34,7 @@ import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.then
+import love.yinlin.foundation.http.NetCookie
 import love.yinlin.foundation.http.NetHeader
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
@@ -78,7 +79,7 @@ class NetClient internal constructor(val delegate: HttpClient) {
                     override val status: HttpStatusCode = status
                     override val url: String = url
                     override val headers: NetHeader = NetHeader(headers)
-                    override val cookies: List<Cookie> = cookies
+                    override val cookies: NetCookie = NetCookie(cookies)
                     override val rawBody: ByteArray = rawBody
                     override val bodyString: String get() = this.rawBody.decodeToString()
                     override val body: Body get() = this.bodyString.parseJsonValue()

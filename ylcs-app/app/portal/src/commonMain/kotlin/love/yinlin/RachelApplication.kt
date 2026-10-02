@@ -42,6 +42,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenChaohuaSettings)
             screen(::ScreenDouyinSettings)
             screen(::ScreenRedBookSettings)
+            screen(::ScreenBilibiliSettings)
 
             // music
             screen(::ScreenAccompaniment)

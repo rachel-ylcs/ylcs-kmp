@@ -8,11 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import love.yinlin.common.BasicWeiboManager
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.data.UUIDKey
 import love.yinlin.compose.data.data
-import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
@@ -20,14 +20,14 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.SimpleClipText
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.weibo.WeiboAlbum
 import love.yinlin.tpl.weibo.WeiboAPI
 
 @Stable
 class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: String) : Screen() {
     @Stable
-    private data class AlbumCache(val count: Int, val items: List<UUIDKey<Picture>>)
+    private data class AlbumCache(val count: Int, val items: List<UUIDKey<ThumbImage>>)
 
     private val provider = RachelStatefulProvider()
 
@@ -39,9 +39,9 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
     private suspend fun requestAlbum(page: Int) {
         if (caches[page] == null) { // 无缓存
             provider.withLoading {
-                val cookie = DataSourceInformation.fetchWeiboCookie()
+                val cookie = BasicWeiboManager.fetchWeiboCookie()
                 val [data, count] = WeiboAPI.requestUserAlbumPics(containerId, page, WeiboAlbum.DEFAULT_LIMIT, cookie)!!
-                caches[page] = AlbumCache(count, data.map { (val image, val source) -> UUIDKey(Picture(image, source)) })
+                caches[page] = AlbumCache(count, data.map { (val image, val source) -> UUIDKey(ThumbImage(image, source)) })
                 true
             }
         }

@@ -55,7 +55,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.tool.UnsupportedPlatformComponent
 import love.yinlin.cs.*
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.SubComment
 import love.yinlin.data.rachel.topic.Topic
@@ -104,7 +104,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
         navigate(::ScreenUserCard, uid)
     }
 
-    private fun onImageClick(images: List<Picture>, current: Int) {
+    private fun onImageClick(images: List<ThumbImage>, current: Int) {
         navigate(::ScreenImagePreview, images, current)
     }
 
@@ -303,7 +303,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
             contentAlignment = Alignment.TopCenter,
             shadowElevation = Theme.shadow.v3,
         ) {
-            val pics = remember(details, topic) { details.pics.fastMap { Picture(topic.picPath(it).url) } }
+            val pics = remember(details, topic) { details.pics.fastMap { ThumbImage(topic.picPath(it).url) } }
 
             Column(
                 modifier = Modifier.fillMaxWidth(),

@@ -79,6 +79,7 @@ internal object AppAbout {
             AppContributor("海屿悼词", 9),
             AppContributor("桑檀", 1768),
             AppContributor("黎耘", 1844),
+            AppContributor("熔金", 856)
         ]),
         AppContributorGroup("开发", Icons.Code, Colors.Green4, [
             AppContributor("焦骨", 10),

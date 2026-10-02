@@ -20,7 +20,7 @@ import androidx.compose.ui.util.fastCoerceAtMost
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.icon.Icons
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.Picture
 
 /**
  * column / row:
@@ -158,14 +158,14 @@ private fun buildGridSpec(picSize: Int): GridSpec = when (picSize) {
 }
 
 @Composable
-fun NineGrid(
-    pics: List<Picture>,
+fun <P : Picture> NineGrid(
+    pics: List<P>,
     modifier: Modifier = Modifier,
     unique: Boolean = false,
     space: Dp = Theme.padding.g3,
-    onImageClick: (Int, Picture) -> Unit = { _, _ -> },
-    onVideoClick: (Picture) -> Unit = {},
-    content: @Composable (ContentScale, Picture, () -> Unit) -> Unit
+    onImageClick: (Int, P) -> Unit = { _, _ -> },
+    onVideoClick: (P) -> Unit = {},
+    content: @Composable (ContentScale, P, () -> Unit) -> Unit
 ) {
     // 无图跳过
     val picSize = pics.size.fastCoerceAtMost(9)

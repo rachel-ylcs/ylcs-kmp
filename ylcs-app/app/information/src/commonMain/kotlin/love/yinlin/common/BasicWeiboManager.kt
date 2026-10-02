@@ -9,13 +9,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.ui.floating.downloadPhotos
+import love.yinlin.compose.ui.floating.downloadVideo
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.RachelRichText
 import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.data.compose.Picture
+import love.yinlin.coroutines.ioContext
+import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.information.DataValue
 import love.yinlin.data.information.UnifiedData
 import love.yinlin.data.information.UnifiedMedia
@@ -30,12 +33,29 @@ import love.yinlin.screen.ScreenWeiboDetails
 import love.yinlin.screen.ScreenWeiboUser
 import love.yinlin.screen.navigateScreenWebPage
 import love.yinlin.tpl.weibo.WeiboAPI
+import love.yinlin.tpl.weibo.WeiboCookie
 import love.yinlin.tpl.weibo.weiboHtmlToRichString
 
 @Stable
 abstract class BasicWeiboManager : MessageManager<Weibo>() {
     companion object {
         private val searchUserMutex = Mutex()
+
+        private var weiboCookie: WeiboCookie? = null
+
+        suspend fun fetchWeiboCookie(): WeiboCookie {
+            val oldCookie = weiboCookie
+            if (oldCookie == null) {
+                val cookie = WeiboAPI.generateCookie()
+                weiboCookie = cookie
+                return cookie
+            }
+            return oldCookie
+        }
+
+        internal fun resetWeiboCookies() {
+            weiboCookie = null
+        }
     }
 
     override fun BasicScreen.onMessageClick(message: UnifiedMessage) {
@@ -62,7 +82,7 @@ abstract class BasicWeiboManager : MessageManager<Weibo>() {
                 else if (searchUserMutex.tryLock()) {
                     launch {
                         val user = Coroutines.catchingNull {
-                            val cookie = DataSourceInformation.fetchWeiboCookie()
+                            val cookie = fetchWeiboCookie()
                             WeiboAPI.searchUser(name, cookie)?.find { it.name == name }
                         }
                         searchUserMutex.unlock()
@@ -76,29 +96,23 @@ abstract class BasicWeiboManager : MessageManager<Weibo>() {
 
     @Composable
     override fun BasicScreen.MessageMediaLayout(modifier: Modifier, medias: List<UnifiedMedia>) {
-        val pics = remember(medias) {
-            medias.map { media ->
-                when (media) {
-                    is WeiboMedia.Image -> Picture(media.image, media.source)
-                    is WeiboMedia.Video -> Picture(media.cover, video = media.video)
-                    else -> Picture("")
-                }
-            }
-        }
-
         NineGrid(
-            pics = pics,
+            pics = medias,
             modifier = modifier,
             unique = true,
             onImageClick = { index, _ ->
-                navigate(::ScreenImagePreview, pics, index)
+                navigate(::ScreenImagePreview, medias.map {
+                    (val image, val source) = it as WeiboMedia.Image
+                    ThumbImage(image, source)
+                }, index)
             },
-            onVideoClick = { pic ->
-                navigate(::ScreenVideo, pic.video)
+            onVideoClick = { media ->
+                val video = (media as? WeiboMedia.Video)?.video
+                if (video != null) navigate(::ScreenVideo, video)
             }
-        ) { contentScale, pic, onClick ->
+        ) { contentScale, media, onClick ->
             WebImage(
-                uri = pic.image,
+                uri = media.image,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = contentScale,
                 onClick = onClick
@@ -126,6 +140,21 @@ abstract class BasicWeiboManager : MessageManager<Weibo>() {
 
     @Composable
     override fun BasicScreen.MessageExtraLayout(modifier: Modifier, message: UnifiedMessage) {
-        MediaDownloadButton(message = message)
+        MediaDownloadButton<Weibo>(
+            message = message,
+            onClick = { weibo ->
+                val medias = weibo.medias
+                launch(ioContext) {
+                    val first = medias[0]
+                    if (medias.size == 1 && first is WeiboMedia.Video) DataSourceInformation.CommonDownloadDialog.downloadVideo(first.video)
+                    else DataSourceInformation.CommonDownloadDialog.downloadPhotos(medias.map { media ->
+                        when (media) {
+                            is WeiboMedia.Image -> media.source
+                            is WeiboMedia.Video -> media.image
+                        }
+                    })
+                }
+            }
+        )
     }
 }

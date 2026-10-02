@@ -71,7 +71,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
 
     override suspend fun initialize() {
         supervisorScope {
-            val cookie = DataSourceInformation.fetchWeiboCookie()
+            val cookie = BasicWeiboManager.fetchWeiboCookie()
 
             // 请求微博
             this.launch {
@@ -274,7 +274,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     @Composable
     override fun Content() {
         val weiboUser = currentWeiboUser
-        val manager = DataSourceInformation.managers[MessageType.Weibo] as BasicWeiboManager
+        val manager: BasicWeiboManager = DataSourceInformation.manager(MessageType.Weibo)
         if (weiboUser != null) {
             val deviceType by rememberDeviceType()
             when (deviceType) {

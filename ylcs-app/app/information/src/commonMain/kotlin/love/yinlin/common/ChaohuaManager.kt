@@ -2,7 +2,6 @@ package love.yinlin.common
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
-import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.screen.ScreenChaohuaSettings
@@ -17,10 +16,10 @@ class ChaohuaManager : BasicWeiboManager() {
     private var currentPage: Int = 1
 
     override suspend fun onNewData(flushContent: () -> Unit): Boolean {
-        val cookie = DataSourceInformation.fetchWeiboCookie()
+        val cookie = fetchWeiboCookie()
 
         val result = WeiboAPI.requestChaohua(1, cookie)
-        require(!result.isNullOrEmpty()) { DataSourceInformation.resetWeiboCookies() }
+        require(!result.isNullOrEmpty()) { resetWeiboCookies() }
         currentPage = 1
         items = result
         // 超话始终都能加载新的内容
@@ -28,11 +27,11 @@ class ChaohuaManager : BasicWeiboManager() {
     }
 
     override suspend fun onMoreData(): Boolean {
-        val cookie = DataSourceInformation.fetchWeiboCookie()
+        val cookie = fetchWeiboCookie()
 
         val newPage = currentPage + 1
         val result = WeiboAPI.requestChaohua(newPage, cookie)
-        require(result != null) { DataSourceInformation.resetWeiboCookies() }
+        require(result != null) { resetWeiboCookies() }
         currentPage = newPage
         items = items + result
         return true

@@ -33,7 +33,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.cs.url
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.then
 import love.yinlin.platform.Platform
@@ -280,7 +280,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
 
             // 海报
             val pics = remember(activity) {
-                activity.photo.posters.fastMap { Picture(activity.photo.posterPath(it).url) }
+                activity.photo.posters.fastMap { ThumbImage(activity.photo.posterPath(it).url) }
             }
             if (pics.isNotEmpty()) {
                 Text(

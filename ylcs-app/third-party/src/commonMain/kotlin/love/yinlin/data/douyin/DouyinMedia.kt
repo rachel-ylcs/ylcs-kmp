@@ -9,9 +9,13 @@ import love.yinlin.data.information.UnifiedMedia
 sealed interface DouyinMedia : UnifiedMedia {
     @Stable
     @Serializable
-    data class Image(val image: String) : DouyinMedia
+    data class Image(override val image: String) : DouyinMedia {
+        override val isVideo: Boolean = false
+    }
 
     @Stable
     @Serializable
-    data class Video(val cover: String, val video: List<String>) : DouyinMedia
+    data class Video(override val image: String, val videoList: List<String>) : DouyinMedia {
+        override val isVideo: Boolean = true
+    }
 }

@@ -5,10 +5,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.common.TPProxy
-import love.yinlin.data.douyin.Douyin
-import love.yinlin.data.douyin.DouyinData
-import love.yinlin.data.douyin.DouyinMedia
-import love.yinlin.data.douyin.DouyinUserInfo
+import love.yinlin.data.douyin.*
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.http.NetHeader
@@ -47,8 +44,8 @@ object DouyinAPI {
                 val playAddr = video["play_addr"].ObjectNull ?: video["play_addr_264"].ObjectNull ?: video["play_addr_265"].Object
                 val cover = video["cover"].ObjectNull ?: video["raw_cover"].ObjectNull ?: video["origin_cover"].Object
                 medias += DouyinMedia.Video(
-                    cover = cover.arr("url_list")[0].String,
-                    video = playAddr.arr("url_list").map { it.String }.reversed() // 视频一般底部有效
+                    image = cover.arr("url_list")[0].String,
+                    videoList = playAddr.arr("url_list").map { it.String }.reversed() // 视频一般底部有效
                 )
             }
 
@@ -95,23 +92,18 @@ object DouyinAPI {
     private const val DEFAULT_UIFID = "ca297c42bcefdf0ae322da592c17a6a6fdf368337d4fcdb6ba6eba9bdfe56c67580be2b4c6d26444fafc4eb7c2d1853bd16d73944c0a162531782cb16bcf8b7a0edaa71fa55bbe2e1c396d81744021e4"
 
     suspend fun generateCookie(): DouyinCookie {
-        val result = NetClient.Common.request<ByteArray, Pair<String, String>>({
+        val [ttwid, uifid] = NetClient.Common.request<ByteArray, Pair<String, String>>({
             url = "https://www.douyin.com/"
             method = HttpMethod.Head
         }) {
-            val ttwid = cookies.first { it.name.equals("ttwid", ignoreCase = true) }.value
-            val uifid = cookies.first { it.name.equals("UIFID_TEMP", ignoreCase = true) }.value
-            ttwid to uifid
-        }
-
-        val fp = DouyinEncoder.buildFingerprint()
-        val msToken = DouyinEncoder.buildMsToken()
+            cookies["ttwid"]!!.value to cookies["UIFID_TEMP"]!!.value
+        } ?: (DEFAULT_TTWID to DEFAULT_UIFID)
 
         return DouyinCookie(
-            ttwid = result?.first ?: DEFAULT_TTWID,
-            fp = fp,
-            msToken = msToken,
-            uifid = result?.second ?: DEFAULT_UIFID
+            ttwid = ttwid,
+            fp = DouyinEncoder.buildFingerprint(),
+            msToken = DouyinEncoder.buildMsToken(),
+            uifid = uifid
         )
     }
 

@@ -133,14 +133,14 @@ class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
     override val title: String = "微博详情"
 
     override suspend fun initialize() {
-        val cookie = DataSourceInformation.fetchWeiboCookie()
+        val cookie = BasicWeiboManager.fetchWeiboCookie()
         comments = WeiboAPI.requestWeiboComment(weibo.id, cookie) ?: emptyList()
     }
 
     @Composable
     override fun Content() {
         val deviceType by rememberDeviceType()
-        val manager = DataSourceInformation.managers[MessageType.Weibo] as BasicWeiboManager
+        val manager: BasicWeiboManager = DataSourceInformation.manager(MessageType.Weibo)
         when (deviceType) {
             Device.Type.PORTRAIT -> Portrait(manager = manager)
             Device.Type.LANDSCAPE, Device.Type.SQUARE -> Landscape(manager = manager)

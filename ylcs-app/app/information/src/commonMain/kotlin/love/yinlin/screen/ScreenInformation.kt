@@ -29,7 +29,7 @@ import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 @Stable
 class ScreenInformation : BasicScreen() {
     private val provider = RachelStatefulProvider()
-    private var currentManager: MessageManager<*> by mutableStateOf(DataSourceInformation.managers[MessageType.Default]!!)
+    private var currentManager: MessageManager<*> by mutableStateOf(DataSourceInformation.manager(MessageType.Default))
     private var isNavigating by mutableStateOf(false)
 
     init {
@@ -91,7 +91,7 @@ class ScreenInformation : BasicScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         items(items = MessageType.entries, key = { it }) { type ->
-                            val manager = DataSourceInformation.managers[type]!!
+                            val manager: MessageManager<*> = DataSourceInformation.manager(type)
                             val isSelected = currentManager == manager
                             val alpha = ((manager.level.value + 1) / 2).coerceIn(0f, 1f)
                             val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = alpha) else Colors.Transparent

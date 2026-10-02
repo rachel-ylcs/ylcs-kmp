@@ -33,7 +33,7 @@ import love.yinlin.cs.ApiPhotoSearchPhotoAlbums
 import love.yinlin.cs.request
 import love.yinlin.cs.requestNull
 import love.yinlin.cs.url
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.rachel.photo.PhotoAlbum
 import love.yinlin.extension.then
 
@@ -122,7 +122,7 @@ class ScreenPhotoAlbum : BasicScreen() {
                                     modifier = Modifier.weight(1f).fillMaxHeight(),
                                     onClick = {
                                         val pics = List(album.picNum) {
-                                            Picture(album.thumbPath(it).url, album.picPath(it).url)
+                                            ThumbImage(album.thumbPath(it).url, album.picPath(it).url)
                                         }
                                         navigate(::ScreenImagePreview, pics, index)
                                     }

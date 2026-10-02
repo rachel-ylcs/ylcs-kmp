@@ -11,9 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.util.fastMap
 import love.yinlin.app
+import love.yinlin.common.BasicWeiboManager
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
-import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
@@ -48,7 +48,7 @@ class ScreenWeiboSettings : Screen() {
         val weiboUsers = app.config.weiboUsers
         for ([index, user] in weiboUsers.withIndex()) {
             if (user.avatar.isEmpty()) {
-                val cookie = DataSourceInformation.fetchWeiboCookie()
+                val cookie = BasicWeiboManager.fetchWeiboCookie()
                 val data = WeiboAPI.requestUser(user.id, cookie)
                 if (data != null) weiboUsers[index] = data.user
             }
@@ -59,7 +59,7 @@ class ScreenWeiboSettings : Screen() {
     private suspend fun onSearchWeiboUser() {
         searchDialog.open()?.then { key ->
             provider.withLoading {
-                val cookie = DataSourceInformation.fetchWeiboCookie()
+                val cookie = BasicWeiboManager.fetchWeiboCookie()
                 val result = WeiboAPI.searchUser(key, cookie)!!
                 searchResult = result
                 result.isNotEmpty()

@@ -6,15 +6,17 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.util.fastJoinToString
 import kotlinx.coroutines.delay
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.ui.floating.downloadPhotos
+import love.yinlin.compose.ui.floating.downloadVideo
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.data.compose.Picture
+import love.yinlin.coroutines.ioContext
+import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.douyin.Douyin
 import love.yinlin.data.douyin.DouyinData
 import love.yinlin.data.douyin.DouyinMedia
@@ -55,39 +57,31 @@ class DouyinManager : MessageManager<Douyin>() {
 
     @Composable
     override fun BasicScreen.MessageMediaLayout(modifier: Modifier, medias: List<UnifiedMedia>) {
-        val pics = remember(medias) {
-            medias.map { media ->
-                when (media) {
-                    is DouyinMedia.Image -> Picture(media.image)
-                    is DouyinMedia.Video -> Picture(media.cover, video = media.video.fastJoinToString("||"))
-                    else -> Picture("")
-                }
-            }
-        }
-
         NineGrid(
-            pics = pics,
+            pics = medias,
             modifier = modifier,
             unique = true,
             onImageClick = { index, _ ->
-                navigate(::ScreenImagePreview, pics, index)
+                navigate(::ScreenImagePreview, medias.map {
+                    ThumbImage(image = (it as DouyinMedia).image)
+                }, index)
             },
-            onVideoClick = { pic ->
-                val mediaList = pic.video.split("||")
-                when (mediaList.size) {
-                    0 -> { }
-                    1 -> navigate(::ScreenVideo, mediaList[0])
+            onVideoClick = { media ->
+                val videoList = (media as? DouyinMedia.Video)?.videoList
+                when (val videoSize = videoList?.size) {
+                    null, 0 -> { }
+                    1 -> navigate(::ScreenVideo, videoList[0])
                     else -> {
                         launch {
-                            val index = DataSourceInformation.ChoiceDialog.openSuspend(List(mediaList.size) { index -> "线路${index + 1}" })
-                            if (index != null) navigate(::ScreenVideo, mediaList[index])
+                            val index = DataSourceInformation.ChoiceDialog.openSuspend(List(videoSize) { "线路${it + 1}" })
+                            if (index != null) navigate(::ScreenVideo, videoList[index])
                         }
                     }
                 }
             }
-        ) { contentScale, pic, onClick ->
+        ) { contentScale, media, onClick ->
             WebImage(
-                uri = pic.image,
+                uri = media.image,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = contentScale,
                 onClick = onClick
@@ -118,6 +112,16 @@ class DouyinManager : MessageManager<Douyin>() {
 
     @Composable
     override fun BasicScreen.MessageExtraLayout(modifier: Modifier, message: UnifiedMessage) {
-        MediaDownloadButton(message = message)
+        MediaDownloadButton<Douyin>(
+            message = message,
+            onClick = { douyin ->
+                val medias = douyin.medias
+                launch(ioContext) {
+                    val first = medias[0]
+                    if (medias.size == 1 && first is DouyinMedia.Video) DataSourceInformation.CommonDownloadDialog.downloadVideo(first.videoList[0])
+                    else DataSourceInformation.CommonDownloadDialog.downloadPhotos(medias.map { it.image })
+                }
+            }
+        )
     }
 }

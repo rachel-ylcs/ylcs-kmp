@@ -34,7 +34,7 @@ import love.yinlin.compose.ui.text.Text
 import love.yinlin.cs.ApiTopicSendTopic
 import love.yinlin.cs.apiFile
 import love.yinlin.cs.request
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.rachel.profile.UserProfile
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.EditedTopic
@@ -49,7 +49,7 @@ class ScreenAddTopic : Screen() {
         val title = InputState(maxLength = 48)
         val content = RichEditorState(maxLength = 512)
         var section by mutableIntStateOf(Comment.Section.WATER)
-        val pics = mutableStateListOf<Picture>()
+        val pics = mutableStateListOf<ThumbImage>()
 
         val canSubmit by derivedStateOf { title.isSafe && content.isSafe }
     }
@@ -64,7 +64,7 @@ class ScreenAddTopic : Screen() {
                     image.thumbnail()
                     sink.write(image.encode(quality = ImageQuality.High)!!)
                     true
-                }?.then { input.pics += Picture(it.path) }
+                }?.then { input.pics += ThumbImage(it.path) }
             }
         }
     }
@@ -103,7 +103,7 @@ class ScreenAddTopic : Screen() {
             input.title.text = editedTopic.title
             input.content.text = editedTopic.content
             input.section = editedTopic.section
-            input.pics += editedTopic.pics.map { Picture(it) }
+            input.pics += editedTopic.pics.map { ThumbImage(it) }
         }
     }
 

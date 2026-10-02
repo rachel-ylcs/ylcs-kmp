@@ -29,17 +29,17 @@ import love.yinlin.compose.ui.input.CheckBox
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.coroutines.ioContext
-import love.yinlin.data.compose.Picture
+import love.yinlin.data.common.ThumbImage
 
 @Stable
-class ScreenImagePreview(rawImages: List<Picture>, initIndex: Int) : Screen() {
+class ScreenImagePreview(rawImages: List<ThumbImage>, initIndex: Int) : Screen() {
     private val images = rawImages.keyList
     private var downloadSource: Boolean by mutableStateOf(false)
     private val pagerState = PagerState(initIndex) { images.size }
 
     private fun downloadPicture() {
-        val image = images.getByData(pagerState.settledPage)
-        val url = if (downloadSource) image.source else image.image
+        (val image, val source) = images.getByData(pagerState.settledPage)
+        val url = if (downloadSource) source else image
         launch(ioContext) { downloadDialog.downloadPhoto(url) }
     }
 

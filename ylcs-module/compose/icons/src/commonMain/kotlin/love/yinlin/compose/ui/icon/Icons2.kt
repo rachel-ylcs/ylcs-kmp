@@ -1386,6 +1386,221 @@ object Icons2 {
         }
     }
 
+    val Bilibili by icon(rawSize = 1024f) {
+        path(
+            color = Color(0xFFEC5D85),
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(0f, 0f)
+            moveToRelative(184.3f, 0f)
+            lineToRelative(655.4f, 0f)
+            quadToRelative(184.3f, 0f, 184.3f, 184.3f)
+            lineToRelative(0f, 655.4f)
+            quadToRelative(0f, 184.3f, -184.3f, 184.3f)
+            lineToRelative(-655.4f, 0f)
+            quadToRelative(-184.3f, 0f, -184.3f, -184.3f)
+            lineToRelative(0f, -655.4f)
+            quadToRelative(0f, -184.3f, 184.3f, -184.3f)
+            close()
+        }
+        path(
+            color = Color(0xFFEF85A7),
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(512f, 242f)
+            horizontalLineToRelative(52.2f)
+            lineToRelative(65.1f, -96.3f)
+            curveToRelative(49.6f, -50.3f, 89.6f, 0.4f, 63.9f, 45.7f)
+            lineToRelative(-34.3f, 51.5f)
+            curveToRelative(257.6f, 5f, 257.6f, 43f, 257.6f, 325f)
+            curveToRelative(0f, 325.9f, 0f, 336.5f, -404.5f, 336.5f)
+            reflectiveCurveTo(107.5f, 893.8f, 107.5f, 567.9f)
+            curveToRelative(0f, -277.7f, 0f, -318.8f, 253.1f, -325f)
+            lineToRelative(-39.4f, -58.4f)
+            curveToRelative(-31.3f, -54.9f, 37.3f, -90.4f, 64.7f, -42.4f)
+            lineToRelative(60.4f, 99.8f)
+            curveToRelative(18.2f, -0.1f, 41.2f, -0.1f, 65.7f, -0.1f)
+            close()
+        }
+        path(
+            color = Color(0xFFEC5D85),
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(512f, 338.6f)
+            curveToRelative(332.8f, 0f, 332.8f, 0f, 332.8f, 240.6f)
+            reflectiveCurveToRelative(0f, 248.4f, -332.8f, 248.4f)
+            reflectiveCurveToRelative(-332.8f, -7.8f, -332.8f, -248.4f)
+            reflectiveCurveToRelative(0f, -240.6f, 332.8f, -240.6f)
+            close()
+        }
+        path(
+            color = Color(0xFFEF85A7),
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(281.6f, 558.1f)
+            arcToRelative(30.7f, 30.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, -27.5f, -17f)
+            arcToRelative(30.7f, 30.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, 13.7f, -41.2f)
+            lineToRelative(122.9f, -61.4f)
+            arcToRelative(30.7f, 30.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, 41.2f, 13.7f)
+            arcToRelative(30.7f, 30.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, -13.7f, 41.2f)
+            lineToRelative(-122.9f, 61.4f)
+            arcToRelative(30.6f, 30.6f, 0f, isMoreThanHalf = false, isPositiveArc = true, -13.7f, 3.2f)
+            close()
+            moveTo(752.6f, 558.1f)
+            arcToRelative(30.6f, 30.6f, 0f, isMoreThanHalf = false, isPositiveArc = true, -12.9f, -2.8f)
+            lineToRelative(-133.1f, -61.4f)
+            arcToRelative(30.7f, 30.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, -15f, -40.8f)
+            arcToRelative(30.7f, 30.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, 40.8f, -15f)
+            lineToRelative(133.1f, 61.4f)
+            arcTo(30.7f, 30.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, 752.6f, 558.1f)
+            close()
+            moveTo(454.7f, 666.9f)
+            arcToRelative(15.4f, 15.4f, 0f, isMoreThanHalf = false, isPositiveArc = true, -12.3f, -6.2f)
+            arcToRelative(15.4f, 15.4f, 0f, isMoreThanHalf = false, isPositiveArc = true, 3.1f, -21.5f)
+            lineToRelative(68.5f, -50.9f)
+            lineToRelative(50.4f, 52.6f)
+            arcToRelative(15.4f, 15.4f, 0f, isMoreThanHalf = false, isPositiveArc = true, -22.2f, 21.2f)
+            lineToRelative(-31.6f, -33f)
+            lineToRelative(-46.7f, 34.7f)
+            arcToRelative(15.3f, 15.3f, 0f, isMoreThanHalf = false, isPositiveArc = true, -9.1f, 3f)
+            close()
+        }
+        path(
+            color = Color.White,
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(65.5f, 369.3f)
+            curveToRelative(15f, 101.9f, 32.8f, 147.2f, 44.5f, 355.3f)
+            curveToRelative(14.6f, 2.2f, 177.7f, 10f, 204.1f, -74.6f)
+            arcToRelative(16.1f, 16.1f, 0f, isMoreThanHalf = false, isPositiveArc = false, 1.6f, -10.9f)
+            curveToRelative(-30.6f, -80.3f, -169.2f, -60.4f, -169.2f, -60.4f)
+            reflectiveCurveToRelative(-10.4f, -146.5f, -11.5f, -238.8f)
+            close()
+            moveTo(362.3f, 383f)
+            lineToRelative(34.8f, 303.2f)
+            horizontalLineToRelative(34.6f)
+            lineTo(405.2f, 381.1f)
+            close()
+            moveTo(309.5f, 536.3f)
+            horizontalLineToRelative(45.5f)
+            lineToRelative(16.1f, 158.6f)
+            lineToRelative(-31.8f, 1.9f)
+            close()
+            moveTo(446.9f, 543f)
+            horizontalLineToRelative(45.8f)
+            verticalLineTo(705.3f)
+            horizontalLineToRelative(-33.9f)
+            close()
+            moveTo(296.6f, 458f)
+            horizontalLineToRelative(21.4f)
+            lineToRelative(5.3f, 59f)
+            lineToRelative(-18.9f, 2.3f)
+            close()
+            moveTo(327f, 458f)
+            horizontalLineToRelative(21.4f)
+            lineToRelative(2.5f, 55.8f)
+            lineToRelative(-17.4f, 1.6f)
+            close()
+            moveTo(470.6f, 459.9f)
+            horizontalLineToRelative(19.5f)
+            verticalLineToRelative(62.3f)
+            horizontalLineToRelative(-19.5f)
+            close()
+            moveTo(440.2f, 459.9f)
+            horizontalLineToRelative(22.2f)
+            verticalLineToRelative(62.3f)
+            horizontalLineToRelative(-16.6f)
+            close()
+        }
+        path(
+            color = Color(0xFFEB5480),
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(243.6f, 645.5f)
+            arcToRelative(275.5f, 275.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, -28.5f, 23.7f)
+            arcToRelative(242.7f, 242.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, -29.5f, 17.5f)
+            arcToRelative(2.7f, 2.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, -4.4f, -2f)
+            arcToRelative(258.6f, 258.6f, 0f, isMoreThanHalf = false, isPositiveArc = true, -5.1f, -29.6f)
+            curveToRelative(-1.4f, -12.2f, -2f, -25.7f, -2.2f, -36.4f)
+            curveToRelative(0f, -0.3f, 0f, -2.5f, 3f, -1.9f)
+            arcToRelative(245.9f, 245.9f, 0f, isMoreThanHalf = false, isPositiveArc = true, 34.2f, 9.6f)
+            arcToRelative(257f, 257f, 0f, isMoreThanHalf = false, isPositiveArc = true, 32.4f, 15.2f)
+            curveToRelative(0.5f, 0.3f, 2.5f, 1.5f, 0.1f, 3.8f)
+            close()
+        }
+        path(
+            color = Color.White,
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(513.3f, 369.3f)
+            curveToRelative(15f, 101.9f, 32.8f, 147.2f, 44.5f, 355.3f)
+            curveToRelative(14.6f, 2.2f, 177.7f, 10f, 204.1f, -74.6f)
+            arcToRelative(16.1f, 16.1f, 0f, isMoreThanHalf = false, isPositiveArc = false, 1.6f, -10.9f)
+            curveToRelative(-30.6f, -80.3f, -169.2f, -60.4f, -169.2f, -60.4f)
+            reflectiveCurveToRelative(-10.4f, -146.5f, -11.5f, -238.8f)
+            close()
+            moveTo(810f, 383f)
+            lineToRelative(34.8f, 303.2f)
+            horizontalLineToRelative(34.6f)
+            lineTo(853f, 381.1f)
+            close()
+            moveTo(757.3f, 536.3f)
+            horizontalLineToRelative(45.5f)
+            lineToRelative(16.1f, 158.6f)
+            lineToRelative(-31.8f, 1.9f)
+            close()
+            moveTo(894.6f, 543f)
+            horizontalLineToRelative(45.8f)
+            verticalLineTo(705.3f)
+            horizontalLineTo(906.5f)
+            close()
+            moveTo(744.4f, 458f)
+            horizontalLineToRelative(21.4f)
+            lineToRelative(5.3f, 59f)
+            lineToRelative(-18.9f, 2.3f)
+            close()
+            moveTo(774.7f, 458f)
+            horizontalLineToRelative(21.4f)
+            lineToRelative(2.5f, 55.8f)
+            lineToRelative(-17.4f, 1.6f)
+            close()
+            moveTo(918.4f, 459.9f)
+            horizontalLineToRelative(19.5f)
+            verticalLineToRelative(62.3f)
+            horizontalLineToRelative(-19.5f)
+            close()
+            moveTo(888f, 459.9f)
+            horizontalLineToRelative(22.2f)
+            verticalLineToRelative(62.3f)
+            horizontalLineToRelative(-16.6f)
+            close()
+        }
+        path(
+            color = Color(0xFFEB5480),
+            strokeLineWidth = 0f,
+            strokeLineMiter = 4f
+        ) {
+            moveTo(691.3f, 645.5f)
+            arcToRelative(275.5f, 275.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, -28.5f, 23.7f)
+            arcToRelative(242.7f, 242.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, -29.5f, 17.5f)
+            arcToRelative(2.7f, 2.7f, 0f, isMoreThanHalf = false, isPositiveArc = true, -4.4f, -2f)
+            arcToRelative(258.6f, 258.6f, 0f, isMoreThanHalf = false, isPositiveArc = true, -5.1f, -29.6f)
+            curveToRelative(-1.4f, -12.2f, -2f, -25.7f, -2.2f, -36.4f)
+            curveToRelative(0f, -0.3f, 0f, -2.5f, 3f, -1.9f)
+            arcToRelative(245.9f, 245.9f, 0f, isMoreThanHalf = false, isPositiveArc = true, 34.2f, 9.6f)
+            arcToRelative(257f, 257f, 0f, isMoreThanHalf = false, isPositiveArc = true, 32.4f, 15.2f)
+            curveToRelative(0.5f, 0.3f, 2.5f, 1.5f, 0.1f, 3.8f)
+            close()
+        }
+    }
+
     val QQ by icon(rawSize = 16f) {
         moveTo(6.048f, 3.323f)
         curveToRelative(0.022f, 0.277f, -0.13f, 0.523f, -0.338f, 0.55f)
