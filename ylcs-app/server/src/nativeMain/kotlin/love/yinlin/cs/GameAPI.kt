@@ -38,7 +38,7 @@ fun ServerScope.gameAPI() {
         val uid = AN.throwExpireToken(token)
         VN.throwId(gid)
         mysql.throwTransaction {
-            val result = it.throwQuerySQLSingle("SELECT uid, reward, num, winner FROM game WHERE gid = ?", gid)
+            val result = it.throwQuerySQLSingle("SELECT uid, reward, num, winner FROM game WHERE gid = ? AND isDeleted = 0", gid)
             val userUid = result["uid"].Int
             if (userUid != uid) {
                 if (it.querySQLSingle("""
