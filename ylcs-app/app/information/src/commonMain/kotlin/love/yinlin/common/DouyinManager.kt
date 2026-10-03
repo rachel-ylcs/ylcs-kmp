@@ -6,7 +6,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import kotlinx.coroutines.delay
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.floating.downloadPhotos
@@ -29,24 +28,19 @@ import love.yinlin.screen.ScreenDouyinSettings
 import love.yinlin.screen.ScreenImagePreview
 import love.yinlin.screen.ScreenVideo
 import love.yinlin.tpl.douyin.DouyinAPI
-import kotlin.time.Duration.Companion.seconds
 
 @Stable
 class DouyinManager : MessageManager<Douyin>() {
     override val name: String = "抖音"
     override val icon: ImageVector = Icons2.Douyin
-    override val level: APILevel = APILevel.Alpha
+    override val level: APILevel = APILevel.ALPHA
 
     override suspend fun onNewData(flushContent: () -> Unit): Boolean {
         val cookie = DouyinAPI.generateCookie()
         val rachel = DouyinUserInfo.Default[0].id // 默认先银临
 
-        var result = DouyinAPI.requestUserDouyin(rachel, cookie)
-        while (result.isNullOrEmpty()) { // 抖音会经常被网关拦住
-            delay(1.seconds)
-            result = DouyinAPI.requestUserDouyin(rachel, cookie)
-        }
-        items = result.sortedDescending()
+        val result = DouyinAPI.requestUserDouyin(rachel, cookie)
+        items = result?.sortedDescending() ?: []
 
         return false
     }

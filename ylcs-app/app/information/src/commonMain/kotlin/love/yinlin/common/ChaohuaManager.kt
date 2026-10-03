@@ -11,7 +11,7 @@ import love.yinlin.tpl.weibo.WeiboAPI
 class ChaohuaManager : BasicWeiboManager() {
     override val name: String = "超话"
     override val icon: ImageVector = Icons2.Chaohua
-    override val level: APILevel = APILevel.Stable
+    override val level: APILevel = APILevel.STABLE
 
     private var currentPage: Int = 1
 

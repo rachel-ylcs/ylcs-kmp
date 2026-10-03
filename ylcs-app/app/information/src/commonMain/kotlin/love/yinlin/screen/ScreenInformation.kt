@@ -11,11 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import love.yinlin.common.APILevel
 import love.yinlin.common.MessageManager
 import love.yinlin.common.MessageType
 import love.yinlin.compose.Colors
+import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
@@ -23,6 +26,7 @@ import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.node.squareByContentSize
@@ -44,18 +48,14 @@ class ScreenInformation : BasicScreen() {
     }
 
     private fun onNavigate(manager: MessageManager<*>) {
-        if (currentManager == manager) {
-            with(manager) { openSettings() }
-        }
-        else {
-            // 防止正在切换
-            if (!isNavigating) {
-                currentManager = manager
-                // 检查是否有数据需要更新
-                if (manager.items.isEmpty()) {
-                    launch { requestNewData(manager) }
-                }
+        // 防止正在切换
+        if (currentManager != manager && !isNavigating) {
+            currentManager = manager
+            // 检查是否有数据需要更新
+            if (manager.items.isEmpty()) {
+                launch { requestNewData(manager) }
             }
+            else provider.status = StatefulStatus.Content
         }
     }
 
@@ -84,32 +84,57 @@ class ScreenInformation : BasicScreen() {
                 modifier = Modifier.fillMaxWidth(),
                 shadowElevation = Theme.shadow.v7
             ) {
-                HorizontalScrollContainer(state = state, modifier = Modifier.fillMaxWidth()) {
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth().background(Theme.color.surface),
-                        state = state,
-                        contentPadding = Theme.padding.value,
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        items(items = MessageType.entries, key = { it }) { type ->
-                            val manager: MessageManager<*> = DataSourceInformation.manager(type)
-                            val isSelected = currentManager == manager
-                            val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent
-                            val levelName = manager.level.name
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        icon = Icons.Settings,
+                        onClick = {
+                            with(currentManager) { openSettings() }
+                        }
+                    )
+                    HorizontalScrollContainer(state = state, modifier = Modifier.weight(1f)) {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth().background(Theme.color.surface),
+                            state = state,
+                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            items(items = MessageType.entries, key = { it }) { type ->
+                                val manager: MessageManager<*> = DataSourceInformation.manager(type)
+                                val isSelected = currentManager == manager
+                                val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent
+                                val levelName = manager.level.name
 
-                            Column(
-                                modifier = Modifier
-                                    .clip(Theme.shape.v7)
-                                    .background(background)
-                                    .clickable(enabled = !isNavigating) { onNavigate(manager) }
-                                    .squareByContentSize()
-                                    .padding(Theme.padding.g2),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(Theme.padding.g2, Alignment.CenterVertically)
-                            ) {
-                                Icon(icon = manager.icon, color = Colors.Unspecified, tip = levelName)
-                                SimpleClipText(text = levelName, style = Theme.typography.v8)
+
+                                Column(
+                                    modifier = Modifier
+                                        .clip(Theme.shape.v7)
+                                        .background(background)
+                                        .clickable(enabled = !isNavigating) { onNavigate(manager) }
+                                        .squareByContentSize()
+                                        .padding(Theme.padding.g2),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(Theme.padding.g2, Alignment.CenterVertically)
+                                ) {
+                                    Icon(
+                                        icon = manager.icon,
+                                        color = Colors.Unspecified,
+                                        tip = levelName
+                                    )
+                                    SimpleClipText(
+                                        text = levelName,
+                                        color = when (manager.level) {
+                                            APILevel.UNUSED -> LocalColor.current
+                                            APILevel.ALPHA -> Theme.color.tertiary
+                                            APILevel.BETA -> Theme.color.secondary
+                                            APILevel.RC, APILevel.STABLE -> Theme.color.primary
+                                        },
+                                        style = Theme.typography.v8.bold
+                                    )
+                                }
                             }
                         }
                     }

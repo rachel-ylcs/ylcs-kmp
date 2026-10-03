@@ -51,7 +51,7 @@ class BilibiliManager : MessageManager<Bilibili>() {
 
     override val name: String = "哔哩哔哩"
     override val icon: ImageVector = Icons2.Bilibili
-    override val level: APILevel = APILevel.Beta
+    override val level: APILevel = APILevel.BETA
 
     private var currentOffset: String? = null
 
@@ -66,7 +66,7 @@ class BilibiliManager : MessageManager<Bilibili>() {
         val [newItems, offset] = result
         require(newItems.isNotEmpty()) { resetBilibiliCookies() }
         currentOffset = offset
-        items = newItems
+        items = newItems.sortedDescending()
         return offset != null
     }
 
@@ -81,7 +81,7 @@ class BilibiliManager : MessageManager<Bilibili>() {
         val [newItems, offset] = result
         require(newItems.isNotEmpty()) { resetBilibiliCookies() }
         currentOffset = offset
-        items = items + newItems
+        items = (items + newItems).sortedDescending()
         return offset != null
     }
 

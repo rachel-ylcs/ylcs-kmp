@@ -13,7 +13,7 @@ import love.yinlin.tpl.weibo.WeiboAPI
 class WeiboManager : BasicWeiboManager() {
     override val name: String = "微博"
     override val icon: ImageVector = Icons2.Weibo
-    override val level: APILevel = APILevel.Stable
+    override val level: APILevel = APILevel.STABLE
 
     override suspend fun onNewData(flushContent: () -> Unit): Boolean {
         val users = app.config.weiboUsers.map { it.id }
