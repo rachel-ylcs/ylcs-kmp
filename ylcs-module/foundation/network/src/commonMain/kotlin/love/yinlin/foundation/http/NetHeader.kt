@@ -2,6 +2,7 @@ package love.yinlin.foundation.http
 
 import io.ktor.http.Headers
 import io.ktor.util.CaseInsensitiveMap
+import io.ktor.util.toMap
 
 class NetHeader private constructor(private val raw: RawMap) : Headers {
     private typealias RawMap = CaseInsensitiveMap<List<String>>
@@ -49,4 +50,6 @@ class NetHeader private constructor(private val raw: RawMap) : Headers {
     override fun entries(): Set<Map.Entry<String, List<String>>> = raw.entries
 
     override fun isEmpty(): Boolean = raw.isEmpty()
+
+    override fun toString(): String = raw.toMap().toString()
 }

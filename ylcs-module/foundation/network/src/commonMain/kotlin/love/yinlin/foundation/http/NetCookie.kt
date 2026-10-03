@@ -41,4 +41,6 @@ class NetCookie private constructor(private val raw: RawMap) : Map<String, Cooki
     }
 
     val asPlainText: String get() = raw.values.joinToString("; ", transform = ::renderCookieHeader)
+
+    override fun toString(): String = raw.toMap().toString()
 }
