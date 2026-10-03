@@ -1,6 +1,6 @@
 package love.yinlin.io
 
-import kotlin.enums.enumEntries
+import love.yinlin.extension.enum
 
 class ByteArrayIO(val bytes: ByteArray) {
     constructor(size: Int) : this(ByteArray(size))
@@ -34,7 +34,7 @@ class ByteArrayIO(val bytes: ByteArray) {
 
     fun readUInt(index: Int, endian: Endian = Endian.BIG): UInt = readInt(index, endian).toUInt()
 
-    inline fun <reified E : Enum<E>> readEnum(index: Int, endian: Endian = Endian.BIG): E = enumEntries<E>()[readInt(index, endian)]
+    inline fun <reified E : Enum<E>> readEnum(index: Int, endian: Endian = Endian.BIG): E = enum(readInt(index, endian))
 
     fun readLong(index: Int, endian: Endian = Endian.BIG): Long {
         val b0 = bytes[index].toLong() and 0xFFL

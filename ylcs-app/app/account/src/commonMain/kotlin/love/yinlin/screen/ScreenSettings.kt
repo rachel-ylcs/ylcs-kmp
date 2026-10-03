@@ -52,6 +52,8 @@ import love.yinlin.data.rachel.literal.AppDescription
 import love.yinlin.data.rachel.literal.AppPrivacyPolicy
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumSize
 import love.yinlin.extension.fileSizeString
 import love.yinlin.extension.then
 import love.yinlin.fs.File
@@ -207,10 +209,10 @@ class ScreenSettings : Screen() {
                 val themeText = [Theme.value.systemThemeText, Theme.value.lightThemeText, Theme.value.darkThemeText]
 
                 Filter(
-                    size = ThemeMode.entries.size,
+                    size = enumSize<ThemeMode>(),
                     selectedProvider = { app.config.themeMode.ordinal == it },
                     titleProvider = { themeText[it] },
-                    onClick = { index, selected -> if (selected) app.config.themeMode = ThemeMode.entries[index] },
+                    onClick = { index, selected -> if (selected) app.config.themeMode = enum(index) },
                     style = Theme.typography.v8,
                     activeIcon = null,
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.g9),
@@ -224,10 +226,10 @@ class ScreenSettings : Screen() {
                 onClick = null
             ) {
                 Filter(
-                    size = AnimationSpeedConfig.entries.size,
+                    size = enumSize<AnimationSpeedConfig>(),
                     selectedProvider = { app.config.animationSpeed.ordinal == it },
-                    titleProvider = { AnimationSpeedConfig.entries[it].title },
-                    onClick = { index, selected -> if (selected) app.config.animationSpeed = AnimationSpeedConfig.entries[index] },
+                    titleProvider = { enum<AnimationSpeedConfig>(it).title },
+                    onClick = { index, selected -> if (selected) app.config.animationSpeed = enum(index) },
                     style = Theme.typography.v8,
                     activeIcon = null,
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.g9),
@@ -241,10 +243,10 @@ class ScreenSettings : Screen() {
                 onClick = null
             ) {
                 Filter(
-                    size = FontScaleConfig.entries.size,
+                    size = enumSize<FontScaleConfig>(),
                     selectedProvider = { app.config.fontScale.ordinal == it },
-                    titleProvider = { FontScaleConfig.entries[it].title },
-                    onClick = { index, selected -> if (selected) app.config.fontScale = FontScaleConfig.entries[index] },
+                    titleProvider = { enum<FontScaleConfig>(it).title },
+                    onClick = { index, selected -> if (selected) app.config.fontScale = enum(index) },
                     style = Theme.typography.v8,
                     activeIcon = null,
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.g9),

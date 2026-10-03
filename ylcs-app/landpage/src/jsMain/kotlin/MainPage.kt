@@ -3,6 +3,7 @@ import kotlinx.html.*
 import kotlinx.html.js.onClickFunction
 import love.yinlin.Local
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.enumForEach
 import love.yinlin.extension.getElementById
 import org.w3c.dom.HTMLElement
 
@@ -135,7 +136,7 @@ object MainPage : Page {
                     a(href = GITHUB_URL, target = ATarget.blank, classes = "text-[#16a34a] font-semibold hover:underline hidden sm:block") { +"查看Github开源代码 >>" }
                 }
                 div("grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6") {
-                    AppPlatform.entries.forEach { appPlatform ->
+                    enumForEach { appPlatform: AppPlatform ->
                         val label = appPlatform.label
                         div("relative p-4 lg:p-8 rounded-2xl bg-white/30 dark:bg-white/5 backdrop-blur-2xl border border-gray-200 dark:border-gray-800 hover:border-[#16a34a]/50 active:scale-95 transition-all duration-300 group cursor-pointer") {
                             div("absolute top-4 right-4 px-2.5 py-1 rounded-md text-[10px] font-black tracking-widest uppercase ${label.bgColor} ${label.textColor} border border-white/5") {

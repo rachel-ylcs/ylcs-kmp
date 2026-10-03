@@ -17,6 +17,8 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.data.rachel.game.Game
 import love.yinlin.data.rachel.game.GameType
 import love.yinlin.data.rachel.profile.UserProfile
+import love.yinlin.extension.enumAssociateWith
+import love.yinlin.extension.enumSequence
 import love.yinlin.screen.ScreenGameHall
 
 @Stable
@@ -31,11 +33,11 @@ abstract class GameMapper {
     }
 
     companion object {
-        val Groups = Game.entries.asSequence().sortedBy { it.type.order }.groupBy(Game::type)
+        val Groups = enumSequence<Game>().sortedBy { it.type.order }.groupBy(Game::type)
 
         // 使用when是为了利用enum域穷尽检查，实际查找仍然是基于预先associateWith的Map
-        val TypeIcons = GameType.entries.associateWith {
-            when (it) {
+        val TypeIcons = enumAssociateWith { type: GameType ->
+            when (type) {
                 GameType.RANK -> Icons.Leaderboard
                 GameType.EXPLORATION -> Icons.RocketLaunch
                 GameType.SPEED -> Icons.Timer

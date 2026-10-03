@@ -8,12 +8,6 @@ import kotlinx.serialization.Serializable
 enum class MediaPlayMode {
     Order, Loop, Random;
 
-    val next: MediaPlayMode get() = when (this) {
-        Order -> Loop
-        Loop -> Random
-        Random -> Order
-    }
-
     companion object {
         val Default = Order
     }

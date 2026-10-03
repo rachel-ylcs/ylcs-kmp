@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.util.*
+import love.yinlin.extension.enum
 import kotlin.annotation.AnnotationTarget.CLASS
 import kotlin.annotation.AnnotationTarget.FUNCTION
 
@@ -18,6 +19,25 @@ import kotlin.annotation.AnnotationTarget.FUNCTION
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
 annotation class GoogleCreativeConsistencyAPI
+
+// MutableEnumState
+
+@Stable
+interface MutableEnumState<E : Enum<E>> : MutableState<E>
+
+@Stable
+@StateFactoryMarker
+inline fun <reified E : Enum<E>> mutableEnumStateOf(initValue: E): MutableEnumState<E> = object : MutableEnumState<E> {
+    val delegate = mutableIntStateOf(initValue.ordinal)
+
+    override var value: E
+        get() = enum(delegate.value)
+        set(initValue) { delegate.value = initValue.ordinal }
+
+    override fun component1(): E = value
+
+    override fun component2(): (E) -> Unit = { value = it }
+}
 
 // MutableBiasAlignmentState
 

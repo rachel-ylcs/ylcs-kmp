@@ -1,12 +1,9 @@
 package love.yinlin.uri
 
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.extension.StringSerializer
+import love.yinlin.reflect.metaClassName
 
 @Serializable(Scheme.Serializer::class)
 data class Scheme(val name: String) {
@@ -25,9 +22,9 @@ data class Scheme(val name: String) {
 
     override fun toString(): String = name
 
-    object Serializer : KSerializer<Scheme> {
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.Scheme", PrimitiveKind.STRING)
-        override fun serialize(encoder: Encoder, value: Scheme) = encoder.encodeString(value.name)
-        override fun deserialize(decoder: Decoder): Scheme = Scheme(decoder.decodeString())
+    @OptIn(CompatibleRachelApi::class)
+    object Serializer : StringSerializer<Scheme>(metaClassName<Scheme>()) {
+        override fun encode(value: Scheme): String = value.name
+        override fun decode(value: String): Scheme = Scheme(value)
     }
 }

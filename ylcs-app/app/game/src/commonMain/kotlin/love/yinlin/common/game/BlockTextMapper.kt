@@ -46,6 +46,7 @@ import love.yinlin.data.rachel.game.info.BTConfig
 import love.yinlin.data.rachel.game.info.BTResult
 import love.yinlin.extension.String
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.enumNext
 import love.yinlin.extension.json
 import love.yinlin.extension.then
 import love.yinlin.extension.to
@@ -73,12 +74,6 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
     @Stable
     private enum class CharacterBlockInputMode(val icon: ImageVector) {
         DISABLED(Icons.MobiledataOff), HORIZONTAL(Icons.SwapHoriz), VERTICAL(Icons.SwapVert);
-
-        val next: CharacterBlockInputMode get() = when (this) {
-            DISABLED -> HORIZONTAL
-            HORIZONTAL -> VERTICAL
-            VERTICAL -> DISABLED
-        }
     }
 
     @Composable
@@ -180,7 +175,7 @@ object BlockTextMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
                             openIndex = -1
                         })
                         ThemeContainer(if (inputMode == CharacterBlockInputMode.DISABLED) LocalColor.current else Theme.color.primary) {
-                            Icon(icon = inputMode.icon, onClick = { inputMode = inputMode.next })
+                            Icon(icon = inputMode.icon, onClick = { inputMode = enumNext(inputMode) })
                         }
                     }
                 }

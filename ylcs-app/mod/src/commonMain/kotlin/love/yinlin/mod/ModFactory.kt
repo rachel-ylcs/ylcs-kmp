@@ -73,7 +73,7 @@ object ModFactory {
 
                 val resourcePaths: MutableList<Pair<File, ModResourceType>> = []
                 for (path in mediaPath.list()) {
-                    val type = ModResourceType.fromType(path.nameWithoutExtension)
+                    val type: ModResourceType? = enumNull(path.nameWithoutExtension) { it.type }
                     if (path.extension == ModResourceType.RES_EXT && type != null && type in filters) {
                         resourcePaths += path to type
                     }
@@ -138,7 +138,7 @@ object ModFactory {
 
         private suspend fun Source.readResource(mediaPath: File) = Coroutines.io {
             val resName = readLengthString() // 读资源名称
-            val type = ModResourceType.fromType(resName)
+            val type: ModResourceType? = enumNull(resName) { it.type }
             require(type != null) { "未知资源类型: $resName" }
             val resLength = readInt() // 读资源长度
             require(resLength > 0) { "资源长度非法 Length: $resLength" }
@@ -202,7 +202,7 @@ object ModFactory {
 
         private suspend fun Source.previewResource(): Pair<ResourceItem, MusicInfo?> = Coroutines.io {
             val resName = readLengthString() // 读资源名称
-            val type = ModResourceType.fromType(resName)
+            val type: ModResourceType? = enumNull(resName) { it.type }
             require(type != null) { "未知资源类型: $resName" }
             val resLength = readInt() // 读资源长度
             require(resLength > 0) { "资源长度非法 Length: $resLength" }

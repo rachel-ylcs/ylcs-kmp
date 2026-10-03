@@ -6,6 +6,7 @@ import love.yinlin.cs.url
 import love.yinlin.data.rachel.rhyme.CharacterInfo
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymeRank
+import love.yinlin.extension.enum
 
 @Stable
 data class RhymeRankItem(
@@ -19,7 +20,7 @@ data class RhymeRankItem(
 ) {
     companion object {
         fun parse(rankList: List<RhymeRank>): Map<RhymeDifficulty, List<RhymeRankItem>> {
-            return rankList.groupBy { RhymeDifficulty.fromInt(it.result.difficulty) }.mapValues { [_, items] ->
+            return rankList.groupBy { enum(it.result.difficulty, RhymeDifficulty.Easy) }.mapValues { [_, items] ->
                 items.asSequence().sortedByDescending { it.result.score }.map { (val rid, val uid, val name, val result) ->
                     RhymeRankItem(
                         rid = rid,

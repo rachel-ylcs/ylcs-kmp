@@ -1,5 +1,6 @@
 package love.yinlin.foundation.cryptography
 
+import love.yinlin.extension.enumForEach
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -23,7 +24,7 @@ class TestCipher {
     @Test
     fun testAESGeneratedKeys() {
         val plaintext = ByteArray(20) { (it * 17).toByte() }
-        for (keySize in AES.KeySize.entries) {
+        enumForEach { keySize: AES.KeySize ->
             val key = AES.generateKey(keySize)
             assertEquals(keySize.bytes, key.size)
             val aes = AES(key)

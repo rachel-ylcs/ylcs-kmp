@@ -62,18 +62,5 @@ enum class ModResourceType(
         val BASE = entries.filter { it.base }
         val ALL = entries.toList()
         val DEPLOYMENT = ALL.filter { it != Audio }
-
-        fun fromType(type: String): ModResourceType? = when (type) {
-            Config.type -> Config
-            Audio.type -> Audio
-            Record.type -> Record
-            Background.type -> Background
-            LineLyrics.type -> LineLyrics
-            Animation.type -> Animation
-            Video.type -> Video
-            Rhyme.type -> Rhyme
-            Accompaniment.type -> Accompaniment
-            else -> null
-        }
     }
 }

@@ -2,19 +2,16 @@ package love.yinlin.fs
 
 import kotlinx.io.*
 import kotlinx.io.files.FileMetadata
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.IOCoroutine
+import love.yinlin.extension.StringSerializer
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
 import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
+import love.yinlin.reflect.metaClassName
 
 @Serializable(File.FileSerializer::class)
 abstract class File {
@@ -24,10 +21,10 @@ abstract class File {
         operator fun invoke(parent: File, vararg parts: String): File = buildFile(parent, *parts)
     }
 
-    object FileSerializer : KSerializer<File> {
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.File", PrimitiveKind.STRING)
-        override fun serialize(encoder: Encoder, value: File) = encoder.encodeString(value.path)
-        override fun deserialize(decoder: Decoder): File = File(decoder.decodeString())
+    @OptIn(CompatibleRachelApi::class)
+    object FileSerializer : StringSerializer<File>(metaClassName<File>()) {
+        override fun encode(value: File): String = value.path
+        override fun decode(value: String): File = File(value)
     }
 
     /**

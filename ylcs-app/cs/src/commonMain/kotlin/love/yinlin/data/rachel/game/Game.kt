@@ -1,14 +1,12 @@
 package love.yinlin.data.rachel.game
 
 import androidx.compose.runtime.Stable
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.cs.ServerRes
+import love.yinlin.extension.IntSerializer
+import love.yinlin.extension.enum
+import love.yinlin.reflect.metaClassName
 
 @Stable
 @Serializable(Game.Serializer::class)
@@ -79,20 +77,9 @@ enum class Game(
 
     val logo by lazy { ServerRes.Game.res(this.ordinal) }
 
-    object Serializer : KSerializer<Game> {
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.Game", PrimitiveKind.INT)
-
-        override fun serialize(encoder: Encoder, value: Game) = encoder.encodeInt(value.ordinal)
-
-        override fun deserialize(decoder: Decoder): Game = when (val game = decoder.decodeInt()) {
-            AnswerQuestion.ordinal -> AnswerQuestion
-            BlockText.ordinal -> BlockText
-            FlowersOrder.ordinal -> FlowersOrder
-            SearchAll.ordinal -> SearchAll
-            GuessLyrics.ordinal -> GuessLyrics
-            Pictionary.ordinal -> Pictionary
-            Rhyme.ordinal -> Rhyme
-            else -> error("Unexpected Game: $game")
-        }
+    @OptIn(CompatibleRachelApi::class)
+    object Serializer : IntSerializer<Game>(metaClassName<Game>()) {
+        override fun encode(value: Game): Int = value.ordinal
+        override fun decode(value: Int): Game = enum(value)
     }
 }

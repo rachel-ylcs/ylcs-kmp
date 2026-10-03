@@ -18,6 +18,8 @@ import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import love.yinlin.compose.data.media.MediaPlayMode
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumNext
 import kotlin.reflect.KClass
 
 @OptIn(UnstableApi::class)
@@ -43,8 +45,13 @@ abstract class MusicService : MediaSessionService() {
             val player = exoPlayer ?: return Futures.immediateFuture(SessionResult(SessionError.ERROR_SESSION_DISCONNECTED))
             return when (customCommand) {
                 MediaCommands.SetMode -> {
-                    val playMode = if (args.isEmpty) mergePlayMode(player.repeatMode, player.shuffleModeEnabled).next
-                    else MediaPlayMode.entries.getOrNull(args.getInt(MediaCommands.Args.SET_MODE_ARG_MODE)) ?: MediaPlayMode.Order
+                    val playMode = if (args.isEmpty) {
+                        enumNext(mergePlayMode(player.repeatMode, player.shuffleModeEnabled))
+                    }
+                    else {
+                        enum(args.getInt(MediaCommands.Args.SET_MODE_ARG_MODE), MediaPlayMode.Order)
+                    }
+
                     when (playMode) {
                         MediaPlayMode.Order -> {
                             player.repeatMode = Player.REPEAT_MODE_ALL

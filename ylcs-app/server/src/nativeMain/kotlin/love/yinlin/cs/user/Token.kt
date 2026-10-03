@@ -3,6 +3,7 @@ package love.yinlin.cs.user
 import kotlinx.cinterop.*
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.enumMap
 import love.yinlin.io.ByteArrayIO
 import love.yinlin.io.Endian
 import love.yinlin.platform.Platform
@@ -27,7 +28,7 @@ data class Token(
             return Token(uid = uid, platform = platform, timestamp = timestamp)
         }
 
-        fun keys(uid: Int): List<String> = Platform.entries.map { "token/${it.ordinal}/$uid" }
+        fun keys(uid: Int): List<String> = enumMap { platform: Platform -> "token/${platform.ordinal}/$uid" }
     }
 
     val bytes: ByteArray by lazy {

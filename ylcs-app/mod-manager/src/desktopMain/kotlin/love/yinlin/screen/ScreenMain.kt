@@ -166,7 +166,7 @@ class ScreenMain : BasicScreen() {
                     itemPath.mkdir()
                     // 复制基础资源
                     for (resPath in path.list()) {
-                        val type = ModResourceType.fromType(resPath.nameWithoutExtension)!!
+                        val type: ModResourceType = enum(resPath.nameWithoutExtension) { it.type }
                         if (type in ModResourceType.DEPLOYMENT) resPath.writeTo(File(itemPath, resPath.name))
                     }
                     // 基础资源打包
@@ -639,7 +639,7 @@ class ScreenMain : BasicScreen() {
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                         verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
                     ) {
-                        for (type in ModResourceType.entries) SwitchText(type)
+                        enumForEach { type: ModResourceType -> SwitchText(type) }
                     }
                     SimpleEllipsisText("打包模式", color = Theme.color.onSurface)
                     Row(

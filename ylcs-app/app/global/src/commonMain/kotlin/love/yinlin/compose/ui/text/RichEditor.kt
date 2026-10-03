@@ -17,11 +17,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.movableComposable
+import love.yinlin.compose.extension.mutableEnumStateOf
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.ui.container.ActionScope
@@ -32,6 +32,9 @@ import love.yinlin.data.rachel.emoji.EmojiType
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.navigation.TabBar
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumForEachIndexed
+import love.yinlin.extension.enumSize
 
 @Stable
 private object RichEditorParser {
@@ -118,7 +121,7 @@ open class RichEditorState(maxLength: Int) {
     private val focusRequester = FocusRequester()
 
     private var enablePreview by mutableStateOf(false)
-    private var currentPage by mutableStateOf(RichEditorPage.CONTENT)
+    private var currentPage by mutableEnumStateOf(RichEditorPage.CONTENT)
 
     protected open val useEmoji: Boolean = true
     protected open val useImage: Boolean = false
@@ -126,7 +129,7 @@ open class RichEditorState(maxLength: Int) {
     protected open val useTopic: Boolean = true
     protected open val useAt: Boolean = false
 
-    private var emojiClassify by mutableStateOf(EmojiType.Static)
+    private var emojiClassify by mutableEnumStateOf(EmojiType.Static)
 
     val richString: RichString get() = RichEditorParser.parse(inputState.text)
     var text: String get() = inputState.text
@@ -145,10 +148,10 @@ open class RichEditorState(maxLength: Int) {
     protected open fun EmojiLayout(modifier: Modifier) {
         Column(modifier = modifier) {
             TabBar(
-                size = EmojiType.entries.size,
+                size = enumSize<EmojiType>(),
                 index = emojiClassify.ordinal,
-                onNavigate = { emojiClassify = EmojiType.entries[it] },
-                titleProvider = { EmojiType.entries[it].title },
+                onNavigate = { emojiClassify = enum(it) },
+                titleProvider = { enum<EmojiType>(it).title },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -344,7 +347,8 @@ open class RichEditorState(maxLength: Int) {
                 ) {
                     ActionScope.Right.Container(modifier = Modifier.fillMaxWidth()) {
                         val enableList by rememberDerivedState { [true, useEmoji, useImage, useLink, useTopic, useAt] }
-                        RichEditorPage.entries.fastForEachIndexed { index, editorPage ->
+
+                        enumForEachIndexed { index, editorPage: RichEditorPage ->
                             val isActive = currentPage == editorPage
                             Icon(
                                 icon = editorPage.icon,

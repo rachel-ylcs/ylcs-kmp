@@ -43,7 +43,7 @@ fun ServerScope.rhymeAPI() {
         val sql = RhymeDifficulty.entries.joinToString("\nUNION ALL") {
             "(SELECT rid, uid, result FROM rhyme_record WHERE sid = ? AND difficulty = ${it.ordinal} ORDER BY score DESC, rid ASC LIMIT 10)"
         }
-        val args = Array<Any?>(RhymeDifficulty.entries.size) { sid }
+        val args = Array<Any?>(enumSize<RhymeDifficulty>()) { sid }
         val rankList = mysql.throwQuerySQL("""
             SELECT t.rid, t.uid, t.result, u.name 
             FROM (

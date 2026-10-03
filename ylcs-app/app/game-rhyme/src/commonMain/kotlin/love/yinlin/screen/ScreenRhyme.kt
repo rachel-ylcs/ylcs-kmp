@@ -87,6 +87,8 @@ import love.yinlin.data.rachel.rhyme.RhymeRepository
 import love.yinlin.data.rachel.rhyme.RhymeUploadResult
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumSize
 import love.yinlin.extension.parseJsonValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -465,10 +467,10 @@ class ScreenRhyme : BasicScreen() {
                 SimpleClipText(text = "难度", style = Theme.typography.v6.bold)
 
                 Filter(
-                    size = RhymeDifficulty.entries.size,
-                    selectedProvider = { difficulty == RhymeDifficulty.entries[it] },
-                    titleProvider = { RhymeDifficulty.entries[it].title },
-                    onClick = { index, selected -> if (selected) difficulty = RhymeDifficulty.entries[index] }
+                    size = enumSize<RhymeDifficulty>(),
+                    selectedProvider = { difficulty == enum<RhymeDifficulty>(it) },
+                    titleProvider = { enum<RhymeDifficulty>(it).title },
+                    onClick = { index, selected -> if (selected) difficulty = enum(index) }
                 )
 
                 ArgsSlider(

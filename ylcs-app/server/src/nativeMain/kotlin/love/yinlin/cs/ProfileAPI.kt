@@ -30,7 +30,7 @@ fun ServerScope.profileAPI() {
             WHERE u1.uid = ?
         """, uid, uid)
         // 处理提醒
-        val signin = user["signin"]!!.to(JsonConverter.ByteArray)
+        val signin = user["signin"]!!.to(ByteArraySerializer)
         var profile = user.to<UserProfile>()
         signin.checkSignin { isSignin, _, _, _ ->
             profile = profile.copy(
@@ -104,7 +104,7 @@ fun ServerScope.profileAPI() {
         val uid = AN.throwExpireToken(token)
         val user = VN.throwGetUser(uid, "signin")
         // 查询是否签到 ... 签到记录46字节(368位)
-        val signin = user["signin"]!!.to(JsonConverter.ByteArray)
+        val signin = user["signin"]!!.to(ByteArraySerializer)
         signin.checkSignin { isSignin, byteValue, byteIndex, bitIndex ->
             if (!isSignin) {
                 // 更新签到值，银币增加

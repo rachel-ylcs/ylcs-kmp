@@ -28,6 +28,8 @@ import love.yinlin.data.rachel.follows.FollowInfo
 import love.yinlin.data.rachel.follows.FollowTabItem
 import love.yinlin.data.rachel.follows.FollowerInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumSize
 
 @Stable
 class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
@@ -152,15 +154,15 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
                 shadowElevation = Theme.shadow.v3
             ) {
                 TabBar(
-                    size = FollowTabItem.entries.size,
+                    size = enumSize<FollowTabItem>(),
                     index = tab.ordinal,
                     onNavigate = {
-                        tab = FollowTabItem.entries[it]
+                        tab = enum(it)
                         launch {
                             if (items.isEmpty()) requestNewData()
                         }
                     },
-                    titleProvider = { FollowTabItem.entries[it].title },
+                    titleProvider = { enum<FollowTabItem>(it).title },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

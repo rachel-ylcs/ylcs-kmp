@@ -25,6 +25,8 @@ import love.yinlin.compose.ui.container.StatefulStatus
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
+import love.yinlin.compose.ui.node.squareByContentSize
+import love.yinlin.compose.ui.text.SimpleClipText
 
 @Stable
 class ScreenInformation : BasicScreen() {
@@ -93,17 +95,22 @@ class ScreenInformation : BasicScreen() {
                         items(items = MessageType.entries, key = { it }) { type ->
                             val manager: MessageManager<*> = DataSourceInformation.manager(type)
                             val isSelected = currentManager == manager
-                            val alpha = ((manager.level.value + 1) / 2).coerceIn(0f, 1f)
-                            val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = alpha) else Colors.Transparent
+                            val background = if (isSelected) Theme.color.secondaryContainer.copy(alpha = 0.5f) else Colors.Transparent
+                            val levelName = manager.level.name
 
-                            Icon(
-                                icon = manager.icon,
-                                color = Colors.Unspecified,
-                                tip = manager.level.name,
-                                modifier = Modifier.clip(Theme.shape.v7)
+                            Column(
+                                modifier = Modifier
+                                    .clip(Theme.shape.v7)
                                     .background(background)
-                                    .clickable(enabled = !isNavigating) { onNavigate(manager) }.padding(Theme.padding.g2).size(Theme.size.image9)
-                            )
+                                    .clickable(enabled = !isNavigating) { onNavigate(manager) }
+                                    .squareByContentSize()
+                                    .padding(Theme.padding.g2),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(Theme.padding.g2, Alignment.CenterVertically)
+                            ) {
+                                Icon(icon = manager.icon, color = Colors.Unspecified, tip = levelName)
+                                SimpleClipText(text = levelName, style = Theme.typography.v8)
+                            }
                         }
                     }
                 }

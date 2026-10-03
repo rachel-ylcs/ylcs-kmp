@@ -3,6 +3,7 @@ import kotlinx.browser.window
 import kotlinx.html.*
 import kotlinx.html.dom.append
 import kotlinx.html.js.onClickFunction
+import love.yinlin.extension.enumForEach
 import love.yinlin.extension.then
 import love.yinlin.reflect.metaSimpleClassName
 import love.yinlin.uri.Uri
@@ -122,7 +123,7 @@ fun TagConsumer<HTMLElement>.renderFooter() {
     footer("bg-transparent font-sans text-gray-500 dark:text-gray-400") {
         div("mx-5 md:mx-20 my-6") {
             div("flex items-center text-base space-x-10 mb-8") {
-                ContactInfo.entries.forEach { contact ->
+                enumForEach<ContactInfo> { contact: ContactInfo ->
                     a(href = contact.url, target = ATarget.blank, classes = "flex text-[#999999] hover:text-black dark:hover:text-white transition-colors items-center gap-x-1") {
                         i(contact.icon)
                         span("uppercase tracking-wider") { +contact.title }

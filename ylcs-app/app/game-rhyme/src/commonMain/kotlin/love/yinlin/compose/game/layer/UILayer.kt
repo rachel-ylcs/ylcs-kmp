@@ -32,6 +32,7 @@ import love.yinlin.compose.game.traits.Layer
 import love.yinlin.compose.game.ui.StarPaths
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
+import love.yinlin.extension.enumSize
 import love.yinlin.extension.then
 
 @Stable
@@ -121,7 +122,7 @@ class UILayer(
     private val comboGraphMap = mutableMapOf<Int, StrokeTextGraph>()
 
     // 统计数据收集
-    private val statistics = IntArray(BlockResult.entries.size) // 各评级数量
+    private val statistics = IntArray(enumSize<BlockResult>()) // 各评级数量
     private var maxCombo: Int = 0
 
     fun updateResult(skillResult: RhymeSkillResult) {

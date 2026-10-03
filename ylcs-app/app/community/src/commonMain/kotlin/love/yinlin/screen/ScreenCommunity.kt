@@ -41,6 +41,8 @@ import love.yinlin.data.rachel.discovery.DiscoveryItem
 import love.yinlin.data.rachel.topic.Comment
 import love.yinlin.data.rachel.topic.Topic
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumSize
 import love.yinlin.extension.then
 
 @Stable
@@ -166,14 +168,14 @@ class ScreenCommunity : BasicScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TabBar(
-                        size = DiscoveryItem.entries.size,
+                        size = enumSize<DiscoveryItem>(),
                         index = DataSourceDiscovery.currentPage,
                         onNavigate = {
                             DataSourceDiscovery.currentPage = it
                             launch { requestNewData(true) }
                         },
-                        titleProvider = { Comment.Section.sectionName(DiscoveryItem.entries[it].id) },
-                        iconProvider = { DiscoveryItem.entries[it].icon },
+                        titleProvider = { Comment.Section.sectionName(enum<DiscoveryItem>(it).id) },
+                        iconProvider = { enum<DiscoveryItem>(it).icon },
                         modifier = Modifier.weight(1f)
                     )
                     ActionScope.Right.Container(modifier = Modifier.padding(end = Theme.padding.e)) {

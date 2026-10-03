@@ -4,6 +4,7 @@ package love.yinlin.native.win32
 
 import kotlinx.cinterop.*
 import love.yinlin.extension.Reference
+import love.yinlin.extension.enum
 import love.yinlin.extension.then
 import platform.windows.*
 
@@ -42,23 +43,6 @@ class Reg(
         _FRD(9U),
         _RRL(10U),
         _N64(11U);
-
-        companion object {
-            fun fromUInt(value: UInt): KeyType = when (value) {
-                String.value -> String
-                _ES.value -> _ES
-                Binary.value -> Binary
-                Number.value -> Number
-                _BN.value -> _BN
-                _Link.value -> _Link
-                MultiLineString.value -> MultiLineString
-                _RL.value -> _RL
-                _FRD.value -> _FRD
-                _RRL.value -> _RRL
-                _N64.value -> _N64
-                else -> None
-            }
-        }
     }
 
     constructor(base: KeyBase, route: String, wow64: Boolean = true) : this(null, wow64) {
@@ -143,7 +127,7 @@ class Reg(
     fun keyType(key: String): KeyType = withMemory { hKey ->
         val pType = alloc<UIntVar>()
         val pSize = alloc<UIntVar>()
-        if (RegQueryValueExW(hKey, key, null, pType.ptr, null, pSize.ptr) == ERROR_SUCCESS) KeyType.fromUInt(pType.value)
+        if (RegQueryValueExW(hKey, key, null, pType.ptr, null, pSize.ptr) == ERROR_SUCCESS) enum(pType.value, KeyType.None) { it.value }
         else KeyType.None
     } ?: KeyType.None
 
@@ -261,7 +245,7 @@ class Reg(
             while (true) {
                 val result = RegEnumValueW(hKey, container.size.convert(), buffer, pMaxKeySize.ptr, null, pType.ptr, null, null)
                 if (result != ERROR_SUCCESS) break
-                container += buffer.toKString() to KeyType.fromUInt(pType.value)
+                container += buffer.toKString() to enum(pType.value, KeyType.None) { it.value }
             }
         }
         return@withMemory container

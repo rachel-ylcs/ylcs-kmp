@@ -35,13 +35,13 @@ actual class StartupKV actual constructor(pool: StartupPool, initPath: File): Sy
     actual fun set(key: String, value: Float, expire: Int) = setItem(key, value.toString(), expire)
     actual fun set(key: String, value: Double, expire: Int) = setItem(key, value.toString(), expire)
     actual fun set(key: String, value: String, expire: Int) = setItem(key, value, expire)
-    actual fun set(key: String, value: ByteArray, expire: Int) = setItem(key, value.toJsonString(JsonConverter.ByteArray), expire)
+    actual fun set(key: String, value: ByteArray, expire: Int) = setItem(key, value.toJsonString(ByteArraySerializer), expire)
     actual inline fun <reified T : Any> get(key: String, default: T): T {
         val value = getItem(key)
         return if (value == null) default else when (default) {
             is Boolean, is Int, is Long, is Float, is Double -> value.parseJsonValue<T>()
             is String -> value as T
-            is ByteArray -> value.parseJsonValue(JsonConverter.ByteArray) as? T ?: default
+            is ByteArray -> value.parseJsonValue(ByteArraySerializer) as? T ?: default
             else -> default
         }
     }

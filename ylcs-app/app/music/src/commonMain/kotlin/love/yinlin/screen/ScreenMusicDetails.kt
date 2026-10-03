@@ -106,7 +106,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
     private suspend fun requestClientSong(): Song? {
         val musicInfo = DataSourceMusic.library[sid]
         return if (musicInfo != null) {
-            val items = ModResourceType.entries.associateWith { musicInfo.path(app.modPath, it).fileSize() }
+            val items = enumAssociateWith { type: ModResourceType -> musicInfo.path(app.modPath, type).fileSize() }
             clientResources.replaceAll(items.asSequence().filter { it.value > 0 }.map { ResourceItem(it.key, it.value) }.toList())
             Song(
                 sid = musicInfo.id,
@@ -256,8 +256,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    val resBrush = ModResourceType.entries.associateWith {
-        Brush.linearGradient(colors = when (it) {
+    val resBrush = enumAssociateWith { type: ModResourceType ->
+        Brush.linearGradient(colors = when (type) {
             ModResourceType.Config -> [Colors.Yellow5, Colors.Yellow6]
             ModResourceType.Audio -> [Colors.Pink4, Colors.Pink5]
             ModResourceType.Record -> [Colors.Purple4, Colors.Purple5]
@@ -270,8 +270,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         })
     }
 
-    val resIcon = ModResourceType.entries.associateWith {
-        when (it) {
+    val resIcon = enumAssociateWith { type: ModResourceType ->
+        when (type) {
             ModResourceType.Config -> Icons.Construction
             ModResourceType.Audio -> Icons.AudioFile
             ModResourceType.Record -> Icons.Album
@@ -333,8 +333,8 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
         }
     }
 
-    private val resAction = ModResourceType.entries.associateWith {
-        when (it) {
+    private val resAction = enumAssociateWith { type: ModResourceType ->
+        when (type) {
             ModResourceType.Config -> [resActionConfigEditor]
             ModResourceType.Audio -> []
             ModResourceType.Record -> [resActionReplaceImage(1f)]

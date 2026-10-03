@@ -72,10 +72,10 @@ sealed interface BilibiliRichNode {
                             add(Link(text = item["text"].String, url = item["jump_url"].String, id = null))
                         }
                         "RICH_TEXT_NODE_TYPE_AT" -> { // AT
-                            add(At(text = item["text"].String.removePrefix("@"), id = item["rid"].String))
+                            add(At(text = item["text"].String, id = item["rid"].String))
                         }
                         "RICH_TEXT_NODE_TYPE_TOPIC" -> { // 话题
-                            add(Topic(text = item["text"].String.removePrefix("#").removeSuffix("#"), url = "https://${item["jump_url"].String}"))
+                            add(Topic(text = item["text"].String, url = "https://${item["jump_url"].String}"))
                         }
                         "RICH_TEXT_NODE_TYPE_VIEW_PICTURE" -> { // 图片
                             val pics = item.arr("pics")

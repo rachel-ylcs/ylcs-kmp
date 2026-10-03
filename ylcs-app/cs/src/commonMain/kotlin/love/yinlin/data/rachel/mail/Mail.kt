@@ -32,15 +32,6 @@ data class Mail(
 		CoinReward("user#coinReward");
 
 		override fun toString(): String = value
-
-		companion object {
-			fun fromValue(value: String): Filter? = when (value) {
-				Register.value -> Register
-				ForgotPassword.value -> ForgotPassword
-				CoinReward.value -> CoinReward
-				else -> null
-			}
-		}
 	}
 
 	val typeString: String by lazy {

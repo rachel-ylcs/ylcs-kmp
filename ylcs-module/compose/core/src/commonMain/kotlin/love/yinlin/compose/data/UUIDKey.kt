@@ -22,9 +22,7 @@ import kotlin.uuid.Uuid
 class UUIDKey<T>(val data: T) {
     class Serializer<T>(private val dataSerializer: KSerializer<T>) : KSerializer<UUIDKey<T>> {
         override val descriptor: SerialDescriptor = dataSerializer.descriptor
-        override fun serialize(encoder: Encoder, value: UUIDKey<T>) {
-            encoder.encodeSerializableValue(dataSerializer, value.data)
-        }
+        override fun serialize(encoder: Encoder, value: UUIDKey<T>) = encoder.encodeSerializableValue(dataSerializer, value.data)
         override fun deserialize(decoder: Decoder): UUIDKey<T> = UUIDKey(decoder.decodeSerializableValue(dataSerializer))
     }
 

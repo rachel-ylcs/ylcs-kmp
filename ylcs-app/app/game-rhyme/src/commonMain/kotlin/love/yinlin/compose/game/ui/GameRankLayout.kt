@@ -27,6 +27,8 @@ import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumSize
 
 @Composable
 internal fun GameRankLayout(
@@ -54,10 +56,10 @@ internal fun GameRankLayout(
             }
 
             Filter(
-                size = RhymeDifficulty.entries.size,
-                selectedProvider = { difficulty == RhymeDifficulty.entries[it] },
-                titleProvider = { RhymeDifficulty.entries[it].title },
-                onClick = { index, selected -> if (selected) difficulty = RhymeDifficulty.entries[index] }
+                size = enumSize<RhymeDifficulty>(),
+                selectedProvider = { difficulty == enum<RhymeDifficulty>(it) },
+                titleProvider = { enum<RhymeDifficulty>(it).title },
+                onClick = { index, selected -> if (selected) difficulty = enum(index) }
             )
 
             Surface(

@@ -22,6 +22,7 @@ import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.data.music.PlatformMusicType
+import love.yinlin.extension.enumForEach
 
 class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
     @Stable
@@ -90,7 +91,7 @@ class DialogModFactory : Dialog<DialogModFactory.ModResult>() {
                         icon = Icons.DesignServices,
                         iconColor = Theme.color.tertiary
                     )
-                    PlatformMusicType.entries.fastForEach { type ->
+                    enumForEach<PlatformMusicType> { type ->
                         ModFactoryItem(
                             result = ModResult.FromPlatform(type),
                             text = type.description,

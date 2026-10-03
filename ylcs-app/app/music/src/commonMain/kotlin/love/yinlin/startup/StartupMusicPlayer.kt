@@ -22,6 +22,7 @@ import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.Playlist
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.enumNext
 import love.yinlin.extension.then
 import love.yinlin.foundation.AsyncStartup
 import love.yinlin.foundation.AsyncStartupFactory
@@ -301,7 +302,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
     }
 
     suspend fun switchPlayMode() {
-        if (controller.isInit) controller.updatePlayMode(controller.playMode.next)
+        if (controller.isInit) controller.updatePlayMode(enumNext(controller.playMode))
     }
 
     override suspend fun init() {

@@ -1,13 +1,7 @@
 package love.yinlin.extension
 
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonArrayBuilder
 import kotlinx.serialization.json.JsonElement
@@ -68,7 +62,7 @@ fun <T> T.toJson(serializer: SerializationStrategy<T>): JsonElement = Json.encod
 val Boolean?.json: JsonElement get() = JsonPrimitive(this)
 val Number?.json: JsonElement get() = JsonPrimitive(this)
 val String?.json: JsonElement get() = JsonPrimitive(this)
-val ByteArray?.json: JsonElement get() = this?.toJson(JsonConverter.ByteArray) ?: JsonNull
+val ByteArray?.json: JsonElement get() = this?.toJson(ByteArraySerializer) ?: JsonNull
 
 inline fun <reified T> JsonElement.to(): T = Json.decodeFromJsonElement(this)
 fun <T> JsonElement.to(deserializer: DeserializationStrategy<T>): T = Json.decodeFromJsonElement(deserializer, this)
@@ -84,16 +78,6 @@ fun <T> T.toJsonString(serializer: SerializationStrategy<T>): String = Json.enco
 
 inline fun <reified T> String.parseJsonValue(): T = Json.decodeFromString(this)
 fun <T> String.parseJsonValue(deserializer: DeserializationStrategy<T>): T = Json.decodeFromString(deserializer, this)
-
-// JsonConverter
-
-object JsonConverter {
-    val ByteArray = object : KSerializer<ByteArray> {
-        override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("json.convert.ByteArray", PrimitiveKind.STRING)
-        override fun serialize(encoder: Encoder, value: ByteArray) = encoder.encodeString(value.toHexString(HexFormat.UpperCase))
-        override fun deserialize(decoder: Decoder) = decoder.decodeString().hexToByteArray(HexFormat.UpperCase)
-    }
-}
 
 // Json DSL
 

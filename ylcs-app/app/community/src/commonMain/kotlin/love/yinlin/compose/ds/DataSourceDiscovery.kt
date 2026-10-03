@@ -8,12 +8,13 @@ import love.yinlin.compose.ui.layout.PaginationArgs
 import love.yinlin.cs.APIConfig
 import love.yinlin.data.rachel.discovery.DiscoveryItem
 import love.yinlin.data.rachel.topic.Topic
+import love.yinlin.extension.enum
 
 @Stable
 object DataSourceDiscovery {
     internal var currentPage by mutableIntStateOf(0)
 
-    val currentSection: Int get() = DiscoveryItem.entries[currentPage].id
+    val currentSection: Int get() = enum<DiscoveryItem>(currentPage).id
 
     val page = object : PaginationArgs<Topic, Int, Int, Double>(
         default = Int.MAX_VALUE,

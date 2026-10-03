@@ -55,6 +55,7 @@ import love.yinlin.data.rachel.rhyme.CharacterInfo
 import love.yinlin.data.rachel.rhyme.RhymeDifficulty
 import love.yinlin.data.rachel.rhyme.RhymePlayResult
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.enum
 import love.yinlin.extension.timeString
 import kotlin.math.sqrt
 
@@ -243,7 +244,7 @@ private fun SettlingResult(
 
             val countList = remember {
                 (result.statistics.mapIndexed { index, count ->
-                    val blockResult = BlockResult.entries[index]
+                    val blockResult: BlockResult = enum(index)
                     Triple(blockResult.title, blockResult.color, count)
                 } + Triple("COMBO+", Colors.Yellow4, result.maxCombo)).reversed()
             }

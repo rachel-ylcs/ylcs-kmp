@@ -3,6 +3,7 @@ package love.yinlin.cs
 import love.yinlin.cs.APIConfig.coercePageNum
 import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.data.rachel.mail.MailEntry
+import love.yinlin.extension.enum
 import love.yinlin.extension.to
 
 fun ServerScope.mailAPI() {
@@ -31,7 +32,7 @@ fun ServerScope.mailAPI() {
 		""", mid, uid).to<MailEntry>()
         if (mailEntry.processed) failure("此邮件已被处理")
         val ret = if (confirm) {
-            val filter = Mail.Filter.fromValue(mailEntry.filter)!!
+            val filter: Mail.Filter = enum(mailEntry.filter) { it.toString() }
             val callback = callMap[filter]!!
             callback(mailEntry)
         }

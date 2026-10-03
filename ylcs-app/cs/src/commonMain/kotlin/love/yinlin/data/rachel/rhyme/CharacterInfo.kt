@@ -2,6 +2,7 @@ package love.yinlin.data.rachel.rhyme
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.Serializable
+import love.yinlin.extension.enumSequence
 
 @Stable
 @Serializable
@@ -276,6 +277,6 @@ A. 你的连击奖励要求降低{range}
 
     companion object {
         val Default = ChuXing
-        val Pool = CharacterInfo.entries.asSequence().filter { it.enabled }.sortedBy(CharacterInfo::id).associateBy(CharacterInfo::id)
+        val Pool = enumSequence<CharacterInfo>().filter { it.enabled }.sortedBy(CharacterInfo::id).associateBy(CharacterInfo::id)
     }
 }

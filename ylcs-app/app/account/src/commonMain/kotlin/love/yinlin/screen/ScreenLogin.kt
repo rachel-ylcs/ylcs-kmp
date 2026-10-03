@@ -12,6 +12,8 @@ import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.movableComposable
+import love.yinlin.compose.extension.mutableEnumStateOf
+import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.AnimationContent
@@ -37,9 +39,9 @@ class ScreenLogin : Screen() {
         ForgotPassword("忘记密码");
     }
 
-    private var inviters: List<String> by mutableStateOf([])
+    private var inviters: List<String> by mutableRefStateOf([])
 
-    private var mode: Mode by mutableStateOf(Mode.Login)
+    private var mode: Mode by mutableEnumStateOf(Mode.Login)
     private val loginId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH)
     private val loginPwd = InputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
     private val registerId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH)

@@ -32,6 +32,8 @@ import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.SliderDpConverter
 import love.yinlin.compose.ui.input.SliderIntConverter
 import love.yinlin.compose.ui.text.Text
+import love.yinlin.extension.enum
+import love.yinlin.extension.enumSize
 import love.yinlin.gallery.resources.*
 
 @Stable
@@ -107,10 +109,10 @@ object ContainerPage : Page() {
                 val provider = remember { DefaultStatefulProvider() }
 
                 Filter(
-                    size = StatefulStatus.entries.size,
+                    size = enumSize<StatefulStatus>(),
                     selectedProvider = { provider.status.ordinal == it },
-                    titleProvider = { StatefulStatus.entries[it].name },
-                    onClick = { index, selected -> if (selected) provider.status = StatefulStatus.entries[index] }
+                    titleProvider = { enum<StatefulStatus>(it).name },
+                    onClick = { index, selected -> if (selected) provider.status = enum(index) }
                 )
 
                 ThemeContainer {
