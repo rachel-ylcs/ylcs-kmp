@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.then
 
-class WebSocketClient internal constructor(@PublishedApi internal val delegate: HttpClient) {
+class WebSocketClient internal constructor(@PublishedApi internal val delegate: HttpClient) : AutoCloseable {
     abstract class Connection {
         internal var session: WebSocketSession? = null
 
@@ -25,6 +25,8 @@ class WebSocketClient internal constructor(@PublishedApi internal val delegate: 
         abstract suspend fun onDisconnect()
         abstract suspend fun onMessage(msg: String)
     }
+
+    override fun close() = delegate.close()
 
     suspend fun connect(host: String?, path: String, connection: Connection) {
         catchingError {

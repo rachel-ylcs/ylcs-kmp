@@ -39,11 +39,13 @@ import love.yinlin.foundation.http.NetHeader
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.jvm.JvmName
 
-class NetClient internal constructor(val delegate: HttpClient) {
+class NetClient internal constructor(val delegate: HttpClient) : AutoCloseable {
     companion object {
         val Common by lazy { buildCommonNetClient() }
         val File by lazy { buildFileClient() }
     }
+
+    override fun close() = delegate.close()
 
     suspend fun internalPrepareStatement(method: HttpMethod, url: String, block: HttpRequestBuilder.() -> Unit): HttpStatement = delegate.prepareRequest(urlString = url) {
         this.method = method
