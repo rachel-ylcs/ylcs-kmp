@@ -12,7 +12,9 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
+                libs.compose.resources,
                 projects.ylcsApp.app.global,
+                projects.ylcsApp.app.viewer,
             )
         }
     }

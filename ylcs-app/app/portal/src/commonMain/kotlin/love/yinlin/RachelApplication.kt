@@ -60,6 +60,9 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             // photo
             screen(::ScreenPhotoAlbum)
 
+            // radio
+            screen(::ScreenRadio)
+
             // community
             screen(::ScreenAddTopic)
             screen(::ScreenCommunity)
@@ -71,6 +74,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenWorld)
 
             // game
+            screen(::ScreenGame)
             screen(::ScreenCreateGame)
             screen(::ScreenGameHall)
             screen(::ScreenGameHistory)

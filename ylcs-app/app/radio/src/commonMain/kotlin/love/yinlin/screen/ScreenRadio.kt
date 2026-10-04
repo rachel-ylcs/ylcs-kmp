@@ -5,7 +5,7 @@ import androidx.compose.runtime.Stable
 import love.yinlin.compose.screen.BasicScreen
 
 @Stable
-class ScreenWorld : BasicScreen() {
+class ScreenRadio : BasicScreen() {
     @Composable
     override fun BasicContent() {
 

@@ -104,6 +104,7 @@ include(
     "ylcs-app:app:information",
     "ylcs-app:app:music",
     "ylcs-app:app:photo",
+    "ylcs-app:app:radio",
     "ylcs-app:app:viewer",
     "ylcs-app:app:world",
 

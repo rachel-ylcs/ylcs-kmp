@@ -1,15 +1,10 @@
 package love.yinlin.screen
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,11 +20,7 @@ import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.number
 import love.yinlin.app
 import love.yinlin.app.portal.resources.*
-import love.yinlin.compose.Colors
-import love.yinlin.compose.Device
-import love.yinlin.compose.LocalImmersivePadding
-import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
+import love.yinlin.compose.*
 import love.yinlin.compose.ds.DataSourceAccount
 import love.yinlin.compose.ds.DataSourceActivity
 import love.yinlin.compose.extension.movableComposable
@@ -384,7 +375,29 @@ class ScreenMain : BasicScreen() {
             onClick = {
                 navigate(::ScreenWorld)
             }
-        )
+        ),
+        PortalCardItem(
+            eyebrow = "RADIO",
+            title = "电台",
+            subtitle = "聆听与声浪共鸣",
+            drawable = Res.drawable.card_radio,
+            lightColors = [Color(0xFFFFB84D), Color(0xFFFFCB75), Color(0xFFFFDFA3)],
+            darkColors = [Color(0xFFFFB84D), Color(0xFF3B2C19), Color(0xFF1D1A17)],
+            onClick = {
+                navigate(::ScreenRadio)
+            }
+        ),
+        PortalCardItem(
+            eyebrow = "GAME",
+            title = "娱乐",
+            subtitle = "曲谱与音律狂欢",
+            drawable = Res.drawable.card_game,
+            lightColors = [Color(0xFFFF70C8), Color(0xFFFF96D7), Color(0xFFFFBCE6)],
+            darkColors = [Color(0xFFFF70C8), Color(0xFF3A2032), Color(0xFF1D1820)],
+            onClick = {
+                navigate(::ScreenGame)
+            }
+        ),
     ]
 
     private val cardLayout = movableComposable { modifier: Modifier ->

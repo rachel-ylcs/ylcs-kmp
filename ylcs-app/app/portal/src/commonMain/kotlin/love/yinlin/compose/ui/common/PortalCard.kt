@@ -67,6 +67,7 @@ data class PortalCardItem(
         val shape = Theme.shape.v8
 
         val darkMode = Theme.darkMode
+        val borderWidth = if (darkMode) Theme.border.v7 else Theme.border.v4
         val backgroundBrush = if (darkMode) darkBackgroundBrush else lightBackgroundBrush
         val borderBrush = if (darkMode) darkBorderBrush else lightBorderBrush
 
