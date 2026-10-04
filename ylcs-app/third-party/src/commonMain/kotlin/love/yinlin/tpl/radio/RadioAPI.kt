@@ -28,7 +28,7 @@ object RadioAPI {
                 title = data["rcmdText"].String,
                 description = data["desc"].String,
                 subscriberNum = data["subCount"].Int,
-                shareNum = data["shareCount"].Int,
+                repostNum = data["shareCount"].Int,
                 programNum = data["programCount"].Int,
                 commentNum = data["commentCount"].Int,
                 updateTime = data["lastProgramCreateTime"].Long.toLocalDateTime!!
@@ -42,7 +42,6 @@ object RadioAPI {
                 id = json["id"].String,
                 user = extractUserInfo(json.obj("dj")),
                 time = json["createTime"].Long.toLocalDateTime!!,
-                location = "",
                 title = json["name"].String,
                 content = json["description"].String,
                 data = RadioData(
@@ -51,7 +50,7 @@ object RadioAPI {
                     repostNum = json["shareCount"].Int,
                     playNum = json["listenerCount"].Int,
                 ),
-                medias = [RadioMedia(image = json["coverUrl"].String)],
+                pic = json["coverUrl"].String,
                 duration = json["duration"].Long,
                 audioId = mainSong["id"].String,
             )

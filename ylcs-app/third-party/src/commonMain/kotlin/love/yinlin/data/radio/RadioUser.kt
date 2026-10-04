@@ -14,7 +14,7 @@ data class RadioUser(
     val title: String, // 标题
     val description: String, // 简介
     val subscriberNum: Int, // 订阅数
-    val shareNum: Int, // 分享数
+    val repostNum: Int, // 分享数
     val programNum: Int, // 节目数
     val commentNum: Int, // 评论数
     val updateTime: LocalDateTime, // 更新时间

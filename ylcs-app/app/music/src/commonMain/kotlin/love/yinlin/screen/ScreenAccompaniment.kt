@@ -17,6 +17,7 @@ import love.yinlin.app
 import love.yinlin.app.music.resources.Res
 import love.yinlin.app.music.resources.img_music_record
 import love.yinlin.compose.*
+import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.BasicScreen
@@ -43,7 +44,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngineType) : BasicScreen() {
-    private val player = buildAudioPlayer(app.rawContext) { pop() }
+    private val player = buildAudioPlayer(app.rawContext, ::resetPlayer)
     private val engine = LyricsEngine.clone(engineType)
     private val engineHost = LyricsEngineHost {
         player.seekTo(it)
@@ -77,10 +78,12 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                         while (this@launch.isActive) {
                             val newPosition = player.position
                             position = newPosition
+                            duration = player.duration
                             engine.update(newPosition)
                             delay(engine.interval.milliseconds)
                         }
                     }
+                    else position = player.position
                 }
             }
         }?.then { slot.tip.error("播放器加载失败") }
@@ -88,6 +91,10 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
 
     override fun uninitialize() {
         player.release()
+    }
+
+    private fun resetPlayer() {
+        player.seekTo(0L)
     }
 
     @Composable
@@ -128,6 +135,8 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val hasDuration by rememberDerivedState { duration != 0L }
+
             Icon(
                 icon = if (isPlaying) Icons.Pause else Icons.Play,
                 onClick = {
@@ -145,7 +154,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                         isPlayingFlow.value = true
                     }
                 },
-                enabled = duration != 0L,
+                enabled = hasDuration,
                 trackHeight = Theme.size.box4,
                 trackColor = Colors.Gray3,
                 activeColor = Colors.Green5,

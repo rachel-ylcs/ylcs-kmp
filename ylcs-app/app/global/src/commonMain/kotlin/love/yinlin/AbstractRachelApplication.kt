@@ -29,14 +29,17 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     val cachePath: File = PlatformFileSystem.cachePath(rawContext, Local.info.appName)
     val configPath: File = File(dataPath, "config")
     val modPath: File = File(dataPath, "mod")
+    val radioPath: File = File(dataPath, "radio")
 
     init {
         ClientEngine.init(Local.API_BASE_URL)
 
         async {
-            dataPath.mkdir()
-            cachePath.mkdir()
-            modPath.mkdir()
+            dataPath.mkdirSync()
+            cachePath.mkdirSync()
+            configPath.mkdirSync()
+            modPath.mkdirSync()
+            radioPath.mkdirSync()
         }
     }
 

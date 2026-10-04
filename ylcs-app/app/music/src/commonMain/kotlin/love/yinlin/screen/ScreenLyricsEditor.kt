@@ -20,6 +20,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.*
+import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.OverlayAction
@@ -136,6 +137,8 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            val hasDuration by rememberDerivedState { duration != 0L }
+
             Icon(
                 icon = if (isPlaying) Icons.Pause else Icons.Play,
                 onClick = {
@@ -153,7 +156,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                         isPlayingFlow.value = true
                     }
                 },
-                enabled = duration != 0L,
+                enabled = hasDuration,
                 trackHeight = Theme.size.box4,
                 trackColor = Colors.Gray3,
                 activeColor = Colors.Green5,
