@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.supervisorScope
 import love.yinlin.common.BasicWeiboManager
 import love.yinlin.common.MessageType
 import love.yinlin.compose.Device
@@ -30,6 +31,8 @@ import love.yinlin.tpl.weibo.WeiboAPI
 @Stable
 class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
     private var comments: List<WeiboComment>? by mutableRefStateOf(null)
+
+    private var actualWeibo: Weibo by mutableRefStateOf(weibo)
 
     init {
         land(DataSourceInformation.CommonDownloadDialog)
@@ -80,10 +83,7 @@ class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
                 with(manager) {
-                    MessageLayout(
-                        modifier = Modifier.fillMaxWidth(),
-                        message = weibo
-                    )
+                    MessageLayout(modifier = Modifier.fillMaxWidth(), message = actualWeibo)
                 }
             }
         }
@@ -109,7 +109,7 @@ class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
     @Composable
     private fun Landscape(manager: BasicWeiboManager) {
         Row(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
-            weiboInfoLayout(manager, Modifier.width(Theme.size.cell1).fillMaxHeight(), Modifier.fillMaxSize().verticalScroll(rememberScrollState()))
+            weiboInfoLayout(manager, Modifier.width(Theme.size.cell1 * 1.25f).fillMaxHeight(), Modifier.fillMaxSize().verticalScroll(rememberScrollState()))
             Box(
                 modifier = Modifier.weight(1f).fillMaxHeight().padding(Theme.padding.e),
                 contentAlignment = Alignment.Center
@@ -134,7 +134,18 @@ class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
 
     override suspend fun initialize() {
         val cookie = BasicWeiboManager.fetchWeiboCookie()
-        comments = WeiboAPI.requestWeiboComment(weibo.id, cookie) ?: emptyList()
+
+        supervisorScope {
+            launch {
+                // 获取更多图片
+                val newWeibo = WeiboAPI.requestWeiboDetails(weibo.id, cookie)
+                if (newWeibo != null && newWeibo.medias.size > weibo.medias.size) actualWeibo = newWeibo
+            }
+            launch {
+                // 获取评论
+                comments = WeiboAPI.requestWeiboComment(weibo.id, cookie) ?: emptyList()
+            }
+        }
     }
 
     @Composable

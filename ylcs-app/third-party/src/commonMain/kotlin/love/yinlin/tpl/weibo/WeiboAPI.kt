@@ -314,11 +314,21 @@ object WeiboAPI {
     }
 
     /**
+     * 获取微博详情
+     *
+     * 比信息流的图片更完整
+     */
+    suspend fun requestWeiboDetails(id: String, cookie: WeiboCookie): Weibo? = weiboRequest(WeiboUrl.weiboDetails(id), cookie) { json: JsonObject ->
+        val data = json.obj("data")
+        Fetcher.extractWeibo(data)
+    }
+
+    /**
      * 获取微博评论
      *
      * @param id 微博ID
      */
-    suspend fun requestWeiboComment(id: String, cookie: WeiboCookie): List<WeiboComment>? = weiboRequest(WeiboUrl.weiboDetails(id), cookie) { json: JsonObject ->
+    suspend fun requestWeiboComment(id: String, cookie: WeiboCookie): List<WeiboComment>? = weiboRequest(WeiboUrl.weiboComments(id), cookie) { json: JsonObject ->
         val cards = json.obj("data").arr("data")
         val items: MutableList<WeiboComment> = []
         for (item in cards) items += Fetcher.extractComment(item.Object)

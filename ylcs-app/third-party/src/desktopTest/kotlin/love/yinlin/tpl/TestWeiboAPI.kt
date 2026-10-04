@@ -63,4 +63,18 @@ class TestWeiboAPI {
         assertNotNull(chaohua2)
         assertTrue { chaohua2.isNotEmpty() }
     }
+
+    @Test
+    fun testNewPictureAPI() = runTest {
+        // 获取 cookie
+        val cookie = WeiboAPI.generateCookie()
+        println(cookie)
+        assertTrue { cookie.sub.isNotEmpty() }
+        assertTrue { cookie.subp.isNotEmpty() }
+        assertEquals(6, cookie.xsrfToken.length)
+
+        val weibo = WeiboAPI.requestWeiboDetails("5350312425555052", cookie)
+        assertTrue { weibo != null && weibo.medias.size > 9 }
+        println(weibo)
+    }
 }

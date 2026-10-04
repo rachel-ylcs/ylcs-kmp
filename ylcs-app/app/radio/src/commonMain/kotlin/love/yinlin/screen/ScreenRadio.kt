@@ -2,7 +2,6 @@ package love.yinlin.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -49,7 +49,6 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.coroutines.Coroutines
-import love.yinlin.coroutines.ioContext
 import love.yinlin.data.radio.Radio
 import love.yinlin.data.radio.RadioUser
 import love.yinlin.data.radio.RadioUserInfo
@@ -81,38 +80,33 @@ class ScreenRadio : BasicScreen() {
     private val Radio.audioPath: File get() = File(app.radioPath, id)
 
     override suspend fun initialize() {
-        @Suppress("UNCHECKED_CAST")
         val result = supervisorScope {
-            val [isInit, local, user, items] = [
+            [
                 async { // 初始化播放器
                     player.init()
                     player.isInit
                 },
-                async(ioContext) { // 加载本地缓存
-                    app.radioPath.list().filter {
-                        it.fileSize() > 1024 * 100 // 至少100KB的文件
-                    }.map { it.nameWithoutExtension }
+                async { // 加载本地缓存
+                    val radioData = Coroutines.io {
+                        app.radioPath.list().filter {
+                            it.fileSize() > 1024 * 100 // 至少100KB的文件
+                        }.map { it.nameWithoutExtension }
+                    }
+                    localMap.replaceAll(radioData)
+                    true
                 },
                 async { // 加载电台用户
-                    RadioAPI.requestUser(rachel.id)
+                    val user = RadioAPI.requestUser(rachel.id) ?: return@async false
+                    radioUser = user
+                    true
                 },
                 async { // 加载电台节目
-                    val cookie = RadioAPI.generateCookie() ?: return@async null
-                    RadioAPI.requestPrograms(rachel.id, cookie)
+                    val cookie = RadioAPI.generateCookie() ?: return@async false
+                    val programs = RadioAPI.requestPrograms(rachel.id, cookie) ?: return@async false
+                    radioPrograms = programs
+                    programs.isNotEmpty()
                 }
-            ].awaitAll()
-
-            var result = isInit as? Boolean ?: false
-
-            localMap.replaceAll(local as List<String>)
-
-            if (user is RadioUser) radioUser = user
-            else result = false
-
-            if (items is List<*>) radioPrograms = items as List<Radio>
-            else result = false
-
-            result
+            ].awaitAll().fastAll { it }
         }
 
         if (result) {
@@ -471,7 +465,7 @@ class ScreenRadio : BasicScreen() {
                         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
                     ) {
                         Column(
-                            modifier = Modifier.width(Theme.size.cell1 * 1.5f).fillMaxHeight(),
+                            modifier = Modifier.width(Theme.size.cell1 * 1.25f).fillMaxHeight(),
                             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
                         ) {
                             radioInfoLayout(this)
