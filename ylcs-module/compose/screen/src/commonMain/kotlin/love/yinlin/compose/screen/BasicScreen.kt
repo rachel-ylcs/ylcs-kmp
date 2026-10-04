@@ -16,6 +16,9 @@ import love.yinlin.compose.ui.floating.Dialog
 import love.yinlin.compose.ui.floating.FAB
 import love.yinlin.compose.ui.tool.NavigationBack
 import love.yinlin.extension.Array
+import love.yinlin.extension.catching
+import love.yinlin.extension.catchingError
+import love.yinlin.extension.cleaning
 import love.yinlin.extension.parseJson
 import love.yinlin.extension.then
 import kotlin.coroutines.CoroutineContext
@@ -36,12 +39,15 @@ abstract class BasicScreen : ViewModel() {
     final override fun addCloseable(closeable: AutoCloseable) = super.addCloseable(closeable)
 
     final override fun onCleared() {
-        // 1. 清理回调
-        uninitialize()
-        // 3. 注销屏幕
-        uniqueId.then { manager.unregisterScreen(it) }
-        // 4. ViewModel 回收
-        super.onCleared()
+        cleaning({
+            // 3. ViewModel 回收
+            super.onCleared()
+        }) {
+            // 1. 清理回调
+            uninitialize()
+            // 2. 注销屏幕
+            uniqueId.then { manager.unregisterScreen(it) }
+        }
     }
 
     /**
