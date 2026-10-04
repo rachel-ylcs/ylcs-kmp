@@ -6,4 +6,8 @@ import org.khronos.webgl.toByteArray
 @OptIn(ExperimentalWasmJsInterop::class)
 private fun webCryptoRandomValues(size: Int): Int8Array = js("globalThis.crypto.getRandomValues(new Int8Array(size))")
 
-internal actual fun secureRandomBytes(size: Int): ByteArray = webCryptoRandomValues(size).toByteArray()
+actual object SecureEntropy {
+    actual fun bytes(size: Int): ByteArray {
+        return webCryptoRandomValues(size).toByteArray()
+    }
+}

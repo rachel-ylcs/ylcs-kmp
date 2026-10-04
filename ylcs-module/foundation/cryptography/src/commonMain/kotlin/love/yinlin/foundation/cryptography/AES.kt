@@ -24,7 +24,7 @@ class AES(
     }
 
     companion object {
-        fun generateKey(keySize: KeySize = KeySize.B256): ByteArray = secureRandomBytes(keySize.bytes)
+        fun generateKey(keySize: KeySize = KeySize.B256): ByteArray = SecureEntropy.bytes(keySize.bytes)
 
         private const val BLOCK_SIZE = 16
 
