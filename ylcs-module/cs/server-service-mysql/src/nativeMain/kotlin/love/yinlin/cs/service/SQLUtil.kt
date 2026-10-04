@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.extension.Long
 import love.yinlin.extension.Object
+import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.makeArray
 import org.intellij.lang.annotations.Language
@@ -80,16 +81,16 @@ suspend fun QueryExecutor.deleteSQL(@Language("SQL") sql: String, vararg args: A
 
 suspend fun QueryExecutor.throwInsertSQLDuplicateKey(@Language("SQL") sql: String, vararg args: Any?): Boolean {
     val statement = buildSQLStatement(sql, *args)
-    return try {
+    val err = catchingError {
         val affectRows = execute(statement).getOrThrow()
         if (affectRows <= 0) throw IllegalStateException("NoAffect ${args.joinToString()}")
-        false
     }
-    catch (e: Throwable) {
-        val msg = (e as? SQLError)?.message ?: throw e // 库没提供获取sql错误码的接口
+    return if (err == null) false else {
+        // 库没提供获取sql错误码的接口
+        val msg = (err as? SQLError)?.message ?: throw err
         val pattern = Regex("\\s(\\d+)\\s*\\(")
-        val code = pattern.find(msg)?.groupValues?.get(1)?.toIntOrNull() ?: throw e
-        if (code == 1062) true else throw e // 1062: 键重复
+        val code = pattern.find(msg)?.groupValues?.get(1)?.toIntOrNull() ?: throw err
+        if (code == 1062) true else throw err // 1062: 键重复
     }
 }
 

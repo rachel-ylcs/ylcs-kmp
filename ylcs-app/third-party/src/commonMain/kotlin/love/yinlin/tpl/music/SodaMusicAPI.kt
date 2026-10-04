@@ -95,66 +95,60 @@ object SodaMusicAPI : PlatformMusicAPI {
     }
 
     // ---------- 获取单曲信息（最外层捕获所有异常，返回 null）----------
-    private suspend fun fetchTrackInfo(trackId: String): PlatformMusicInfo? {
-        return try {
-            // 1. 获取音频链接（从分享页）
-            var audioUrl = ""
-            val html = NetClient.Common.request<String>({
-                url = "$TRACK_SHARE_PAGE?track_id=$trackId"
-                headers = defaultHeaders
-            }) { text: String -> text }
-            if (html != null) {
-                val regex = Regex("""(?s)_ROUTER_DATA\s*=\s*(\{.*?\});""")
-                regex.find(html)?.then { match ->
-                    val jsonString = match.groupValues[1].replace("\\u002F", "/")
-                    val routerData = Json.decodeFromString<JsonObject>(jsonString)
-                    val rawUrl = routerData.obj("loaderData")
-                        .obj("track_page")
-                        .obj("audioWithLyricsOption")["url"]?.String
-                    if (rawUrl != null) {
-                        audioUrl = rawUrl.replace("\\u002F", "/")
-                    }
+    private suspend fun fetchTrackInfo(trackId: String): PlatformMusicInfo? = catchingNull {
+        // 1. 获取音频链接（从分享页）
+        var audioUrl = ""
+        val html = NetClient.Common.request<String>({
+            url = "$TRACK_SHARE_PAGE?track_id=$trackId"
+            headers = defaultHeaders
+        }) { text: String -> text }
+        if (html != null) {
+            val regex = Regex("""(?s)_ROUTER_DATA\s*=\s*(\{.*?\});""")
+            regex.find(html)?.then { match ->
+                val jsonString = match.groupValues[1].replace("\\u002F", "/")
+                val routerData = Json.decodeFromString<JsonObject>(jsonString)
+                val rawUrl = routerData.obj("loaderData")
+                    .obj("track_page")
+                    .obj("audioWithLyricsOption")["url"]?.String
+                if (rawUrl != null) {
+                    audioUrl = rawUrl.replace("\\u002F", "/")
                 }
             }
-
-            // 2. 音频格式过滤：仅丢弃 .mp4 视频，其他所有格式都保留
-            if (audioUrl.isNotEmpty() && audioUrl.lowercase().endsWith(".mp4")) {
-                return null  // 丢弃整首视频歌曲
-            }
-
-            // 3. 元数据 API
-            val apiData: JsonObject = NetClient.Common.request<JsonObject>({
-                url = "https://api.qishui.com/luna/pc/track_v2?track_id=$trackId&media_type=track"
-                headers = defaultHeaders
-            }) { json: JsonObject -> json } ?: return null
-
-            val trackObj = apiData.obj("track")
-            val name = trackObj["name"]?.String ?: ""
-            val artists = trackObj.arr("artists").mapNotNull { it.Object["name"]?.String }
-            val singer = artists.joinToString("、")
-            val durationMs = trackObj["duration"]?.Long ?: 0L
-            val cover = buildCoverUrl(trackObj.obj("album").obj("url_cover")) ?: ""
-
-            val krcContent = apiData.obj("lyric")["content"]?.String ?: ""
-            val lyrics = if (krcContent.isNotBlank()) {
-                val lrcText = convertKrcToLrc(krcContent)
-                LrcParser(lrcText).toString()
-            } else ""
-
-            PlatformMusicInfo(
-                id = trackId,
-                name = name,
-                singer = singer,
-                time = durationMs.timeString,
-                pic = cover,
-                audioUrl = audioUrl,
-                lyrics = lyrics
-            )
-        } catch (_: Exception) {
-            currentCoroutineContext().ensureActive()
-            // 任何异常都导致该歌曲解析失败，返回 null
-            null
         }
+
+        // 2. 音频格式过滤：仅丢弃 .mp4 视频，其他所有格式都保留
+        if (audioUrl.isNotEmpty() && audioUrl.lowercase().endsWith(".mp4")) {
+            return null  // 丢弃整首视频歌曲
+        }
+
+        // 3. 元数据 API
+        val apiData: JsonObject = NetClient.Common.request<JsonObject>({
+            url = "https://api.qishui.com/luna/pc/track_v2?track_id=$trackId&media_type=track"
+            headers = defaultHeaders
+        }) { json: JsonObject -> json } ?: return null
+
+        val trackObj = apiData.obj("track")
+        val name = trackObj["name"]?.String ?: ""
+        val artists = trackObj.arr("artists").mapNotNull { it.Object["name"]?.String }
+        val singer = artists.joinToString("、")
+        val durationMs = trackObj["duration"]?.Long ?: 0L
+        val cover = buildCoverUrl(trackObj.obj("album").obj("url_cover")) ?: ""
+
+        val krcContent = apiData.obj("lyric")["content"]?.String ?: ""
+        val lyrics = if (krcContent.isNotBlank()) {
+            val lrcText = convertKrcToLrc(krcContent)
+            LrcParser(lrcText).toString()
+        } else ""
+
+        PlatformMusicInfo(
+            id = trackId,
+            name = name,
+            singer = singer,
+            time = durationMs.timeString,
+            pic = cover,
+            audioUrl = audioUrl,
+            lyrics = lyrics
+        )
     }
 
     // ---------- 搜索 ----------

@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.cs.APIScope
 import love.yinlin.cs.ServerService
 import love.yinlin.extension.catchingNull
+import love.yinlin.extension.cleaning
 import love.yinlin.extension.to
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.milliseconds
@@ -47,12 +48,7 @@ class MysqlService(scope: APIScope) : ServerService(scope) {
     @PublishedApi
     internal suspend inline fun <R> withConnection(block: (Connection) -> R): R {
         val connection = client!!.acquire().getOrThrow()
-        try {
-            return block(connection)
-        }
-        finally {
-            connection.close()
-        }
+        return cleaning({ connection.close() }) { block(connection) }
     }
 
     suspend inline fun <R> throwTransaction(crossinline block: suspend (QueryExecutor) -> R): R = client!!.transaction {

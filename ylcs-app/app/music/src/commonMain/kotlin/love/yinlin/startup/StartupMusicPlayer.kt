@@ -15,13 +15,13 @@ import love.yinlin.compose.data.media.MediaInfo
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
 import love.yinlin.coroutines.mainContext
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.Playlist
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.catchingNull
 import love.yinlin.extension.enumNext
 import love.yinlin.extension.then
 import love.yinlin.foundation.AsyncStartup
@@ -129,7 +129,7 @@ class StartupMusicPlayer(pool: StartupPool) : AsyncStartup(pool) {
             val music = if (id != null) DataSourceMusic.library[id] else null
             if (music != null) {
                 scope.launch(ioContext) {
-                    Coroutines.catchingNull {
+                    catchingNull {
                         // 按引擎顺序依次检查是否成功加载
                         val rootPath = music.path(modPath)
                         var currentEngine = engine

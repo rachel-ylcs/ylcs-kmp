@@ -23,6 +23,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.extension.catching
 import love.yinlin.extension.replaceAll
 
 @Stable
@@ -111,7 +112,7 @@ internal class DialogModFilter : DialogTemplate<DialogModFilter.ModFilter>() {
             val tempComposer = mutableMapOf<String, Int>()
 
             for ((val singer, val lyricist, val composer, val album) in library) {
-                Coroutines.catching {
+                catching {
                     // 专辑
                     tmpAlbum[album] = (tmpAlbum[album] ?: 0) + 1
                     // 歌手

@@ -22,6 +22,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import love.yinlin.extension.cleaning
 
 data object Ripple : IndicationNodeFactory {
     const val PRESSED_ALPHA = 0.15f
@@ -166,11 +167,11 @@ data object Ripple : IndicationNodeFactory {
                     val rippleAnimation = RippleAnimation(origin, targetRadius)
                     ripples[pressInteraction] = rippleAnimation
                     coroutineScope.launch {
-                        try {
-                            rippleAnimation.animate()
-                        } finally {
+                        cleaning({
                             ripples.remove(pressInteraction)
                             invalidateDraw()
+                        }) {
+                            rippleAnimation.animate()
                         }
                     }
                     invalidateDraw()

@@ -1,5 +1,6 @@
 package love.yinlin.concurrent
 
+import love.yinlin.extension.cleaning
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -18,6 +19,7 @@ class Mutex(locked: Boolean = false) {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         }
         lock()
-        return try { block() } finally { unlock() }
+
+        return cleaning(clean = ::unlock, block = block)
     }
 }

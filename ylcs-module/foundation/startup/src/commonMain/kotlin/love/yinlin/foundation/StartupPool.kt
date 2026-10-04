@@ -14,6 +14,7 @@ import love.yinlin.coroutines.cpuContext
 import love.yinlin.coroutines.mainContext
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.then
+import love.yinlin.extension.throwing
 import kotlin.reflect.KProperty
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -109,10 +110,8 @@ open class StartupPool(
                 throw IllegalStateException("sync startup $id is dependent on async startup $dependentId")
             }
             // 初始化同步服务
-            val startup = try {
+            val startup = throwing({ StartupError(id, "init", it) }) {
                 syncStartup.build(pool)
-            } catch (e: Throwable) {
-                throw StartupError(id, "init", e)
             }
             startupMap[id] = startup
         }
@@ -138,12 +137,8 @@ open class StartupPool(
                                 else dependencyTask.await()
                             }
                             // 初始化异步服务
-                            val startup = try {
+                            val startup = throwing({ StartupError(id, "init", it) }) {
                                 factory.build(pool).also { it.init() }
-                            } catch (e: CancellationException) {
-                                throw e
-                            } catch (e: Throwable) {
-                                throw StartupError(id, "init", e)
                             }
                             Coroutines.main {
                                 mutex.with { startupMap[id] = startup } // LinkedHashMap线程不安全
@@ -172,7 +167,7 @@ open class StartupPool(
                         // 继续initLater
                         val startup = startupMap[id]
                         if (startup != null) {
-                            Coroutines.catchingError { startup.initLater() }?.then { throw StartupError(id, "initLater", it) }
+                            catchingError { startup.initLater() }?.then { throw StartupError(id, "initLater", it) }
                         }
                     }
                 }.awaitAll()

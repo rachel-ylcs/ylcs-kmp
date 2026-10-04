@@ -2,6 +2,7 @@ package love.yinlin.uri
 
 import kotlinx.serialization.Serializable
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.cleaning
 import love.yinlin.extension.then
 
 @Serializable
@@ -52,9 +53,9 @@ data class Uri(
                 buffer[writePosition++] = byte
             }
 
-            fun decodeToStringAndReset() = try {
+            fun decodeToStringAndReset() = cleaning({ writePosition = 0}) {
                 buffer.decodeToString(startIndex = 0, endIndex = writePosition, throwOnInvalidSequence = false)
-            } finally { writePosition = 0 }
+            }
 
             fun flushDecodingByteAccumulator(builder: StringBuilder) {
                 if (writePosition == 0) return

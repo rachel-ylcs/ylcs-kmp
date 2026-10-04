@@ -6,7 +6,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.currentCoroutineContext
-import love.yinlin.data.Data
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.foundation.WebSocketClient
@@ -26,8 +25,6 @@ object ClientEngine {
     fun init(baseUrl: String) {
         this.baseUrl = baseUrl
     }
-
-    fun proxy(proxy: String, url: String): String = "$baseUrl/$proxy?$proxy=${Uri.encodeUri(url)}"
 }
 
 @IOCoroutine
@@ -36,27 +33,20 @@ suspend inline fun <reified R : Any> API<out APIType>.internalRequest(
     uploadFile: Boolean,
     crossinline block: suspend (HttpResponse) -> R
 ): R {
-    val result = try {
-        val context = currentCoroutineContext()
-        val url = "${ClientEngine.baseUrl}$route"
-        val client = if (uploadFile) ClientEngine.File else ClientEngine.Common
+    val context = currentCoroutineContext()
+    val url = "${ClientEngine.baseUrl}$route"
+    val client = if (uploadFile) ClientEngine.File else ClientEngine.Common
 
-        Coroutines.io {
-            client.internalPrepareStatement(HttpMethod.Post, url, builder).execute { response ->
-                when (response.status) {
-                    HttpStatusCode.OK -> Coroutines.with(context) { Data.Success(block(response)) }
-                    HttpStatusCode.Accepted -> Data.Failure(FailureException(response.bodyAsText()))
-                    HttpStatusCode.Unauthorized -> Data.Failure(UnauthorizedException("Unauthorized: 登录验证已过期"))
-                    HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> Data.Failure(RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp))
-                    else -> Data.Failure(IllegalArgumentException("HTTP Error: ${response.status}"))
-                }
+    return Coroutines.io {
+        client.internalPrepareStatement(HttpMethod.Post, url, builder).execute { response ->
+            when (response.status) {
+                HttpStatusCode.OK -> Coroutines.with(context) { block(response) }
+                HttpStatusCode.Accepted -> throw FailureException(response.bodyAsText())
+                HttpStatusCode.Unauthorized -> throw UnauthorizedException("Unauthorized: 登录验证已过期")
+                HttpStatusCode.RequestTimeout, HttpStatusCode.GatewayTimeout -> throw RequestTimeoutException(response.responseTime.timestamp - response.requestTime.timestamp)
+                else -> throw IllegalArgumentException("HTTP Error: ${response.status}")
             }
         }
-    }
-    catch (e: Throwable) { Data.Failure(e) }
-    when (result) {
-        is Data.Success -> return result.data
-        is Data.Failure -> throw result.throwable
     }
 }
 

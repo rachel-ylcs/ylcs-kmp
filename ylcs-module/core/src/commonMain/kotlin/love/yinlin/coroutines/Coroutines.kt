@@ -1,6 +1,5 @@
 package love.yinlin.coroutines
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -56,61 +55,5 @@ object Coroutines {
 
     suspend inline fun <T> sync(crossinline block: (SyncFuture<T>) -> Unit): T? = suspendCancellableCoroutine { continuation ->
         block(SyncFuture(continuation))
-    }
-
-    suspend inline fun catching(block: suspend () -> Unit) {
-        contract {
-            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-        }
-
-        @Suppress("SuppressedCancellationException")
-        try { block() }
-        catch (e: CancellationException) { throw e }
-        catch (_: Throwable) { }
-    }
-
-    suspend inline fun catchingError(block: suspend () -> Unit): Throwable? {
-        contract {
-            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-        }
-
-        @Suppress("SuppressedCancellationException")
-        return try {
-            block()
-            null
-        }
-        catch (e: CancellationException) { throw e }
-        catch (e: Throwable) { e }
-    }
-
-    suspend inline fun <R> catchingNull(block: suspend () -> R): R? {
-        contract {
-            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-        }
-
-        @Suppress("SuppressedCancellationException")
-        return try { block() }
-        catch (e: CancellationException) { throw e }
-        catch (_: Throwable) { null }
-    }
-
-    suspend inline fun <R> catchingDefault(default: R, block: suspend () -> R): R {
-        contract {
-            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-        }
-
-        @Suppress("SuppressedCancellationException")
-        return try { block() }
-        catch (e: CancellationException) { throw e }
-        catch (_: Throwable) { default }
-    }
-
-    suspend inline fun <R> catchingDefault(default: (Throwable) -> R, block: suspend () -> R): R {
-        contract {
-            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-        }
-        return try { block() }
-        catch (e: CancellationException) { throw e }
-        catch (e: Throwable) { default(e) }
     }
 }

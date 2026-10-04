@@ -1,10 +1,10 @@
 package love.yinlin.compose.cache
 
-import kotlinx.coroutines.ensureActive
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.extension.catchingNull
 import love.yinlin.fs.File
 
 class DiskCache<S : Any>(
@@ -35,19 +35,15 @@ class DiskCache<S : Any>(
                 if (check(target) != null) target
                 else {
                     val temp = File(cachePath, "$sourceKey.tmp")
-                    try {
+                    val newTarget = catchingNull {
                         cachePath.mkdir()
                         temp.write { sink -> fetcher(source, sink) }
-                        if (check(temp) != null) {
-                            temp.move(target)
-                            target
-                        }
-                        else error("")
-                    } catch (_: Throwable) {
-                        temp.delete()
-                        ensureActive()
-                        null
+                        require(check(temp) != null)
+                        temp.move(target)
+                        target
                     }
+                    if (newTarget == null) temp.delete()
+                    newTarget
                 }
             }
         }

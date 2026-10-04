@@ -1,5 +1,6 @@
 package love.yinlin.platform
 
+import love.yinlin.extension.cleaning
 import love.yinlin.platform.ffi.Address
 import love.yinlin.platform.ffi.NativeLibrary
 import love.yinlin.platform.ffi.NativeType
@@ -12,16 +13,13 @@ internal object MacOSNativeWindow : NativeWindowImpl, NativeLibrary("/usr/lib/li
 
     override fun updateClickThrough(handle: Long, enabled: Boolean) {
         val pool = objc_autoreleasePoolPush()
-        try {
+        cleaning({ objc_autoreleasePoolPop(pool) }) {
             val windowPtr = Address.ofAddress(handle)
             useMemory { arena ->
                 val selName = arena.allocateFrom("setIgnoresMouseEvents:")
                 val sel = sel_registerName(selName) as Address
                 objc_msgSend(windowPtr, sel, enabled)
             }
-        }
-        finally {
-            objc_autoreleasePoolPop(pool)
         }
     }
 }

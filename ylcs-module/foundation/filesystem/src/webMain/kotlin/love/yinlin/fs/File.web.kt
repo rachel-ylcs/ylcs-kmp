@@ -69,19 +69,22 @@ private class WebFile private constructor(private val uri: String, private val u
         val [parent, name] = castParent() ?: return@io null
 
         if (name.isEmpty()) FileMetadata(isRegularFile = false, isDirectory = true)
-        else try {
-            val fileHandle = parent.getFileHandle(name).await()
-            val file = fileHandle.getFile().await()
-            FileMetadata(
-                isRegularFile = true,
-                isDirectory = false,
-                size = file.size.toDouble().toLong()
-            )
-        } catch (_: Throwable) {
+        else {
             catchingNull {
+                val fileHandle = parent.getFileHandle(name).await()
+                val file = fileHandle.getFile().await()
+                FileMetadata(
+                    isRegularFile = true,
+                    isDirectory = false,
+                    size = file.size.toDouble().toLong()
+                )
+            } ?: catchingNull {
                 ensureActive()
                 parent.getDirectoryHandle(name).await()
-                FileMetadata(isRegularFile = false, isDirectory = true)
+                FileMetadata(
+                    isRegularFile = false,
+                    isDirectory = true
+                )
             }
         }
     }

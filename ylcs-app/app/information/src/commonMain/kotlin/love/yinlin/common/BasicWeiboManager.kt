@@ -16,7 +16,6 @@ import love.yinlin.compose.ui.image.NineGrid
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.text.RachelRichText
 import love.yinlin.concurrent.Mutex
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
 import love.yinlin.data.common.ThumbImage
 import love.yinlin.data.information.DataValue
@@ -27,6 +26,7 @@ import love.yinlin.data.information.UnifiedUserInfo
 import love.yinlin.data.weibo.Weibo
 import love.yinlin.data.weibo.WeiboData
 import love.yinlin.data.weibo.WeiboMedia
+import love.yinlin.extension.catchingNull
 import love.yinlin.screen.ScreenImagePreview
 import love.yinlin.screen.ScreenVideo
 import love.yinlin.screen.ScreenWeiboDetails
@@ -81,7 +81,7 @@ abstract class BasicWeiboManager : MessageManager<Weibo>() {
                 if (name.isEmpty()) navigateScreenWebPage(name)
                 else if (searchUserMutex.tryLock()) {
                     launch {
-                        val user = Coroutines.catchingNull {
+                        val user = catchingNull {
                             val cookie = fetchWeiboCookie()
                             WeiboAPI.searchUser(name, cookie)?.find { it.name == name }
                         }
