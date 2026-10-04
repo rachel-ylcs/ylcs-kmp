@@ -87,8 +87,8 @@ class MysqlService(scope: APIScope) : ServerService(scope) {
         connection.deleteSQL(sql, *args)
     }
 
-    // 插入成功 -> false
-    // 键重复 -> true
+    // 插入成功 -> true
+    // 键重复 -> false
     // 错误 -> throw
     suspend fun throwInsertSQLDuplicateKey(@Language("SQL") sql: String, vararg args: Any?): Boolean = withConnection { connection ->
         connection.throwInsertSQLDuplicateKey(sql, *args)

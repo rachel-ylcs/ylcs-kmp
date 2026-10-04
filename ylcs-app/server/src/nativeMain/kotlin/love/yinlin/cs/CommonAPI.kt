@@ -16,7 +16,7 @@ fun ServerScope.commonAPI() {
 
     ApiCommonSendFeedback.response { token, content ->
         val uid = AN.throwExpireToken(token)
-        if (mysql.throwInsertSQLDuplicateKey("INSERT INTO feedback(uid, content) ${values(2)}", uid, content))
+        if (!mysql.throwInsertSQLDuplicateKey("INSERT INTO feedback(uid, content) ${values(2)}", uid, content))
             failure("您已提交过反馈, 请耐心等待处理")
     }
 

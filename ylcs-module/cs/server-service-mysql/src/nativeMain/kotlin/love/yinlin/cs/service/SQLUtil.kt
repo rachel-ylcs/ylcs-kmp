@@ -85,12 +85,11 @@ suspend fun QueryExecutor.throwInsertSQLDuplicateKey(@Language("SQL") sql: Strin
         val affectRows = execute(statement).getOrThrow()
         if (affectRows <= 0) throw IllegalStateException("NoAffect ${args.joinToString()}")
     }
-    return if (err == null) false else {
+    return if (err == null) true else {
         // 库没提供获取sql错误码的接口
         val msg = (err as? SQLError)?.message ?: throw err
-        val pattern = Regex("\\s(\\d+)\\s*\\(")
-        val code = pattern.find(msg)?.groupValues?.get(1)?.toIntOrNull() ?: throw err
-        if (code == 1062) true else throw err // 1062: 键重复
+        val code = "\\s(\\d+)\\s*\\(".toRegex().find(msg)?.groupValues?.get(1)?.toIntOrNull() ?: throw err
+        if (code == 1062) false else throw err // 1062: 键重复
     }
 }
 
