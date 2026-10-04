@@ -4,6 +4,8 @@ import androidx.compose.runtime.Stable
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.extension.toJsonString
 import love.yinlin.reflect.metaClassName
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @Stable
 @PublishedApi
@@ -34,11 +36,12 @@ internal class Route @PublishedApi internal constructor(private val screenKey: S
     @PublishedApi
     internal val items: MutableList<String> = []
 
+    @OptIn(ExperimentalUuidApi::class)
     @PublishedApi
     internal fun build(): String = buildString {
         append(screenKey)
         append('|')
-        append(ScreenManager.useScreenUniqueId())
+        append(Uuid.generateV7().toHexString())
         append('?')
         items.joinTo(this, separator = ",", prefix = "[", postfix = "]")
     }

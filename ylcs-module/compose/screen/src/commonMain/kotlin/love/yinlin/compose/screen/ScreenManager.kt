@@ -37,10 +37,6 @@ import love.yinlin.extension.parseJson
 class ScreenManager @PublishedApi internal constructor(savedBackStack: List<String>) {
     @Stable
     companion object {
-        private var ScreenUniqueId: Long = 0L
-
-        internal fun useScreenUniqueId(): Long = ScreenUniqueId++
-
         private val VMMap = mutableMapOf<String, BasicScreen>()
 
         @PublishedApi
