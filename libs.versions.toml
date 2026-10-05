@@ -48,6 +48,7 @@ gradle-plugin-dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", vers
 # Common
 
 test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+jetbrains-annotation = { module = "org.jetbrains:annotations", version = "26.1.0" }
 
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 skiko-lottie = { module = "org.jetbrains.skiko:skiko-skottie", version.ref = "skiko" }
