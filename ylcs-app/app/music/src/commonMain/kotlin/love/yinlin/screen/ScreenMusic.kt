@@ -412,7 +412,7 @@ class ScreenMusic : BasicScreen() {
                     if (player.isReady) {
                         if (deviceType == Device.Type.PORTRAIT) {
                             MusicCoverLayout(player, musicInfo, modifier = Modifier
-                                .padding(Theme.padding.value7)
+                                .padding(Theme.padding.value5)
                                 .heightIn(max = Theme.size.image2)
                                 .aspectRatio(1f, matchHeightConstraintsFirst = true)
                                 .shadow(Theme.shape.circle, Theme.shadow.v3)
