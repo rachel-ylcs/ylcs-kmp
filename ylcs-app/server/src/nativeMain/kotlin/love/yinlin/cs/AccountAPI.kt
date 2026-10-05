@@ -1,5 +1,8 @@
 package love.yinlin.cs
 
+import love.yinlin.cs.service.querySQLSingle
+import love.yinlin.cs.service.throwExecuteSQL
+import love.yinlin.cs.service.throwInsertSQLGeneratedKey
 import love.yinlin.cs.service.values
 import love.yinlin.cs.user.Token
 import love.yinlin.data.rachel.mail.Mail
@@ -61,12 +64,9 @@ fun ServerScope.accountAPI() {
             Mail.Filter.Register.toString(), name, MD5.Default.encodeToHex(pwd))
     }
 
-    callMap[Mail.Filter.Register] = {
-        val inviterID = it.uid
-        val registerName = it.param1
-        val registerPwd = it.param2
+    callMap[Mail.Filter.Register] = { transaction, (val inviterID = uid, val registerName = param1, val registerPwd = param2) ->
         val createTime = DateEx.CurrentString
-        val registerID = mysql.throwInsertSQLGeneratedKey("""
+        val registerID = transaction.throwInsertSQLGeneratedKey("""
             INSERT INTO user(name, pwd, inviter, createTime, lastTime, playlist, signin) ${values(7)}
         """, registerName, registerPwd, inviterID, createTime, createTime, "{}", ByteArray(46)
         ).toInt()
@@ -110,11 +110,9 @@ fun ServerScope.accountAPI() {
             "\"${name}\"需要修改密码，是否同意？", Mail.Filter.ForgotPassword.toString(), name, MD5.Default.encodeToHex(pwd))
     }
 
-    callMap[Mail.Filter.ForgotPassword] = {
-        val name = it.param1
-        val pwd = it.param2
-        val user = mysql.querySQLSingle("SELECT uid FROM user WHERE name = ?", name) ?: failure("用户不存在")
-        mysql.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", pwd, name)
+    callMap[Mail.Filter.ForgotPassword] = { transaction, (val name = param1, val pwd = param2) ->
+        val user = transaction.querySQLSingle("SELECT uid FROM user WHERE name = ? FOR UPDATE", name) ?: failure("用户不存在")
+        transaction.throwExecuteSQL("UPDATE user SET pwd = ? WHERE name = ?", pwd, name)
         // 清除修改密码用户的 Token
         AN.removeAllTokens(user["uid"].Int)
         "\"${name}\"修改密码成功"

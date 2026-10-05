@@ -1,5 +1,6 @@
 package love.yinlin.cs
 
+import io.github.smyrgeorge.sqlx4k.QueryExecutor
 import love.yinlin.cs.service.MysqlService
 import love.yinlin.cs.service.RedisService
 import love.yinlin.cs.user.Authorization
@@ -8,7 +9,7 @@ import love.yinlin.data.rachel.mail.Mail
 import love.yinlin.data.rachel.mail.MailEntry
 
 class ServerScope(engine: ServerEngine) : APIScope(engine) {
-    val callMap = buildCallBackMap<Mail.Filter, MailEntry, String>()
+    val callMap = buildCallBackMap<Mail.Filter, MailEntry, String, QueryExecutor>()
     val mysql: MysqlService = MysqlService(this)
     val redis: RedisService = RedisService(this)
 

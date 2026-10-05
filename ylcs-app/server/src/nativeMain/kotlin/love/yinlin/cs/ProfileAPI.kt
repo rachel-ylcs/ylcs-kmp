@@ -1,5 +1,7 @@
 package love.yinlin.cs
 
+import love.yinlin.cs.service.throwExecuteSQL
+import love.yinlin.cs.service.throwQuerySQLSingle
 import love.yinlin.data.rachel.follows.FollowStatus
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.profile.UserProfile
@@ -102,16 +104,18 @@ fun ServerScope.profileAPI() {
 
     ApiProfileSignin.response { token ->
         val uid = AN.throwExpireToken(token)
-        val user = VN.throwGetUser(uid, "signin")
-        // 查询是否签到 ... 签到记录46字节(368位)
-        val signin = user["signin"]!!.to(ByteArraySerializer)
-        signin.checkSignin { isSignin, byteValue, byteIndex, bitIndex ->
-            if (!isSignin) {
-                // 更新签到值，银币增加
-                signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
-                mysql.throwExecuteSQL("UPDATE user SET signin = ? , exp = exp + 1, coin = coin + 1 WHERE uid = ?", signin, uid)
+        mysql.throwTransaction { transaction ->
+            val user = transaction.throwQuerySQLSingle("SELECT signin FROM user WHERE uid = ? FOR UPDATE", uid)
+            // 查询是否签到 ... 签到记录46字节(368位)
+            val signin = user["signin"]!!.to(ByteArraySerializer)
+            signin.checkSignin { isSignin, byteValue, byteIndex, bitIndex ->
+                if (!isSignin) {
+                    // 更新签到值，银币增加
+                    signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
+                    transaction.throwExecuteSQL("UPDATE user SET signin = ? , exp = exp + 1, coin = coin + 1 WHERE uid = ?", signin, uid)
+                }
+                result(isSignin, byteValue, bitIndex)
             }
-            result(isSignin, byteValue, bitIndex)
         }
     }
 }

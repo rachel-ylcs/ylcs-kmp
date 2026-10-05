@@ -5,7 +5,7 @@ open class APICallbackScope {
     fun failure(message: String? = null): Nothing = throw FailureException(message)
 }
 
-typealias APICallback<I, O> = suspend APICallbackScope.(I) -> O
-typealias APICallbackMap<K, I, O> = MutableMap<K, APICallback<I, O>>
+typealias APICallback<I, O, C> = suspend APICallbackScope.(C, I) -> O
+typealias APICallbackMap<K, I, O, C> = MutableMap<K, APICallback<I, O, C>>
 
-fun <K : Any, I, O> buildCallBackMap(): APICallbackMap<K, I, O> = mutableMapOf<K, APICallback<I, O>>()
+fun <K : Any, I, O, C : Any> buildCallBackMap(): APICallbackMap<K, I, O, C> = mutableMapOf<K, APICallback<I, O, C>>()
