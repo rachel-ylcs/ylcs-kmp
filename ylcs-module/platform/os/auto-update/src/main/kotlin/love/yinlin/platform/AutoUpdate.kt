@@ -46,7 +46,11 @@ object AutoUpdate {
     ]
 
     private fun unixScript(currentDir: Path, newName: String): Array<String> = [
-        "sh", "-c", "sleep 3 && cd $currentDir && (if [ -d $newName ]; then rm -rf app && mv $newName app; fi)"
+        "sh", "-c",
+        "sleep 3 && cd \"\\$1\" && (if [ -d \"\\$2\" ]; then rm -rf app && mv \"\\$2\" app; fi)",
+        "ylcs-update",
+        currentDir.toString(),
+        newName
     ]
 
     private fun startScript(currentDir: Path, newName: String) {
