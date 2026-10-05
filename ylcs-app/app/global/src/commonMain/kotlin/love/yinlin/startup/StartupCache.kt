@@ -19,7 +19,9 @@ class StartupCache(pool: StartupPool, cachePath: File) : SyncStartup(pool) {
     }
 
     private val diskCache = DiskCache<String>(cachePath = cachePath, key = XXHash64::encode) { source, sink ->
-        Coroutines.io { NetClient.File.download(source, sink) }
+        Coroutines.io {
+            require(NetClient.File.download(source, sink)) { "下载失败" }
+        }
     }
 
     suspend fun store(url: String): File? = diskCache.store(url)

@@ -145,7 +145,8 @@ class NetClient internal constructor(val delegate: HttpClient) : AutoCloseable {
                     }
                 }
             }.execute { response ->
-                response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
+                if (response.status.isSuccess()) response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
+                else false
             }
         }
     }
@@ -156,7 +157,8 @@ class NetClient internal constructor(val delegate: HttpClient) : AutoCloseable {
             internalPrepareStatement(HttpMethod.Get, url) {
                 this.headers.appendDefaultHeaders()
             }.execute { response ->
-                response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
+                if (response.status.isSuccess()) response.bodyAsChannel().copyAndClose(sink.asByteWriteChannel()) > 0L
+                else false
             }
         }
     }
@@ -167,7 +169,8 @@ class NetClient internal constructor(val delegate: HttpClient) : AutoCloseable {
             internalPrepareStatement(HttpMethod.Get, url) {
                 this.headers.appendDefaultHeaders()
             }.execute { response ->
-                response.bodyAsBytes()
+                if (response.status.isSuccess()) response.bodyAsBytes()
+                else null
             }
         }
     }
