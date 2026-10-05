@@ -82,6 +82,7 @@ include(
     "ylcs-module:foundation:filesystem",
     "ylcs-module:foundation:network",
     "ylcs-module:foundation:parser:lrc",
+    "ylcs-module:foundation:parser:markdown",
     "ylcs-module:foundation:parser:toml",
     "ylcs-module:foundation:parser:yaml",
     "ylcs-module:foundation:startup",
