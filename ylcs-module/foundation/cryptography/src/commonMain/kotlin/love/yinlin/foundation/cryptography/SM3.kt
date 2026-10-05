@@ -1,5 +1,8 @@
 package love.yinlin.foundation.cryptography
 
+import love.yinlin.io.ByteArrayIO
+import love.yinlin.io.Endian
+
 class SM3 : ByteDigest() {
     private companion object {
         val ROT: IntArray = IntArray(64) { i ->
@@ -99,57 +102,21 @@ class SM3 : ByteDigest() {
     }
 
     private fun compressBlock(input: ByteArray, offset: Int) {
-        var p = offset
-        var i = 0
-
-        while (i < 16) {
-            w[i] = ((input[p].toInt() and 0xFF) shl 24) or
-                    ((input[p + 1].toInt() and 0xFF) shl 16) or
-                    ((input[p + 2].toInt() and 0xFF) shl 8) or
-                    (input[p + 3].toInt() and 0xFF)
-            p += 4
-            i++
-        }
-
+        val inputIO = ByteArrayIO(input)
+        for (i in 0 ..< 16) w[i] = inputIO.readInt(offset + i * 4, Endian.BIG)
         expandAndCompress()
     }
 
     private fun compressFinal(input: ByteArray, offset: Int, remaining: Int, bitLength: Long) {
-        w.fill(0, 0, 16)
+        val size = if (remaining <= 55) 64 else 128
+        val final = ByteArray(size)
+        input.copyInto(destination = final, destinationOffset = 0, startIndex = offset, endIndex = offset + remaining)
+        final[remaining] = 0x80.toByte()
 
-        var i = 0
-
-        while (i < remaining) {
-            val wordIndex = i ushr 2
-            val shift = 24 - ((i and 3) shl 3)
-
-            w[wordIndex] = w[wordIndex] or ((input[offset + i].toInt() and 0xFF) shl shift)
-            i++
-        }
-
-        val paddingWord = remaining ushr 2
-        val paddingShift = 24 - ((remaining and 3) shl 3)
-
-        w[paddingWord] = w[paddingWord] or (0x80 shl paddingShift)
-
-        if (remaining <= 55) {
-            w[14] = (bitLength ushr 32).toInt()
-            w[15] = bitLength.toInt()
-            expandAndCompress()
-        } else {
-            expandAndCompress()
-            w.fill(element = 0, fromIndex = 0, toIndex = 16)
-            w[14] = (bitLength ushr 32).toInt()
-            w[15] = bitLength.toInt()
-            expandAndCompress()
-        }
-    }
-
-    private fun writeInt(output: ByteArray, offset: Int, value: Int) {
-        output[offset] = (value ushr 24).toByte()
-        output[offset + 1] = (value ushr 16).toByte()
-        output[offset + 2] = (value ushr 8).toByte()
-        output[offset + 3] = value.toByte()
+        val finalIO = ByteArrayIO(final)
+        finalIO.writeLong(size - 8, bitLength, Endian.BIG)
+        compressBlock(final, 0)
+        if (size == 128) compressBlock(final, 64)
     }
 
     override fun encode(data: ByteArray): ByteArray {
@@ -167,17 +134,15 @@ class SM3 : ByteDigest() {
 
         compressFinal(input = data, offset = offset, remaining = length - offset, bitLength = length.toLong() shl 3)
 
-        val result = ByteArray(32)
-
-        writeInt(result, 0, h0)
-        writeInt(result, 4, h1)
-        writeInt(result, 8, h2)
-        writeInt(result, 12, h3)
-        writeInt(result, 16, h4)
-        writeInt(result, 20, h5)
-        writeInt(result, 24, h6)
-        writeInt(result, 28, h7)
-
-        return result
+        return ByteArrayIO(32).write {
+            writeInt(0, h0, Endian.BIG)
+            writeInt(4, h1, Endian.BIG)
+            writeInt(8, h2, Endian.BIG)
+            writeInt(12, h3, Endian.BIG)
+            writeInt(16, h4, Endian.BIG)
+            writeInt(20, h5, Endian.BIG)
+            writeInt(24, h6, Endian.BIG)
+            writeInt(28, h7, Endian.BIG)
+        }
     }
 }

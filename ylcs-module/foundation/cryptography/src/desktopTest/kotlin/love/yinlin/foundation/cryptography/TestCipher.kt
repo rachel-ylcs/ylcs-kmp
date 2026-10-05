@@ -42,4 +42,12 @@ class TestCipher {
         assertEquals("cac70df5bf3fb1b2d10f3db4ca75778ce8496499183e5ca22c5beecabbe2fed18d", output)
         assertEquals(input, result)
     }
+
+    @Test
+    fun testXChaCha20() {
+        val xChaCha20 = XChaCha20(key = "9d23bd4149cb979ccf3c5c94dd217e9808cb0e50cd0f67812235eaaf601d6232".hexToByteArray())
+        val output = xChaCha20.encodeToHex("hello world!")
+        val result = xChaCha20.decodeFromHexToString(output)
+        assertEquals("hello world!", result)
+    }
 }

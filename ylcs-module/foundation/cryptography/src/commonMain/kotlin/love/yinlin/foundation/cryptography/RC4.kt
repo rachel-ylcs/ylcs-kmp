@@ -1,6 +1,6 @@
 package love.yinlin.foundation.cryptography
 
-class RC4(private val key: ByteArray): SymmetricCipher() {
+class RC4(private val key: ByteArray): Cipher() {
     constructor(key: String) : this(key.encodeToByteArray())
 
     init {
@@ -68,4 +68,6 @@ class RC4(private val key: ByteArray): SymmetricCipher() {
     }
 
     override fun encode(data: ByteArray): ByteArray = run(data)
+
+    override fun decode(data: ByteArray): ByteArray = run(data)
 }

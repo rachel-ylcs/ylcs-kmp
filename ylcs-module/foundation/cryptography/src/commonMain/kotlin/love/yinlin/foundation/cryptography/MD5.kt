@@ -1,6 +1,9 @@
 package love.yinlin.foundation.cryptography
 
-class MD5(private val mini: Boolean = false) : ByteDigest() {
+import love.yinlin.io.ByteArrayIO
+import love.yinlin.io.Endian
+
+class MD5(private val half: Boolean = false) : ByteDigest() {
     companion object {
         private val S: IntArray = [
             7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
@@ -31,28 +34,21 @@ class MD5(private val mini: Boolean = false) : ByteDigest() {
         private fun calculate(input: ByteArray): ByteArray {
             val oldLen = input.size
             val newLen = ((oldLen + 8).ushr(6) shl 6) + 64
-            val padding = ByteArray(newLen - oldLen)
-            padding[0] = 0x80.toByte()
+            val padded = ByteArray(newLen)
 
-            val lengthBits = oldLen.toLong() * 8
-            for (i in 0 .. 7) padding[padding.size - 8 + i] = (lengthBits ushr (i * 8)).toByte()
+            input.copyInto(padded)
+            padded[oldLen] = 0x80.toByte()
+            ByteArrayIO(padded).writeLong(newLen - 8, oldLen.toLong() shl 3, Endian.LITTLE)
 
             var a = 0x67452301
             var b = 0xefcdab89.toInt()
             var c = 0x98badcfe.toInt()
             var d = 0x10325476
 
+            val inputIO = ByteArrayIO(padded)
             val x = IntArray(16)
-            for (offset in 0 until (oldLen + padding.size) step 64) {
-                for (j in 0..15) {
-                    var value = 0
-                    for (k in 0..3) {
-                        val bytePos = offset + j * 4 + k
-                        val bVal = if (bytePos < oldLen) input[bytePos].toInt() else padding[bytePos - oldLen].toInt()
-                        value = value or ((bVal and 0xFF) shl (k * 8))
-                    }
-                    x[j] = value
-                }
+            for (offset in padded.indices step 64) {
+                for (j in 0 .. 15) x[j] = inputIO.readInt(offset + j * 4, Endian.LITTLE)
 
                 val aa = a
                 var bb = b
@@ -94,24 +90,12 @@ class MD5(private val mini: Boolean = false) : ByteDigest() {
                 d += dd
             }
 
-            val result = ByteArray(16)
-            result[0] = (a and 0xFF).toByte()
-            result[1] = (a ushr 8 and 0xFF).toByte()
-            result[2] = (a ushr 16 and 0xFF).toByte()
-            result[3] = (a ushr 24 and 0xFF).toByte()
-            result[4] = (b and 0xFF).toByte()
-            result[5] = (b ushr 8 and 0xFF).toByte()
-            result[6] = (b ushr 16 and 0xFF).toByte()
-            result[7] = (b ushr 24 and 0xFF).toByte()
-            result[8] = (c and 0xFF).toByte()
-            result[9] = (c ushr 8 and 0xFF).toByte()
-            result[10] = (c ushr 16 and 0xFF).toByte()
-            result[11] = (c ushr 24 and 0xFF).toByte()
-            result[12] = (d and 0xFF).toByte()
-            result[13] = (d ushr 8 and 0xFF).toByte()
-            result[14] = (d ushr 16 and 0xFF).toByte()
-            result[15] = (d ushr 24 and 0xFF).toByte()
-            return result
+            return ByteArrayIO(16).write {
+                writeInt(0, a, Endian.LITTLE)
+                writeInt(4, b, Endian.LITTLE)
+                writeInt(8, c, Endian.LITTLE)
+                writeInt(12, d, Endian.LITTLE)
+            }
         }
 
         val Default = MD5()
@@ -119,6 +103,6 @@ class MD5(private val mini: Boolean = false) : ByteDigest() {
 
     override fun encode(data: ByteArray): ByteArray {
         val rawData = calculate(data)
-        return if (mini) rawData.copyOfRange(4, 12) else rawData
+        return if (half) rawData.copyOfRange(4, 12) else rawData
     }
 }
