@@ -5,7 +5,7 @@ import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
-import love.yinlin.tpl.lyrics.LrcParser
+import love.yinlin.foundation.parser.lrc.LrcParser
 import love.yinlin.uri.Uri
 import kotlin.io.encoding.Base64
 
@@ -111,7 +111,7 @@ object KugouMusicAPI : PlatformMusicAPI {
     suspend fun requestMusic(hash: String, coverUrl: String): PlatformMusicInfo? {
         val baseInfo = getSongDetail(hash, coverUrl) ?: return null
         val lyrics = getLyrics(hash) ?: ""
-        return baseInfo.copy(lyrics = LrcParser(lyrics).toString())
+        return baseInfo.copy(lyrics = LrcParser.parse(lyrics).toString())
     }
 
     override suspend fun search(keyword: String): List<PlatformMusicInfo>? {

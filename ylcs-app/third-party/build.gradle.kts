@@ -13,6 +13,7 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 projects.ylcsModule.foundation.cryptography,
+                projects.ylcsModule.foundation.parser.lrc,
                 projects.ylcsModule.foundation.network,
 
                 libs.compose.runtime,

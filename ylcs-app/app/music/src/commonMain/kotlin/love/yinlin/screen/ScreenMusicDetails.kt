@@ -68,10 +68,10 @@ import love.yinlin.data.rachel.song.Song
 import love.yinlin.data.rachel.song.SongComment
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
+import love.yinlin.foundation.parser.lrc.LrcParser
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
 import love.yinlin.startup.StartupMusicPlayer
-import love.yinlin.tpl.lyrics.LrcParser
 
 @Stable
 class ScreenMusicDetails(private val sid: String) : Screen() {
@@ -249,7 +249,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                         else {
                             currentClientSong.clientPath(ModResourceType.LineLyrics).readText()!!
                         }
-                        LrcParser(lyricsText).plainText
+                        LrcParser.parse(lyricsText).plainText
                     }
                 }
             }

@@ -2,8 +2,6 @@ package love.yinlin.tpl.music
 
 import androidx.compose.runtime.Stable
 import io.ktor.http.HttpHeaders
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.coroutines.Coroutines
@@ -11,7 +9,7 @@ import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.http.NetHeader
-import love.yinlin.tpl.lyrics.LrcParser
+import love.yinlin.foundation.parser.lrc.LrcParser
 import love.yinlin.uri.Uri
 
 @Stable
@@ -137,7 +135,7 @@ object SodaMusicAPI : PlatformMusicAPI {
         val krcContent = apiData.obj("lyric")["content"]?.String ?: ""
         val lyrics = if (krcContent.isNotBlank()) {
             val lrcText = convertKrcToLrc(krcContent)
-            LrcParser(lrcText).toString()
+            LrcParser.parse(lrcText).toString()
         } else ""
 
         PlatformMusicInfo(

@@ -6,7 +6,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
-import love.yinlin.tpl.lyrics.LrcParser
+import love.yinlin.foundation.parser.lrc.LrcParser
 import love.yinlin.uri.Uri
 
 @Stable
@@ -41,7 +41,7 @@ object NetEaseCloudAPI : PlatformMusicAPI {
         url = "https://$NETEASECLOUD_HOST/${Container.lyrics(id)}"
     }) { json: JsonObject ->
         val text = json.obj("lrc")["lyric"].String
-        LrcParser(text).toString()
+        LrcParser.parse(text).toString()
     }
 
     suspend fun requestMusic(id: String): PlatformMusicInfo? = NetClient.Common.request({
