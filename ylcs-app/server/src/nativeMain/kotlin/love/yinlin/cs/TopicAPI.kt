@@ -286,12 +286,26 @@ fun ServerScope.topicAPI() {
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：主题本人，超管
-        if (mysql.querySQLSingle("""
-			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
-			UNION
-            SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, uid) == null) failure("无权限")
-        mysql.throwExecuteSQL("UPDATE $tableName SET isTop = ? WHERE cid = ? AND isDeleted = 0", isTop, cid)
+        mysql.throwTransaction { transaction ->
+            if (transaction.throwQuerySQL("""
+                SELECT c.cid
+                FROM $tableName AS c
+                JOIN topic AS t ON t.tid = c.tid
+                JOIN user AS u ON u.uid = ?
+                WHERE c.tid = ? AND c.cid = ?
+                    AND c.pid IS NULL AND c.isDeleted = 0
+                    AND t.rawSection = ?
+                    AND (
+                        (t.uid = u.uid AND t.isDeleted = 0)
+                        OR (u.privilege & ${UserPrivilege.VIP_TOPIC}) != 0
+                    )
+                FOR UPDATE
+            """, uid, tid, cid, rawSection).isEmpty()) failure("无权限")
+            transaction.throwExecuteSQL("""
+                UPDATE $tableName SET isTop = ?
+                WHERE tid = ? AND cid = ? AND pid IS NULL AND isDeleted = 0
+            """, isTop, tid, cid)
+        }
     }
 
     ApiTopicDeleteComment.response { token, tid, cid, rawSection ->
@@ -299,18 +313,32 @@ fun ServerScope.topicAPI() {
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
-        if (mysql.querySQLSingle("""
-			SELECT 1 FROM $tableName WHERE uid = ? AND tid = ? AND cid = ? AND isDeleted = 0
-			UNION
-			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
-			UNION
-            SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, cid, uid, tid, uid) == null) failure("无权限")
-        mysql.throwTransaction {
+        mysql.throwTransaction { transaction ->
+            if (transaction.throwQuerySQL("""
+                SELECT c.cid
+                FROM $tableName AS c
+                JOIN topic AS t ON t.tid = c.tid
+                JOIN user AS u ON u.uid = ?
+                WHERE c.tid = ? AND c.cid = ?
+                  AND c.pid IS NULL AND c.isDeleted = 0
+                  AND t.rawSection = ?
+                  AND (
+                      c.uid = u.uid
+                      OR (t.uid = u.uid AND t.isDeleted = 0)
+                      OR (u.privilege & ${UserPrivilege.VIP_TOPIC}) != 0
+                  )
+                FOR UPDATE
+            """, uid, tid, cid, rawSection).isEmpty()) failure("无权限")
             // 逻辑删除
-            it.throwExecuteSQL("UPDATE $tableName SET isDeleted = 1 WHERE cid = ? AND isDeleted = 0", cid)
+            transaction.throwExecuteSQL("""
+                UPDATE $tableName SET isDeleted = 1
+                WHERE tid = ? AND cid = ? AND pid IS NULL AND isDeleted = 0
+            """, tid, cid)
             // 更新主题评论数
-            it.throwExecuteSQL("UPDATE topic SET commentNum = commentNum - 1 WHERE tid = ?", tid)
+            transaction.throwExecuteSQL("""
+                UPDATE topic SET commentNum = commentNum - 1
+                WHERE tid = ? AND rawSection = ?
+            """, tid, rawSection)
         }
     }
 
@@ -319,18 +347,34 @@ fun ServerScope.topicAPI() {
         val tableName = VN.throwSection(rawSection)
         val uid = AN.throwExpireToken(token)
         // 权限：评论本人，主题本人，超管
-        if (mysql.querySQLSingle("""
-			SELECT 1 FROM $tableName WHERE uid = ? AND tid = ? AND pid = ? AND cid = ? AND isDeleted = 0
-			UNION
-			SELECT 1 FROM topic WHERE uid = ? AND tid = ? AND isDeleted = 0
-			UNION
-            SELECT 1 FROM user WHERE uid = ? AND (privilege & ${UserPrivilege.VIP_TOPIC}) != 0
-        """, uid, tid, pid, cid, uid, tid, uid) == null) failure("无权限")
-        mysql.throwTransaction {
+        mysql.throwTransaction { transaction ->
+            if (transaction.throwQuerySQL("""
+                SELECT c.cid
+                FROM $tableName AS c
+                JOIN $tableName AS p ON p.cid = c.pid AND p.tid = c.tid
+                JOIN topic AS t ON t.tid = c.tid
+                JOIN user AS u ON u.uid = ?
+                WHERE c.tid = ? AND c.pid = ? AND c.cid = ?
+                  AND c.isDeleted = 0
+                  AND p.pid IS NULL AND p.isDeleted = 0
+                  AND t.rawSection = ?
+                  AND (
+                      c.uid = u.uid
+                      OR (t.uid = u.uid AND t.isDeleted = 0)
+                      OR (u.privilege & ${UserPrivilege.VIP_TOPIC}) != 0
+                  )
+                FOR UPDATE
+            """, uid, tid, pid, cid, rawSection).isEmpty()) failure("无权限")
             // 逻辑删除
-            it.throwExecuteSQL("UPDATE $tableName SET isDeleted = 1 WHERE pid = ? AND cid = ? AND isDeleted = 0", pid, cid)
+            transaction.throwExecuteSQL("""
+                UPDATE $tableName SET isDeleted = 1
+                WHERE tid = ? AND pid = ? AND cid = ? AND isDeleted = 0
+            """, tid, pid, cid)
             // 更新评论楼中楼数
-            it.throwExecuteSQL("UPDATE $tableName SET subCommentNum = subCommentNum - 1 WHERE pid IS NULL AND cid = ? AND isDeleted = 0", pid)
+            transaction.throwExecuteSQL("""
+                UPDATE $tableName SET subCommentNum = subCommentNum - 1
+                WHERE tid = ? AND cid = ? AND pid IS NULL AND isDeleted = 0
+            """, tid, pid)
         }
     }
 }
