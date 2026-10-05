@@ -2,27 +2,28 @@ plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
+        libs.plugins.androidLibraryNew,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
     )
 }
 
-template(object : KotlinNativeLibTemplate() {
+template(object : KotlinMultiplatformTemplate() {
     override val windowsTarget: Boolean = true
     override val linuxTarget: Boolean = true
     override val macosTarget: Boolean = true
 
-    override fun KotlinNativeSourceSetsScope.source() {
-        nativeMain.configure(commonMain) {
+    override fun KotlinMultiplatformSourceSetsScope.source() {
+        commonMain.configure {
             lib(
                 libs.jetbrains.annotation,
-                libs.sqlx4k,
-                projects.ylcsModule.cs.serverEngine,
+                ExportLib,
+                projects.ylcsModule.core,
             )
         }
 
-        windowsMain.configure(nativeMain)
-        linuxMain.configure(nativeMain)
-        macosMain.configure(nativeMain)
+        desktopTest.configure {
+            lib(libs.test)
+        }
     }
 })
