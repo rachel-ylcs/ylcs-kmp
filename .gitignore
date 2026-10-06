@@ -44,9 +44,4 @@ ylcs-app/config/secret/
 !**/gradle-wrapper.properties
 
 # 文档
-ylcs-docs/docs/overrides/dokka
-ylcs-docs/docs/overrides/gallery
-
-# gemini
-.gemini/
-gha-creds-*.json
+ylcs-docs/docs/overrides/*
