@@ -119,6 +119,7 @@ include(
     "ylcs-app:landpage",
     "ylcs-app:mod",
     "ylcs-app:mod-manager",
+    "ylcs-app:modern-screen",
     "ylcs-app:server",
     "ylcs-app:third-party",
     "ylcs-app:web-app",
