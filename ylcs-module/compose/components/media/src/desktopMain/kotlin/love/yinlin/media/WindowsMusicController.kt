@@ -74,9 +74,9 @@ internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMus
         }
     }
 
-    override fun innerStop() { nativeSetSource(nativeHandle, null) }
+    override suspend fun innerStop() { nativeSetSource(nativeHandle, null) }
 
-    override fun innerGotoIndex(path: String, playing: Boolean): Boolean {
+    override suspend fun innerGotoIndex(path: String, playing: Boolean): Boolean {
         nativeSetSource(nativeHandle, path)
         shouldImmediatePlay = playing
         return true
@@ -110,13 +110,15 @@ internal class WindowsMusicController(fetcher: MediaMetadataFetcher) : CommonMus
 
     @Suppress("unused")
     private fun nativeMediaEnded() {
-        if (!isReady) return
+        scope.launch {
+            if (!isReady || isRelease) return@launch
 
-        internalGotoIndex(when (playMode) {
-            MediaPlayMode.Order -> loopNextIndex
-            MediaPlayMode.Loop -> currentIndex
-            MediaPlayMode.Random -> randomNextIndex ?: reshuffled()
-        })
+            internalGotoIndex(when (playMode) {
+                MediaPlayMode.Order -> loopNextIndex
+                MediaPlayMode.Loop -> currentIndex
+                MediaPlayMode.Random -> randomNextIndex ?: reshuffled()
+            })
+        }
     }
 
     @Suppress("unused")

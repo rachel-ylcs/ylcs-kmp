@@ -119,12 +119,12 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
         if (isReady) player.seekToTime(CMTimeMake(position, 1000))
     }
 
-    override fun innerStop() {
+    override suspend fun innerStop() {
         player.pause()
         player.replaceCurrentItemWithPlayerItem(null)
     }
 
-    override fun innerGotoIndex(path: String, playing: Boolean): Boolean {
+    override suspend fun innerGotoIndex(path: String, playing: Boolean): Boolean {
         val nsUrl = if (path.startsWith("http")) NSURL.URLWithString(path) else NSURL.fileURLWithPath(path)
         return if (nsUrl != null) {
             player.replaceCurrentItemWithPlayerItem(AVPlayerItem(nsUrl))

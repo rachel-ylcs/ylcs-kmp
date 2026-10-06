@@ -13,8 +13,8 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
     private var shuffledList = ShuffledOrder()
     protected var currentIndex: Int by mutableIntStateOf(-1)
 
-    abstract fun innerStop()
-    abstract fun innerGotoIndex(path: String, playing: Boolean = true): Boolean
+    abstract suspend fun innerStop()
+    abstract suspend fun innerGotoIndex(path: String, playing: Boolean = true): Boolean
 
     protected val loopPreviousIndex: Int get() = (currentIndex + musicList.size - 1) % musicList.size
 
@@ -60,7 +60,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         if (mode == MediaPlayMode.Random) reshuffled(start = currentIndex)
     }
 
-    protected fun internalStop() {
+    protected suspend fun internalStop() {
         musicList.clear()
         duration = 0L
         currentId = null
@@ -71,7 +71,7 @@ abstract class CommonMusicPlayer(fetcher: MediaMetadataFetcher) : MusicPlayer(fe
         listener?.onPlayerStop()
     }
 
-    protected fun internalGotoIndex(index: Int, playing: Boolean = true) {
+    protected suspend fun internalGotoIndex(index: Int, playing: Boolean = true) {
         var success = false
         if (index in musicList.indices) {
             val path = fetcher.extractAudioUri(musicList[index])

@@ -84,11 +84,11 @@ internal open class MiniaudioMusicController(fetcher: MediaMetadataFetcher) : Co
         }
     }
 
-    override fun innerStop() {
+    override suspend fun innerStop() {
         if (nativeHandle != 0L) nativeSetSource(nativeHandle, null)
     }
 
-    override fun innerGotoIndex(path: String, playing: Boolean): Boolean {
+    override suspend fun innerGotoIndex(path: String, playing: Boolean): Boolean {
         if (nativeHandle == 0L || !nativeSetSource(nativeHandle, path)) return false
         if (playing) nativePlay(nativeHandle)
         return true

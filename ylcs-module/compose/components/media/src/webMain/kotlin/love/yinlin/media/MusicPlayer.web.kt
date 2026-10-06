@@ -10,8 +10,8 @@ class WebMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
     override suspend fun play() {}
     override suspend fun pause() {}
     override suspend fun seekTo(position: Long) {}
-    override fun innerStop() {}
-    override fun innerGotoIndex(path: String, playing: Boolean): Boolean = false
+    override suspend fun innerStop() {}
+    override suspend fun innerGotoIndex(path: String, playing: Boolean): Boolean = false
 }
 
 actual fun buildMusicPlayer(fetcher: MediaMetadataFetcher): MusicPlayer = WebMusicPlayer(fetcher)
