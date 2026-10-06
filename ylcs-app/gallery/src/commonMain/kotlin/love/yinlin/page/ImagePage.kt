@@ -159,6 +159,9 @@ object ImagePage : Page() {
                     Example("p9", modifier = Modifier.weight(1f)) {
                         NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(9) }, content = imageBlock)
                     }
+                    Example("p12", modifier = Modifier.weight(1f)) {
+                        NineGrid(modifier = Modifier.fillMaxWidth(), pics = remember { buildPictures(12) }, content = imageBlock)
+                    }
                 }
             }
         }

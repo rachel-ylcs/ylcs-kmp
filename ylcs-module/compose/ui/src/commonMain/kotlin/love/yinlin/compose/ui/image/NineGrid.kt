@@ -1,6 +1,8 @@
 package love.yinlin.compose.ui.image
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -18,8 +20,11 @@ import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.util.fastCoerceAtMost
 import androidx.compose.ui.zIndex
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
+import love.yinlin.compose.bold
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.data.Picture
 
 /**
@@ -195,6 +200,21 @@ fun <P : Picture> NineGrid(
                                 color = Theme.color.onContainer,
                                 modifier = Modifier.size(Theme.size.image8).zIndex(2f)
                             )
+                        }
+                        else {
+                            val diff = pics.size - picSize
+                            if (index + 1 == picSize && diff > 0) { // 多出的图片给最后一张附加提示图层
+                                Box(
+                                    modifier = Modifier.matchParentSize().background(Theme.color.scrim.copy(alpha = 0.6f)).zIndex(2f),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    SimpleClipText(
+                                        text = "+$diff",
+                                        style = Theme.typography.v3.bold,
+                                        color = Colors.White
+                                    )
+                                }
+                            }
                         }
                     }
                 }
