@@ -2,45 +2,60 @@
 package love.yinlin.compose.ui.media
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.UIKitInteropProperties
-import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import love.yinlin.compose.ui.PlatformView
+import love.yinlin.compose.ui.Releasable
+import love.yinlin.compose.ui.Updatable
+import love.yinlin.compose.ui.rememberPlatformView
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingError
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.IOSAVPlayer
 import love.yinlin.media.IOSPlayerLifetime
 import platform.AVFoundation.*
+import platform.CoreGraphics.CGRectMake
 import platform.QuartzCore.CATransaction
 import platform.UIKit.*
 import kotlin.time.Duration.Companion.milliseconds
 
+private class VideoView : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
+    val videoLayer = AVPlayerLayer()
+
+    override fun layoutSubviews() {
+        super.layoutSubviews()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        videoLayer.frame = bounds
+        CATransaction.commit()
+    }
+}
+
 @Stable
-private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
-    private class IOSVideoView : UIView() {
-        val videoLayer = AVPlayerLayer()
-
-        init {
-            backgroundColor = UIColor.blackColor
-            videoLayer.videoGravity = AVLayerVideoGravityResizeAspect
-            layer.addSublayer(videoLayer)
-        }
-
-        override fun layoutSubviews() {
-            super.layoutSubviews()
-            CATransaction.begin()
-            CATransaction.setDisableActions(true)
-            videoLayer.frame = bounds
-            CATransaction.commit()
-        }
+private class VideoViewWrapper(private val getSurfacePlayer: () -> AVPlayer?) : PlatformView<VideoView>(), Updatable<VideoView>, Releasable<VideoView> {
+    override fun build(): VideoView {
+        val videoView = VideoView()
+        videoView.backgroundColor = UIColor.blackColor
+        videoView.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect
+        videoView.layer.addSublayer(videoView.videoLayer)
+        return videoView
     }
 
+    override fun update(view: VideoView) {
+        view.videoLayer.player = getSurfacePlayer()
+    }
+
+    override fun release(view: VideoView) {
+        view.videoLayer.player = null
+    }
+}
+
+@Stable
+private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     private val lifetime = IOSPlayerLifetime()
     private val scope = lifetime.scope
     private var player: IOSAVPlayer? = null
@@ -141,20 +156,10 @@ private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     override fun SurfaceContent(modifier: Modifier) {
-        UIKitView(
-            factory = { IOSVideoView() },
-            modifier = modifier,
-            update = { it.videoLayer.player = surfacePlayer },
-            onRelease = { it.videoLayer.player = null },
-            properties = UIKitInteropProperties(
-                interactionMode = null,
-                isNativeAccessibilityEnabled = false,
-                placedAsOverlay = false,
-            )
-        )
+        val wrapper = rememberPlatformView { VideoViewWrapper { surfacePlayer } }
+        wrapper.HostView(modifier)
     }
 }
 
