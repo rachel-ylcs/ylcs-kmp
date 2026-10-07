@@ -78,8 +78,10 @@ class ScreenUser : BasicScreen() {
         levelSheet.open(profile)
     }
 
-    override suspend fun initialize() {
-        DataSourceAccount.updateUserProfile()
+    override fun initialize() {
+        launch {
+            DataSourceAccount.updateUserProfile()
+        }
     }
 
     private val userProfileCard = movableComposable { profile: UserProfile, innerPadding: PaddingValues, modifier: Modifier ->

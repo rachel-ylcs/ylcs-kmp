@@ -245,22 +245,24 @@ class ScreenRhyme : BasicScreen() {
         }
     }
 
-    override suspend fun initialize() {
-        // 初始化曲库
-        val rawLibrary = DataSourceMusic.library.values
-        Coroutines.io {
-            val modPath = app.modPath
-            rawLibrary.mapNotNullTo(library) { info ->
-                if (info.path(modPath, ModResourceType.Rhyme).exists()) info else null
+    override fun initialize() {
+        launch {
+            // 初始化曲库
+            val rawLibrary = DataSourceMusic.library.values
+            Coroutines.io {
+                val modPath = app.modPath
+                rawLibrary.mapNotNullTo(library) { info ->
+                    if (info.path(modPath, ModResourceType.Rhyme).exists()) info else null
+                }
             }
+            // 初始化仓库
+            Coroutines.io {
+                val token = app.config.userToken
+                if (token.isNotEmpty()) ApiRhymeGetUserRepository.request(token) { repository = it }
+            }
+            // 初始化游戏引擎
+            if (!engine.initialize()) gameError = true
         }
-        // 初始化仓库
-        Coroutines.io {
-            val token = app.config.userToken
-            if (token.isNotEmpty()) ApiRhymeGetUserRepository.request(token) { repository = it }
-        }
-        // 初始化游戏引擎
-        if (!engine.initialize()) gameError = true
     }
 
     override fun uninitialize() {

@@ -223,11 +223,13 @@ class ScreenMusicLibrary : Screen() {
 
     override val title: String get() = if (isSearching) "搜索" else "曲库"
 
-    override suspend fun initialize() {
+    override fun initialize() {
         resetLibrary()
-        monitor(state = { DataSourceMusic.library }) {
-            if (isManaging) exitManagement()
-            if (!isSearching) resetLibrary()
+        launch {
+            monitor(state = { DataSourceMusic.library }) {
+                if (isManaging) exitManagement()
+                if (!isSearching) resetLibrary()
+            }
         }
     }
 

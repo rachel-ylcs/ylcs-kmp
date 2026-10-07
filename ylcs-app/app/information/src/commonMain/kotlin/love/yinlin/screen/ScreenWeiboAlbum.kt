@@ -73,8 +73,10 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
 
     override val title: String get() = "$albumTitle - 共 $num 张"
 
-    override suspend fun initialize() {
-        requestAlbum(1)
+    override fun initialize() {
+        launch {
+            requestAlbum(1)
+        }
     }
 
     @Composable

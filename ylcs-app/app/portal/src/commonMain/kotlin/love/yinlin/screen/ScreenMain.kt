@@ -16,6 +16,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.zIndex
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.datetime.number
 import love.yinlin.app
@@ -48,12 +49,14 @@ class ScreenMain : BasicScreen() {
         if (isAppInitialized) app.backHome()
     }
 
-    override suspend fun initialize() {
-        // 更新用户信息
-        if (!DataSourceAccount.updateUserToken()) navigate(::ScreenLogin)
+    override fun initialize() {
+        launch {
+            // 更新用户信息
+            if (!DataSourceAccount.updateUserToken()) navigate(::ScreenLogin)
 
-        supervisorScope {
-            launch { DataSourceActivity.requestNewActivity() } // 加载轮播图
+            supervisorScope {
+                this.launch { DataSourceActivity.requestNewActivity() } // 加载轮播图
+            }
         }
     }
 

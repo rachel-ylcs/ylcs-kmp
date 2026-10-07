@@ -80,13 +80,15 @@ class ScreenUserCard(private val uid: Int) : Screen() {
 
     override val title: String = "主页"
 
-    override suspend fun initialize() {
-        supervisorScope {
-            launch {
-                ApiProfileGetPublicProfile.request(app.config.userToken.ifEmpty { null }, uid) { currentProfile = it }
-            }
-            launch {
-                ApiTopicGetTopics.request(uid, page.default1, page.default, page.pageNum) { page.newData(it) }
+    override fun initialize() {
+        launch {
+            supervisorScope {
+                this.launch {
+                    ApiProfileGetPublicProfile.request(app.config.userToken.ifEmpty { null }, uid) { currentProfile = it }
+                }
+                this.launch {
+                    ApiTopicGetTopics.request(uid, page.default1, page.default, page.pageNum) { page.newData(it) }
+                }
             }
         }
     }

@@ -98,12 +98,12 @@ class ScreenAddTopic : Screen() {
 
     override val title: String = "发表主题"
 
-    override suspend fun initialize() {
-        app.config.editedTopic?.then { editedTopic ->
-            input.title.text = editedTopic.title
-            input.content.text = editedTopic.content
-            input.section = editedTopic.section
-            input.pics += editedTopic.pics.map { ThumbImage(it) }
+    override fun initialize() {
+        app.config.editedTopic?.then { (val title1 = title, val content, val section, val pics) ->
+            input.title.text = title1
+            input.content.text = content
+            input.section = section
+            input.pics += pics.map(::ThumbImage)
         }
     }
 

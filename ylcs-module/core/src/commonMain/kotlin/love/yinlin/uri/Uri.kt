@@ -53,7 +53,7 @@ data class Uri(
                 buffer[writePosition++] = byte
             }
 
-            fun decodeToStringAndReset() = cleaning({ writePosition = 0}) {
+            fun decodeToStringAndReset() = cleaning({ writePosition = 0 }) {
                 buffer.decodeToString(startIndex = 0, endIndex = writePosition, throwOnInvalidSequence = false)
             }
 

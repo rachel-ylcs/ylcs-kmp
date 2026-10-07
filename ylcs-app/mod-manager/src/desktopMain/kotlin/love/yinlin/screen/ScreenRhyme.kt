@@ -144,26 +144,28 @@ class ScreenRhyme(private val path: String?) : Screen() {
         }
     }
 
-    override suspend fun initialize() {
-        catchingError {
-            val [musicName, musicConfig] = Coroutines.io {
-                path?.let {
-                    val musicInfo = File(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
-                    val rhymePath = File(it, ModResourceType.Rhyme.filename)
-                    val newConfig = RhymeLyricsConfig(
-                        id = musicInfo.id,
-                        duration = 0L,
-                        chorus = musicInfo.chorus?.map { v -> Chorus(v, v) } ?: [],
-                        lyrics = [],
-                        offset = 0,
-                    )
-                    if (!rhymePath.exists()) rhymePath.writeText(prettyJson.encodeToString(newConfig))
-                    musicInfo.name to rhymePath.readText()!!.parseJsonValue()
-                } ?: ("未知歌曲" to defaultConfig)
-            }
-            name = musicName
-            rhymeConfig = musicConfig
-        }.errorTip
+    override fun initialize() {
+        launch {
+            catchingError {
+                val [musicName, musicConfig] = Coroutines.io {
+                    path?.let {
+                        val musicInfo = File(it, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
+                        val rhymePath = File(it, ModResourceType.Rhyme.filename)
+                        val newConfig = RhymeLyricsConfig(
+                            id = musicInfo.id,
+                            duration = 0L,
+                            chorus = musicInfo.chorus?.map { v -> Chorus(v, v) } ?: [],
+                            lyrics = [],
+                            offset = 0,
+                        )
+                        if (!rhymePath.exists()) rhymePath.writeText(prettyJson.encodeToString(newConfig))
+                        musicInfo.name to rhymePath.readText()!!.parseJsonValue()
+                    } ?: ("未知歌曲" to defaultConfig)
+                }
+                name = musicName
+                rhymeConfig = musicConfig
+            }.errorTip
+        }
     }
 
     @Composable

@@ -48,6 +48,11 @@ jobs:
           mkdir -p ylcs-docs/docs/overrides
           ./gradlew ylcs-app:gallery:galleryPublish
 
+      - name: Build ModernScreen
+        run: |
+          mkdir -p ylcs-docs/docs/overrides
+          ./gradlew ylcs-app:modern-screen:modernScreenPublish
+
       - name: Build Dokka
         run: |
           mkdir -p ylcs-docs/docs/overrides

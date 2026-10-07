@@ -70,8 +70,10 @@ class ScreenWeiboSettings : Screen() {
 
     override val title: String get() = if (isLocal) "微博关注" else "搜索结果"
 
-    override suspend fun initialize() {
-        refreshLocalUser()
+    override fun initialize() {
+        launch {
+            refreshLocalUser()
+        }
     }
 
     @Composable

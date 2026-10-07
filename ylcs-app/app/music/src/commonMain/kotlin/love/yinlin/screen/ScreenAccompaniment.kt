@@ -59,23 +59,23 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
 
     private val blurState = BlurState()
 
-    override suspend fun initialize() {
-        player.init()
+    override fun initialize() {
+        launch {
+            player.init()
 
-        catchingError {
-            require(player.isInit)
-            player.load(music.path(app.modPath, ModResourceType.Accompaniment), false)
+            catchingError {
+                require(player.isInit)
+                player.load(music.path(app.modPath, ModResourceType.Accompaniment), false)
 
-            Coroutines.io {
-                engine.load(music.path(app.modPath))
-            }
+                Coroutines.io {
+                    engine.load(music.path(app.modPath))
+                }
 
-            launch {
                 isPlayingFlow.collectLatest { value ->
                     isPlaying = value
                     duration = player.duration
                     if (value) {
-                        while (this@launch.isActive) {
+                        while (Coroutines.isActive()) {
                             val newPosition = player.position
                             position = newPosition
                             duration = player.duration
@@ -85,8 +85,8 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                     }
                     else position = player.position
                 }
-            }
-        }?.then { slot.tip.error("播放器加载失败") }
+            }?.then { slot.tip.error("播放器加载失败") }
+        }
     }
 
     override fun uninitialize() {

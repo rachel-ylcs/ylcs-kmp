@@ -9,6 +9,15 @@ import kotlinx.serialization.encoding.Encoder
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.reflect.metaClassName
 
+abstract class DelegateSerializer<T, R> : KSerializer<T> {
+    abstract val delegate: KSerializer<R>
+    abstract fun encode(value: T): R
+    abstract fun decode(value: R): T
+    final override val descriptor: SerialDescriptor get() = delegate.descriptor
+    final override fun serialize(encoder: Encoder, value: T) = encoder.encodeSerializableValue(delegate, encode(value))
+    final override fun deserialize(decoder: Decoder): T = decode(decoder.decodeSerializableValue(delegate))
+}
+
 abstract class IntSerializer<T>(name: String) : KSerializer<T> {
     abstract fun encode(value: T): Int
     abstract fun decode(value: Int): T

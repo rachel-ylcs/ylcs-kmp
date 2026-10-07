@@ -53,14 +53,6 @@ class AppNode(val root: RootProjectNode, c: Constants) : Directory by root.dir("
     }
     val landpage = LandpageNode(this)
 
-    class GalleryNode(parent: AppNode) : Directory by parent.dir("gallery") {
-        private val build: Directory = dir("build")
-
-        val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
-        val output: Directory = parent.root.docs.gallery
-    }
-    val gallery = GalleryNode(this)
-
     class ServerNode(parent: AppNode, c: Constants) : Directory by parent.dir("server") {
         val originOutput: RegularFile = dir("build").dir("bin").dir("linux").dir("releaseExecutable").file("server.kexe")
     }
@@ -71,6 +63,22 @@ class AppNode(val root: RootProjectNode, c: Constants) : Directory by root.dir("
         val originOutput: Directory = build.dir("compose").dir("binaries").dir("main-release").dir("app")
     }
     val modManager = ModManagerNode(this)
+
+    class GalleryNode(parent: AppNode) : Directory by parent.dir("gallery") {
+        private val build: Directory = dir("build")
+
+        val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
+        val output: Directory = parent.root.docs.gallery
+    }
+    val gallery = GalleryNode(this)
+
+    class ModernScreenNode(parent: AppNode) : Directory by parent.dir("modern-screen") {
+        private val build: Directory = dir("build")
+
+        val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
+        val output: Directory = parent.root.docs.modernScreen
+    }
+    val modernScreen = ModernScreenNode(this)
 }
 
 class DocsNode(root: RootProjectNode) : Directory by root.dir("ylcs-docs") {
@@ -79,6 +87,7 @@ class DocsNode(root: RootProjectNode) : Directory by root.dir("ylcs-docs") {
     val overrides: Directory = docs.dir("overrides")
     val dokka: Directory = overrides.dir("dokka")
     val gallery: Directory = overrides.dir("gallery")
+    val modernScreen: Directory = overrides.dir("modern-screen")
 }
 
 class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
