@@ -31,6 +31,7 @@ jobs:
       modManager: ${{ steps.filter.outputs.modManager }}
       landpage: ${{ steps.filter.outputs.landpage }}
       gallery: ${{ steps.filter.outputs.gallery }}
+      modernScreen: ${{ steps.filter.outputs.modernScreen }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -100,6 +101,9 @@ jobs:
             gallery:
               - *common
               - 'ylcs-app/gallery/**'
+            modernScreen:
+              - *common
+              - 'ylcs-app/modern-screen/**'
 
   build-android:
     name: Build Android
@@ -312,3 +316,25 @@ jobs:
 
       - name: Build
         run: ./gradlew ylcs-app:gallery:desktopJar
+
+  build-modernScreen:
+    name: Build Rachel Modern Screen
+    needs: changes
+    if: ${{ needs.changes.outputs.modernScreen == 'true' }}
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: oracle
+          java-version: 25
+          cache: gradle
+          cache-dependency-path: |
+            ./*.gradle*
+            ./**/gradle-wrapper.properties
+
+      - name: Build
+        run: ./gradlew ylcs-app:modern-screen:desktopJar
