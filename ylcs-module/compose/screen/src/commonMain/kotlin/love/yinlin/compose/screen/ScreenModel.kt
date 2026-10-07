@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.extension.cleaning
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -116,21 +117,27 @@ abstract class ScreenModel : ViewModel() {
     inline fun <reified S : ScreenModel, reified A1, reified A2, reified A3, reified A4, reified A5> navigate(metaConstructor: (A1, A2, A3, A4, A5) -> S, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(metaConstructor, arg1, arg2, arg3, arg4, arg5, policy)
 
+    @LooseTyped
     fun navigate(key: String, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, policy)
 
+    @LooseTyped
     inline fun <reified A1> navigate(key: String, arg1: A1, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, arg1, policy)
 
+    @LooseTyped
     inline fun <reified A1, reified A2> navigate(key: String, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, arg1, arg2, policy)
 
+    @LooseTyped
     inline fun <reified A1, reified A2, reified A3> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, arg1, arg2, arg3, policy)
 
+    @LooseTyped
     inline fun <reified A1, reified A2, reified A3, reified A4> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, arg1, arg2, arg3, arg4, policy)
 
+    @LooseTyped
     inline fun <reified A1, reified A2, reified A3, reified A4, reified A5> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, arg1, arg2, arg3, arg4, arg5, policy)
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.compose.screen.ClearPolicy
 import love.yinlin.compose.screen.CreatePolicy
 import love.yinlin.compose.screen.ScreenManager
@@ -24,7 +25,7 @@ import love.yinlin.extension.catchingError
 import love.yinlin.reflect.metaClassName
 
 @Stable
-@OptIn(CompatibleRachelApi::class)
+@OptIn(CompatibleRachelApi::class, LooseTyped::class)
 internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, GallerySection.Factories) {
     private var result by mutableStateOf("尚未执行失败请求。下面三个案例会捕获预期异常，并把原始信息留在这里。")
 
@@ -131,6 +132,7 @@ internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, G
 }
 
 @Stable
+@OptIn(LooseTyped::class)
 internal class FactoryProbeScreen(routes: GalleryRoutes, private val value: Int) :
     GalleryScreen(routes, GallerySection.Factories, "Factory Probe", "value=$value") {
     private var currentValue by mutableStateOf(value)

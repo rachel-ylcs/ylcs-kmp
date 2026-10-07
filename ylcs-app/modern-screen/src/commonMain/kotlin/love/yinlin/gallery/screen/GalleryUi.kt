@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
-
 package love.yinlin.gallery.screen
 
 import androidx.compose.foundation.BorderStroke

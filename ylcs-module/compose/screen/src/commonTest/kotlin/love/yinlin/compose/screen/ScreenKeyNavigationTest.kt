@@ -6,10 +6,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Serializable
 import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.annotation.LooseTyped
 import love.yinlin.reflect.metaClassName
 import kotlin.test.*
 
-@OptIn(CompatibleRachelApi::class)
+@OptIn(CompatibleRachelApi::class, LooseTyped::class)
 class ScreenKeyNavigationTest {
     private open class ProbeScreen : TestScreen() {
         var initializeCount = 0

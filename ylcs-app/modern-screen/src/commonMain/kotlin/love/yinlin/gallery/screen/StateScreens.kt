@@ -16,6 +16,7 @@ import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputState
+import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 internal class DemoResource(private val journal: GalleryJournal, private val scope: String, private val owner: String) : AutoCloseable {
@@ -64,7 +65,7 @@ internal class StateScreen(routes: GalleryRoutes) : GalleryScreen(routes, Galler
         ticker = viewModelScope.launch {
             try {
                 while (isActive) {
-                    delay(1_000)
+                    delay(1000.milliseconds)
                     ticks++
                     publish()
                 }

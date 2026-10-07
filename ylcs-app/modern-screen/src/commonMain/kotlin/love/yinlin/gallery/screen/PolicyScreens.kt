@@ -148,7 +148,7 @@ internal abstract class PolicyPage(
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Actions {
                 Badge("当前真实页面：$displayName $instanceId")
-                Badge("${scope.name}")
+                Badge(scope.name)
             }
             Actions {
                 Metric("初始参数", initialValue?.toString() ?: "无参")
