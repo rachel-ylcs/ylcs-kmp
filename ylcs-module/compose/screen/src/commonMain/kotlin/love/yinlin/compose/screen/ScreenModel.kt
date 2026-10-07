@@ -86,17 +86,17 @@ abstract class ScreenModel : ViewModel() {
     }
 
     /**
+     * 启动协程
+     */
+    fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(context = context, block = block)
+
+    /**
      * 普通变量监听
      *
      * @param state 非状态形式的变量
      * @param action 变量变化回调
      */
-    fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = launch { snapshotFlow(state).collectLatest(action) }
-
-    /**
-     * 启动协程
-     */
-    fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(context = context, block = block)
+    suspend fun <T> monitor(state: () -> T, action: suspend (T) -> Unit) = snapshotFlow(state).collectLatest(action)
 
     inline fun <reified S : ScreenModel> navigate(metaConstructor: () -> S, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(metaConstructor, policy)

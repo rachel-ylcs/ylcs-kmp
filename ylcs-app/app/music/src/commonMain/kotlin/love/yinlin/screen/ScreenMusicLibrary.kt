@@ -225,9 +225,11 @@ class ScreenMusicLibrary : Screen() {
 
     override fun initialize() {
         resetLibrary()
-        monitor(state = { DataSourceMusic.library }) {
-            if (isManaging) exitManagement()
-            if (!isSearching) resetLibrary()
+        launch {
+            monitor(state = { DataSourceMusic.library }) {
+                if (isManaging) exitManagement()
+                if (!isSearching) resetLibrary()
+            }
         }
     }
 
