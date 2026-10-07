@@ -20,12 +20,12 @@ class Screen404 : BasicScreen() {
     @Composable
     override fun BasicContent() {
         Column(
-            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize(),
+            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().padding(Theme.padding.value),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v6, Alignment.CenterVertically)
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v6, Alignment.CenterVertically),
         ) {
             Text(text = Theme.value.noContent404Text, style = Theme.typography.v1.bold)
-            PrimaryButton(text = Theme.value.backText, icon = Icons.ArrowBack, style = Theme.typography.v6.bold, onClick = { manager.pop() })
+            PrimaryButton(text = Theme.value.backText, icon = Icons.ArrowBack, onClick = ::pop)
         }
     }
 }
