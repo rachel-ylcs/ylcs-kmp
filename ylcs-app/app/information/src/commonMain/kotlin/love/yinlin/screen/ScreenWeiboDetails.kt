@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import love.yinlin.common.BasicWeiboManager
 import love.yinlin.common.MessageType
@@ -132,18 +133,20 @@ class ScreenWeiboDetails(private val weibo: Weibo) : Screen() {
 
     override val title: String = "微博详情"
 
-    override suspend fun initialize() {
-        val cookie = BasicWeiboManager.fetchWeiboCookie()
+    override fun initialize() {
+        launch {
+            val cookie = BasicWeiboManager.fetchWeiboCookie()
 
-        supervisorScope {
-            launch {
-                // 获取更多图片
-                val newWeibo = WeiboAPI.requestWeiboDetails(weibo.id, cookie)
-                if (newWeibo != null && newWeibo.medias.size > weibo.medias.size) actualWeibo = newWeibo
-            }
-            launch {
-                // 获取评论
-                comments = WeiboAPI.requestWeiboComment(weibo.id, cookie) ?: emptyList()
+            supervisorScope {
+                this.launch {
+                    // 获取更多图片
+                    val newWeibo = WeiboAPI.requestWeiboDetails(weibo.id, cookie)
+                    if (newWeibo != null && newWeibo.medias.size > weibo.medias.size) actualWeibo = newWeibo
+                }
+                this.launch {
+                    // 获取评论
+                    comments = WeiboAPI.requestWeiboComment(weibo.id, cookie) ?: emptyList()
+                }
             }
         }
     }

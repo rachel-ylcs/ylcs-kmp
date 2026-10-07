@@ -109,8 +109,10 @@ class ScreenLogin : Screen() {
 
     override val title: String get() = mode.title
 
-    override suspend fun initialize() {
-        ApiAccountGetInviters.request { inviters = it }
+    override fun initialize() {
+        launch {
+            ApiAccountGetInviters.request { inviters = it }
+        }
     }
 
     @Composable

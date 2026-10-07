@@ -73,8 +73,10 @@ class ScreenGameRecordHistory : Screen() {
 
     override val title: String = "我的游戏记录"
 
-    override suspend fun initialize() {
-        requestNewGameRecords(true)
+    override fun initialize() {
+        launch {
+            requestNewGameRecords(true)
+        }
     }
 
     @Composable

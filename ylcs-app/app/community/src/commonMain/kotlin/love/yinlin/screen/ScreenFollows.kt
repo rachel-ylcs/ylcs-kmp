@@ -120,8 +120,10 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
 
     override val title: String get() = tab.title
 
-    override suspend fun initialize() {
-        requestNewData()
+    override fun initialize() {
+        launch {
+            requestNewData()
+        }
     }
 
     @Composable

@@ -69,8 +69,10 @@ class ScreenModCenter : Screen() {
 
     override val title: String = "工坊"
 
-    override suspend fun initialize() {
-        requestNewData(true)
+    override fun initialize() {
+        launch {
+            requestNewData(true)
+        }
     }
 
     @Composable

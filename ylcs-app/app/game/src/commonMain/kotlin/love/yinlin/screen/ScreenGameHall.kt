@@ -54,8 +54,10 @@ class ScreenGameHall(private val game: Game) : Screen() {
 
     override val title: String = game.title
 
-    override suspend fun initialize() {
-        requestNewGames(true)
+    override fun initialize() {
+        launch {
+            requestNewGames(true)
+        }
     }
 
     @Composable

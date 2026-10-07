@@ -179,8 +179,10 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
         }
     }
 
-    override suspend fun initialize() {
-        launch { openSockets() }
+    override fun initialize() {
+        launch {
+            openSockets()
+        }
     }
 
     @Composable

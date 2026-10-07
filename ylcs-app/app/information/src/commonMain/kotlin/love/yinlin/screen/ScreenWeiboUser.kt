@@ -69,26 +69,28 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
 
     override val title: String get() = currentWeiboUser?.user?.name ?: ""
 
-    override suspend fun initialize() {
-        supervisorScope {
-            val cookie = BasicWeiboManager.fetchWeiboCookie()
+    override fun initialize() {
+        launch {
+            supervisorScope {
+                val cookie = BasicWeiboManager.fetchWeiboCookie()
 
-            // 请求微博
-            this.launch {
-                currentWeiboUser = WeiboAPI.requestUser(userId, cookie)
-                currentWeiboUser?.user?.id?.then { id ->
-                    provider.withLoading {
-                        val newItems = mutableMapOf<String, Weibo>()
-                        newItems += WeiboAPI.requestUserWeibo(id, cookie)!!.associateBy { it.id }
-                        items = newItems.map { it.value }.sortedDescending()
-                        newItems.isNotEmpty()
+                // 请求微博
+                this.launch {
+                    currentWeiboUser = WeiboAPI.requestUser(userId, cookie)
+                    currentWeiboUser?.user?.id?.then { id ->
+                        provider.withLoading {
+                            val newItems = mutableMapOf<String, Weibo>()
+                            newItems += WeiboAPI.requestUserWeibo(id, cookie)!!.associateBy { it.id }
+                            items = newItems.map { it.value }.sortedDescending()
+                            newItems.isNotEmpty()
+                        }
                     }
                 }
-            }
 
-            // 请求相册
-            this.launch {
-                albums = WeiboAPI.requestUserAlbum(userId, cookie)
+                // 请求相册
+                this.launch {
+                    albums = WeiboAPI.requestUserAlbum(userId, cookie)
+                }
             }
         }
     }

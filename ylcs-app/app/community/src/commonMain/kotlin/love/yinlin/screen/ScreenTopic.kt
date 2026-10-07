@@ -222,16 +222,18 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
 
     override val title: String = "主题"
 
-    override suspend fun initialize() {
-        supervisorScope {
-            this.launch {
-                ApiTopicGetTopicDetails.request(topic.tid) {
-                    currentDetails = it
+    override fun initialize() {
+        launch {
+            supervisorScope {
+                this.launch {
+                    ApiTopicGetTopicDetails.request(topic.tid) {
+                        currentDetails = it
+                    }
                 }
-            }
-            this.launch {
-                ApiTopicGetTopicComments.request(topic.tid, topic.rawSection, pageComments.default1, pageComments.default, pageComments.pageNum) {
-                    pageComments.newData(it)
+                this.launch {
+                    ApiTopicGetTopicComments.request(topic.tid, topic.rawSection, pageComments.default1, pageComments.default, pageComments.pageNum) {
+                        pageComments.newData(it)
+                    }
                 }
             }
         }

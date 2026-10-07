@@ -74,8 +74,10 @@ class ScreenPhotoAlbum : BasicScreen() {
         }
     }
 
-    override suspend fun initialize() {
-        requestNewPhotos()
+    override fun initialize() {
+        launch {
+            requestNewPhotos()
+        }
     }
 
     @Composable

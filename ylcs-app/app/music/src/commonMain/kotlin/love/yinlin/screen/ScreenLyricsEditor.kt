@@ -64,31 +64,30 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
 
     private val listState = LazyListState()
 
-    override suspend fun initialize() {
-        player.init()
+    override fun initialize() {
+        launch {
+            player.init()
 
-        catchingError {
-            require(player.isInit)
-            loadMusic(false)
+            catchingError {
+                require(player.isInit)
+                loadMusic(false)
 
-            val parser = LrcParser.parse(musicInfo.path(app.modPath, ModResourceType.LineLyrics).readText()!!)
-            lyrics.replaceAllByData(parser.lines!!)
+                val parser = LrcParser.parse(musicInfo.path(app.modPath, ModResourceType.LineLyrics).readText()!!)
+                lyrics.replaceAllByData(parser.lines!!)
 
-            launch {
                 isPlayingFlow.collectLatest { value ->
                     isPlaying = value
                     duration = player.duration
                     if (value) {
-                        while (this@launch.isActive) {
+                        while (Coroutines.isActive()) {
                             position = player.position
                             updatePosition(position)
                             delay(32.milliseconds)
                         }
                     }
                 }
-            }
-
-        }?.then { slot.tip.error("播放器加载失败") }
+            }?.then { slot.tip.error("播放器加载失败") }
+        }
     }
 
     override fun uninitialize() {

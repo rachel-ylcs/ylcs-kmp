@@ -71,8 +71,10 @@ class ScreenInformation : BasicScreen() {
         isNavigating = false
     }
 
-    override suspend fun initialize() {
-        requestNewData(currentManager)
+    override fun initialize() {
+        launch {
+            requestNewData(currentManager)
+        }
     }
 
     @Composable

@@ -91,7 +91,7 @@ class ScreenImportMusic(private val deeplink: Uri?) : Screen() {
 
     override val title: String = "导入MOD"
 
-    override suspend fun initialize() {
+    override fun initialize() {
         val uri = deeplink ?: return
         catchingError {
             step = Step.Prepare(app.implicitFileUri(uri))

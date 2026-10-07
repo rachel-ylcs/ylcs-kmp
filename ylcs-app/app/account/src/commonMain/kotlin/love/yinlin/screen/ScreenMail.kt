@@ -91,8 +91,10 @@ class ScreenMail : Screen() {
 
     override val title: String = "邮箱"
 
-    override suspend fun initialize() {
-        requestNewMails(true)
+    override fun initialize() {
+        launch {
+            requestNewMails(true)
+        }
     }
 
     @Composable

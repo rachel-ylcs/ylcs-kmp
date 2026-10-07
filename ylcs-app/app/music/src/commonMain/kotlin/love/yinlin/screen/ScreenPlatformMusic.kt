@@ -121,10 +121,12 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
 
     override val title: String get() = platformType.description
 
-    override suspend fun initialize() {
-        deeplink?.then {
-            val result = parseDialog.open(it.toString(), "${platformType.description}解析")
-            if (result != null) parseMusic(result)
+    override fun initialize() {
+        launch {
+            deeplink?.then {
+                val result = parseDialog.open(it.toString(), "${platformType.description}解析")
+                if (result != null) parseMusic(result)
+            }
         }
     }
 

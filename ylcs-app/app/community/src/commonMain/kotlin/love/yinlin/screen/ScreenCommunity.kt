@@ -74,8 +74,10 @@ class ScreenCommunity : BasicScreen() {
         }?.then { page.moreData(it.o1) }
     }
 
-    override suspend fun initialize() {
-        requestNewData(true)
+    override fun initialize() {
+        launch {
+            requestNewData(true)
+        }
     }
 
     @Composable

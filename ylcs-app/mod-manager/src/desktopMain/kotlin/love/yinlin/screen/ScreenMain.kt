@@ -179,8 +179,10 @@ class ScreenMain : BasicScreen() {
         }.errorTip
     }
 
-    override suspend fun initialize() {
-        loadLibrary()
+    override fun initialize() {
+        launch {
+            loadLibrary()
+        }
     }
 
     @Composable

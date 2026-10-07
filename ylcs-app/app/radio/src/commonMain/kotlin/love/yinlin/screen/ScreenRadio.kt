@@ -79,38 +79,38 @@ class ScreenRadio : BasicScreen() {
 
     private val Radio.audioPath: File get() = File(app.radioPath, id)
 
-    override suspend fun initialize() {
-        val result = supervisorScope {
-            [
-                async { // 初始化播放器
-                    player.init()
-                    player.isInit
-                },
-                async { // 加载本地缓存
-                    val radioData = Coroutines.io {
-                        app.radioPath.list().filter {
-                            it.fileSize() > 1024 * 100 // 至少100KB的文件
-                        }.map { it.nameWithoutExtension }
+    override fun initialize() {
+        launch {
+            val result = supervisorScope {
+                [
+                    this.async { // 初始化播放器
+                        player.init()
+                        player.isInit
+                    },
+                    this.async { // 加载本地缓存
+                        val radioData = Coroutines.io {
+                            app.radioPath.list().filter {
+                                it.fileSize() > 1024 * 100 // 至少100KB的文件
+                            }.map { it.nameWithoutExtension }
+                        }
+                        localMap.replaceAll(radioData)
+                        true
+                    },
+                    this.async { // 加载电台用户
+                        val user = RadioAPI.requestUser(rachel.id) ?: return@async false
+                        radioUser = user
+                        true
+                    },
+                    this.async { // 加载电台节目
+                        val cookie = RadioAPI.generateCookie() ?: return@async false
+                        val programs = RadioAPI.requestPrograms(rachel.id, cookie) ?: return@async false
+                        radioPrograms = programs
+                        programs.isNotEmpty()
                     }
-                    localMap.replaceAll(radioData)
-                    true
-                },
-                async { // 加载电台用户
-                    val user = RadioAPI.requestUser(rachel.id) ?: return@async false
-                    radioUser = user
-                    true
-                },
-                async { // 加载电台节目
-                    val cookie = RadioAPI.generateCookie() ?: return@async false
-                    val programs = RadioAPI.requestPrograms(rachel.id, cookie) ?: return@async false
-                    radioPrograms = programs
-                    programs.isNotEmpty()
-                }
-            ].awaitAll().fastAll { it }
-        }
+                ].awaitAll().fastAll { it }
+            }
 
-        if (result) {
-            launch {
+            if (result) {
                 isPlayingFlow.collectLatest { value ->
                     isPlaying = value
                     duration = player.duration
@@ -124,8 +124,8 @@ class ScreenRadio : BasicScreen() {
                     else position = player.position
                 }
             }
+            else slot.tip.error("播放器加载失败")
         }
-        else slot.tip.error("播放器加载失败")
     }
 
     override fun uninitialize() {

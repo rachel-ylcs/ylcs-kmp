@@ -233,23 +233,25 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
 
     override val title: String get() = clientSong?.name ?: remoteSong?.name ?: "未知歌曲"
 
-    override suspend fun initialize() {
-        val currentClientSong = requestClientSong()
-        clientSong = currentClientSong
+    override fun initialize() {
+        launch {
+            val currentClientSong = requestClientSong()
+            clientSong = currentClientSong
 
-        supervisorScope {
-            this.launch { remoteSong = requestRemoteSong() }
-            this.launch { requestNewSongComments() }
-            this.launch {
-                lyrics = catchingNull {
-                    Coroutines.io {
-                        val lyricsText = if (currentClientSong == null) {
-                            NetClient.File.download(ServerRes.Mod.Song(sid).res(ModResourceType.LineLyrics.filename).url)!!.decodeToString()
+            supervisorScope {
+                this.launch { remoteSong = requestRemoteSong() }
+                this.launch { requestNewSongComments() }
+                this.launch {
+                    lyrics = catchingNull {
+                        Coroutines.io {
+                            val lyricsText = if (currentClientSong == null) {
+                                NetClient.File.download(ServerRes.Mod.Song(sid).res(ModResourceType.LineLyrics.filename).url)!!.decodeToString()
+                            }
+                            else {
+                                currentClientSong.clientPath(ModResourceType.LineLyrics).readText()!!
+                            }
+                            LrcParser.parse(lyricsText).plainText
                         }
-                        else {
-                            currentClientSong.clientPath(ModResourceType.LineLyrics).readText()!!
-                        }
-                        LrcParser.parse(lyricsText).plainText
                     }
                 }
             }

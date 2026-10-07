@@ -158,52 +158,40 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
         navigateTo(type ?: key, args, policy, isUnboundKey = type == null)
     }
 
-    @PublishedApi
-    internal inline fun <reified S : ScreenModel> navigate(metaConstructor: () -> S, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified S : ScreenModel> navigate(metaConstructor: () -> S, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateTo(metaClassName<S>(), ScreenArgs.Empty, policy)
 
-    @PublishedApi
-    internal inline fun <reified S : ScreenModel, reified A1> navigate(metaConstructor: (A1) -> S, arg1: A1, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified S : ScreenModel, reified A1> navigate(metaConstructor: (A1) -> S, arg1: A1, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateTo(metaClassName<S>(), ScreenArgs.build(arg1), policy)
 
-    @PublishedApi
-    internal inline fun <reified S : ScreenModel, reified A1, reified A2> navigate(metaConstructor: (A1, A2) -> S, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified S : ScreenModel, reified A1, reified A2> navigate(metaConstructor: (A1, A2) -> S, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateTo(metaClassName<S>(), ScreenArgs.build(arg1, arg2), policy)
 
-    @PublishedApi
-    internal inline fun <reified S : ScreenModel, reified A1, reified A2, reified A3> navigate(metaConstructor: (A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified S : ScreenModel, reified A1, reified A2, reified A3> navigate(metaConstructor: (A1, A2, A3) -> S, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateTo(metaClassName<S>(), ScreenArgs.build(arg1, arg2, arg3), policy)
 
-    @PublishedApi
-    internal inline fun <reified S : ScreenModel, reified A1, reified A2, reified A3, reified A4> navigate(metaConstructor: (A1, A2, A3, A4) -> S, arg1: A1, arg2: A2, arg3: A3, arg4: A4, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified S : ScreenModel, reified A1, reified A2, reified A3, reified A4> navigate(metaConstructor: (A1, A2, A3, A4) -> S, arg1: A1, arg2: A2, arg3: A3, arg4: A4, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateTo(metaClassName<S>(), ScreenArgs.build(arg1, arg2, arg3, arg4), policy)
 
-    @PublishedApi
-    internal inline fun <reified S : ScreenModel, reified A1, reified A2, reified A3, reified A4, reified A5> navigate(metaConstructor: (A1, A2, A3, A4, A5) -> S, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified S : ScreenModel, reified A1, reified A2, reified A3, reified A4, reified A5> navigate(metaConstructor: (A1, A2, A3, A4, A5) -> S, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateTo(metaClassName<S>(), ScreenArgs.build(arg1, arg2, arg3, arg4, arg5), policy)
 
-    @PublishedApi
-    internal fun navigate(key: String, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    fun navigate(key: String, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateKey(key, ScreenArgs.Empty, policy)
 
-    @PublishedApi
-    internal inline fun <reified A1> navigate(key: String, arg1: A1, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified A1> navigate(key: String, arg1: A1, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateKey(key, ScreenArgs.build(arg1), policy)
 
-    @PublishedApi
-    internal inline fun <reified A1, reified A2> navigate(key: String, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified A1, reified A2> navigate(key: String, arg1: A1, arg2: A2, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateKey(key, ScreenArgs.build(arg1, arg2), policy)
 
-    @PublishedApi
-    internal inline fun <reified A1, reified A2, reified A3> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified A1, reified A2, reified A3> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateKey(key, ScreenArgs.build(arg1, arg2, arg3), policy)
 
-    @PublishedApi
-    internal inline fun <reified A1, reified A2, reified A3, reified A4> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified A1, reified A2, reified A3, reified A4> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateKey(key, ScreenArgs.build(arg1, arg2, arg3, arg4), policy)
 
-    @PublishedApi
-    internal inline fun <reified A1, reified A2, reified A3, reified A4, reified A5> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
+    inline fun <reified A1, reified A2, reified A3, reified A4, reified A5> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         navigateKey(key, ScreenArgs.build(arg1, arg2, arg3, arg4, arg5), policy)
 
     internal fun pop(): Boolean {
