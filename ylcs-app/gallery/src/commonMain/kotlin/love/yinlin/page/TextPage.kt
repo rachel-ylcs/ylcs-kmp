@@ -1,6 +1,8 @@
 package love.yinlin.page
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.util.fastForEachIndexed
 import love.yinlin.Page
+import love.yinlin.GalleryCaption
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
@@ -41,7 +44,7 @@ object TextPage : Page() {
                         Input(hint = "Input something")
                     }
                     Example("MultiLine", modifier = Modifier.weight(1f)) {
-                        Input( maxLines = Int.MAX_VALUE)
+                        Input(maxLines = 2)
                     }
                 }
                 ExampleRow {
@@ -61,7 +64,9 @@ object TextPage : Page() {
                 }
                 ExampleRow {
                     Example("Style", modifier = Modifier.weight(1f)) {
-                        Input(style = Theme.typography.v4.bold)
+                        Input(
+                            style = Theme.typography.v4.bold.copy(textDecoration = TextDecoration.LineThrough)
+                        )
                     }
                     Example("Readonly", modifier = Modifier.weight(1f)) {
                         Input(
@@ -83,19 +88,28 @@ object TextPage : Page() {
                 var isUnderline by rememberFalse()
                 var isStrikethrough by rememberFalse()
 
-                Row(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
+                    itemVerticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(text = "加粗")
-                    Switch(isBold, { isBold = it })
-                    Text(text = "斜体")
-                    Switch(isItalic, { isItalic = it })
-                    Text(text = "下划线")
-                    Switch(isUnderline, { isUnderline = it })
-                    Text(text = "删除线")
-                    Switch(isStrikethrough, { isStrikethrough = it })
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
+                        Text(text = "加粗")
+                        Switch(isBold, { isBold = it })
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
+                        Text(text = "斜体")
+                        Switch(isItalic, { isItalic = it })
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
+                        Text(text = "下划线")
+                        Switch(isUnderline, { isUnderline = it })
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)) {
+                        Text(text = "删除线")
+                        Switch(isStrikethrough, { isStrikethrough = it })
+                    }
                 }
 
                 val styles = [
@@ -120,11 +134,11 @@ object TextPage : Page() {
                     if (isStrikethrough) decoration += TextDecoration.LineThrough
                     textStyle = textStyle.copy(textDecoration = decoration)
 
-                    SelectionBox {
-                        Text(
-                            text = "[v${index + 1}] $text",
-                            style = textStyle
-                        )
+                    Column(verticalArrangement = Arrangement.spacedBy(Theme.padding.v)) {
+                        GalleryCaption("TYPOGRAPHY / v${index + 1}")
+                        SelectionBox {
+                            Text(text = text, style = textStyle)
+                        }
                     }
                 }
             }
@@ -155,9 +169,6 @@ object TextPage : Page() {
 
                 val encodedText = remember { richText.toString() }
 
-                // 仅作解码测试, 实际可以直接使用 richText
-                val decodeText = remember { RichParser.Default.parse(encodedText) }
-
                 val renderer = rememberRichRenderer({
                     [
                         object : RichDrawer {
@@ -174,7 +185,7 @@ object TextPage : Page() {
                 ExampleRow {
                     Example("RichText") {
                         SelectionBox {
-                            RichText(text = decodeText, renderer = renderer)
+                            RichText(text = richText, renderer = renderer)
                         }
                     }
 

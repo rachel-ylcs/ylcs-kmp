@@ -186,7 +186,7 @@ object InputPage : Page() {
                             verticalArrangement = Arrangement.spacedBy(Theme.padding.v),
                         ) {
                             Text(
-                                text = remember(converter, convertValue) {
+                                text = remember(converter, convertValue, activeColor, activeStyle) {
                                     buildAnnotatedString {
                                         val text = converter.text
                                         val ch = convertValue

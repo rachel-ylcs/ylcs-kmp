@@ -58,7 +58,7 @@ object AnimationPage : Page() {
             Component("ExpandableContent") {
                 var isExpanded by rememberFalse()
 
-                PrimaryButton(if (isExpanded) "expand" else "collapse", onClick = {
+                PrimaryButton(if (isExpanded) "收起内容" else "展开内容", onClick = {
                     isExpanded = !isExpanded
                 })
                 ExpandableContent(isExpanded) {

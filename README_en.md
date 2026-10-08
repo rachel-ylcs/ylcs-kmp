@@ -60,23 +60,17 @@ The interface library covers various components such as themes, text, inputs, im
 
 |                       Theme                        |                     Dark Mode                      |
 |:--------------------------------------------------:|:--------------------------------------------------:|
-|   ![rachel](ylcs-docs/docs/assets/ui/theme.png)    |    ![rachel](ylcs-docs/docs/assets/ui/dark.png)    |
+|   ![rachel](ylcs-docs/docs/assets/ui/gallery.png)    |    ![rachel](ylcs-docs/docs/assets/ui/theme.png)    |
 |                        Text                        |                      RichText                      |
-|   ![rachel](ylcs-docs/docs/assets/ui/text1.png)    |   ![rachel](ylcs-docs/docs/assets/ui/text2.png)    |
-|                       Button                       |                       Input                        |
-|   ![rachel](ylcs-docs/docs/assets/ui/input1.png)   |   ![rachel](ylcs-docs/docs/assets/ui/input2.png)   |
-|                        Icon                        |                       Image                        |
-|   ![rachel](ylcs-docs/docs/assets/ui/image1.png)   |   ![rachel](ylcs-docs/docs/assets/ui/image2.png)   |
-|                     Container                      |                   Data Container                   |
-| ![rachel](ylcs-docs/docs/assets/ui/container1.png) | ![rachel](ylcs-docs/docs/assets/ui/container2.png) |
-|                     Collection                     |                      Calendar                      |
-| ![rachel](ylcs-docs/docs/assets/ui/collection.png) |  ![rachel](ylcs-docs/docs/assets/ui/calendar.png)  |
-|                     Animation                      |                     Navigation                     |
-| ![rachel](ylcs-docs/docs/assets/ui/animation.png)  | ![rachel](ylcs-docs/docs/assets/ui/navigation.png) |
-|                       Dialog                       |                       Sheet                        |
-|   ![rachel](ylcs-docs/docs/assets/ui/dialog.png)   |   ![rachel](ylcs-docs/docs/assets/ui/sheet.png)    |
-|                       Flyout                       |                        Tip                         |
-|   ![rachel](ylcs-docs/docs/assets/ui/flyout.png)   |    ![rachel](ylcs-docs/docs/assets/ui/tip.png)     |
+|   ![rachel](ylcs-docs/docs/assets/ui/text.png)    |   ![rachel](ylcs-docs/docs/assets/ui/richtext.png)    |
+|                       Input                       |                       Animation                        |
+|   ![rachel](ylcs-docs/docs/assets/ui/input.png)   |   ![rachel](ylcs-docs/docs/assets/ui/animation.png)   |
+|                     Navigation                      |                   Dialog                   |
+| ![rachel](ylcs-docs/docs/assets/ui/tab.png) | ![rachel](ylcs-docs/docs/assets/ui/dialog.png) |
+|                     Image                     |                      Container                      |
+| ![rachel](ylcs-docs/docs/assets/ui/image.png) |  ![rachel](ylcs-docs/docs/assets/ui/container.png)  |
+|                     Collection                      |                     Calendar                     |
+| ![rachel](ylcs-docs/docs/assets/ui/collection.png)  | ![rachel](ylcs-docs/docs/assets/ui/calendar.png) |
 
 
 # Sample: 银临茶舍 Cross-Platform App

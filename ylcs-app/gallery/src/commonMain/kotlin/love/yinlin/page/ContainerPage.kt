@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -48,39 +49,47 @@ object ContainerPage : Page() {
                 var tonal by rememberValueState(0)
                 var border by rememberValueState(0.dp)
 
-                ExampleRow {
-                    Text(text = "边距")
-                    Slider(padding, SliderDpConverter(0.dp, 40.dp), { padding = it }, onValueChange = { padding = it })
-                    Text(text = "形状")
-                    Slider(shape, SliderDpConverter(0.dp, 40.dp), { shape = it }, onValueChange = { shape = it })
-                    Text(text = "阴影")
-                    Slider(shadow, SliderDpConverter(0.dp, 20.dp), { shadow = it }, onValueChange = { shadow = it })
-                    Text(text = "色调")
-                    Slider(tonal, SliderIntConverter(0, 10), { tonal = it }, onValueChange = { tonal = it })
-                    Text(text = "边框")
-                    Slider(border, SliderDpConverter(0.dp, 10.dp), { border = it }, onValueChange = { border = it })
+                ExampleRow(maxItemsInEachRow = 3) {
+                    Example("内边距 · $padding", Modifier.weight(1f)) {
+                        Slider(padding, SliderDpConverter(0.dp, 40.dp), { padding = it }, onValueChange = { padding = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Example("圆角 · $shape", Modifier.weight(1f)) {
+                        Slider(shape, SliderDpConverter(0.dp, 40.dp), { shape = it }, onValueChange = { shape = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Example("阴影 · $shadow", Modifier.weight(1f)) {
+                        Slider(shadow, SliderDpConverter(0.dp, 20.dp), { shadow = it }, onValueChange = { shadow = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Example("色调 · $tonal", Modifier.weight(1f)) {
+                        Slider(tonal, SliderIntConverter(0, 10), { tonal = it }, onValueChange = { tonal = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Example("边框 · $border", Modifier.weight(1f)) {
+                        Slider(border, SliderDpConverter(0.dp, 10.dp), { border = it }, onValueChange = { border = it }, modifier = Modifier.fillMaxWidth())
+                    }
                 }
 
                 Box(
-                    modifier = Modifier.size(Theme.size.cell3, Theme.size.cell4)
-                        .background(Theme.color.secondaryContainer)
-                        .padding(Theme.padding.v8),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
+                        .background(Theme.color.backgroundVariant).padding(28.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(padding),
-                        shape = RoundedCornerShape(shape),
-                        shadowElevation = shadow,
-                        tonalLevel = tonal,
-                        border = if (border == 0.dp) null else BorderStroke(border, Theme.color.tertiary)
+                    Box(
+                        Modifier.size(Theme.size.cell3, Theme.size.cell4).background(Theme.color.secondaryContainer).padding(Theme.padding.v8)
                     ) {
-                        Text(
-                            text = "hello world",
-                            color = Theme.color.onContainer,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxSize().background(Theme.color.primaryContainer)
-                        )
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(padding),
+                            shape = RoundedCornerShape(shape),
+                            shadowElevation = shadow,
+                            tonalLevel = tonal,
+                            border = if (border == 0.dp) null else BorderStroke(border, Theme.color.tertiary)
+                        ) {
+                            Text(
+                                text = "hello world",
+                                color = Theme.color.onContainer,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxSize().background(Theme.color.primaryContainer)
+                            )
+                        }
                     }
                 }
             }
@@ -88,18 +97,27 @@ object ContainerPage : Page() {
             Component("OffsetBox") {
                 var x by rememberValueState(0.5f)
                 var y by rememberValueState(0.5f)
-                ExampleRow {
-                    Text(text = "x")
-                    Slider(x, { x = it }, onValueChange = { x = it })
-                    Text(text = "y")
-                    Slider(y, { y = it }, onValueChange = { y = it })
-                    Box(modifier = Modifier.weight(1f))
-                    Box(modifier = Modifier.size(Theme.size.cell4).background(Theme.color.primaryContainer)) {
-                        OffsetBox(
-                            x = (x * -100f).dp,
-                            y = (y * -100f).dp
-                        ) {
-                            Box(modifier = Modifier.size(Theme.size.cell4).background(Theme.color.secondaryContainer))
+                ExampleRow(maxItemsInEachRow = 2) {
+                    Example("x · ${(-x * 100).toInt()} dp", Modifier.weight(1f)) {
+                        Slider(x, { x = it }, onValueChange = { x = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                    Example("y · ${(-y * 100).toInt()} dp", Modifier.weight(1f)) {
+                        Slider(y, { y = it }, onValueChange = { y = it }, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+                Box(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Theme.color.backgroundVariant)
+                        .horizontalScroll(rememberScrollState()),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Box(Modifier.size(Theme.size.cell4 + 220.dp), contentAlignment = Alignment.Center) {
+                        Box(modifier = Modifier.size(Theme.size.cell4).background(Theme.color.primaryContainer)) {
+                            OffsetBox(
+                                x = (x * -100f).dp,
+                                y = (y * -100f).dp
+                            ) {
+                                Box(modifier = Modifier.size(Theme.size.cell4).background(Theme.color.secondaryContainer))
+                            }
                         }
                     }
                 }

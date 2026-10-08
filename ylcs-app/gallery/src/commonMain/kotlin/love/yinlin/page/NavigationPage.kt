@@ -5,12 +5,14 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import love.yinlin.Page
+import love.yinlin.GalleryActions
+import love.yinlin.GalleryBadge
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.navigation.Breadcrumb
 import love.yinlin.compose.ui.navigation.TabBar
-import love.yinlin.compose.ui.text.Text
+import love.yinlin.compose.ui.input.TextButton
 
 @Stable
 object NavigationPage : Page() {
@@ -20,7 +22,7 @@ object NavigationPage : Page() {
             Component("TabBar") {
                 var currentIndex by rememberValueState(0)
 
-                Text(text = "Item $currentIndex")
+                GalleryBadge("当前选中 · Item $currentIndex")
                 TabBar(
                     size = 5,
                     index = currentIndex,
@@ -34,6 +36,10 @@ object NavigationPage : Page() {
             Component("Breadcrumb") {
                 var items by rememberState { ["Home", "Documents", "Code", "Kotlin", "Compose"] }
 
+                GalleryActions {
+                    GalleryBadge("当前路径 · ${items.last()}")
+                    TextButton("重置路径", icon = Icons.Refresh) { items = ["Home", "Documents", "Code", "Kotlin", "Compose"] }
+                }
                 Breadcrumb(
                     size = items.size,
                     onNavigate = { items = items.take(it + 1) },
