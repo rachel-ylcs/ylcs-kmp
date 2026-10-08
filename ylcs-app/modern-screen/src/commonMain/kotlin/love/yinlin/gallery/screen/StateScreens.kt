@@ -37,7 +37,7 @@ internal class StateScreen(routes: GalleryRoutes) : GalleryScreen(routes, Galler
     private var counter by mutableStateOf(0)
     private var ticks by mutableStateOf(0)
     private var running by mutableStateOf(false)
-    private val draft = InputState("这份草稿属于 Screen ViewModel。", maxLength = 500)
+    private val draft = InputState("这份草稿属于 Screen ViewModel。", maxLength = 500, maxLines = 4, minLines = 2)
     private var ticker: Job? = null
     private var resource: DemoResource? = null
 
@@ -98,7 +98,7 @@ internal class StateScreen(routes: GalleryRoutes) : GalleryScreen(routes, Galler
                 SecondaryButton("remember +1") { rememberedCounter++ }
                 SecondaryButton("saveable +1") { savedCounter++ }
             }
-            Input(draft, Modifier.fillMaxWidth(), hint = "编辑一份页面草稿", minLines = 2, maxLines = 4)
+            Input(modifier = Modifier.fillMaxWidth(), state = draft, hint = "编辑一份页面草稿")
             Paragraph("草稿由 VM 的 InputState 保存。这里的保存指仍在当前进程、当前导航条目作用域内保留。")
         }
         GalleryCard("后台页面的协程与资源", "页面留在栈内时，viewModelScope 不会因为 UI 被覆盖而取消。计时应继续；只有页面清理或主动暂停才结束计时任务。") {

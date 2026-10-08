@@ -170,7 +170,7 @@ internal abstract class PolicyPage(
                 Filter(size = 2, selectedProvider = { scope.target == if (it == 0) "A" else "B" },
                     titleProvider = { if (it == 0) "目标 A" else "目标 B" }, onClick = { index, _ -> scope.target = if (index == 0) "A" else "B" })
                 CheckBox(scope.clear, { scope.clear = it }, "Clear 上方页面")
-                Input(scope.request, Modifier.width(160.dp), hint = "整数参数")
+                Input(modifier = Modifier.width(160.dp), state = scope.request, hint = "整数参数")
             }
             Actions {
                 PrimaryButton("执行 ${scope.create} → ${scope.target}", enabled = scope.request.text.toIntOrNull() != null) { scope.send(this@PolicyPage) }

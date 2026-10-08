@@ -145,7 +145,7 @@ class ScreenWeiboSettings : Screen() {
     private val importSheet = this land object : Sheet() {
         @Composable
         override fun Content() {
-            val state = rememberInputState()
+            val state = rememberInputState(maxLines = 6)
 
             Column(
                 modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
@@ -156,7 +156,6 @@ class ScreenWeiboSettings : Screen() {
                 Input(
                     state = state,
                     hint = "关注列表(JSON格式)",
-                    maxLines = 6,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Row(

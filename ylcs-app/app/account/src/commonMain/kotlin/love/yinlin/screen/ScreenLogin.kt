@@ -25,6 +25,7 @@ import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputDecoration
 import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.PasswordInput
+import love.yinlin.compose.ui.text.PasswordInputState
 import love.yinlin.cs.*
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.extension.DateEx
@@ -42,14 +43,14 @@ class ScreenLogin : Screen() {
     private var inviters: List<String> by mutableRefStateOf([])
 
     private var mode: Mode by mutableEnumStateOf(Mode.Login)
-    private val loginId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH)
-    private val loginPwd = InputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
-    private val registerId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH)
-    private val registerPwd = InputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
-    private val registerPwd2 = InputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
+    private val loginId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH, imeAction = ImeAction.Next)
+    private val loginPwd = PasswordInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
+    private val registerId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH, imeAction = ImeAction.Next)
+    private val registerPwd = PasswordInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
+    private val registerPwd2 = PasswordInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
     private var registerInviter by mutableIntStateOf(-1)
-    private val forgotPasswordId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH)
-    private val forgotPasswordPwd = InputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
+    private val forgotPasswordId = InputState(maxLength = UserConstraint.MAX_NAME_LENGTH, imeAction = ImeAction.Next)
+    private val forgotPasswordPwd = PasswordInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
 
     private val canLogin by derivedStateOf { loginId.isSafe && loginPwd.isSafe }
     private val canRegister by derivedStateOf { registerId.isSafe && registerPwd.isSafe && registerPwd2.isSafe }
@@ -126,7 +127,6 @@ class ScreenLogin : Screen() {
                 modifier = Modifier.fillMaxWidth(),
                 state = loginId,
                 hint = "昵称",
-                imeAction = ImeAction.Next,
                 trailing = InputDecoration.Icon.Clear
             )
 
@@ -135,7 +135,11 @@ class ScreenLogin : Screen() {
                 state = loginPwd,
                 hint = "密码",
                 onImeClick = {
-                    if (canLogin) launch { login() }
+                    if (canLogin) {
+                        launch { login() }
+                        true
+                    }
+                    else false
                 }
             )
 
@@ -178,7 +182,6 @@ class ScreenLogin : Screen() {
                 modifier = Modifier.fillMaxWidth(),
                 state = registerId,
                 hint = "注册昵称",
-                imeAction = ImeAction.Next,
                 trailing = InputDecoration.Icon.Clear
             )
 
@@ -232,7 +235,6 @@ class ScreenLogin : Screen() {
                 modifier = Modifier.fillMaxWidth(),
                 state = forgotPasswordId,
                 hint = "昵称",
-                imeAction = ImeAction.Next,
                 trailing = InputDecoration.Icon.Clear
             )
 
@@ -241,7 +243,11 @@ class ScreenLogin : Screen() {
                 state = forgotPasswordPwd,
                 hint = "新密码",
                 onImeClick = {
-                    if (canForgotPassword) launch { forgotPassword() }
+                    if (canForgotPassword) {
+                        launch { forgotPassword() }
+                        true
+                    }
+                    else false
                 }
             )
 

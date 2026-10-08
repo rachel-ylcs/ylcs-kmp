@@ -1,16 +1,7 @@
 package love.yinlin.page
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
@@ -44,7 +35,7 @@ object TextPage : Page() {
                         Input(hint = "Input something")
                     }
                     Example("MultiLine", modifier = Modifier.weight(1f)) {
-                        Input(maxLines = 2)
+                        Input(state = rememberInputState(maxLines = 2))
                     }
                 }
                 ExampleRow {
@@ -75,9 +66,9 @@ object TextPage : Page() {
                         )
                     }
 
-                    val passwordState = rememberInputState(maxLength = 16)
+                    val passwordState = rememberPasswordInputState(maxLength = 16)
                     Example("Password: ${passwordState.text}", modifier = Modifier.weight(1f)) {
-                        PasswordInput(passwordState, hint = "enter password")
+                        PasswordInput(state = passwordState, hint = "enter password")
                     }
                 }
             }

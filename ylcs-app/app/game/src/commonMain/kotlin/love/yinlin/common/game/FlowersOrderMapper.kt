@@ -156,7 +156,6 @@ object FlowersOrderMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, Gam
                 state = content,
                 hint = "内容(长度${FOConfig.minLength}~${FOConfig.maxLength})",
                 modifier = Modifier.fillMaxWidth(),
-                maxLines = 1,
                 trailing = InputDecoration.LengthViewer
             )
         }

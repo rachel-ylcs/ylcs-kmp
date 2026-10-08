@@ -7,9 +7,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActionScope
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.util.fastCoerceAtLeast
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
@@ -102,26 +98,19 @@ internal fun DecorationBox(
  * @param enabled 可写入
  * @param style 文字样式
  * @param alignment 文字对齐方式
- * @param maxLines 最大行数
- * @param minLines 最小行数
- * @param imeAction IME图标
- * @param onImeClick IME按钮点击事件
  * @param colorProvider 提示灯颜色
  * @param leading 头部装饰
  * @param trailing 尾部装饰
  */
 @Composable
 fun Input(
-    state: InputState = rememberInputState(),
     modifier: Modifier = Modifier,
+    state: InputState = rememberInputState(),
     hint: String? = null,
     enabled: Boolean = true,
     style: TextStyle = LocalStyle.current,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
-    maxLines: Int = 1,
-    minLines: Int = maxLines,
-    imeAction: ImeAction = ImeAction.Done,
-    onImeClick: (KeyboardActionScope.() -> Unit)? = null,
+    onImeClick: (() -> Boolean)? = null,
     colorProvider: InputStatusColorProvider = InputStatusColorProvider.Default,
     leading: InputDecoration? = null,
     trailing: InputDecoration? = null,
@@ -135,32 +124,35 @@ fun Input(
         LocalStyle provides textStyle
     ) {
         BasicTextField(
-            value = state.value,
-            onValueChange = { state.update(it) },
+            state = state.rawState,
             modifier = modifier,
             enabled = enabled,
             readOnly = !enabled,
+            inputTransformation = state.inputTransformation,
             textStyle = textStyle,
-            singleLine = maxLines.fastCoerceAtLeast(1) == 1,
-            minLines = minLines.fastCoerceAtLeast(1),
-            maxLines = maxLines.fastCoerceAtLeast(1),
-            keyboardOptions = state.keyboardOptions ?: remember(imeAction) {
+            keyboardOptions = remember(state.imeAction) {
                 KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     autoCorrectEnabled = false,
-                    imeAction = imeAction
+                    imeAction = state.imeAction
                 )
             },
-            keyboardActions = state.keyboardActions ?: remember(onImeClick, maxLines) {
-                // 多行输入框回车的功能是换行而不是触发IME
-                KeyboardActions(if (onImeClick != null && maxLines == 1) onImeClick else null)
+            onKeyboardAction = remember(onImeClick) {
+                KeyboardActionHandler { perform ->
+                    if (onImeClick?.invoke() == true) {
+                        perform()
+                        println("fuck")
+                    }
+                }
             },
-            visualTransformation = state.visualTransformation ?: VisualTransformation.None,
-            cursorBrush = remember(contentColor) { SolidColor(contentColor) },
+            lineLimits = state.lineLimits,
             interactionSource = state.interactionSource,
-            decorationBox = { innerContent ->
+            cursorBrush = remember(contentColor) { SolidColor(contentColor) },
+            outputTransformation = null,
+            decorator = { innerContent ->
                 DecorationBox(state, hint, alignment, enabled, colorProvider, leading, trailing, innerContent)
-            }
+            },
+            scrollState = state.scrollState
         )
     }
 }

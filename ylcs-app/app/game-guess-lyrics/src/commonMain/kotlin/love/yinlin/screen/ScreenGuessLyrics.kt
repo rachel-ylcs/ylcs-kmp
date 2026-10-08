@@ -376,7 +376,9 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
                     launch {
                         connection.send(LyricsSockets.CM.SaveAnswer(index, newAnswer))
                     }
+                    true
                 }
+                else false
             },
             modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
         )

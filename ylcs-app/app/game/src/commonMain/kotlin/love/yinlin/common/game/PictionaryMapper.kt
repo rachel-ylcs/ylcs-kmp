@@ -102,7 +102,6 @@ object PictionaryMapper : GameMapper(), GameAnswerInfo, GameRecordInfo {
                 state = inputState,
                 hint = "答案(长度${PConfig.minAnswerLength}~${PConfig.maxAnswerLength})",
                 modifier = Modifier.fillMaxWidth(),
-                maxLines = 1,
                 trailing = InputDecoration.LengthViewer
             )
             PaintCanvas(state = paintState, modifier = Modifier.fillMaxWidth())

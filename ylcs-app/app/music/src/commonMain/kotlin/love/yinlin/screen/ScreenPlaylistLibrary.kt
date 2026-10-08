@@ -382,7 +382,7 @@ class ScreenPlaylistLibrary : Screen() {
 
         @Composable
         override fun Content() {
-            val state = rememberInputState()
+            val state = rememberInputState(maxLines = 6)
 
             Column(
                 modifier = Modifier.fillMaxSize().padding(Theme.padding.eValue9),
@@ -393,7 +393,6 @@ class ScreenPlaylistLibrary : Screen() {
                 Input(
                     state = state,
                     hint = "本地歌单(JSON格式)",
-                    maxLines = 6,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Row(

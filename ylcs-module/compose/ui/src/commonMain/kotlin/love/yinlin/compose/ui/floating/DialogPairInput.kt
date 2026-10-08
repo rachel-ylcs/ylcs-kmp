@@ -4,13 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -30,10 +24,10 @@ class DialogPairInput(
     val hint2: String = "",
     maxLength1: Int = Int.MAX_VALUE,
     maxLength2: Int = Int.MAX_VALUE,
-    val maxLines1: Int = 1,
-    val maxLines2: Int = 1,
-    val minLines1: Int = maxLines1,
-    val minLines2: Int = maxLines2,
+    maxLines1: Int = 1,
+    maxLines2: Int = 1,
+    minLines1: Int = maxLines1,
+    minLines2: Int = maxLines2,
     val leading1: InputDecoration? = null,
     val leading2: InputDecoration? = null,
     val trailing1: InputDecoration? = null,
@@ -43,8 +37,8 @@ class DialogPairInput(
     override val scrollable: Boolean = false
 
     private var title: String? by mutableStateOf(ValueTheme.runtime())
-    private val textInputState1 = InputState(maxLength = maxLength1)
-    private val textInputState2 = InputState(maxLength = maxLength2)
+    private val textInputState1 = InputState(maxLength = maxLength1, maxLines = maxLines1, minLines = minLines1)
+    private val textInputState2 = InputState(maxLength = maxLength2, maxLines = maxLines2, minLines = minLines2)
     private val focusRequester = FocusRequester()
 
     private val canSubmit by derivedStateOf { textInputState1.isSafe && textInputState2.isSafe }
@@ -76,8 +70,6 @@ class DialogPairInput(
                 Input(
                     state = textInputState1,
                     hint = hint1,
-                    maxLines = maxLines1,
-                    minLines = minLines1,
                     leading = leading1,
                     trailing = trailing1,
                     modifier = Modifier.widthIn(min = minContentWidth).focusRequester(focusRequester)
@@ -85,8 +77,6 @@ class DialogPairInput(
                 Input(
                     state = textInputState2,
                     hint = hint2,
-                    maxLines = maxLines2,
-                    minLines = minLines2,
                     leading = leading2,
                     trailing = trailing2,
                     modifier = Modifier.widthIn(min = minContentWidth)

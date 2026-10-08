@@ -1,22 +1,27 @@
 package love.yinlin.compose.ui.text
 
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.text.input.VisualTransformation
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.layout.MeasurePolicies
 
@@ -101,20 +106,28 @@ interface InputDecoration {
         // 文字显然比*更宽，长按时如果Input宽度增大会导致密码Icon从鼠标所在位置移开从而又触发收缩
         @Composable
         override fun Content(state: InputState) {
-            if (state.isNotEmpty) {
-                val oldTransformation = remember { state.visualTransformation }
-
+            if (state.isNotEmpty && state is PasswordInputState) {
+                // 恢复原始模式
                 DisposableEffect(Unit) {
                     onDispose {
-                        state.visualTransformation = oldTransformation
+                        state.maskStatus = state.mask.mode.asTextObfuscationMode
                     }
                 }
 
+                var isPressed by rememberFalse()
+
                 love.yinlin.compose.ui.image.Icon(
-                    color = if (state.visualTransformation == VisualTransformation.None) Theme.color.primary else LocalColor.current,
-                    icon = if (state.visualTransformation == VisualTransformation.None) Icons.VisibilityOff else Icons.Visibility,
-                    onClick = {
-                        state.visualTransformation = if (state.visualTransformation == VisualTransformation.None) oldTransformation else VisualTransformation.None
+                    color = if (isPressed) Theme.color.primary else LocalColor.current,
+                    icon = if (isPressed) Icons.VisibilityOff else Icons.Visibility,
+                    modifier = Modifier.pointerInput(Unit) {
+                        awaitEachGesture {
+                            awaitFirstDown()
+                            isPressed = true
+                            state.maskStatus = TextObfuscationMode.Visible
+                            waitForUpOrCancellation()
+                            isPressed = false
+                            state.maskStatus = state.mask.mode.asTextObfuscationMode
+                        }
                     }
                 )
             }

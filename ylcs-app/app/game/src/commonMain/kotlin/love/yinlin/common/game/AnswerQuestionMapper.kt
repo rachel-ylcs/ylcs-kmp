@@ -625,7 +625,9 @@ object AnswerQuestionMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, G
                                             answers[currentIndex] = answer.copy(value = inputState.text)
                                             inputState.text = ""
                                             if (currentIndex < questions.size - 1) ++currentIndex
+                                            true
                                         }
+                                        else false
                                     },
                                     modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
                                 )

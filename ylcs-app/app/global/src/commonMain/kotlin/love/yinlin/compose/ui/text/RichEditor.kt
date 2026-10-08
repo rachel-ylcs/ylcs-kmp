@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -116,8 +115,11 @@ enum class RichEditorPage(val icon: ImageVector) {
 }
 
 @Stable
-open class RichEditorState(maxLength: Int) {
-    private val inputState = InputState(maxLength = maxLength)
+open class RichEditorState(
+    maxLength: Int,
+    internal val imeAction: ImeAction = ImeAction.Done
+) {
+    private val inputState = InputState(maxLength = maxLength, maxLines = 10, minLines = 1, imeAction = imeAction)
     private val focusRequester = FocusRequester()
 
     private var enablePreview by mutableStateOf(false)
@@ -255,14 +257,11 @@ open class RichEditorState(maxLength: Int) {
     @Composable
     protected open fun AtLayout(modifier: Modifier) {}
 
-    private val inputLayout = movableComposable { (val hint = first, val imeAction = second): Pair<String?, ImeAction>, onImeClick: (KeyboardActionScope.() -> Unit)?, modifier: Modifier ->
+    private val inputLayout = movableComposable { hint: String?, onImeClick: (() -> Boolean)?, modifier: Modifier ->
         val iconColor by rememberUpdatedState(if (enablePreview) Theme.color.primary else LocalColor.current)
         Input(
             state = inputState,
             hint = hint,
-            maxLines = 10,
-            minLines = if (enablePreview) 10 else 1,
-            imeAction = imeAction,
             onImeClick = onImeClick,
             leading = remember { InputDecoration.Icon(
                 icon = { Icons.Preview },
@@ -301,8 +300,7 @@ open class RichEditorState(maxLength: Int) {
     @Composable
     private fun PreviewLayout(
         hint: String?,
-        imeAction: ImeAction,
-        onImeClick: (KeyboardActionScope.() -> Unit)?,
+        onImeClick: (() -> Boolean)?,
         modifier: Modifier = Modifier
     ) {
         val deviceType by rememberDeviceType()
@@ -313,7 +311,7 @@ open class RichEditorState(maxLength: Int) {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
             ) {
                 previewTextLayout(Modifier.fillMaxWidth().aspectRatio(2f))
-                inputLayout(hint to imeAction, onImeClick, Modifier.fillMaxWidth().aspectRatio(2f))
+                inputLayout(hint, onImeClick, Modifier.fillMaxWidth().aspectRatio(2f))
             }
         }
         else {
@@ -322,7 +320,7 @@ open class RichEditorState(maxLength: Int) {
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                inputLayout(hint to imeAction, onImeClick, Modifier.weight(1f).aspectRatio(2f))
+                inputLayout(hint, onImeClick, Modifier.weight(1f).aspectRatio(2f))
                 previewTextLayout(Modifier.weight(1f).aspectRatio(2f))
             }
         }
@@ -331,8 +329,7 @@ open class RichEditorState(maxLength: Int) {
     @Composable
     fun Content(
         hint: String?,
-        imeAction: ImeAction,
-        onImeClick: (KeyboardActionScope.() -> Unit)?,
+        onImeClick: (() -> Boolean)?,
         modifier: Modifier = Modifier
     ) {
         LaunchedEffect(enablePreview) {
@@ -360,13 +357,12 @@ open class RichEditorState(maxLength: Int) {
                     }
                     PreviewLayout(
                         hint = hint,
-                        imeAction = imeAction,
                         onImeClick = onImeClick,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
-            else inputLayout(hint to imeAction, onImeClick, Modifier.fillMaxWidth())
+            else inputLayout(hint, onImeClick, Modifier.fillMaxWidth())
         }
     }
 }
@@ -374,13 +370,11 @@ open class RichEditorState(maxLength: Int) {
 @Composable
 fun RichEditor(
     state: RichEditorState,
+    modifier: Modifier = Modifier,
     hint: String? = null,
-    imeAction: ImeAction = ImeAction.Done,
-    onImeClick: (KeyboardActionScope.() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    onImeClick: (() -> Boolean)? = null,
 ) = state.Content(
     hint = hint,
-    imeAction = imeAction,
     onImeClick = onImeClick,
     modifier = modifier
 )

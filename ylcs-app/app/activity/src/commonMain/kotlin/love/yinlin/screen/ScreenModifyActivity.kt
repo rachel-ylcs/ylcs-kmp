@@ -51,22 +51,22 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
     private val activity: Activity by derivedStateOf { DataSourceActivity.activities.find { it.aid == aid }!! }
 
     // 活动信息状态
-    private val shortTitle = InputState(initText = activity.shortTitle ?: "", maxLength = 5)
-    private val fullTitle = InputState(initText = activity.title ?: "", maxLength = 32)
-    private val date = InputState(initText = activity.ts ?: "", maxLength = 12)
-    private val timeInfo = InputState(initText = activity.tsInfo ?: "", maxLength = 128)
-    private val location = InputState(initText = activity.location ?: "", maxLength = 32)
-    private val content = InputState(initText = activity.content ?: "", maxLength = 512)
+    private val shortTitle = InputState(initText = activity.shortTitle ?: "", maxLength = 5, imeAction = ImeAction.Next)
+    private val fullTitle = InputState(initText = activity.title ?: "", maxLength = 32, imeAction = ImeAction.Next)
+    private val date = InputState(initText = activity.ts ?: "", maxLength = 12, imeAction = ImeAction.Next)
+    private val timeInfo = InputState(initText = activity.tsInfo ?: "", maxLength = 128, imeAction = ImeAction.Next)
+    private val location = InputState(initText = activity.location ?: "", maxLength = 32, imeAction = ImeAction.Next)
+    private val content = InputState(initText = activity.content ?: "", maxLength = 512, maxLines = 5)
     private val price = activity.price.toMutableStateList()
     private val saleTime = activity.saleTime.toMutableStateList()
     private val lineup = activity.lineup.toMutableStateList()
     private val playlist = activity.playlist.toMutableStateList()
-    private val showstart = InputState(initText = activity.link.showstart ?: "", maxLength = 1024)
-    private val damai = InputState(initText = activity.link.damai ?: "", maxLength = 16)
-    private val maoyan = InputState(initText = activity.link.maoyan ?: "", maxLength = 16)
-    private val link = InputState(initText = activity.link.link ?: "", maxLength = 256)
-    private val qqGroupPhone = InputState(initText = activity.link.qqGroupPhone ?: "", maxLength = 16)
-    private val qqGroupLink = InputState(initText = activity.link.qqGroupLink ?: "", maxLength = 128)
+    private val showstart = InputState(initText = activity.link.showstart ?: "", maxLength = 1024, imeAction = ImeAction.Next)
+    private val damai = InputState(initText = activity.link.damai ?: "", maxLength = 16, imeAction = ImeAction.Next)
+    private val maoyan = InputState(initText = activity.link.maoyan ?: "", maxLength = 16, imeAction = ImeAction.Next)
+    private val link = InputState(initText = activity.link.link ?: "", maxLength = 256, imeAction = ImeAction.Next)
+    private val qqGroupPhone = InputState(initText = activity.link.qqGroupPhone ?: "", maxLength = 16, imeAction = ImeAction.Next)
+    private val qqGroupLink = InputState(initText = activity.link.qqGroupLink ?: "", maxLength = 128, imeAction = ImeAction.Next)
     private var hide: Boolean by mutableStateOf(activity.hide)
     private var photo by mutableRefStateOf(activity.photo)
 
@@ -284,12 +284,12 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9),
         ) {
-            Input(state = shortTitle, hint = "短活动名称(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = fullTitle, hint = "活动名称(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = date, hint = "活动时间(可空, YYYY-MM-DD)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = timeInfo, hint = "活动时间补充信息(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = location, hint = "活动地点(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = content, hint = "活动内容(可空, 512字)", maxLines = 5, modifier = Modifier.fillMaxWidth())
+            Input(state = shortTitle, hint = "短活动名称(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = fullTitle, hint = "活动名称(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = date, hint = "活动时间(可空, YYYY-MM-DD)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = timeInfo, hint = "活动时间补充信息(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = location, hint = "活动地点(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = content, hint = "活动内容(可空, 512字)", modifier = Modifier.fillMaxWidth())
 
             Text(
                 text = "票价",
@@ -323,12 +323,12 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             AdderLayout(list = lineup, text = "阵容艺人") { "" }
             AdderLayout(list = playlist, text = "歌单曲目") { "" }
 
-            Input(state = showstart, hint = "秀动ID(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = damai, hint = "大麦ID(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = maoyan, hint = "猫眼ID(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = link, hint = "活动链接(可空)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = qqGroupPhone, hint = "QQ群号(可空,仅手机端)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
-            Input(state = qqGroupLink, hint = "QQ群分享链接(可空,非手机端)", imeAction = ImeAction.Next, modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = showstart, hint = "秀动ID(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = damai, hint = "大麦ID(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = maoyan, hint = "猫眼ID(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = link, hint = "活动链接(可空)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = qqGroupPhone, hint = "QQ群号(可空,仅手机端)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
+            Input(state = qqGroupLink, hint = "QQ群分享链接(可空,非手机端)", modifier = Modifier.fillMaxWidth(), trailing = InputDecoration.LengthViewer)
 
             Text(
                 text = "轮播图(可空)",

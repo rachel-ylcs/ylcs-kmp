@@ -151,14 +151,15 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
                 state = inputState,
                 hint = "备选答案 ${items.size}",
                 modifier = Modifier.fillMaxWidth(),
-                maxLines = 1,
                 trailing = InputDecoration.LengthViewer,
                 onImeClick = {
                     val text = inputState.text
                     if (text.length in SAConfig.minLength ..SAConfig.maxLength) {
                         items.add(text)
                         inputState.text = ""
+                        true
                     }
+                    else false
                 }
             )
 
@@ -246,7 +247,9 @@ object SearchAllMapper : GameMapper(), GameItemExtraInfo, GameAnswerInfo, GameRe
                         if (text.length in SAConfig.minLength ..SAConfig.maxLength) {
                             items.add(text)
                             inputState.text = ""
+                            true
                         }
+                        else false
                     },
                     modifier = Modifier.fillMaxWidth().focusRequester(focusRequester)
                 )

@@ -55,7 +55,7 @@ class ScreenCreateGame(private val game: Game) : Screen() {
     private val state = GameMapper.cast<GameMapper>(game)!!.gameCreator!!.invoke(this)
     private val config = state.config
 
-    private val gameTitle = InputState(maxLength = 128)
+    private val gameTitle = InputState(maxLength = 128, maxLines = 3, minLines = 1)
     private var args by mutableRefStateOf(GameConfigArgs(config))
 
     private val canSubmit by derivedStateOf { gameTitle.isSafe && state.canSubmit }
@@ -67,8 +67,6 @@ class ScreenCreateGame(private val game: Game) : Screen() {
         Input(
             state = gameTitle,
             hint = "标题与介绍",
-            maxLines = 3,
-            minLines = 1,
             modifier = Modifier.fillMaxWidth()
         )
 

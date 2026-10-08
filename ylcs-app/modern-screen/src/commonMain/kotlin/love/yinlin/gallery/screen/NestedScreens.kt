@@ -106,7 +106,7 @@ internal abstract class NestedPage(protected val scope: NestedRoutes, name: Stri
                 Metric("独立计数", counter.toString())
                 if (level == 0) Metric("根页 ticks", ticks.toString())
             }
-            Input(draft, Modifier.fillMaxWidth(), hint = "这一侧的草稿")
+            Input(modifier = Modifier.fillMaxWidth(), state = draft, hint = "这一侧的草稿")
             Actions {
                 PrimaryButton("New 下一层") {
                     publish()

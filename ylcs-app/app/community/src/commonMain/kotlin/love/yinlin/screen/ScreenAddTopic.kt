@@ -46,7 +46,7 @@ import love.yinlin.fs.File
 class ScreenAddTopic : Screen() {
     @Stable
     private class TopicInputState {
-        val title = InputState(maxLength = 48)
+        val title = InputState(maxLength = 48, maxLines = 2, minLines = 1, imeAction = ImeAction.Next)
         val content = RichEditorState(maxLength = 512)
         var section by mutableIntStateOf(Comment.Section.WATER)
         val pics = mutableStateListOf<ThumbImage>()
@@ -155,9 +155,6 @@ class ScreenAddTopic : Screen() {
                 Input(
                     state = input.title,
                     hint = "标题",
-                    maxLines = 2,
-                    minLines = 1,
-                    imeAction = ImeAction.Next,
                     modifier = Modifier.fillMaxWidth()
                 )
 

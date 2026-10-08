@@ -25,8 +25,8 @@ import love.yinlin.compose.ui.text.InputState
 class DialogInput(
     val hint: String = "",
     maxLength: Int = Int.MAX_VALUE,
-    val maxLines: Int = 1,
-    val minLines: Int = maxLines,
+    maxLines: Int = 1,
+    minLines: Int = maxLines,
     val leading: InputDecoration? = null,
     val trailing: InputDecoration? = null
 ) : DialogTemplate<String>() {
@@ -34,7 +34,7 @@ class DialogInput(
     override val scrollable: Boolean = false
 
     private var title: String? by mutableStateOf(ValueTheme.runtime())
-    private val textInputState = InputState(maxLength = maxLength)
+    private val textInputState = InputState(maxLength = maxLength, maxLines = maxLines, minLines = minLines)
     private val focusRequester = FocusRequester()
 
     override val actions: @Composable (RowScope.() -> Unit) = {
@@ -58,10 +58,8 @@ class DialogInput(
             Input(
                 state = textInputState,
                 hint = hint,
-                maxLines = maxLines,
-                minLines = minLines,
                 onImeClick = {
-                    if (textInputState.isSafe) future?.send(textInputState.text)
+                    textInputState.isSafe && future?.send(textInputState.text) != null
                 },
                 leading = leading,
                 trailing = trailing,

@@ -50,14 +50,14 @@ import love.yinlin.uri.ImplicitUri
 class ScreenCreateMusic : Screen() {
     @Stable
     private class MusicInfoState {
-        val id = InputState(DateEx.CurrentLong.toString(), maxLength = 32)
-        val name = InputState(maxLength = 32)
-        val author = InputState(app.config.userProfile?.name ?: "", maxLength = 32)
-        val singer = InputState(maxLength = 32)
-        val lyricist = InputState(maxLength = 32)
-        val composer = InputState(maxLength = 32)
-        val album = InputState(maxLength = 32)
-        val lyrics = InputState("")
+        val id = InputState(DateEx.CurrentLong.toString(), maxLength = 32, imeAction = ImeAction.Next)
+        val name = InputState(maxLength = 32, imeAction = ImeAction.Next)
+        val author = InputState(app.config.userProfile?.name ?: "", maxLength = 32, imeAction = ImeAction.Next)
+        val singer = InputState(maxLength = 32, imeAction = ImeAction.Next)
+        val lyricist = InputState(maxLength = 32, imeAction = ImeAction.Next)
+        val composer = InputState(maxLength = 32, imeAction = ImeAction.Next)
+        val album = InputState(maxLength = 32, imeAction = ImeAction.Next)
+        val lyrics = InputState("", maxLines = 5)
         var record: String? by mutableStateOf(null)
         var background: String? by mutableStateOf(null)
         var audioUri: ImplicitUri? by mutableRefStateOf(null)
@@ -183,49 +183,41 @@ class ScreenCreateMusic : Screen() {
             Input(
                 state = input.id,
                 hint = "唯一ID(仅字母或数字)",
-                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             Input(
                 state = input.author,
                 hint = "作者",
-                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             Input(
                 state = input.name,
                 hint = "歌名",
-                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             Input(
                 state = input.singer,
                 hint = "演唱",
-                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             Input(
                 state = input.lyricist,
                 hint = "作词",
-                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             Input(
                 state = input.composer,
                 hint = "作曲",
-                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             Input(
                 state = input.album,
                 hint = "专辑",
-                imeAction = ImeAction.Next,
                 modifier = Modifier.fillMaxWidth()
             )
             Input(
                 state = input.lyrics,
                 hint = "LRC格式歌词",
-                maxLines = 5,
                 modifier = Modifier.fillMaxWidth()
             )
 

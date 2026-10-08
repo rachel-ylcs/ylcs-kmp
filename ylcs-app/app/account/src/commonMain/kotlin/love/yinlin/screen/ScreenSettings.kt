@@ -423,7 +423,7 @@ class ScreenSettings : Screen() {
     private val feedbackSheet = this land object : Sheet() {
         @Composable
         override fun Content() {
-            val state = rememberInputState(maxLength = 512)
+            val state = rememberInputState(maxLength = 512, maxLines = 5)
 
             Column(
                 modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue9),
@@ -449,7 +449,6 @@ class ScreenSettings : Screen() {
                 Input(
                     state = state,
                     hint = "您的建议",
-                    maxLines = 5,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -550,9 +549,9 @@ class ScreenSettings : Screen() {
 
         @Composable
         override fun Content() {
-            val oldPassword = rememberInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
-            val newPassword1 = rememberInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
-            val newPassword2 = rememberInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
+            val oldPassword = rememberPasswordInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
+            val newPassword1 = rememberPasswordInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
+            val newPassword2 = rememberPasswordInputState(maxLength = UserConstraint.MAX_PWD_LENGTH)
 
             val canSubmit by rememberDerivedState { oldPassword.isSafe && newPassword1.isSafe && newPassword2.isSafe }
 
@@ -588,9 +587,13 @@ class ScreenSettings : Screen() {
                     state = newPassword2,
                     hint = "确认新密码",
                     onImeClick = {
-                        if (canSubmit) launch {
-                            submit(oldPassword.text, newPassword1.text, newPassword2.text)
+                        if (canSubmit) {
+                            launch {
+                                submit(oldPassword.text, newPassword1.text, newPassword2.text)
+                            }
+                            true
                         }
+                        else false
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
