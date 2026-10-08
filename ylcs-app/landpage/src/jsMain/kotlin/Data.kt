@@ -86,7 +86,7 @@ enum class AppPlatform(
         AppPlatformVersion.ALPHA,
         "下载",
         {
-            downloadApp("$HOMEPAGE_URL/app/[macOS]银临茶舍${Local.info.versionName}.img")
+            downloadApp("$HOMEPAGE_URL/app/[macOS]银临茶舍${Local.info.versionName}.zip")
         }
     ),
     PWA(
