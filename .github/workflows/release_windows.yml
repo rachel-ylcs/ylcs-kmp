@@ -13,21 +13,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup JDK
-        uses: actions/setup-java@v6
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
         with:
-          distribution: oracle
-          java-version: 25
-          cache: gradle
-          cache-dependency-path: |
-            ./*.gradle*
-            ./**/gradle-wrapper.properties
-
-      - name: Setup MSVC
-        uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
-          export-path-to-vs: VS_PATH
+          msvc: 'true'
 
       - name: Build
         run: ./gradlew ylcs-app:desktop-app:desktopPublish

@@ -28,20 +28,10 @@ jobs:
       - name: Check Github Environment
         run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
 
-      - name: Setup JDK
-        uses: actions/setup-java@v6
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
         with:
-          distribution: oracle
-          java-version: 25
-          cache: gradle
-          cache-dependency-path: |
-            ./*.gradle*
-            ./**/gradle-wrapper.properties
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools platforms;android-37.1'
+          android: 'true'
 
       - name: Build Gallery
         run: |

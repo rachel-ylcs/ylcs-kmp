@@ -14,20 +14,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev
-
-      - name: Setup JDK
-        uses: actions/setup-java@v6
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
         with:
-          distribution: oracle
-          java-version: 25
-          cache: gradle
-          cache-dependency-path: |
-            ./*.gradle*
-            ./**/gradle-wrapper.properties
+          gtk: 'true'
 
       - name: Build
         run: ./gradlew ylcs-app:desktop-app:desktopPublish

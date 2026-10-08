@@ -13,15 +13,8 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup JDK
-        uses: actions/setup-java@v6
-        with:
-          distribution: oracle
-          java-version: 25
-          cache: gradle
-          cache-dependency-path: |
-            ./*.gradle*
-            ./**/gradle-wrapper.properties
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:web-app:webPublish
