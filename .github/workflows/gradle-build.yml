@@ -30,7 +30,7 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Gradle
     runs-on: ${{ inputs.runner }}
     steps:
       - name: Setup Build Environment
@@ -42,15 +42,7 @@ jobs:
           gtk: ${{ inputs.gtk }}
 
       - name: Build
-        if: runner.os != 'Windows'
-        shell: bash
+        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
         env:
           GRADLE_TASK: ${{ inputs.task }}
-        run: ./gradlew "$GRADLE_TASK"
-
-      - name: Build
-        if: runner.os == 'Windows'
-        shell: pwsh
-        env:
-          GRADLE_TASK: ${{ inputs.task }}
-        run: ./gradlew "$env:GRADLE_TASK"
+        run: ./gradlew "${{ runner.os == 'Windows' && '$env:GRADLE_TASK' || '$GRADLE_TASK' }}"
