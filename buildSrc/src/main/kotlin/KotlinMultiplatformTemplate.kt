@@ -129,7 +129,12 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
             // Android
             extensions.findByType<KotlinMultiplatformAndroidLibraryTarget>()?.apply {
                 namespace = uniqueSafeModuleName
-                compileSdk = C.android.compileSdk
+                compileSdk {
+                    val (major, minor) = C.android.compileSdk
+                    version = release(major) {
+                        minorApiLevel = minor
+                    }
+                }
                 minSdk = C.android.minSdk
                 lint.targetSdk = C.android.targetSdk
 

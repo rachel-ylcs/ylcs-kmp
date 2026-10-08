@@ -92,7 +92,7 @@ class Constants(project: Project) {
     // Android 配置
     val android = AndroidConfig(
         minSdk = 29,
-        compileSdk = 37,
+        compileSdk = 37 to 1,
         targetSdk = 37,
         ndkAbi = arrayOf("arm64-v8a"),
         ndkVersion = "29.0.14206865",
@@ -166,7 +166,7 @@ data class JvmConfig(
 
 class AndroidConfig(
     val minSdk: Int,
-    val compileSdk: Int,
+    val compileSdk: Pair<Int, Int>,
     val targetSdk: Int,
     val ndkAbi: Array<String>,
     val ndkVersion: String,

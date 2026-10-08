@@ -58,7 +58,12 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
 
         extensions.configure<ApplicationExtension> {
             namespace = packageName
-            compileSdk = C.android.compileSdk
+            compileSdk {
+                val (major, minor) = C.android.compileSdk
+                version = release(major) {
+                    minorApiLevel = minor
+                }
+            }
 
             compileOptions {
                 sourceCompatibility = C.jvm.compatibility
@@ -94,7 +99,7 @@ abstract class KotlinAndroidTemplate : KotlinTemplate<KotlinAndroidExtension>() 
 
                     val proguardDir = androidProguardAndroidDir.asFile
                     val proguardConfigs = mutableListOf<Any>(getDefaultProguardFile(C.proguard.defaultRule))
-                    if (proguardDir.isDirectory) proguardConfigs.addAll(proguardDir.listFiles { it.extension == "pro" })
+                    if (proguardDir.isDirectory) proguardConfigs.addAll(proguardDir.listFiles { it.extension == "pro" } ?: emptyArray())
                     proguardFiles(*proguardConfigs.toTypedArray())
 
                     signingConfig = androidSigningConfig

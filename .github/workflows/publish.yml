@@ -29,7 +29,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools'
+          packages: 'platform-tools platforms;android-37.1'
 
       - name: Setup Node
         uses: actions/setup-node@v7

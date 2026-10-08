@@ -22,7 +22,12 @@ abstract class KotlinAndroidNDKTemplate : KotlinTemplate<KotlinAndroidExtension>
 
         extensions.configure<LibraryExtension> {
             namespace = uniqueSafeModuleName
-            compileSdk = C.android.compileSdk
+            compileSdk {
+                val (major, minor) = C.android.compileSdk
+                version = release(major) {
+                    minorApiLevel = minor
+                }
+            }
 
             compileOptions {
                 sourceCompatibility = C.jvm.compatibility
@@ -35,7 +40,7 @@ abstract class KotlinAndroidNDKTemplate : KotlinTemplate<KotlinAndroidExtension>
 
                 val proguardDir = androidProguardAndroidDir.asFile
                 val proguardConfigs = mutableListOf<Any>()
-                if (proguardDir.isDirectory) proguardConfigs.addAll(proguardDir.listFiles { it.extension == "pro" })
+                if (proguardDir.isDirectory) proguardConfigs.addAll(proguardDir.listFiles { it.extension == "pro" } ?: emptyArray())
                 consumerProguardFiles(*proguardConfigs.toTypedArray())
 
                 ndk {
