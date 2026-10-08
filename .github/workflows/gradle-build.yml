@@ -32,6 +32,10 @@ jobs:
   build:
     name: Gradle
     runs-on: ${{ inputs.runner }}
+    # Shell configuration cannot use runner.os; choose it from the runner label.
+    defaults:
+      run:
+        shell: ${{ startsWith(inputs.runner, 'windows-') && 'pwsh' || 'bash' }}
     steps:
       - name: Setup Build Environment
         uses: $/.github/actions/setup-build
@@ -42,7 +46,6 @@ jobs:
           gtk: ${{ inputs.gtk }}
 
       - name: Build
-        shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
         env:
           GRADLE_TASK: ${{ inputs.task }}
         run: ./gradlew "${{ runner.os == 'Windows' && '$env:GRADLE_TASK' || '$GRADLE_TASK' }}"
