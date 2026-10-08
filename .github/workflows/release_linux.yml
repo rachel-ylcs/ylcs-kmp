@@ -7,17 +7,9 @@ jobs:
   package-linux:
     name: Package Linux
     # 用太新的 Ubuntu 会导致 native 库链接的 glibc 版本过高，导致无法在较旧的 Linux 上运行
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          gtk: 'true'
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktop-app:desktopPublish
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ubuntu-22.04
+      task: ylcs-app:desktop-app:desktopPublish
+      submodules: recursive
+      gtk: true

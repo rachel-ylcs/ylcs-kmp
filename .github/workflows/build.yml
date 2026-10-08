@@ -34,7 +34,7 @@ jobs:
       modernScreen: ${{ steps.filter.outputs.modernScreen }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: $/.github/actions/checkout
         with:
           fetch-depth: 0
           submodules: recursive
@@ -111,38 +111,22 @@ jobs:
     name: Build Android
     needs: changes
     if: ${{ needs.changes.outputs.android == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          android: 'true'
-
-      - name: Build
-        run: ./gradlew ylcs-app:android-app:androidPackage
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ubuntu-latest
+      task: ylcs-app:android-app:androidPackage
+      submodules: recursive
+      android: true
 
   build-ios:
     name: Build iOS
     needs: changes
     if: ${{ needs.changes.outputs.ios == 'true' }}
-    runs-on: macos-26
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: |
-          ./gradlew ylcs-app:app:portal:linkDebugFrameworkIosArm64
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: macos-26
+      task: ylcs-app:app:portal:linkDebugFrameworkIosArm64
+      submodules: recursive
 
   build-desktop:
     name: Build Desktop
@@ -151,112 +135,66 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          msvc: ${{ runner.os == 'Windows' }}
-          gtk: ${{ runner.os == 'Linux' }}
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktop-app:desktopJar
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ${{ matrix.os }}
+      task: ylcs-app:desktop-app:desktopJar
+      submodules: recursive
+      msvc: true
+      gtk: true
 
   build-web:
     name: Build Web
     needs: changes
     if: ${{ needs.changes.outputs.web == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:web-app:wasmJsJar
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ubuntu-latest
+      task: ylcs-app:web-app:wasmJsJar
+      submodules: recursive
 
   build-server:
     name: Build Server
     needs: changes
     if: ${{ needs.changes.outputs.server == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:server:linkDebugExecutableLinux
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ubuntu-latest
+      task: ylcs-app:server:linkDebugExecutableLinux
 
   build-modManager:
     name: Build Mod Manager
     needs: changes
     if: ${{ needs.changes.outputs.modManager == 'true' }}
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          msvc: 'true'
-
-      - name: Build
-        run: ./gradlew ylcs-app:mod-manager:desktopJar
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: windows-latest
+      task: ylcs-app:mod-manager:desktopJar
+      msvc: true
 
   build-landpage:
     name: Build Landpage
     needs: changes
     if: ${{ needs.changes.outputs.landpage == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:landpage:jsJar
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ubuntu-latest
+      task: ylcs-app:landpage:jsJar
 
   build-gallery:
     name: Build Rachel UI Gallery
     needs: changes
     if: ${{ needs.changes.outputs.gallery == 'true' }}
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:gallery:desktopJar
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: windows-latest
+      task: ylcs-app:gallery:desktopJar
 
   build-modernScreen:
     name: Build Rachel Modern Screen
     needs: changes
     if: ${{ needs.changes.outputs.modernScreen == 'true' }}
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:modern-screen:desktopJar
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: windows-latest
+      task: ylcs-app:modern-screen:desktopJar

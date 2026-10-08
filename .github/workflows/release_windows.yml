@@ -6,17 +6,9 @@ on:
 jobs:
   package-windows:
     name: Package Windows
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          msvc: 'true'
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktop-app:desktopPublish
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: windows-latest
+      task: ylcs-app:desktop-app:desktopPublish
+      submodules: recursive
+      msvc: true

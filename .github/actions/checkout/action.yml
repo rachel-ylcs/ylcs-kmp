@@ -1,0 +1,19 @@
+name: Checkout Code
+description: Check out the caller repository with shared action version and explicit fetch options.
+
+inputs:
+  fetch-depth:
+    description: Number of commits to fetch; zero fetches all history.
+    default: '1'
+  submodules:
+    description: Whether to fetch submodules; accepts false, true, or recursive.
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+        submodules: ${{ inputs.submodules }}

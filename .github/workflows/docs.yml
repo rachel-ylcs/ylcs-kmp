@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-26
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v7
+        uses: $/.github/actions/checkout
         with:
           submodules: recursive
 
@@ -29,8 +29,9 @@ jobs:
         run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
 
       - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+        uses: $/.github/actions/setup-build
         with:
+          checkout: 'false'
           android: 'true'
 
       - name: Build Gallery

@@ -6,15 +6,8 @@ on:
 jobs:
   package-web:
     name: Package Web
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:web-app:webPublish
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ubuntu-latest
+      task: ylcs-app:web-app:webPublish
+      submodules: recursive

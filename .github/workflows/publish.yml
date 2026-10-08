@@ -10,15 +10,11 @@ jobs:
     name: Publish To Maven Central
     runs-on: macos-26
     steps:
-      - name: Checkout Code
+      - name: Setup Build Environment
         id: check
-        uses: actions/checkout@v7
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
           android: 'true'
 
       - name: Setup Node

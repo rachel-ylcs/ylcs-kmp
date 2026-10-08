@@ -6,17 +6,9 @@ on:
 jobs:
   package-android:
     name: Package Android
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          android: 'true'
-
-      - name: Build
-        run: ./gradlew ylcs-app:android-app:androidPublish
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: ubuntu-latest
+      task: ylcs-app:android-app:androidPublish
+      submodules: recursive
+      android: true

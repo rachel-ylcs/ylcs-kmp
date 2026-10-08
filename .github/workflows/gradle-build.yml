@@ -1,0 +1,56 @@
+name: Gradle Build
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        description: Runner used to execute the Gradle task.
+        type: string
+        default: ubuntu-latest
+      task:
+        description: A single fully qualified Gradle task.
+        type: string
+        required: true
+      submodules:
+        description: Whether to fetch submodules; accepts false, true, or recursive.
+        type: string
+        default: 'false'
+      android:
+        description: Install Android SDK packages.
+        type: boolean
+        default: false
+      msvc:
+        description: Configure the MSVC toolchain on Windows.
+        type: boolean
+        default: false
+      gtk:
+        description: Install GTK development dependencies on Linux.
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ inputs.runner }}
+    steps:
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
+        with:
+          submodules: ${{ inputs.submodules }}
+          android: ${{ inputs.android }}
+          msvc: ${{ inputs.msvc }}
+          gtk: ${{ inputs.gtk }}
+
+      - name: Build
+        if: runner.os != 'Windows'
+        shell: bash
+        env:
+          GRADLE_TASK: ${{ inputs.task }}
+        run: ./gradlew "$GRADLE_TASK"
+
+      - name: Build
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          GRADLE_TASK: ${{ inputs.task }}
+        run: ./gradlew "$env:GRADLE_TASK"

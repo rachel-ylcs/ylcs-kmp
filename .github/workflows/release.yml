@@ -10,14 +10,10 @@ jobs:
     name: Package Android
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
           android: 'true'
 
       - name: Build
@@ -33,48 +29,35 @@ jobs:
     name: Package iOS
     runs-on: macos-26
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
 
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
       - name: Build
-        run: |
-          ./gradlew ylcs-app:app:portal:linkDebugFrameworkIosArm64
-          # xcodebuild build -project ./ylcs-app/iosApp/iosApp.xcodeproj -scheme iosApp
-          xcodebuild archive -project ./ylcs-app/iosApp/iosApp.xcodeproj -scheme iosApp -archivePath ./outputs/iosApp CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
-          # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
-          mkdir -p outputs/Payload
-          cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
-          cd outputs
-          zip -r "ylcs-ios.ipa" Payload
+        id: package
+        uses: $/.github/actions/package-ios
+        with:
+          ipa-name: "ylcs-ios.ipa"
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: ylcs-ios
-          path: outputs/ylcs-ios.ipa
+          path: ${{ steps.package.outputs.path }}
 
   package-windows:
     name: Package Windows
     runs-on: windows-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
           msvc: 'true'
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:desktop-app:desktopArtifact
+        run: ./gradlew ylcs-app:desktop-app:desktopArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -93,19 +76,14 @@ jobs:
     # 用太新的 Ubuntu 会导致 native 库链接的 glibc 版本过高，导致无法在较旧的 Linux 上运行
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
           gtk: 'true'
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:desktop-app:desktopArtifact
+        run: ./gradlew ylcs-app:desktop-app:desktopArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -123,17 +101,13 @@ jobs:
     name: Package macOS
     runs-on: macos-26
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
 
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
       - name: Build
-        run: |
-          ./gradlew ylcs-app:desktop-app:desktopArtifact
+        run: ./gradlew ylcs-app:desktop-app:desktopArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -145,13 +119,10 @@ jobs:
     name: Package Web
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:web-app:webArtifact
@@ -172,13 +143,10 @@ jobs:
     name: Package Server
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:server:linkReleaseExecutableLinux
@@ -193,19 +161,14 @@ jobs:
     name: Package Mod Manager
     runs-on: windows-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
           msvc: 'true'
 
       - name: Build
-        run: |
-          ./gradlew ylcs-app:mod-manager:modManagerPublish
+        run: ./gradlew ylcs-app:mod-manager:modManagerPublish
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -217,13 +180,10 @@ jobs:
     name: Package Landpage
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:landpage:landpagePublish

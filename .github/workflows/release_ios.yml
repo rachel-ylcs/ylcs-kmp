@@ -8,21 +8,13 @@ jobs:
     name: Package iOS
     runs-on: macos-26
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
         with:
           submodules: recursive
 
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
       - name: Build
-        run: |
-          ./gradlew ylcs-app:app:portal:linkDebugFrameworkIosArm64
-          # xcodebuild build -project ./ylcs-app/iosApp/iosApp.xcodeproj -scheme iosApp
-          xcodebuild archive -project ./ylcs-app/iosApp/iosApp.xcodeproj -scheme iosApp -archivePath ./outputs/iosApp CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
-          # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
-          mkdir -p outputs/Payload
-          cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
-          cd outputs
-          zip -r "[iOS]银临茶舍${{ github.ref_name }}.ipa" Payload
+        id: package
+        uses: $/.github/actions/package-ios
+        with:
+          ipa-name: "[iOS]银临茶舍${{ github.ref_name }}.ipa"

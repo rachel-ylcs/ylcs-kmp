@@ -6,15 +6,8 @@ on:
 jobs:
   package-macos:
     name: Package macOS
-    runs-on: macos-26
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktop-app:desktopPublish
+    uses: $/.github/workflows/gradle-build.yml
+    with:
+      runner: macos-26
+      task: ylcs-app:desktop-app:desktopPublish
+      submodules: recursive

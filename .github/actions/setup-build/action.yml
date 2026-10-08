@@ -2,6 +2,15 @@ name: Setup Build Environment
 description: Prepare the shared JDK and optional platform build tools.
 
 inputs:
+  checkout:
+    description: Check out the repository before preparing build tools.
+    default: 'true'
+  fetch-depth:
+    description: Number of commits to fetch when checkout is enabled.
+    default: '1'
+  submodules:
+    description: Whether to fetch submodules; accepts false, true, or recursive.
+    default: 'false'
   android:
     description: Install Android SDK packages.
     default: 'false'
@@ -15,6 +24,13 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Checkout Code
+      if: ${{ inputs.checkout == 'true' }}
+      uses: $/.github/actions/checkout
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+        submodules: ${{ inputs.submodules }}
+
     - name: Install Dependencies (Linux)
       if: ${{ inputs.gtk == 'true' && runner.os == 'Linux' }}
       shell: bash

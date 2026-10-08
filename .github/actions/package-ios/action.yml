@@ -1,0 +1,31 @@
+name: Package iOS
+description: Build the Kotlin framework and package the unsigned iOS archive.
+
+inputs:
+  ipa-name:
+    description: File name of the generated IPA in the outputs directory.
+    required: true
+
+outputs:
+  path:
+    description: Path to the generated IPA relative to the workspace.
+    value: ${{ steps.package.outputs.path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Build and Package
+      id: package
+      shell: bash
+      env:
+        IPA_NAME: ${{ inputs.ipa-name }}
+      run: |
+        ./gradlew ylcs-app:app:portal:linkDebugFrameworkIosArm64
+        # xcodebuild build -project ./ylcs-app/iosApp/iosApp.xcodeproj -scheme iosApp
+        xcodebuild archive -project ./ylcs-app/iosApp/iosApp.xcodeproj -scheme iosApp -archivePath ./outputs/iosApp CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+        # xcodebuild -exportArchive -archivePath ./outputs/iosApp.xcarchive -exportPath outputs/ylcs -exportOptionsPlist ./ylcs-app/iosApp/ExportOptions.plist
+        mkdir -p outputs/Payload
+        cp -r outputs/iosApp.xcarchive/Products/Applications/ylcs.app outputs/Payload/
+        cd outputs
+        zip -r "$IPA_NAME" Payload
+        printf 'path=outputs/%s\n' "$IPA_NAME" >> "$GITHUB_OUTPUT"
