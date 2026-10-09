@@ -9,9 +9,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.withSaveLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastFilter
@@ -33,8 +42,10 @@ import love.yinlin.compose.ui.common.PortalCardItem
 import love.yinlin.compose.ui.container.Banner
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.node.horizontalFade
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.cs.url
@@ -232,103 +243,114 @@ class ScreenMain : BasicScreen() {
         }
     }
 
+    private val musicInactivePaint = Paint().apply { alpha = 0.3f }
+    private val musicOverlayBrush = Brush.horizontalGradient([Colors.White.copy(alpha = 0.3f), Colors.White.copy(alpha = 0.85f)])
+
     private val musicLayout = movableComposable { modifier: Modifier ->
-        Surface(
-            modifier = modifier,
-            shape = Theme.shape.v7,
-            shadowElevation = Theme.shadow.v7,
-            border = BorderStroke(Theme.border.v7, Theme.color.outline)
-        ) {
-            val player = musicPlayer
-            val musicInfo = player?.currentMusic
-
-            if (musicInfo != null) {
-                val path = musicInfo.path(app.modPath, ModResourceType.Background).path
-                LocalFileImage(
-                    uri = path,
-                    musicInfo,
-                    contentScale = ContentScale.Crop,
-                    alpha = 0.2f,
-                    modifier = Modifier.matchParentSize().zIndex(1f)
-                )
-                LocalFileImage(
-                    uri = path,
-                    musicInfo,
-                    contentScale = ContentScale.Crop,
-                    alpha = 0.75f,
-                    modifier = Modifier.matchParentSize().zIndex(2f).drawWithContent {
-                        val position = player.position
-                        val duration = player.duration
-                        val progress = if (duration == 0L) 0f else position.toFloat() / duration
-                        clipRect(right = size.width * progress) {
-                            this@drawWithContent.drawContent()
-                        }
-                    }
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth()
-                    .clickable { navigate(::ScreenMusic) }
-                    .padding(Theme.padding.eValue)
-                    .zIndex(3f),
-                horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                verticalAlignment = Alignment.CenterVertically
+        Theme.ThemeModeWrapper(true) {
+            Surface(
+                modifier = modifier,
+                shape = Theme.shape.v7,
+                shadowElevation = Theme.shadow.v7,
+                border = BorderStroke(Theme.border.v7, Theme.color.outline)
             ) {
-                val shape = Theme.shape.v8
+                val player = musicPlayer
+                val musicInfo = player?.currentMusic
+
                 if (musicInfo != null) {
+                    val path = musicInfo.path(app.modPath, ModResourceType.Background).path
                     LocalFileImage(
-                        uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
+                        uri = path,
                         musicInfo,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(Theme.size.image8).clip(shape).border(Theme.border.v9, Theme.color.outline.copy(alpha = 0.5f), shape),
-                    )
-                }
-                else {
-                    Box(modifier = Modifier.size(Theme.size.image8).clip(shape).background(Theme.color.backgroundVariant))
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
-                ) {
-                    SimpleEllipsisText(
-                        text = musicInfo?.name ?: "未知歌曲",
-                        style = Theme.typography.v6.bold
-                    )
-                    SimpleEllipsisText(
-                        text = musicInfo?.singer ?: "未知歌手",
-                        style = Theme.typography.v7,
-                        color = Theme.color.onSurfaceVariant
+                        modifier = Modifier.matchParentSize().graphicsLayer {
+                            compositingStrategy = CompositingStrategy.Offscreen
+                        }.drawWithCache {
+                            val position = player.position
+                            val duration = player.duration
+                            val progress = if (duration == 0L) 0f else position.toFloat() / duration
+                            onDrawWithContent {
+                                val w = size.width
+                                val splitX = w * progress
+                                clipRect(right = splitX) {
+                                    this@onDrawWithContent.drawContent()
+                                }
+                                clipRect(left = splitX, right = w) {
+                                    drawIntoCanvas { canvas ->
+                                        canvas.withSaveLayer(Rect(splitX, 0f, w, size.height), musicInactivePaint) {
+                                            this@onDrawWithContent.drawContent()
+                                        }
+                                    }
+                                }
+                                drawRect(brush = musicOverlayBrush, blendMode = BlendMode.DstIn)
+                            }
+                        }.zIndex(1f)
                     )
                 }
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                    modifier = Modifier.fillMaxWidth()
+                        .clickable { navigate(::ScreenMusic) }
+                        .padding(Theme.padding.eValue)
+                        .zIndex(2f),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    PlayControlUI(
-                        size = Theme.size.smallIcon,
-                        isPlaying = player?.isPlaying ?: false,
-                        onPrevious = {
-                            if (player != null && player.isReady) {
-                                launch { player.gotoPrevious() }
-                            }
-                        },
-                        onNext = {
-                            if (player != null && player.isReady) {
-                                launch { player.gotoNext() }
-                            }
-                        },
-                        onPlay = {
-                            if (player != null && player.isReady) {
-                                launch {
-                                    if (player.isPlaying) player.pause()
-                                    else player.play()
+                    val shape = Theme.shape.v8
+                    if (musicInfo != null) {
+                        LocalFileImage(
+                            uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
+                            musicInfo,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(Theme.size.image8).clip(shape).border(Theme.border.v9, Theme.color.outline.copy(alpha = 0.5f), shape),
+                        )
+                    }
+                    else {
+                        Box(modifier = Modifier.size(Theme.size.image8).clip(shape).background(Theme.color.backgroundVariant))
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                    ) {
+                        SimpleEllipsisText(
+                            text = musicInfo?.name ?: "未知歌曲",
+                            style = Theme.typography.v6.bold
+                        )
+                        SimpleEllipsisText(
+                            text = musicInfo?.singer ?: "未知歌手",
+                            style = Theme.typography.v7,
+                            color = Theme.color.onSurfaceVariant
+                        )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.e),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        PlayControlUI(
+                            size = Theme.size.smallIcon,
+                            isPlaying = player?.isPlaying ?: false,
+                            onPrevious = {
+                                if (player != null && player.isReady) {
+                                    launch { player.gotoPrevious() }
+                                }
+                            },
+                            onNext = {
+                                if (player != null && player.isReady) {
+                                    launch { player.gotoNext() }
+                                }
+                            },
+                            onPlay = {
+                                if (player != null && player.isReady) {
+                                    launch {
+                                        if (player.isPlaying) player.pause()
+                                        else player.play()
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
