@@ -31,28 +31,33 @@ data class ColorTheme(
 ) {
     companion object {
         internal val DefaultLight = ColorTheme(
-            primary = Colors.Steel4,
-            primaryContainer = Colors.Steel6,
-            secondary = Color(0xff76c1c6),
-            secondaryContainer = Color(0xff1c8d95),
-            tertiary = Color(0xffef91a1),
-            tertiaryContainer = Color(0xffc48b92),
-            onContainer = Color(0xfffbfbfb),
-            onContainerVariant = Color(0xffe0e0e0),
-            background = Colors.Ghost,
-            backgroundVariant = Color(0xfff2f2f2),
-            onBackground = Colors.Black,
-            onBackgroundVariant = Color(0xff444444),
-            surface = Color(0xfff9f9f9),
-            onSurface = Color(0xff1a1a1a),
-            onSurfaceVariant = Colors.Gray5,
-            error = Colors.Red5,
-            onError = Colors.Ghost,
-            warning = Colors.Yellow4,
-            onWarning = Colors.Ghost,
-            outline = Color(0xff79747e),
-            disabledContent = Color(0x611c1b1f),
-            disabledContainer = Color(0xffe0dddd),
+            primary = Color(0xff356b82),
+            primaryContainer = Color(0xff2d5c70),
+            secondary = Color(0xff527039),
+            secondaryContainer = Color(0xff476232),
+            tertiary = Color(0xff745c8b),
+            tertiaryContainer = Color(0xff655178),
+
+            onContainer = Color(0xffffffff),
+            onContainerVariant = Color(0xffe2e9ec),
+
+            background = Color(0xffeef2f4),
+            backgroundVariant = Color(0xffe1e8ec),
+            onBackground = Color(0xff24323a),
+            onBackgroundVariant = Color(0xff52636d),
+
+            surface = Color(0xffffffff),
+            onSurface = Color(0xff24323a),
+            onSurfaceVariant = Color(0xff52636d),
+
+            error = Color(0xffb43845),
+            onError = Color(0xffffffff),
+            warning = Color(0xff8b590a),
+            onWarning = Color(0xffffffff),
+
+            outline = Color(0xff76858d),
+            disabledContent = Color(0x6124323a),
+            disabledContainer = Color(0xffdee4e7),
             scrim = Colors.Dark,
         )
 
