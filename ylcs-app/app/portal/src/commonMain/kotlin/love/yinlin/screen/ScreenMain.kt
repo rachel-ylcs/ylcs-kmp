@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -42,10 +41,8 @@ import love.yinlin.compose.ui.common.PortalCardItem
 import love.yinlin.compose.ui.container.Banner
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.Surface
-import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.node.horizontalFade
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.cs.url
@@ -244,7 +241,11 @@ class ScreenMain : BasicScreen() {
     }
 
     private val musicInactivePaint = Paint().apply { alpha = 0.3f }
-    private val musicOverlayBrush = Brush.horizontalGradient([Colors.White.copy(alpha = 0.3f), Colors.White.copy(alpha = 0.85f)])
+    private val musicOverlayBrush = Brush.horizontalGradient(
+        0f to Colors.White.copy(alpha = 0.3f),
+        0.25f to Colors.White.copy(alpha = 0.5f),
+        1f to Colors.White.copy(alpha = 0.85f)
+    )
 
     private val musicLayout = movableComposable { modifier: Modifier ->
         Theme.ThemeModeWrapper(true) {
@@ -274,6 +275,7 @@ class ScreenMain : BasicScreen() {
                                 val splitX = w * progress
                                 clipRect(right = splitX) {
                                     this@onDrawWithContent.drawContent()
+                                    drawRect(brush = musicOverlayBrush, blendMode = BlendMode.DstIn)
                                 }
                                 clipRect(left = splitX, right = w) {
                                     drawIntoCanvas { canvas ->
@@ -282,7 +284,6 @@ class ScreenMain : BasicScreen() {
                                         }
                                     }
                                 }
-                                drawRect(brush = musicOverlayBrush, blendMode = BlendMode.DstIn)
                             }
                         }.zIndex(1f)
                     )
@@ -362,7 +363,7 @@ class ScreenMain : BasicScreen() {
             title = "资讯",
             subtitle = "漫游与新鲜现场",
             drawable = Res.drawable.card_information,
-            lightColors = [Color(0xFF52D9E8), Color(0xFF80E1EC), Color(0xFFADEBF2)],
+            lightColors = [Color(0xFF9FBFC5), Color(0xFFF3FAFB), Color(0xFFB7E2EA)],
             darkColors = [Color(0xFF52D9E8), Color(0xFF17323A), Color(0xFF151B20)],
             onClick = {
                 navigate(::ScreenInformation)
@@ -373,7 +374,7 @@ class ScreenMain : BasicScreen() {
             title = "图集",
             subtitle = "定格与闪耀瞬间",
             drawable = Res.drawable.card_photo,
-            lightColors = [Color(0xFFA593FF), Color(0xFFB8A9FF), Color(0xFFCFC4FF)],
+            lightColors = [Color(0xFFB8AFD2), Color(0xFFF8F6FC), Color(0xFFD5C8F0)],
             darkColors = [Color(0xFFA593FF), Color(0xFF2A2340), Color(0xFF181B23)],
             onClick = {
                 navigate(::ScreenPhotoAlbum)
@@ -384,7 +385,7 @@ class ScreenMain : BasicScreen() {
             title = "社区",
             subtitle = "分享与热爱共鸣",
             drawable = Res.drawable.card_community,
-            lightColors = [Color(0xFFFF7C68), Color(0xFFFF9B88), Color(0xFFFFBBAA)],
+            lightColors = [Color(0xFFCFB1A9), Color(0xFFFCF7F4), Color(0xFFF1C7B6)],
             darkColors = [Color(0xFFFF7C68), Color(0xFF3A231F), Color(0xFF1D191A)],
             onClick = {
                 navigate(::ScreenCommunity)
@@ -395,7 +396,7 @@ class ScreenMain : BasicScreen() {
             title = "世界",
             subtitle = "探索与无限可能",
             drawable = Res.drawable.card_world,
-            lightColors = [Color(0xFFD9FF63), Color(0xFFE1FF83), Color(0xFFE9FFA6)],
+            lightColors = [Color(0xFFB8C394), Color(0xFFF9FBF3), Color(0xFFD4E3AA)],
             darkColors = [Color(0xFFD9FF63), Color(0xFF29301A), Color(0xFF181C16)],
             onClick = {
                 navigate(::ScreenWorld)
@@ -406,7 +407,7 @@ class ScreenMain : BasicScreen() {
             title = "电台",
             subtitle = "聆听与声浪共鸣",
             drawable = Res.drawable.card_radio,
-            lightColors = [Color(0xFFFFB84D), Color(0xFFFFCB75), Color(0xFFFFDFA3)],
+            lightColors = [Color(0xFFCCB78F), Color(0xFFFCF9F1), Color(0xFFEED5A4)],
             darkColors = [Color(0xFFFFB84D), Color(0xFF3B2C19), Color(0xFF1D1A17)],
             onClick = {
                 navigate(::ScreenRadio)
@@ -417,7 +418,7 @@ class ScreenMain : BasicScreen() {
             title = "娱乐",
             subtitle = "曲谱与音律狂欢",
             drawable = Res.drawable.card_game,
-            lightColors = [Color(0xFFFF70C8), Color(0xFFFF96D7), Color(0xFFFFBCE6)],
+            lightColors = [Color(0xFFCCA8BF), Color(0xFFFCF5F9), Color(0xFFEDBDD9)],
             darkColors = [Color(0xFFFF70C8), Color(0xFF3A2032), Color(0xFF1D1820)],
             onClick = {
                 navigate(::ScreenGame)

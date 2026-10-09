@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import love.yinlin.compose.Colors
@@ -30,12 +31,11 @@ data class PortalCardItem(
     private val darkColors: List<Color>,
     private val onClick: () -> Unit
 ) {
-    private val lightBackgroundBrush = Brush.linearGradient(
-        colors = [
-            lightColors[0].copy(alpha = 0.22f),
-            lightColors[1].copy(alpha = 0.96f),
-            lightColors[2].copy(alpha = 0.98f)
-        ]
+    private val lightBackgroundBrush = Brush.horizontalGradient(
+        0.00f to lightColors[0].copy(alpha = 0.32f),
+        0.25f to lightColors[1],
+        0.75f to lightColors[2].copy(alpha = 0.75f),
+        1.00f to lightColors[2]
     )
 
     private val darkBackgroundBrush = Brush.linearGradient(
@@ -46,13 +46,7 @@ data class PortalCardItem(
         ]
     )
 
-    private val lightBorderBrush = Brush.linearGradient(
-        colors = [
-            lightColors[0].copy(alpha = 0.75f),
-            Colors.Dark.copy(alpha = 0.25f),
-            Colors.Transparent
-        ]
-    )
+    private val lightBorderBrush = SolidColor(lightColors[0])
 
     private val darkBorderBrush = Brush.linearGradient(
         colors = [
@@ -67,7 +61,6 @@ data class PortalCardItem(
         val shape = Theme.shape.v8
 
         val darkMode = Theme.darkMode
-        val borderWidth = if (darkMode) Theme.border.v7 else Theme.border.v4
         val backgroundBrush = if (darkMode) darkBackgroundBrush else lightBackgroundBrush
         val borderBrush = if (darkMode) darkBorderBrush else lightBorderBrush
 
@@ -76,7 +69,7 @@ data class PortalCardItem(
                 brush = backgroundBrush,
                 shape = shape
             ).border(
-                width = Theme.border.v8,
+                width = Theme.border.v7,
                 brush = borderBrush,
                 shape = shape
             ).clickable(onClick = onClick),
