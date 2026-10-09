@@ -138,4 +138,4 @@ ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.re
 ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 rethis = { module = "eu.vendeli:rethis", version = "0.4.4" }
-sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.14.0" }
+sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.15.0" }
