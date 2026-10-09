@@ -57,6 +57,8 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 ## UI 在线预览: [Rachel UI Gallery](https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery)
 
+## 现代导航预览：[Modern Navigation](https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen)
+
 |                       Theme                        |                     Dark Mode                      |
 |:--------------------------------------------------:|:--------------------------------------------------:|
 |   ![rachel](ylcs-docs/docs/assets/ui/gallery.png)    |    ![rachel](ylcs-docs/docs/assets/ui/theme.png)    |
@@ -122,4 +124,6 @@ https://private-user-images.githubusercontent.com/76944654/586743677-ce62598a-75
 | Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
 | Library  |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
 | Library  |      panpf      |                                                             [sketch](https://github.com/panpf/sketch)                                                              |
+| Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
 | Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
+| Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |

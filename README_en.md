@@ -58,6 +58,8 @@ The interface library covers various components such as themes, text, inputs, im
 
 ## UI Online Preview: [Rachel UI Gallery](https://rachel-ylcs.github.io/ylcs-kmp/overrides/gallery)
 
+## Navigation Preview：[Modern Navigation](https://rachel-ylcs.github.io/ylcs-kmp/overrides/modern-screen)
+
 |                       Theme                        |                     Dark Mode                      |
 |:--------------------------------------------------:|:--------------------------------------------------:|
 |   ![rachel](ylcs-docs/docs/assets/ui/gallery.png)    |    ![rachel](ylcs-docs/docs/assets/ui/theme.png)    |
@@ -125,4 +127,6 @@ Sort by first letter.
 | Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
 | Library  |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
 | Library  |      panpf      |                                                             [sketch](https://github.com/panpf/sketch)                                                              |
+| Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
 | Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
+| Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |
