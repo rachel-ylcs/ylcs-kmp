@@ -1,16 +1,15 @@
 package love.yinlin.encoding
 
-fun String.convert(encoding: Encoding): ByteArray = when (encoding) {
-    Encoding.UTF8 -> convertUTF8(this)
-    Encoding.ASCII -> convertASCII(this)
-    Encoding.GBK -> convertGBK(this)
-}
+private val ConvertMap = [
+    ::convertStringToUTF8 to ::convertUTF8ToString,
+    ::convertStringToASCII to ::convertASCIIToString,
+    ::convertStringToLatin1 to ::convertLatin1ToString,
+    ::convertStringToGBK to ::convertGBKToString,
+]
 
-fun ByteArray.convert(encoding: Encoding): String = when (encoding) {
-    Encoding.UTF8 -> convertUTF8(this)
-    Encoding.ASCII -> convertASCII(this)
-    Encoding.GBK -> convertGBK(this)
-}
+fun String.convert(encoding: Encoding): ByteArray = ConvertMap[encoding.ordinal].first(this)
 
-internal expect fun convertUTF8(data: ByteArray): String
-internal expect fun convertUTF8(data: String): ByteArray
+fun ByteArray.convert(encoding: Encoding): String = ConvertMap[encoding.ordinal].second(this)
+
+internal expect fun convertStringToUTF8(data: String): ByteArray
+internal expect fun convertUTF8ToString(data: ByteArray): String

@@ -102,7 +102,41 @@ private object GBKMapping {
     }
 }
 
-internal fun convertGBK(data: ByteArray): String {
+internal fun convertStringToGBK(data: String): ByteArray {
+    val length = data.length
+    var asciiLength = 0
+    while (asciiLength < length && data[asciiLength].code < 0x80) asciiLength++
+    if (asciiLength == length) return data.convert(Encoding.UTF8)
+
+    val remaining = length - asciiLength
+    if (remaining > Int.MAX_VALUE - length) return ByteArray(0)
+    val bytes = ByteArray(length + remaining)
+    for (index in 0 ..< asciiLength) bytes[index] = data[index].code.toByte()
+    var input = asciiLength
+    var output = asciiLength
+    while (input < length) {
+        val code = data[input++].code
+        when {
+            code < 0x80 -> bytes[output++] = code.toByte()
+            code == 0x20AC -> bytes[output++] = 0x80.toByte()
+            code in 0xD800 .. 0xDFFF -> {
+                if (code <= 0xDBFF && input < length && data[input].code in 0xDC00..0xDFFF) input++
+                bytes[output++] = 0x3F
+            }
+            else -> {
+                val packed = GBKMapping.encode[code].code
+                if (packed == 0) bytes[output++] = 0x3F
+                else {
+                    bytes[output++] = (packed shr 8).toByte()
+                    bytes[output++] = packed.toByte()
+                }
+            }
+        }
+    }
+    return if (output == bytes.size) bytes else bytes.copyOf(output)
+}
+
+internal fun convertGBKToString(data: ByteArray): String {
     if (data.isEmpty()) return ""
     var asciiLength = 0
     while (asciiLength < data.size && data[asciiLength] >= 0) asciiLength++
@@ -136,38 +170,4 @@ internal fun convertGBK(data: ByteArray): String {
         }
     }
     return chars.concatToString(0, output)
-}
-
-internal fun convertGBK(data: String): ByteArray {
-    val length = data.length
-    var asciiLength = 0
-    while (asciiLength < length && data[asciiLength].code < 0x80) asciiLength++
-    if (asciiLength == length) return data.convert(Encoding.UTF8)
-
-    val remaining = length - asciiLength
-    if (remaining > Int.MAX_VALUE - length) return ByteArray(0)
-    val bytes = ByteArray(length + remaining)
-    for (index in 0 ..< asciiLength) bytes[index] = data[index].code.toByte()
-    var input = asciiLength
-    var output = asciiLength
-    while (input < length) {
-        val code = data[input++].code
-        when {
-            code < 0x80 -> bytes[output++] = code.toByte()
-            code == 0x20AC -> bytes[output++] = 0x80.toByte()
-            code in 0xD800 .. 0xDFFF -> {
-                if (code <= 0xDBFF && input < length && data[input].code in 0xDC00..0xDFFF) input++
-                bytes[output++] = 0x3F
-            }
-            else -> {
-                val packed = GBKMapping.encode[code].code
-                if (packed == 0) bytes[output++] = 0x3F
-                else {
-                    bytes[output++] = (packed shr 8).toByte()
-                    bytes[output++] = packed.toByte()
-                }
-            }
-        }
-    }
-    return if (output == bytes.size) bytes else bytes.copyOf(output)
 }

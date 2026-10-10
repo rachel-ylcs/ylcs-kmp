@@ -17,9 +17,7 @@ class EncodingTest {
         return result
     }
 
-    private fun hex(value: String): ByteArray = ByteArray(value.length / 2) {
-        value.substring(it * 2, it * 2 + 2).toInt(16).toByte()
-    }
+    private fun hex(value: String): ByteArray = value.hexToByteArray(HexFormat.UpperCase)
 
     @Test
     fun testEmptyAndAscii() {
@@ -56,7 +54,7 @@ class EncodingTest {
             "41E4B8AD42" to "A\uFFFD\uFFFD\uFFFDB",
             "41F09F988042" to "A\uFFFD\uFFFD\uFFFD\uFFFDB",
         ]
-        for ([bytes, text] in cases) assertEquals(text, convertASCII(hex(bytes)), bytes)
+        for ([bytes, text] in cases) assertEquals(text, convertASCIIToString(hex(bytes)), bytes)
     }
 
     @Test
@@ -76,14 +74,81 @@ class EncodingTest {
             "\uD83D\uDE00\uD83C\uDF0DZ" to "3F3F5A",
         ]
         for ([text, bytes] in cases) {
-            assertContentEquals(hex(bytes), convertASCII(text), bytes)
+            assertContentEquals(hex(bytes), convertStringToASCII(text), bytes)
         }
     }
 
     @Test
     fun testASCIISupplementaryPlanes() {
         for (code in 0x10000 .. 0x10FFFF step 997) {
-            assertContentEquals([0x3F], convertASCII(supplementary(code)), "U+${code.toString(16)}")
+            assertContentEquals([0x3F], convertStringToASCII(supplementary(code)), "U+${code.toString(16)}")
+        }
+    }
+
+    @Test
+    fun testLatin1EveryByteValue() {
+        val bytes = ByteArray(256) { it.toByte() }
+        val text = CharArray(256) { it.toChar() }.concatToString()
+        assertEquals(text, bytes.convert(Encoding.LATIN1))
+        assertContentEquals(bytes, text.convert(Encoding.LATIN1))
+    }
+
+    @Test
+    fun testLatin1WesternText() {
+        val text = "café, Noël, Straße, £5"
+        val bytes = hex("636166E92C204E6FEB6C2C2053747261DF652C20A335")
+        assertContentEquals(bytes, text.convert(Encoding.LATIN1))
+        assertEquals(text, bytes.convert(Encoding.LATIN1))
+    }
+
+    @Test
+    fun testLatin1UnmappableBmpCharacters() {
+        val text = "\u0000\u007F\u0080ÿ\u0100\u017F中€\uFFFD\uFFFFé"
+        val bytes = hex("007F80FF3F3F3F3F3F3FE9")
+        assertContentEquals(bytes, text.convert(Encoding.LATIN1))
+        assertEquals("\u0000\u007F\u0080ÿ??????é", bytes.convert(Encoding.LATIN1))
+    }
+
+    @Test
+    fun testLatin1ControlBytesAndUtf8Sequences() {
+        val cases = [
+            "80919293949F" to "\u0080\u0091\u0092\u0093\u0094\u009F",
+            "C3A9" to "\u00C3\u00A9",
+            "E4B8AD" to "\u00E4\u00B8\u00AD",
+            "F09F9880" to "\u00F0\u009F\u0098\u0080",
+        ]
+        for ([bytes, text] in cases) {
+            assertEquals(text, hex(bytes).convert(Encoding.LATIN1), bytes)
+            assertContentEquals(hex(bytes), text.convert(Encoding.LATIN1), bytes)
+        }
+        assertContentEquals(hex("3F3F3F3F3F3F"), "€‘’“”Ÿ".convert(Encoding.LATIN1))
+    }
+
+    @Test
+    fun testLatin1Surrogates() {
+        val cases = [
+            "\uD800" to "3F",
+            "\uDC00" to "3F",
+            "\uD800\uDC00" to "3F",
+            "\uDBFF\uDFFF" to "3F",
+            "é\uD83D\uDE00ÿ" to "E93FFF",
+            "\uD800é\uDC00" to "3FE93F",
+            "\uD800\uD800" to "3F3F",
+            "\uDC00\uDC00" to "3F3F",
+            "\uDC00\uD800" to "3F3F",
+            "\uD800\uD800\uDC00" to "3F3F",
+            "\uDC00\uD800\uDC00\uDBFF" to "3F3F3F",
+            "\uD83D\uDE00\uD83C\uDF0Dé" to "3F3FE9",
+        ]
+        for ([text, bytes] in cases) {
+            assertContentEquals(hex(bytes), text.convert(Encoding.LATIN1), bytes)
+        }
+    }
+
+    @Test
+    fun testLatin1SupplementaryPlanes() {
+        for (code in 0x10000 .. 0x10FFFF step 997) {
+            assertContentEquals([0x3F], convertStringToLatin1(supplementary(code)), "U+${code.toString(16)}")
         }
     }
 
@@ -110,14 +175,14 @@ class EncodingTest {
             "FF80" to "\uFFFD€",
             "90308130" to "\uFFFD0\uFFFD0",
         )
-        for ([r, v] in cases) assertEquals(v, convertGBK(hex(r)), r)
+        for ([r, v] in cases) assertEquals(v, convertGBKToString(hex(r)), r)
     }
 
     @Test
     fun testGBKUnmappableCharactersAndSurrogates() {
         val text = "A\uD83D\uDE00\uD800中\uDC00\uD800\uD800\uDC00\uE000Z"
-        assertContentEquals(hex("413F3FD6D03F3F3F3F5A"), convertGBK(text))
-        assertContentEquals([0x3F], convertGBK("\u2641"))
+        assertContentEquals(hex("413F3FD6D03F3F3F3F5A"), convertStringToGBK(text))
+        assertContentEquals([0x3F], convertStringToGBK("\u2641"))
     }
 
     @Test
@@ -130,9 +195,9 @@ class EncodingTest {
             for (trail in 0x40..0xFE) {
                 if (trail == 0x7F) continue
                 val bytes: ByteArray = [lead.toByte(), trail.toByte()]
-                val text = convertGBK(bytes)
+                val text = convertGBKToString(bytes)
                 val code = if (text.length == 1 && text[0] != '\uFFFD') {
-                    assertContentEquals(bytes, convertGBK(text), "$lead/$trail")
+                    assertContentEquals(bytes, convertStringToGBK(text), "$lead/$trail")
                     corpus.append(text)
                     corpusBytes[assigned * 2] = lead.toByte()
                     corpusBytes[assigned * 2 + 1] = trail.toByte()
@@ -149,15 +214,15 @@ class EncodingTest {
         }
         assertEquals(21791, assigned)
         assertEquals(0xD6965DC7.toInt(), checksum.inv())
-        assertContentEquals(corpusBytes, convertGBK(corpus.toString()))
-        assertEquals(corpus.toString(), convertGBK(corpusBytes))
+        assertContentEquals(corpusBytes, convertStringToGBK(corpus.toString()))
+        assertEquals(corpus.toString(), convertGBKToString(corpusBytes))
     }
 
     @Test
     fun testGBKEveryBmpCodeUnit() {
         var checksum = -1
         for (code in 0 .. 0xFFFF) {
-            val bytes = convertGBK(code.toChar().toString())
+            val bytes = convertStringToGBK(code.toChar().toString())
             checksum = crc32Byte(checksum, bytes.size)
             for (byte in bytes) checksum = crc32Byte(checksum, byte.toInt())
         }
@@ -168,8 +233,8 @@ class EncodingTest {
     fun testUTF8WidthBoundaries() {
         val text = "\u0000\u007F\u0080\u07FF\u0800\uD7FF\uE000\uFFFF\uD800\uDC00\uDBFF\uDFFF"
         val bytes = hex("007FC280DFBFE0A080ED9FBFEE8080EFBFBFF0908080F48FBFBF")
-        assertContentEquals(bytes, convertUTF8(text))
-        assertEquals(text, convertUTF8(bytes))
+        assertContentEquals(bytes, convertStringToUTF8(text))
+        assertEquals(text, convertUTF8ToString(bytes))
     }
 
     @Test
@@ -178,7 +243,7 @@ class EncodingTest {
         assertContentEquals(text.encodeToByteArray(), text.convert(Encoding.UTF8))
         assertEquals(text, text.convert(Encoding.UTF8).convert(Encoding.UTF8))
         val chinese = hex("E4BDA0E5A5BDEFBC8CE4B896E7958CEFBC81")
-        assertEquals("你好，世界！", convertUTF8(chinese))
+        assertEquals("你好，世界！", convertUTF8ToString(chinese))
     }
 
     @Test
@@ -187,8 +252,8 @@ class EncodingTest {
             if (code in 0xD800 .. 0xDFFF) continue
             val text = code.toChar().toString()
             val expected = text.encodeToByteArray()
-            assertContentEquals(expected, convertUTF8(text), "U+${code.toString(16)}")
-            assertEquals(text, convertUTF8(expected), "U+${code.toString(16)}")
+            assertContentEquals(expected, convertStringToUTF8(text), "U+${code.toString(16)}")
+            assertEquals(text, convertUTF8ToString(expected), "U+${code.toString(16)}")
         }
     }
 
@@ -197,8 +262,8 @@ class EncodingTest {
         for (code in 0x10000 .. 0x10FFFF step 997) {
             val text = supplementary(code)
             val expected = text.encodeToByteArray()
-            assertContentEquals(expected, convertUTF8(text), "U+${code.toString(16)}")
-            assertEquals(text, convertUTF8(expected), "U+${code.toString(16)}")
+            assertContentEquals(expected, convertStringToUTF8(text), "U+${code.toString(16)}")
+            assertEquals(text, convertUTF8ToString(expected), "U+${code.toString(16)}")
         }
     }
 
@@ -206,10 +271,10 @@ class EncodingTest {
     fun testUTF8EverySingleAndDoubleByteInput() {
         for (first in 0 .. 0xFF) {
             val single: ByteArray = [first.toByte()]
-            assertEquals(single.decodeToString(), convertUTF8(single), "$first")
+            assertEquals(single.decodeToString(), convertUTF8ToString(single), "$first")
             for (second in 0 .. 0xFF) {
                 val bytes: ByteArray = [first.toByte(), second.toByte()]
-                assertEquals(bytes.decodeToString(), convertUTF8(bytes), "$first/$second")
+                assertEquals(bytes.decodeToString(), convertUTF8ToString(bytes), "$first/$second")
             }
         }
     }
@@ -223,10 +288,10 @@ class EncodingTest {
         ]
         for (value in cases) {
             val bytes = hex(value)
-            assertEquals(bytes.decodeToString(), convertUTF8(bytes), value)
+            assertEquals(bytes.decodeToString(), convertUTF8ToString(bytes), value)
         }
-        assertEquals("\uFFFDA", convertUTF8(hex("E28241")))
-        assertEquals("\uFFFDA", convertUTF8(hex("F0908041")))
+        assertEquals("\uFFFDA", convertUTF8ToString(hex("E28241")))
+        assertEquals("\uFFFDA", convertUTF8ToString(hex("F0908041")))
     }
 
     @Test
@@ -237,8 +302,8 @@ class EncodingTest {
         ]
         for (text in cases) {
             val expected = text.encodeToByteArray()
-            assertContentEquals(expected, convertUTF8(text))
-            assertEquals(expected.decodeToString(), convertUTF8(convertUTF8(text)))
+            assertContentEquals(expected, convertStringToUTF8(text))
+            assertEquals(expected.decodeToString(), convertUTF8ToString(convertStringToUTF8(text)))
         }
     }
 
@@ -259,8 +324,8 @@ class EncodingTest {
                 }
             }
             val expected = text.encodeToByteArray()
-            assertContentEquals(expected, convertUTF8(text))
-            assertEquals(text, convertUTF8(convertUTF8(text)))
+            assertContentEquals(expected, convertStringToUTF8(text))
+            assertEquals(text, convertUTF8ToString(convertStringToUTF8(text)))
         }
     }
 }

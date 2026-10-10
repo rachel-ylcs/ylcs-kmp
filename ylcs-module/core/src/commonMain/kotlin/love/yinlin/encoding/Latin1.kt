@@ -1,12 +1,12 @@
 package love.yinlin.encoding
 
-internal fun convertStringToASCII(data: String): ByteArray {
+internal fun convertStringToLatin1(data: String): ByteArray {
     val bytes = ByteArray(data.length)
     var input = 0
     var output = 0
     while (input < data.length) {
         val code = data[input++].code
-        if (code < 0x80) bytes[output++] = code.toByte()
+        if (code <= 0xFF) bytes[output++] = code.toByte()
         else {
             if (code in 0xD800 .. 0xDBFF && input < data.length && data[input].code in 0xDC00 .. 0xDFFF) input++
             bytes[output++] = 0x3F
@@ -15,10 +15,9 @@ internal fun convertStringToASCII(data: String): ByteArray {
     return if (output == bytes.size) bytes else bytes.copyOf(output)
 }
 
-internal fun convertASCIIToString(data: ByteArray): String {
+internal fun convertLatin1ToString(data: ByteArray): String {
     val chars = CharArray(data.size) { index ->
-        val byte = data[index]
-        if (byte >= 0) byte.toInt().toChar() else '\uFFFD'
+        (data[index].toInt() and 0xFF).toChar()
     }
     return chars.concatToString()
 }

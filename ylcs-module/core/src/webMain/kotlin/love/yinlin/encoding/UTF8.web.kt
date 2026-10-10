@@ -55,7 +55,47 @@ private val REPLACEMENT_BYTE_SEQUENCE: ByteArray = [0xEF.toByte(), 0xBF.toByte()
 
 private const val REPLACEMENT_CHAR = '\uFFFD'
 
-internal actual fun convertUTF8(data: ByteArray): String {
+internal actual fun convertStringToUTF8(data: String): ByteArray {
+    val length = data.length
+    val bytes = ByteArray(length * MAX_BYTES_PER_CHAR)
+    var byteIndex = 0
+    var charIndex = 0
+
+    while (charIndex < length) {
+        val code = data[charIndex++].code
+        when {
+            code < 0x80 -> bytes[byteIndex++] = code.toByte()
+            code < 0x800 -> {
+                bytes[byteIndex++] = ((code shr 6) or 0xC0).toByte()
+                bytes[byteIndex++] = ((code and 0x3F) or 0x80).toByte()
+            }
+            code !in 0xD800 ..< 0xE000 -> {
+                bytes[byteIndex++] = ((code shr 12) or 0xE0).toByte()
+                bytes[byteIndex++] = (((code shr 6) and 0x3F) or 0x80).toByte()
+                bytes[byteIndex++] = ((code and 0x3F) or 0x80).toByte()
+            }
+            else -> {
+                val codePoint = codePointFromSurrogate(data, code, charIndex, length)
+                if (codePoint <= 0) {
+                    bytes[byteIndex++] = REPLACEMENT_BYTE_SEQUENCE[0]
+                    bytes[byteIndex++] = REPLACEMENT_BYTE_SEQUENCE[1]
+                    bytes[byteIndex++] = REPLACEMENT_BYTE_SEQUENCE[2]
+                }
+                else {
+                    bytes[byteIndex++] = ((codePoint shr 18) or 0xF0).toByte()
+                    bytes[byteIndex++] = (((codePoint shr 12) and 0x3F) or 0x80).toByte()
+                    bytes[byteIndex++] = (((codePoint shr 6) and 0x3F) or 0x80).toByte()
+                    bytes[byteIndex++] = ((codePoint and 0x3F) or 0x80).toByte()
+                    charIndex++
+                }
+            }
+        }
+    }
+
+    return if (bytes.size == byteIndex) bytes else bytes.copyOf(byteIndex)
+}
+
+internal actual fun convertUTF8ToString(data: ByteArray): String {
     val length = data.size
     var byteIndex = 0
     return buildString {
@@ -102,44 +142,4 @@ internal actual fun convertUTF8(data: ByteArray): String {
             }
         }
     }
-}
-
-internal actual fun convertUTF8(data: String): ByteArray {
-    val length = data.length
-    val bytes = ByteArray(length * MAX_BYTES_PER_CHAR)
-    var byteIndex = 0
-    var charIndex = 0
-
-    while (charIndex < length) {
-        val code = data[charIndex++].code
-        when {
-            code < 0x80 -> bytes[byteIndex++] = code.toByte()
-            code < 0x800 -> {
-                bytes[byteIndex++] = ((code shr 6) or 0xC0).toByte()
-                bytes[byteIndex++] = ((code and 0x3F) or 0x80).toByte()
-            }
-            code !in 0xD800 ..< 0xE000 -> {
-                bytes[byteIndex++] = ((code shr 12) or 0xE0).toByte()
-                bytes[byteIndex++] = (((code shr 6) and 0x3F) or 0x80).toByte()
-                bytes[byteIndex++] = ((code and 0x3F) or 0x80).toByte()
-            }
-            else -> {
-                val codePoint = codePointFromSurrogate(data, code, charIndex, length)
-                if (codePoint <= 0) {
-                    bytes[byteIndex++] = REPLACEMENT_BYTE_SEQUENCE[0]
-                    bytes[byteIndex++] = REPLACEMENT_BYTE_SEQUENCE[1]
-                    bytes[byteIndex++] = REPLACEMENT_BYTE_SEQUENCE[2]
-                }
-                else {
-                    bytes[byteIndex++] = ((codePoint shr 18) or 0xF0).toByte()
-                    bytes[byteIndex++] = (((codePoint shr 12) and 0x3F) or 0x80).toByte()
-                    bytes[byteIndex++] = (((codePoint shr 6) and 0x3F) or 0x80).toByte()
-                    bytes[byteIndex++] = ((codePoint and 0x3F) or 0x80).toByte()
-                    charIndex++
-                }
-            }
-        }
-    }
-
-    return if (bytes.size == byteIndex) bytes else bytes.copyOf(byteIndex)
 }
