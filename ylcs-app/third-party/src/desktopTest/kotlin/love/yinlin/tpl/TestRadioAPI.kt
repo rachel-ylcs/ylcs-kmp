@@ -3,7 +3,7 @@ package love.yinlin.tpl
 import kotlinx.coroutines.test.runTest
 import love.yinlin.data.radio.RadioUserInfo
 import love.yinlin.tpl.radio.RadioAPI
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 

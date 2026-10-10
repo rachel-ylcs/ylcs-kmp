@@ -20,7 +20,7 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        desktopTest.configure {
+        commonTest.configure {
             lib(
                 libs.test,
                 libs.kotlinx.coroutines.test,

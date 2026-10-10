@@ -3,7 +3,7 @@ package love.yinlin.tpl
 import kotlinx.coroutines.test.runTest
 import love.yinlin.data.redbook.RedBookUserInfo
 import love.yinlin.tpl.redbook.RedBookAPI
-import org.junit.Test
+import kotlin.test.Test
 
 class TestRedBookAPI {
     @Test

@@ -3,7 +3,7 @@ package love.yinlin.tpl
 import kotlinx.coroutines.test.runTest
 import love.yinlin.data.bilibili.BilibiliUserInfo
 import love.yinlin.tpl.bilibili.BilibiliAPI
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TestBilibiliAPI {

@@ -21,6 +21,13 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        commonTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test,
+            )
+        }
+
         appleMain.configure(commonMain)
 
         val jvmMain = createJvm(commonMain)
@@ -46,12 +53,5 @@ template(object : KotlinMultiplatformTemplate() {
         linuxMain.configure(nativeMain)
 
         macosMain.configure(appleMain)
-
-        desktopTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
-        }
     }
 })

@@ -22,7 +22,7 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        desktopTest.configure {
+        commonTest.configure {
             lib(libs.test)
         }
     }
