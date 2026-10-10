@@ -19,6 +19,23 @@ class EncodingTest {
 
     private fun hex(value: String): ByteArray = value.hexToByteArray(HexFormat.UpperCase)
 
+    private val unicodeEncodings = [Encoding.UTF16LE, Encoding.UTF16BE, Encoding.UTF32LE, Encoding.UTF32BE]
+
+    private fun crc32(bytes: ByteArray): Int {
+        var checksum = -1
+        for (byte in bytes) checksum = crc32Byte(checksum, byte.toInt())
+        return checksum.inv()
+    }
+
+    private fun reverseUnits(bytes: ByteArray, width: Int): ByteArray {
+        val result = bytes.copyOf()
+        val end = bytes.size - bytes.size % width
+        for (start in 0 ..< end step width) {
+            for (offset in 0 ..< width) result[start + offset] = bytes[start + width - offset - 1]
+        }
+        return result
+    }
+
     @Test
     fun testEmptyAndAscii() {
         val bytes = ByteArray(128) { it.toByte() }
@@ -26,6 +43,8 @@ class EncodingTest {
         for (encoding in Encoding.entries) {
             assertContentEquals([], "".convert(encoding))
             assertEquals("", byteArrayOf().convert(encoding))
+        }
+        for (encoding in [Encoding.UTF8, Encoding.ASCII, Encoding.LATIN1, Encoding.GBK]) {
             assertContentEquals(bytes, text.convert(encoding))
             assertEquals(text, bytes.convert(encoding))
         }
@@ -227,6 +246,221 @@ class EncodingTest {
             for (byte in bytes) checksum = crc32Byte(checksum, byte.toInt())
         }
         assertEquals(0xD34A151C.toInt(), checksum.inv())
+    }
+
+    @Test
+    fun testUTF16ByteOrderAndBoundaries() {
+        val text = "\u0000\u007F\u0080\u07FF\u0800\uD7FF\uE000\uFEFF\uFFFE\uFFFF\uD800\uDC00\uDBFF\uDFFF"
+        val cases = [
+            Encoding.UTF16LE to "00007F008000FF070008FFD700E0FFFEFEFFFFFF00D800DCFFDBFFDF",
+            Encoding.UTF16BE to "0000007F008007FF0800D7FFE000FEFFFFFEFFFFD800DC00DBFFDFFF",
+        ]
+        for ([encoding, value] in cases) {
+            val bytes = hex(value)
+            assertContentEquals(bytes, text.convert(encoding), encoding.name)
+            assertEquals(text, bytes.convert(encoding), encoding.name)
+        }
+    }
+
+    @Test
+    fun testUTF32ByteOrderAndBoundaries() {
+        val text = "\u0000\u007F\u0080\u07FF\u0800\uD7FF\uE000\uFEFF\uFFFE\uFFFF\uD800\uDC00\uDBFF\uDFFF"
+        val cases = [
+            Encoding.UTF32LE to "000000007F00000080000000FF07000000080000FFD7000000E00000FFFE0000FEFF0000FFFF000000000100FFFF1000",
+            Encoding.UTF32BE to "000000000000007F00000080000007FF000008000000D7FF0000E0000000FEFF0000FFFE0000FFFF000100000010FFFF",
+        ]
+        for ([encoding, value] in cases) {
+            val bytes = hex(value)
+            assertContentEquals(bytes, text.convert(encoding), encoding.name)
+            assertEquals(text, bytes.convert(encoding), encoding.name)
+        }
+    }
+
+    @Test
+    fun testUTF16EveryValidBmpCodeUnit() {
+        val text = buildString {
+            for (code in 0 .. 0xFFFF) if (code !in 0xD800 .. 0xDFFF) append(code.toChar())
+        }
+        val cases = [Encoding.UTF16LE to 0x2300E2A3, Encoding.UTF16BE to 0x0C7AAD0E]
+        for ([encoding, checksum] in cases) {
+            val bytes = text.convert(encoding)
+            assertEquals(126976, bytes.size, encoding.name)
+            assertEquals(checksum, crc32(bytes), encoding.name)
+            assertEquals(text, bytes.convert(encoding), encoding.name)
+        }
+    }
+
+    @Test
+    fun testUTF32EveryValidBmpCodeUnit() {
+        val text = buildString {
+            for (code in 0 .. 0xFFFF) if (code !in 0xD800 .. 0xDFFF) append(code.toChar())
+        }
+        val cases = [Encoding.UTF32LE to 0x4290C0D9, Encoding.UTF32BE to 0x032F428A]
+        for ([encoding, checksum] in cases) {
+            val bytes = text.convert(encoding)
+            assertEquals(253952, bytes.size, encoding.name)
+            assertEquals(checksum, crc32(bytes), encoding.name)
+            assertEquals(text, bytes.convert(encoding), encoding.name)
+        }
+    }
+
+    @Test
+    fun testUTF16MalformedInput() {
+        val cases = [
+            "00" to "\uFFFD",
+            "FF" to "\uFFFD",
+            "D800" to "\uFFFD",
+            "DBFF" to "\uFFFD",
+            "DC00" to "\uFFFD",
+            "DFFF" to "\uFFFD",
+            "D8000041" to "\uFFFDA",
+            "DC000041" to "\uFFFDA",
+            "D800D800" to "\uFFFD\uFFFD",
+            "DC00DC00" to "\uFFFD\uFFFD",
+            "DC00D800" to "\uFFFD\uFFFD",
+            "D800D800DC00" to "\uFFFD\uD800\uDC00",
+            "D8000041DC00" to "\uFFFDA\uFFFD",
+            "0041DC000042" to "A\uFFFDB",
+            "004100" to "A\uFFFD",
+            "D80000" to "\uFFFD\uFFFD",
+            "D83DDE0000" to "\uD83D\uDE00\uFFFD",
+            "0041D83DDE00DBFF0042" to "A\uD83D\uDE00\uFFFDB",
+        ]
+        for ([value, text] in cases) {
+            val bytes = hex(value)
+            assertEquals(text, bytes.convert(Encoding.UTF16BE), value)
+            assertEquals(text, reverseUnits(bytes, 2).convert(Encoding.UTF16LE), value)
+        }
+    }
+
+    @Test
+    fun testUTF32MalformedInput() {
+        val cases = [
+            "00" to "\uFFFD",
+            "0000" to "\uFFFD",
+            "000000" to "\uFFFD",
+            "FFFFFF" to "\uFFFD",
+            "0000D800" to "\uFFFD",
+            "0000DBFF" to "\uFFFD",
+            "0000DC00" to "\uFFFD",
+            "0000DFFF" to "\uFFFD",
+            "00110000" to "\uFFFD",
+            "01000041" to "\uFFFD",
+            "7FFFFFFF" to "\uFFFD",
+            "80000000" to "\uFFFD",
+            "FFFFFFFF" to "\uFFFD",
+            "0000D8000000DC00" to "\uFFFD\uFFFD",
+            "0000D80000000041" to "\uFFFDA",
+            "8000000000000041" to "\uFFFDA",
+            "001100000000FFFF" to "\uFFFD\uFFFF",
+            "0000004100" to "A\uFFFD",
+            "000000410000" to "A\uFFFD",
+            "00000041000000" to "A\uFFFD",
+            "000000410001F600FFFFFFFF00000042" to "A\uD83D\uDE00\uFFFDB",
+        ]
+        for ([value, text] in cases) {
+            val bytes = hex(value)
+            assertEquals(text, bytes.convert(Encoding.UTF32BE), value)
+            assertEquals(text, reverseUnits(bytes, 4).convert(Encoding.UTF32LE), value)
+        }
+    }
+
+    @Test
+    fun testUnicodeUnpairedSurrogates() {
+        val cases = [
+            "\uD800" to "\uFFFD",
+            "\uDBFF" to "\uFFFD",
+            "\uDC00" to "\uFFFD",
+            "\uDFFF" to "\uFFFD",
+            "\uD800\uDC00" to "\uD800\uDC00",
+            "\uDBFF\uDFFF" to "\uDBFF\uDFFF",
+            "é\uD83D\uDE00中" to "é\uD83D\uDE00中",
+            "\uD800A\uDC00" to "\uFFFDA\uFFFD",
+            "\uD800\uD800" to "\uFFFD\uFFFD",
+            "\uDC00\uDC00" to "\uFFFD\uFFFD",
+            "\uDC00\uD800" to "\uFFFD\uFFFD",
+            "\uD800\uD800\uDC00" to "\uFFFD\uD800\uDC00",
+            "\uDC00\uD800\uDC00\uDBFF" to "\uFFFD\uD800\uDC00\uFFFD",
+        ]
+        for (encoding in unicodeEncodings) {
+            for ([text, expected] in cases) {
+                val bytes = text.convert(encoding)
+                assertContentEquals(expected.convert(encoding), bytes, encoding.name)
+                assertEquals(expected, bytes.convert(encoding), encoding.name)
+            }
+        }
+        val text = buildString {
+            for (code in 0xD800 .. 0xDFFF) append(code.toChar()).append('A')
+        }
+        val expected = "\uFFFDA".repeat(2048)
+        for (encoding in unicodeEncodings) {
+            val bytes = text.convert(encoding)
+            assertContentEquals(expected.convert(encoding), bytes, encoding.name)
+            assertEquals(expected, bytes.convert(encoding), encoding.name)
+        }
+    }
+
+    @Test
+    fun testUnicodeSupplementaryPlanes() {
+        val text = buildString {
+            for (code in 0x10000 .. 0x10FFFF step 997) append(supplementary(code))
+        }
+        val cases = [
+            Encoding.UTF16LE to 0x65F52E37,
+            Encoding.UTF16BE to 0x1DF96275,
+            Encoding.UTF32LE to 0xD65A2850.toInt(),
+            Encoding.UTF32BE to 0x24C28727,
+        ]
+        for ([encoding, checksum] in cases) {
+            val bytes = text.convert(encoding)
+            assertEquals(4208, bytes.size, encoding.name)
+            assertEquals(checksum, crc32(bytes), encoding.name)
+            assertEquals(text, bytes.convert(encoding), encoding.name)
+        }
+    }
+
+    @Test
+    fun testUnicodeByteOrderMarkIsContent() {
+        val text = "\uFEFFA\uFEFF\uFFFE"
+        val cases = [
+            Encoding.UTF16LE to "FFFE4100FFFEFEFF",
+            Encoding.UTF16BE to "FEFF0041FEFFFFFE",
+            Encoding.UTF32LE to "FFFE000041000000FFFE0000FEFF0000",
+            Encoding.UTF32BE to "0000FEFF000000410000FEFF0000FFFE",
+        ]
+        for ([encoding, value] in cases) {
+            val bytes = hex(value)
+            assertContentEquals(bytes, text.convert(encoding), encoding.name)
+            assertEquals(text, bytes.convert(encoding), encoding.name)
+        }
+    }
+
+    @Test
+    fun testUnicodeMixedTextRoundTrips() {
+        val random = Random(1632)
+        repeat(100) {
+            val text = buildString {
+                repeat(128) {
+                    when (random.nextInt(3)) {
+                        0 -> append(random.nextInt(128).toChar())
+                        1 -> {
+                            val code = random.nextInt(0xF800)
+                            append((if (code >= 0xD800) code + 0x800 else code).toChar())
+                        }
+                        else -> append(supplementary(random.nextInt(0x10000, 0x110000)))
+                    }
+                }
+            }
+            for (encoding in unicodeEncodings) {
+                val bytes = text.convert(encoding)
+                val size = when (encoding) {
+                    Encoding.UTF16LE, Encoding.UTF16BE -> text.length * 2
+                    else -> 128 * 4
+                }
+                assertEquals(size, bytes.size, encoding.name)
+                assertEquals(text, bytes.convert(encoding), encoding.name)
+            }
+        }
     }
 
     @Test

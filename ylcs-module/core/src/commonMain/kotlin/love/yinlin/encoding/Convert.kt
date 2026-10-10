@@ -5,6 +5,10 @@ private val ConvertMap = [
     ::convertStringToASCII to ::convertASCIIToString,
     ::convertStringToLatin1 to ::convertLatin1ToString,
     ::convertStringToGBK to ::convertGBKToString,
+    ::convertStringToUTF16LE to ::convertUTF16LEToString,
+    ::convertStringToUTF16BE to ::convertUTF16BEToString,
+    ::convertStringToUTF32LE to ::convertUTF32LEToString,
+    ::convertStringToUTF32BE to ::convertUTF32BEToString,
 ]
 
 fun String.convert(encoding: Encoding): ByteArray = ConvertMap[encoding.ordinal].first(this)
