@@ -26,6 +26,13 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        commonTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test
+            )
+        }
+
         val clientMain = createClient(commonMain)
 
         nativeMain.configure(clientMain)
@@ -63,13 +70,6 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
-        desktopTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test
-            )
-        }
-
         webMain.configure(commonMain) {
             lib(
                 ExportLib,
@@ -80,21 +80,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         jsMain.configure(webMain)
 
-        jsTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test
-            )
-        }
-
         wasmJsMain.configure(webMain)
-
-        wasmJsTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test
-            )
-        }
 
         windowsMain.configure(nativeMain) {
             lib(
