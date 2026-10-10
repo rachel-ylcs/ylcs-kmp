@@ -2,11 +2,13 @@ package love.yinlin.encoding
 
 fun String.convert(encoding: Encoding): ByteArray = when (encoding) {
     Encoding.UTF8 -> convertUTF8(this)
+    Encoding.ASCII -> convertASCII(this)
     Encoding.GBK -> convertGBK(this)
 }
 
 fun ByteArray.convert(encoding: Encoding): String = when (encoding) {
     Encoding.UTF8 -> convertUTF8(this)
+    Encoding.ASCII -> convertASCII(this)
     Encoding.GBK -> convertGBK(this)
 }
 
