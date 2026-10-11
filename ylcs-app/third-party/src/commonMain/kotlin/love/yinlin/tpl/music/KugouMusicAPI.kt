@@ -3,6 +3,7 @@ package love.yinlin.tpl.music
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.data.music.PlatformMusicInfo
+import love.yinlin.encoding.convert
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.parser.lrc.LrcParser
@@ -101,7 +102,7 @@ object KugouMusicAPI : PlatformMusicAPI {
             url = "$LYRIC_DOWNLOAD_API?charset=utf8&accesskey=$accessKey&id=$lyricId&client=mobi&fmt=lrc&ver=1"
         }) { json: JsonObject ->
             val contentBase64 = json["content"]?.String ?: ""
-            if (contentBase64.isEmpty()) "" else Base64.decode(contentBase64).decodeToString().removePrefix("\ufeff")
+            if (contentBase64.isEmpty()) "" else Base64.decode(contentBase64).convert().removePrefix("\ufeff")
         }
     }
 

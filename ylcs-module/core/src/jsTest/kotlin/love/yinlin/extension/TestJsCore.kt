@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalWasmJsInterop::class)
 package love.yinlin.extension
 
+import love.yinlin.encoding.convert
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.toByteArray
 import org.khronos.webgl.toInt8Array
@@ -36,7 +37,7 @@ class TestJsCore {
         val arr3 = jsArrayOf("hello", "world")
         assertContentEquals(["hello".raw, "world".raw], arr3.toArray())
 
-        val arr4 = jsArrayOf("hello".encodeToByteArray(), "world".encodeToByteArray()) { it.toInt8Array() }
-        assertContentEquals(["hello", "world"], arr4.asArray { v: Int8Array -> v.toByteArray().decodeToString() })
+        val arr4 = jsArrayOf("hello".convert(), "world".convert()) { it.toInt8Array() }
+        assertContentEquals(["hello", "world"], arr4.asArray { v: Int8Array -> v.toByteArray().convert() })
     }
 }

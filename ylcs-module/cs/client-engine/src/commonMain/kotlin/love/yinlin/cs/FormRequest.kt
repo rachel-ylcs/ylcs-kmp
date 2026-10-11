@@ -14,6 +14,7 @@ import kotlinx.io.buffered
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.data.Data
+import love.yinlin.encoding.convert
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
@@ -28,7 +29,7 @@ class ClientAPIFile internal constructor(val value: Any) : APIFile {
     override val files: List<String> = []
 }
 
-fun apiFile(data: String): APIFile = ClientAPIFile(value = data.encodeToByteArray())
+fun apiFile(data: String): APIFile = ClientAPIFile(value = data.convert())
 fun apiFile(data: ByteArray): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: RawSource): APIFile = ClientAPIFile(value = data)
 fun apiFile(data: Sources<RawSource>): APIFile = ClientAPIFile(value = data)

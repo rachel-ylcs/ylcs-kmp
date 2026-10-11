@@ -4,6 +4,7 @@ import io.github.alexzhirkevich.qrose.qrcode.QRCodeDataType
 import io.github.alexzhirkevich.qrose.qrcode.QRCodeDataType.DEFAULT
 import io.github.alexzhirkevich.qrose.qrcode.QRCodeDataType.NUMBERS
 import io.github.alexzhirkevich.qrose.qrcode.QRCodeDataType.UPPER_ALPHA_NUM
+import love.yinlin.encoding.convert
 
 /**
  * Rewritten in Kotlin from the [original (GitHub)](https://github.com/kazuhikoarase/qrcode-generator/blob/master/java/src/main/java/com/d_project/qrcode/QRData.java)
@@ -52,7 +53,7 @@ internal abstract class QRData(val dataType: QRCodeDataType, val data: String) {
  * @author Kazuhiko Arase - kazuhikoarase
  */
 internal class QR8BitByte(data: String) : QRData(DEFAULT, data) {
-    private val dataBytes = data.encodeToByteArray()
+    private val dataBytes = data.convert()
 
     override fun write(buffer: BitBuffer) {
         for (i in dataBytes.indices) {

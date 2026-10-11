@@ -16,13 +16,14 @@ import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.lottie.Lottie
 import love.yinlin.data.rachel.emoji.Emoji
 import love.yinlin.data.rachel.emoji.EmojiType
+import love.yinlin.encoding.convert
 import love.yinlin.extension.then
 import love.yinlin.foundation.NetClient
 
 @Stable
 data object RichEmojiDrawer : RichDrawer {
     private val cache = StateCache<String, String> { source ->
-        NetClient.File.download(source)!!.decodeToString()
+        NetClient.File.download(source)!!.convert()
     }
 
     override val type: String = RichType.Emoji.value

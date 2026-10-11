@@ -1,5 +1,6 @@
 package love.yinlin.io
 
+import love.yinlin.encoding.convert
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -91,7 +92,7 @@ class TestByteArrayIO {
     @Test
     fun stringAndByteArray() {
         val text = "A中🙂"
-        val textLength = text.encodeToByteArray().size
+        val textLength = text.convert().size
         val io = ByteArrayIO(textLength + 3)
 
         io.writeString(0, text)

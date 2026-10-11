@@ -3,6 +3,7 @@ package love.yinlin.tpl.douyin
 import androidx.compose.runtime.Stable
 import io.ktor.http.encodeURLParameter
 import io.ktor.http.formUrlEncode
+import love.yinlin.encoding.convert
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.mapString
 import love.yinlin.foundation.cryptography.RC4
@@ -95,7 +96,7 @@ object DouyinEncoder {
             24,
             24,
             "Win32",
-        ].joinToString("|").encodeToByteArray()
+        ].joinToString("|").convert()
 
         val data: IntArray = [
             44,

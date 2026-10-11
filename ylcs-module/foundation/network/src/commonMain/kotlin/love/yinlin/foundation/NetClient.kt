@@ -29,6 +29,7 @@ import kotlinx.io.Sink
 import kotlinx.serialization.json.JsonObject
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.IOCoroutine
+import love.yinlin.encoding.convert
 import love.yinlin.extension.Json
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
@@ -83,7 +84,7 @@ class NetClient internal constructor(val delegate: HttpClient) : AutoCloseable {
                     override val headers: NetHeader = NetHeader(headers)
                     override val cookies: NetCookie = NetCookie(cookies)
                     override val rawBody: ByteArray = rawBody
-                    override val bodyString: String get() = this.rawBody.decodeToString()
+                    override val bodyString: String get() = this.rawBody.convert()
                     override val body: Body get() = this.bodyString.parseJsonValue()
                 }
                 Coroutines.with(context) { scope.onResponse() }

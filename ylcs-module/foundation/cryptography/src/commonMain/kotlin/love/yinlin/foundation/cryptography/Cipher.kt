@@ -1,18 +1,20 @@
 package love.yinlin.foundation.cryptography
 
+import love.yinlin.encoding.convert
+
 abstract class Cipher : Cryptography {
     abstract fun encode(data: ByteArray): ByteArray
     abstract fun decode(data: ByteArray): ByteArray
 
-    fun encode(data: String): ByteArray = encode(data.encodeToByteArray())
+    fun encode(data: String): ByteArray = encode(data.convert())
 
     fun encodeToHex(data: ByteArray, format: HexFormat = HexFormat.Default): String = encode(data).toHexString(format)
 
-    fun encodeToHex(data: String, format: HexFormat = HexFormat.Default): String = encode(data.encodeToByteArray()).toHexString(format)
+    fun encodeToHex(data: String, format: HexFormat = HexFormat.Default): String = encode(data.convert()).toHexString(format)
 
-    fun decodeToString(data: ByteArray): String = decode(data).decodeToString()
+    fun decodeToString(data: ByteArray): String = decode(data).convert()
 
     fun decodeFromHex(data: String, format: HexFormat = HexFormat.Default): ByteArray = decode(data.hexToByteArray(format))
 
-    fun decodeFromHexToString(data: String, format: HexFormat = HexFormat.Default): String = decode(data.hexToByteArray(format)).decodeToString()
+    fun decodeFromHexToString(data: String, format: HexFormat = HexFormat.Default): String = decode(data.hexToByteArray(format)).convert()
 }

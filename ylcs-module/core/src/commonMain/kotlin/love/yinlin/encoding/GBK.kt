@@ -140,7 +140,7 @@ internal fun convertGBKToString(data: ByteArray): String {
     if (data.isEmpty()) return ""
     var asciiLength = 0
     while (asciiLength < data.size && data[asciiLength] >= 0) asciiLength++
-    if (asciiLength == data.size) return data.decodeToString()
+    if (asciiLength == data.size) return data.convert(Encoding.UTF8)
     val chars = CharArray(data.size)
     for (index in 0 ..< asciiLength) chars[index] = data[index].toInt().toChar()
     var input = asciiLength

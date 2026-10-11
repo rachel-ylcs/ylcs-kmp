@@ -11,6 +11,7 @@ import love.yinlin.data.mod.ModInfo
 import love.yinlin.data.mod.ModMetadata
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
+import love.yinlin.encoding.convert
 import love.yinlin.extension.*
 import love.yinlin.fs.*
 import kotlin.random.Random
@@ -28,7 +29,7 @@ object ModFactory {
     ) {
         companion object {
             private fun Sink.writeLengthString(str: String) {
-                val bytes = str.encodeToByteArray()
+                val bytes = str.convert()
                 writeInt(bytes.size)
                 write(bytes)
             }
@@ -108,7 +109,7 @@ object ModFactory {
                 val length = readInt()
                 require(length >= 0) { "MOD文件已破坏" }
                 val bytes = readByteArray(length)
-                return bytes.decodeToString()
+                return bytes.convert()
             }
         }
 
@@ -210,7 +211,7 @@ object ModFactory {
             val config = if (type == ModResourceType.Config) { // 读取媒体配置
                 val bytes = ByteArray(resLength)
                 readTo(bytes)
-                bytes.decodeToString().parseJsonValue<MusicInfo>()
+                bytes.convert().parseJsonValue<MusicInfo>()
             }
             else { // 跳过资源数据
                 skip((resLength + times).toLong())

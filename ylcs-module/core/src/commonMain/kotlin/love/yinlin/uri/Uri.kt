@@ -1,6 +1,7 @@
 package love.yinlin.uri
 
 import kotlinx.serialization.Serializable
+import love.yinlin.encoding.convert
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.cleaning
 import love.yinlin.extension.then
@@ -129,7 +130,7 @@ data class Uri(
                 while (nextAllowed < oldLength && !isAllowed(str[nextAllowed])) nextAllowed++
                 val toEncode = str.substring(current, nextAllowed)
                 catchingError {
-                    val bytes: ByteArray = toEncode.encodeToByteArray()
+                    val bytes: ByteArray = toEncode.convert()
                     val bytesLength = bytes.size
                     for(i in 0 until bytesLength) {
                         encoded.append('%')

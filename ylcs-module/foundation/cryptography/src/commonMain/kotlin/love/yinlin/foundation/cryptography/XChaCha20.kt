@@ -1,12 +1,13 @@
 package love.yinlin.foundation.cryptography
 
+import love.yinlin.encoding.convert
 import love.yinlin.extension.cleaning
 import love.yinlin.io.ByteArrayIO
 import love.yinlin.io.Endian
 import kotlin.collections.listOf
 
 class XChaCha20(private val key: ByteArray) : Cipher() {
-    constructor(key: String) : this(key.encodeToByteArray())
+    constructor(key: String) : this(key.convert())
 
     private object ChaCha20 {
         val Constants: IntArray = [0x61707865, 0x3320646e, 0x79622d32, 0x6b206574]

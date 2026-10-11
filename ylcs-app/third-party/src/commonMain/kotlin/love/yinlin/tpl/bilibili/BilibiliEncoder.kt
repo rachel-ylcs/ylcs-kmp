@@ -1,6 +1,7 @@
 package love.yinlin.tpl.bilibili
 
 import androidx.compose.runtime.Stable
+import love.yinlin.encoding.convert
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.makeObject
 import love.yinlin.extension.toJsonString
@@ -18,7 +19,7 @@ object BilibiliEncoder {
 
     internal fun percentEncode(value: String): String = buildString {
         val hex = "0123456789ABCDEF"
-        for (byte in value.encodeToByteArray()) {
+        for (byte in value.convert()) {
             val number = byte.toInt() and 0xff
             if (number in 0x41..0x5a || number in 0x61..0x7a || number in 0x30..0x39 ||
                 number == 0x2d || number == 0x2e || number == 0x5f || number == 0x7e) {

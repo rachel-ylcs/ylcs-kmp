@@ -11,9 +11,9 @@ private val ConvertMap = [
     ::convertStringToUTF32BE to ::convertUTF32BEToString,
 ]
 
-fun String.convert(encoding: Encoding): ByteArray = ConvertMap[encoding.ordinal].first(this)
+fun String.convert(encoding: Encoding = Encoding.Default): ByteArray = ConvertMap[encoding.ordinal].first(this)
 
-fun ByteArray.convert(encoding: Encoding): String = ConvertMap[encoding.ordinal].second(this)
+fun ByteArray.convert(encoding: Encoding = Encoding.Default): String = ConvertMap[encoding.ordinal].second(this)
 
 internal expect fun convertStringToUTF8(data: String): ByteArray
 internal expect fun convertUTF8ToString(data: ByteArray): String

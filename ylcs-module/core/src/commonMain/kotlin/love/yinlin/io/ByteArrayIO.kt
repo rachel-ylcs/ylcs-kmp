@@ -1,5 +1,7 @@
 package love.yinlin.io
 
+import love.yinlin.encoding.Encoding
+import love.yinlin.encoding.convert
 import love.yinlin.extension.enum
 
 class ByteArrayIO(val bytes: ByteArray) {
@@ -125,7 +127,7 @@ class ByteArrayIO(val bytes: ByteArray) {
 
     fun writeDouble(index: Int, value: Double) = writeLong(index, value.toRawBits())
 
-    fun writeString(index: Int, value: String) { value.encodeToByteArray().copyInto(bytes, destinationOffset = index) }
+    fun writeString(index: Int, value: String, encoding: Encoding = Encoding.Default) { value.convert(encoding).copyInto(bytes, destinationOffset = index) }
 
     fun writeByteArray(index: Int, value: ByteArray) { value.copyInto(bytes, destinationOffset = index) }
 

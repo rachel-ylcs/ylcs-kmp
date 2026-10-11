@@ -1,7 +1,9 @@
 package love.yinlin.foundation.cryptography
 
+import love.yinlin.encoding.convert
+
 class RC4(private val key: ByteArray): Cipher() {
-    constructor(key: String) : this(key.encodeToByteArray())
+    constructor(key: String) : this(key.convert())
 
     init {
         require(key.isNotEmpty()) { "RC4 key cannot be empty." }

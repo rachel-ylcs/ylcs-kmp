@@ -4,6 +4,7 @@ package love.yinlin.fs
 import kotlinx.cinterop.*
 import kotlinx.datetime.LocalDateTime
 import kotlinx.io.bytestring.buildByteString
+import love.yinlin.encoding.convert
 import love.yinlin.extension.merge64
 import love.yinlin.extension.then
 import love.yinlin.extension.toLocalDateTime
@@ -162,7 +163,7 @@ val File.shortcutTarget: File? get() = memScoped {
                     v = p.pointed.value.toInt()
                 }
             }
-            return File(data.toByteArray().decodeToString())
+            return File(data.toByteArray().convert())
         }
     }
     return null
