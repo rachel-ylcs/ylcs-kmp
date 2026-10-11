@@ -9,7 +9,7 @@ import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.http.NetHeader
-import love.yinlin.foundation.parser.lrc.LrcParser
+import love.yinlin.foundation.parser.lrc.Lrc
 import love.yinlin.uri.Uri
 
 @Stable
@@ -135,7 +135,7 @@ object SodaMusicAPI : PlatformMusicAPI {
         val krcContent = apiData.obj("lyric")["content"]?.String ?: ""
         val lyrics = if (krcContent.isNotBlank()) {
             val lrcText = convertKrcToLrc(krcContent)
-            LrcParser.parse(lrcText).toString()
+            Lrc.parse(lrcText).toString()
         } else ""
 
         PlatformMusicInfo(

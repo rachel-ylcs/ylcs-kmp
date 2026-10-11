@@ -8,7 +8,7 @@ import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
 import love.yinlin.foundation.http.NetHeader
-import love.yinlin.foundation.parser.lrc.LrcParser
+import love.yinlin.foundation.parser.lrc.Lrc
 import love.yinlin.uri.Uri
 
 @Stable
@@ -85,7 +85,7 @@ object MiguMusicAPI : PlatformMusicAPI {
             NetClient.Common.request({
                 url = lrcUrl
                 headers = defaultHeaders
-            }) { text: String -> LrcParser.parse(text).toString() } ?: ""
+            }) { text: String -> Lrc.parse(text).toString() } ?: ""
         } else ""
 
         var pic = result.imgUrl

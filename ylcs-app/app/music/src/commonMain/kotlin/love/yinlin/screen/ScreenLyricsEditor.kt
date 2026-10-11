@@ -40,9 +40,9 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.then
 import love.yinlin.extension.timeString
+import love.yinlin.foundation.parser.lrc.Lrc
 import love.yinlin.foundation.parser.lrc.LrcLine
 import love.yinlin.foundation.parser.lrc.LrcMetadata
-import love.yinlin.foundation.parser.lrc.LrcParser
 import love.yinlin.media.buildAudioPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -72,8 +72,8 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                 require(player.isInit)
                 loadMusic(false)
 
-                val parser = LrcParser.parse(musicInfo.path(app.modPath, ModResourceType.LineLyrics).readText()!!)
-                lyrics.replaceAllByData(parser.lines!!)
+                val parser = Lrc.parse(musicInfo.path(app.modPath, ModResourceType.LineLyrics).readText()!!)
+                lyrics.replaceAllByData(parser.lines)
 
                 isPlayingFlow.collectLatest { value ->
                     isPlaying = value
@@ -123,7 +123,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
     private suspend fun saveLyrics() {
         catchingError {
             Coroutines.io {
-                val parser = LrcParser(lyrics.data, LrcMetadata())
+                val parser = Lrc(lyrics.data, LrcMetadata())
                 musicInfo.path(app.modPath, ModResourceType.LineLyrics).writeText(parser.toString())
             }
             slot.tip.success("保存成功")
@@ -273,7 +273,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                     else lyrics.replaceAllByData(lyrics.mapByData { it.copy(position = it.position + offset) })
                 })
                 SecondaryLoadingTextButton(text = "导出到剪贴板", icon = Icons.Download, onClick = {
-                    val lyricsText = Coroutines.cpu { LrcParser(lyrics.data, LrcMetadata()).toString() }
+                    val lyricsText = Coroutines.cpu { Lrc(lyrics.data, LrcMetadata()).toString() }
                     if (app.copyText(lyricsText)) slot.tip.success("导出到剪贴板成功")
                     else slot.tip.warning("导出失败")
                 })
@@ -282,9 +282,9 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                     if (needPlay) player.pause()
                     val lyricsText = importDialog.open()
                     if (lyricsText != null) {
-                        val parseLines = LrcParser.parse(lyricsText).lines
-                        if (parseLines != null) {
-                            lyrics.replaceAllByData(parseLines)
+                        val lrc = Lrc.parse(lyricsText)
+                        if (lrc.isNotEmpty) {
+                            lyrics.replaceAllByData(lrc.lines)
                             slot.tip.success("导入LRC歌词成功")
                         }
                         else slot.tip.warning("LRC歌词存在错误")

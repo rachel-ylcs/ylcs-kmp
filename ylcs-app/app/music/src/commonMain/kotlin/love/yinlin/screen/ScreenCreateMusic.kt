@@ -41,7 +41,7 @@ import love.yinlin.extension.catchingError
 import love.yinlin.extension.then
 import love.yinlin.extension.timeString
 import love.yinlin.extension.toJsonString
-import love.yinlin.foundation.parser.lrc.LrcParser
+import love.yinlin.foundation.parser.lrc.Lrc
 import love.yinlin.fs.*
 import love.yinlin.startup.StartupMusicPlayer
 import love.yinlin.uri.ImplicitUri
@@ -88,10 +88,10 @@ class ScreenCreateMusic : Screen() {
         }
     }
 
-    private fun prepareLyrics(lyrics: String): LrcParser {
+    private fun prepareLyrics(lyrics: String): Lrc {
         // 首先尝试 lrc 解析
-        val lrcParser = LrcParser.parse(lyrics)
-        if (lrcParser.ok) return lrcParser
+        val lrcParser = Lrc.parse(lyrics)
+        if (lrcParser.isNotEmpty) return lrcParser
         // 手动添加lrc
         val items = lyrics.splitToSequence("\\r?\\n".toRegex()).filter { it.isNotBlank() }.toList()
         // 假定歌词至少有 5 行
@@ -102,8 +102,8 @@ class ScreenCreateMusic : Screen() {
             currentTime += step
             "[${currentTime.timeString}.00]$text"
         }
-        val customParser = LrcParser.parse(newLyrics)
-        require(customParser.ok) { "歌词文件非法" }
+        val customParser = Lrc.parse(newLyrics)
+        require(customParser.isNotEmpty) { "歌词文件非法" }
         return customParser
     }
 

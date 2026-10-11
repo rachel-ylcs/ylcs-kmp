@@ -2,12 +2,27 @@ package love.yinlin.foundation.parser.lrc
 
 import love.yinlin.extension.timeString
 
-class LrcParser(val lines: List<LrcLine>?, val metadata: LrcMetadata) {
+data class Lrc(
+    val lines: List<LrcLine>,
+    val metadata: LrcMetadata
+) {
+    val isEmpty: Boolean = lines.isEmpty()
+    val isNotEmpty: Boolean = lines.isNotEmpty()
+
+    val plainText: String get() = lines.joinToString("\n") { it.text }
+
+    override fun toString(): String = lines.joinToString("\n") {
+        val milliseconds = (it.position % 1000) / 10
+        "[${it.position.timeString}.${if (milliseconds < 10) "0" else ""}$milliseconds]${it.text}"
+    }
+
     companion object {
-        fun parse(source: String): LrcParser {
-            val newLines = mutableListOf<LrcLine>()
-            val timePattern = """\[(\d+):([0-5]?\d)(?:[.:](\d{2,3}))?]""".toRegex()
-            val metadataPattern = """^\[([A-Za-z]+):(.*)]$""".toRegex()
+        private val SourcePattern = Regex("""\r\n|\r|\n""")
+        private val TimePattern = Regex("""\[(\d+):([0-5]?\d)(?:[.:](\d{2,3}))?]""")
+        private val MetadataPattern = Regex("""^\[([A-Za-z]+):(.*)]$""")
+
+        fun parse(source: String): Lrc {
+            val newLines: MutableList<LrcLine> = []
 
             var title: String? = null
             var artist: String? = null
@@ -19,12 +34,12 @@ class LrcParser(val lines: List<LrcLine>?, val metadata: LrcMetadata) {
             var version: String? = null
             var length: String? = null
 
-            val items = source.split(Regex("""\r\n|\r|\n"""))
+            val items = source.split(SourcePattern)
 
             for (item in items) {
                 val line = item.trim()
                 if (line.isEmpty()) continue
-                val metadataMatch = metadataPattern.matchEntire(line)
+                val metadataMatch = MetadataPattern.matchEntire(line)
 
                 if (metadataMatch != null) {
                     val key = metadataMatch.groupValues[1].lowercase()
@@ -44,7 +59,7 @@ class LrcParser(val lines: List<LrcLine>?, val metadata: LrcMetadata) {
                     continue
                 }
 
-                val timeMatches = timePattern.findAll(line).toList()
+                val timeMatches = TimePattern.findAll(line).toList()
                 if (timeMatches.isEmpty()) continue
 
                 val lastMatch = timeMatches.last()
@@ -68,12 +83,10 @@ class LrcParser(val lines: List<LrcLine>?, val metadata: LrcMetadata) {
                 }
             }
 
-            val parsedLines = newLines.asSequence().map {
-                it.copy(position = (it.position + offset).coerceAtLeast(0L))
-            }.distinct().sorted().toList().ifEmpty { null }
-
-            return LrcParser(
-                lines = parsedLines,
+            return Lrc(
+                lines = newLines.asSequence().map {
+                    it.copy(position = (it.position + offset).coerceAtLeast(0L))
+                }.distinct().sorted().toList(),
                 metadata = LrcMetadata(
                     title = title,
                     artist = artist,
@@ -88,17 +101,4 @@ class LrcParser(val lines: List<LrcLine>?, val metadata: LrcMetadata) {
             )
         }
     }
-
-    val ok: Boolean get() = lines != null
-
-    val plainText: String get() = lines?.let { items ->
-        items.joinToString("\n") { it.text }
-    } ?: ""
-
-    override fun toString(): String = lines?.let { items ->
-        items.joinToString("\n") {
-            val milliseconds = (it.position % 1000) / 10
-            "[${it.position.timeString}.${if (milliseconds < 10) "0" else ""}$milliseconds]${it.text}"
-        }
-    } ?: ""
 }

@@ -15,7 +15,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.ui.text.FastCenterText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.extension.catchingDefault
-import love.yinlin.foundation.parser.lrc.LrcParser
+import love.yinlin.foundation.parser.lrc.Lrc
 import love.yinlin.fs.File
 
 @Stable
@@ -27,10 +27,13 @@ internal class LineLyricsEngine : TextLyricsEngine<StaticLine>() {
     override val type: LyricsEngineType = LyricsEngineType.Line
 
     override suspend fun load(rootPath: File): Boolean = catchingDefault(false) {
-        val source = File(rootPath, type.resType.filename).readText()
-        lines = source?.let(LrcParser::parse)?.lines?.map { (val position, val text) -> StaticLine(position, text) }
+        val source = File(rootPath, type.resType.filename).readText()!!
+        val lrc = Lrc.parse(source)
+        require(lrc.isNotEmpty)
+        val newlines = lrc.lines.map { (val position, val text) -> StaticLine(position, text) }
+        lines = newlines
         currentIndex = -1
-        lines!!.isNotEmpty()
+        newlines.isNotEmpty()
     }
 
     @Composable

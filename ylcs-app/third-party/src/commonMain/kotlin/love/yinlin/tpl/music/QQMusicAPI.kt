@@ -8,7 +8,7 @@ import love.yinlin.data.music.PlatformMusicInfo
 import love.yinlin.encoding.convert
 import love.yinlin.extension.*
 import love.yinlin.foundation.NetClient
-import love.yinlin.foundation.parser.lrc.LrcParser
+import love.yinlin.foundation.parser.lrc.Lrc
 import kotlin.io.encoding.Base64
 
 @Stable
@@ -105,7 +105,7 @@ object QQMusicAPI : PlatformMusicAPI {
             time = (trackInfo["interval"].Long * 1000).timeString,
             pic = "https://y.qq.com/music/photo_new/T002R300x300M000${trackInfo.obj("album")["pmid"].String}.jpg?max_age=2592000",
             audioUrl = "https://ws.stream.qqmusic.qq.com/${midUrlInfo["purl"].String}",
-            lyrics = LrcParser.parse(Base64.decode(lyricsBase64).convert()).toString()
+            lyrics = Lrc.parse(Base64.decode(lyricsBase64).convert()).toString()
         )
     }
 
