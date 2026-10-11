@@ -1,10 +1,6 @@
 package love.yinlin.data.rachel.game.info
 
 import androidx.compose.runtime.Stable
-import kotlinx.io.Buffer
-import kotlinx.io.UnsafeIoApi
-import kotlinx.io.readByteArray
-import kotlinx.io.unsafe.UnsafeBufferOperations
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,6 +13,8 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 import love.yinlin.data.rachel.game.RankConfig
+import love.yinlin.io.ByteArrayIO
+import love.yinlin.io.Endian
 import kotlin.io.encoding.Base64
 
 @Stable
@@ -36,27 +34,29 @@ data class PaintPath(
 
         override fun serialize(encoder: Encoder, value: PaintPath) {
             encoder.encodeStructure(descriptor) {
-                val buffer = Buffer()
-                for (path in value.paths) buffer.writeLong(path)
-                encodeStringElement(descriptor, 0, Base64.encode(buffer.readByteArray()))
+                val bytes = ByteArrayIO(value.paths.size * Long.SIZE_BYTES).write {
+                    value.paths.forEachIndexed { index, path ->
+                        writeLong(index * Long.SIZE_BYTES, path, Endian.BIG)
+                    }
+                }
+                encodeStringElement(descriptor, 0, Base64.encode(bytes))
                 encodeFloatElement(descriptor, 1, value.width)
                 encodeIntElement(descriptor, 2, value.color)
             }
         }
 
-        @OptIn(UnsafeIoApi::class)
         override fun deserialize(decoder: Decoder): PaintPath = decoder.decodeStructure(descriptor) {
             val paths: MutableList<Long> = []
             var width = 1f
             var color = 0
-            val buffer = Buffer()
             while (true) {
                 when (val index = decodeElementIndex(descriptor)) {
                     0 -> {
                         val base64Str = decodeStringElement(descriptor, 0)
-                        val bytes = Base64.decode(base64Str)
-                        UnsafeBufferOperations.moveToTail(buffer, bytes)
-                        repeat(bytes.size / 8) { paths += buffer.readLong() }
+                        val io = ByteArrayIO(Base64.decode(base64Str))
+                        repeat(io.size / Long.SIZE_BYTES) { index ->
+                            paths += io.readLong(index * Long.SIZE_BYTES, Endian.BIG)
+                        }
                     }
                     1 -> width = decodeFloatElement(descriptor, 1)
                     2 -> color = decodeIntElement(descriptor, 2)
