@@ -1,5 +1,6 @@
 package love.yinlin.encoding
 
+import love.yinlin.io.CRC32
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -11,21 +12,9 @@ class EncodingTest {
         (0xDC00 + ((code - 0x10000) and 0x3FF)).toChar(),
     ).concatToString()
 
-    private fun crc32Byte(checksum: Int, value: Int): Int {
-        var result = checksum xor (value and 0xFF)
-        repeat(8) { result = (result ushr 1) xor if (result and 1 == 0) 0 else 0xEDB88320.toInt() }
-        return result
-    }
-
     private fun hex(value: String): ByteArray = value.hexToByteArray(HexFormat.UpperCase)
 
     private val unicodeEncodings = [Encoding.UTF16LE, Encoding.UTF16BE, Encoding.UTF32LE, Encoding.UTF32BE]
-
-    private fun crc32(bytes: ByteArray): Int {
-        var checksum = -1
-        for (byte in bytes) checksum = crc32Byte(checksum, byte.toInt())
-        return checksum.inv()
-    }
 
     private fun reverseUnits(bytes: ByteArray, width: Int): ByteArray {
         val result = bytes.copyOf()
@@ -206,7 +195,7 @@ class EncodingTest {
 
     @Test
     fun testGBKEveryDoubleByteSlot() {
-        var checksum = -1
+        val checksum = CRC32()
         var assigned = 0
         val corpus = StringBuilder()
         val corpusBytes = ByteArray(21791 * 2)
@@ -228,24 +217,23 @@ class EncodingTest {
                     assertEquals(expected, text, "$lead/$trail")
                     0
                 }
-                checksum = crc32Byte(crc32Byte(checksum, code), code shr 8)
+                checksum.update(code.toByte(), (code shr 8).toByte())
             }
         }
         assertEquals(21791, assigned)
-        assertEquals(0xD6965DC7.toInt(), checksum.inv())
+        assertEquals(0xD6965DC7.toInt(), checksum.value)
         assertContentEquals(corpusBytes, convertStringToGBK(corpus.toString()))
         assertEquals(corpus.toString(), convertGBKToString(corpusBytes))
     }
 
     @Test
     fun testGBKEveryBmpCodeUnit() {
-        var checksum = -1
+        val checksum = CRC32()
         for (code in 0 .. 0xFFFF) {
             val bytes = convertStringToGBK(code.toChar().toString())
-            checksum = crc32Byte(checksum, bytes.size)
-            for (byte in bytes) checksum = crc32Byte(checksum, byte.toInt())
+            checksum.update(bytes.size.toByte()).update(bytes)
         }
-        assertEquals(0xD34A151C.toInt(), checksum.inv())
+        assertEquals(0xD34A151C.toInt(), checksum.value)
     }
 
     @Test
@@ -285,7 +273,7 @@ class EncodingTest {
         for ([encoding, checksum] in cases) {
             val bytes = text.convert(encoding)
             assertEquals(126976, bytes.size, encoding.name)
-            assertEquals(checksum, crc32(bytes), encoding.name)
+            assertEquals(checksum, CRC32.calculate(bytes), encoding.name)
             assertEquals(text, bytes.convert(encoding), encoding.name)
         }
     }
@@ -299,7 +287,7 @@ class EncodingTest {
         for ([encoding, checksum] in cases) {
             val bytes = text.convert(encoding)
             assertEquals(253952, bytes.size, encoding.name)
-            assertEquals(checksum, crc32(bytes), encoding.name)
+            assertEquals(checksum, CRC32.calculate(bytes), encoding.name)
             assertEquals(text, bytes.convert(encoding), encoding.name)
         }
     }
@@ -414,7 +402,7 @@ class EncodingTest {
         for ([encoding, checksum] in cases) {
             val bytes = text.convert(encoding)
             assertEquals(4208, bytes.size, encoding.name)
-            assertEquals(checksum, crc32(bytes), encoding.name)
+            assertEquals(checksum, CRC32.calculate(bytes), encoding.name)
             assertEquals(text, bytes.convert(encoding), encoding.name)
         }
     }
