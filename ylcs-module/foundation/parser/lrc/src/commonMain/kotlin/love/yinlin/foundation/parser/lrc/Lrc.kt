@@ -1,7 +1,5 @@
 package love.yinlin.foundation.parser.lrc
 
-import love.yinlin.extension.timeString
-
 data class Lrc(
     val lines: List<LrcLine>,
     val metadata: LrcMetadata
@@ -11,9 +9,29 @@ data class Lrc(
 
     val plainText: String get() = lines.joinToString("\n") { it.text }
 
-    override fun toString(): String = lines.joinToString("\n") {
-        val milliseconds = (it.position % 1000) / 10
-        "[${it.position.timeString}.${if (milliseconds < 10) "0" else ""}$milliseconds]${it.text}"
+    override fun toString(): String = buildString {
+        for ([key, value] in [
+            "ti" to metadata.title,
+            "ar" to metadata.artist,
+            "al" to metadata.album,
+            "au" to metadata.author,
+            "by" to metadata.by,
+            "re" to metadata.editor,
+            "ve" to metadata.version,
+            "length" to metadata.length
+        ]) {
+            if (!value.isNullOrBlank()) appendLine("[$key:$value]")
+        }
+        if (metadata.offset != 0L) appendLine("[offset:${metadata.offset}]")
+
+        lines.forEachIndexed { index, (val p = position, val text) ->
+            val position = (p - metadata.offset).coerceAtLeast(0L)
+            val minutes = (position / 60000L).toString().padStart(2, '0')
+            val seconds = (position / 1000L % 60L).toString().padStart(2, '0')
+            val milliseconds = (position % 1000L / 10L).toString().padStart(2, '0')
+            if (index > 0) append('\n')
+            append("[$minutes:$seconds.$milliseconds]$text")
+        }
     }
 
     companion object {
