@@ -5,6 +5,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.coroutines.Coroutines
@@ -70,11 +71,11 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
         if (progressJob?.isActive == true) return
         progressJob = scope.launch {
             catchingError {
-                while (Coroutines.isActive() && !lifetime.isClosed) {
+                while (isActive && !lifetime.isClosed) {
                     val current = player ?: break
                     if (!current.wantsPlay) break
                     current.checkForFailure()
-                    if (!Coroutines.isActive() || lifetime.isClosed) break
+                    if (!isActive || lifetime.isClosed) break
                     synchronize()
                     delay(fetcher.interval.milliseconds)
                 }

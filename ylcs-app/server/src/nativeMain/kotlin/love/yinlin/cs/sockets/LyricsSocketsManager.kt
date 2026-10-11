@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import love.yinlin.coroutines.Coroutines
@@ -81,9 +82,9 @@ class LyricsSocketsManager(
 
     suspend fun send(data: LyricsSockets.SM) = super.send(data.toJsonString())
 
-    private suspend fun onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
+    private suspend fun CoroutineScope.onInviteTimer(uid: Int, targetInfo: LyricsSockets.PlayerInfo) {
         delay(LyricsSockets.INVITE_TIME.milliseconds)
-        if (Coroutines.isActive()) {
+        if (isActive) {
             // 超时自动拒绝
             val target = players[targetInfo.uid]
             if (target?.room == null) {

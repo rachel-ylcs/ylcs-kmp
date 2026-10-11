@@ -7,6 +7,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import love.yinlin.compose.ui.PlatformView
 import love.yinlin.compose.ui.Releasable
@@ -102,11 +103,11 @@ private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
         if (progressJob?.isActive == true) return
         progressJob = scope.launch {
             catchingError {
-                while (Coroutines.isActive() && !lifetime.isClosed) {
+                while (isActive && !lifetime.isClosed) {
                     val current = player ?: break
                     if (!current.wantsPlay) break
                     current.checkForFailure()
-                    if (!Coroutines.isActive() || lifetime.isClosed) break
+                    if (!isActive || lifetime.isClosed) break
                     synchronize()
                     delay(100.milliseconds)
                 }

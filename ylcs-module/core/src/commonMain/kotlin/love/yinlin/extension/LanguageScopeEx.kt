@@ -32,3 +32,29 @@ inline fun <reified B, reified D : B, R> B.cast(block: (D) -> R) {
         val _ = block(d)
     }
 }
+
+/**
+ * 无循环体的循环
+ */
+inline fun loop(condition: () -> Boolean) {
+    contract {
+        callsInPlace(condition, InvocationKind.AT_LEAST_ONCE)
+    }
+
+    while (condition()) {
+        // 自旋等待
+    }
+}
+
+/**
+ * 无条件的循环
+ */
+inline fun forever(block: () -> Unit): Nothing {
+    contract {
+        returns() implies false
+    }
+
+    while (true) {
+        block()
+    }
+}

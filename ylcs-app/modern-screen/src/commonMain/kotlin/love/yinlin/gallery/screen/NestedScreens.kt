@@ -24,6 +24,7 @@ import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputState
+import love.yinlin.coroutines.Coroutines
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
@@ -139,7 +140,11 @@ internal class NestedRootScreen(scope: NestedRoutes) : NestedPage(scope, "Root",
         resource = DemoResource(journal, scope.name, instanceId)
         viewModelScope.launch {
             try {
-                while (isActive) { delay(1000.milliseconds); ticks++; publish() }
+                while (isActive) {
+                    delay(1000.milliseconds)
+                    ticks++
+                    publish()
+                }
             }
             finally { journal.event(scope.name, "协程结束", "$instanceId · 子根页计时结束") }
         }

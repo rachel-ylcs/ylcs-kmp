@@ -79,7 +79,7 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                     isPlaying = value
                     duration = player.duration
                     if (value) {
-                        while (Coroutines.isActive()) {
+                        while (this@launch.isActive) {
                             position = player.position
                             updatePosition(position)
                             delay(32.milliseconds)

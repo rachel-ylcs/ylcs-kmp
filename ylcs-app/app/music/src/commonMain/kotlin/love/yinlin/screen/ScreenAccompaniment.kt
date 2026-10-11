@@ -75,7 +75,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                     isPlaying = value
                     duration = player.duration
                     if (value) {
-                        while (Coroutines.isActive()) {
+                        while (this@launch.isActive) {
                             val newPosition = player.position
                             position = newPosition
                             duration = player.duration

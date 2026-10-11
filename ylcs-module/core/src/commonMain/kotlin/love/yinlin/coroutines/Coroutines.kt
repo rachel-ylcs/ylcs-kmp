@@ -1,9 +1,6 @@
 package love.yinlin.coroutines
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -49,9 +46,6 @@ object Coroutines {
         }
         return withTimeout(limit.milliseconds, block)
     }
-
-    suspend fun isActive(): Boolean = currentCoroutineContext().isActive
-    suspend fun requireActive() = currentCoroutineContext().ensureActive()
 
     suspend inline fun <T> sync(crossinline block: (SyncFuture<T>) -> Unit): T? = suspendCancellableCoroutine { continuation ->
         block(SyncFuture(continuation))

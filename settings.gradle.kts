@@ -77,6 +77,7 @@ include(
     "ylcs-module:cs:server-engine",
     "ylcs-module:cs:server-service-mysql",
     "ylcs-module:cs:server-service-redis",
+    "ylcs-module:foundation:compression",
     "ylcs-module:foundation:context",
     "ylcs-module:foundation:cryptography",
     "ylcs-module:foundation:filesystem",

@@ -20,6 +20,8 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.coroutines.Coroutines
@@ -505,7 +507,7 @@ abstract class APIScope(val engine: ServerEngine) {
                     }
                 }
                 part.release()
-                Coroutines.requireActive()
+                currentCoroutineContext().ensureActive()
             }
             dataList = dataItems.sortedBy { it.first }.map { it.second }
             fileList = fileItems.toList().sortedBy { it.first }.map { [_, items] ->

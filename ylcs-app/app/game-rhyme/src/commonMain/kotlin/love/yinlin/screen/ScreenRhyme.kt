@@ -89,6 +89,7 @@ import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.enum
 import love.yinlin.extension.enumSize
+import love.yinlin.extension.forever
 import love.yinlin.extension.parseJsonValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -291,7 +292,7 @@ class ScreenRhyme : BasicScreen() {
             val rotateValues = remember { mutableStateListOf(0f, 0f, 0f, 0f, 0f) }
 
             LaunchedEffect(Unit) {
-                while (true) {
+                forever {
                     delay(1.seconds)
                     val [index1, index2] = rotateValues.indices.shuffled().take(2)
                     rotateValues[index1] += 45f
