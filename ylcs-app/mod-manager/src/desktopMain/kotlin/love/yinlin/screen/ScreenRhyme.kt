@@ -97,8 +97,8 @@ class ScreenRhyme(private val path: String?) : Screen() {
         val lines = lyrics.split("\n")
 
         val rhymeLines: MutableList<RhymeLine> = []
-        val headerRegex = "\\[\\s*(\\d+),\\s*(\\d+)\\s*](.*)".toRegex()
-        val bodyRegex = "([^()]+?)\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)".toRegex()
+        val headerRegex = Regex("\\[\\s*(\\d+),\\s*(\\d+)\\s*](.*)")
+        val bodyRegex = Regex("([^()]+?)\\s*\\(\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)")
         for (line in lines) {
             val headerMatch = headerRegex.find(line) ?: continue
             val lineStart = headerMatch.groupValues[1].toLong()

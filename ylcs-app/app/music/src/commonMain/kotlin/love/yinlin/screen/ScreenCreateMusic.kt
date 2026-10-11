@@ -93,7 +93,7 @@ class ScreenCreateMusic : Screen() {
         val lrcParser = Lrc.parse(lyrics)
         if (lrcParser.isNotEmpty) return lrcParser
         // 手动添加lrc
-        val items = lyrics.splitToSequence("\\r?\\n".toRegex()).filter { it.isNotBlank() }.toList()
+        val items = lyrics.splitToSequence(Regex("\\r?\\n")).filter { it.isNotBlank() }.toList()
         // 假定歌词至少有 5 行
         require(items.size > 5) { "歌词至少包含 5 行" }
         var currentTime = 1000L // 从第一秒开始

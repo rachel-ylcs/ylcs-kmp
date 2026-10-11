@@ -34,11 +34,11 @@ class MainApplication : ComposeApplication() {
                         val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
                         when {
                             text.contains("QQ音乐") -> {
-                                val result = Uri.parse("https?://\\S+".toRegex().find(text)?.value!!)!!
+                                val result = Uri.parse(Regex("https?://\\S+").find(text)?.value!!)!!
                                 DeepLink.openUri(result.copy(scheme = Scheme.QQMusic))
                             }
                             text.contains("网易云音乐") -> {
-                                val result = Uri.parse("https?://\\S+".toRegex().find(text)?.value!!)!!
+                                val result = Uri.parse(Regex("https?://\\S+").find(text)?.value!!)!!
                                 DeepLink.openUri(result.copy(scheme = Scheme.NetEaseCloud))
                             }
                         }

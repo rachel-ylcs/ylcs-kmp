@@ -24,7 +24,7 @@ object NetEaseCloudAPI : PlatformMusicAPI {
     suspend fun requestMusicId(url: String): String? = NetClient.Common.request({
         this.url = url
     }) { text: String ->
-        "https://music\\.163\\.com/song\\?id=(\\d+)".toRegex().find(text)!!.groupValues[1]
+        Regex("https://music\\.163\\.com/song\\?id=(\\d+)").find(text)!!.groupValues[1]
     }
 
     private fun getCloudMusic(json: JsonObject): PlatformMusicInfo = PlatformMusicInfo(

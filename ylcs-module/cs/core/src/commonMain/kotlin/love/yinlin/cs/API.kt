@@ -171,7 +171,7 @@ class APIChain5<T : APIType, I1, I2, I3, I4, I5> internal constructor() {
 class APIDelegate<A : API<out APIType>> internal constructor(private val factory: (String) -> A) : ReadOnlyProperty<Any?, A> {
     private lateinit var api: A
 
-    private fun parseAPIRoute(name: String): String = name.replace("Api([A-Z])([a-z]*)([A-Z].*)".toRegex()) {
+    private fun parseAPIRoute(name: String): String = name.replace(Regex("Api([A-Z])([a-z]*)([A-Z].*)")) {
         val [_, v1, v2, v3] = it.groupValues
         "/${v1.lowercase()}$v2/${v3.replaceFirstChar { c -> c.lowercase() }}"
     }

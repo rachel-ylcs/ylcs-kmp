@@ -181,12 +181,12 @@ object SodaMusicAPI : PlatformMusicAPI {
             }
             // 长链接 playlist_id -> 例如 https://music.douyin.com/qishui/share/playlist?playlist_id=7635277649740922923&...
             link.contains("playlist_id=") -> {
-                val id = """playlist_id=(\d+)""".toRegex().find(link)?.groupValues?.get(1)
+                val id = Regex("""playlist_id=(\d+)""").find(link)?.groupValues?.get(1)
                 if (id != null) fetchPlaylist(id) else null
             }
             // 长链接 track_id -> 例如 https://music.douyin.com/qishui/share/track?track_id=7145746290255595521
             link.contains("track_id=") -> {
-                val id = """track_id=(\d+)""".toRegex().find(link)?.groupValues?.get(1)
+                val id = Regex("""track_id=(\d+)""").find(link)?.groupValues?.get(1)
                 if (id != null) fetchTrackInfo(id)?.let(::listOf) else null
             }
             // 纯数字作为单曲 ID -> 例如 7145746290255595521
