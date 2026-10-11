@@ -14,6 +14,8 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 import love.yinlin.data.rachel.game.RankConfig
 import kotlin.io.encoding.Base64
 
@@ -33,18 +35,17 @@ data class PaintPath(
         }
 
         override fun serialize(encoder: Encoder, value: PaintPath) {
-            encoder.beginStructure(descriptor).run {
+            encoder.encodeStructure(descriptor) {
                 val buffer = Buffer()
                 for (path in value.paths) buffer.writeLong(path)
                 encodeStringElement(descriptor, 0, Base64.encode(buffer.readByteArray()))
                 encodeFloatElement(descriptor, 1, value.width)
                 encodeIntElement(descriptor, 2, value.color)
-                endStructure(descriptor)
             }
         }
 
         @OptIn(UnsafeIoApi::class)
-        override fun deserialize(decoder: Decoder): PaintPath = decoder.beginStructure(descriptor).run {
+        override fun deserialize(decoder: Decoder): PaintPath = decoder.decodeStructure(descriptor) {
             val paths: MutableList<Long> = []
             var width = 1f
             var color = 0
@@ -63,7 +64,6 @@ data class PaintPath(
                     else -> error("unexpected index: $index")
                 }
             }
-            endStructure(descriptor)
             PaintPath(paths, width, color)
         }
     }

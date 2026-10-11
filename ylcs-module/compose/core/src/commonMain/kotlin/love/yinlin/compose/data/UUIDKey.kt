@@ -9,23 +9,20 @@ import androidx.compose.ui.util.fastLastOrNull
 import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import love.yinlin.extension.DelegateSerializer
 import love.yinlin.extension.replaceAll
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 @Stable
 @Serializable(UUIDKey.Serializer::class)
 class UUIDKey<T>(val data: T) {
-    class Serializer<T>(private val dataSerializer: KSerializer<T>) : KSerializer<UUIDKey<T>> {
-        override val descriptor: SerialDescriptor = dataSerializer.descriptor
-        override fun serialize(encoder: Encoder, value: UUIDKey<T>) = encoder.encodeSerializableValue(dataSerializer, value.data)
-        override fun deserialize(decoder: Decoder): UUIDKey<T> = UUIDKey(decoder.decodeSerializableValue(dataSerializer))
+    class Serializer<T>(override val delegate: KSerializer<T>) : DelegateSerializer<UUIDKey<T>, T>() {
+        override fun encode(value: UUIDKey<T>): T = value.data
+        override fun decode(value: T): UUIDKey<T> = UUIDKey(value)
     }
 
+    @OptIn(ExperimentalUuidApi::class)
     val key: Uuid = Uuid.generateV7()
 
     operator fun component1(): T = data
