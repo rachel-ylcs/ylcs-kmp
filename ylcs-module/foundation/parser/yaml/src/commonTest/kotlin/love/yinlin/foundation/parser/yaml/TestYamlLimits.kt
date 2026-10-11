@@ -6,10 +6,10 @@ class TestYamlLimits {
     @Test
     fun depthLimitsForParsingAndWriting() {
         val yaml = Yaml(YamlConfiguration(maxDepth = 2))
-        assertEquals(1, yaml.parse("[[1]]").Array[0].Array[0].Int)
+        assertEquals(1, yaml.parse("[[1]]").root.Array[0].Array[0].Int)
         assertFailsWith<YamlParseException> { yaml.parse("[[[1]]]") }
         assertFailsWith<YamlParseException> { yaml.parse("a:\n  b:\n    c:\n      d: 1") }
-        val deep = Yaml.parse("[[[1]]]")
+        val deep = Yaml.parse("[[[1]]]").root
         assertFailsWith<IllegalArgumentException> { yaml.encodeToString(deep) }
         assertFailsWith<IllegalArgumentException> { Yaml(YamlConfiguration(style = YamlStyle.Flow, maxDepth = 2)).encodeToString(deep) }
     }
@@ -17,7 +17,7 @@ class TestYamlLimits {
     @Test
     fun aliasLimitsAndSharedReferences() {
         val yaml = Yaml(YamlConfiguration(maxAliases = 1))
-        val root = yaml.parse("a: &a [1, 2]\nb: *a") as YamlObject
+        val root = yaml.parse("a: &a [1, 2]\nb: *a").root as YamlObject
         assertSame(root["a"], root["b"])
         assertFailsWith<YamlParseException> { yaml.parse("a: &a 1\nb: [*a, *a]") }
         assertFailsWith<YamlParseException> { Yaml(YamlConfiguration(maxAliases = 0)).parse("[&a 1, *a]") }
@@ -27,7 +27,7 @@ class TestYamlLimits {
     fun nodeLimitsBoundAliasExpansionWhenWriting() {
         val yaml = Yaml(YamlConfiguration(maxNodes = 8))
         assertFailsWith<YamlParseException> { yaml.parse("[1, 2, 3, 4, 5, 6, 7, 8]") }
-        val root = Yaml.parse("a: &a [1, 2, 3]\nb: [*a, *a, *a]")
+        val root = Yaml.parse("a: &a [1, 2, 3]\nb: [*a, *a, *a]").root
         assertFailsWith<IllegalArgumentException> { yaml.encodeToString(root) }
     }
 

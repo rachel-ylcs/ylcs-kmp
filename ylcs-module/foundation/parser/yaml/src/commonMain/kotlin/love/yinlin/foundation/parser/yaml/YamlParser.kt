@@ -13,7 +13,7 @@ internal class YamlParser(private val source: String, private val config: YamlCo
     private val anchors = mutableMapOf<String, YamlElement>()
     private val pendingAnchors = mutableSetOf<String>()
 
-    fun parse(): YamlElement {
+    fun parse(): YamlDocument {
         skipTrivia()
         var directive = false
         while (lineIndex < lines.size && charAt(lines[lineIndex].content) == '%') {
@@ -53,7 +53,7 @@ internal class YamlParser(private val source: String, private val config: YamlCo
             if (isDocumentBoundary(line) || charAt(line.content) == '%') fail("Expected one YAML document", line.content)
             fail("Unexpected content or indentation", line.content)
         }
-        return value
+        return YamlDocument(value)
     }
 
     private fun readDocumentRoot(): YamlElement {

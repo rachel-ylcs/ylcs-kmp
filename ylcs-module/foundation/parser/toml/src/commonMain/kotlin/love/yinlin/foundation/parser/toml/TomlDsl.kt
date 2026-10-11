@@ -47,4 +47,4 @@ inline fun buildTomlArray(block: TomlArrayBuilder.() -> Unit): TomlArray {
     return TomlArray(TomlArrayBuilder().apply(block).content)
 }
 
-inline fun toml(block: TomlObjectBuilder.() -> Unit): TomlObject = buildTomlObject(block)
+inline fun toml(block: TomlObjectBuilder.() -> Unit): TomlDocument = TomlDocument(buildTomlObject(block))

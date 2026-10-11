@@ -5,8 +5,9 @@ internal class YamlWriter(private val config: YamlConfiguration) {
     private var nodes = 0
 
     fun write(value: YamlElement): String {
-        if (config.style == YamlStyle.Flow) writeFlow(value, 0)
-        else writeBlock(value, 0, 0)
+        val root = if (value is YamlDocument) value.root else value
+        if (config.style == YamlStyle.Flow) writeFlow(root, 0)
+        else writeBlock(root, 0, 0)
         return output.toString()
     }
 
@@ -52,6 +53,7 @@ internal class YamlWriter(private val config: YamlConfiguration) {
     }
 
     private fun writeInline(value: YamlElement) = when (value) {
+        is YamlDocument -> throw IllegalArgumentException("A YAML document cannot be nested in a value")
         is YamlObject -> { check(value.isEmpty()); output.append("{}") }
         is YamlArray -> { check(value.isEmpty()); output.append("[]") }
         is YamlPrimitive -> writePrimitive(value, flow = false)
@@ -60,6 +62,7 @@ internal class YamlWriter(private val config: YamlConfiguration) {
     private fun writeFlow(value: YamlElement, depth: Int) {
         visit(depth)
         when (value) {
+            is YamlDocument -> throw IllegalArgumentException("A YAML document cannot be nested in a value")
             is YamlObject -> {
                 output.append('{')
                 var first = true

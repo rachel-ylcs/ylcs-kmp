@@ -1,5 +1,7 @@
 package love.yinlin.foundation.parser.lrc
 
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.toJsonString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -306,5 +308,13 @@ class LrcTest {
 
             assertEquals("${timestamp}边界歌词", lrc.toString(), "position=$position")
         }
+    }
+
+    @Test
+    fun serializeLrc() {
+        val lrc = Lrc.parse(SOURCE)
+        val jsonString = lrc.toJsonString()
+        val decodeLrc = jsonString.parseJsonValue<Lrc>()
+        assertEquals(lrc, decodeLrc)
     }
 }

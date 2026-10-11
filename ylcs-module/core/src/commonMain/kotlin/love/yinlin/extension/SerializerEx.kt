@@ -1,6 +1,8 @@
 package love.yinlin.extension
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -14,6 +16,26 @@ abstract class DelegateSerializer<T, R> : KSerializer<T> {
     abstract fun encode(value: T): R
     abstract fun decode(value: R): T
     final override val descriptor: SerialDescriptor get() = delegate.descriptor
+    final override fun serialize(encoder: Encoder, value: T) = encoder.encodeSerializableValue(delegate, encode(value))
+    final override fun deserialize(decoder: Decoder): T = decode(decoder.decodeSerializableValue(delegate))
+}
+
+abstract class ListDelegateSerializer<T, E>(elementSerializer: KSerializer<E>) : KSerializer<T> {
+    abstract fun encode(value: T): List<E>
+    abstract fun decode(value: List<E>): T
+
+    private val delegate = ListSerializer(elementSerializer)
+    final override val descriptor: SerialDescriptor = delegate.descriptor
+    final override fun serialize(encoder: Encoder, value: T) = encoder.encodeSerializableValue(delegate, encode(value))
+    final override fun deserialize(decoder: Decoder): T = decode(decoder.decodeSerializableValue(delegate))
+}
+
+abstract class MapDelegateSerializer<T, K, V>(keySerializer: KSerializer<K>, valueSerializer: KSerializer<V>) : KSerializer<T> {
+    abstract fun encode(value: T): Map<K, V>
+    abstract fun decode(value: Map<K, V>): T
+
+    private val delegate = MapSerializer(keySerializer, valueSerializer)
+    final override val descriptor: SerialDescriptor = delegate.descriptor
     final override fun serialize(encoder: Encoder, value: T) = encoder.encodeSerializableValue(delegate, encode(value))
     final override fun deserialize(decoder: Decoder): T = decode(decoder.decodeSerializableValue(delegate))
 }

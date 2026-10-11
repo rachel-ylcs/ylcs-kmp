@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class TestTomlStrings {
-    private fun read(value: String, toml: Toml = Toml.Default): String = toml.parse("value = $value").Object["value"].String
+    private fun read(value: String, toml: Toml = Toml.Default): String = toml.parse("value = $value").root["value"].String
 
     @Test
     fun basicAndLiteralStrings() {
@@ -84,7 +84,7 @@ class TestTomlStrings {
     @Test
     fun unicodeValidityAndTabCharacters() {
         assertEquals("你好 🌍\t", read("\"你好 🌍\t\""))
-        assertEquals("🌍", Toml.parse("'🌍'='🌍' #🌍").Object.getValue("🌍").String)
+        assertEquals("🌍", Toml.parse("'🌍'='🌍' #🌍").root.getValue("🌍").String)
         for (source in ["x='\ud800'", "x='\udc00'", "#\ud800", "'\ud800'=1"])
             assertFailsWith<TomlParseException> { Toml.parse(source) }
     }

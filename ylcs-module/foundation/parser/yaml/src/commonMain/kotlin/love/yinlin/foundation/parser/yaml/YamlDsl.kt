@@ -50,4 +50,4 @@ inline fun buildYamlArray(block: YamlArrayBuilder.() -> Unit): YamlArray {
     return YamlArray(YamlArrayBuilder().apply(block).content)
 }
 
-inline fun yaml(block: YamlObjectBuilder.() -> Unit): YamlObject = buildYamlObject(block)
+inline fun yaml(block: YamlObjectBuilder.() -> Unit): YamlDocument = YamlDocument(buildYamlObject(block))

@@ -19,7 +19,7 @@ internal class TomlParser(private val source: String, private val configuration:
 
     private class Scalar(val value: TomlPrimitive) : Node
 
-    fun parse(): TomlObject {
+    fun parse(): TomlDocument {
         val root = table(0, Definition.Root)
         var current = root
         skipTrivia(true)
@@ -29,7 +29,7 @@ internal class TomlParser(private val source: String, private val configuration:
             finishLine()
             skipTrivia(true)
         }
-        return freeze(root).Object
+        return TomlDocument(freeze(root).Object)
     }
 
     private fun header(root: Table): Table {

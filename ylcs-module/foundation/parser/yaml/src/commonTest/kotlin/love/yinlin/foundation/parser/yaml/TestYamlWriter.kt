@@ -45,8 +45,8 @@ class TestYamlWriter {
         }
         for (style in YamlStyle.entries) {
             val yaml = Yaml(YamlConfiguration(style = style))
-            assertEquals(value, yaml.parse(yaml.encodeToString(value)))
-            assertEquals(YamlPrimitive("\ufefftext"), yaml.parse(yaml.encodeToString(YamlPrimitive("\ufefftext"))))
+            assertEquals(value, yaml.parse(yaml.encodeToString(value)).root)
+            assertEquals(YamlPrimitive("\ufefftext"), yaml.parse(yaml.encodeToString(YamlPrimitive("\ufefftext"))).root)
         }
     }
 
@@ -59,12 +59,12 @@ class TestYamlWriter {
                 val yaml = Yaml(YamlConfiguration(indent = indent, blockStrings = literal))
                 for (text in strings) {
                     val value = YamlPrimitive(text)
-                    assertEquals(value, yaml.parse(yaml.encodeToString(value)), "indent=$indent, literal=$literal, text=$value")
+                    assertEquals(value, yaml.parse(yaml.encodeToString(value)).root, "indent=$indent, literal=$literal, text=$value")
                     val mapping = buildYamlObject {
                         "text" with text
                         "next" with "end"
                     }
-                    assertEquals(mapping, yaml.parse(yaml.encodeToString(mapping)))
+                    assertEquals(mapping, yaml.parse(yaml.encodeToString(mapping)).root)
                 }
             }
         }
@@ -83,7 +83,7 @@ class TestYamlWriter {
         }
         for (style in YamlStyle.entries) {
             val yaml = Yaml(YamlConfiguration(style = style))
-            assertEquals(value, yaml.parse(yaml.encodeToString(value)))
+            assertEquals(value, yaml.parse(yaml.encodeToString(value)).root)
         }
     }
 
@@ -109,7 +109,7 @@ class TestYamlWriter {
             val yaml = Yaml(YamlConfiguration(style = style))
             repeat(200) {
                 val value = tree(4)
-                assertEquals(value, yaml.parse(yaml.encodeToString(value)))
+                assertEquals(value, yaml.parse(yaml.encodeToString(value)).root)
             }
         }
     }
@@ -125,6 +125,6 @@ class TestYamlWriter {
                 }
             }
         }
-        assertEquals(value, Yaml.parse(Yaml.encodeToString(value)))
+        assertEquals(value, Yaml.parse(Yaml.encodeToString(value)).root)
     }
 }

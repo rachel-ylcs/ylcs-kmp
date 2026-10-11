@@ -6,7 +6,7 @@ class TestTomlLimits {
     @Test
     fun depthAndNodeLimits() {
         val limited = Toml(TomlConfiguration(maxDepth = 3, maxNodes = 5))
-        assertEquals(1, limited.parse("a.b=1").Object.obj("a").getValue("b").Int)
+        assertEquals(1, limited.parse("a.b=1").root.obj("a").getValue("b").Int)
         for (source in ["a.b.c.d=1", "x=[[[1]]]", "x=[1,2,3,4]", "[[a.b.c]]"])
             assertFailsWith<TomlParseException>(source) { limited.parse(source) }
         assertFailsWith<IllegalArgumentException> { TomlConfiguration(maxDepth = 0) }

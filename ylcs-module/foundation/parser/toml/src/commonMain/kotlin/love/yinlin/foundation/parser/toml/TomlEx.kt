@@ -1,5 +1,7 @@
 package love.yinlin.foundation.parser.toml
 
+val TomlElement?.Document: TomlDocument get() = this as TomlDocument
+val TomlElement?.DocumentNull: TomlDocument? get() = this as? TomlDocument
 val TomlElement?.Boolean: Boolean get() = (this as TomlPrimitive).internalBoolean!!
 val TomlElement?.BooleanNull: Boolean? get() = (this as? TomlPrimitive)?.internalBoolean
 val TomlElement?.Int: Int get() = (this as TomlPrimitive).internalInt!!

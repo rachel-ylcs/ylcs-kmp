@@ -1,9 +1,21 @@
 package love.yinlin.foundation.parser.lrc
 
+import kotlinx.serialization.Serializable
+import love.yinlin.annotation.CompatibleRachelApi
+import love.yinlin.extension.StringSerializer
+import love.yinlin.reflect.metaClassName
+
+@Serializable(Lrc.Serializer::class)
 data class Lrc(
     val lines: List<LrcLine>,
     val metadata: LrcMetadata
 ) {
+    @OptIn(CompatibleRachelApi::class)
+    object Serializer : StringSerializer<Lrc>(metaClassName<Lrc>()) {
+        override fun encode(value: Lrc): String = value.toString()
+        override fun decode(value: String): Lrc = parse(value)
+    }
+
     val isEmpty: Boolean = lines.isEmpty()
     val isNotEmpty: Boolean = lines.isNotEmpty()
 

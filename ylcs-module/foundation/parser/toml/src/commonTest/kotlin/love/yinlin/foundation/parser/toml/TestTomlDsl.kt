@@ -18,11 +18,11 @@ class TestTomlDsl {
                 obj { "name" with "two" }
             }
         }
-        assertEquals(8080, document.obj("server").getValue("port").Int)
-        assertEquals("two", document.arr("products")[1].Object.getValue("name").String)
+        assertEquals(8080, document.root.obj("server").getValue("port").Int)
+        assertEquals("two", document.root.arr("products")[1].Object.getValue("name").String)
         assertEquals(document, Toml.parse(Toml.encodeToString(document)))
         assertTrue(Toml.encodeToString(document).contains("[[products]]"))
-        assertEquals(document, Toml.parse("value = $document").Object["value"])
+        assertEquals(document.root, Toml.parse("value = ${document.root}").root["value"])
     }
 
     @Test
@@ -43,24 +43,24 @@ class TestTomlDsl {
         }
         objectBuilder.apply { "later" with true }
         arrayBuilder.add(2)
-        assertFalse(built.containsKey("later"))
-        assertEquals(1, built.arr("a").size)
+        assertFalse(built.root.containsKey("later"))
+        assertEquals(1, built.root.arr("a").size)
     }
 
     @Test
     fun collectionEqualityAndMerge() {
-        val one = toml { "a" with 1; arr("b") { add(true) } }
+        val one = buildTomlObject { "a" with 1; arr("b") { add(true) } }
         val two = buildTomlObject { merge(one) }
         assertEquals(one, two)
         assertEquals(one.hashCode(), two.hashCode())
         assertEquals(buildTomlArray { add(1); add(2) }, buildTomlArray { merge(buildTomlArray { add(1); add(2) }) })
         assertNotEquals(TomlPrimitive("1"), TomlPrimitive(1))
-        assertNotEquals(one, toml { "a" with 2 })
+        assertNotEquals(one, buildTomlObject { "a" with 2 })
     }
 
     @Test
     fun scalarExtensionsReadNullableMembers() {
-        val root = toml {
+        val root = buildTomlObject {
             "name" with "demo"
             "enabled" with true
             "count" with 42L
@@ -84,12 +84,12 @@ class TestTomlDsl {
         assertEquals(123, root["digits"].Int)
         assertEquals("42", root["count"].StringNull)
         assertEquals("2026-10-05", root["created"].String)
-        assertEquals(root, Toml.parse(Toml.encodeToString(root)))
+        assertEquals(root, Toml.parse(Toml.encodeToString(TomlDocument(root))).root)
     }
 
     @Test
     fun nullableScalarExtensionsHandleMissingAndCollectionNodes() {
-        val root = toml {
+        val root = buildTomlObject {
             "text" with "not a number"
             obj("table") { }
             arr("items") { }
@@ -112,9 +112,9 @@ class TestTomlDsl {
 
     @Test
     fun collectionExtensionsProvideOptionalAndEmptyAccess() {
-        val table = toml { "x" with 1 }
+        val table = buildTomlObject { "x" with 1 }
         val array = buildTomlArray { add("first") }
-        val root = toml {
+        val root = buildTomlObject {
             "table" with table
             "items" with array
             "scalar" with true

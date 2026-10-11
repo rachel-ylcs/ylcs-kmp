@@ -1,5 +1,7 @@
 package love.yinlin.foundation.parser.yaml
 
+val YamlElement?.Document: YamlDocument get() = this as YamlDocument
+val YamlElement?.DocumentNull: YamlDocument? get() = this as? YamlDocument
 val YamlElement?.Boolean: Boolean get() = (this as YamlPrimitive).internalBoolean!!
 val YamlElement?.BooleanNull: Boolean? get() = (this as? YamlPrimitive)?.internalBoolean
 val YamlElement?.Int: Int get() = (this as YamlPrimitive).internalInt!!

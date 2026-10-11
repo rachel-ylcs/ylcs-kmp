@@ -1,5 +1,7 @@
 package love.yinlin.foundation.parser.markdown
 
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.toJsonString
 import kotlin.test.*
 
 class TestMarkdownParser {
@@ -133,5 +135,12 @@ class TestMarkdownParser {
         assertEquals("REF", links[1].plainText)
         assertEquals("[missing]", Markdown.parse("[missing]").plainText)
         assertEquals("[a]: invalid target extra", Markdown.parse("[a]: invalid target extra").plainText)
+    }
+
+    @Test
+    fun serializeMarkdown() {
+        val doc = Markdown.parse("# Title ###\r\n\r\nSubtitle\r---\r\rFirst\nsecond\n\n###### Sixth\n\n####### plain")
+        val jsonString = doc.toJsonString()
+        assertEquals(doc, jsonString.parseJsonValue<MarkdownDocument>())
     }
 }

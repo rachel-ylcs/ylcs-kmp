@@ -3,7 +3,7 @@ package love.yinlin.foundation.parser.toml
 import kotlin.test.*
 
 class TestTomlScalars {
-    private fun read(value: String): TomlPrimitive = Toml.parse("value = $value").Object["value"] as TomlPrimitive
+    private fun read(value: String): TomlPrimitive = Toml.parse("value = $value").root["value"] as TomlPrimitive
 
     @Test
     fun integerRadicesAndUnderscores() {

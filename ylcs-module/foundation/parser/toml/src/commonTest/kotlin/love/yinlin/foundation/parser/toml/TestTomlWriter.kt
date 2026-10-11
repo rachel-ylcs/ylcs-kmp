@@ -63,12 +63,12 @@ class TestTomlWriter {
         }
         val strict = Toml(TomlConfiguration(version = TomlVersion.V1_0))
         assertEquals(document, strict.parse(strict.encodeToString(document)))
-        assertEquals(document, Toml.parse("value = $document").Object["value"])
+        assertEquals(document.root, Toml.parse("value = ${document.root}").root["value"])
     }
 
     @Test
     fun numericAndDateTextIsPreserved() {
-        val document = Toml.parse("a=0xDEAD_beef\nb=+1.234567890123456789\nc=-nan\nd=1979-05-27t07:32:00.123456789z").Object
+        val document = Toml.parse("a=0xDEAD_beef\nb=+1.234567890123456789\nc=-nan\nd=1979-05-27t07:32:00.123456789z")
         val text = Toml.encodeToString(document)
         assertTrue(text.contains("0xDEAD_beef"))
         assertTrue(text.contains("+1.234567890123456789"))
@@ -77,9 +77,7 @@ class TestTomlWriter {
     }
 
     @Test
-    fun documentRootAndInvalidUnicodeAreRejected() {
-        assertFailsWith<IllegalArgumentException> { Toml.encodeToString(TomlPrimitive(1)) }
-        assertFailsWith<IllegalArgumentException> { Toml.encodeToString(buildTomlArray {}) }
+    fun invalidUnicodeAndNodeAccessAreRejected() {
         assertFailsWith<IllegalArgumentException> { Toml.encodeToString(toml { "value" with "\ud800" }) }
         assertFailsWith<IllegalArgumentException> { Toml.encodeToString(toml { "\udc00" with 1 }) }
         assertFailsWith<ClassCastException> { TomlPrimitive(true).Array }
@@ -105,7 +103,7 @@ class TestTomlWriter {
             val document = toml { repeat(random.nextInt(7)) { keys.random(random) with element(4) } }
             assertEquals(document, Toml.parse(Toml.encodeToString(document)))
             assertEquals(document, inline.parse(inline.encodeToString(document)))
-            assertEquals(document, Toml.parse("value = $document").Object["value"])
+            assertEquals(document.root, Toml.parse("value = ${document.root}").root["value"])
         }
     }
 
@@ -118,9 +116,9 @@ class TestTomlWriter {
                 append("\n[services.options]\nenabled=true\n")
             }
         }
-        val document = Toml.parse(source).Object
-        assertEquals(2_000, document.arr("services").size)
-        assertEquals(9999, document.arr("services").last().Object.getValue("port").Int)
+        val document = Toml.parse(source)
+        assertEquals(2_000, document.root.arr("services").size)
+        assertEquals(9999, document.root.arr("services").last().Object.getValue("port").Int)
         assertEquals(document, Toml.parse(Toml.encodeToString(document)))
     }
 }

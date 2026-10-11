@@ -1,5 +1,7 @@
 package love.yinlin.foundation.parser.arguments
 
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.toJsonString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -163,5 +165,12 @@ class TestArguments {
         assertEquals(args.hashCode(), Arguments("tool.exe a=1 flag a=2").hashCode())
         assertNotEquals(args, Arguments("other.exe a=1 flag a=2"))
         assertNotEquals(args, Arguments("tool.exe a=2 flag a=1"))
+    }
+
+    @Test
+    fun serializeArguments() {
+        val args = Arguments("tool.exe a=1 flag a=2")
+        val jsonString = args.toJsonString()
+        assertEquals(args, jsonString.parseJsonValue<Arguments>())
     }
 }

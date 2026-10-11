@@ -3,7 +3,7 @@ package love.yinlin.foundation.parser.toml
 import kotlin.test.*
 
 class TestTomlParser {
-    private fun mapping(source: String): TomlObject = Toml.parse(source).Object
+    private fun mapping(source: String): TomlObject = Toml.parse(source).root
     private val strict = Toml(TomlConfiguration(version = TomlVersion.V1_0))
 
     @Test
@@ -152,7 +152,7 @@ class TestTomlParser {
         assertEquals(2, mapping(source).obj("x").size)
         for (text in [source, "x={a=1,}", "x={\n}", "x={a=1 # comment\n}"])
             assertFailsWith<TomlParseException> { strict.parse(text) }
-        assertEquals(1, strict.parse("x={a=[\n1, # allowed inside value\n]}").Object.obj("x").arr("a").size)
+        assertEquals(1, strict.parse("x={a=[\n1, # allowed inside value\n]}").root.obj("x").arr("a").size)
     }
 
     @Test

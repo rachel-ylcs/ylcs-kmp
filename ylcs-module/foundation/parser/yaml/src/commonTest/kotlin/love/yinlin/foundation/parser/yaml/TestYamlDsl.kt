@@ -5,7 +5,7 @@ import kotlin.test.*
 class TestYamlDsl {
     @Test
     fun jsonStyleBuildersAndCollectionInterfaces() {
-        val root = yaml {
+        val document = yaml {
             "name" with "demo"
             "nullable" with null
             "enabled" with true
@@ -19,6 +19,7 @@ class TestYamlDsl {
                 obj { "key" with "value" }
             }
         }
+        val root = document.root.Object
         val list = root.arr("items")
         assertEquals(6, root.size)
         assertEquals(5, list.size)
@@ -55,7 +56,7 @@ class TestYamlDsl {
         assertSame(YamlNull, root["number"])
         assertSame(YamlNull, YamlPrimitive(null))
         assertEquals("nested", root.arr("items")[2].Array[0].String)
-        assertEquals(root, Yaml.parse(Yaml.encodeToString(root)))
-        assertEquals(root.hashCode(), Yaml.parse(root.toString()).hashCode())
+        assertEquals(root, Yaml.parse(Yaml.encodeToString(root)).root)
+        assertEquals(root.hashCode(), Yaml.parse(root.toString()).root.hashCode())
     }
 }

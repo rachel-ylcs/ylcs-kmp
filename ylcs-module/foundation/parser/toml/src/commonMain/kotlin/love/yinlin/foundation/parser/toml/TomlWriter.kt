@@ -5,21 +5,20 @@ internal class TomlWriter(private val configuration: TomlConfiguration) {
     private var nodes = 0
 
     fun write(element: TomlElement): String {
-        require(element is TomlObject) { "A TOML document must have a table root" }
-        if (configuration.style == TomlStyle.Inline) {
-            count(0)
-            for ([key, child] in element) {
-                key(key)
-                output.append(" = ")
-                value(child, 1)
-                output.append('\n')
+        if (element is TomlDocument) {
+            val root = element.root
+            if (configuration.style == TomlStyle.Inline) {
+                count(0)
+                for ([key, child] in root) {
+                    key(key)
+                    output.append(" = ")
+                    value(child, 1)
+                    output.append('\n')
+                }
             }
-        } else table(element, "", 0, false)
-        return output.toString()
-    }
-
-    fun writeValue(element: TomlElement): String {
-        value(element, 0)
+            else table(root, "", 0, false)
+        }
+        else value(element, 0)
         return output.toString()
     }
 
@@ -55,6 +54,7 @@ internal class TomlWriter(private val configuration: TomlConfiguration) {
     private fun value(element: TomlElement, depth: Int) {
         count(depth)
         when (element) {
+            is TomlDocument -> throw IllegalArgumentException("A TOML document cannot be nested in a value")
             is TomlPrimitive -> if (element.isString) string(output, element.content) else {
                 if (element.isDateTime) require(TomlScalarKind.dateTimeKind(element.content, configuration.version) != null) {
                     "Date/time '${element.content}' cannot be written as ${configuration.version}"

@@ -1,5 +1,7 @@
 package love.yinlin.foundation.parser.arguments
 
+import love.yinlin.extension.parseJsonValue
+import love.yinlin.extension.toJsonString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -156,5 +158,29 @@ class TestArgumentValues {
         assertFailsWith<ArgumentStateException> { Argument("a")[-1] }
         assertFailsWith<ArgumentStateException> { Argument("a")[1] }
         assertFailsWith<ArgumentStateException> { Argument("a")[Int.MAX_VALUE] }
+    }
+
+    @Test
+    fun serializeArgument() {
+        val argument1: Argument.Empty = Argument.Empty
+        val argument2: Argument.Single = Argument("123") as Argument.Single
+        val argument3: Argument.Values = Argument("a", "b") as Argument.Values
+        val argument4: Argument = Argument.Empty
+        val argument5 = Argument("123")
+        val argument6 = Argument("a", "b")
+
+        assertEquals(argument1, argument1.toJsonString().parseJsonValue<Argument.Empty>())
+        assertEquals(argument2, argument2.toJsonString().parseJsonValue<Argument.Single>())
+        assertEquals(argument3, argument3.toJsonString().parseJsonValue<Argument.Values>())
+        assertEquals(argument4, argument4.toJsonString().parseJsonValue<Argument>())
+        assertEquals(argument5, argument5.toJsonString().parseJsonValue<Argument>())
+        assertEquals(argument6, argument6.toJsonString().parseJsonValue<Argument>())
+
+        assertEquals(argument1, argument1.toJsonString().parseJsonValue<Argument>())
+        assertEquals(argument2, argument2.toJsonString().parseJsonValue<Argument>())
+        assertEquals(argument3, argument3.toJsonString().parseJsonValue<Argument>())
+        assertEquals(argument4, argument4.toJsonString().parseJsonValue<Argument.Empty>())
+        assertEquals(argument5, argument5.toJsonString().parseJsonValue<Argument.Single>())
+        assertEquals(argument6, argument6.toJsonString().parseJsonValue<Argument.Values>())
     }
 }
