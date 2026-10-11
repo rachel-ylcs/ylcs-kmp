@@ -16,7 +16,7 @@ import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputState
-import love.yinlin.coroutines.Coroutines
+import love.yinlin.extension.cleaning
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
@@ -64,14 +64,15 @@ internal class StateScreen(routes: GalleryRoutes) : GalleryScreen(routes, Galler
         running = true
         journal.event("状态实验", "协程启动", "$instanceId · viewModelScope，每秒一次")
         ticker = viewModelScope.launch {
-            try {
+            cleaning({
+                journal.event("状态实验", "协程结束", "$instanceId · 计时任务 finally，ticks=$ticks")
+            }) {
                 while (isActive) {
                     delay(1000.milliseconds)
                     ticks++
                     publish()
                 }
             }
-            finally { journal.event("状态实验", "协程结束", "$instanceId · 计时任务 finally，ticks=$ticks") }
         }
         publish()
     }
@@ -152,10 +153,10 @@ internal class CoverScreen(routes: GalleryRoutes, message: String) : GalleryScre
     override fun PageContent() {
         PageHeading("03 / 04", "前一个页面暂时看不见", message)
         GalleryCard("被保留的实例快照", "下方记录来自各页面自己的状态更新。组合数为 0 仍可能有存活的 VM 和运行中的协程。") {
-            val records = journal.instances.filter { !it.cleared && it.id != instanceId }
-            records.takeLast(12).forEach { record ->
-                Badge("${record.scope} · ${record.name} ${record.id} · 组合 ${record.compositions}")
-                Paragraph(record.state)
+            val records = journal.instances.filter { (val id, val cleared) -> !cleared && id != instanceId }
+            records.takeLast(12).forEach { (val id, val scope, val name, val compositions, val state) ->
+                Badge("$scope · $name $id · 组合 $compositions")
+                Paragraph(state)
             }
             Actions {
                 PrimaryButton("返回被覆盖的页面") { pop() }

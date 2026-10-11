@@ -44,20 +44,20 @@ internal class JournalScreen(routes: GalleryRoutes) : GalleryScreen(routes, Gall
                 when (instanceFilter) { 0 -> !it.cleared; 1 -> it.cleared; else -> true }
             }.takeLast(24).asReversed()
             if (records.isEmpty()) Paragraph("这个筛选条件下还没有实例。")
-            records.forEach { record ->
-                GalleryCard("${record.name} ${record.id}", record.scope) {
+            records.forEach { (val id, val scope, val name, val initial, val initialized, val cleared, val compositions, val resumes, val state) ->
+                GalleryCard("$name $id", scope) {
                     Actions {
                         Badge(when {
-                            record.cleared -> "已清理"
-                            record.compositions > 0 -> "UI 在组合中"
+                            cleared -> "已清理"
+                            compositions > 0 -> "UI 在组合中"
                             else -> "VM 保留 / 无 UI"
-                        }, if (record.cleared) Theme.color.onSurfaceVariant else Theme.color.primary)
-                        Badge("initialize ${if (record.initialized) 1 else 0} 次")
-                        Badge("resume ${record.resumes} 次")
-                        Badge("组合数 ${record.compositions}")
+                        }, if (cleared) Theme.color.onSurfaceVariant else Theme.color.primary)
+                        Badge("initialize ${if (initialized) 1 else 0} 次")
+                        Badge("resume $resumes 次")
+                        Badge("组合数 $compositions")
                     }
-                    Paragraph("初始：${record.initial}")
-                    Paragraph("状态：${record.state}")
+                    Paragraph("初始：$initial")
+                    Paragraph("状态：$state")
                 }
             }
         }

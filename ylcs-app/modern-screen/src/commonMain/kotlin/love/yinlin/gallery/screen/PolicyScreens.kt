@@ -21,6 +21,7 @@ import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.TextButton
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.InputState
+import love.yinlin.extension.cleaning
 
 @Stable
 internal class PolicyLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, GallerySection.Policies) {
@@ -91,7 +92,7 @@ internal class PolicyRoutes(val journal: GalleryJournal, val name: String) {
         if (!seedOnResume) return
         seedOnResume = false
         seeding = true
-        try {
+        cleaning({ seeding = false }) {
             caller.navigate(::alpha, 1)
             val a1 = lastCreatedId
             caller.navigate(::beta, 1)
@@ -104,7 +105,6 @@ internal class PolicyRoutes(val journal: GalleryJournal, val name: String) {
             lastResult = "示例栈创建完成。当前显示 B2 $b2；目标 A 应匹配 A2 $a2。"
             journal.event(name, "示例就绪", seedDescription)
         }
-        finally { seeding = false }
     }
 
     fun prediction(): String {

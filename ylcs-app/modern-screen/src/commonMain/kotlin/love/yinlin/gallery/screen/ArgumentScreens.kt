@@ -125,7 +125,7 @@ internal abstract class ArgumentPage(
     protected val scope: ArgumentRoutes,
     name: String,
     private val initialFields: List<ArgumentField>,
-) : ObservedScreen(scope.journal, scope.name, name, initialFields.joinToString { "${it.type}=${it.value}" }.ifEmpty { "无导航参数" }) {
+) : ObservedScreen(scope.journal, scope.name, name, initialFields.joinToString { (val type, val value) -> "$type=$value" }.ifEmpty { "无导航参数" }) {
     private var currentFields by mutableStateOf(initialFields)
     var counter by mutableStateOf(0)
         private set
@@ -137,7 +137,7 @@ internal abstract class ArgumentPage(
 
     override fun onInitialize() = publish()
 
-    private fun publish() = journal.state(instanceId, "${currentFields.joinToString { "${it.type}=${it.value}" }} · 计数 $counter")
+    private fun publish() = journal.state(instanceId, "${currentFields.joinToString { (val type, val value) -> "$type=$value" }} · 计数 $counter")
 
     @Composable
     override fun ScreenContent() {
@@ -180,10 +180,10 @@ internal abstract class ArgumentPage(
 @Composable
 private fun FieldRows(fields: List<ArgumentField>) {
     if (fields.isEmpty()) Paragraph("0 个导航参数。仍然可以区分 New 的新实例与 Resume 的回调次数。")
-    fields.forEach { field ->
+    fields.forEach { (val type, val value) ->
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(field.type, Modifier.width(65.dp))
-            Column(Modifier.weight(1f)) { CodeBlock(field.value) }
+            Text(type, Modifier.width(65.dp))
+            Column(Modifier.weight(1f)) { CodeBlock(value) }
         }
     }
 }

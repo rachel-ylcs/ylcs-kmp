@@ -198,15 +198,15 @@ internal fun CodeBlock(code: String) {
 @Composable
 internal fun EventRows(events: List<GalleryEvent>) {
     if (events.isEmpty()) Paragraph("还没有事件。执行一次导航或返回后，记录会出现在这里。")
-    events.forEach { event ->
+    events.forEach { (val number, val elapsed, val scope, val kind, val message) ->
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Actions {
-                Text("${event.number.toString().padStart(3, '0')}  +${event.elapsed}", fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                Text("${number.toString().padStart(3, '0')}  +$elapsed", fontFamily = FontFamily.Monospace, fontSize = 11.sp,
                     color = Theme.color.onSurfaceVariant)
-                Badge(event.kind)
-                Text(event.scope, fontSize = 11.sp, color = Theme.color.onSurfaceVariant)
+                Badge(kind)
+                Text(scope, fontSize = 11.sp, color = Theme.color.onSurfaceVariant)
             }
-            Text(event.message, fontSize = 13.sp, lineHeight = 20.sp)
+            Text(message, fontSize = 13.sp, lineHeight = 20.sp)
             HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.2f))
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import love.yinlin.compose.screen.ScreenModel
 import love.yinlin.compose.screen.ScreenRegistry
+import love.yinlin.extension.cleaning
 import kotlin.time.TimeSource
 
 @Immutable
@@ -67,18 +68,18 @@ internal class GalleryJournal {
 
     fun initialize(id: String) {
         update(id) { it.copy(initialized = true, state = "已初始化") }
-        instances.find { it.id == id }?.let { event(it.scope, "initialize", "${it.name} $id · 只调用一次") }
+        instances.find { it.id == id }?.let { (val scope, val name) -> event(scope, "initialize", "$name $id · 只调用一次") }
     }
 
     fun resume(id: String) {
         update(id) { it.copy(resumes = it.resumes + 1) }
-        instances.find { it.id == id }?.let { event(it.scope, "resume", "${it.name} $id · 第 ${it.resumes} 次") }
+        instances.find { it.id == id }?.let { (val scope, val name, val resumes) -> event(scope, "resume", "$name $id · 第 $resumes 次") }
     }
 
     fun composition(id: String, enter: Boolean) {
         update(id) { it.copy(compositions = (it.compositions + if (enter) 1 else -1).coerceAtLeast(0)) }
-        instances.find { it.id == id }?.let {
-            event(it.scope, if (enter) "进入组合" else "离开组合", "${it.name} $id")
+        instances.find { it.id == id }?.let { (val scope, val name) ->
+            event(scope, if (enter) "进入组合" else "离开组合", "$name $id")
         }
     }
 
@@ -87,7 +88,7 @@ internal class GalleryJournal {
     fun clear(id: String) {
         update(id) { it.copy(cleared = true) }
         clearedCount++
-        instances.find { it.id == id }?.let { event(it.scope, "uninitialize", "${it.name} $id · ViewModel 已清理") }
+        instances.find { it.id == id }?.let { (val scope, val name) -> event(scope, "uninitialize", "$name $id · ViewModel 已清理") }
         // 保留全部存活实例以及有限的已清理历史，避免网页演示无限积累记录。
         while (instances.count { it.cleared } > 40) instances.removeAt(instances.indexOfFirst { it.cleared })
     }
@@ -116,8 +117,7 @@ internal abstract class ObservedScreen(
     }
 
     final override fun uninitialize() {
-        try { onUninitialize() }
-        finally { journal.clear(instanceId) }
+        cleaning({ journal.clear(instanceId) }, ::onUninitialize)
     }
 
     protected open fun onInitialize() { }
