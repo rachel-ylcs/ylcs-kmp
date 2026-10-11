@@ -20,9 +20,5 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.core,
             )
         }
-
-        desktopTest.configure {
-            lib(libs.test)
-        }
     }
 })
