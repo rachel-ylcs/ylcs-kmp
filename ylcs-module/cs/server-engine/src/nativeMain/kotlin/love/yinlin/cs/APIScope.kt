@@ -483,12 +483,15 @@ abstract class APIScope(val engine: ServerEngine) {
             multipartData.forEachPart { part ->
                 catching {
                     val name: String = part.name ?: return@catching
+                    println("[FORM1] $name")
                     when (part) {
                         is PartData.FormItem -> {
+                            println("[FORM2] ${part.value}")
                             if (name.startsWith('#')) fileItems[name.removePrefix("#").toInt()] = [] // APIFile?
                             else dataItems += name.toInt() to part.value // Normal body data
                         }
                         is PartData.FileItem -> {
+                            println("[FORM3] FILE")
                             val keys = name.split(":")
                             val index = keys[0].toInt()
                             val fileIndex = keys.getOrNull(1)?.toInt() ?: 0
@@ -510,9 +513,11 @@ abstract class APIScope(val engine: ServerEngine) {
                 currentCoroutineContext().ensureActive()
             }
             dataList = dataItems.sortedBy { it.first }.map { it.second }
+            println("[FORM4] $dataList")
             fileList = fileItems.toList().sortedBy { it.first }.map { [_, items] ->
                 items.sortedBy { it.first }.map { it.second }.ifEmpty { null }?.let(::ServerAPIFile)
             }
+            println("[FORM5] $fileList")
         }
 
         inline operator fun <reified I> invoke(): I = if (I::class == APIFile::class) fileList[fileIndex++] as I else dataList[dataIndex++].parseJsonValue()
