@@ -508,7 +508,9 @@ abstract class APIScope(val engine: ServerEngine) {
                         }
                         else -> { }
                     }
-                }?.let { println(it.stackTraceToString()) }
+                }?.let {
+                    println(it.stackTraceToString())
+                }
                 part.release()
                 currentCoroutineContext().ensureActive()
             }
