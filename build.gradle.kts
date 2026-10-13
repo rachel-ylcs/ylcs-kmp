@@ -11,7 +11,6 @@ plugins {
             libs.plugins.composeCompiler,
             libs.plugins.androidApplication,
             libs.plugins.androidLibrary,
-            libs.plugins.androidLibraryNew,
             libs.plugins.mavenPublish,
             libs.plugins.dokka,
         ),

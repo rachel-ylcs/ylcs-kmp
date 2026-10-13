@@ -2,7 +2,7 @@ plugins {
     install(
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
-        libs.plugins.androidLibraryNew,
+        libs.plugins.androidLibrary,
     )
 }
 
