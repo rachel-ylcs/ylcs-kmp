@@ -94,8 +94,9 @@ internal data class PageItem(
                 ComponentItem("Tip", "查看信息、成功、警告与错误四种提示。"),
                 ComponentItem("FAB", "控制右下角悬浮按钮的可见性与展开菜单。"),
             ]),
-            PageItem("widget", Icons.Token, "组件", "Calendar & Widgets", "把基础控件组合成完整的日历展示。", WidgetPage, PageGroup.Layout, [
+            PageItem("widget", Icons.Token, "组件", "Calendar & Widgets", "组合基础控件，体验日历与可选择复制的日志输出。", WidgetPage, PageGroup.Layout, [
                 ComponentItem("Calendar", "切换月份，查看日期、农历、节日与节气。"),
+                ComponentItem("LogOutput", "切换默认、固定与填满尺寸，在组件外过滤日志，暂停滚动后查看新增/总行数并回到底部。", "LogOutputState append ANSI filter size fillMaxWidth fillMaxSize 日志 行号 复制"),
             ]),
         ]
 
