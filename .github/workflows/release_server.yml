@@ -1,0 +1,24 @@
+name: release_server
+
+on:
+  push:
+    tags:
+      - 'server*'
+
+jobs:
+  package-server:
+    name: Package Server
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
+
+      - name: Build
+        run: ./gradlew ylcs-app:server:serverPublish
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          path: outputs/server.kexe
+          archive: false
+          if-no-files-found: error
