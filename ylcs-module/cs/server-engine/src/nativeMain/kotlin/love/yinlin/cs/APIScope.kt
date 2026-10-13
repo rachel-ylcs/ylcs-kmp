@@ -481,7 +481,7 @@ abstract class APIScope(val engine: ServerEngine) {
             val dataItems: MutableList<Pair<Int, String>> = []
             val fileItems = mutableMapOf<Int, MutableList<Pair<Int, String>>>()
             multipartData.forEachPart { part ->
-                catching {
+                catchingError {
                     val name: String = part.name ?: return@catching
                     println("[FORM1] $name")
                     when (part) {
@@ -508,12 +508,12 @@ abstract class APIScope(val engine: ServerEngine) {
                         }
                         else -> { }
                     }
-                }
+                }?.let { println(it.stackTraceToString()) }
                 part.release()
                 currentCoroutineContext().ensureActive()
             }
             dataList = dataItems.sortedBy { it.first }.map { it.second }
-            println("[FORM4] $dataList")
+            println("[FORM4] $dataList $fileItems")
             fileList = fileItems.toList().sortedBy { it.first }.map { [_, items] ->
                 items.sortedBy { it.first }.map { it.second }.ifEmpty { null }?.let(::ServerAPIFile)
             }
