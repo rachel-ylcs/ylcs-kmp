@@ -482,7 +482,7 @@ abstract class APIScope(val engine: ServerEngine) {
             val fileItems = mutableMapOf<Int, MutableList<Pair<Int, String>>>()
             multipartData.forEachPart { part ->
                 catchingError {
-                    val name: String = part.name ?: return@catching
+                    val name: String = part.name ?: return@catchingError
                     println("[FORM1] $name")
                     when (part) {
                         is PartData.FormItem -> {
