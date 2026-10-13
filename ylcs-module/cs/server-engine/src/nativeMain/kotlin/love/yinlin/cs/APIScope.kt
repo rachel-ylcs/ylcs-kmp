@@ -26,8 +26,8 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.DateEx
-import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.cleaning
 import love.yinlin.extension.makeArray
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.then
@@ -481,17 +481,15 @@ abstract class APIScope(val engine: ServerEngine) {
             val dataItems: MutableList<Pair<Int, String>> = []
             val fileItems = mutableMapOf<Int, MutableList<Pair<Int, String>>>()
             multipartData.forEachPart { part ->
-                catchingError {
-                    val name: String = part.name ?: return@catchingError
-                    println("[FORM1] $name")
+                cleaning({ part.release() }) {
+                    val name = part.name
+                    require(name != null) { "part.name == null" }
                     when (part) {
                         is PartData.FormItem -> {
-                            println("[FORM2] ${part.value}")
                             if (name.startsWith('#')) fileItems[name.removePrefix("#").toInt()] = [] // APIFile?
                             else dataItems += name.toInt() to part.value // Normal body data
                         }
                         is PartData.FileItem -> {
-                            println("[FORM3] FILE")
                             val keys = name.split(":")
                             val index = keys[0].toInt()
                             val fileIndex = keys.getOrNull(1)?.toInt() ?: 0
@@ -508,18 +506,13 @@ abstract class APIScope(val engine: ServerEngine) {
                         }
                         else -> { }
                     }
-                }?.let {
-                    println(it.stackTraceToString())
+                    currentCoroutineContext().ensureActive()
                 }
-                part.release()
-                currentCoroutineContext().ensureActive()
             }
             dataList = dataItems.sortedBy { it.first }.map { it.second }
-            println("[FORM4] $dataList $fileItems")
             fileList = fileItems.toList().sortedBy { it.first }.map { [_, items] ->
                 items.sortedBy { it.first }.map { it.second }.ifEmpty { null }?.let(::ServerAPIFile)
             }
-            println("[FORM5] $fileList")
         }
 
         inline operator fun <reified I> invoke(): I = if (I::class == APIFile::class) fileList[fileIndex++] as I else dataList[dataIndex++].parseJsonValue()

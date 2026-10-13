@@ -69,25 +69,16 @@ fun ServerScope.activityAPI() {
 
     ApiActivityAddActivityPhotos.response { token, aid, key, pics ->
         VN.throwId(aid)
-        logger.warn("|Test1|")
         val ngp = NineGridProcessor(pics)
-        logger.warn("|Test2| $pics")
         val uid = AN.throwExpireToken(token)
-        logger.warn("|Test3| $uid")
         val user = VN.throwGetUser(uid, "privilege")
-        logger.warn("|Test4| $user")
         if (!UserPrivilege.vipCalendar(user["privilege"].Int)) failure("无权限")
         val photo = mysql.throwQuerySQLSingle("SELECT photo FROM activity WHERE aid = ?", aid)["photo"].Object.toMutableMap()
-        logger.warn("|Test5| $photo")
         val oldPics = photo[key]?.to<MutableList<String>>() ?: []
-        logger.warn("|Test6| $oldPics")
         VN.throwIf(pics.isEmpty, oldPics.size + pics.num > 9)
         oldPics += ngp.actualPics
-        logger.warn("|Test7| $oldPics")
         photo[key] = oldPics.toJson()
-        logger.warn("|Test8| $photo")
         mysql.throwExecuteSQL("UPDATE activity SET photo = ? WHERE aid = ?", photo.toJsonString(), aid)
-        logger.warn("|Test9|")
         ngp.copy { ServerRes.Activity.activity(it) }
         result(ngp.actualPics)
     }
