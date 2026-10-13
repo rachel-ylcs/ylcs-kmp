@@ -2,7 +2,7 @@
 
 # Plugins #
 kotlin = "2.5.0-Beta1"
-agp = "9.2.1"
+agp = "9.3.3"
 cmp = "1.13.0-alpha02"
 mavenPublish = "0.37.0"
 dokka = "2.3.0-Beta"
