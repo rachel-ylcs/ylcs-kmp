@@ -471,6 +471,7 @@ abstract class APIScope(val engine: ServerEngine) {
     // Form
 
     class FormResult(private val multipartData: MultiPartData) {
+        // TODO: 后期考虑自身目录，因为非root写tmp可能会存在权限问题
         private val tempDir = PlatformFileSystem.cachePath(PlatformContext.Instance, "ServerNative")
         @PublishedApi internal var dataIndex = 0
         @PublishedApi internal var fileIndex = 0
