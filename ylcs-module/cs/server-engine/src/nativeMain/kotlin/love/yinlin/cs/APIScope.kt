@@ -24,6 +24,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.catchingError
@@ -470,60 +471,96 @@ abstract class APIScope(val engine: ServerEngine) {
 
     // Form
 
-    class FormResult(private val multipartData: MultiPartData) {
+    class FormResult(private val multipartData: MultiPartData) : AutoCloseable {
         // TODO: 后期考虑自身目录，因为非root写tmp可能会存在权限问题
         private val tempDir = PlatformFileSystem.cachePath(PlatformContext.Instance, "ServerNative")
-        @PublishedApi internal var dataIndex = 0
-        @PublishedApi internal var fileIndex = 0
-        @PublishedApi internal var dataList: List<String> = []
-        @PublishedApi internal var fileList: List<APIFile?> = []
+        private val tempFiles: MutableList<File> = []
+        @PublishedApi
+        internal var index = 0
+        @PublishedApi
+        internal var dataItems: Map<Int, JsonElement> = emptyMap()
+        @PublishedApi
+        internal var fileItems: Map<Int, APIFile> = emptyMap()
 
         suspend fun parse() {
-            val dataItems: MutableList<Pair<Int, String>> = []
-            val fileItems = mutableMapOf<Int, MutableList<Pair<Int, String>>>()
+            val dataItems = mutableMapOf<Int, JsonElement>()
+            val fileItems = mutableMapOf<Int, MutableList<String>>()
             multipartData.forEachPart { part ->
                 cleaning({ part.release() }) {
-                    val name = part.name
-                    require(name != null) { "part.name == null" }
+                    val name = requireNotNull(part.name) { "part.name == null" }
+                    val parameterIndex = requireNotNull(name.toIntOrNull()) { "Invalid form key: $name" }
+                    require(parameterIndex >= 0 && name == parameterIndex.toString()) { "Invalid form key: $name" }
+
                     when (part) {
                         is PartData.FormItem -> {
-                            if (name.startsWith('#')) fileItems[name.removePrefix("#").toInt()] = [] // APIFile?
-                            else dataItems += name.toInt() to part.value // Normal body data
+                            require(parameterIndex !in dataItems && parameterIndex !in fileItems) { "Duplicate or mixed form parameter $parameterIndex" }
+                            dataItems[parameterIndex] = part.value.parseJsonValue<JsonElement>()
                         }
                         is PartData.FileItem -> {
-                            val keys = name.split(":")
-                            val index = keys[0].toInt()
-                            val fileIndex = keys.getOrNull(1)?.toInt() ?: 0
-
-                            val tempFilename = "${Random.nextInt(1314520, 5201314)}-$index-${DateEx.uniqueTimeId(fileIndex)}"
+                            require(parameterIndex !in dataItems) { "Mixed JSON and file parameter $parameterIndex" }
+                            val paths = fileItems.getOrPut(parameterIndex, ::mutableListOf)
+                            val fileIndex = paths.size
+                            val tempFilename = "${Random.nextInt(1314520, 5201314)}-$parameterIndex-${DateEx.uniqueTimeId(fileIndex)}"
 
                             if (!tempDir.exists()) tempDir.mkdir()
                             val tempFile = File(tempDir, tempFilename)
-                            val tempSink = tempFile.bufferedSink()
-                            if (part.provider().copyAndClose(tempSink.asByteWriteChannel()) > 0) {
-                                val oldItems = fileItems.getOrPut(index, ::mutableListOf)
-                                oldItems += fileIndex to tempFile.path
+                            tempFiles += tempFile
+
+                            val size = tempFile.bufferedSink().use { sink ->
+                                part.provider().copyAndClose(sink.asByteWriteChannel())
                             }
+                            require(size > 0L) { "Empty upload file at parameter $parameterIndex, file $fileIndex" }
+                            paths += tempFile.path
                         }
-                        else -> { }
+                        else -> error("Unsupported form part at parameter $parameterIndex")
                     }
                     currentCoroutineContext().ensureActive()
                 }
             }
-            dataList = dataItems.sortedBy { it.first }.map { it.second }
-            fileList = fileItems.toList().sortedBy { it.first }.map { [_, items] ->
-                items.sortedBy { it.first }.map { it.second }.ifEmpty { null }?.let(::ServerAPIFile)
-            }
+
+            val parameterCount = dataItems.size + fileItems.size
+            require((0 ..< parameterCount).all { it in dataItems || it in fileItems }) { "Form parameter indices must start at 0 and be continuous" }
+
+            this.dataItems = dataItems.toMap()
+            this.fileItems = fileItems.mapValues { [_, paths] -> ServerAPIFile(paths.toList()) }
         }
 
-        inline operator fun <reified I> invoke(): I = if (I::class == APIFile::class) fileList[fileIndex++] as I else dataList[dataIndex++].parseJsonValue()
+        inline operator fun <reified I> invoke(): I {
+            val parameterIndex = index++
+            if (I::class == APIFile::class) {
+                fileItems[parameterIndex]?.let { return it as I }
+                require(dataItems[parameterIndex] == JsonNull) { "Expected a file or null at parameter $parameterIndex" }
+                require(null is I) { "File parameter $parameterIndex is not nullable" }
+                return null as I
+            }
+
+            require(parameterIndex !in fileItems) { "Expected JSON at parameter $parameterIndex" }
+
+            return requireNotNull(dataItems[parameterIndex]) { "Missing form parameter $parameterIndex"}.to()
+        }
+
+        override fun close() {
+            var failure: Throwable? = null
+            for (file in tempFiles) {
+                catchingError {
+                    if (file.existsSync()) file.deleteSync()
+                }?.let { err ->
+                    val previous = failure
+                    if (previous == null) failure = err
+                    else previous.addSuppressed(err)
+                }
+            }
+            tempFiles.clear()
+            failure?.let { throw it }
+        }
     }
 
     inline fun API<out APIType>.internalResponseForm(crossinline block: suspend (FormResult) -> JsonElement) {
         internalResponse {
-            val formResult = FormResult(it.receiveMultipart())
-            formResult.parse()
-            block(formResult)
+            FormResult(it.receiveMultipart()).use { formResult ->
+                formResult.parse()
+                block(formResult)
+            }
         }
     }
 

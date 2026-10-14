@@ -45,25 +45,30 @@ class APIFormScope {
 
     fun internalAddByteArray(key: String, value: ByteArray) { formParts += FormPart(key = key, value = value, headers = headers) }
 
-    fun internalAddRawSource(key: String, value: RawSource) { formParts += FormPart(key = key, value = InputProvider { value.buffered() }, headers = headers) }
+    fun internalAddRawSource(key: String, value: RawSource) {
+        sources += value
+        formParts += FormPart(key = key, value = InputProvider { value.buffered() }, headers = headers)
+    }
 
     @OptIn(CompatibleRachelApi::class)
     inline fun <reified I> add(i: I) {
-        if (i is ClientAPIFile?) {
+        val key = (index++).toString()
+        if (I::class == APIFile::class) {
             if (i != null) {
+                require(i is ClientAPIFile) { "Unsupported APIFile at parameter $key" }
                 when (val value = i.value) {
-                    is ByteArray -> internalAddByteArray("${index++}", value)
-                    is RawSource -> internalAddRawSource("${index++}", value)
+                    is ByteArray -> internalAddByteArray(key, value)
+                    is RawSource -> internalAddRawSource(key, value)
                     is Sources<out RawSource> -> {
-                        val currentIndex = index++
-                        value.forEachIndexed { i, source -> internalAddRawSource("$currentIndex:$i", source) }
+                        require(value.isNotEmpty()) { "Empty file collection at parameter $key; use null instead" }
+                        value.forEach { source -> internalAddRawSource(key, source) }
                     }
                     else -> error("unsupported file type ${value.metaClassName}")
                 }
             }
-            else formParts += FormPart(key = "#${index++}", value = "")
+            else formParts += FormPart(key = key, value = "null")
         }
-        else formParts += FormPart(key = "${index++}", value = i.toJsonString())
+        else formParts += FormPart(key = key, value = i.toJsonString())
     }
 }
 
