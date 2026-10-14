@@ -19,6 +19,7 @@ import io.github.alexzhirkevich.qrose.qrcode.internals.QRCodeSetup.setupTopLeftP
 import io.github.alexzhirkevich.qrose.qrcode.internals.QRCodeSetup.setupTopRightPositionProbePattern
 import io.github.alexzhirkevich.qrose.qrcode.internals.QRCodeSetup.setupTypeInfo
 import io.github.alexzhirkevich.qrose.qrcode.internals.QRCodeSetup.setupTypeNumber
+import love.yinlin.reflect.metaSimpleClassName
 import kotlin.jvm.JvmOverloads
 import kotlin.jvm.JvmStatic
 
@@ -199,7 +200,7 @@ internal class QRCode @JvmOverloads constructor(
         "QRCode(data=$data" +
             ", errorCorrectionLevel=$errorCorrectionLevel" +
             ", dataType=$dataType" +
-            ", qrCodeData=${qrCodeData::class.simpleName}" +
+            ", qrCodeData=${qrCodeData.metaSimpleClassName}" +
             ")"
 }
 

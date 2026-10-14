@@ -94,11 +94,11 @@ internal data class PageItem(
                 ComponentItem("Tip", "查看信息、成功、警告与错误四种提示。"),
                 ComponentItem("FAB", "控制右下角悬浮按钮的可见性与展开菜单。"),
             ]),
-            PageItem("widget", Icons.Token, "组件", "Calendar & Widgets", "组合基础控件，体验日历、日志输出、十六进制字节预览与数据表编辑。", WidgetPage, PageGroup.Layout, [
+            PageItem("widget", Icons.Token, "组件", "Widgets", "更多丰富组件", WidgetPage, PageGroup.Layout, [
                 ComponentItem("Calendar", "切换月份，查看日期、农历、节日与节气。"),
                 ComponentItem("LogOutput", "切换默认、固定与填满尺寸，在组件外过滤日志，暂停滚动后查看新增/总行数并回到底部。", "LogOutputState append ANSI filter 日志 行号 复制"),
                 ComponentItem("HexView", "切换尺寸和数据样例，比较自适应列数与 ASCII 显示，点击或拖选字节并查看连续选区。", "HexViewState rememberHexViewState selectedRange select clearSelection OFFSET HEX ASCII ByteArray 十六进制 偏移 字节 拖选"),
-                ComponentItem("DataTable", "编辑五种类型，合法输入即时保存，均结束编辑并取消选中；点击序号或表头取消选中并结束编辑，拖动调整列顺序，未排序时拖动序号调整行顺序，长按序号删除。", "DataTableState"),
+                ComponentItem("DataTable", "数据管理表格，支持多种类型读写编辑、排序", "DataTableState DataTableItem DataTableCell DataTableColumn DataTableSortableCell"),
             ]),
         ]
 

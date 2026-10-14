@@ -23,6 +23,7 @@ import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.extension.catchingError
 import love.yinlin.reflect.metaClassName
+import love.yinlin.reflect.metaSimpleClassName
 
 @Stable
 @OptIn(CompatibleRachelApi::class, LooseTyped::class)
@@ -32,7 +33,7 @@ internal class FactoryLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, G
     private fun attempt(label: String, action: () -> Unit) {
         val error = catchingError(action)
         result = if (error == null) "$label：意外成功，请检查演示注册与输入。"
-        else "$label：${error::class.simpleName}\n${error.message}"
+        else "$label：${error.metaSimpleClassName}\n${error.message}"
         journal.event("工厂实验", if (error == null) "意外成功" else "预期失败", result)
     }
 
