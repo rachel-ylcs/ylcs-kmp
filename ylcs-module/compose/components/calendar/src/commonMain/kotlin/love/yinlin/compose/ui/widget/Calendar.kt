@@ -3,8 +3,10 @@ package love.yinlin.compose.ui.widget
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,108 +25,14 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.localComposition
-import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.scaleSize
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.node.keepSize
-import love.yinlin.compose.ui.resources.Res
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.compose.ui.text.measureTextHeight
-import love.yinlin.concurrent.Mutex
 import love.yinlin.extension.DateEx
-
-@Stable
-private val lunarFestivalTable = mapOf(
-    101 to "春节", 115 to "元宵", 202 to "龙抬头", 505 to "端午",
-    707 to "七夕", 715 to "中元", 815 to "中秋", 909 to "重阳",
-    1001 to "寒衣", 1208 to "腊八"
-)
-
-@Stable
-private val solarFestivalTable = mapOf(
-    101 to "元旦", 214 to "情人节", 308 to "妇女节", 401 to "愚人节",
-    501 to "劳动节", 601 to "儿童节", 701 to "建党节", 801 to "建军节",
-    910 to "教师节", 1001 to "国庆节", 1101 to "万圣节", 1225 to "圣诞节"
-)
-
-@Stable
-private val lunarDayTable: Array<String> = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
-
-@Stable
-private val lunarDaysTable: Array<String> = ["初", "十", "廿", "三"]
-
-@Stable
-private val lunarMonthTable: Array<String> = ["", "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊"]
-
-@Stable
-private val solarTermTable: Array<String> = [
-    "小寒", "大寒", "立春", "雨水", "惊蛰", "春分",
-    "清明", "谷雨", "立夏", "小满", "芒种", "夏至",
-    "小暑", "大暑", "立秋", "处暑", "白露", "秋分",
-    "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"
-]
-
-@Stable
-private object LunarLoader {
-    var table: ByteArray? by mutableRefStateOf(null)
-        private set
-
-    private val mutex = Mutex()
-
-    @Composable
-    fun Load() {
-        LaunchedEffect(Unit) {
-            if (table == null) {
-                mutex.with {
-                    if (table == null) table = Res.readBytes("files/lunar.bin")
-                }
-            }
-        }
-    }
-
-    fun lunar(date: LocalDate): String {
-        val lunarTable = table ?: return ".."
-        val solarYear = date.year
-        val solarMonth = date.month.number
-        val solarDay = date.day
-        val index = ((solarYear - 2000) * 12 * 31 + (solarMonth - 1) * 31 + (solarDay - 1)) * 2
-        val byte0 = lunarTable[index].toInt() and 0xFF
-        val byte1 = lunarTable[index + 1].toInt() and 0xFF
-        val combined = (byte1 shl 8) or byte0
-        val isTerm = (combined and 0x01) != 0
-        val isLeap = (combined and 0x02) != 0
-        // val isCurrentYear = (combined and 0x04) != 0
-        val lunarMonth = ((combined ushr 3) and 0x0F) + 1
-        val lunarDay = ((combined ushr 7) and 0x1F) + 1
-
-        return solarFestivalTable[solarMonth * 100 + solarDay] ?: lunarFestivalTable[lunarMonth * 100 + lunarDay] ?:
-        if (isTerm) solarTermTable[(solarMonth - 1) * 2 + solarDay / 16]
-        else when (lunarDay) {
-            1 -> "${if (isLeap) "闰" else ""}${lunarMonthTable[lunarMonth]}月"
-            10 -> "初十"
-            20 -> "二十"
-            30 -> "三十"
-            else -> "${lunarDaysTable[lunarDay / 10]}${lunarDayTable[lunarDay % 10]}"
-        }
-    }
-}
-
-@Stable
-class CalendarState : PagerState(currentPage = 5) {
-    override val pageCount: Int = 12
-
-    companion object {
-        internal fun indexShadowDate(index: Int): LocalDate {
-            val today = DateEx.Today
-            val value = index - 5 + today.month.number
-            return if (value <= 0) LocalDate(year = today.year - 1, month = value + 12, day = 1)
-            else if (value > 12) LocalDate(year = today.year + 1, month = value - 12, day = 1)
-            else LocalDate(year = today.year, month = value, day = 1)
-        }
-    }
-}
 
 @Composable
 fun rememberCalendarState() = remember { CalendarState() }
@@ -278,7 +186,7 @@ fun Calendar(
 
     val dayNumberStyle = style.scaleSize(1.6f, true)
 
-    val cellSize = measureTextHeight("31", dayNumberStyle, solarTermTable[0], style) { v1, v2 -> v1 + v2 }
+    val cellSize = measureTextHeight("31", dayNumberStyle, "清明", style) { v1, v2 -> v1 + v2 }
 
     CompositionLocalProvider(
         LocalCalendarDayTextStyle provides style,

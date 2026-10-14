@@ -18,9 +18,10 @@ template(object : KotlinMultiplatformTemplate() {
             lib(
                 libs.compose.resources,
                 projects.ylcsModule.compose.ui,
+                projects.ylcsModule.compose.components.calendar,
+                projects.ylcsModule.compose.components.hexview,
+                projects.ylcsModule.compose.components.logOutput,
                 projects.ylcsModule.compose.components.richText,
-                libs.sketch,
-                libs.sketch.http,
             )
         }
 

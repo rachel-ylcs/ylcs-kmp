@@ -646,42 +646,42 @@ private class DataTableDragState {
         targetIndex = -1
         columnOffset = 0f
     }
+
+    fun updateColumnTarget(columns: List<DataTableColumn>, widths: DataTableWidths, density: Float) {
+        val key = columnKey ?: return
+        var left = 0f
+        var center = 0f
+        for (column in columns) {
+            val width = widths.getValue(column.key).value * density
+            if (column.key == key) center = left + width / 2 + columnOffset
+            left += width
+        }
+        left = 0f
+        targetIndex = columns.lastIndex
+        for ([index, column] in columns.withIndex()) {
+            left += widths.getValue(column.key).value * density
+            if (center < left) { targetIndex = index; break }
+        }
+    }
+
+    fun updateRowTarget(list: LazyListState, rowCount: Int) {
+        var distance = Float.MAX_VALUE
+        for (item in list.layoutInfo.visibleItemsInfo) {
+            if (item.key !is Long || item.index >= rowCount) continue
+            val current = abs(rowPointer - item.offset - item.size / 2f)
+            if (current < distance) {
+                distance = current
+                targetIndex = item.index
+            }
+        }
+        if (distance == Float.MAX_VALUE && rowCount > 0) targetIndex = rowCount - 1
+    }
 }
 
 @Immutable
 private class DataTableWidths(private val values: Map<String, Dp>) {
     val total: Dp = values.values.fold(0.dp) { sum, width -> sum + width }
     fun getValue(key: String): Dp = values.getValue(key)
-}
-
-private fun DataTableDragState.updateColumnTarget(columns: List<DataTableColumn>, widths: DataTableWidths, density: Float) {
-    val key = columnKey ?: return
-    var left = 0f
-    var center = 0f
-    for (column in columns) {
-        val width = widths.getValue(column.key).value * density
-        if (column.key == key) center = left + width / 2 + columnOffset
-        left += width
-    }
-    left = 0f
-    targetIndex = columns.lastIndex
-    for ([index, column] in columns.withIndex()) {
-        left += widths.getValue(column.key).value * density
-        if (center < left) { targetIndex = index; break }
-    }
-}
-
-private fun DataTableDragState.updateRowTarget(list: LazyListState, rowCount: Int) {
-    var distance = Float.MAX_VALUE
-    for (item in list.layoutInfo.visibleItemsInfo) {
-        if (item.key !is Long || item.index >= rowCount) continue
-        val current = abs(rowPointer - item.offset - item.size / 2f)
-        if (current < distance) {
-            distance = current
-            targetIndex = item.index
-        }
-    }
-    if (distance == Float.MAX_VALUE && rowCount > 0) targetIndex = rowCount - 1
 }
 
 private fun Modifier.dataTableRowGestures(

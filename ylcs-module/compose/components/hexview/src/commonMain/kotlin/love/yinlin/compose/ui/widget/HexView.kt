@@ -1,9 +1,6 @@
 package love.yinlin.compose.ui.widget
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
-import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,92 +44,8 @@ import love.yinlin.compose.extension.rememberOffsetState
 import love.yinlin.extension.cleaning
 import kotlin.math.roundToInt
 
-@Stable
-class HexViewState(private val data: ByteArray) {
-    val size: Int get() = data.size
-
-    internal var selectionAnchor by mutableIntStateOf(-1)
-        private set
-
-    var selectedIndex by mutableIntStateOf(-1)
-        private set
-
-    val selectedRange: IntRange get() = if (selectedIndex < 0) IntRange.EMPTY else minOf(selectionAnchor, selectedIndex) .. maxOf(selectionAnchor, selectedIndex)
-
-    operator fun get(index: Int): Byte = data[index]
-
-    fun select(index: Int, endIndex: Int = index) {
-        require(index in data.indices && endIndex in data.indices) { "HexView selection is out of bounds" }
-        selectionAnchor = index
-        selectedIndex = endIndex
-    }
-
-    internal fun select(index: Int, extend: Boolean) {
-        if (extend && selectedIndex == index) return
-        select(if (extend && selectionAnchor >= 0) selectionAnchor else index, index)
-    }
-
-    fun clearSelection() {
-        selectionAnchor = -1
-        selectedIndex = -1
-    }
-}
-
 private val HexViewByteTexts = Array(256) { it.toString(16).uppercase().padStart(2, '0') }
 private val HexViewAsciiTexts = Array(256) { if (it in 0x20 .. 0x7E) it.toChar().toString() else "." }
-private const val HexViewGroupSize = 8
-
-@Stable
-private data class HexViewMetrics(
-    val columns: Int,
-    val width: Int,
-    val rowHeight: Int,
-    val padding: Float,
-    val offsetWidth: Float,
-    val hexCellWidth: Float,
-    val asciiCellWidth: Float,
-    val groupGap: Float,
-    val asciiGap: Float,
-    val showAscii: Boolean,
-) {
-    val hexStart: Float = padding + offsetWidth
-    val hexEnd: Float = hexStart + columns * hexCellWidth + (columns / HexViewGroupSize - 1) * groupGap
-    val asciiStart: Float = hexEnd + asciiGap
-
-    fun hexPosition(column: Int): Float = hexStart + column * hexCellWidth + column / HexViewGroupSize * groupGap
-
-    fun columnAt(x: Float, ascii: Boolean, clamp: Boolean): Int? {
-        val start = if (ascii) asciiStart else hexStart
-        val end = if (ascii) asciiStart + columns * asciiCellWidth else hexEnd
-        if (!clamp && x !in start ..< end) return null
-
-        val position = (x - start).coerceAtLeast(0f)
-        val column = if (ascii) {
-            (position / asciiCellWidth).toInt()
-        }
-        else {
-            val groupWidth = HexViewGroupSize * hexCellWidth + groupGap
-            val group = (position / groupWidth).toInt()
-            val withinGroup = position - group * groupWidth
-            if (!clamp && withinGroup >= HexViewGroupSize * hexCellWidth) return null
-            group * HexViewGroupSize + (withinGroup / hexCellWidth).toInt().coerceAtMost(HexViewGroupSize - 1)
-        }
-        return column.coerceIn(0, columns - 1)
-    }
-
-    fun indexAt(position: Offset, listState: LazyListState, size: Int, ascii: Boolean, clamp: Boolean): Int? {
-        if (size == 0) return null
-        val column = columnAt(position.x, ascii, clamp) ?: return null
-        val layout = listState.layoutInfo
-        val start = layout.viewportStartOffset.toFloat()
-        val end = layout.viewportEndOffset.toFloat()
-        if (end <= start || (!clamp && position.y !in start ..< end)) return null
-        val y = if (clamp) position.y.coerceIn(start, (end - 1f).coerceAtLeast(start)) else position.y
-        val row = layout.visibleItemsInfo.firstOrNull { y >= it.offset && y < it.offset + it.size } ?: return null
-        val index = row.index.toLong() * columns + column
-        return if (clamp) index.coerceAtMost(size.toLong() - 1).toInt() else index.toInt().takeIf { index < size }
-    }
-}
 
 private fun DrawScope.drawHexViewText(result: TextLayoutResult, color: Color, x: Float, width: Float, centered: Boolean = true) {
     drawText(
@@ -342,7 +255,7 @@ fun HexView(
                 placeable.placeRelative(0, 0)
             }
         }.clipToBounds(),
-        propagateMinConstraints = true,
+        propagateMinConstraints = true
     ) {
         val metrics = remember(constraints.maxWidth, density, style, headerStyle, measurer, showAscii, padding, gap, verticalPadding, minCellWidth, minRowHeight) {
             val byteText = measurer.measure("FF", style, maxLines = 1)
@@ -357,10 +270,10 @@ fun HexView(
                 val asciiWidth = (asciiText.size.width + gapPx).coerceAtLeast(1)
                 val asciiGap = if (showAscii) paddingPx else 0
                 val fixedWidth = paddingPx * 2 + offsetWidth + asciiGap
-                val groupWidth = HexViewGroupSize * (hexWidth + if (showAscii) asciiWidth else 0) + paddingPx
+                val groupWidth = HexViewMetrics.HEX_VIEW_GROUP_SIZE * (hexWidth + if (showAscii) asciiWidth else 0) + paddingPx
                 val availableWidth = if (constraints.hasBoundedWidth) constraints.maxWidth else fixedWidth + groupWidth - paddingPx
                 val groups = ((availableWidth - fixedWidth + paddingPx) / groupWidth).coerceAtLeast(1)
-                val columns = groups * HexViewGroupSize
+                val columns = groups * HexViewMetrics.HEX_VIEW_GROUP_SIZE
                 val minimumWidth = fixedWidth + groups * groupWidth - paddingPx
                 val width = maxOf(availableWidth, minimumWidth)
                 val expandedHexWidth = hexWidth + (width - minimumWidth).toFloat() / columns
