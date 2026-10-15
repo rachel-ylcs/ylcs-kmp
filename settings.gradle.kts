@@ -85,6 +85,7 @@ include(
     "ylcs-module:foundation:context",
     "ylcs-module:foundation:cryptography",
     "ylcs-module:foundation:filesystem",
+    "ylcs-module:foundation:fts",
     "ylcs-module:foundation:network",
     "ylcs-module:foundation:parser:arguments",
     "ylcs-module:foundation:parser:lrc",

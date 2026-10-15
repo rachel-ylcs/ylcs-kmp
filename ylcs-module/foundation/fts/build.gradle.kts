@@ -1,0 +1,27 @@
+plugins {
+    install(
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.androidLibrary,
+        libs.plugins.mavenPublish,
+        libs.plugins.dokka,
+    )
+}
+
+template(object : KotlinMultiplatformTemplate() {
+    override val windowsTarget: Boolean = true
+    override val linuxTarget: Boolean = true
+    override val macosTarget: Boolean = true
+
+    override fun KotlinMultiplatformSourceSetsScope.source() {
+        commonMain.configure {
+            lib(
+                ExportLib,
+                projects.ylcsModule.core,
+            )
+        }
+
+        commonTest.configure {
+            lib(libs.test)
+        }
+    }
+})

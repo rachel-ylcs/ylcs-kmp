@@ -17,6 +17,7 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 libs.compose.resources,
+                projects.ylcsModule.foundation.fts,
                 projects.ylcsModule.compose.ui,
                 projects.ylcsModule.compose.components.calendar,
                 projects.ylcsModule.compose.components.dataTable,

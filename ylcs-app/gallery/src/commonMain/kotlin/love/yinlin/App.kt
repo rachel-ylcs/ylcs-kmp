@@ -43,7 +43,7 @@ import love.yinlin.page.OverviewPage
 var darkMode: Boolean by mutableStateOf(false)
 var currentPage: Page? by mutableRefStateOf(OverviewPage)
 val mainScope = MainScope()
-internal var galleryPalette: GalleryPalette by mutableStateOf(GalleryPalette.Gallery)
+internal var galleryPalette: GalleryPalette by mutableStateOf(GalleryPalette.Framework)
 
 @Composable
 fun App() {
@@ -51,7 +51,7 @@ fun App() {
     val holder = rememberSaveableStateHolder()
     val selected = currentPage?.let { PageItem.forPage(it) } ?: PageItem.overview
     val query = search.text.trim()
-    val filtered = remember(query) { PageItem.allEntries.filter { it.matches(query) } }
+    val filtered = remember(query) { PageItem.searchIndex.search(query) }
 
     Theme(
         mainFontResource = Res.font.font,

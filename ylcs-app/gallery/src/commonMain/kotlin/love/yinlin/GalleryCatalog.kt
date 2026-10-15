@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.foundation.fts.FullTextSearch
 import love.yinlin.page.*
 
 @Immutable
@@ -26,13 +27,6 @@ internal data class PageItem(
     val group: PageGroup? = null,
     val components: List<ComponentItem> = [],
 ) {
-    fun matches(query: String): Boolean = query.isBlank() ||
-        title.contains(query, ignoreCase = true) || english.contains(query, ignoreCase = true) ||
-        description.contains(query, ignoreCase = true) || components.any {
-            it.title.contains(query, ignoreCase = true) || it.description.contains(query, ignoreCase = true) ||
-                it.keywords.contains(query, ignoreCase = true)
-        }
-
     companion object {
         val overview = PageItem("overview", Icons.Home, "总览", "Overview", "从设计基础到交互反馈，探索 Rachel UI。", OverviewPage)
 
@@ -95,15 +89,30 @@ internal data class PageItem(
                 ComponentItem("FAB", "控制右下角悬浮按钮的可见性与展开菜单。"),
             ]),
             PageItem("widget", Icons.Token, "组件", "Widgets", "更多丰富组件", WidgetPage, PageGroup.Layout, [
-                ComponentItem("Calendar", "切换月份，查看日期、农历、节日与节气。"),
+                ComponentItem("Calendar", "切换月份，查看日期、农历、节日与节气。", "日历 月历 日期 星期"),
                 ComponentItem("LogOutput", "切换默认、固定与填满尺寸，在组件外过滤日志，暂停滚动后查看新增/总行数并回到底部。", "LogOutputState append ANSI filter 日志 行号 复制"),
-                ComponentItem("HexView", "切换尺寸和数据样例，比较自适应列数与 ASCII 显示，点击或拖选字节并查看连续选区。", "HexViewState rememberHexViewState selectedRange select clearSelection OFFSET HEX ASCII ByteArray 十六进制 偏移 字节 拖选"),
+                ComponentItem("HexView", "切换尺寸和数据样例，比较自适应列数与 ASCII 显示，点击或拖选字节并查看连续选区。", "HexViewState rememberHexViewState selectedRange select HEX ASCII ByteArray 十六进制 偏移 字节 拖选"),
                 ComponentItem("DataTable", "数据管理表格，支持多种类型读写编辑、排序", "DataTableState DataTableItem DataTableCell DataTableColumn DataTableSortableCell"),
             ]),
         ]
 
         val allEntries: List<PageItem> = [overview] + entries
         val componentCount: Int = entries.sumOf { it.components.size }
+
+        val searchIndex: FullTextSearch<PageItem> by lazy {
+            FullTextSearch(allEntries) { item ->
+                buildList {
+                    add(item.title)
+                    add(item.english)
+                    add(item.description)
+                    for (component in item.components) {
+                        add(component.title)
+                        add(component.description)
+                        add(component.keywords)
+                    }
+                }
+            }
+        }
 
         fun forPage(page: Page): PageItem? = allEntries.find { it.page === page }
     }
