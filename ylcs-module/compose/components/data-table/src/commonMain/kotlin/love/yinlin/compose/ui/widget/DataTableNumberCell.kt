@@ -1,7 +1,6 @@
 package love.yinlin.compose.ui.widget
 
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.setValue
@@ -10,7 +9,7 @@ import androidx.compose.ui.text.input.KeyboardType
 @Stable
 open class DataTableNumberCell(initialValue: Double = 0.0) : DataTableCell(), DataTableSortableCell {
     private companion object {
-        val DataTableNumberInput = Regex("[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]*)(?:[eE][+-]?[0-9]*)?|[+-]?")
+        val NumberInput = Regex("[+-]?(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]*)(?:[eE][+-]?[0-9]*)?|[+-]?")
     }
 
     init {
@@ -19,10 +18,10 @@ open class DataTableNumberCell(initialValue: Double = 0.0) : DataTableCell(), Da
 
     private var value by mutableDoubleStateOf(initialValue)
 
-    override val text: String by derivedStateOf { value.toString().removeSuffix(".0") }
+    override val text: String get() = value.toString().removeSuffix(".0")
     override val keyboardType: KeyboardType = KeyboardType.Decimal
     override val sortType = DataTableNumberCell::class
-    override fun acceptsInput(value: String): Boolean = DataTableNumberInput.matches(value)
+    override fun acceptsInput(value: String): Boolean = NumberInput.matches(value)
 
     override fun update(value: String): Boolean {
         val input = value.trim()

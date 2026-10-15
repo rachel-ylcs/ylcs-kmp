@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import love.yinlin.Page
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberState
@@ -54,7 +56,7 @@ object WidgetPage : Page() {
         rate: Double = 48000.0,
         status: Int = 0,
         enabled: Boolean = true,
-        notes: String = "",
+        json: JsonElement = JsonNull
     ) : DataTableItem() {
         override val items: List<DataTableCell> = [
             DataTableTextCell(device),
@@ -62,7 +64,8 @@ object WidgetPage : Page() {
             DataTableNumberCell(rate),
             StatusCell(status),
             DataTableBoolCell(enabled),
-            DataTableTextCell(notes),
+            DataTableDateTimeCell(),
+            DataTableJsonCell(json)
         ]
 
         companion object {
@@ -88,6 +91,8 @@ object WidgetPage : Page() {
                 DataTableColumn("Sample rate / Hz", DataTableNumberCell::class, width = 190.dp),
                 DataTableColumn("Status", DataTableSelectionCell::class, width = 160.dp),
                 DataTableColumn("Enabled", DataTableBoolCell::class, width = 150.dp),
+                DataTableColumn("Time", DataTableDateTimeCell::class, width = 200.dp),
+                DataTableColumn("Json", DataTableJsonCell::class, width = 200.dp),
             ]
         }
     }

@@ -329,10 +329,10 @@ private fun DataTableBodyRow(
 /**
  * 数据表编辑器。点击数据单元格直接内嵌编辑，合法输入即时保存，bool 单击切换，selection 使用单元格内的下拉入口。
  * 第一列固定为 # 和序号，未排序时拖动序号调整行顺序；直接拖动只读表头调整数据列顺序。
- * 单击序号列或表头行的任意单元格清除焦点、结束编辑并取消选中。
  * Enter 保存，Escape 恢复编辑前的值，两者均结束编辑、清除焦点并取消选中。
- * 列中存在实现 DataTableSortableCell 的单元格时显示排序按钮，循环切换未排序、升序、降序并回到首行；行列增删由 state 管理。
- * [readonly] 关闭单元格编辑和行列拖动，仍可排序和滚动查看。
+ * 列中存在实现 DataTableSortableCell 的单元格时显示排序按钮，循环切换未排序、升序、降序并回到首行
+ *
+ * @param readonly 关闭单元格编辑和行列拖动，仍可排序和滚动查看。
  */
 @Composable
 fun <T : DataTableItem> DataTable(

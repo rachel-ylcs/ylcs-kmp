@@ -35,13 +35,15 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 @Stable
 abstract class DataTableCell {
     abstract val text: String
-    open val keyboardType: KeyboardType get() = KeyboardType.Text
-    open val editable: Boolean get() = true
+    open val keyboardType: KeyboardType = KeyboardType.Text
+    open val editable: Boolean = true
 
     abstract fun update(value: String): Boolean
     open fun acceptsInput(value: String): Boolean = true
     abstract fun captureValue(): () -> Unit
     open fun toggle(): Boolean = false
+
+    override fun toString(): String = text
 
     @Composable
     open fun Display(modifier: Modifier) {
