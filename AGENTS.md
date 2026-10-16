@@ -44,7 +44,7 @@ Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化框�
 
 ## Compose、导航与示例
 
-- 优先复用 Rachel 的主题、布局和 UI 组件，沿用现有颜色、尺寸与资源组织方式；界面库保持自身的组件体系，避免无关地引入 Material 依赖。
+- 优先复用 Rachel 的主题、布局和 UI 组件，沿用现有颜色、尺寸与资源组织方式，使用 Theme 下的尺寸边距、边框、阴影等属性，避免用字面量直接值；界面库保持自身的组件体系，避免无关地引入 Material 依赖。
 - 沿用页面既有的状态归属，避免增加重复状态源。正确选择 `remember`、可保存状态和副作用 API，处理 effect 的 key、取消及清理，不在重组过程中直接执行 I/O。
 - 保持 `BasicScreen` 经 `ScreenModel` 继承的 ViewModel 生命周期语义，以及页面实例隔离、`viewModelScope` 和清理行为。修改导航时同时检查返回、替换、嵌套宿主与状态恢复。
 - 可恢复状态只保存必要的标识、可序列化参数和小型 UI 状态；ViewModel、平台句柄、回调及大对象留在运行时所有者中。
