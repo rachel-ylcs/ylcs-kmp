@@ -3,7 +3,7 @@ package love.yinlin
 import android.content.Intent
 import android.os.Build
 import love.yinlin.compose.ComposeApplication
-import love.yinlin.compose.window.DeepLink
+import love.yinlin.compose.screen.DeepLink
 import love.yinlin.extension.then
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
@@ -16,7 +16,7 @@ class MainApplication : ComposeApplication() {
                 Intent.ACTION_VIEW -> intent.data?.then { data ->
                     val uri = data.toUri()
                     when (uri.scheme) {
-                        Scheme.Content -> DeepLink.openUri(uri)
+                        Scheme.Content -> DeepLink.navigate(uri)
                     }
                 }
                 Intent.ACTION_SEND -> {
@@ -27,7 +27,7 @@ class MainApplication : ComposeApplication() {
                     if (data != null) {
                         val uri = data.toUri()
                         if (uri.scheme == Scheme.Content) {
-                            DeepLink.openUri(uri)
+                            DeepLink.navigate(uri)
                         }
                     }
                     else {
@@ -35,11 +35,11 @@ class MainApplication : ComposeApplication() {
                         when {
                             text.contains("QQ音乐") -> {
                                 val result = Uri.parse(Regex("https?://\\S+").find(text)?.value!!)!!
-                                DeepLink.openUri(result.copy(scheme = Scheme.QQMusic))
+                                DeepLink.navigate(result.copy(scheme = Scheme.QQMusic))
                             }
                             text.contains("网易云音乐") -> {
                                 val result = Uri.parse(Regex("https?://\\S+").find(text)?.value!!)!!
-                                DeepLink.openUri(result.copy(scheme = Scheme.NetEaseCloud))
+                                DeepLink.navigate(result.copy(scheme = Scheme.NetEaseCloud))
                             }
                         }
                     }

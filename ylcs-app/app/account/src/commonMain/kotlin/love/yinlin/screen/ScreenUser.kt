@@ -31,6 +31,7 @@ import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.common.BoardButton
 import love.yinlin.compose.ui.common.BoardButtonContainer
 import love.yinlin.compose.ui.common.PortraitValue
@@ -58,7 +59,6 @@ import love.yinlin.compose.ui.text.TextIconAdapter
 import love.yinlin.compose.ui.text.TextIconBinder
 import love.yinlin.compose.ui.widget.QrcodeBox
 import love.yinlin.compose.ui.widget.QrcodeScanner
-import love.yinlin.compose.window.DeepLink
 import love.yinlin.cs.ApiProfileSignin
 import love.yinlin.cs.request
 import love.yinlin.cs.url
@@ -258,7 +258,7 @@ class ScreenUser : BasicScreen() {
                 onResult = { result ->
                     close()
                     val uri = Uri.parse(result)
-                    if (uri?.scheme == Scheme.Rachel) DeepLink.openUri(uri)
+                    if (uri?.scheme == Scheme.Rachel) DeepLink.navigate(uri)
                     else slot.tip.warning("不能识别此信息")
                 }
             )

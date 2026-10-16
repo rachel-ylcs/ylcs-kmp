@@ -12,17 +12,28 @@ import love.yinlin.compose.DefaultTopBar
 import love.yinlin.compose.DefaultTopBarActions
 import love.yinlin.compose.Theme
 import love.yinlin.compose.WindowController
+import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.coroutines.ioContext
 import love.yinlin.data.MimeType
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.platform.AutoUpdate
+import love.yinlin.platform.Platform
 import love.yinlin.platform.SingleInstance
+import love.yinlin.uri.toUri
 import org.jetbrains.compose.resources.DrawableResource
+import java.awt.Desktop
 
 fun main() {
     SingleInstance.run("${Local.info.appName}.lock")
+
+    // 配置 macOS 深度链接
+    Platform.use(Platform.MacOS) {
+        Desktop.getDesktop().setOpenURIHandler { event ->
+            DeepLink.navigate(event.uri.toUri())
+        }
+    }
 
     object : RachelApplication(PlatformContext.Instance) {
         override val title: String = "银临茶舍"

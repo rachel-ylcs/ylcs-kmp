@@ -24,7 +24,6 @@ import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.annotation.LooseTyped
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberImmersivePadding
-import love.yinlin.compose.window.DeepLink
 import love.yinlin.extension.cleaning
 import love.yinlin.reflect.metaClassName
 
@@ -226,7 +225,7 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
         @Composable
         inline fun <reified Main : ScreenModel> Navigation(
             modifier: Modifier = Modifier,
-            deeplink: DeepLink<ScreenManager> = DeepLink.default(),
+            deeplink: DeepLink? = null,
             noinline transitionSpecProvider: AnimatedContentTransitionScope<*>.() -> ContentTransform = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Start,
@@ -250,7 +249,7 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
         internal fun Navigation(
             mainType: String,
             modifier: Modifier,
-            deeplink: DeepLink<ScreenManager>,
+            deeplink: DeepLink?,
             transitionSpecProvider: AnimatedContentTransitionScope<*>.() -> ContentTransform,
             builder: ScreenRegistry.Builder.() -> Unit
         ) {

@@ -1,4 +1,4 @@
-package love.yinlin.compose.window
+package love.yinlin.compose.screen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -6,14 +6,17 @@ import androidx.compose.runtime.Stable
 import love.yinlin.extension.then
 import love.yinlin.uri.Uri
 
+/**
+ * 深度链接
+ *
+ * 全局只能绑定维护一个 [ScreenManager] 实例
+ */
 @Stable
-fun interface DeepLink<M : Any> {
-    fun onDeepLink(manager: M, uri: Uri)
+fun interface DeepLink {
+    fun onDeepLink(manager: ScreenManager, uri: Uri)
 
     @Stable
     companion object {
-        fun <M : Any> default() = DeepLink<M> { _, _ -> }
-
         private var cached: Uri? = null
         private var listener: ((uri: Uri) -> Unit)? = null
             set(value) {
@@ -25,17 +28,22 @@ fun interface DeepLink<M : Any> {
             }
 
         @Composable
-        fun <M : Any> Register(deeplink: DeepLink<M>, manager: M) {
+        fun Register(deeplink: DeepLink?, manager: ScreenManager) {
             DisposableEffect(deeplink, manager) {
-                listener = { deeplink.onDeepLink(manager, it) }
-                onDispose { listener = null }
+                listener = if (deeplink == null) null else {
+                    { deeplink.onDeepLink(manager, it) }
+                }
+                onDispose {
+                    listener = null
+                }
             }
         }
 
-        fun openUri(uri: Uri) {
+        fun navigate(uri: Uri) {
             cached = uri
-            listener?.then {
-                it(uri)
+            val currentListener = listener
+            if (currentListener != null) {
+                currentListener(uri)
                 cached = null
             }
         }
