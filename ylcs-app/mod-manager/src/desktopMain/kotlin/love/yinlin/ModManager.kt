@@ -12,7 +12,7 @@ import love.yinlin.mod.ModFactory
 import love.yinlin.screen.ScreenMain
 import love.yinlin.screen.ScreenRhyme
 
-class MainApplication : PlatformApplication<MainApplication>(appReference) {
+class MainApplication(override val commandArgs: Array<String>) : PlatformApplication<MainApplication>(appReference) {
     override val title: String = "MOD管理器 第${ModFactory.VERSION}版"
     override val initSize: DpSize = DpSize(1200.dp, 800.dp)
     override val toolingTheme: ToolingTheme = ToolingTheme(enableBallonTip = true)
@@ -41,4 +41,4 @@ class MainApplication : PlatformApplication<MainApplication>(appReference) {
 private val appReference = LazyReference<MainApplication>()
 val app by appReference
 
-fun main() = MainApplication().run()
+fun main(args: Array<String>) = MainApplication(args).run()

@@ -62,6 +62,11 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     // 这些配置都是非状态变量作为初始值表达, 需要监听变化请使用 controller
 
     /**
+     * 命令行参数
+     */
+    protected open val commandArgs: Array<String> = []
+
+    /**
      * 标题
      */
     protected open val title: String = ""
@@ -118,11 +123,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         // 配置 compose 渲染
         if (composeSwingRenderOnGraphics) System.setProperty("compose.swing.render.on.graphics", "true")
         if (composeInteropBlending) System.setProperty("compose.interop.blending", "true")
+        val isAOTMode = System.getProperty("compose.aot.training-run") == "true"
 
         @OptIn(InternalComposeUiApi::class)
         registerSkikoComposeImplementation()
-
-        val isAOTMode = System.getProperty("compose.aot.training-run") == "true"
 
         initApplication(scope = mainScope)
 

@@ -25,7 +25,7 @@ import love.yinlin.uri.toUri
 import org.jetbrains.compose.resources.DrawableResource
 import java.awt.Desktop
 
-fun main() {
+fun main(args: Array<String>) {
     SingleInstance.run("${Local.info.appName}.lock")
 
     // 配置 macOS 深度链接
@@ -36,6 +36,7 @@ fun main() {
     }
 
     object : RachelApplication(PlatformContext.Instance) {
+        override val commandArgs: Array<String> = args
         override val title: String = "银临茶舍"
         override val icon: DrawableResource = Res.drawable.img_logo
 
