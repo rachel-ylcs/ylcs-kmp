@@ -114,6 +114,12 @@ struct MyApp: App {
 
 `ComposeView` 的 `makeUIViewController` 返回 `instance.buildUIViewController()`。必须一直持有同一个 Kotlin 实例；每次 SwiftUI 更新都新建应用会重复启动服务并丢失全局状态。
 
+`buildUIViewController()` 返回一个包含 Compose 子控制器的 UIKit 父容器。父容器在 `viewDidLoad()` 中建立父子关系，将子视图约束到容器四边，并在挂载完成后执行 `initPoolLater`；显隐等生命周期回调由 UIKit 自动转发。这里使用容器完整边界而非安全区，配合 SwiftUI 的 `.ignoresSafeArea(.all)`，继续由 Compose 处理安全区。
+
+`PlatformContextProvider.controller` 保存该父容器，与 `buildUIViewController()` 的返回值是同一个实例，可作为展示原生界面、访问宿主视图和所属窗口的入口。创建控制器不代表视图已挂接窗口，访问 `viewIfLoaded?.window` 时仍需处理空值，UI 操作应在主线程执行。
+
+Compose 子控制器继续负责内容渲染，父容器的状态栏样式、显隐和动画仍读取该子控制器。Swift 桥接保持原有调用方式，无需设置已弃用的 `ComposeUIViewControllerDelegate`，也无需在 `updateUIViewController` 中重复初始化。
+
 ## 公共平台操作
 
 `PlatformApplication` 统一提供：

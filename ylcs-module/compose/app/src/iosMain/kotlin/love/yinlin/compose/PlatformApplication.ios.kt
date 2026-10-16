@@ -2,8 +2,6 @@ package love.yinlin.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.uikit.ComposeUIViewControllerDelegate
-import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.MainScope
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
@@ -12,9 +10,7 @@ import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toNSUrl
-import platform.UIKit.UIApplication
-import platform.UIKit.UIPasteboard
-import platform.UIKit.UIViewController
+import platform.UIKit.*
 
 @Stable
 @Suppress("unused")
@@ -29,23 +25,19 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     private val scope = MainScope()
 
-    fun buildUIViewController(): UIViewController {
-        val uiViewController = ComposeUIViewController({
-            delegate = object : ComposeUIViewControllerDelegate {
-                override fun viewDidLoad() {
-                    super.viewDidLoad()
-                    initPoolLater(scope)
-                }
-            }
-        }) {
+    fun buildUIViewController(): UIViewController = object : CMPUIViewController() {
+        @Composable
+        override fun ComposeUI() {
             ComposedLayout {
                 BeginContent()
                 Content()
             }
         }
-        controller = uiViewController
-        return uiViewController
-    }
+
+        override fun onViewLoad() {
+            initPoolLater(scope)
+        }
+    }.also { controller = it }
 
     fun run() = initApplication(scope = scope)
 
