@@ -4,7 +4,6 @@
 [submodule "mmkv"]
 	path = ylcs-module/compose/startup/mmkv-kmp/src/desktopMain/cpp/mmkv
 	url = https://github.com/Tencent/MMKV.git
-	ignore = all
 [submodule "miniaudio"]
 	path = ylcs-module/compose/components/media/src/desktopMain/cpp/miniaudio
 	url = https://github.com/mackron/miniaudio.git

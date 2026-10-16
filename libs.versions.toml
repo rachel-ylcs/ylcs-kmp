@@ -16,7 +16,7 @@ coroutines = "1.11.0"
 ktor = "3.6.0"
 sketch = "4.7.0"
 haze = "2.0.1"
-mmkv = "2.4.2"
+mmkv = "2.4.3"
 
 # Android
 androidx-activity = "1.13.0"
