@@ -5,7 +5,6 @@ import io.github.smyrgeorge.sqlx4k.SQLError
 import io.github.smyrgeorge.sqlx4k.Statement
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
-import love.yinlin.extension.Long
 import love.yinlin.extension.Object
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
@@ -94,7 +93,8 @@ suspend fun QueryExecutor.throwInsertSQLDuplicateKey(@Language("SQL") sql: Strin
 
 suspend fun QueryExecutor.throwInsertSQLGeneratedKey(@Language("SQL") sql: String, vararg args: Any?): Long {
     val statement = buildSQLStatement(sql, *args)
-    val affectRows = execute(statement).getOrThrow()
-    if (affectRows <= 0) throw IllegalStateException("NoAffect ${args.joinToString()}")
-    return throwQuerySQLSingle("SELECT LAST_INSERT_ID() AS id")["id"].Long // 库没提供获取生成自增key的接口
+    (val rowsAffected, val lastInsertId) = executeWithResult(statement).getOrThrow()
+    if (rowsAffected <= 0) throw IllegalStateException("NoAffect ${args.joinToString()}")
+    require(lastInsertId != null) { "lastInsertId is null" }
+    return lastInsertId
 }
