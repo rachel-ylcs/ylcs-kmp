@@ -65,8 +65,7 @@ fun Icon(
                         enabled = enabled,
                         onClick = onClick
                     )
-                }
-                .pointerIcon(PointerIcon.Hand, enabled && onClick != null),
+                }.pointerIcon(PointerIcon.Hand, enabled && onClick != null),
             measurePolicy = MeasurePolicies.Empty
         )
     }

@@ -87,17 +87,17 @@ class ScreenMusic : BasicScreen() {
     private fun ToolLayout(player: StartupMusicPlayer, musicInfo: MusicInfo?, modifier: Modifier = Modifier) {
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+            verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
             AnimationContent(
                 state = musicInfo?.name,
-                modifier = Modifier.fillMaxWidth().padding(start = Theme.padding.h10, end = Theme.padding.h10, top = Theme.padding.v)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 SimpleEllipsisText(text = it ?: "无音源", color = Colors.Green4, style = Theme.typography.v4.bold)
             }
 
             ActionScope.SplitContainer(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Theme.padding.h10),
+                modifier = Modifier.fillMaxWidth(),
                 left = {
                     AnimationContent(musicInfo?.singer) {
                         SimpleEllipsisText(text = it ?: "未知歌手", color = Colors.Green1, style = Theme.typography.v6)
@@ -366,7 +366,7 @@ class ScreenMusic : BasicScreen() {
                             if (player.isPlaying) player.pause()
                             else player.play()
                         }
-                    }.padding(Theme.padding.e),
+                    }.padding(Theme.padding.e9),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -407,7 +407,7 @@ class ScreenMusic : BasicScreen() {
                 ) {
                     val deviceType by rememberDeviceType()
 
-                    ToolLayout(player, musicInfo, modifier = Modifier.fillMaxWidth())
+                    ToolLayout(player, musicInfo, modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue7))
 
                     if (player.isReady) {
                         if (deviceType == Device.Type.PORTRAIT) {
@@ -447,17 +447,17 @@ class ScreenMusic : BasicScreen() {
 
                     if (deviceType == Device.Type.LANDSCAPE) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
+                            modifier = Modifier.fillMaxWidth().padding(Theme.padding.value5),
                             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            MusicControlLayout(player, modifier = Modifier.weight(1f))
+                            MusicControlLayout(player, modifier = Modifier.widthIn(min = Theme.size.cell1).weight(1f))
                             MusicProgressLayout(player, musicInfo, modifier = Modifier.weight(3f))
                         }
                     }
                     else {
                         MusicProgressLayout(player, musicInfo, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
-                        MusicControlLayout(player, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
+                        MusicControlLayout(player, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value5))
                     }
                 }
             }
