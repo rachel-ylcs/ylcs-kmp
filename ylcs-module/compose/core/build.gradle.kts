@@ -15,13 +15,14 @@ template(object : KotlinMultiplatformTemplate() {
         commonMain.configure {
             lib(
                 ExportLib,
-                projects.ylcsModule.foundation.context,
+                libs.androidx.savedstate,
+                libs.androidx.viewmodel,
+                libs.androidx.lifecycle,
                 libs.compose.runtime,
                 libs.compose.ui,
                 libs.compose.foundation,
-                libs.compose.savedstate,
-                libs.compose.viewmodel,
-                libs.compose.lifecycle,
+
+                projects.ylcsModule.foundation.context,
             )
         }
 

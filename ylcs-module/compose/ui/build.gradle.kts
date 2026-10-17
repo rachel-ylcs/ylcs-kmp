@@ -14,8 +14,8 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
+                libs.androidx.navigation.event,
                 libs.compose.resources,
-                libs.compose.navigation.event,
                 ExportLib,
                 libs.compose.animation,
                 projects.ylcsModule.compose.theme,

@@ -14,8 +14,8 @@ template(object : KotlinMultiplatformTemplate() {
     override fun KotlinMultiplatformSourceSetsScope.source() {
         commonMain.configure {
             lib(
-                libs.compose.navigation3,
-                libs.compose.navigation3.viewmodel,
+                libs.androidx.navigation3,
+                libs.androidx.navigation3.viewmodel,
                 ExportLib,
                 libs.kotlinx.json,
                 projects.ylcsModule.compose.ui,
