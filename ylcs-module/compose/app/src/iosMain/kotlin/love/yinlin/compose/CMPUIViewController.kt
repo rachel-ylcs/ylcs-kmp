@@ -9,13 +9,11 @@ import platform.UIKit.UIViewController
 import platform.UIKit.addChildViewController
 import platform.UIKit.didMoveToParentViewController
 
-internal abstract class CMPUIViewController : UIViewController(nibName = null, bundle = null) {
-    @Composable
-    protected abstract fun ComposeUI()
-
-    protected abstract fun onViewLoad()
-
-    private val composeUIController = ComposeUIViewController(::ComposeUI)
+internal class CMPUIViewController(
+    private val onViewLoad: () -> Unit,
+    composeUI: @Composable () -> Unit
+) : UIViewController(nibName = null, bundle = null) {
+    private val composeUIController = ComposeUIViewController(composeUI)
 
     override fun viewDidLoad() {
         super.viewDidLoad()
@@ -38,9 +36,7 @@ internal abstract class CMPUIViewController : UIViewController(nibName = null, b
         onViewLoad()
     }
 
-    final override fun preferredStatusBarStyle(): UIStatusBarStyle = composeUIController.preferredStatusBarStyle()
-
-    final override fun preferredStatusBarUpdateAnimation(): UIStatusBarAnimation = composeUIController.preferredStatusBarUpdateAnimation()
-
-    final override fun prefersStatusBarHidden(): Boolean = composeUIController.prefersStatusBarHidden()
+    override fun preferredStatusBarStyle(): UIStatusBarStyle = composeUIController.preferredStatusBarStyle()
+    override fun preferredStatusBarUpdateAnimation(): UIStatusBarAnimation = composeUIController.preferredStatusBarUpdateAnimation()
+    override fun prefersStatusBarHidden(): Boolean = composeUIController.prefersStatusBarHidden()
 }

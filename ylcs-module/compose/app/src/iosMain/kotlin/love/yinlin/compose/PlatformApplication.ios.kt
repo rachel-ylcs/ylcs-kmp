@@ -25,17 +25,12 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     private val scope = MainScope()
 
-    fun buildUIViewController(): UIViewController = object : CMPUIViewController() {
-        @Composable
-        override fun ComposeUI() {
-            ComposedLayout {
-                BeginContent()
-                Content()
-            }
-        }
-
-        override fun onViewLoad() {
-            initPoolLater(scope)
+    fun buildUIViewController(): UIViewController = CMPUIViewController(
+        onViewLoad = { initPoolLater(scope) }
+    ) {
+        ComposedLayout {
+            BeginContent()
+            Content()
         }
     }.also { controller = it }
 
