@@ -9,10 +9,10 @@ import love.yinlin.compose.ui.icon.Icons
 internal object AppAbout {
      val updateInfo = AppUpdateInfo(
         platform = "Android/iOS/Windows/Linux/macOS/Web 发布",
-        title = "银临茶舍 音游上线",
-        force = false,
-        maintenance = false,
-        date = LocalDate(2026, 5, 6),
+        title = "银临茶舍 统一资讯源 演出记忆",
+        force = true,
+        maintenance = true,
+        date = LocalDate(2026, 10, 17),
         groups = [
             AppUpdateRecordGroup(
                 type = "特性",
@@ -20,8 +20,11 @@ internal object AppAbout {
                 color = Colors.Steel5,
                 background = Colors.Steel2,
                 records = [
-                    "1. Rhyme音游正式不删档公测，持续更新",
-                    "2. 各音乐平台支持下载和搜索歌曲导入MOD",
+                    "1. 统一资讯源支持（微博、超话、B站、小红书、抖音）",
+                    "2. 银临的剪刀手电台支持（本地缓存电台节目离线播放）",
+                    "3. 演出记忆板块支持（聆听每一场演出的回忆）",
+                    "4. iOS端，Linux端和macos端支持音频视频播放",
+                    "5. 安卓端支持Android17"
                 ]
             ),
             AppUpdateRecordGroup(
@@ -30,11 +33,11 @@ internal object AppAbout {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = [
-                    "1. 汽水音乐/咪咕音乐平台导入支持",
-                    "2. 音乐界面UI美化更新",
-                    "3. 默认歌单支持",
-                    "4. 工坊MOD搜索筛选支持",
-                    "5. LRC编辑器支持导入和导出歌词",
+                    "1. 重构所有客户端的UI界面",
+                    "2. 去除几乎所有曲库歌单更新时要求停止播放器的限制",
+                    "3. 九宫格图片超出九张时显示更多数量",
+                    "4. 桌面端支持批量下载资讯源图片",
+                    "5. 减少安卓端安装包大小，稍增桌面端大小，提升运行性能",
                 ]
             ),
             AppUpdateRecordGroup(
@@ -43,9 +46,10 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = [
-                    "1. 修复菜单宽度太窄的问题",
-                    "2. 修复MOD导入不更新曲库的问题",
-                    "3. 修复安卓端旋转屏幕崩溃的问题",
+                    "1. 修复平台下载MOD歌手名称错误的问题",
+                    "2. 修复裁剪框点击外部消失的问题",
+                    "3. 修复MOD导入后当前播放列表数据异常崩溃的问题",
+                    "4. 修复歌单移动歌曲索引异常的问题"
                 ]
             )
         ]
