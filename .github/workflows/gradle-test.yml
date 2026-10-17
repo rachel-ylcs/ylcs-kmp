@@ -32,6 +32,8 @@ jobs:
   test:
     name: Gradle
     runs-on: ${{ inputs.runner }}
+    env:
+      PYTHONUTF8: '1'
     defaults:
       run:
         shell: ${{ startsWith(inputs.runner, 'windows-') && 'pwsh' || 'bash' }}
@@ -44,21 +46,55 @@ jobs:
           msvc: ${{ inputs.msvc }}
           gtk: ${{ inputs.gtk }}
 
-      - name: Test
-        if: ${{ !inputs.web }}
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Test (Windows)
+        id: windows-tests
+        if: ${{ !inputs.web && runner.os == 'Windows' }}
+        shell: pwsh
         env:
           GRADLE_TASK: ylcs-module:build-tool:${{ inputs.task }}
-        run: ./gradlew "${{ runner.os == 'Windows' && '$env:GRADLE_TASK' || '$GRADLE_TASK' }}" --continue --stacktrace
+          TEST_LOG: build/test-report/gradle-${{ inputs.task }}.log
+        run: |
+          New-Item -ItemType Directory -Force build/test-report | Out-Null
+          ./gradlew "$env:GRADLE_TASK" --continue --console=plain --stacktrace 2>&1 | Tee-Object -FilePath $env:TEST_LOG
+          exit $LASTEXITCODE
+
+      - name: Test
+        id: unix-tests
+        if: ${{ !inputs.web && runner.os != 'Windows' }}
+        shell: bash
+        env:
+          GRADLE_TASK: ylcs-module:build-tool:${{ inputs.task }}
+          TEST_LOG: build/test-report/gradle-${{ inputs.task }}.log
+        run: |
+          mkdir -p build/test-report
+          set -o pipefail
+          ./gradlew "$GRADLE_TASK" --continue --console=plain --stacktrace 2>&1 | tee "$TEST_LOG"
 
       - name: Test in Chrome
+        id: browser-tests
         if: ${{ inputs.web }}
         shell: bash
         env:
           GRADLE_TASK: ylcs-module:build-tool:${{ inputs.task }}
+          TEST_LOG: build/test-report/gradle-${{ inputs.task }}.log
         # Some modules use headed Chrome; Xvfb also supports those tests in CI.
         run: |
+          mkdir -p build/test-report
+          set -o pipefail
           export CHROME_BIN="$(command -v google-chrome)"
-          xvfb-run --auto-servernum ./gradlew "$GRADLE_TASK" --continue --stacktrace
+          xvfb-run --auto-servernum ./gradlew "$GRADLE_TASK" --continue --console=plain --stacktrace 2>&1 | tee "$TEST_LOG"
+
+      - name: Summarize Tests
+        if: ${{ always() }}
+        env:
+          TEST_PLATFORM: ${{ inputs.task }}
+          TEST_OUTCOME: ${{ inputs.web && steps.browser-tests.outcome || (runner.os == 'Windows' && steps.windows-tests.outcome || steps.unix-tests.outcome) }}
+        run: python .github/scripts/test_report.py collect
 
       - name: Upload Test Reports
         if: ${{ always() }}
@@ -66,6 +102,7 @@ jobs:
         with:
           name: tests-${{ inputs.task }}-${{ inputs.runner }}
           path: |
-            ylcs-module/**/build/reports/tests/**
-            ylcs-module/**/build/test-results/**
-          if-no-files-found: ignore
+            build/test-report/results-*.json
+            build/test-report/gradle-*.log
+            ylcs-module/**/build/test-results/**/TEST-*.xml
+          if-no-files-found: warn

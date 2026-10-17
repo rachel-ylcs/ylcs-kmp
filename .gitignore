@@ -9,6 +9,7 @@
 .DS_Store
 *.log
 kotlin-js-store/
+__pycache__
 
 # 工作目录
 work/

@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+  <title>Rachel · 单元测试报告</title>
+  <style>
+    :root { color-scheme: light; --ink:#172c32; --muted:#66777b; --paper:#f3f5f2; --line:#dce4df; --white:#fff; --green:#246653; --mint:#dcedd9; --red:#b13343; --red-bg:#fbecef; --amber:#895e17; --radius:14px; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:14px/1.6 "Segoe UI","Microsoft YaHei",sans-serif; }
+    button,input,select { font:inherit; }
+    button,a,input,select,summary { -webkit-tap-highlight-color:transparent; }
+    button,a { touch-action:manipulation; }
+    button { cursor:pointer; }
+    :focus-visible { outline:3px solid #579385; outline-offset:3px; }
+    a { color:var(--green); text-underline-offset:3px; }
+    button { color:inherit; }
+    .topbar { background:var(--ink); color:#edf5ed; padding:19px max(28px,calc((100vw - 1376px)/2)); display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:13px; font-size:18px; letter-spacing:.02em; }
+    .brand-mark { width:34px; height:34px; border-radius:10px; background:var(--mint); color:var(--ink); display:grid; place-items:center; font-size:23px; font-weight:700; }
+    .topbar small { display:block; font:10px/1.5 ui-monospace,Consolas,monospace; letter-spacing:.15em; color:#b8cbc4; }
+    .topbar a { color:var(--mint); font-size:12px; }
+    main { max-width:1432px; margin:auto; padding:35px 28px 50px; }
+    .eyebrow { color:var(--green); font-size:11px; font-weight:700; letter-spacing:.14em; }
+    h1 { font-size:32px; line-height:1.25; margin:8px 0 12px; letter-spacing:-.025em; }
+    h2 { font-size:18px; margin:0; letter-spacing:-.02em; }
+    p { margin:8px 0; }
+    .hero { display:flex; justify-content:space-between; align-items:center; gap:24px; margin-bottom:26px; }
+    .subtle { color:var(--muted); }
+    .metadata { display:flex; gap:10px 20px; flex-wrap:wrap; font-size:12px; color:var(--muted); }
+    .mono { font-family:ui-monospace,Consolas,monospace; }
+    .badge { display:inline-flex; align-items:center; gap:7px; border-radius:20px; padding:4px 10px; font-size:11px; font-weight:600; white-space:nowrap; background:#e9eee9; color:var(--muted); }
+    .badge::before { content:""; width:6px; height:6px; background:currentColor; border-radius:50%; flex-shrink:0; }
+    .badge.passed { color:var(--green); background:#e6f1e8; }
+    .badge.failed,.badge.error,.badge.missing { color:var(--red); background:var(--red-bg); }
+    .badge.empty,.badge.cancelled { color:var(--amber); background:#fff0d8; }
+    .hero-badge { padding:9px 15px; font-size:13px; }
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:32px; }
+    .stat { border:1px solid var(--line); border-radius:var(--radius); background:var(--white); padding:19px 22px; }
+    .stat:first-child { background:var(--ink); color:#f6faf5; border-color:var(--ink); }
+    .stat-label { font-size:12px; color:var(--muted); }
+    .stat:first-child .stat-label { color:#bbcdc5; }
+    .stat-value { font-size:34px; font-weight:650; line-height:1.4; font-variant-numeric:tabular-nums; letter-spacing:-.04em; }
+    .stat small { font-size:11px; color:var(--muted); }
+    .stat:first-child small { color:#bbcdc5; }
+    .section-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:28px 0 13px; }
+    .section-head p { margin:3px 0 0; font-size:12px; color:var(--muted); }
+    .text-button { background:none; border:0; color:var(--green); font-size:12px; text-decoration:underline; text-underline-offset:4px; padding:6px; }
+    .platforms { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .platform { border:1px solid var(--line); background:var(--white); border-radius:var(--radius); padding:16px 18px; text-align:left; transition:border-color .15s,box-shadow .15s; }
+    .platform:hover { border-color:#8aab98; }
+    .platform[aria-pressed="true"] { border-color:var(--green); box-shadow:0 0 0 2px #24665325; background:#f7fbf6; }
+    .platform-title { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; font-weight:600; margin-bottom:15px; }
+    .platform-total { font-size:26px; font-weight:650; line-height:1.1; font-variant-numeric:tabular-nums; }
+    .platform-total small { font-size:11px; font-weight:400; color:var(--muted); margin-left:7px; }
+    .progress { height:4px; border-radius:10px; background:#edf0ed; display:flex; overflow:hidden; margin:14px 0 8px; }
+    .progress span { height:100%; }
+    .platform-foot { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+    .fail-text { color:var(--red); }
+    .panel { border:1px solid var(--line); border-radius:var(--radius); background:var(--white); overflow:hidden; }
+    .table-wrap { max-height:370px; overflow:auto; }
+    table { width:100%; border-collapse:collapse; text-align:left; }
+    th { color:var(--muted); font-size:11px; font-weight:500; background:#f8faf7; position:sticky; top:0; z-index:1; }
+    th,td { padding:11px 18px; border-bottom:1px solid #e9eee9; }
+    tbody tr:last-child td { border-bottom:0; }
+    td { font-size:12px; }
+    td.number,th.number { text-align:right; font-variant-numeric:tabular-nums; }
+    .module-link { background:none; border:0; padding:0; font-size:12px; color:var(--green); text-align:left; }
+    .module-link:hover { text-decoration:underline; }
+    .filters { display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:15px; border-bottom:1px solid var(--line); }
+    input,select { height:37px; border:1px solid var(--line); border-radius:8px; background:white; color:var(--ink); padding:0 11px; min-width:0; }
+    input { flex:1; min-width:220px; }
+    select { max-width:300px; }
+    .results-caption { font-size:12px; color:var(--muted); white-space:nowrap; }
+    .case-row { display:grid; grid-template-columns:85px minmax(0,1fr) 150px 85px 90px; align-items:center; gap:12px; padding:15px 18px; border-bottom:1px solid #e9eee9; }
+    .case-row:last-child { border-bottom:0; }
+    .case-row:hover { background:#fafcf8; }
+    .case-name { display:block; font-size:13px; font-weight:600; color:var(--ink); padding:0; border:0; background:none; text-align:left; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .case-name:hover { color:var(--green); }
+    .case-sub { color:var(--muted); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .case-location { font-size:11px; text-align:right; }
+    .case-time { color:var(--muted); font-size:11px; text-align:right; }
+    .empty { padding:45px 20px; text-align:center; color:var(--muted); }
+    .pagination { display:flex; align-items:center; justify-content:space-between; padding:13px 18px; font-size:12px; color:var(--muted); border-top:1px solid var(--line); }
+    .pagination button,.action-button { border:1px solid var(--line); background:white; padding:5px 12px; border-radius:7px; margin-left:7px; }
+    button:disabled { cursor:default; opacity:.4; }
+    details.log { padding:15px 18px; border-bottom:1px solid var(--line); }
+    details.log:last-child { border-bottom:0; }
+    summary { cursor:pointer; }
+    details.log summary { font-size:12px; }
+    pre { padding:18px; border:1px solid #32464b; background:#172c32; color:#e2eee7; border-radius:10px; font:12px/1.8 ui-monospace,Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; max-height:55vh; overflow:auto; tab-size:4; }
+    .notice { padding:15px 18px; border-left:3px solid var(--amber); background:#fff7e9; margin-top:18px; font-size:12px; overflow-wrap:anywhere; }
+    dialog { border:0; border-radius:18px; padding:0; width:min(1000px,calc(100vw - 32px)); max-height:90vh; box-shadow:0 30px 100px #172c3240; color:var(--ink); }
+    dialog::backdrop { background:#142a3266; backdrop-filter:blur(3px); }
+    .dialog-head { position:sticky; top:0; display:flex; justify-content:space-between; align-items:center; background:white; border-bottom:1px solid var(--line); padding:16px 24px; z-index:2; }
+    .dialog-body { padding:23px 24px; overflow-wrap:anywhere; }
+    .dialog-body h2 { margin:7px 0; }
+    .dialog-body h3 { font-size:13px; margin-top:25px; }
+    .source-row { margin:8px 0; font-size:12px; }
+    .source-kind { display:inline-block; margin-right:10px; font-size:10px; color:var(--muted); }
+    footer { display:flex; gap:20px; justify-content:space-between; margin-top:27px; font-size:11px; color:var(--muted); }
+    @media(max-width:1050px) { .platforms { grid-template-columns:repeat(2,minmax(0,1fr)); } .case-row { grid-template-columns:75px minmax(0,1fr) 100px 80px; } .case-time { display:none; } }
+    @media(max-width:650px) { main { padding:25px 16px; } .topbar { padding:15px 16px; } .hero { align-items:flex-start; } h1 { font-size:27px; } .hero-badge { padding:6px 10px; font-size:11px; } .stats { grid-template-columns:repeat(2,1fr); gap:10px; } .stat { padding:14px 17px; } .stat-value { font-size:29px; } .platforms { grid-template-columns:1fr; } .platform-title { margin-bottom:10px; } th,td { padding:10px 12px; } .filters { gap:8px; } .filters input { flex-basis:100%; } select { flex:1; max-width:100%; } .case-row { grid-template-columns:65px minmax(0,1fr); padding:13px; } .case-location,.case-platform { display:none; } .section-head { align-items:flex-start; } footer { flex-direction:column; gap:3px; } .metadata { gap:6px 12px; } .dialog-body,.dialog-head { padding:16px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">R</span><div>Rachel<small>QUALITY / UNIT TESTS</small></div></div>
+    <a id="run-link" target="_blank" rel="noopener noreferrer">查看 GitHub Actions ↗</a>
+  </header>
+  <main>
+    <div class="hero"><div><div class="eyebrow">YLCS MODULE / TEST REPORT</div><h1>单元测试报告</h1><div class="metadata" id="metadata"></div></div><span id="overall" class="badge hero-badge"></span></div>
+    <section class="stats" id="stats" aria-label="测试总览"></section>
+    <div class="section-head"><div><h2>平台概览</h2><p>选择平台，查看对应的模块和测试用例。</p></div><button class="text-button" id="reset">查看全部平台</button></div>
+    <section id="platforms" class="platforms" aria-label="筛选平台"></section>
+    <div class="section-head"><div><h2>模块统计</h2><p>优先显示有失败的模块；点击模块名称筛选用例。</p></div><span id="module-count" class="results-caption"></span></div>
+    <section class="panel table-wrap" aria-label="各模块测试统计"><table><thead><tr><th>模块 / 平台</th><th class="number">总数</th><th class="number">通过</th><th class="number">失败</th><th class="number">跳过</th></tr></thead><tbody id="modules"></tbody></table></section>
+    <div class="section-head" id="cases-heading"><div><h2>测试用例</h2><p>点击用例查看完整异常、源码位置和输出。</p></div><span id="case-count" class="results-caption" aria-live="polite"></span></div>
+    <section class="panel" aria-label="测试用例列表">
+      <div class="filters"><input id="search" type="search" aria-label="搜索测试用例" placeholder="搜索模块、用例或异常内容…"><select id="status" aria-label="筛选测试状态"><option value="failed">仅失败</option><option value="all">全部用例</option><option value="passed">仅通过</option><option value="skipped">仅跳过</option></select><select id="module-filter" aria-label="筛选模块"><option value="all">全部模块</option></select></div>
+      <div id="cases"></div>
+      <div class="pagination"><span id="page-label"></span><div><button id="previous" aria-label="上一页">上一页</button><button id="next" aria-label="下一页">下一页</button></div></div>
+    </section>
+    <div id="notices"></div>
+    <div class="section-head"><div><h2>Gradle 执行日志</h2><p>包含编译、环境错误及完整任务日志；按平台展开。</p></div></div>
+    <section class="panel" id="logs" aria-label="各平台 Gradle 日志"></section>
+    <footer><span>按平台执行次数统计 · commonTest 在各平台重复执行 · 缺少报告不代表测试通过</span><span>Standalone report / 无外部资源</span></footer>
+  </main>
+  <dialog id="case-dialog" aria-labelledby="detail-title"><div class="dialog-head"><strong>测试详情</strong><div><button class="action-button" id="copy">复制异常</button><button class="action-button" id="close" autofocus>关闭 ✕</button></div></div><div class="dialog-body" id="detail"></div></dialog>
+  <script id="report-data" type="application/json">__REPORT_DATA__</script>
+  <script>
+    "use strict";
+    const report = JSON.parse(document.getElementById("report-data").textContent);
+    const labels = {passed:"通过",failed:"测试失败",error:"执行或报告失败",empty:"无测试结果",skipped:"未触发",cancelled:"已取消",missing:"缺少报告"};
+    const byId = id => document.getElementById(id);
+    const node = (tag, text, className) => { const item=document.createElement(tag); if(text!==undefined)item.textContent=String(text); if(className)item.className=className; return item; };
+    const link = (text, url) => { const item=node("a",text); if(/^https?:\/\//i.test(url||"")){item.href=url;item.target="_blank";item.rel="noopener noreferrer";} return item; };
+    const badge = (status, text) => node("span",text||labels[status],"badge "+status);
+    const count = number => number.toLocaleString("zh-CN");
+    const allCases = report.platforms.flatMap(platform => platform.cases.map(test => ({...test,platform:platform.platform,platformLabel:platform.label})));
+    const state = {platform:"all",module:"all",query:"",status:report.totals.failed?"failed":"all",page:0};
+    const pageSize=100;
+    const meta=report.meta;
+    byId("run-link").href=/^https?:\/\//.test(meta.run_url)?meta.run_url:"#";
+    if(!meta.run_url)byId("run-link").hidden=true;
+    for(const value of [meta.repository,meta.branch,meta.sha?"commit "+meta.sha.slice(0,8):"",meta.created?new Date(meta.created).toLocaleString("zh-CN",{timeZone:"Asia/Shanghai",hour12:false})+" UTC+8":""]){if(value)byId("metadata").append(node("span",value));}
+    const incomplete=report.diagnostics.length||report.platforms.some(p=>["missing","error","empty","cancelled"].includes(p.status));
+    const overall=report.totals.failed?"failed":incomplete?"error":report.totals.total?"passed":"skipped";
+    byId("overall").classList.add(overall);
+    byId("overall").textContent=report.totals.failed?"存在失败用例":incomplete?"结果不完整":report.totals.total?"测试全部通过":"本次未执行测试";
+    for(const [key,title,note] of [["total","测试执行次数","覆盖 "+report.platforms.filter(p=>p.reports).length+" 个平台"],["passed","通过",report.totals.total?"通过率 "+(100*report.totals.passed/report.totals.total).toFixed(1)+"%":"暂无测试结果"],["failed","失败","点击下方用例查看完整异常"],["skipped","跳过","用例跳过与平台未触发分别统计"]]){const card=node("div",undefined,"stat");card.append(node("div",title,"stat-label"),node("div",count(report.totals[key]),"stat-value"+(key==="failed"&&report.totals.failed?" fail-text":"")),node("small",note));byId("stats").append(card);}
+
+    function renderPlatforms(){
+      byId("platforms").replaceChildren();
+      for(const p of report.platforms){
+        const card=node("button",undefined,"platform");card.type="button";card.setAttribute("aria-pressed",String(state.platform===p.platform));
+        const title=node("div",undefined,"platform-title");title.append(node("span",p.label),badge(p.status));
+        const total=node("div",count(p.totals.total),"platform-total");total.append(node("small","次执行"));
+        const progress=node("div",undefined,"progress");progress.setAttribute("aria-hidden","true");
+        for(const [key,color]of[["passed","var(--green)"],["failed","var(--red)"],["skipped","#c6a45d"]]){const part=node("span");part.style.width=(100*p.totals[key]/(p.totals.total||1))+"%";part.style.background=color;progress.append(part);}
+        const foot=node("div",undefined,"platform-foot");foot.append(node("span",count(p.totals.passed)+" 通过"),node("span",count(p.totals.failed)+" 失败",p.totals.failed?"fail-text":""));
+        card.append(title,total,progress,foot);card.addEventListener("click",()=>{state.platform=state.platform===p.platform?"all":p.platform;state.module="all";state.page=0;render();});byId("platforms").append(card);
+      }
+    }
+    function renderModules(){
+      const groups=new Map();
+      for(const c of allCases){if(state.platform!=="all"&&c.platform!==state.platform)continue;const key=c.platform+"|"+c.module;if(!groups.has(key))groups.set(key,{module:c.module,platform:c.platform,label:c.platformLabel,total:0,passed:0,failed:0,skipped:0});const group=groups.get(key);group.total++;group[c.status]++;}
+      const rows=[...groups.values()].sort((a,b)=>b.failed-a.failed||a.module.localeCompare(b.module)||a.label.localeCompare(b.label));
+      byId("modules").replaceChildren();byId("module-count").textContent=count(rows.length)+" 组模块结果";
+      for(const group of rows){const row=node("tr");const cell=node("td");const button=node("button",group.module.replace(/^ylcs-module\//,""),"module-link mono");button.addEventListener("click",()=>{state.platform=group.platform;state.module=group.module;state.page=0;render();byId("cases-heading").scrollIntoView({behavior:"smooth",block:"start"});});cell.append(button,node("div",group.label,"case-sub"));row.append(cell);for(const key of["total","passed","failed","skipped"])row.append(node("td",count(group[key]),"number"+(key==="failed"&&group.failed?" fail-text":"")));byId("modules").append(row);}
+      if(!rows.length){const row=node("tr");const cell=node("td","该平台没有已生成的测试用例报告，请查看执行状态和日志。","empty");cell.colSpan=5;row.append(cell);byId("modules").append(row);}
+      const names=[...new Set(rows.map(row=>row.module))].sort();byId("module-filter").replaceChildren(new Option("全部模块","all"),...names.map(name=>new Option(name.replace(/^ylcs-module\//,""),name)));byId("module-filter").value=state.module;
+    }
+    function renderCases(){
+      const query=state.query.toLowerCase();const cases=allCases.filter(c=>(state.platform==="all"||c.platform===state.platform)&&(state.module==="all"||c.module===state.module)&&(state.status==="all"||c.status===state.status)&&(!query||[c.name,c.class,c.module,c.message,c.stack].join(" ").toLowerCase().includes(query)));
+      const pages=Math.max(1,Math.ceil(cases.length/pageSize));state.page=Math.min(state.page,pages-1);byId("case-count").textContent=count(cases.length)+" 个用例";byId("cases").replaceChildren();
+      for(const c of cases.slice(state.page*pageSize,(state.page+1)*pageSize)){
+        const row=node("div",undefined,"case-row");row.append(badge(c.status,c.status==="failed"?"失败":c.status==="skipped"?"跳过":"通过"));const name=node("div");const button=node("button",c.name,"case-name");button.title=c.name;button.addEventListener("click",()=>openCase(c));name.append(button,node("div",c.module.replace(/^ylcs-module\//,"")+" / "+c.class,"case-sub"));row.append(name,node("span",c.platformLabel,"case-sub case-platform"),node("span",c.seconds.toFixed(3)+" s","case-time"));
+        const source=node("div",undefined,"case-location");if(c.locations.length){const loc=c.locations[0];source.append(link(loc.file.split("/").pop()+":"+loc.line,loc.url));source.title=loc.kind==="entry"?"测试入口，非异常行":"异常位置";}else{source.textContent=c.status==="failed"?"查看异常 ↗":"—";if(c.status==="failed")source.addEventListener("click",()=>openCase(c));}row.append(source);byId("cases").append(row);
+      }
+      if(!cases.length)byId("cases").append(node("div","当前筛选条件下没有测试用例。","empty"));byId("page-label").textContent="第 "+(state.page+1)+" / "+pages+" 页 · 每页 "+pageSize+" 项";byId("previous").disabled=state.page===0;byId("next").disabled=state.page>=pages-1;
+    }
+    let copyText="";
+    function openCase(c){
+      const body=byId("detail");body.replaceChildren(badge(c.status,c.status==="failed"?"失败":c.status==="skipped"?"跳过":"通过"),node("div",c.platformLabel+" · "+c.module,"case-sub"));const heading=node("h2",c.name);heading.id="detail-title";body.append(heading,node("p",c.class,"mono subtle"));
+      if(c.locations.length){body.append(node("h3","源码位置"));for(const loc of c.locations){const row=node("div",undefined,"source-row");row.append(node("span",loc.kind==="entry"?"测试入口 · 非异常行":"异常位置","source-kind"),link(loc.file+":"+loc.line,loc.url));body.append(row);}}
+      else if(c.status==="failed")body.append(node("p","报告未提供可用的 Kotlin/Java 源码位置。下方保留原始平台异常栈。","subtle"));
+      if(c.message){body.append(node("h3","异常信息"),node("p",c.message));}if(c.stack){body.append(node("h3","完整异常栈"),node("pre",c.stack));}if(c.output){body.append(node("h3","测试输出"),node("pre",c.output));}if(c.status==="passed")body.append(node("p","该测试通过，执行耗时 "+c.seconds.toFixed(3)+" 秒。","subtle"));
+      copyText=c.class+"."+c.name+"\n"+(c.stack||c.message||"测试通过");byId("copy").textContent="复制异常";byId("case-dialog").showModal();
+    }
+    function render(){renderPlatforms();renderModules();renderCases();}
+    byId("status").value=state.status;byId("status").addEventListener("change",event=>{state.status=event.target.value;state.page=0;renderCases();});byId("module-filter").addEventListener("change",event=>{state.module=event.target.value;state.page=0;renderCases();});byId("search").addEventListener("input",event=>{state.query=event.target.value;state.page=0;renderCases();});byId("reset").addEventListener("click",()=>{state.platform="all";state.module="all";state.page=0;render();});byId("previous").addEventListener("click",()=>{state.page--;renderCases();});byId("next").addEventListener("click",()=>{state.page++;renderCases();});byId("close").addEventListener("click",()=>byId("case-dialog").close());
+    byId("copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(copyText);byId("copy").textContent="已复制";}catch{byId("copy").textContent="请选中异常文本复制";}});
+    const notices=[...report.diagnostics,...report.platforms.flatMap(p=>p.diagnostics.map(d=>p.label+" · "+d))];for(const text of notices)byId("notices").append(node("div",text,"notice"));
+    for(const p of report.platforms){const item=node("details",undefined,"log");item.append(node("summary",p.label+" · "+labels[p.status]),node("pre",p.log||"未收集到 Gradle 日志。请打开对应的 GitHub Actions Job 查看环境准备与执行情况。"));byId("logs").append(item);}
+    render();
+  </script>
+</body>
+</html>

@@ -50,6 +50,7 @@ jobs:
             common: &common
               - '.github/actions/**'
               - '.github/workflows/**'
+              - '.github/scripts/**'
               - '.gitmodules'
               - 'gradle/**'
               - 'buildSrc/**'
@@ -181,3 +182,52 @@ jobs:
     with:
       runner: macos-26
       task: macosTest
+
+  test-report:
+    name: Test Summary
+    needs: [changes, test-android, test-ios, test-desktop, test-js, test-wasmJs, test-windows, test-linux, test-macos]
+    if: ${{ always() && needs.changes.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: $/.github/actions/checkout
+
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Verify Report Generator
+        run: python -B -m unittest discover -s .github/scripts/tests -v
+
+      - name: Download Test Results
+        id: results
+        if: ${{ always() }}
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: tests-*
+          path: build/test-input
+          merge-multiple: true
+
+      - name: Generate Test Summary
+        if: ${{ always() }}
+        env:
+          TEST_JOB_RESULTS: ${{ toJSON(needs) }}
+          TEST_DOWNLOAD_OUTCOME: ${{ steps.results.outcome }}
+        run: python .github/scripts/test_report.py merge --input build/test-input
+
+      - name: Upload Combined Test Report
+        id: combined-report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-report
+          path: build/test-report/index.html
+          if-no-files-found: error
+
+      - name: Link Combined Test Report
+        if: ${{ always() && steps.combined-report.outcome == 'success' }}
+        env:
+          REPORT_URL: ${{ steps.combined-report.outputs.artifact-url }}
+        run: printf '\n[下载完整单文件 HTML 测试报告](%s)\n' "$REPORT_URL" >> "$GITHUB_STEP_SUMMARY"
