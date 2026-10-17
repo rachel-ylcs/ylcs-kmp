@@ -52,7 +52,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
             screen(::ScreenLyricsSettings)
             screen(::ScreenModCenter)
             screen(::ScreenMusic)
-            screen(::ScreenMusicDetails)
+            screen(::ScreenMusicDetails, key = "ScreenMusicDetails")
             screen(::ScreenMusicLibrary)
             screen(::ScreenPlatformMusic)
             screen(::ScreenPlaylistLibrary)
@@ -72,6 +72,7 @@ abstract class RachelApplication(context: PlatformContext) : AbstractRachelAppli
 
             // world
             screen(::ScreenWorld)
+            screen(::ScreenConcert)
 
             // game
             screen(::ScreenGame)
