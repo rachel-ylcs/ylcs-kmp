@@ -1,0 +1,183 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - '*'
+    paths-ignore:
+      - '**.md'
+      - 'ylcs-docs/**'
+      - 'design/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'ylcs-docs/**'
+      - 'design/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changes:
+    name: Detect Test Changes
+    runs-on: ubuntu-latest
+    outputs:
+      android: ${{ steps.filter.outputs.android }}
+      ios: ${{ steps.filter.outputs.ios }}
+      desktop: ${{ steps.filter.outputs.desktop }}
+      js: ${{ steps.filter.outputs.js }}
+      wasmJs: ${{ steps.filter.outputs.wasmJs }}
+      windows: ${{ steps.filter.outputs.windows }}
+      linux: ${{ steps.filter.outputs.linux }}
+      macos: ${{ steps.filter.outputs.macos }}
+    steps:
+      - name: Checkout Code
+        uses: $/.github/actions/checkout
+        with:
+          fetch-depth: 0
+
+      - name: Detect File Changes
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            common: &common
+              - '.github/actions/**'
+              - '.github/workflows/**'
+              - '.gitmodules'
+              - 'gradle/**'
+              - 'buildSrc/**'
+              - 'gradlew'
+              - 'gradlew.bat'
+              - 'gradle.properties'
+              - 'settings.gradle.kts'
+              - 'build.gradle.kts'
+              - 'libs.versions.toml'
+              - 'ylcs-module/**/build.gradle.kts'
+              - 'ylcs-module/**/config/**'
+              - 'ylcs-module/**/src/{commonMain,commonTest,clientMain,clientTest}/**'
+            jvm: &jvm
+              - *common
+              - 'ylcs-module/**/src/{jvmMain,jvmTest}/**'
+            native: &native
+              - *common
+              - 'ylcs-module/**/src/{nativeMain,nativeTest,nativeInterop}/**'
+            apple: &apple
+              - *native
+              - 'ylcs-module/**/src/{appleMain,appleTest,posixMain,posixTest}/**'
+            skiko: &skiko
+              - 'ylcs-module/**/src/{skikoMain,skikoTest}/**'
+            web: &web
+              - *common
+              - *skiko
+              - 'ylcs-module/**/src/{webMain,webTest}/**'
+            android:
+              - *jvm
+              - 'ylcs-module/**/src/{androidMain,androidHostTest,androidUnitTest,androidTest}/**'
+            ios:
+              - *apple
+              - *skiko
+              - 'ylcs-module/**/src/{iosMain,iosTest,iosArm64Main,iosArm64Test,iosSimulatorArm64Main,iosSimulatorArm64Test}/**'
+            desktop:
+              - *jvm
+              - *skiko
+              - 'ylcs-module/**/src/{desktopMain,desktopTest,main,test}/**'
+            js:
+              - *web
+              - 'ylcs-module/**/src/{jsMain,jsTest}/**'
+            wasmJs:
+              - *web
+              - 'ylcs-module/**/src/{wasmJsMain,wasmJsTest}/**'
+            windows:
+              - *native
+              - 'ylcs-module/**/src/{windowsMain,windowsTest}/**'
+            linux:
+              - *native
+              - 'ylcs-module/**/src/{linuxMain,linuxTest,posixMain,posixTest}/**'
+            macos:
+              - *apple
+              - 'ylcs-module/**/src/{macosMain,macosTest}/**'
+
+  test-android:
+    name: Test Android
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.android == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: ubuntu-latest
+      task: androidTest
+      android: true
+
+  test-ios:
+    name: Test iOS
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.ios == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: macos-26
+      task: iosTest
+
+  test-desktop:
+    name: Test Desktop
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.desktop == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: windows-latest
+      task: desktopTest
+      msvc: true
+
+  test-js:
+    name: Test Web JS
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.js == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: ubuntu-latest
+      task: jsTest
+      web: true
+
+  test-wasmJs:
+    name: Test Web Wasm
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.wasmJs == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: ubuntu-latest
+      task: wasmJsTest
+      web: true
+
+  test-windows:
+    name: Test Windows Native
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.windows == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: windows-latest
+      task: windowsTest
+      msvc: true
+
+  test-linux:
+    name: Test Linux Native
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.linux == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: ubuntu-latest
+      task: linuxTest
+      gtk: true
+
+  test-macos:
+    name: Test macOS Native
+    needs: changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.macos == 'true' }}
+    uses: $/.github/workflows/gradle-test.yml
+    with:
+      runner: macos-26
+      task: macosTest

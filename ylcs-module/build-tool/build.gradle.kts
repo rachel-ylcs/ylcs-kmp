@@ -1,4 +1,58 @@
 afterEvaluate {
+    val modules = project(":ylcs-module").subprojects.filter { it != project }
+
+    tasks.register("androidTest") {
+        group = "verification"
+        description = "运行所有库模块的Android单元测试"
+        dependsOn(modules.map { module -> module.tasks.matching { it.name == "testAndroidHostTest" } })
+    }
+
+    tasks.register("iosTest") {
+        group = "verification"
+        description = "运行所有库模块的iOS ARM64模拟器单元测试"
+        dependsOn(modules.map { module -> module.tasks.matching { it.name == "iosSimulatorArm64Test" } })
+    }
+
+    tasks.register("desktopTest") {
+        group = "verification"
+        description = "运行所有库模块的Desktop及JVM单元测试"
+        dependsOn(modules.map { module ->
+            module.tasks.matching {
+                it.name == "desktopTest" || (it.name == "test" && module.plugins.hasPlugin("org.jetbrains.kotlin.jvm"))
+            }
+        })
+    }
+
+    tasks.register("jsTest") {
+        group = "verification"
+        description = "运行所有库模块的Web JS单元测试"
+        dependsOn(modules.map { module -> module.tasks.matching { it.name == "jsTest" } })
+    }
+
+    tasks.register("wasmJsTest") {
+        group = "verification"
+        description = "运行所有库模块的Web Wasm单元测试"
+        dependsOn(modules.map { module -> module.tasks.matching { it.name == "wasmJsTest" } })
+    }
+
+    tasks.register("windowsTest") {
+        group = "verification"
+        description = "运行所有库模块的Windows Native单元测试"
+        dependsOn(modules.map { module -> module.tasks.matching { it.name == "windowsTest" } })
+    }
+
+    tasks.register("linuxTest") {
+        group = "verification"
+        description = "运行所有库模块的Linux Native单元测试"
+        dependsOn(modules.map { module -> module.tasks.matching { it.name == "linuxTest" } })
+    }
+
+    tasks.register("macosTest") {
+        group = "verification"
+        description = "运行所有库模块的macOS Native单元测试"
+        dependsOn(modules.map { module -> module.tasks.matching { it.name == "macosTest" } })
+    }
+
 //    tasks.register<BuildDesktopNativeTask>("buildDesktopNativeTemplate") {
 //        description = "编译Native库模板"
 //        val targetProject = findProject(projects.ylcsModule.plugin.pagKmp)!! // 模块

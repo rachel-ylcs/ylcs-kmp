@@ -1,0 +1,71 @@
+name: Gradle Test
+
+on:
+  workflow_call:
+    inputs:
+      runner:
+        description: Runner used to execute the Gradle task.
+        type: string
+        default: ubuntu-latest
+      task:
+        description: An aggregate test task in ylcs-module:build-tool.
+        type: string
+        required: true
+      android:
+        description: Install Android SDK packages.
+        type: boolean
+        default: false
+      msvc:
+        description: Configure the MSVC toolchain on Windows.
+        type: boolean
+        default: false
+      gtk:
+        description: Install GTK development dependencies on Linux.
+        type: boolean
+        default: false
+      web:
+        description: Run browser tests with a virtual display on Linux.
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    name: Gradle
+    runs-on: ${{ inputs.runner }}
+    defaults:
+      run:
+        shell: ${{ startsWith(inputs.runner, 'windows-') && 'pwsh' || 'bash' }}
+    steps:
+      - name: Setup Build Environment
+        uses: $/.github/actions/setup-build
+        with:
+          submodules: recursive
+          android: ${{ inputs.android }}
+          msvc: ${{ inputs.msvc }}
+          gtk: ${{ inputs.gtk }}
+
+      - name: Test
+        if: ${{ !inputs.web }}
+        env:
+          GRADLE_TASK: ylcs-module:build-tool:${{ inputs.task }}
+        run: ./gradlew "${{ runner.os == 'Windows' && '$env:GRADLE_TASK' || '$GRADLE_TASK' }}" --continue --stacktrace
+
+      - name: Test in Chrome
+        if: ${{ inputs.web }}
+        shell: bash
+        env:
+          GRADLE_TASK: ylcs-module:build-tool:${{ inputs.task }}
+        # Some modules use headed Chrome; Xvfb also supports those tests in CI.
+        run: |
+          export CHROME_BIN="$(command -v google-chrome)"
+          xvfb-run --auto-servernum ./gradlew "$GRADLE_TASK" --continue --stacktrace
+
+      - name: Upload Test Reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: tests-${{ inputs.task }}-${{ inputs.runner }}
+          path: |
+            ylcs-module/**/build/reports/tests/**
+            ylcs-module/**/build/test-results/**
+          if-no-files-found: ignore
