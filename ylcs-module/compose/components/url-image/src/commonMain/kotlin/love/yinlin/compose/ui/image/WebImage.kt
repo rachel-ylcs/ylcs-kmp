@@ -1,5 +1,6 @@
 package love.yinlin.compose.ui.image
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -39,6 +40,7 @@ import com.github.panpf.sketch.request.disallowAnimatedImage
 import com.github.panpf.sketch.size
 import com.github.panpf.sketch.state.ColorPainterStateImage
 import com.github.panpf.sketch.util.toSize
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.components.url_image.resources.Res
 import love.yinlin.compose.components.url_image.resources.placeholder_pic
@@ -154,37 +156,39 @@ internal fun WebImage(
     onClick: (() -> Unit)? = null
 ) {
     Box(modifier = modifier) {
-        AsyncImage(
-            uri = buildWebImageKeyUrl(uri, key),
-            contentDescription = null,
-            state = state,
-            alignment = alignment,
-            contentScale = contentScale,
-            filterQuality = quality.filterQuality,
-            alpha = alpha,
-            modifier = Modifier
-                .matchParentSize()
-                .condition(circle) { clip(Theme.shape.circle) }
-                .progressIndicator(state, rememberWebImageIndicator())
-                .zIndex(1f)
-        )
+        if (uri.isBlank()) Box(modifier = Modifier.matchParentSize().background(Colors.Black))
+        else {
+            AsyncImage(
+                uri = buildWebImageKeyUrl(uri, key),
+                contentDescription = null,
+                state = state,
+                alignment = alignment,
+                contentScale = contentScale,
+                filterQuality = quality.filterQuality,
+                alpha = alpha,
+                modifier = Modifier.matchParentSize()
+                    .condition(circle) { clip(Theme.shape.circle) }
+                    .progressIndicator(state, rememberWebImageIndicator())
+                    .zIndex(1f)
+            )
 
-        // asyncImage库目前没法解决的问题, 暂时只能把可点击区域固定到实际图片区域
-        val density = LocalDensity.current
-        val hitBox by rememberDerivedState {
-            if (contentScale == ContentScale.Fit) {
-                val size = with(density) { state.size?.toSize()?.toDpSize() }
-                val rawSize = with(density) { state.result?.image?.size?.toSize()?.toDpSize() }
-                if (size != null && rawSize != null) Modifier.calcHitBox(size, rawSize) else Modifier
+            // asyncImage库目前没法解决的问题, 暂时只能把可点击区域固定到实际图片区域
+            val density = LocalDensity.current
+            val hitBox by rememberDerivedState {
+                if (contentScale == ContentScale.Fit) {
+                    val size = with(density) { state.size?.toSize()?.toDpSize() }
+                    val rawSize = with(density) { state.result?.image?.size?.toSize()?.toDpSize() }
+                    if (size != null && rawSize != null) Modifier.calcHitBox(size, rawSize) else Modifier
+                }
+                else Modifier.matchParentSize()
             }
-            else Modifier.matchParentSize()
+            Box(
+                modifier = Modifier
+                    .then(hitBox)
+                    .condition(circle) { clip(Theme.shape.circle) }
+                    .condition(onClick != null) { clickable(onClick = onClick) }.zIndex(2f)
+            )
         }
-        Box(
-            modifier = Modifier
-                .then(hitBox)
-                .condition(circle) { clip(Theme.shape.circle) }
-                .condition(onClick != null) { clickable(onClick = onClick) }.zIndex(2f)
-        )
     }
 }
 
