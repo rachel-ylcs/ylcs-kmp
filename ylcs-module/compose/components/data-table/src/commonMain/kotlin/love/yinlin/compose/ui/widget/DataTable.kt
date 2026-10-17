@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.zIndex
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
@@ -130,7 +131,7 @@ private fun DataTableCellFrame(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     invalid: Boolean = false,
-    background: Color = Color.Transparent,
+    background: Color = Colors.Transparent,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val outline = Theme.color.outline.copy(alpha = 0.35f)
@@ -141,7 +142,7 @@ private fun DataTableCellFrame(
 
     Box(
         modifier = modifier.width(width).height(height).background(background)
-            .background(if (isSelected) selectedBackground else Color.Transparent)
+            .background(if (isSelected) selectedBackground else Colors.Transparent)
             .drawWithContent {
                 drawContent()
                 val stroke = line.toPx()

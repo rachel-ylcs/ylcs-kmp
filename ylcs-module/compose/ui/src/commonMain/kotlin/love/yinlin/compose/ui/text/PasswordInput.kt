@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalStyle
@@ -41,7 +42,7 @@ fun PasswordInput(
     trailing: InputDecoration = InputDecoration.PasswordViewer,
 ) {
     val contentColor = if (enabled) Theme.color.onBackground else Theme.color.disabledContent
-    val textStyle = if (style.color == Color.Unspecified) style.copy(color = contentColor) else style
+    val textStyle = if (style.color == Colors.Unspecified) style.copy(color = contentColor) else style
 
     CompositionLocalProvider(
         LocalColor provides contentColor,

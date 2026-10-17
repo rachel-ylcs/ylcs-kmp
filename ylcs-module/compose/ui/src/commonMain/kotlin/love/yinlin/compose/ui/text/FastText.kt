@@ -20,6 +20,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastCoerceAtLeast
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
 import love.yinlin.extension.then
@@ -35,7 +36,7 @@ fun FastFixedText(
     placeholder: String,
     textProvider: () -> String?,
     modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
+    color: Color = Colors.Unspecified,
     style: TextStyle = LocalStyle.current,
     measurer: TextMeasurer = rememberTextMeasurer()
 ) {

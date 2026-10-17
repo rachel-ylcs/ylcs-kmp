@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberDerivedState
@@ -166,7 +167,7 @@ fun Banner(
         else {
             val contentColor = Theme.color.onSurfaceVariant
             val brush = remember(contentColor) {
-                Brush.horizontalGradient([Color.Transparent, contentColor.copy(alpha = 0.2f), Color.Transparent])
+                Brush.horizontalGradient([Colors.Transparent, contentColor.copy(alpha = 0.2f), Colors.Transparent])
             }
 
             Box(

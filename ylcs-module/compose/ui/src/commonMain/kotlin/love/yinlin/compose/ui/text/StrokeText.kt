@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.zIndex
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.ui.node.semantics
 
@@ -28,7 +29,7 @@ fun StrokeText(
     strokeColor: Color,
     strokeWidth: TextUnit = style.fontSize / 12f,
     modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
+    color: Color = Colors.Unspecified,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
     fontWeight: FontWeight? = null,

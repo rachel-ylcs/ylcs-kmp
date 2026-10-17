@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalStyle
 
@@ -35,7 +36,7 @@ data class AutoSizer(private val min: TextUnit, private val max: TextUnit, priva
 fun Text(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
+    color: Color = Colors.Unspecified,
     autoSizer: AutoSizer? = null,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
@@ -79,7 +80,7 @@ fun Text(
 fun Text(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
+    color: Color = Colors.Unspecified,
     autoSizer: AutoSizer? = null,
     fontSize: TextUnit = TextUnit.Unspecified,
     fontStyle: FontStyle? = null,
@@ -125,7 +126,7 @@ fun Text(
 fun SimpleClipText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
+    color: Color = Colors.Unspecified,
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,
     style: TextStyle = LocalStyle.current
@@ -146,7 +147,7 @@ fun SimpleClipText(
 fun SimpleEllipsisText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
+    color: Color = Colors.Unspecified,
     textDecoration: TextDecoration? = null,
     textAlign: TextAlign? = null,
     style: TextStyle = LocalStyle.current,

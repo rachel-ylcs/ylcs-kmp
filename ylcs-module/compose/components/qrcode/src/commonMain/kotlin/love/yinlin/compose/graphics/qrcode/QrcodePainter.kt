@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.LayoutDirection
+import love.yinlin.compose.Colors
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -29,10 +30,10 @@ fun rememberQrcodePainter(
     text: String,
     logo: Painter? = null,
     shape: QrcodeShape = QrcodeShape.Square,
-    color: Color = Color.Black,
+    color: Color = Colors.Black,
     secondaryColor: Color = color,
     ecLevel: QrcodeECLevel = QrcodeECLevel.H,
-    background: Color = Color.Transparent,
+    background: Color = Colors.Transparent,
 ): Painter {
     val matrix = remember(text, ecLevel) { QrcodeEncoder.encode(text, ecLevel) }
     return remember(matrix, logo, shape, color, secondaryColor, background) {
@@ -201,8 +202,8 @@ private fun Color.qrcodeColor(background: Color): Color {
     var high = 1f
     repeat(8) {
         val middle = (low + high) / 2f
-        if (lerp(Color.Black, opaque, middle).luminance() <= 0.2f) low = middle
+        if (lerp(Colors.Black, opaque, middle).luminance() <= 0.2f) low = middle
         else high = middle
     }
-    return lerp(Color.Black, opaque, low)
+    return lerp(Colors.Black, opaque, low)
 }

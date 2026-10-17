@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import love.yinlin.compose.Colors
 import love.yinlin.extension.Array
 import love.yinlin.extension.Boolean
 import love.yinlin.extension.Float
@@ -48,7 +49,7 @@ class RichNodeStyle @PublishedApi internal constructor(
             if (item.underline) textDecorations += TextDecoration.Underline
             if (item.strikethrough) textDecorations += TextDecoration.LineThrough
             builder.withStyle(SpanStyle(
-                color = item.color ?: Color.Unspecified,
+                color = item.color ?: Colors.Unspecified,
                 fontSize = item.fontSize ?: TextUnit.Unspecified,
                 fontWeight = if (item.bold) FontWeight.SemiBold else FontWeight.Light,
                 fontStyle = if (item.italic) FontStyle.Italic else null,

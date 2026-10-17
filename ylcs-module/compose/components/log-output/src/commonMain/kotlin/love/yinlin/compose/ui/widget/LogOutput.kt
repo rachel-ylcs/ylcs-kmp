@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.flow.distinctUntilChanged
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
@@ -131,7 +132,7 @@ fun LogOutput(
                     val resolved = entry.spans.map { span ->
                         span to SpanStyle(
                             color = AnsiColor.resolve(span.style.foreground) ?: if (entry.level == LogLevel.Error) errorColor else textColor,
-                            background = AnsiColor.resolve(span.style.background) ?: Color.Unspecified,
+                            background = AnsiColor.resolve(span.style.background) ?: Colors.Unspecified,
                             fontWeight = if (span.style.bold) FontWeight.Bold else null,
                             fontStyle = if (span.style.italic) FontStyle.Italic else null,
                             textDecoration = if (span.style.underline) TextDecoration.Underline else null,

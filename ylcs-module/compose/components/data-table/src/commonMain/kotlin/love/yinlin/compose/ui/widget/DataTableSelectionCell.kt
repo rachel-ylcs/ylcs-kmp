@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.rememberDpState
 import love.yinlin.compose.extension.rememberFalse
@@ -105,7 +106,7 @@ open class DataTableSelectionCell(options: List<String>, initialIndex: Int = 0) 
                             style = Theme.typography.v8,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(if (index == value) Theme.color.primary.copy(alpha = 0.12f) else Color.Transparent)
+                                .background(if (index == value) Theme.color.primary.copy(alpha = 0.12f) else Colors.Transparent)
                                 .clickable {
                                     state.updateText(option)
                                     expanded = false; state.commit()

@@ -3,6 +3,7 @@ package love.yinlin.compose.ui.text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
+import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.interaction.InteractionState
 
@@ -50,7 +51,7 @@ interface InputStatusColorProvider {
                 state.isFull -> Theme.color.warning
                 interactionState.isFocused -> Theme.color.primary
                 interactionState.isHovered -> Theme.color.primaryContainer.copy(alpha = 0.4f)
-                else -> Color.Transparent
+                else -> Colors.Transparent
             }
         }
     }

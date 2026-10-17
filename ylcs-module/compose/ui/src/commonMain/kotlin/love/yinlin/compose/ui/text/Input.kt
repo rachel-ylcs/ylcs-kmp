@@ -19,6 +19,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.zIndex
+import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.LocalStyle
@@ -116,7 +117,7 @@ fun Input(
     trailing: InputDecoration? = null,
 ) {
     val contentColor = if (enabled) Theme.color.onBackground else Theme.color.disabledContent
-    val textStyle = if (style.color == Color.Unspecified) style.copy(color = contentColor) else style
+    val textStyle = if (style.color == Colors.Unspecified) style.copy(color = contentColor) else style
 
     CompositionLocalProvider(
         LocalColor provides contentColor,
