@@ -20,6 +20,10 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        commonTest.configure {
+            lib(libs.test)
+        }
+
         androidMain.configure(commonMain) {
             lib(
                 libs.scan.android,

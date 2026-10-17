@@ -29,6 +29,7 @@ import love.yinlin.compose.ds.DataSourceAccount
 import love.yinlin.compose.ds.DataSourceActivity
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.graphics.qrcode.QrcodeShape
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.DeepLink
@@ -289,6 +290,7 @@ class ScreenUser : BasicScreen() {
                 QrcodeBox(
                     text = "rachel://yinlin.love/openProfile?uid=${args.uid}",
                     logo = love.yinlin.app.global.resources.Res.drawable.img_logo,
+                    shape = QrcodeShape.Rounded,
                     modifier = Modifier.size(Theme.size.image2)
                 )
             }
