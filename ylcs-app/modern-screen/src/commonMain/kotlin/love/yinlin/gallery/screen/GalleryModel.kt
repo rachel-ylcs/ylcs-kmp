@@ -2,7 +2,6 @@ package love.yinlin.gallery.screen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -13,10 +12,10 @@ import love.yinlin.compose.screen.ScreenRegistry
 import love.yinlin.extension.cleaning
 import kotlin.time.TimeSource
 
-@Immutable
+@Stable
 internal data class GalleryEvent(val number: Int, val elapsed: String, val scope: String, val kind: String, val message: String)
 
-@Immutable
+@Stable
 internal data class InstanceRecord(
     val id: String,
     val scope: String,

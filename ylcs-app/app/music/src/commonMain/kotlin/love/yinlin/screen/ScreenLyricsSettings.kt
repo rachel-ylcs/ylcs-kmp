@@ -23,13 +23,13 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.input.ColorPicker
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.input.Switch
+import love.yinlin.compose.ui.layout.ReorderingColumn
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.extension.moveItem
 import love.yinlin.media.lyrics.FloatingLyrics
 import love.yinlin.media.lyrics.LyricsEngineConfig
 import love.yinlin.startup.StartupMusicPlayer
-import sh.calvin.reorderable.ReorderableColumn
 
 @Composable
 expect fun ScreenLyricsSettings.PlatformContent()
@@ -193,25 +193,22 @@ class ScreenLyricsSettings : BasicScreen() {
 
             SimpleEllipsisText("歌词引擎优先级", color = Theme.color.primary, style = Theme.typography.v6.bold)
 
-            ReorderableColumn(
+            ReorderingColumn(
                 list = app.config.lyricsEngineOrder,
+                key = { it.key },
                 onSettle = { from, to ->
                     app.config.lyricsEngineOrder = app.config.lyricsEngineOrder.toMutableList().also { it.moveItem(from, to) }
                 },
                 modifier = Modifier.fillMaxWidth()
-            ) { _, item, _ ->
-                key(item.key) {
-                    ReorderableItem {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().clickable { }.padding(Theme.padding.value),
-                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(icon = item.icon)
-                            SimpleEllipsisText(item.title, modifier = Modifier.weight(1f))
-                            Icon(icon = Icons.DragHandle, modifier = Modifier.draggableHandle())
-                        }
-                    }
+            ) { item, _ ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().clickable { }.padding(Theme.padding.value),
+                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(icon = item.icon)
+                    SimpleEllipsisText(item.title, modifier = Modifier.weight(1f))
+                    Icon(icon = Icons.DragHandle, modifier = Modifier.dragHandle())
                 }
             }
 

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,15 +26,15 @@ import love.yinlin.compose.screen.ScreenModel
 @Serializable
 internal enum class ArgumentMode { Preview, Edit }
 
-@Immutable
+@Stable
 @Serializable
 internal data class PayloadOwner(val id: Int, val name: String)
 
-@Immutable
+@Stable
 @Serializable
 internal data class DemoPayload(val revision: Int, val owner: PayloadOwner, val tags: List<String>, val note: String?, val enabled: Boolean)
 
-@Immutable
+@Stable
 internal data class ArgumentField(val type: String, val value: String)
 
 private fun fields(value: Int): List<ArgumentField> = [ArgumentField("Int", value.toString())]

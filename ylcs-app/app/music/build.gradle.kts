@@ -22,6 +22,7 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.components.dragDrop,
                 projects.ylcsModule.compose.components.paginationLayout,
                 projects.ylcsModule.compose.components.media,
+                projects.ylcsModule.compose.components.reordering,
             )
         }
 

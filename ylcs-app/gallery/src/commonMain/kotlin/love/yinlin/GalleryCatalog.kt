@@ -1,13 +1,12 @@
 package love.yinlin
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.foundation.fts.FullTextSearch
 import love.yinlin.page.*
 
-@Immutable
+@Stable
 internal data class ComponentItem(val title: String, val description: String, val keywords: String = "")
 
 internal enum class PageGroup(val title: String) {
@@ -76,6 +75,13 @@ internal data class PageItem(
             PageItem("collection", Icons.GridOn, "集合", "Trees & Tags", "用层级结构与可删除标签整理更多内容。", CollectionPage, PageGroup.Layout, [
                 ComponentItem("TreeView", "展开层级节点，查看图标、缩进与嵌套的子节点。"),
                 ComponentItem("TagView", "五十个标签按可用宽度换行，点击删除以观察集合更新。"),
+            ]),
+            PageItem("reordering", Icons.DragHandle, "拖动排序", "Reordering", "拖动列表、网格与瀑布流，观察框架默认的激活状态层与抬升阴影、条目让位、边缘滚动和索引回调。", ReorderingPage, PageGroup.Layout, [
+                ComponentItem("LazyColumn / LazyRow", "纵向与横向列表；可切换尺寸、拖柄、整项长按、反向布局和 RTL，查看最近的索引回调。", "rememberReorderingState ReorderingItem dragHandle onMove onSettle"),
+                ComponentItem("LazyVerticalGrid / LazyHorizontalGrid", "两列／三列及横向网格的跨行跨列插入排序，含不同尺寸、header 和禁用目标。", "LazyGridState GridCells"),
+                ComponentItem("LazyVerticalStaggeredGrid / LazyHorizontalStaggeredGrid", "不同尺寸的条目在瀑布流中排序，拖动到边缘可继续滚动。", "LazyStaggeredGridState StaggeredGridCells"),
+                ComponentItem("ReorderingColumn", "少量条目在容器边界内拖动，回落中可继续拖动；记录每次提交的索引和最终顺序。", "歌词引擎 优先级 边界 onSettle"),
+                ComponentItem("ReorderingRow", "在内容边界内拖动，可切换不同宽度及 RTL，回落中可连续拖动；在外部接入横向滚动。", "Row horizontalScroll 边界 onSettle"),
             ]),
             PageItem("navigation", Icons.Anchor, "导航", "Tabs & Breadcrumbs", "切换当前内容，或者沿着路径回到更上层的位置。", NavigationPage, PageGroup.Interaction, [
                 ComponentItem("TabBar", "切换五个标签，其中一个带图标，另一个处于禁用状态。"),

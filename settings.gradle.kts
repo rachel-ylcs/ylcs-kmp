@@ -61,6 +61,7 @@ include(
     "ylcs-module:compose:components:media",
     "ylcs-module:compose:components:pagination-layout",
     "ylcs-module:compose:components:qrcode",
+    "ylcs-module:compose:components:reordering",
     "ylcs-module:compose:components:rich-text",
     "ylcs-module:compose:components:url-image",
     "ylcs-module:compose:components:webview",

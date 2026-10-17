@@ -19,8 +19,6 @@ template(object : KotlinMultiplatformTemplate() {
 
                 ExportLib,
 
-                libs.tool.reorder,
-
                 projects.ylcsApp.cs,
                 projects.ylcsApp.mod,
                 projects.ylcsApp.thirdParty,

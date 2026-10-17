@@ -24,7 +24,6 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
-import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TreeView
 import love.yinlin.compose.ui.floating.DialogChoice
@@ -37,7 +36,9 @@ import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.PrimaryLoadingButton
 import love.yinlin.compose.ui.input.SecondaryLoadingButton
 import love.yinlin.compose.ui.layout.Divider
+import love.yinlin.compose.ui.layout.ReorderingItem
 import love.yinlin.compose.ui.layout.Space
+import love.yinlin.compose.ui.layout.rememberReorderingState
 import love.yinlin.compose.ui.navigation.TabBar
 import love.yinlin.compose.ui.text.Input
 import love.yinlin.compose.ui.text.SimpleEllipsisText
@@ -62,8 +63,6 @@ import love.yinlin.extension.toJson
 import love.yinlin.extension.toJsonString
 import love.yinlin.fs.File
 import love.yinlin.startup.StartupMusicPlayer
-import sh.calvin.reorderable.ReorderableItem
-import sh.calvin.reorderable.rememberReorderableLazyGridState
 
 @Stable
 class ScreenPlaylistLibrary : Screen() {
@@ -238,16 +237,13 @@ class ScreenPlaylistLibrary : Screen() {
 
     @Composable
     private fun PlaylistGrid(modifier: Modifier = Modifier) {
-        var dragStartIndex by rememberValueState(-1)
-        var dragEndIndex by rememberValueState(-1)
         val gridState = rememberLazyGridState()
-        val reorderState = rememberReorderableLazyGridState(gridState) { from, to ->
-            if (dragStartIndex == -1) dragStartIndex = from.index
-            dragEndIndex = to.index
-            library.moveItem(from.index, to.index)
+        val reorderState = rememberReorderingState(gridState, onSettle = ::moveMusicFromPlaylist) { from, to ->
+            library.moveItem(from, to)
         }
 
         LaunchedEffect(currentPage, tabs) {
+            reorderState.cancelDrag()
             if (currentPage == -1) library.clear()
             else {
                 val playlist = playlistLibrary[tabs[currentPage]]
@@ -284,19 +280,9 @@ class ScreenPlaylistLibrary : Screen() {
                     items = library,
                     key = { _, (val id, val isDeleted) -> id to isDeleted }
                 ) { index, item ->
-                    ReorderableItem(state = reorderState, key = item.id to item.isDeleted) {
+                    ReorderingItem(state = reorderState, key = item.id to item.isDeleted) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).longPressDraggableHandle(
-                                onDragStarted = {
-                                    dragStartIndex = -1
-                                    dragEndIndex = -1
-                                },
-                                onDragStopped = {
-                                    if (dragStartIndex != -1 && dragEndIndex != -1 && dragStartIndex != dragEndIndex) {
-                                        moveMusicFromPlaylist(dragStartIndex, dragEndIndex)
-                                    }
-                                }
-                            ).clickable {
+                            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min).dragHandle(longPress = true).clickable {
                                 launch {
                                     if (item.isDeleted) slot.tip.warning("此歌曲已不在曲库中")
                                     else playPlaylist(item.id)

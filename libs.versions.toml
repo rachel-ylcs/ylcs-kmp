@@ -92,7 +92,6 @@ sketch-zoom = { module = "io.github.panpf.zoomimage:zoomimage-compose-sketch4", 
 
 tool-haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 tool-haze-blur = { module = "dev.chrisbanes.haze:haze-blur", version.ref = "haze" }
-tool-reorder = { module = "sh.calvin.reorderable:reorderable", version = "3.1.0" }
 
 # JVM
 ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
