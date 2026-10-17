@@ -71,7 +71,7 @@ class Screen404Test {
         assertSame(manager, screen.manager)
         assertSame(missing, screen.screenKey)
         assertSame(missing.args, screen.screenKey.args)
-        assertEquals([missing], manager.backStack)
+        assertContentEquals([missing], manager.backStack)
         assertEquals(missing.id.toString(), entry.contentKey)
         assertSame(screen.navEntry, entry)
         repeat(3) { assertSame(entry, manager.navEntry(missing)) }
@@ -97,7 +97,7 @@ class Screen404Test {
         assertNotEquals(manager.navEntry(firstKey).contentKey, manager.navEntry(secondKey).contentKey)
 
         assertTrue(second.pop())
-        assertEquals([firstKey], manager.backStack)
+        assertContentEquals([firstKey], manager.backStack)
         assertEquals(0, first.clearCount)
         assertEquals(1, second.clearCount)
         assertFalse(first.pop())
@@ -171,7 +171,7 @@ class Screen404Test {
                 }
 
                 assertEquals(Unit, result)
-                assertEquals(expected, manager.backStack, "$create + $clear")
+                assertContentEquals(expected, manager.backStack, "$create + $clear")
                 assertSame(first, manager.store[firstKey.id])
                 assertSame(otherType, manager.store[middle.id])
                 assertEquals(0, first.clearCount)
@@ -206,7 +206,7 @@ class Screen404Test {
                 source.navigate(::Missing0, create + clear)
                 val fallback = manager.requireTopScreen<Custom404>()
 
-                assertEquals([home, fallback.screenKey], manager.backStack)
+                assertContentEquals([home, fallback.screenKey], manager.backStack)
                 assertSame(source, manager.store[home.id])
                 assertEquals(metaClassName<Missing0>(), fallback.screenKey.type)
                 assertEquals(1, fallback.initializeCount)
@@ -234,7 +234,7 @@ class Screen404Test {
         assertSame(failure, assertFailsWith<IllegalStateException> {
             source.navigate(::Missing0, CreatePolicy.Replace + ClearPolicy.Clear)
         })
-        assertEquals([home], manager.backStack)
+        assertContentEquals([home], manager.backStack)
         assertSame(source, manager.requireTopScreen<HomeScreen>())
         assertFalse(manager.isClosed)
         shouldFail = false
@@ -266,7 +266,7 @@ class Screen404Test {
         val entry = manager.navEntry(originalKey)
         val fallback = assertIs<Custom404>(manager.store[originalKey.id])
 
-        assertEquals([originalKey], manager.backStack)
+        assertContentEquals([originalKey], manager.backStack)
         assertSame(originalKey, fallback.screenKey)
         assertSame(manager, fallback.manager)
         assertTrue(fallback.foundSelfDuringInitialize)
@@ -311,7 +311,7 @@ class Screen404Test {
         assertTrue(job.isCancelled)
         assertFailsWith<IllegalArgumentException> { manager.navEntry(missing) }
         assertNull(manager.store[missing.id])
-        assertEquals([home], manager.backStack)
+        assertContentEquals([home], manager.backStack)
     }
 
     @Test
@@ -349,7 +349,7 @@ class Screen404Test {
         manager.store.remove(originalKey.id)
 
         assertSame(failure, assertFailsWith<IllegalStateException> { manager.navEntry(originalKey) })
-        assertEquals([originalKey], manager.backStack)
+        assertContentEquals([originalKey], manager.backStack)
         assertNull(manager.store[originalKey.id])
         shouldFail = false
 

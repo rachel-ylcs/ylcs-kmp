@@ -127,8 +127,8 @@ class TestArguments {
     @Test
     fun emptyValuesAndFlagsAreDifferent() {
         val args = Arguments("a= b=\"\" enabled other enabled")
-        assertEquals([""], (args["a"] as Argument.Values).values)
-        assertEquals([""], (args["b"] as Argument.Values).values)
+        assertEquals("", (args["a"] as Argument.Single).value)
+        assertEquals("", (args["b"] as Argument.Single).value)
         assertFalse(args["a"] is Argument.Empty)
         assertSame(Argument.Empty, args["enabled"])
         assertSame(args["enabled"], args["other"])

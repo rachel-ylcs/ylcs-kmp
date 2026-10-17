@@ -4,18 +4,33 @@ import love.yinlin.encoding.Encoding
 import love.yinlin.encoding.convert
 import love.yinlin.extension.enum
 
+/**
+ * 读写共享的字节数组，负长度抛出 [IllegalArgumentException]，范围越界抛出 [IndexOutOfBoundsException]。
+ * 每个值的写入会先校验完整范围，越界时不会部分修改 [bytes]。
+ */
 class ByteArrayIO(val bytes: ByteArray) {
     constructor(size: Int) : this(ByteArray(size))
 
     val size: Int get() = bytes.size
 
-    fun readByte(index: Int): Byte = bytes[index]
+    private fun checkRange(index: Int, length: Int) {
+        require(length >= 0) { "length must be non-negative: $length" }
+        if (index !in 0 .. size || length > size - index) {
+            throw IndexOutOfBoundsException("index=$index, length=$length, size=$size")
+        }
+    }
+
+    fun readByte(index: Int): Byte {
+        checkRange(index, Byte.SIZE_BYTES)
+        return bytes[index]
+    }
 
     fun readUByte(index: Int): UByte = readByte(index).toUByte()
 
     fun readBoolean(index: Int): Boolean = readByte(index).toInt() != 0
 
     fun readShort(index: Int, endian: Endian = Endian.BIG): Short {
+        checkRange(index, Short.SIZE_BYTES)
         val b0 = bytes[index].toInt() and 0xFF
         val b1 = bytes[index + 1].toInt() and 0xFF
         val value = if (endian == Endian.BIG) (b0 shl 8) or b1 else (b1 shl 8) or b0
@@ -27,6 +42,7 @@ class ByteArrayIO(val bytes: ByteArray) {
     fun readChar(index: Int, endian: Endian = Endian.BIG): Char = readUShort(index, endian).toInt().toChar()
 
     fun readInt(index: Int, endian: Endian = Endian.BIG): Int {
+        checkRange(index, Int.SIZE_BYTES)
         val b0 = bytes[index].toInt() and 0xFF
         val b1 = bytes[index + 1].toInt() and 0xFF
         val b2 = bytes[index + 2].toInt() and 0xFF
@@ -39,6 +55,7 @@ class ByteArrayIO(val bytes: ByteArray) {
     inline fun <reified E : Enum<E>> readEnum(index: Int, endian: Endian = Endian.BIG): E = enum(readInt(index, endian))
 
     fun readLong(index: Int, endian: Endian = Endian.BIG): Long {
+        checkRange(index, Long.SIZE_BYTES)
         val b0 = bytes[index].toLong() and 0xFFL
         val b1 = bytes[index + 1].toLong() and 0xFFL
         val b2 = bytes[index + 2].toLong() and 0xFFL
@@ -56,17 +73,27 @@ class ByteArrayIO(val bytes: ByteArray) {
 
     fun readDouble(index: Int): Double = Double.fromBits(readLong(index))
 
-    fun readString(index: Int, length: Int): String = bytes.decodeToString(startIndex = index, endIndex = index + length)
+    fun readString(index: Int, length: Int): String {
+        checkRange(index, length)
+        return bytes.decodeToString(startIndex = index, endIndex = index + length)
+    }
 
-    fun readByteArray(index: Int, length: Int): ByteArray = bytes.copyOfRange(index, index + length)
+    fun readByteArray(index: Int, length: Int): ByteArray {
+        checkRange(index, length)
+        return bytes.copyOfRange(index, index + length)
+    }
 
-    fun writeByte(index: Int, value: Byte) { bytes[index] = value }
+    fun writeByte(index: Int, value: Byte) {
+        checkRange(index, Byte.SIZE_BYTES)
+        bytes[index] = value
+    }
 
     fun writeUByte(index: Int, value: UByte) = writeByte(index, value.toByte())
 
     fun writeBoolean(index: Int, value: Boolean) = writeByte(index, (if (value) 1 else 0).toByte())
 
     fun writeShort(index: Int, value: Short, endian: Endian = Endian.BIG) {
+        checkRange(index, Short.SIZE_BYTES)
         val bits = value.toInt()
         if (endian == Endian.BIG) {
             bytes[index] = (bits ushr 8).toByte()
@@ -82,6 +109,7 @@ class ByteArrayIO(val bytes: ByteArray) {
     fun writeChar(index: Int, value: Char, endian: Endian = Endian.BIG) = writeShort(index, value.code.toShort(), endian)
 
     fun writeInt(index: Int, value: Int, endian: Endian = Endian.BIG) {
+        checkRange(index, Int.SIZE_BYTES)
         if (endian == Endian.BIG) {
             bytes[index] = (value ushr 24).toByte()
             bytes[index + 1] = (value ushr 16).toByte()
@@ -100,6 +128,7 @@ class ByteArrayIO(val bytes: ByteArray) {
     inline fun <reified E : Enum<E>> writeEnum(index: Int, value: E, endian: Endian = Endian.BIG) = writeInt(index, value.ordinal, endian)
 
     fun writeLong(index: Int, value: Long, endian: Endian = Endian.BIG) {
+        checkRange(index, Long.SIZE_BYTES)
         if (endian == Endian.BIG) {
             bytes[index] = (value ushr 56).toByte()
             bytes[index + 1] = (value ushr 48).toByte()
@@ -127,9 +156,12 @@ class ByteArrayIO(val bytes: ByteArray) {
 
     fun writeDouble(index: Int, value: Double) = writeLong(index, value.toRawBits())
 
-    fun writeString(index: Int, value: String, encoding: Encoding = Encoding.Default) { value.convert(encoding).copyInto(bytes, destinationOffset = index) }
+    fun writeString(index: Int, value: String, encoding: Encoding = Encoding.Default) = writeByteArray(index, value.convert(encoding))
 
-    fun writeByteArray(index: Int, value: ByteArray) { value.copyInto(bytes, destinationOffset = index) }
+    fun writeByteArray(index: Int, value: ByteArray) {
+        checkRange(index, value.size)
+        value.copyInto(bytes, destinationOffset = index)
+    }
 
     inline fun write(block: ByteArrayIO.() -> Unit): ByteArray {
         block()

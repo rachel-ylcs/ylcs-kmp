@@ -46,10 +46,12 @@ data class Lrc(
         }
     }
 
+    @Suppress("RegExpRedundantEscape")
     companion object {
+        // 在 js 上正则的实现与其他平台不同，]转义不添加会失败
         private val SourcePattern = Regex("""\r\n|\r|\n""")
-        private val TimePattern = Regex("""\[(\d+):([0-5]?\d)(?:[.:](\d{2,3}))?]""")
-        private val MetadataPattern = Regex("""^\[([A-Za-z]+):(.*)]$""")
+        private val TimePattern = Regex("""\[(\d+):([0-5]?\d)(?:[.:](\d{2,3}))?\]""")
+        private val MetadataPattern = Regex("""^\[([A-Za-z]+):(.*)\]$""")
 
         fun parse(source: String): Lrc {
             val newLines: MutableList<LrcLine> = []

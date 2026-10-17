@@ -150,7 +150,7 @@ class ScreenKeyNavigationTest {
                 clear == ClearPolicy.Clear -> before.take(3)
                 else -> before.filter { it.id != target.screenKey.id }
             }
-            assertEquals(remaining + top.screenKey, manager.backStack, "$create / $clear / $stringFirst")
+            assertContentEquals(remaining + top.screenKey, manager.backStack, "$create / $clear / $stringFirst")
             assertSame(first, manager.store[first.screenKey.id])
             assertEquals(0, first.clearCount)
             assertEquals(1, top.initializeCount)
@@ -185,7 +185,7 @@ class ScreenKeyNavigationTest {
             home.navigate(name, "not an Int", create + clear)
             val missing = manager.requireTopScreen<Custom404>()
 
-            assertEquals(before + missing.screenKey, manager.backStack)
+            assertContentEquals(before + missing.screenKey, manager.backStack)
             assertTrue(missing.screenKey.isUnboundKey)
             assertEquals(name, missing.screenKey.type)
             assertEquals(0, missing.resumeCount)
@@ -250,7 +250,7 @@ class ScreenKeyNavigationTest {
         assertFailsWith<SerializationException> { home.navigate<Int?>("one", null) }
         assertEquals(0, calls)
         assertSame(failure, assertFailsWith<IllegalStateException> { home.navigate("one", 7) })
-        assertEquals(before, manager.backStack)
+        assertContentEquals(before, manager.backStack)
         assertEquals(0, fallbackCalls)
 
         shouldFail = false
@@ -349,7 +349,7 @@ class ScreenKeyNavigationTest {
         assertTrue(missing.screenKey.isUnboundKey)
         for (key in ["", " ", "\t\n"]) {
             assertFailsWith<IllegalArgumentException> { home.navigate(key) }
-            assertEquals(before, manager.backStack)
+            assertContentEquals(before, manager.backStack)
         }
         assertTrue(missing.pop())
         home.navigate(::Screen0)

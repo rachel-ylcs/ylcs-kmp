@@ -188,7 +188,7 @@ class ScreenEntryTest {
 
         assertEquals(0, counterFactoryCalls)
         assertSame(homeEntry, manager.navEntry(homeKey))
-        assertEquals([homeKey], manager.backStack)
+        assertContentEquals([homeKey], manager.backStack)
     }
 
     @Test

@@ -205,7 +205,7 @@ class ScreenManagerTest {
         initial.clear()
         initial += key<OtherScreen>(ScreenArgs.build("unrelated"))
 
-        assertEquals([rootKey], manager.backStack)
+        assertContentEquals([rootKey], manager.backStack)
         assertIs<RootScreen>(top(manager))
     }
 
@@ -326,7 +326,7 @@ class ScreenManagerTest {
                         else [rootKey, firstKey, middleKey, topKey, targetKey]
                 }
 
-                assertEquals(expected, manager.backStack, "$create + $clear")
+                assertContentEquals(expected, manager.backStack, "$create + $clear")
                 assertSame(result, top(manager))
                 assertEquals(0, first.clearCount)
                 assertEquals(10, first.value)
@@ -358,7 +358,7 @@ class ScreenManagerTest {
                 manager.navigate(::NumberScreen, 7, policy = create + clear)
                 val screen = manager.requireTopScreen<NumberScreen>()
 
-                assertEquals([root.screenKey, screen.screenKey], manager.backStack)
+                assertContentEquals([root.screenKey, screen.screenKey], manager.backStack)
                 assertEquals(0, root.clearCount)
                 assertEquals(7, screen.value)
                 assertEquals(1, screen.initializeCount)
@@ -379,13 +379,13 @@ class ScreenManagerTest {
         manager.navigate(::NumberScreen, 2, policy = CreatePolicy.Move + ClearPolicy.Clear)
         assertSame(screen, manager.requireTopScreen<NumberScreen>())
         assertSame(stack, manager.backStack)
-        assertEquals(entries, manager.backStack)
+        assertContentEquals(entries, manager.backStack)
         assertEquals(1, screen.value)
 
         manager.navigate(::NumberScreen, 3, policy = CreatePolicy.Resume + ClearPolicy.Clear)
         assertSame(screen, manager.requireTopScreen<NumberScreen>())
         assertSame(stack, manager.backStack)
-        assertEquals(entries, manager.backStack)
+        assertContentEquals(entries, manager.backStack)
         assertSame(key, screen.screenKey)
         assertEquals(1, screen.screenKey.args.get<Int?>(0))
         assertEquals(3, screen.value)
@@ -411,7 +411,7 @@ class ScreenManagerTest {
         assertEquals([1, 2, 1], screen.values)
         assertEquals(0, screen.screenKey.args.get<Int>(0))
         assertSame(stack, manager.backStack)
-        assertEquals(entries, manager.backStack)
+        assertContentEquals(entries, manager.backStack)
         assertSame(screen, top(manager))
         assertEquals(1, screen.initializeCount)
         assertFailsWith<IllegalArgumentException> { screen.requireResumeArgs(1) }
@@ -473,7 +473,7 @@ class ScreenManagerTest {
         }
 
         assertSame(failure, caught)
-        assertEquals(stack, manager.backStack)
+        assertContentEquals(stack, manager.backStack)
         assertSame(original, manager.store[original.screenKey.id])
         assertSame(top, top(manager))
         assertEquals(0, original.clearCount)
@@ -496,7 +496,7 @@ class ScreenManagerTest {
         assertFailsWith<IllegalArgumentException> { manager.navigate<NumberScreen>({ error("Must not execute the navigation constructor.") }) }
         assertFailsWith<SerializationException> { manager.navigate<NumberScreen, String>({ NumberScreen(0) }, "not-an-int") }
 
-        assertEquals(stack, manager.backStack)
+        assertContentEquals(stack, manager.backStack)
         assertSame(root, top(manager))
         assertEquals(0, root.clearCount)
     }
@@ -599,7 +599,7 @@ class ScreenManagerTest {
         reenter = true
 
         assertFailsWith<IllegalArgumentException> { manager.navigate(::NumberScreen, 1) }
-        assertEquals(stack, manager.backStack)
+        assertContentEquals(stack, manager.backStack)
 
         reenter = false
         manager.navigate(::NumberScreen, 2)
@@ -682,7 +682,7 @@ class ScreenManagerTest {
         }
 
         assertSame(failure, caught)
-        assertEquals([root.screenKey, target.screenKey], manager.backStack)
+        assertContentEquals([root.screenKey, target.screenKey], manager.backStack)
         assertSame(target, top(manager))
         assertEquals(1, previousTop.clearCount)
         assertEquals(0, target.clearCount)
@@ -782,7 +782,7 @@ class ScreenManagerTest {
         assertEquals(firstScreen.screenKey.id, secondScreen.screenKey.id)
         first.navigate(::NumberScreen, 7)
         val added = first.requireTopScreen<NumberScreen>()
-        assertEquals([secondScreen.screenKey], second.backStack)
+        assertContentEquals([secondScreen.screenKey], second.backStack)
         assertTrue(first.pop())
         assertEquals(1, added.clearCount)
         assertSame(secondScreen, top(second))
@@ -936,7 +936,7 @@ class ScreenManagerTest {
 
         assertEquals([rootKey], old)
         assertSame(view, manager.backStack)
-        assertEquals([rootKey, screen.screenKey], view)
+        assertContentEquals([rootKey, screen.screenKey], view)
         assertSame(rootKey, manager.backStack.first())
         assertSame(rootKey.args, manager.backStack.first().args)
     }
@@ -958,7 +958,7 @@ class ScreenManagerTest {
         assertSame(initial.first().args, pushed.first().args)
 
         assertTrue(manager.pop())
-        assertEquals(initial, view)
+        assertContentEquals(initial, view)
         assertEquals([initial.first(), screen.screenKey], pushed)
         owner.clear()
 
@@ -991,7 +991,7 @@ class ScreenManagerTest {
                     else [root.screenKey, upper.screenKey, result.screenKey]
 
                     assertEquals([expected], published, "$create + $clear")
-                    assertEquals(expected, manager.backStack)
+                    assertContentEquals(expected, manager.backStack)
                 }
             }
         }
@@ -1016,7 +1016,7 @@ class ScreenManagerTest {
         assertEquals(1, screen.clearCount)
         assertEquals(0, screen.initializeCount)
         assertNull(manager.store[screen.screenKey.id])
-        assertEquals(before, manager.backStack)
+        assertContentEquals(before, manager.backStack)
         assertEquals(0, assertIs<RootScreen>(top(manager)).clearCount)
     }
 

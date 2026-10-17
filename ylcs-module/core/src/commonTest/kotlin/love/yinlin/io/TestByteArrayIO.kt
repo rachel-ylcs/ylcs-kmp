@@ -111,9 +111,100 @@ class TestByteArrayIO {
         val io = ByteArrayIO(4)
 
         assertFailsWith<IndexOutOfBoundsException> { io.readInt(1) }
-        assertFailsWith<IndexOutOfBoundsException> { io.writeLong(0, 1L) }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeLong(0, 0x0102030405060708L) }
         assertFailsWith<IndexOutOfBoundsException> { io.writeByteArray(3, [1, 2]) }
         assertFailsWith<IllegalArgumentException> { io.readString(0, -1) }
         assertContentEquals(ByteArray(4), io.bytes)
+    }
+
+    @Test
+    fun primitiveReadsRejectInvalidRanges() {
+        val io = ByteArrayIO(8)
+        for (index in [-1, Int.MIN_VALUE, Int.MAX_VALUE, io.size]) {
+            assertFailsWith<IndexOutOfBoundsException> { io.readByte(index) }
+            assertFailsWith<IndexOutOfBoundsException> { io.readShort(index) }
+            assertFailsWith<IndexOutOfBoundsException> { io.readInt(index) }
+            assertFailsWith<IndexOutOfBoundsException> { io.readLong(index) }
+        }
+        for (endian in Endian.entries) {
+            assertFailsWith<IndexOutOfBoundsException> { io.readShort(7, endian) }
+            assertFailsWith<IndexOutOfBoundsException> { io.readInt(5, endian) }
+            assertFailsWith<IndexOutOfBoundsException> { io.readLong(1, endian) }
+        }
+        assertFailsWith<IndexOutOfBoundsException> { io.readUByte(8) }
+        assertFailsWith<IndexOutOfBoundsException> { io.readChar(7) }
+        assertFailsWith<IndexOutOfBoundsException> { io.readFloat(5) }
+        assertFailsWith<IndexOutOfBoundsException> { io.readDouble(1) }
+    }
+
+    @Test
+    fun primitiveWritesRejectInvalidRangesWithoutChangingBytes() {
+        val original = ByteArray(8) { 0x55 }
+        val io = ByteArrayIO(original.copyOf())
+        for (index in [-1, Int.MIN_VALUE, Int.MAX_VALUE, io.size]) {
+            assertFailsWith<IndexOutOfBoundsException> { io.writeByte(index, 0x12) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeShort(index, 0x1234) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeInt(index, 0x12345678) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeLong(index, 0x0102030405060708L) }
+        }
+        for (endian in Endian.entries) {
+            assertFailsWith<IndexOutOfBoundsException> { io.writeShort(7, 0x1234, endian) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeInt(5, 0x12345678, endian) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeLong(1, 0x0102030405060708L, endian) }
+            assertContentEquals(original, io.bytes)
+        }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeBoolean(8, true) }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeChar(7, '中') }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeFloat(5, 12.5f) }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeDouble(1, 12.5) }
+        assertContentEquals(original, io.bytes)
+    }
+
+    @Test
+    fun variableReadsRejectNegativeLengthsAndOverflow() {
+        val io = ByteArrayIO(4)
+        for (length in [-1, Int.MIN_VALUE]) {
+            assertFailsWith<IllegalArgumentException> { io.readString(0, length) }
+            assertFailsWith<IllegalArgumentException> { io.readByteArray(0, length) }
+        }
+        for (index in [-1, Int.MIN_VALUE, Int.MAX_VALUE, io.size + 1]) {
+            assertFailsWith<IndexOutOfBoundsException> { io.readString(index, 0) }
+            assertFailsWith<IndexOutOfBoundsException> { io.readByteArray(index, 0) }
+        }
+        assertFailsWith<IndexOutOfBoundsException> { io.readString(3, 2) }
+        assertFailsWith<IndexOutOfBoundsException> { io.readByteArray(3, 2) }
+        assertFailsWith<IndexOutOfBoundsException> { io.readString(1, Int.MAX_VALUE) }
+        assertFailsWith<IndexOutOfBoundsException> { io.readByteArray(1, Int.MAX_VALUE) }
+    }
+
+    @Test
+    fun bulkWritesRejectInvalidRangesWithoutChangingBytes() {
+        val original: ByteArray = [1, 2, 3, 4]
+        val io = ByteArrayIO(original.copyOf())
+        for (index in [-1, Int.MIN_VALUE, Int.MAX_VALUE, io.size + 1]) {
+            assertFailsWith<IndexOutOfBoundsException> { io.writeByteArray(index, [0x12, 0x34]) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeString(index, "中") }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeByteArray(index, []) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeString(index, "") }
+        }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeByteArray(3, [0x12, 0x34]) }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeString(2, "中") }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeByteArray(io.size, [1]) }
+        assertFailsWith<IndexOutOfBoundsException> { io.writeString(io.size, "x") }
+        assertContentEquals(original, io.bytes)
+    }
+
+    @Test
+    fun emptyRangesAtEndAreAllowed() {
+        for (size in [0, 4]) {
+            val io = ByteArrayIO(size)
+            assertEquals("", io.readString(size, 0))
+            assertContentEquals(ByteArray(0), io.readByteArray(size, 0))
+            io.writeString(size, "")
+            io.writeByteArray(size, [])
+            assertContentEquals(ByteArray(size), io.bytes)
+            assertFailsWith<IndexOutOfBoundsException> { io.readByte(size) }
+            assertFailsWith<IndexOutOfBoundsException> { io.writeByte(size, 1) }
+        }
     }
 }

@@ -187,7 +187,7 @@ class ScreenNavigationTest {
         assertSame(screen, retained.store[key.id])
         assertSame(entry, retained.navEntry(key))
         assertSame(backStack, retained.backStack)
-        assertEquals(savedKeys, retained.backStack)
+        assertContentEquals(savedKeys, retained.backStack)
         assertSame(key, retained.backStack.last())
         assertEquals(12, screen.value)
         assertEquals(1, screen.resumeCount)
