@@ -404,7 +404,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                         )
                     } ?: remoteSong?.let {
                         WebImage(
-                            uri = it.remotePath(ModResourceType.Background),
+                            uri = it.remotePath(ModResourceType.Record),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
