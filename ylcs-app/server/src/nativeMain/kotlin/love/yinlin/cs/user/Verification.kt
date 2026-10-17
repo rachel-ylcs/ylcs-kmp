@@ -1,9 +1,7 @@
 package love.yinlin.cs.user
 
-import io.github.smyrgeorge.sqlx4k.QueryExecutor
 import love.yinlin.cs.ServerLogger
 import love.yinlin.cs.service.MysqlService
-import love.yinlin.cs.service.throwQuerySQLSingle
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.topic.Comment
 
@@ -25,5 +23,5 @@ class Verification(
         throw ValidationError("Section", section) else Comment.Section.commentTable(section)
 
     suspend fun throwGetUser(uid: Int, col: String = "uid") = mysql.throwQuerySQLSingle("SELECT $col FROM user WHERE uid = ?", uid)
+    suspend fun throwGetUserData(uid: Int, col: String = "uid") = mysql.throwQuerySQLSingle("SELECT $col FROM user_data WHERE uid = ?", uid)
 }
-

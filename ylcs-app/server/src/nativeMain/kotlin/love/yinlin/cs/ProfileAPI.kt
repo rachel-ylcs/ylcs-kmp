@@ -22,7 +22,7 @@ fun ServerScope.profileAPI() {
         val uid = AN.throwExpireToken(token)
         val user = mysql.throwQuerySQLSingle("""
             SELECT
-				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.exp, u1.coin, u1.signin, u1.follows, u1.followers, u2.name AS inviterName,
+				u1.uid, u1.name, u1.privilege, u1.signature, u1.label, u1.exp, u1.coin, u1.follows, u1.followers, u2.name AS inviterName,
 				JSON_OBJECT(
 					'mailCount', (SELECT COUNT(*) FROM mail WHERE processed = 0 AND uid = ?)
 				) AS notification
@@ -31,8 +31,13 @@ fun ServerScope.profileAPI() {
             ON u1.inviter = u2.uid
             WHERE u1.uid = ?
         """, uid, uid)
+        val userData = mysql.throwQuerySQLSingle("""
+           SELECT signin
+           FROM user_data
+           WHERE uid = ?
+        """, uid)
         // 处理提醒
-        val signin = user["signin"]!!.to(ByteArraySerializer)
+        val signin = userData["signin"]!!.to(ByteArraySerializer)
         var profile = user.to<UserProfile>()
         signin.checkSignin { isSignin, _, _, _ ->
             profile = profile.copy(
@@ -105,14 +110,15 @@ fun ServerScope.profileAPI() {
     ApiProfileSignin.response { token ->
         val uid = AN.throwExpireToken(token)
         mysql.throwTransaction { transaction ->
-            val user = transaction.throwQuerySQLSingle("SELECT signin FROM user WHERE uid = ? FOR UPDATE", uid)
+            val userData = transaction.throwQuerySQLSingle("SELECT signin FROM user_data WHERE uid = ? FOR UPDATE", uid)
             // 查询是否签到 ... 签到记录46字节(368位)
-            val signin = user["signin"]!!.to(ByteArraySerializer)
+            val signin = userData["signin"]!!.to(ByteArraySerializer)
             signin.checkSignin { isSignin, byteValue, byteIndex, bitIndex ->
                 if (!isSignin) {
                     // 更新签到值，银币增加
                     signin[byteIndex] = (byteValue or (1 shl bitIndex)).toByte()
-                    transaction.throwExecuteSQL("UPDATE user SET signin = ? , exp = exp + 1, coin = coin + 1 WHERE uid = ?", signin, uid)
+                    transaction.throwExecuteSQL("UPDATE user SET exp = exp + 1, coin = coin + 1 WHERE uid = ?", uid)
+                    transaction.throwExecuteSQL("UPDATE user_data SET signin = ? WHERE uid = ?", signin, uid)
                 }
                 result(isSignin, byteValue, bitIndex)
             }

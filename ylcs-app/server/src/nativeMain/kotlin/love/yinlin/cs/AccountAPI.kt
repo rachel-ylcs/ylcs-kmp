@@ -67,9 +67,9 @@ fun ServerScope.accountAPI() {
     callMap[Mail.Filter.Register] = { transaction, (val inviterID = uid, val registerName = param1, val registerPwd = param2) ->
         val createTime = DateEx.CurrentString
         val registerID = transaction.throwInsertSQLGeneratedKey("""
-            INSERT INTO user(name, pwd, inviter, createTime, lastTime, playlist, signin) ${values(7)}
-        """, registerName, registerPwd, inviterID, createTime, createTime, "{}", ByteArray(46)
-        ).toInt()
+            INSERT INTO user(name, pwd, inviter, createTime, lastTime) ${values(5)}
+        """, registerName, registerPwd, inviterID, createTime, createTime).toInt()
+        transaction.throwExecuteSQL("INSERT INTO user_data(uid) ${values(1)}", registerID)
         if (registerID == 0) failure("\"${registerName}\"已注册")
         // 处理用户目录
         val userPath = ServerRes.Users.User(registerID)
