@@ -20,6 +20,7 @@ class ServerScope(engine: ServerEngine) : APIScope(engine) {
         activityAPI()
         backupAPI()
         commonAPI()
+        concertAPI()
         followsAPI()
         gameAPI()
         mailAPI()
