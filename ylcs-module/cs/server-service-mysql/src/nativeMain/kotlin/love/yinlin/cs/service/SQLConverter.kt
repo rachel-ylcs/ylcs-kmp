@@ -4,7 +4,6 @@ import io.github.smyrgeorge.sqlx4k.ResultSet
 import io.github.smyrgeorge.sqlx4k.impl.extensions.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
-import love.yinlin.encoding.convert
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.json
 import love.yinlin.extension.parseJson
@@ -15,8 +14,7 @@ internal object SQLConverter {
         if (value.isNull()) return JsonNull
         return when (type) {
             "BOOLEAN" -> (value.asInt() != 0).json
-            "BINARY", "BLOB", "VARBINARY" -> value.asByteArray().json
-            "LONGBLOB" -> value.asByteArray().convert().json // TODO: 上游问题: sqlx4k对json解析字段的结果应该是字符串, 但实际上是LONGBLOB
+            "BINARY", "BLOB", "VARBINARY", "LONGBLOB" -> value.asByteArray().json
             "BIT" -> (value.asChar() != Char.MIN_VALUE).json
             "INT", "TINYINT", "SMALLINT", "MEDIUMINT" -> value.asInt().json
             "INT UNSIGNED" -> value.asUInt().toJson()
@@ -24,7 +22,7 @@ internal object SQLConverter {
             "BIGINT UNSIGNED" -> value.asULong().toJson()
             "FLOAT" -> value.asFloat().json
             "DOUBLE", "DECIMAL" -> value.asDouble().json
-            "CHAR", "TEXT", "VARCHAR" -> value.asString().json
+            "CHAR", "TEXT", "LONGTEXT", "VARCHAR" -> value.asString().json
             "DATE" -> value.asString().json
             "TIME" -> value.asString().json
             "DATETIME", "TIMESTAMP" -> DateEx.Formatter.standardDateTime.format(value.asLocalDateTime()).json
