@@ -12,7 +12,7 @@ internal object AppAbout {
         title = "银临茶舍 统一资讯源 演出记忆",
         force = true,
         maintenance = true,
-        date = LocalDate(2026, 10, 17),
+        date = LocalDate(2026, 10, 18),
         groups = [
             AppUpdateRecordGroup(
                 type = "特性",
