@@ -13,3 +13,4 @@ jobs:
       task: ylcs-app:desktop-app:desktopPublish
       submodules: recursive
       gtk: true
+      virtual-display: true

@@ -126,6 +126,12 @@ XCODEPROJ_PATH="$PWD/ylcs-app/iosApp/iosApp.xcodeproj" \
 
 CI 的 `.github/actions/package-ios` 会先生成 SwiftPM 链接包，再以 Release 配置归档 iOS 真机应用并打包未签名 IPA。仅执行 `linkDebugFrameworkIosArm64` 不会验证 Swift 宿主编译和 Xcode 归档。
 
+### Linux Release 与 AOT
+
+桌面 Release 保留 AOT 预构建，训练阶段会实际启动桌面应用，因此无显示服务的 Linux CI 需要提供虚拟 X11 显示。`.github/workflows/release.yml` 的 Linux 打包任务和 `.github/workflows/release_linux.yml` 均启用 `virtual-display`，由共用环境 action 安装 `xvfb`、`xauth`，再使用 `xvfb-run` 执行原有 Gradle 发布任务。
+
+这两个构建步骤通过 `SKIKO_RENDER_API=SOFTWARE_FAST` 使用软件渲染，避免依赖 CI 的 GPU 环境。该环境变量仅作用于 CI 构建过程，不写入发行包的 JVM 参数。`virtual-display` 默认关闭，其他构建入口按需启用。
+
 ## 文档生成
 
 `.github/workflows/docs.yml` 依次生成 Gallery、ModernScreen 与 Dokka 页面，再由 MkDocs 发布站点。对应的生成任务为 `:ylcs-app:gallery:galleryPublish`、`:ylcs-app:modern-screen:modernScreenPublish` 与 `dokkaGenerateHtml`。

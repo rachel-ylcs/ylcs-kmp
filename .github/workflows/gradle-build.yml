@@ -27,6 +27,10 @@ on:
         description: Install GTK development dependencies on Linux.
         type: boolean
         default: false
+      virtual-display:
+        description: Run the Gradle task with Xvfb and software rendering on Linux.
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -44,8 +48,19 @@ jobs:
           android: ${{ inputs.android }}
           msvc: ${{ inputs.msvc }}
           gtk: ${{ inputs.gtk }}
+          virtual-display: ${{ inputs.virtual-display }}
 
       - name: Build
+        if: ${{ runner.os != 'Linux' || !inputs.virtual-display }}
         env:
           GRADLE_TASK: ${{ inputs.task }}
         run: ./gradlew "${{ runner.os == 'Windows' && '$env:GRADLE_TASK' || '$GRADLE_TASK' }}"
+
+      - name: Build with Virtual Display
+        if: ${{ runner.os == 'Linux' && inputs.virtual-display }}
+        shell: bash
+        env:
+          GRADLE_TASK: ${{ inputs.task }}
+          SKIKO_RENDER_API: SOFTWARE_FAST
+        # AOT training launches the desktop app and needs an X11 display.
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" ./gradlew "$GRADLE_TASK"

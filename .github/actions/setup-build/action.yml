@@ -20,6 +20,9 @@ inputs:
   gtk:
     description: Install GTK development dependencies on Linux.
     default: 'false'
+  virtual-display:
+    description: Install Xvfb and Xauthority tools on Linux.
+    default: 'false'
 
 runs:
   using: composite
@@ -32,11 +35,21 @@ runs:
         submodules: ${{ inputs.submodules }}
 
     - name: Install Dependencies (Linux)
-      if: ${{ inputs.gtk == 'true' && runner.os == 'Linux' }}
+      if: ${{ runner.os == 'Linux' && (inputs.gtk == 'true' || inputs.virtual-display == 'true') }}
       shell: bash
+      env:
+        INSTALL_GTK: ${{ inputs.gtk }}
+        INSTALL_VIRTUAL_DISPLAY: ${{ inputs.virtual-display }}
       run: |
+        packages=()
+        if [[ "$INSTALL_GTK" == 'true' ]]; then
+          packages+=(libgtk-3-dev)
+        fi
+        if [[ "$INSTALL_VIRTUAL_DISPLAY" == 'true' ]]; then
+          packages+=(xvfb xauth)
+        fi
         sudo apt-get update
-        sudo apt-get install -y libgtk-3-dev
+        sudo apt-get install -y "${packages[@]}"
 
     - name: Setup JDK
       uses: actions/setup-java@v6

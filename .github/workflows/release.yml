@@ -81,9 +81,12 @@ jobs:
         with:
           submodules: recursive
           gtk: 'true'
+          virtual-display: 'true'
 
       - name: Build
-        run: ./gradlew ylcs-app:desktop-app:desktopArtifact
+        env:
+          SKIKO_RENDER_API: SOFTWARE_FAST
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" ./gradlew ylcs-app:desktop-app:desktopArtifact
 
       - name: Upload
         uses: actions/upload-artifact@v7
