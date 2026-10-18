@@ -14,6 +14,7 @@ import love.yinlin.GalleryActions
 import love.yinlin.GalleryCaption
 import love.yinlin.Page
 import love.yinlin.compose.Theme
+import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.extension.rememberValueState
@@ -144,41 +145,41 @@ object ReorderingPage : Page() {
 
         when {
             kind == 0 && vertical -> LazyColumn(modifier, list, contentPadding = padding, reverseLayout = reverse, verticalArrangement = spacing) {
-                item(key = "header") { Header() }
+                item(key = ItemKey("header")) { Header() }
                 items(order, key = { it }) { item ->
                     ReorderingItem(state, item, enabled = item != 7) { tile(item, it) }
                 }
             }
             kind == 0 -> LazyRow(modifier, list, contentPadding = padding, reverseLayout = reverse, horizontalArrangement = spacing) {
-                item(key = "header") { Header() }
+                item(key = ItemKey("header")) { Header() }
                 items(order, key = { it }) { item ->
                     ReorderingItem(state, item, enabled = item != 7) { tile(item, it) }
                 }
             }
             kind == 1 && vertical -> LazyVerticalGrid(GridCells.Fixed(columns), modifier, grid, contentPadding = padding,
                 reverseLayout = reverse, verticalArrangement = spacing, horizontalArrangement = spacing) {
-                item(key = "header", span = { GridItemSpan(maxLineSpan) }) { Header() }
+                item(key = ItemKey("header"), span = { GridItemSpan(maxLineSpan) }) { Header() }
                 items(order, key = { it }) { item ->
                     ReorderingItem(state, item, enabled = item != 7) { tile(item, it) }
                 }
             }
             kind == 1 -> LazyHorizontalGrid(GridCells.Fixed(columns), modifier, grid, contentPadding = padding,
                 reverseLayout = reverse, verticalArrangement = spacing, horizontalArrangement = spacing) {
-                item(key = "header", span = { GridItemSpan(maxLineSpan) }) { Header() }
+                item(key = ItemKey("header"), span = { GridItemSpan(maxLineSpan) }) { Header() }
                 items(order, key = { it }) { item ->
                     ReorderingItem(state, item, enabled = item != 7) { tile(item, it) }
                 }
             }
             vertical -> LazyVerticalStaggeredGrid(StaggeredGridCells.Fixed(columns), modifier, staggered, contentPadding = padding,
                 reverseLayout = reverse, verticalItemSpacing = Theme.padding.v9, horizontalArrangement = spacing) {
-                item(key = "header", span = StaggeredGridItemSpan.FullLine) { Header() }
+                item(key = ItemKey("header"), span = StaggeredGridItemSpan.FullLine) { Header() }
                 items(order, key = { it }) { item ->
                     ReorderingItem(state, item, enabled = item != 7) { tile(item, it) }
                 }
             }
             else -> LazyHorizontalStaggeredGrid(StaggeredGridCells.Fixed(columns), modifier, staggered, contentPadding = padding,
                 reverseLayout = reverse, horizontalItemSpacing = Theme.padding.h9, verticalArrangement = spacing) {
-                item(key = "header", span = StaggeredGridItemSpan.FullLine) { Header() }
+                item(key = ItemKey("header"), span = StaggeredGridItemSpan.FullLine) { Header() }
                 items(order, key = { it }) { item ->
                     ReorderingItem(state, item, enabled = item != 7) { tile(item, it) }
                 }

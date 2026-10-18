@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.zIndex
 import love.yinlin.app
 import love.yinlin.app.world.resources.Res
@@ -92,7 +91,7 @@ class ScreenWorld : BasicScreen() {
             animationSpec = tween(Theme.animation.duration.v10),
         )
         var hasAppeared by rememberFalse(activity.id)
-        val appearanceScale = remember(activity.id) { Animatable(if (hasAppeared) 1f else 1.05f) }
+        val appearanceScale = remember(activity.id) { Animatable(if (hasAppeared) 1f else 1.1f) }
         val appearanceDuration = Theme.animation.duration.v3
         val shape = Theme.shape.v3
 
@@ -118,7 +117,7 @@ class ScreenWorld : BasicScreen() {
                             waitForUpOrCancellation(pass = PointerEventPass.Initial)
                         }
                     }
-                }.clickable(interactionSource = interactionSource, role = Role.Button, onClick = onClick)
+                }.clickable(interactionSource = interactionSource, onClick = onClick)
         ) {
             Image(
                 res = activity.cover,

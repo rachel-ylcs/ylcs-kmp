@@ -24,6 +24,7 @@ import love.yinlin.compose.ColorSystem
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ThemeMode
 import love.yinlin.compose.ToolingTheme
+import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.container.Surface
@@ -107,7 +108,9 @@ private fun GallerySidebar(selected: PageItem, filtered: List<PageItem>, search:
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            if (PageItem.overview in filtered) item(key = "overview") { GalleryNavItem(PageItem.overview, selected) }
+            if (PageItem.overview in filtered) {
+                item(key = ItemKey("overview")) { GalleryNavItem(PageItem.overview, selected) }
+            }
             PageGroup.entries.forEach { group ->
                 val pages = filtered.filter { it.group == group }
                 if (pages.isNotEmpty()) {
@@ -118,10 +121,12 @@ private fun GallerySidebar(selected: PageItem, filtered: List<PageItem>, search:
                     items(pages, key = { it.id }) { GalleryNavItem(it, selected) }
                 }
             }
-            if (filtered.isEmpty()) item(key = "empty") {
-                Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    GalleryParagraph("没有找到匹配的组件。试试 Button、输入或日历。")
-                    TextButton("清除搜索", icon = Icons.Clear) { search.clear() }
+            if (filtered.isEmpty()) {
+                item(key = ItemKey("empty")) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        GalleryParagraph("没有找到匹配的组件。试试 Button、输入或日历。")
+                        TextButton("清除搜索", icon = Icons.Clear) { search.clear() }
+                    }
                 }
             }
         }
