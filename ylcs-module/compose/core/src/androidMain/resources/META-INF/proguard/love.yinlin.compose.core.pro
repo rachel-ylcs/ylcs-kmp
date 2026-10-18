@@ -4,8 +4,6 @@
     public static final android.os.Parcelable$Creator *;
 }
 
--keep class **.R$*{*;}
-
 -keep public class * extends android.view.View {
     *** get*();
     void set*(***);
