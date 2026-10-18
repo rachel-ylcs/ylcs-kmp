@@ -111,6 +111,21 @@ Maven 发布坐标由模块路径和应用版本名生成，例如：
 
 Linux 与 macOS 使用 `./gradlew`。具体任务是否能执行取决于当前宿主、SDK 和模块配置。
 
+### iOS 宿主与归档
+
+首次打开 Xcode 工程或修改 SwiftPM 依赖后，在 macOS 的仓库根目录执行：
+
+```bash
+XCODEPROJ_PATH="$PWD/ylcs-app/iosApp/iosApp.xcodeproj" \
+  ./gradlew :ylcs-app:app:portal:integrateLinkagePackage
+```
+
+此任务为 `portal` 及其传递依赖生成 `ylcs-app/iosApp/KotlinMultiplatformLinkedPackage`，供 Xcode 链接 MMKV 等 SwiftPM 原生依赖。该目录属于生成内容，不提交到版本控制。
+
+随后打开 `ylcs-app/iosApp/iosApp.xcodeproj`。工程会在 Swift 编译前调用 `:ylcs-app:app:portal:embedAndSignAppleFrameworkForXcode`，根据 Xcode 当前配置及架构构建 framework。Debug 和 Release 的搜索路径均指向 `portal/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`；Scheme 的前置脚本负责生成版本号配置。
+
+CI 的 `.github/actions/package-ios` 会先生成 SwiftPM 链接包，再以 Release 配置归档 iOS 真机应用并打包未签名 IPA。仅执行 `linkDebugFrameworkIosArm64` 不会验证 Swift 宿主编译和 Xcode 归档。
+
 ## 文档生成
 
 `.github/workflows/docs.yml` 依次生成 Gallery、ModernScreen 与 Dokka 页面，再由 MkDocs 发布站点。对应的生成任务为 `:ylcs-app:gallery:galleryPublish`、`:ylcs-app:modern-screen:modernScreenPublish` 与 `dokkaGenerateHtml`。
