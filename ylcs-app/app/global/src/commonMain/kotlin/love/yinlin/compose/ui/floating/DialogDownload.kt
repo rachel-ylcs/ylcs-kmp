@@ -68,7 +68,7 @@ suspend fun DialogDownload.downloadPhotos(pics: List<String>) {
                         if (result) picker.actualSave(filename, origin, it)
                     }
                 }.also { picker.cleanSave(origin, it) }
-            }
+            } ?: return@open false
             this.current = (index + 1).toString()
             this.progress = (index + 1) / pics.size.toFloat()
         }

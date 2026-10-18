@@ -14,6 +14,9 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!-- Android 8/9 保存到公共相册时使用，Android 10 及以上不申请此权限。 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:ignore="PhotoAndVideoPolicy"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:ignore="PhotoAndVideoPolicy"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
@@ -25,7 +28,8 @@
         android:label="银临茶舍"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/Rachel.Theme" >
+        android:theme="@style/Rachel.Theme"
+        tools:ignore="Instantiatable">
         <activity
             android:exported="true"
             android:name="love.yinlin.MainActivity"

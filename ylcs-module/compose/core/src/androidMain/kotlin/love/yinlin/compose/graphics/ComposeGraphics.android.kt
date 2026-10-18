@@ -1,10 +1,13 @@
 package love.yinlin.compose.graphics
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import android.graphics.BlendMode as AndroidBlendMode
 import android.graphics.Matrix as AndroidMatrix
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Matrix
 
+@RequiresApi(Build.VERSION_CODES.Q)
 fun BlendMode.asAndroidBlendMode(): AndroidBlendMode = when (this) {
     BlendMode.Clear -> AndroidBlendMode.CLEAR
     BlendMode.Src -> AndroidBlendMode.SRC
@@ -38,6 +41,7 @@ fun BlendMode.asAndroidBlendMode(): AndroidBlendMode = when (this) {
     else -> error("Unknown BlendMode $this")
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 fun AndroidBlendMode.asComposeBlendMode(): BlendMode = when (this) {
     AndroidBlendMode.CLEAR -> BlendMode.Clear
     AndroidBlendMode.SRC -> BlendMode.Src

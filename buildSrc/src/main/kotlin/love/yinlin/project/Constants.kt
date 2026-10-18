@@ -91,7 +91,7 @@ class Constants(project: Project) {
 
     // Android 配置
     val android = AndroidConfig(
-        minSdk = 29,
+        minSdk = 26,
         compileSdk = 37 to 1,
         targetSdk = 37,
         ndkAbi = arrayOf("arm64-v8a"),

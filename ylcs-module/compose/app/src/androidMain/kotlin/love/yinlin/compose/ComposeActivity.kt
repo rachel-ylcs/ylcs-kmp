@@ -2,6 +2,7 @@ package love.yinlin.compose
 
 import android.app.ComponentCaller
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,7 +21,10 @@ abstract class ComposeActivity : ComponentActivity() {
         instance.activity = this
 
         enableEdgeToEdge()
-        window.isNavigationBarContrastEnforced = false
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
 
         lifecycleScope.launch {
             instance.initPoolLater(this)
