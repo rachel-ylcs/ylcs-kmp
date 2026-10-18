@@ -1,0 +1,1 @@
+@"%~dp0..\..\tool\fontsubset.exe" -a -s -c dic/ ./base_rhyme.ttf ./rhyme.ttf
