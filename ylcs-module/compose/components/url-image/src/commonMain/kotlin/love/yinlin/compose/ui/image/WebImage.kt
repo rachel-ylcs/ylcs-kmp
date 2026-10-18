@@ -1,6 +1,5 @@
 package love.yinlin.compose.ui.image
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -40,13 +39,13 @@ import com.github.panpf.sketch.request.disallowAnimatedImage
 import com.github.panpf.sketch.size
 import com.github.panpf.sketch.state.ColorPainterStateImage
 import com.github.panpf.sketch.util.toSize
-import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.components.url_image.resources.Res
 import love.yinlin.compose.components.url_image.resources.placeholder_pic
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.roundToIntOffset
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.extension.then
 import org.jetbrains.compose.resources.imageResource
@@ -156,8 +155,7 @@ internal fun WebImage(
     onClick: (() -> Unit)? = null
 ) {
     Box(modifier = modifier) {
-        if (uri.isBlank()) Box(modifier = Modifier.matchParentSize().background(Colors.Black))
-        else {
+        if (uri.isNotBlank()) {
             AsyncImage(
                 uri = buildWebImageKeyUrl(uri, key),
                 contentDescription = null,
@@ -171,24 +169,27 @@ internal fun WebImage(
                     .progressIndicator(state, rememberWebImageIndicator())
                     .zIndex(1f)
             )
-
-            // asyncImage库目前没法解决的问题, 暂时只能把可点击区域固定到实际图片区域
-            val density = LocalDensity.current
-            val hitBox by rememberDerivedState {
-                if (contentScale == ContentScale.Fit) {
-                    val size = with(density) { state.size?.toSize()?.toDpSize() }
-                    val rawSize = with(density) { state.result?.image?.size?.toSize()?.toDpSize() }
-                    if (size != null && rawSize != null) Modifier.calcHitBox(size, rawSize) else Modifier
-                }
-                else Modifier.matchParentSize()
-            }
-            Box(
-                modifier = Modifier
-                    .then(hitBox)
-                    .condition(circle) { clip(Theme.shape.circle) }
-                    .condition(onClick != null) { clickable(onClick = onClick) }.zIndex(2f)
-            )
         }
+        else {
+            Icon(icon = Icons.QuestionMark, modifier = Modifier.align(Alignment.Center))
+        }
+
+        // asyncImage库目前没法解决的问题, 暂时只能把可点击区域固定到实际图片区域
+        val density = LocalDensity.current
+        val hitBox by rememberDerivedState {
+            if (contentScale == ContentScale.Fit) {
+                val size = with(density) { state.size?.toSize()?.toDpSize() }
+                val rawSize = with(density) { state.result?.image?.size?.toSize()?.toDpSize() }
+                if (size != null && rawSize != null) Modifier.calcHitBox(size, rawSize) else Modifier
+            }
+            else Modifier.matchParentSize()
+        }
+        Box(
+            modifier = Modifier
+                .then(hitBox)
+                .condition(circle) { clip(Theme.shape.circle) }
+                .condition(onClick != null) { clickable(onClick = onClick) }.zIndex(2f)
+        )
     }
 }
 
