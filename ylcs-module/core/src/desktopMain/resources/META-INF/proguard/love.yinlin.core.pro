@@ -1,15 +1,11 @@
 -optimizationpasses 5
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!method/specialization/parametertype
 -keepattributes Exceptions, InnerClasses, Deprecated, EnclosingMethod
 -keepattributes SourceFile, LineNumberTable, Signature
 -keepattributes RuntimeVisibleAnnotations, AnnotationDefault, *Annotation*
 -dontnote **
 
 # ----------------------------------------- Kotlin ----------------------------------------------- #
-
--keepclassmembers class * {
-    public <init>(...);
-}
 
 -keepclassmembers enum * {
     public static **[] values();
