@@ -55,8 +55,10 @@ class APIFormScope {
         val key = (index++).toString()
         if (I::class == APIFile::class) {
             if (i != null) {
-                require(i is ClientAPIFile) { "Unsupported APIFile at parameter $key" }
-                when (val value = i.value) {
+                // Kotlin/Wasm 2.5.0-Beta1 内联 Int 时，直接智能转换 i 会生成非法字段访问。
+                val file = i as? ClientAPIFile
+                require(file != null) { "Unsupported APIFile at parameter $key" }
+                when (val value = file.value) {
                     is ByteArray -> internalAddByteArray(key, value)
                     is RawSource -> internalAddRawSource(key, value)
                     is Sources<out RawSource> -> {
