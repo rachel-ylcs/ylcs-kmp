@@ -152,13 +152,14 @@ jobs:
           submodules: recursive
 
       - name: Build
-        run: ./gradlew ylcs-app:server:linkReleaseExecutableLinux
+        run: ./gradlew ylcs-app:server:serverPublish
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: ylcs-server
           path: outputs/server.kexe
+          if-no-files-found: error
 
   package-modManager:
     name: Package Mod Manager
