@@ -40,7 +40,7 @@ import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberValueState
 import love.yinlin.compose.rememberDeviceType
-import love.yinlin.compose.screen.Screen
+import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
@@ -65,7 +65,7 @@ import love.yinlin.extension.cleaning
 import kotlin.math.roundToInt
 
 @Stable
-class ScreenConcert : Screen() {
+class ScreenConcert : BasicScreen() {
     @Stable
     private data class ConcertItem(
         val concert: Concert,
@@ -188,8 +188,6 @@ class ScreenConcert : Screen() {
         concertDialog.close()
         navigate("ScreenMusicDetails", pid)
     }
-
-    override val title: String = "演出记忆"
 
     override fun initialize() {
         launch { requestData() }
@@ -880,7 +878,7 @@ class ScreenConcert : Screen() {
     }
 
     @Composable
-    override fun Content() {
+    override fun BasicContent() {
         val animationScope = rememberCoroutineScope()
 
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()) {
