@@ -37,6 +37,9 @@ template(object : KotlinMultiplatformTemplate() {
         wasmJsMain.configure(webMain)
     }
 
+    // 仅导入 MMKV 的公开 API，避免扫描 MMKVCoreOpenSSL 中需要宏定义的内部模板头文件。
+    override val swiftDiscoverClangModulesImplicitly: Boolean = false
+
     override val swiftPackages: List<SwiftPackage> = listOf(
         SwiftPackage.Remote("https://github.com/Tencent/MMKV.git", libs.versions.mmkv.get(), listOf("MMKV")),
         SwiftPackage.Local("Dummy"),

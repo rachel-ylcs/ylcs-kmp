@@ -96,6 +96,8 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
     open val iosFrameworkBaseName: String? = null
     open val iosFrameworkIsStatic: Boolean? = null
     open val swiftPackages: List<SwiftPackage> = emptyList()
+    /** 是否自动发现 SwiftPM 的 Clang 模块；关闭后按声明的模块列表导入。 */
+    open val swiftDiscoverClangModulesImplicitly: Boolean = true
 
     // Desktop
     open val desktopTarget: Boolean = true
@@ -201,6 +203,7 @@ abstract class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformE
                 if (C.platform == BuildPlatform.Mac) {
                     extensions.findByType<SwiftPMImportExtension>()?.apply {
                         iosMinimumDeploymentTarget.set(C.ios.target)
+                        discoverClangModulesImplicitly.set(swiftDiscoverClangModulesImplicitly)
 
                         val localSPMDir = iosLocalSPMDir
 
