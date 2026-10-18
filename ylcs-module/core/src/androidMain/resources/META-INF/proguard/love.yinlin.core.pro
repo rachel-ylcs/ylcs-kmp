@@ -78,8 +78,3 @@
 -keepclassmembers public class **$$serializer {
     private ** descriptor;
 }
-
-# ----------------------------------- kotlinx.io --------------------------------------- #
-
--keep class kotlinx.io.** { *; }
--keep class okio.** { *; }

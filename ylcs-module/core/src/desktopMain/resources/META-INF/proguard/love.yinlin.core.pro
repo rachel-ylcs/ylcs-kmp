@@ -59,8 +59,9 @@
 
 # ----------------------------------- kotlinx.io --------------------------------------- #
 
--keep class kotlinx.io.** { *; }
--keep class okio.** { *; }
+-keep,allowshrinking,allowobfuscation class okio.Okio__* {
+    *;
+}
 
 # ----------------------------------- kotlinx.coroutines --------------------------------------- #
 
