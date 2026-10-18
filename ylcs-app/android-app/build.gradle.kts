@@ -19,6 +19,13 @@ template(object : KotlinAndroidTemplate() {
         lib(projects.ylcsApp.app.portal)
     }
 
+    override fun ApplicationExtension.android() {
+        androidResources {
+            @Suppress("UnstableApiUsage")
+            localeFilters += listOf("zh-rCN")
+        }
+    }
+
     override fun ApplicationExtension.sign(): ApkSigningConfig? = try {
         val localProperties = Properties().also { p ->
             C.root.localProperties.asFile.inputStream().use { p.load(it) }
