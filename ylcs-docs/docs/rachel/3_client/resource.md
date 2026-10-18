@@ -1,67 +1,61 @@
 # 客户端资源
 
-`APIRes` 用共享类型描述静态资源路径。客户端通过 `.url` 使用它，服务端则把同一对象映射到公开目录或文件操作，避免两端分别拼接字符串。
+`APIRes` 使用共享类型描述资源层级。客户端通过 `.url` 生成地址，服务端可使用相同路径组织公开资源。
 
-## 定义资源树
+## 定义层级
 
 ```kotlin
-object ServerRes : APIRes("public") {
+object PublicRes : APIRes("public") {
     object Assets : APIRes(this) {
-        val DefaultAvatar = APIRes(this, "default_avatar.webp")
+        val Logo = APIRes(this, "logo.webp")
     }
 
     object Users : APIRes(this) {
         class User(uid: Int) : APIRes(this, "$uid") {
             val avatar = APIRes(this, "avatar.webp")
-            val wall = APIRes(this, "wall.webp")
         }
     }
 }
 ```
 
-生成路径：
+对应路径：
 
 ```text
-ServerRes.Assets.DefaultAvatar -> public/assets/default_avatar.webp
-ServerRes.Users.User(42).avatar -> public/users/42/avatar.webp
+PublicRes.Assets.Logo          → public/assets/logo.webp
+PublicRes.Users.User(42).avatar → public/users/42/avatar.webp
 ```
 
-只传父节点时，当前类的简单名称会转成小写路径段；显式传 name 时使用给定值。嵌套对象名因此也是公开路径的一部分，重命名需要迁移或兼容别名。
+仅传父节点时，路径段由当前类的简单名称转为小写。显式提供名称时按名称拼接。资源层级中的类型重命名可能改变公开路径。
 
-## 生成 URL
+## 生成地址
 
 ```kotlin
 ClientEngine.init("https://api.example.com")
-
-val avatarUrl = ServerRes.Users.User(uid).avatar.url
-// https://api.example.com/public/users/42/avatar.webp
+val avatarUrl = PublicRes.Users.User(42).avatar.url
 ```
 
-`.url` 只是 `baseUrl` 与资源 path 的直接拼接，不检查文件是否存在，也不附加版本、鉴权或缓存控制。图片变更后需要破缓存时，可由消费组件提供 key/query 策略，或使用内容摘要文件名。
+结果为 `https://api.example.com/public/users/42/avatar.webp`。`.url` 是 `love.yinlin.cs` 中的扩展，直接拼接基础地址和资源路径，不执行存在性检查、查询编码、鉴权或缓存版本管理。
 
-## 动态路径安全
+## 动态名称
 
-`APIRes(parent, name)` 不进行 percent 编码和路径净化。动态段应来自受控 ID，不能直接接受含 `/`、`..`、`?`、`#` 的用户输入：
+`APIRes(parent, name)` 不对动态段进行编码或路径净化。资源 ID 应使用受控格式：
 
 ```kotlin
 require(id.matches(Regex("[A-Za-z0-9_-]+")))
-val resource = APIRes(ServerRes.Users, id)
+val resource = APIRes(PublicRes.Users, id)
 ```
 
-面向任意外部 URL 或复杂查询参数时使用 `Uri`，不要让 `APIRes` 兼任 URL builder。
+任意用户文件名和外部 URL 不应直接作为动态路径段。
 
-## 与 UI 图片的组合
+## 缓存与访问控制
 
-```kotlin
-WebImage(
-    uri = ServerRes.Users.User(uid).avatar.url,
-    key = avatarVersion,
-    circle = true
-)
-```
+网络图片模块负责实际下载和缓存，`APIRes` 仅提供路径。可变资源应明确版本参数、内容摘要名称或服务端缓存策略，避免内容更新后继续显示旧缓存。
 
-`APIRes` 只负责稳定地址；`WebImage`/Sketch 负责请求、内存与磁盘缓存。资源 URL 指向用户可变内容时，提供稳定的版本 key，避免每次重组绕过缓存，也避免更新后继续显示旧图。
+公开静态目录不包含业务鉴权。需要权限检查的内容应通过受控 API 或其他授权路由访问，不能只依赖资源路径难以猜测。
 
-## 公开资源与受保护内容
+`APIRes` 实现 `APIFile` 表示路径集合，但不是客户端上传数据包装。上传需使用 `apiFile(...)`，见[文件上传](file.md)。
 
-当前 ServerEngine 的静态路由直接提供目录内容。需要授权检查、临时签名或审计的文件不应仅靠 `APIRes.url` 暴露；应通过 API 验证后返回数据/短期 URL，或安装独立的受控路由。
+## 源码入口
+
+- `ylcs-module/cs/core/src/commonMain/kotlin/love/yinlin/cs/APIRes.kt`
+- `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/ResRequest.kt`

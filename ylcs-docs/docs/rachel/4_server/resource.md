@@ -1,66 +1,62 @@
 # 服务端静态资源
 
-`ServerEngine.public` 同时决定本地静态目录名和远程路由前缀。若值为 `public`：
+`ServerEngine.public` 决定静态目录名称与远程路由前缀。例如设置为 `public` 时：
 
 ```text
-本地：<currentDirectory>/public/assets/logo.webp
-远程：GET /public/assets/logo.webp
+本地目录：<currentDirectory>/public
+访问地址：GET /public/assets/logo.webp
 ```
 
-共享 `APIRes` 可以在客户端与服务端引用同一条路径：
+共享资源树的根应与该前缀保持一致：
 
 ```kotlin
-object ServerRes : APIRes("public") {
+object PublicRes : APIRes("public") {
     object Assets : APIRes(this) {
         val Logo = APIRes(this, "logo.webp")
     }
 }
 
-override val public = ServerRes.toString()
+override val public = PublicRes.path
 ```
 
-## 静态路由行为
+## 响应行为
 
-- 只处理 GET。
-- 请求目录时尝试返回目录内的 `index.html`。
-- 根据扩展名推断 Content-Type，无法识别时使用 `application/octet-stream`。
-- 文本、SVG 及部分 application 文本格式补 UTF-8 charset。
-- 文件不存在时返回 404。
-- 通过 Source 流式响应并提供文件长度。
+当前静态路由实现如下：
 
-当前实现不生成目录列表，也没有 ETag、Range、压缩或显式 Cache-Control。大流量资源更适合由反向代理/CDN 直接服务；应用服务端可专注于 API 和授权。
+- 处理 GET 请求。
+- 目录请求尝试读取其中的 `index.html`。
+- 根据扩展名选择 Content-Type，未知类型使用 `application/octet-stream`。
+- 为文本、SVG 及部分 application 文本类型补充 UTF-8 charset。
+- 通过 Source 流式响应，并提供文件长度。
+- 路径无对应文件时返回 404。
 
-## 写入资源
+封装未提供目录列表、ETag、Range、压缩和显式 Cache-Control。需要相关能力时由部署层或独立路由实现。
 
-服务端的 `APIRes` 同时实现 `APIFile`，可作为上传文件目标：
+## 文件操作与路径
+
+`APIRes` 实现 `APIFile`，可以作为服务端 `copy` 的目标：
 
 ```kotlin
-val target = ServerRes.Users.User(uid).avatar
+val target = PublicRes.Assets.Logo
 uploaded.copy(target)
 ```
 
-这会把第一个上传临时文件同步复制到目标的第一个路径。目标父目录需要提前建立；覆盖、原子替换和旧文件清理应由业务逻辑明确控制。
+此辅助函数直接使用 `APIFile.files` 中的路径，同步复制第一个文件，不自动以 `engine.currentDirectory` 重新定位。使用相对路径时，必须确认进程工作目录；也可显式以引擎目录构造绝对目标路径。
 
-建议写入临时目标，验证和处理完成后再移动/替换正式资源，避免请求中断留下半文件。对图片等内容，生成服务端决定的文件名，不使用客户端原始文件名。
+父目录、覆盖策略和持久文件生命周期由业务管理。复制上传文件不会改变解析器对源临时文件的所有权。
 
-## 安全边界
+## 公开范围
 
-静态目录里的任何文件都应视为无需鉴权即可读取。不要放置：
+静态目录中的文件按公开内容处理。需要鉴权的导出、原始上传、配置和日志应放置在其他目录，并通过受控接口访问。
 
-- `config.json`、数据库备份或日志；
-- 用户原始上传、未审核内容；
-- 临时文件或含访问令牌的导出；
-- 服务端二进制和调试符号。
-
-动态 `APIRes` 名称必须限制字符并拒绝分隔符、`..`、查询字符。静态路由自身没有额外业务 allowlist；还应在反向代理层验证路径处理、禁用不需要的方法并限制响应大小。
+`APIRes` 不校验动态路径段。业务 ID 与文件名应使用受控字符集，静态路由直接拼接请求路径的实现也不应被描述为已经完成所有路径安全校验。
 
 ## 缓存策略
 
-框架不设置缓存头。常见做法：
+不可变资源可使用内容摘要名称；头像等可变资源应通过版本与缓存头明确更新行为。客户端 `.url` 仅生成地址，资源缓存策略需与部署配置共同确定。
 
-- 不可变资源使用内容摘要文件名和长缓存；
-- 用户头像等稳定 URL 使用版本 query/key 或短缓存；
-- 私有资源不走公开静态目录，改用鉴权 API/签名 URL；
-- HTML 入口短缓存，避免新版引用旧资源图。
+## 源码入口
 
-客户端 `.url` 只是地址拼接，缓存语义必须由部署层和资源命名共同定义。
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/StaticRoute.kt`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APIFiles.kt`
+- `ylcs-module/cs/core/src/commonMain/kotlin/love/yinlin/cs/APIRes.kt`

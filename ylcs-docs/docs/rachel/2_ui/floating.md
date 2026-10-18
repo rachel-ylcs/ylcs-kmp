@@ -1,15 +1,15 @@
 # 浮层
 
-Rachel 把 Dialog、Sheet、Tip 和 FAB 放在统一的 `Floating` 模型中。浮层对象持有“是否打开”和本次参数，Composable 侧通过 `Land()` 把它安放在页面树中；打开动作只改变对象状态，不会临时创建新的窗口树。
+Rachel 通过 `Floating`、Dialog、Sheet、Tip 与 FAB 管理覆盖层交互。浮层实例保存打开状态，组合侧调用 `Land()` 渲染对应内容。
 
-## Land 后再打开
+## 注册与显示
 
-`BasicScreen` 已自动 Land 默认 `slot.info`、`slot.confirm`、`slot.loading`、`slot.tip` 和页面的 `fab`。自定义 Dialog/Sheet 必须注册：
+`BasicScreen` 自动渲染默认 `slot.info`、`slot.confirm`、`slot.loading`、`slot.tip` 和页面 `fab`。自定义对话框与面板通过 `land` 注册：
 
 ```kotlin
 class ScreenEditor : Screen() {
-    private val renameDialog = land DialogInput()
-    private val detailsSheet = land DetailsSheet()
+    private val renameDialog = this land DialogInput(hint = "名称")
+    private val detailsSheet = this land DetailsSheet()
 
     private fun rename() = launch {
         val value = renameDialog.open(initText = currentName) ?: return@launch
@@ -17,83 +17,91 @@ class ScreenEditor : Screen() {
     }
 
     @Composable
-    override fun Content() { /* ... */ }
+    override fun Content() {
+        PrimaryButton("重命名", onClick = { rename() })
+    }
 }
 ```
 
-没有 Land 的实例可以被标记为 open，却没有任何 UI 消费它。不要在 Composable 每次重组时 `DialogInput()`；让页面/ViewModel持有稳定实例。
+`land` 是页面的中缀函数，需提供接收者。非页面场景应保持浮层实例稳定，并在所属组合中调用相应 `Land()`。仅执行 `open()` 不会自动插入组合节点。
 
-## Dialog 的挂起结果
+## 对话框结果
 
 ```kotlin
 launch {
-    if (!slot.confirm.open(content = "删除后无法恢复，继续？")) return@launch
+    if (!slot.confirm.open(content = "确认删除该条目？")) return@launch
 
+    var deleted = false
     slot.loading.open(content = "正在删除") {
         repository.delete(id)
+        deleted = true
     }
-
-    slot.tip.success("已删除")
-    pop()
+    if (deleted) slot.tip.success("删除完成")
 }
 ```
 
-常用返回形式：
+| 类型 | 常用结果 |
+| --- | --- |
+| `DialogInfo` | 等待确认或关闭，无返回值 |
+| `DialogConfirm` | `Boolean` |
+| `DialogInput` | `String?` |
+| `DialogPairInput` | `Pair<String, String>?` |
+| `DialogChoice` | `Int?` |
+| `DialogProgress<R>` | `R?` |
+| `DialogLoading` | 等待任务完成，无返回值 |
 
-- `DialogConfirm.open(...) : Boolean`
-- `DialogInput.open(...) : String?`
-- `DialogPairInput.open(...) : Pair<String, String>?`
-- `DialogChoice.open() : Int?`
-- `DialogProgress<R>.open { ... } : R?`
+Dialog 通过 `SyncFuture` 等待结果。带任务的版本将结果等待与任务置于同一 `coroutineScope`，用户结束交互时可取消并行任务。自定义对话框可通过受保护的 `future?.send(value)` 提交结果。
 
-内部用 `SyncFuture` 与结构化并发同时等待用户结果和自定义任务。用户关闭、页面离开或调用协程取消时，另一侧任务会结束；返回 `null` 表示没有结果。不要把这类取消显示为业务错误。
+普通关闭可得到空结果，协程取消仍传播 `CancellationException`。当前 `awaitResult` 在正常结果路径后调用 `close()`，不保证任意外部取消时均通过 `finally` 立即关闭；浮层离开组合时另有关闭处理。
 
-自定义 Dialog 继承 `Dialog<R>` 或 `DialogTemplate<R>`，按钮通过 `future?.send(value)` 返回结果；关闭会发送空结果并清理 future。
+普通任务异常可能被 `catchingNull` 折叠，尤其 `DialogLoading.open()` 不返回业务成功标志。操作需要区分成功和失败时，应显式保存结果或使用可表达结果的流程，再决定是否提示成功或导航。
+
+同一浮层实例只保存一份当前参数和等待对象，不应同时启动多个竞争的打开流程。
 
 ## Sheet
 
-无参数面板继承 `Sheet`，带打开参数的面板继承 `SheetContent<A>`：
-
 ```kotlin
-class DetailsSheet : SheetContent<Item>() {
+class DetailsSheet : SheetContent<String>() {
     @Composable
-    override fun Content(args: Item) {
-        Details(args)
+    override fun Content(args: String) {
+        Text(args)
     }
 }
 
-detailsSheet.open(item)
+// 已注册的实例可在事件处理中打开。
+detailsSheet.open("详情内容")
 ```
 
-布局会随窗口形态变化：竖屏从底部弹出，横屏/方形从右侧弹出。竖屏高度默认限制在父容器的 30% 到 70%；横屏使用主题 sheet 宽度。拖动超过一半关闭，内容滚动通过 nested scroll 与拖动协作。
+无参数面板继承 `Sheet`，带参数面板继承 `SheetContent<A>`。PORTRAIT 下从底部进入，SQUARE 与 LANDSCAPE 下从右侧进入。
 
-可覆写 `scrollable`、尺寸、圆角和竖屏拖拽柄。若内容本身有复杂 Lazy 列表，通常关闭内置纵向滚动，让内容自己承担滚动，避免双重滚动容器。
+竖向高度默认范围为父容器的 30% 至 70%；横向宽度默认使用主题面板尺寸。可覆写 `scrollable`、高度比例、横向宽度、圆角与竖向拖拽柄。内容本身管理 Lazy 列表滚动时，应核对与内置滚动容器的协作。
 
-## Tip
+## Tip 与 FAB
 
 ```kotlin
-slot.tip.info("提示")
-slot.tip.success("保存成功")
+slot.tip.info("提示信息")
+slot.tip.success("保存完成")
 slot.tip.warning("输入不完整")
 slot.tip.error(error.message)
 ```
 
-Tip 没有遮罩、不拦截返回键，默认 3 秒关闭。新 Tip 会取消旧定时任务，并检查任务身份，防止旧任务稍后把新消息关掉。频繁状态流不适合逐条 Tip；应在页面内展示稳定状态或合并消息。
+Tip 默认显示 3 秒，不显示遮罩，也不接管返回键。新提示会取消前一个计时任务，避免旧任务关闭后续提示。持续状态应在页面内展示，不宜频繁转为临时提示。
 
-## FAB
+页面覆写 `fab` 可提供主动作和 `FABAction` 列表，框架自动调用 `Land()`。`FABScrollTop` 提供回到滚动起点的行为。
 
-`FAB` 提供主动作和可展开的 `FABAction` 列表，动作可使用挂起回调，并通过 provider 动态取得图标、文案、颜色和 enabled。页面覆写 `fab` 后会自动 Land；滚动回顶可使用 `FABScrollTop`。
+## 层级与生命周期
 
-FAB 是当前页面动作，不应承担全局导航栏角色。在小窗口中还要检查它与底部安全区、Sheet 和输入法的重叠。
+| 浮层 | 默认 zIndex |
+| --- | --- |
+| 通用浮层 | 5 |
+| FAB | 8 |
+| Sheet | 10 |
+| Dialog | 20 |
+| Tip | 30 |
 
-## 通用浮层行为
+`Floating` 统一打开参数、进出动画、遮罩、外部点击、返回键及离开组合时的关闭。自定义实现需明确关闭策略，并验证安全区、键盘、焦点与多浮层叠加行为。
 
-`Floating<A>` 提供：
+## 源码入口
 
-- 响应式对齐和进出动画；
-- 可选遮罩、点击外部关闭和返回键关闭；
-- 每次打开一次的 `initialize(args)`；
-- 离开组合时自动 `close()`；
-- 统一层级：普通 5、FAB 8、Sheet 10、Dialog 20、Tip 30。
-
-只有确实需要新的交互形态时才直接继承 `Floating`。覆写 `useBack`、`showScrim` 或 dismiss 行为时，要同时考虑系统返回、可访问性和页面销毁。层级常量保证默认组件互不遮错；自定义 zIndex 应基于这些语义层，而不是随意给一个巨大数字。
+- `ylcs-module/compose/ui/src/commonMain/kotlin/love/yinlin/compose/ui/floating/`
+- `ylcs-module/compose/screen/src/commonMain/kotlin/love/yinlin/compose/screen/BasicScreen.kt`

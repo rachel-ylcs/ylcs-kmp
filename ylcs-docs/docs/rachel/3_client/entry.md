@@ -1,97 +1,73 @@
 # 客户端引擎
 
-`love.yinlin.cs:client-engine` 把共享 API 契约变成可调用的 Ktor Client 扩展。它负责路由拼接、JSON 数组/multipart 编码、响应解码和统一错误映射；鉴权令牌、重试、缓存与业务状态仍由应用管理。
+`cs:client-engine` 为共享 `API.post`、`API.form` 与 `Sockets` 提供请求扩展，负责地址拼接、参数编码、响应解码和状态码映射。
 
 ## 初始化
 
-应用启动时设置一次基础地址：
-
 ```kotlin
-class MainApplication(context: PlatformContext) :
-    PlatformApplication<MainApplication>(appReference, context) {
-
-    init {
-        ClientEngine.init("https://api.example.com")
-    }
-}
+ClientEngine.init("https://api.example.com")
 ```
 
-基础地址应包含 scheme 与 host，且末尾不要带 `/`：
+应在应用初始化阶段、首个请求之前完成配置。基础地址需包含 scheme 与 host，通常不带末尾 `/`。
 
-- API 请求使用 `baseUrl + route`，路由本身以 `/` 开头。
-- 静态资源使用 `baseUrl + "/" + resourcePath`。
-- WebSocket 只从基础地址解析 host，当前固定连接 `wss:443`。
-
-`baseUrl` 是全局可变值，`Common`、`File`、`Socket` 底层客户端按需惰性创建。它适合单后端应用；需要同时访问多个同构后端时，不要在并发请求之间来回修改它，应扩展为独立实例模型。
-
-## 依赖关系
-
-共享协议模块声明 API：
-
-```kotlin
-val ApiAccountLogin by
-    API.post.i<String, String, Platform>().o<String>()
-```
-
-客户端模块为这个精确类型生成可用扩展：
-
-```kotlin
-val error = ApiAccountLogin.request(account, password, platform) { token ->
-    saveToken(token)
-}
-```
-
-输入数量和类型不匹配会在编译期失败；输出回调参数也由声明推导。路径由属性名生成，详情见[C/S 共享契约](../1_start/cs_core.md)。
-
-## 三套调用风格
-
-同一 API 可以根据调用位置选择：
-
-| 风格 | 返回 | 适合场景 |
-| --- | --- | --- |
-| `request(args) { outputs }` | `Throwable?` | 页面操作，成功时直接更新状态，失败统一 Tip |
-| `request(args)` | `Data<APIResultN<...>>` | 必须区分成功与具体异常的业务流程 |
-| `requestNull(args)` | `APIResultN<...>?` | 分页/探测等允许把失败折叠为空的内部流程 |
-
-不要为了代码短而到处使用 `requestNull`。它会把未授权、业务失败、超时、网络错误和解码错误全部折叠成 `null`，UI 无法给出正确反馈。
-
-## HTTP 到异常的映射
-
-| 状态 | 客户端结果 |
+| 请求类型 | 地址规则 |
 | --- | --- |
-| 200 OK | 解码成功数组 |
-| 202 Accepted | `FailureException`，消息来自响应文本 |
-| 401 Unauthorized | `UnauthorizedException` |
-| 408 / 504 | `RequestTimeoutException` |
-| 其他状态 | `IllegalArgumentException("HTTP Error: ...")` |
-| 连接/编码/解码异常 | 原异常进入所选结果风格 |
+| API | `baseUrl + route` |
+| 资源 | `baseUrl + "/" + resourcePath` |
+| WebSocket | 解析基础地址的 host，再固定连接 `wss:443` 与声明路径 |
 
-服务端的业务失败使用 202 是此框架的内部约定，不是通用 REST 语义。若接入其他后端，应使用通用 `NetClient` 或单独适配，不要假设它也遵守这张表。
+`baseUrl` 为全局可变值。底层 Common、File 与 Socket 客户端分别惰性创建并复用。需要同时访问多个后端时，应避免在并发请求之间反复修改该全局地址。
 
-## 生命周期
+## 共享声明
 
-请求是挂起函数，应在页面 `viewModelScope`、Startup 的协程域或其他明确拥有者中运行：
+共享模块定义：
 
 ```kotlin
-class ScreenLogin : Screen() {
-    private fun login(id: String, password: String) = launch {
-        ApiAccountLogin.request(id, password, platform) { token ->
-            app.config.userToken = token
-            pop()
-        }.errorTip
-    }
+val ApiDemoEcho by API.post.i<String>().o<String>()
+```
+
+客户端调用：
+
+```kotlin
+val error = ApiDemoEcho.request("example") { value ->
+    updateContent(value)
 }
 ```
 
-当前生成包装使用返回异常/空值的 catching 逻辑，取消也可能被折叠到相同结果通道。调用方仍应把任务绑定到正确生命周期，并避免在页面已退出后用返回值更新外部状态。
+输入与输出由 API 类型约束。路由来自属性名，声明规则见[C/S 共享契约](../1_start/cs_core.md)。
 
-## 引擎不负责的事情
+## 调用形式
 
-- 不自动添加 Authorization header；令牌通常就是显式 API 输入。
-- 不自动刷新令牌或重放请求。
-- 不缓存响应。
-- 不为表单推断 MIME、文件名或大小限制。
-- 不实现 WebSocket 重连。
-- `proxy()` 只生成一个 URL，不提供代理服务。
+| 调用 | 结果 |
+| --- | --- |
+| `request(args) { outputs -> ... }` | 成功回调后返回 `null`，普通失败返回 `Throwable` |
+| `request(args)` | `Data<APIResultN<...>>`，无输出时为 `Data<Unit>` |
+| `requestNull(args)` | 成功结果或 `null`，无输出时为可空 Unit |
 
-这些边界让共享协议保持简单；应用可以在 DataSource/Startup 中按业务需求组合策略，而不会把特定登录或缓存规则固化到所有请求。
+三种形式均保留 `CancellationException` 的传播。nullable 形式丢失普通失败原因，适用于允许失败折叠为空值的读取流程。
+
+## 状态码映射
+
+| HTTP 状态 | 客户端行为 |
+| --- | --- |
+| 200 | 按声明读取输出 |
+| 202 | 抛出 `FailureException`，消息来自响应文本 |
+| 401 | 抛出 `UnauthorizedException` |
+| 408、504 | 抛出 `RequestTimeoutException` |
+| 其他 | 抛出 `IllegalArgumentException` |
+
+异常随后进入所选调用形式的结果通道，取消异常除外。202 对应业务失败是该引擎的协议约定，接入不遵守该协议的后端时应另行适配。
+
+请求和响应读取在 I/O 上下文执行，成功解码回调恢复至调用方上下文。回调中的本地异常也可能作为请求失败返回，因此不能仅凭失败结果断定服务端未完成操作。
+
+## 生命周期与能力边界
+
+请求为挂起函数，页面中使用 `launch`，应用服务使用具有明确所有者的任务作用域。引擎不自动处理令牌刷新、重试、请求缓存、写入幂等或 WebSocket 重连。
+
+鉴权信息应根据共享契约显式传递，或在应用自己的请求层中组合。当前 `ClientEngine` 没有旧文档中的 `proxy()` 辅助函数，代理现状见[代理能力](../4_server/proxy.md)。
+
+## 源码入口
+
+- `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/ClientEngine.kt`
+- `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/PostRequest.kt`
+- `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/FormRequest.kt`

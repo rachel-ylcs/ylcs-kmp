@@ -1,88 +1,84 @@
 # 服务端文件上传
 
-`API.form` 的 multipart 解析器把普通值和文件按索引恢复为共享声明中的参数。文件先流式写入服务端缓存目录，再以 `APIFile` 交给接口实现。
+`API.form` 解析 multipart 请求，将普通值与上传文件按参数索引恢复。文件内容先写入临时目录，处理器在请求作用域中接收 `APIFile`。
 
-## 接收上传
+## 接收与保存
 
 共享声明：
 
 ```kotlin
-val ApiProfileUpdateAvatar by
-    API.form.i<String, APIFile>().o<String>()
+val ApiDemoUpload by API.form.i<String, APIFile?>().o<String>()
 ```
 
-服务端实现：
+以下片段位于 `APIScope` 的接口注册函数中，仅展示路径校验与保存流程：
 
 ```kotlin
-ApiProfileUpdateAvatar.response { token, file ->
-    val uid = auth.throwExpireToken(token)
-    if (file.isEmpty) failure("没有收到文件")
+ApiDemoUpload.response { requestedId, upload ->
+    if (!requestedId.matches(Regex("[A-Za-z0-9_-]+"))) failure("标识格式不正确")
+    val file = upload ?: failure("未选择文件")
+    if (file.num != 1) failure("文件数量不正确")
 
-    val target = ServerRes.Users.User(uid).avatar
-    validateImage(file[0])
+    val directory = File(engine.currentDirectory, "uploads")
+    directory.mkdir()
+    val target = APIRes(APIRes(directory.path), "$requestedId.bin")
+    validateContent(file[0])
     file[0].copy(target)
-
-    result(target.toString())
+    result(requestedId)
 }
 ```
 
-可空 `APIFile?` 由客户端的 `#index` 占位恢复为空；多文件按 `index:subindex` 排序后成为一个 `APIFile`。
+实际接口还需完成鉴权、资源归属和覆盖规则。`validateContent` 为业务校验。示例将文件保存到独立目录，避免未验证内容直接进入公开静态目录。
 
-## 临时文件位置
+## multipart 解析规则
 
-解析器使用：
+part 名称必须为从 `0` 开始、连续的十进制非负索引，不接受多余前导零、子索引或 `#` 前缀。
 
-```text
+| 输入 | 行为 |
+| --- | --- |
+| 同索引的一个 FormItem | 将内容解析为 JSON |
+| 同索引的多个 FileItem | 按接收顺序组成一个文件参数 |
+| 文件参数的 JSON `null` | 仅在声明允许空值时恢复为 `null` |
+| 重复 FormItem | 拒绝 |
+| 同索引混用 JSON 与文件 | 拒绝 |
+| 零字节 FileItem | 拒绝 |
+
+参数类型与实际 part 不匹配时失败。解析器检查索引连续性，但未统一按 API 声明拒绝所有多余连续参数，接口调用方仍应严格遵循共享契约。
+
+## 临时文件生命周期
+
+临时目录通过以下调用获取：
+
+```kotlin
 PlatformFileSystem.cachePath(PlatformContext.Instance, "ServerNative")
 ```
 
-每个成功写入的 part 获得随机数、参数索引和唯一时间组成的临时名。`APIFile.files` 存这些路径。
+`FormResult` 在写入前登记临时文件，通过 `use { ... }` 包围解析和业务处理。无论解析、处理成功，还是普通异常与取消，退出该作用域时都会尝试删除本次登记的文件；part 也在各自的 `finally` 路径释放。
 
-当前实现没有在请求结束时自动删除临时文件。接口无论成功、业务失败还是处理异常，都应安排清理；还需要进程启动时/定时清除过期临时文件，防止磁盘持续增长。复制到正式目录不会删除源文件。
+临时文件仅在该请求处理作用域内有效。需要持久保存时，应在处理器返回前复制到业务目录；不得将临时路径直接交给稍后执行的后台任务。
 
-## APIFile 工具
+清理会继续尝试其余文件并汇总错误，但文件系统错误或进程异常终止仍可能留下临时文件。是否需要额外的过期清理由部署和业务规模决定。
 
-| API | 行为 |
+## 文件辅助接口
+
+| 接口 | 行为 |
 | --- | --- |
-| `file.isEmpty` | 是否没有任何路径 |
-| `file.num` | 文件数量 |
-| `file[index]` | 取单个文件的新 APIFile 包装 |
-| `file.copy(target)` | 第一个源同步复制到第一个目标，返回目标 File |
-| `file.delete()` | 递归删除包装中的所有路径 |
-| `file.mkdir()` | 为第一个路径创建目录 |
+| `file.files` | 底层文件路径列表 |
+| `file.isEmpty`、`file.num` | 空值与数量 |
+| `file[index]` | 单文件包装 |
+| `file.copy(target)` | 将第一个源同步复制到第一个目标，返回目标 File |
+| `file.mkdir()` | 创建第一个路径对应的目录 |
+| `file.delete()` | 递归删除包装中的路径 |
 
-多文件要逐项处理：
+这些扩展位于 `love.yinlin.cs`。请求临时文件的自动清理由解析器承担，业务目标文件的保留与删除由业务承担。
 
-```kotlin
-try {
-    repeat(files.num) { index ->
-        val source = files[index]
-        val target = APIRes(albumRoot, "$index.webp")
-        source.copy(target)
-    }
-} finally {
-    files.delete()
-}
-```
+## 大小与格式约束
 
-这些 helper 使用同步文件操作；请求处理已位于 I/O 上下文，但大型转码、解压或扫描仍应分离成受控任务，并设置并发上限。
+当前代码调用无显式参数的 `receiveMultipart()`，未在框架层定义独立的总请求、单文件、文件数量或展开内容上限，也不再使用旧文档中的 Content-Length 推导规则。
 
-## 请求大小现状
+限制应根据实际上传协议在入口和业务校验层明确。文件名、MIME 与扩展名不能替代内容验证。复杂媒体处理应在临时文件有效期内完成，或先转存至具有明确所有权的工作目录。
 
-multipart 解析直接使用请求的 `Content-Length` 作为 field limit；缺少长度时回退为 5 MiB。这里没有独立的可信“最大上传大小”，客户端可以声明很大的长度。生产环境必须在反向代理和应用层同时限制总大小、part 数量与单文件大小。
+## 源码入口
 
-不要依赖客户端 `filename` 或 Content-Type；当前客户端本来也只发送通用文件名。根据魔数/解析结果验证真实内容，并限制图片像素、压缩包展开量、媒体时长等资源消耗。
-
-## 安全落盘流程
-
-推荐顺序：
-
-1. 鉴权并检查资源归属。
-2. 检查文件数与已写入大小。
-3. 在临时区识别并完整解析格式。
-4. 对图片/媒体重编码，去除不需要的元数据。
-5. 使用服务端生成的安全文件名写临时目标。
-6. 原子替换正式文件或提交数据库记录。
-7. `finally` 删除请求临时文件。
-
-不要把上传内容直接放进公开目录后再验证；静态路由可能在验证完成前就把它提供给外部。
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APIScope.kt` 中的 `FormResult` 与 `internalResponseForm`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APIFiles.kt`
+- [客户端文件上传](../3_client/file.md)

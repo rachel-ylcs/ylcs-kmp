@@ -1,41 +1,39 @@
 # 应用入口与生命周期
 
-`PlatformApplication` 把共享的 Compose 根节点接到各平台宿主。共享应用只描述内容、主题和启动服务；平台壳负责创建实例、提供系统上下文、接收外部链接并在正确时机清理。
+`PlatformApplication` 将共享应用连接到 Android、Desktop、Web 与 iOS 宿主。共享层定义主题、根内容和启动服务，平台层负责系统上下文、界面容器与平台事件。
 
-## 两阶段启动
-
-应用初始化故意分成两段：
-
-| 阶段 | 发生时机 | 适合的工作 |
-| --- | --- | --- |
-| `initApplication` | 应用实例创建后 | 建立自引用、解析启动图、同步服务初始化、发起异步服务 |
-| `initPoolLater` | Activity、窗口或 UIViewController 已就绪 | 权限/选择器注册、依赖 UI 宿主的准备工作 |
-
-对应的关闭也分成 `destroyPoolBefore` 和 `destroyPool`。前者在 UI 宿主消失前运行，后者在整个应用退出时运行。服务的调用顺序均与依赖拓扑相反。
-
-## 共享应用
+## 共享应用结构
 
 ```kotlin
-class MainApplication(
-    context: PlatformContext
-) : PlatformApplication<MainApplication>(appReference, context) {
+open class MainApplication(context: PlatformContext) :
+    PlatformApplication<MainApplication>(appReference, context) {
+
     override val themeMode = ThemeMode.SYSTEM
 
     @Composable
     override fun Content() {
         ScreenManager.Navigation<ScreenHome> {
             screen(::ScreenHome)
-            screen(::ScreenSettings)
+            screen(::ScreenDetails)
         }
     }
 }
 ```
 
-`ComposedLayout` 会安装 `Theme`、背景和 `LocalPlatformContext`，平台入口通常不应绕开它直接调用 `Content()`。
+`appReference` 使用[快速开始](../1_start/entry.md)中的延迟引用。`ComposedLayout()` 安装主题、根背景、`LocalPlatformContext` 和 `localProvider` 中的附加 Local。标准平台入口已经调用该方法。
+
+## 启动阶段
+
+| 阶段 | 行为 |
+| --- | --- |
+| `initApplication(scope)` | 初始化应用引用并调用 `initPool`，构建同步服务、调度异步服务 |
+| `initPoolLater(scope)` | 在平台选定的界面阶段调度各服务的 `initLater` |
+| `destroyPoolBefore()` | 按服务列表逆拓扑顺序执行 `destroyBefore` |
+| `destroyPool()` | 按服务列表逆拓扑顺序执行 `destroy` |
+
+异步服务不会阻塞全部根内容的首次组合。第二阶段也不代表所有系统句柄均已可用，例如 iOS 控制器视图可能尚未挂接窗口。服务的等待关系和可空读取方式见[应用服务](service.md)。
 
 ## Android
-
-Android 使用框架提供的 `ComposeApplication` 和 `ComposeActivity`：
 
 ```kotlin
 class AndroidApplication : ComposeApplication() {
@@ -45,100 +43,77 @@ class AndroidApplication : ComposeApplication() {
 class MainActivity : ComposeActivity()
 ```
 
-Manifest 必须把二者设为实际的 application/activity。`ComposeApplication` 在 `onCreate` 中完成第一阶段；`ComposeActivity` 设置当前 Activity、启用 edge-to-edge、执行第二阶段并安装 Compose 内容。
+Manifest 应指定这两个宿主类型。`ComposeApplication.onCreate()` 创建共享实例并执行第一阶段初始化。
 
-外部 `Intent` 应在应用实例覆写的 `onIntent` 中转换成公共 `Uri`，再交给 `DeepLink.openUri`。启动 Intent 和 `onNewIntent` 都会走同一入口。不要把 Activity 保存到业务单例；`PlatformContextProvider.activity` 会随宿主更新。
+`ComposeActivity.onCreate()` 设置当前 Activity、启用 edge-to-edge、调度第二阶段初始化、转交启动 Intent，并安装 Compose 内容。后续 Intent 经 `onNewIntent` 转交给共享应用的平台实现。
 
-Android 的 `Application.onTerminate` 在真实设备上并非可靠的进程退出通知，因此持久数据应在修改时提交，不能只依赖最终 `destroy()`。
+Android 源集可覆写 `PlatformApplication.onIntent(intent)`，将外部地址解析为公共 `Uri` 后调用 `DeepLink.navigate(uri)`。应验证 scheme、路径与参数，再执行具体导航。
+
+Activity 销毁时调用 `destroyPoolBefore()`；应用宿主的 `onTerminate()` 调用 `destroyPool()` 并取消应用协程域。持久化数据不应依赖进程最终退出回调，应在数据变化时完成必要写入。
 
 ## Desktop
 
-Desktop 可以直接构造并运行：
+Desktop 源集可以定义平台专属子类：
 
 ```kotlin
+class DesktopApplication : MainApplication(PlatformContext.Instance) {
+    override val title = "示例应用"
+    override val initSize = DpSize(1200.dp, 700.dp)
+    override val minSize = DpSize(360.dp, 640.dp)
+}
+
 fun main() {
-    object : MainApplication(PlatformContext.Instance) {
-        override val title = "My App"
-        override val initSize = DpSize(1200.dp, 700.dp)
-        override val minSize = DpSize(360.dp, 640.dp)
-    }.run()
+    DesktopApplication().run()
 }
 ```
 
-可覆写项包括图标、初始/最小尺寸、圆角、标题栏、Compose/Swing 混合参数和 `ApplicationScope.MultipleWindow`。动态窗口状态通过 `controller` 修改，例如 `title`、`alwaysOnTop`、最大化、最小化和托盘；构造属性只表示初值。
+平台配置包括 `commandArgs`、标题、图标、初始尺寸、最小尺寸、圆角、Swing 混合参数与标题栏。`MultipleWindow()` 用于组合额外窗口；运行期主窗口状态由 `WindowController` 管理。
 
-框架使用无装饰窗口并在 `TopBar` 中实现拖动和窗口操作。主窗口第一次真正进入组合时执行第二阶段初始化；关闭时先清理 UI 相关服务，再退出窗口循环，最后销毁应用服务和主协程域。
+第一阶段初始化发生在窗口循环建立前，主窗口首次进入组合时通过 `LaunchFlag` 执行第二阶段初始化。退出主窗口前执行 `destroyPoolBefore()`，窗口循环结束后执行 `destroyPool()` 并取消主协程域。
 
 ## Web
 
-JS 与 WasmJS 共用入口：
-
 ```kotlin
-fun main() = MainApplication(PlatformContext.Instance).run()
+fun main() {
+    MainApplication(PlatformContext.Instance).run()
+}
 ```
 
-`run()` 通过 `ComposeViewport` 渲染，页面装载后进入第二阶段。浏览器刷新就是完整的新应用生命周期；需要跨刷新保留的数据必须写入 Web 平台持久化实现，而不是只放在应用对象中。
+JS 与 WasmJS 共用 `webMain` 实现，使用 `ComposeViewport` 渲染到 `document.body`，并可通过 `enableAccessibility` 配置可访问性。
+
+当前实现将第二阶段初始化挂接到 `window.onload`，将服务清理挂接到 `window.onclose`。这些钩子的实际触发取决于脚本装载方式和浏览器生命周期，不能作为持久化写入的唯一保证。刷新后会创建新的应用实例，需要跨刷新保留的数据应交给持久化服务。
 
 ## iOS
 
-Kotlin 侧暴露一个可由 Swift 持有的实例：
+Kotlin 侧为 Swift 提供具体子类：
 
 ```kotlin
-class IOSDelegateApplication : MainApplication(PlatformContext.Instance) {
-    fun onIOSDeepLink(uri: NSURL) = DeepLink.openUri(uri.toUri())
-}
+class IOSDelegateApplication : MainApplication(PlatformContext.Instance)
 ```
 
-SwiftUI 侧先启动实例，再创建控制器：
+Swift 宿主持有该实例，先调用 `run()` 初始化应用，再由 `UIViewControllerRepresentable.makeUIViewController` 返回 `instance.buildUIViewController()`。仓库宿主示例位于 `ylcs-app/iosApp`，Kotlin 桥接类位于 `ylcs-app/app/portal/src/iosMain`。
 
-```swift
-@main
-struct MyApp: App {
-    let instance: IOSDelegateApplication
+`buildUIViewController()` 创建 `CMPUIViewController` 父容器，将 Compose 子控制器挂载到容器边界，并在容器 `viewDidLoad()` 后调度 `initPoolLater()`。`PlatformContextProvider.controller` 保存父容器，与返回给 Swift 的控制器相同。
 
-    init() {
-        let app = IOSDelegateApplication()
-        instance = app
-        app.run()
-    }
+视图加载不等于已关联 `UIWindow`。需要窗口的能力应处理 `viewIfLoaded?.window` 为空的情况。Swift 宿主应持续使用同一个应用实例，避免在界面更新过程中重复调用启动流程。
 
-    var body: some Scene {
-        WindowGroup {
-            ComposeView(instance: instance)
-                .ignoresSafeArea(.all)
-                .onOpenURL { instance.onIOSDeepLink(uri: $0) }
-        }
-    }
-}
-```
-
-`ComposeView` 的 `makeUIViewController` 返回 `instance.buildUIViewController()`。必须一直持有同一个 Kotlin 实例；每次 SwiftUI 更新都新建应用会重复启动服务并丢失全局状态。
-
-`buildUIViewController()` 返回一个包含 Compose 子控制器的 UIKit 父容器。父容器在 `viewDidLoad()` 中建立父子关系，将子视图约束到容器四边，并在挂载完成后执行 `initPoolLater`；显隐等生命周期回调由 UIKit 自动转发。这里使用容器完整边界而非安全区，配合 SwiftUI 的 `.ignoresSafeArea(.all)`，继续由 Compose 处理安全区。
-
-`PlatformContextProvider.controller` 保存该父容器，与 `buildUIViewController()` 的返回值是同一个实例，可作为展示原生界面、访问宿主视图和所属窗口的入口。创建控制器不代表视图已挂接窗口，访问 `viewIfLoaded?.window` 时仍需处理空值，UI 操作应在主线程执行。
-
-Compose 子控制器继续负责内容渲染，父容器的状态栏样式、显隐和动画仍读取该子控制器。Swift 桥接保持原有调用方式，无需设置已弃用的 `ComposeUIViewControllerDelegate`，也无需在 `updateUIViewController` 中重复初始化。
+当前 iOS 入口公开 `run()` 和 `buildUIViewController()`；不能据此推断其具有与 Desktop 完全相同的退出清理流程。
 
 ## 公共平台操作
 
-`PlatformApplication` 统一提供：
-
-- `backHome()`：Android 回桌面，Desktop 最小化；其他平台按实际实现。
-- `openUri(uri)`：交给系统打开链接。
-- `copyText(text)`：写入剪贴板。
-- `implicitFileUri(uri)`：把公共 URI 包装成平台可解释的文件 URI。
-
-它们返回布尔值时要处理失败，不要假设系统一定存在浏览器、剪贴板或对应协议处理器。
-
-## 生命周期归属
-
-| 状态或工作 | 正确归属 |
+| 接口 | 作用 |
 | --- | --- |
-| 应用级数据库、配置、网络引擎 | `Startup` |
-| 页面首次加载和页面任务 | `Screen.initialize` / `viewModelScope` |
-| 已存在页面重新置顶 | `Screen.resume` |
-| 组合可见期间的副作用 | `LaunchedEffect` / `DisposableEffect` |
-| 平台宿主句柄 | `PlatformContextProvider` |
+| `backHome()` | Android 返回系统桌面；Desktop 最小化；其他平台按实现处理 |
+| `openUri(uri)` | 请求系统或浏览器打开地址 |
+| `copyText(text)` | 请求写入平台剪贴板 |
+| `implicitFileUri(uri)` | 创建平台可解释的文件 URI 包装 |
 
-把工作放在正确生命周期，是多平台行为一致的前提。最常见的问题来自在 Composable 重组时创建服务，或在应用启动时访问尚未存在的 Activity/UIViewController。
+返回值反映当前实现能报告的结果。例如 Web 剪贴板写入是异步浏览器请求，公共 Boolean 返回值不代表用户权限与最终写入已经确认。
+
+## 源码入口
+
+- `ylcs-module/compose/app/src/commonMain/kotlin/love/yinlin/compose/Application.kt`
+- `ylcs-module/compose/app/src/androidMain/kotlin/love/yinlin/compose/ComposeActivity.kt`
+- `ylcs-module/compose/app/src/desktopMain/kotlin/love/yinlin/compose/PlatformApplication.desktop.kt`
+- `ylcs-module/compose/app/src/webMain/kotlin/love/yinlin/compose/PlatformApplication.web.kt`
+- `ylcs-module/compose/app/src/iosMain/kotlin/love/yinlin/compose/CMPUIViewController.kt`

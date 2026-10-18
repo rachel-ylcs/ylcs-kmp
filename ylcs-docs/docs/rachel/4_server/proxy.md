@@ -1,50 +1,29 @@
-# 代理能力现状
+# 代理能力
 
-旧文档中的服务端代理能力在当前 `main` 基线中已经不存在。现有代码只有客户端 URL 生成函数：
+当前仓库未在 `ServerEngine` 或 `APIScope` 中提供 HTTP 转发路由。客户端 `ClientEngine` 也已移除旧版 `proxy()` URL 辅助函数，因此不能依据旧文档假定 `/proxy` 端点存在。
 
-```kotlin
-ClientEngine.proxy(proxy = "proxy", url = target)
-```
+## 第三方请求现状
 
-结果形如：
+`ylcs-app/third-party` 中的 `TPProxy` 保留 `proxy(url)` 与 `proxyRes(url)` 两个内部函数。当前 Web 与非 Web 分支均原样返回传入地址，源码注明 Web 服务端转发尚未实现。
 
-```text
-https://api.example.com/proxy?proxy=https%3A%2F%2Ftarget.example%2Fdata
-```
+这些函数不编码代理地址、不转发请求，也不解决浏览器 CORS。第三方调用能否成功，取决于目标服务的访问规则与实际部署环境。
 
-它只对目标 URL 做 percent encoding 并拼接地址；不会注册服务端路由、发起转发、复制 header 或绕过浏览器 CORS。若部署端没有另外实现 `/proxy`，请求只会得到 404。
+## 与服务端引擎的关系
 
-## 当前项目里的用途
+`ServerEngine` 负责静态资源、类型化 POST 与 WebSocket。普通 `API.post` 接口不是通用 HTTP 代理，不会自动复制上游方法、请求头、状态码或流式响应。
 
-第三方 Web 数据访问在浏览器目标上使用这个 helper，把外部 URL 指向预期的同源 `/proxy`；非 Web 平台直接请求外站。部分资源请求还会追加编码后的 Cookie/Referer 参数或自定义头。
+若部署环境另有网关代理，其路径、参数与访问规则属于该网关配置，当前仓库源码不能证明其存在或可用。
 
-这代表部署环境需要有独立代理实现，可能位于未纳入当前 ServerEngine 的反向代理/网关中。仅从本仓库当前服务端源码，不能推断该端点已经可用。
+## 扩展要求
 
-## 如果要实现代理
+需要转发能力时，应先定义明确的目标服务与请求结构，再由独立路由或业务服务实现。目标 URL、重定向、可转发请求头、响应大小和超时需受控，避免将任意外部输入直接交给服务端网络客户端。
 
-不要做一个“接收任意 URL 并原样请求”的开放端点。至少需要：
+代理实现应与鉴权、日志和缓存策略保持一致。包含 Cookie 或令牌的内容不宜直接拼接到可被记录的公共 URL。
 
-1. 固定用途或 host allowlist，默认拒绝所有未知目标。
-2. 解析后拒绝 loopback、私网、链路本地、云元数据地址和非 HTTP(S) scheme。
-3. 每次 DNS 解析及重定向后重新校验目标，防止 DNS rebinding/重定向绕过。
-4. 限制方法、请求头、响应头、请求体和响应体大小。
-5. 设置连接、首字节和总时长超时，并限制并发。
-6. 不允许客户端任意注入 `Host`、Authorization、Cookie、转发头。
-7. 审计目标、调用身份、耗时与字节数，但不记录敏感正文。
-8. 对图片/媒体流式转发，避免完整缓存在内存。
+浏览器 CORS 由目标服务或受信任的同源转发端决定，客户端字符串处理不会自行授予跨域访问许可。
 
-如果目标集合已知，专用端点（如 `/third-party/weibo/image?id=...`）通常比通用 URL 代理更安全，也更容易缓存和限流。
+## 源码入口
 
-## CORS 的正确位置
-
-浏览器 CORS 是目标服务端/同源代理给浏览器的许可。客户端改 URL 或添加 header 不能自行授予许可。可选方案：
-
-- 目标 API 官方支持 CORS；
-- 可信服务端专用转发；
-- 构建期抓取并静态托管允许公开的数据。
-
-不要通过关闭浏览器安全策略来验证生产方案。开发代理也要尽量复用生产 allowlist，避免上线后行为完全不同。
-
-## 与客户端 helper 对齐
-
-若保留当前 helper，服务端约定就是：路径与 query key 同名，例如 `/proxy?proxy=<encoded-url>`。额外参数的名字和编码必须由代理实现明确验证。更可维护的做法是把代理请求定义成共享 API DTO，而不是不断在 URL 后拼接敏感 header 参数。
+- `ylcs-app/third-party/src/commonMain/kotlin/love/yinlin/common/TPProxy.kt`
+- `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/ClientEngine.kt`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/ServerEngine.kt`

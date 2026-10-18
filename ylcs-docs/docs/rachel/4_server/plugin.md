@@ -1,10 +1,8 @@
 # 服务端插件
 
-ServerEngine 在建立路由前按列表安装 `BasicServerPlugin`。插件负责 Ktor 应用级能力；业务 API 仍由 `APIScope` 注册。
+`ServerEngine` 在注册路由前按 `plugins` 列表安装 Ktor 应用插件。插件管理应用管线能力，业务接口由 `APIScope` 注册。
 
 ## 插件接口
-
-需要完整 Ktor 安装能力时直接实现：
 
 ```kotlin
 interface BasicServerPlugin {
@@ -12,82 +10,69 @@ interface BasicServerPlugin {
 }
 ```
 
-只想观察每次 call 时，可继承 `ServerPlugin`：
+`Application` 指 `io.ktor.server.application.Application`。实现可以在 `onInstall()` 中安装需要的 Ktor 插件。
+
+`ServerPlugin(name)` 封装 `createApplicationPlugin` 与 `onCall`，子类实现普通回调：
 
 ```kotlin
-class RequestTagPlugin : ServerPlugin("RequestTag") {
+class RequestTracePlugin(private val logger: ServerLogger) :
+    ServerPlugin("RequestTrace") {
+
     override fun onPipelineCall(call: PipelineCall) {
-        // 此回调不是 suspend；保持轻量
+        logger.info(call.request.uri)
     }
 }
 ```
 
-`ServerPlugin` 内部通过 `createApplicationPlugin` 安装 `onCall` hook。不要在非挂起回调中做阻塞数据库/网络 I/O；需要复杂管线行为时直接写 `BasicServerPlugin` 并使用 Ktor 对应 hook。
+`PipelineCall` 来自 Ktor server application 包，`uri` 为 request 扩展。回调不是挂起函数，应保持轻量；需要其他管线行为时直接实现 `BasicServerPlugin`。
 
-## 内置插件
+## JSON
 
-### JsonPlugin
-
-安装 ContentNegotiation，并使用项目全局 `Json`。类型化 POST API 依赖它接收 `JsonArray` 和响应 `JsonElement`：
+`JsonPlugin` 安装 ContentNegotiation，并使用框架全局 `Json`：
 
 ```kotlin
-override val plugins = listOf(JsonPlugin)
+override val plugins: List<BasicServerPlugin> = [JsonPlugin]
 ```
 
-### WebSocketPlugin
+类型化 POST 的数组接收和 JSON 响应依赖对应序列化配置。
 
-安装 Ktor WebSockets，可配置 ping 周期、超时、最大帧、masking，并使用同一 JSON converter：
+## WebSocket
 
 ```kotlin
 WebSocketPlugin(
     socketPingPeriod = 15.seconds,
     socketTimeout = 15.seconds,
-    socketMaxFrameSize = 1L * 1024 * 1024,
+    socketMaxFrameSize = 1024L * 1024L,
     socketMasking = false
 )
 ```
 
-参数应按真实协议流量设置；`Long.MAX_VALUE` 不是安全的通用默认。
+四个参数均由调用方提供。插件设置 ping、超时、帧大小与 masking，并使用相同 JSON converter。示例上限不是框架默认值，需按实际协议确定。
 
-### IPLogPlugin
+## IP 日志
 
-抽象插件读取 `X-Real-IP`，先经 `filterUri(uri)` 过滤，再调用 `onLog(uri, ip)`：
+`IPLogPlugin` 读取 `X-Real-IP`，当 `filterUri(uri)` 为真且请求头存在时调用 `onLog(uri, ip)`：
 
 ```kotlin
-object : IPLogPlugin() {
-    override fun filterUri(uri: String) = uri.startsWith("/account/")
+val ipLog = object : IPLogPlugin() {
+    override fun filterUri(uri: String) = uri.startsWith("/demo/")
+
     override fun onLog(uri: String, ip: String) {
         logger.info("$ip $uri")
     }
 }
 ```
 
-只有在可信反向代理覆盖并清洗该 header 时，它才代表客户端地址。若服务可被直接访问，攻击者可以伪造 `X-Real-IP`。代理还应只允许内部连接到固定 localhost 端口。
+`logger` 来自声明该对象的服务端上下文。该插件不自行校验请求头来源，真实 IP 语义取决于可信代理是否覆盖和清洗该头。没有该头时不会自动回退到连接地址。
 
-## 自定义安装示例
+## 顺序与错误边界
 
-```kotlin
-object StatusPagesPlugin : BasicServerPlugin {
-    override fun Application.onInstall() {
-        install(StatusPages) {
-            // 只处理 APIScope 之外的路由/管线异常时要谨慎，
-            // 不要与框架既有的 API 错误协议重复响应。
-        }
-    }
-}
-```
+安装顺序由列表决定。插件异常不一定发生在 `APIScope.internalResponse` 的捕获范围内，不能假定都转换为 API 的 202、401 或 403 协议。
 
-插件列表顺序就是安装顺序。认证、CORS、压缩、限流和访问日志等存在顺序依赖时，应写集成测试验证实际管线，而不是只凭列表推断。
+当前内置插件不自动提供业务鉴权、通用代理、完整 CORS 策略或上传限流。需要的能力应通过明确的插件、业务接口或部署配置添加，并核对目标平台的依赖可用性。
 
-## 错误边界
+## 源码入口
 
-`APIScope.internalResponse` 只捕获 API handler 内部异常。插件在更早的管线阶段抛错不一定得到框架的 202/401/403 映射，应由插件或 StatusPages 明确处理，并避免把内部堆栈发给客户端。
-
-## 生产检查表
-
-- JSON 与 WebSocket 插件只在需要时安装，配置有上限。
-- CORS 指定确切 origin、method 和 header，不使用无条件通配凭据。
-- 反向代理与应用对 body/frame/超时都有限制。
-- 真实 IP header 只信任代理写入值。
-- 日志脱敏并有容量/保留策略。
-- 鉴权放在每个需要的 API/Socket 协议中；安装一个日志插件不等于访问控制。
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/BasicServerPlugin.kt`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/ServerPlugin.kt`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/plugin/`

@@ -1,85 +1,74 @@
 # 服务端回调分发
 
-`APICallback` 不是网络回调。它是带 `APICallbackScope` receiver 的挂起函数类型，用于把一个输入按业务键分派给不同处理器：
+`APICallback` 用于按业务键调用处理器，可显式传递事务或其他请求上下文。它是进程内函数调用，不创建网络请求或持久任务。
+
+## 类型定义
 
 ```kotlin
-typealias APICallback<I, O> = suspend APICallbackScope.(I) -> O
-typealias APICallbackMap<K, I, O> = MutableMap<K, APICallback<I, O>>
+typealias APICallback<I, O, C> = suspend APICallbackScope.(C, I) -> O
+typealias APICallbackMap<K, I, O, C> = MutableMap<K, APICallback<I, O, C>>
 ```
 
-## 建立分发表
+| 类型参数 | 含义 |
+| --- | --- |
+| `K` | 分发键 |
+| `I` | 业务输入 |
+| `O` | 处理结果 |
+| `C` | 显式上下文，例如 `QueryExecutor` |
+
+receiver `APICallbackScope` 提供 `failure()` 与 `expire()`。上下文 `C` 是额外参数，不替代该 receiver。
+
+## 注册处理器
+
+以下字段位于自定义 `APIScope` 中：
 
 ```kotlin
-class AppServerScope(engine: ServerEngine) : APIScope(engine) {
-    val mailCallbacks =
-        buildCallBackMap<MailType, MailEntry, String>()
+val callbacks = buildCallBackMap<String, String, String, QueryExecutor>()
+```
 
-    override fun api() {
-        accountAPI() // 注册 Register 处理器
-        rewardAPI()  // 注册 Reward 处理器
-        mailAPI()    // 使用分发表
-    }
+在 `api()` 或其调用的注册函数中设置行为：
+
+```kotlin
+callbacks["store"] = { transaction, text ->
+    if (text.isBlank()) failure("内容不能为空")
+    transaction.throwExecuteSQL(
+        "INSERT INTO demo(value) VALUES(?)",
+        text
+    )
+    "处理完成"
 }
 ```
 
-领域模块注册自己的行为：
+`QueryExecutor` 来自 SQLx4k，SQL 扩展位于 `love.yinlin.cs.service`。示例表结构由业务提供。
+
+## 在事务中调用
+
+共享接口为 `API.post.i<String, String>().o<String>()` 时：
 
 ```kotlin
-fun AppServerScope.accountAPI() {
-    mailCallbacks[MailType.Register] = { entry ->
-        val code = entry.param1.ifBlank { failure("验证码无效") }
-        createAccount(entry, code)
-        "注册成功"
+ApiDemoProcess.response { operation, text ->
+    val callback = callbacks[operation] ?: failure("不支持的操作")
+    val message = mysql.throwTransaction { transaction ->
+        callback(transaction, text)
     }
-}
-```
-
-处理接口按键调用：
-
-```kotlin
-ApiMailProcess.response { token, mailId, confirm ->
-    auth.throwExpireToken(token)
-    val entry = loadMail(mailId)
-
-    val message = if (confirm) {
-        val type = MailType.fromValue(entry.type)
-            ?: failure("未知邮件类型")
-        val callback = mailCallbacks[type]
-            ?: failure("该邮件类型暂不可处理")
-        callback(entry)
-    } else {
-        "已拒绝"
-    }
-
-    markProcessed(mailId)
     result(message)
 }
 ```
 
-因为当前 API response scope 也继承 `APICallbackScope`，调用 callback 时可以隐式使用同一个 receiver，`failure()` / `expire()` 会沿请求错误协议传播。
+API 响应作用域继承 `APICallbackScope`，因此可作为 callback 的 receiver。事务通过参数明确传入，各处理器应使用该 executor 完成需要处于同一事务内的操作。
 
-## 适合场景
+回调本身不会创建事务。如果处理器改为通过服务重新获取连接，其操作不再由传入事务统一约束。
 
-- 邮件/奖励类型对应不同领域动作；
-- 命令名对应不同处理器；
-- 插件在启动注册一组纯业务策略。
+## 生命周期与并发
 
-它不提供事件广播、多个监听器、优先级、隔离或持久队列。一个 key 只有一个 callback，重复赋值会覆盖旧处理器。
+`buildCallBackMap` 返回普通可变 Map，一个键对应一个处理器，重复赋值会覆盖。注册宜在开始接收请求前完成；运行期动态修改需要相应同步策略。
 
-## 初始化与并发
+回调输入、事务和临时资源属于当前调用，不应保存至全局字段。未知键应显式返回业务失败，不应依赖强制解包。
 
-注册通常发生在 `api()` 建路由期间，并在接收请求前结束。运行期间不要无锁修改普通 `MutableMap`。若确实需要动态注册，改用受 Mutex 保护的快照或不可变映射原子替换。
+## 应用示例与源码
 
-不要使用 `map[key]!!` 假设注册永远完整；新增枚举值或漏调某个 `xxxAPI()` 会变成 403 和服务端堆栈。启动准备阶段可以校验所有期望 key，并在缺失时直接拒绝启动。
+业务服务端的 `ServerScope.callMap` 使用 `Mail.Filter`、`MailEntry`、String 与 `QueryExecutor` 四个类型参数。`MailAPI` 在事务中调用 `callback(transaction, mailEntry)`，各领域注册对应邮件处理器。
 
-## 事务边界
-
-callback 只是函数调用，不自动创建数据库事务。像“执行奖励，再标记邮件已处理”这样的流程应放入同一数据库事务，否则中途失败会导致重复领取或状态不一致：
-
-```kotlin
-mysql.throwTransaction { tx ->
-    // callback 若要共享 tx，应把它纳入输入/上下文设计
-}
-```
-
-设计 callback 输入时传递完成操作所需的上下文，或让 callback 调用封装好的事务服务。不要让回调通过全局变量隐式抓取一次请求的临时状态。
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APICallback.kt`
+- `ylcs-app/server/src/nativeMain/kotlin/love/yinlin/cs/ServerScope.kt`
+- `ylcs-app/server/src/nativeMain/kotlin/love/yinlin/cs/MailAPI.kt`

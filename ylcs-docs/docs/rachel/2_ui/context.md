@@ -1,73 +1,69 @@
 # 平台上下文
 
-`PlatformContext` 是最小的 `expect` 类型，`PlatformContextProvider` 则在应用与启动服务中保存并补充宿主信息。这个拆分避免共享 API 到处出现 Android `Context` 或 UIKit 类型，同时又允许平台实现拿到真正需要的句柄。
+`foundation:context` 通过 `PlatformContext` 表示平台基础上下文，通过 `PlatformContextProvider` 提供运行期间的宿主信息。应用与启动服务使用同一套上下文模型。
 
-## 各平台含义
+## 平台映射
 
-| 平台 | `PlatformContext` 的实际含义 |
-| --- | --- |
-| Android | `android.app.Application` 的 typealias |
-| iOS / Desktop / Web / Native | 具有单例 `Instance` 的平台占位上下文 |
+| 平台 | `PlatformContext` | Provider 附加能力 |
+| --- | --- | --- |
+| Android | `android.app.Application` 的类型别名 | `contentResolver`、当前 `activity`、`activityResultRegistry` |
+| iOS | 提供 `Instance` 的上下文对象 | 当前 `UIViewController` |
+| JVM Desktop | 提供 `Instance` 的上下文对象 | 可空主窗口原生句柄 `windowHandle` |
+| Web 与桌面 Native | 提供 `Instance` 的上下文对象 | 基础 `rawContext` 及平台实现提供的扩展 |
 
-在 Android 上刻意使用 Application 而不是 Activity，保证长生命周期服务不会意外泄漏界面。需要 Activity 的能力通过 Provider 的可变宿主字段取得。
+Android 的基础上下文为 Application。Activity 通过 Provider 另行提供，可能在启动时尚未建立，或在后续宿主重建时更新。
 
-## Provider 提供的附加能力
+`windowHandle` 和 iOS `controller` 的写入由平台入口管理，消费者读取时应处理空值。Provider 的存在不保证所有宿主能力同时可用。
 
-应用和每个 `Startup` 都可以经由 `StartupPool` 访问 `rawContext`。平台 Provider 还补充：
+## Compose 中的访问
 
-- Android：`contentResolver`、当前 `activity`、`activityResultRegistry`。
-- iOS：当前 `UIViewController`。
-- Desktop：主窗口的原生 `windowHandle`。
-- 其他目标：至少保留 `rawContext`。
-
-这些宿主字段只有在相应 UI 已建立后才可能有值。因此，文件选择器、权限请求或需要窗口句柄的原生库应在 `initLater` 或用户操作时访问，而不是在同步服务构造期间强制解包。
-
-## 在 Compose 中读取
-
-`Application.ComposedLayout` 会提供 `LocalPlatformContext`：
+`Application.ComposedLayout()` 提供 `LocalPlatformContext`：
 
 ```kotlin
 @Composable
-fun OpenButton() {
-    val context = LocalPlatformContext.current
-
-    PrimaryButton("选择文件") {
-        val registry = context.activityResultRegistry
-        // 平台能力存在时再执行
-    }
+fun ContextContent() {
+    val provider = LocalPlatformContext.current
+    val rawContext = provider.rawContext
 }
 ```
 
-`LocalPlatformContext.current` 的类型是 `PlatformContextProvider`，不是裸 `PlatformContext`。这让公共组件既可以把 `rawContext` 传给跨平台构造器，也可以在平台源集中读取扩展属性。
+`LocalPlatformContext` 位于 `love.yinlin.compose`。读取结果是 `PlatformContextProvider`，不是裸上下文。Android 的 `activityResultRegistry` 等属性只能在拥有相应声明的平台源集中使用。
 
-纯业务逻辑不应从 CompositionLocal 隐式获取上下文。将所需文件、服务或回调作为参数传入，测试会更简单；CompositionLocal 适合 UI 树中天然依附宿主的能力。
+组合树之外的业务逻辑应显式接收所需能力，避免将 CompositionLocal 作为隐藏的全局服务入口。
 
-## 路径与上下文
+## 启动服务中的访问
 
-平台数据目录需要上下文时，统一从 `PlatformFileSystem` 获取：
+`Startup` 保存所属 `StartupPool`，启动池本身继承 `PlatformContextProvider`。服务可通过 `pool.rawContext` 获取基础上下文，并在平台实现中按需读取宿主属性。
+
+需要 Activity、控制器或窗口句柄的操作应安排在合适的生命周期阶段，并提供暂不可用时的处理。`initLater()` 的调用时机见[应用入口](entry.md)，依赖规则见[应用服务](service.md)。
+
+## 平台目录
 
 ```kotlin
-val dataPath = PlatformFileSystem.dataPath(rawContext, "my-app")
-val cachePath = PlatformFileSystem.cachePath(rawContext, "my-app")
+val dataPath = PlatformFileSystem.dataPath(provider.rawContext, "example")
+val cachePath = PlatformFileSystem.cachePath(provider.rawContext, "example")
 ```
 
-这两个目录语义不同：数据目录用于需要保留的配置与内容，缓存目录可以随时删除并重建。不要用 `appPath` 存可写用户数据；在打包应用、移动端或只读安装位置上它可能不可写。
+`PlatformFileSystem` 位于 `love.yinlin.fs`。`dataPath`、`cachePath` 与 `appPath` 都是带上下文和应用名参数的函数。
+
+数据目录保存用户配置及需要保留的内容，缓存目录保存可重建数据。应用安装目录或可执行文件位置不应被假定为可写数据目录。获取路径也不代表目录已经创建，调用方需按用途创建目录。
 
 ## 文件 URI
 
-系统分享和文件选择返回的不一定是本地路径：
+系统返回的文件标识可能包含平台访问语义：
 
-- Android 常见 `content://`，由 `ContentResolver` 授权读取。
-- iOS 可能需要沙盒访问语义。
-- Desktop 常见普通文件 URI。
+- Android 的 `ContentUri` 通过 ContentResolver 访问文档提供器资源。
+- iOS 的 `SandboxUri` 保留平台 URL 访问方式。
+- `RegularUri` 用于常规地址或路径包装。
 
-共享层使用 `ImplicitUri`、`ContentUri`、`SandboxUri` 和 `RegularUri` 保留区别。只有当 API 明确需要路径且平台实现能够解析时，才转换成 `File`。把 `content://` 的 path 字段直接当绝对路径会绕过权限模型并在真实设备上失败。
+这些类型实现 `ImplicitUri`。共享代码应使用相应读写能力，不得将任意 URI 的 path 字段直接视为普通文件绝对路径。
 
-## 设计建议
+## 生命周期约束
 
-1. 应用级对象保存 `PlatformContextProvider`，不要保存 Activity/ViewController。
-2. UI 宿主相关工作延迟到 `initLater` 或交互时。
-3. 公共代码依赖能力接口，平台源集完成最后一跳。
-4. 对可空宿主句柄设计“暂不可用”的路径，而不是使用 `!!`。
+长生命周期对象应保存稳定上下文或能力提供者，界面宿主相关操作应读取当前宿主。持有 Provider 并不能自动消除强引用风险；平台服务仍需按实际生命周期解除监听和释放资源。
 
-这个模型看似比直接传 Android Context 多一层，但它明确了所有权：应用拥有稳定上下文，窗口/Activity 只是随生命周期附着的临时宿主。
+## 源码入口
+
+- `ylcs-module/foundation/context/src/commonMain/kotlin/love/yinlin/foundation/PlatformContext.kt`
+- `ylcs-module/foundation/context/src/commonMain/kotlin/love/yinlin/foundation/PlatformContextProvider.kt`
+- `ylcs-module/compose/core/src/commonMain/kotlin/love/yinlin/compose/LocalPlatformContext.kt`

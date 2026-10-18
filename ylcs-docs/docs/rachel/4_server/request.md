@@ -1,83 +1,71 @@
 # 服务端请求
 
-`APIScope` 为共享 `API.post` / `API.form` 提供 `response` 扩展。路由和参数类型来自同一份声明，服务端只实现验证、业务逻辑与返回值。
+`APIScope` 以共享 API 声明注册 POST 路由，并提供类型化 `response` 扩展。业务处理负责鉴权、参数验证与结果生成。
 
 ## 注册接口
 
-把同一领域的实现放在 `APIScope` 扩展函数中：
-
 ```kotlin
-fun AppServerScope.accountAPI() {
-    ApiAccountLogin.response { account, password, platform ->
-        val token = authenticate(account, password, platform)
-            ?: failure("账号或密码错误")
-        result(token)
+class DemoScope(engine: ServerEngine) : APIScope(engine) {
+    override fun api() {
+        demoAPI()
     }
+}
 
-    ApiAccountLogOff.response { token ->
-        val uid = auth.throwExpireToken(token)
-        sessions.remove(uid)
+fun DemoScope.demoAPI() {
+    ApiDemoEcho.response { text ->
+        if (text.isBlank()) failure("内容不能为空")
+        result(text)
     }
 }
 ```
 
-然后只在 `api()` 中调用一次：
+`ApiDemoEcho` 为 `API.post.i<String>().o<String>()`。领域扩展应由 `api()` 调用，确保注册时路由宿主已经建立。重复或遗漏注册需由应用结构避免。
+
+有输出时，处理器使用 `APIResultScopeN` 并返回 `result(...)`；无输出时使用 `APIResponseScope`，正常结束后响应空数组。`API.form` 的注册方式相同，文件生命周期见[文件上传](file.md)。
+
+## 失败协议
+
+响应作用域继承 `APICallbackScope`：
 
 ```kotlin
-override fun api() {
-    accountAPI()
-    profileAPI()
-}
+val userId = validateToken(token) ?: expire()
+if (!canEdit(userId, itemId)) failure("无权修改该条目")
+result(saveItem(itemId))
 ```
 
-所有共享 API 当前注册为 HTTP POST。`response` 会按声明解构 JSON 输入；有输出时 block 的 receiver 是对应 `APIResultScopeN`，用 `result(...)` 返回固定数量的值；无输出时正常结束即可。
+上例的验证与保存函数由业务实现。
 
-## 验证与失败
+| 处理结果 | HTTP 状态 | 响应形式 |
+| --- | --- | --- |
+| 正常 | 200 | JSON 输出数组 |
+| `failure(message)` / `FailureException` | 202 | 错误文本 |
+| `expire()` / `UnauthorizedException` | 401 | 空 JSON 数组 |
+| 其他普通异常 | 403 | 空 JSON 数组 |
 
-所有 Response/Result Scope 都继承 `APICallbackScope`：
+普通异常记录请求 URI 与堆栈，再执行上述映射。`CancellationException` 由 `catchingError` 继续抛出，不进入普通错误响应分支。
 
-```kotlin
-val uid = validateToken(token) ?: expire()
-if (name.isBlank()) failure("名称不能为空")
-return result(savedProfile)
-```
-
-映射规则与客户端成对：
-
-| 服务端异常 | HTTP | 响应 | 客户端 |
-| --- | --- | --- | --- |
-| 正常 | 200 | JSON 输出数组 | 成功 |
-| `failure(message)` | 202 | 文本 message | `FailureException` |
-| `expire()` / `UnauthorizedException` | 401 | 空 JSON 数组 | `UnauthorizedException` |
-| 其他异常 | 403 | 空 JSON 数组 | `IllegalArgumentException` |
-
-所有异常都会先记录 `CallError: <uri>` 与堆栈。未预期异常被映射为 403 是当前内部协议约定，并不代表它真的是权限错误；运维必须查看服务端日志，客户端不应从 403 推断具体原因。
-
-不要用 `failure` 隐藏基础设施故障。业务可预期拒绝才使用 202；数据库连接断开、序列化缺陷等应抛出原异常，让日志保留原因。
+403 是当前引擎的未分类异常协议，不足以推断真实故障原因。客户端映射见[客户端引擎](../3_client/entry.md)。
 
 ## 参数校验
 
-共享序列化保证“能解成某个 Kotlin 类型”，不保证业务安全。每个接口仍需验证：
+共享类型仅约束传输结构，业务处理仍需检查内容长度、数值范围、资源存在性、用户权限、资源归属和重复操作语义。
 
-- 字符串长度、字符集和枚举范围；
-- 分页数量与游标边界；
-- 令牌、角色和资源归属；
-- 重复提交与幂等键；
-- 资源 ID 是否存在且未删除；
-- 文件类型、大小和目标路径。
+POST 解析器按数组位置读取所需参数，未对所有接口统一检查完整数组长度。客户端与服务端应严格按声明发送和接收，不依赖额外值被忽略的细节。
 
-把复用验证封装成抛出 `FailureException` / `UnauthorizedException` 的函数，可以让接口主体保持线性控制流。
+## 调度与资源
 
-## 线程与阻塞
+接口 block 在 `Coroutines.io` 中执行，请求之间可并发。共享可变状态需采用适当同步方式。长时间 CPU 工作应切换至相应上下文，并避免无限占用请求处理资源。
 
-引擎把接口 block 包在 `Coroutines.io` 中。数据库/文件 API 可以挂起调用，但长时间 CPU 工作仍应明确切到 CPU 调度器，并设置业务级超时。不要在进程全局可变集合上假设请求串行执行；共享房间、回调表或内存缓存需要互斥或原子设计。
+数据库事务、文件流和上传临时文件具有请求作用域，不应保存为全局服务字段或交给请求结束后才读取的后台任务。
 
-## 协议演进
+## 协议兼容
 
-路由来自 API 属性名，参数来自数组位置。已经发布后：
+API 名称决定路由，数组位置决定参数与输出含义。已发布接口的重命名、类型修改或位置调整均需评估旧客户端。
 
-- 重命名 `ApiAccountLogin` 会改变路由；
-- 在中间插入参数会改变后续位置；
-- 改变输出数量会让旧客户端解码失败。
+复杂协议可使用带默认字段的可序列化 DTO；需要破坏性变更时应保留兼容处理或新增接口，避免直接使旧路由失效。
 
-长期兼容接口应新增 API 声明，或把可演进字段包进带默认值的 DTO。服务端可以同时注册新旧声明，在迁移窗口结束后再移除旧路由。
+## 源码入口
+
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APIScope.kt`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APIResponseScope.kt`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APICallback.kt`

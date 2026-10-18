@@ -1,103 +1,88 @@
 # 客户端请求
 
-普通 `API.post` 把输入编码为 JSON 数组，并把成功响应按声明的输出顺序解码。即使没有输入或输出，线格式仍是数组。
-
-## 回调版
+普通 API 请求使用 HTTP POST 与 JSON 数组，输入输出位置对应共享声明。本文沿用以下示例契约：
 
 ```kotlin
-val error: Throwable? = ApiProfileGetProfile.request(token) { profile ->
-    app.config.userProfile = profile
+val ApiDemoEcho by API.post.i<String>().o<String>()
+val ApiDemoStatus by API.post.i().o<String, Long>()
+```
+
+## 成功回调
+
+```kotlin
+val error: Throwable? = ApiDemoEcho.request("example") { message ->
+    content = message
 }
 
 error?.let { slot.tip.error(it.message) }
 ```
 
-成功时调用 block 并返回 `null`；任意请求、状态码、解码或成功回调异常都会作为 `Throwable` 返回。页面基类提供 `.errorTip` / `.warningTip` 便捷属性：
+成功时执行回调并返回 `null`。网络、状态码、解码和回调中的普通异常以 `Throwable` 返回，取消异常继续抛出。
+
+`BasicScreen` 提供 `.errorTip` 与 `.warningTip` 等成员扩展：
 
 ```kotlin
-ApiCommonSendFeedback.request(token, content) {
-    slot.tip.success("提交成功")
+ApiDemoEcho.request("example") { message ->
+    content = message
 }.errorTip
 ```
 
-成功回调也在该错误边界内。若回调做了多步本地修改并在中途抛错，网络请求其实已经成功；需要事务性的本地操作应自己组织。
+这些扩展依赖页面浮层槽，只适用于相应页面上下文。
 
-## 结果版
+## 显式结果
 
 ```kotlin
-when (val result = ApiAccountValidateToken.request(token)) {
+when (val result = ApiDemoStatus.request()) {
     is Data.Success -> {
-        val valid = result.data.o1
-        updateSession(valid)
+        val [message, timestamp] = result.data
+        updateStatus(message, timestamp)
     }
     is Data.Failure -> handleError(result.throwable)
 }
 ```
 
-输出使用 `APIResult1` 到 `APIResult5` 包装，可通过 `o1`…`o5` 或解构读取：
+`Data` 位于 `love.yinlin.data`。`APIResult1` 至 `APIResult5` 提供 `o1` 至 `o5` 属性，也可按位置解构。无输出接口的成功数据为 `Unit`。
+
+显式结果形式适合根据失败类型选择下一步的流程，例如鉴权状态更新和多步骤业务操作。
+
+## 可空结果
 
 ```kotlin
-when (val result = ApiProfileSignin.request(token)) {
-    is Data.Success -> {
-        val (status, value, index) = result.data
-    }
-    is Data.Failure -> Unit
+val message = ApiDemoEcho.requestNull("example")?.o1 ?: return
+```
+
+此形式将普通失败折叠为 `null`，不适合需要保留失败原因的提交、删除或权限处理。取消异常不会被转换为空结果。
+
+## 参数与线格式
+
+`ApiDemoEcho` 的请求体与成功响应均为单元素数组：
+
+```json
+["example"]
+```
+
+输入与输出必须保持声明位置和类型。实现会读取所需的数组元素；缺少必要元素或类型不兼容会解码失败。协议演进应依据共享声明及兼容规则，不应依赖额外元素被忽略的实现细节。
+
+复杂接口可将参数封装为可序列化 DTO，并通过默认值和明确字段名维护兼容性。当前 DSL 的输入输出上限均为五项。
+
+## 错误分类
+
+```kotlin
+when (error) {
+    is UnauthorizedException -> requestLogin()
+    is FailureException -> slot.tip.warning(error.message)
+    is RequestTimeoutException -> slot.tip.error("请求超时")
+    null -> Unit
+    else -> slot.tip.error(error.message ?: "请求失败")
 }
 ```
 
-没有输出的 API 成功数据是 `Unit`。结果版最适合状态机、认证刷新和需要针对异常类型决定下一步的代码。
+`FailureException` 表示服务端按协议返回的业务失败。其他异常可能来自连接、协议解码或本地成功回调。
 
-## Nullable 版
+客户端不自动合并重复请求或重试写入。读取任务可由状态所有者取消或替换；写入操作应明确重复提交限制及服务端幂等语义。
 
-```kotlin
-val page = ApiTopicGetLatestTopics
-    .requestNull(offset, pageSize)
-    ?.o1
-    ?: return
-```
+## 源码入口
 
-它适合“取不到就不更新”的非关键刷新。登录、支付、写入、删除等操作不应使用 nullable 版，因为失败原因对用户和恢复策略都很重要。
-
-## 输入输出规则
-
-声明：
-
-```kotlin
-val ApiExampleQuery by
-    API.post.i<String, Int?>().o<List<Item>, Long>()
-```
-
-请求体：
-
-```json
-["keyword", null]
-```
-
-响应体：
-
-```json
-[[{"id":"a"}], 42]
-```
-
-客户端与服务端严格依赖位置和数量。返回少一个元素、改变顺序或让非空输出变成 `null` 都会在解码阶段失败。需要演进复杂参数时，把它封装为带默认字段的 `@Serializable` DTO，比分散增加位置参数更可维护。
-
-当前 DSL 最多 5 个输入和 5 个输出。接近上限通常说明接口应该用 request/response DTO 表达，而不是继续扩展元数。
-
-## 错误处理建议
-
-```kotlin
-fun handleError(error: Throwable) {
-    when (error) {
-        is UnauthorizedException -> forceLogin()
-        is FailureException -> slot.tip.warning(error.message)
-        is RequestTimeoutException -> slot.tip.error("请求超时")
-        else -> slot.tip.error(error.message ?: "网络异常")
-    }
-}
-```
-
-`FailureException` 是服务端主动返回的可预期业务失败；其他未分类异常可能来自网络、协议不兼容或本地代码。生产日志要保留原异常和 API route，但不要记录密码、令牌或完整隐私请求体。
-
-## 并发与幂等
-
-引擎不做重复请求合并或按钮防抖。读取型请求可在 DataSource 中用最新任务覆盖旧任务；写入型请求应在 UI 禁用重复提交，并让服务端以业务键保证幂等。导航自带的 300 ms 防抖不等于网络防重。
+- `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/PostRequest.kt`
+- `ylcs-module/cs/core/src/commonMain/kotlin/love/yinlin/cs/APIResult.kt`
+- `ylcs-module/core/src/commonMain/kotlin/love/yinlin/data/Data.kt`

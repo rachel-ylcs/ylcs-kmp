@@ -1,81 +1,97 @@
 # UI 组件
 
-`love.yinlin.compose:ui` 是一套直接基于 Compose Foundation 构建的跨平台组件，不要求 Material。组件默认读取 Rachel 主题令牌，因此接在 `Application.ComposedLayout` 或 `Theme` 下即可获得一致的颜色、尺寸、动画和文案。
+`compose:ui` 提供基于 Compose Foundation 的跨平台组件，并通过 Rachel 主题统一颜色、排版、尺寸与交互配置。可选复合组件位于独立模块。
 
-可运行用法以 `ylcs-app/gallery` 为准：
+## 基础组件
+
+| 包 | 代表能力 |
+| --- | --- |
+| `animation` | `CircleLoading`、`WaveLoading`、`ExpandableContent` |
+| `collection` | `TagView`、`TreeView` |
+| `container` | `Surface`、`StatefulBox`、`AdaptiveTwoBox`、`Banner`、`ActionScope` |
+| `floating` | Dialog、Sheet、Tip、FAB、Flyout、Menus、BalloonTip |
+| `image` | `Icon`、`Image`、`NineGrid`、`LoadingIcon` |
+| `input` | Button、Switch、CheckBox、Radio、Slider、ComboBox、Filter、ColorPicker |
+| `layout` | Divider、Space 与测量辅助 |
+| `navigation` | Breadcrumb、TabBar |
+| `node` | 条件、语义、绘制、阴影、点击及尺寸 Modifier |
+| `status` | `LinearProgress`、`CircleProgress` |
+| `text` | Text、FastText、Input、PasswordInput、StrokeText、SelectionBox |
+
+组件应置于 `Application.ComposedLayout()` 或显式 `Theme` 下。主题配置见[主题系统](theme.md)。
+
+## 按钮与挂起操作
+
+```kotlin
+PrimaryButton(text = "保存", onClick = ::save)
+SecondaryButton(text = "预览", onClick = ::preview)
+TertiaryButton(text = "取消", onClick = { pop() })
+```
+
+普通 Button 和 TextButton 的 `onClick` 为普通函数，不能直接调用挂起操作。页面中可以通过 `launch` 建立任务：
+
+```kotlin
+PrimaryButton("提交") {
+    launch {
+        submit()
+    }
+}
+```
+
+`PrimaryLoadingButton`、`SecondaryLoadingButton`、`TertiaryLoadingButton` 与 `LoadingTextButton` 提供挂起回调。页面请求状态与控件加载状态应明确所有者，避免重复提交或互相覆盖。
+
+## 输入与状态提升
+
+Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数与回调传递状态。文本输入使用 `InputState`、`PasswordInputState` 等对象保存编辑状态。
+
+格式、长度和界面提示属于交互校验，提交时仍需进行业务校验。显示文本不应替代实际业务数值或标识。
+
+## 状态容器
+
+`StatefulBox` 使用 `StatefulProvider.status` 选择内容，当前状态为：
+
+- `Content`：正常内容。
+- `Custom`：自定义布局。
+- `Empty`：空数据。
+- `NetworkError`：网络异常。
+- `Loading`：加载状态。
+
+`DefaultStatefulProvider` 提供默认布局，也可实现自己的 Provider。`ReplaceableBox` 用于内容替换，`AdderBox` 用于内容与添加入口组合，`AdaptiveTwoBox` 用于自适应区域布局。
+
+`Surface` 统一形状、边框、阴影、内容边距及色调层次。组件实现应优先复用这些能力与主题值。
+
+## 可选模块
+
+| `compose/components` 子模块 | 能力 |
+| --- | --- |
+| `calendar` | 日历、农历及日期状态 |
+| `data-table` | 表格、单元格、排序、编辑及选择 |
+| `drag-drop` | 拖放交互 |
+| `hexview` | 十六进制数据查看 |
+| `log-output` | 日志输出组件 |
+| `lottie` | Lottie 动画 |
+| `media` | 音频、视频及播放控制 |
+| `pagination-layout` | 分页加载布局 |
+| `qrcode` | 二维码相关组件 |
+| `reordering` | 列表重排 |
+| `rich-text` | 富文本渲染 |
+| `url-image` | 网络图片、Sketch 与缓存 |
+| `webview` | 原生网页视图与状态 |
+
+这些模块需按使用范围添加项目依赖。日历已位于独立模块，不属于基础 `compose:ui` 的 `widget` 包内容。各模块目标与平台实现以其构建脚本和源集为准。
+
+## 示例与 API
 
 ```powershell
 .\gradlew.bat :ylcs-app:gallery:galleryRun
 ```
 
-## 基础组件地图
+Gallery 展示当前组件交互，`GalleryCatalog.kt` 维护分类、搜索与概览信息。精确函数签名可查看模块源码或生成的 Dokka 页面。
 
-| 包 | 代表组件 | 用途 |
-| --- | --- | --- |
-| `animation` | `CircleLoading`、`WaveLoading`、`ExpandableContent` | 加载与内容切换 |
-| `collection` | `TagView`、`TreeView` | 标签流与树结构 |
-| `container` | `Surface`、`StatefulBox`、`AdaptiveTwoBox`、`Banner` | 表面、状态容器与响应式布局 |
-| `floating` | Dialog、Sheet、Tip、FAB、Flyout、Menu | 覆盖层与临时交互 |
-| `image` | `Icon`、`Image`、`NineGrid`、`LoadingIcon` | 本地图形与图片布局 |
-| `input` | Button、Switch、CheckBox、Radio、Slider、ComboBox、Filter、ColorPicker | 输入控件 |
-| `layout` | Divider、Space 与测量辅助 | 基础排版 |
-| `navigation` | Breadcrumb、TabBar | 区域内导航 |
-| `node` | condition、点击、阴影、动画等 Modifier | 行为与绘制修饰 |
-| `status` | Progress 等 | 进度与状态呈现 |
-| `text` | Text、FastText、Input、PasswordInput、StrokeText | 文本与编辑 |
-| `widget` | Calendar | 复合业务控件 |
+网络图片和媒体等组件具有服务初始化与资源释放要求；平台原生组件的状态归属见[平台组件](platform_component.md)，浮层结果与注册方式见[浮层](floating.md)。
 
-## 按钮与输入
+## 源码入口
 
-按钮分为主、次、三级语义，并有 loading/text 变体。选择样式时按操作优先级，而不是仅凭颜色：
-
-```kotlin
-PrimaryButton(text = "保存", onClick = ::save)
-SecondaryButton(text = "预览", onClick = ::preview)
-TertiaryButton(text = "取消", onClick = ::pop)
-```
-
-事件回调通常支持挂起调用，页面中可直接执行请求或对话框流程。仍要在组件提供的 loading 语义和页面任务之间保持单一状态源，避免按钮自身 loading 与外层 `isLoading` 互相覆盖。
-
-`Switch`、`CheckBox`、`TriStateCheckBox`、RadioGroup、`Slider` 和 `ComboBox` 都采用状态提升。复杂值通过 `SliderConverter` 等适配为显示/滑动域；不要把格式化字符串当真实业务值保存。
-
-## 容器与状态
-
-`Surface` 统一背景、内容色、边框、形状、阴影和 tonal level，是构建自定义控件的起点。
-
-`StatefulBox` 适合 Loading/Empty/Error/Content 四类内容状态；`ReplaceableBox` 用于带动画替换内容；`AdderBox` 表达“现有内容 + 添加入口”；`ActionScope` 统一左右动作布局。
-
-`AdaptiveTwoBox` 会根据设备形态在单列和双区间切换。把同一状态和回调传给两个布局位置，避免横竖屏分支各自维护一份选择状态。
-
-## 图片与文本
-
-基础 `Image` 处理 Compose 资源；网络图片由可选的 `url-image` 模块提供 `WebImage` 并依赖 `StartupUrlImage`。两者生命周期和缓存语义不同，不应只按函数名替换。
-
-`Text` 继承 `LocalStyle` / `LocalColor`，支持字符串和 `AnnotatedString`；`FastText` 针对更轻的绘制路径；`SimpleEllipsisText` 是常用单行截断。可编辑内容使用 `InputState` 管理长度和选择等规则，业务校验仍在提交边界完成。
-
-## 可选组件模块
-
-这些能力不由 `compose:ui` 全部导出，应按需添加依赖：
-
-| 模块 | 能力 |
-| --- | --- |
-| `compose.components:drag-drop` | 文件/内容拖放 |
-| `compose.components:lottie` | Lottie 动画 |
-| `compose.components:media` | 音频、视频、播放器服务 |
-| `compose.components:pagination-layout` | 分页加载布局 |
-| `compose.components:qrcode` | 二维码生成/扫描相关 UI |
-| `compose.components:rich-text` | 富文本渲染 |
-| `compose.components:url-image` | Sketch 网络图片与缓存 |
-| `compose.components:webview` | 跨平台 WebView 状态与视图 |
-
-模块坐标遵循 `love.yinlin.compose.components:<artifact>:3.7.0`。平台支持以各模块源集为准；例如某个目标可能提供退化实现，而不是与 Android 完全相同的原生能力。
-
-## 组合组件的原则
-
-1. 从 `Surface`、主题令牌和已有 Modifier 开始，不复制颜色/圆角常量。
-2. 数据状态向下传、事件向上传；需要跨页面的数据放 DataSource/Startup。
-3. 组件负责交互状态，页面负责业务状态和错误策略。
-4. 响应式变化移动同一内容或共享状态，不创建互不一致的两套页面。
-5. 原生视图、网络图片、媒体等有资源所有权的能力，遵守各自释放契约。
-
-组件 API 会随仓库演进。Gallery 展示的是当前组合方式，Dokka 则适合核对精确参数；本页负责说明选择和组合思路。
+- `ylcs-module/compose/ui/src/commonMain/kotlin/love/yinlin/compose/ui/`
+- `ylcs-module/compose/components/`
+- `ylcs-app/gallery/src/commonMain/`

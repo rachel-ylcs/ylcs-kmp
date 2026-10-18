@@ -1,47 +1,47 @@
 # 平台原生组件
 
-`love.yinlin.compose:platform-view` 把 Android View、Swing Component、UIKit UIView 和 Web HTMLElement 接入同一套公共模型。它解决宿主创建/更新/释放问题，但最重要的设计决策仍由组件作者完成：状态究竟属于 Compose，还是属于原生控件。
+`compose:platform-view` 将 Android View、Swing Component、UIKit UIView 和 DOM 元素接入 Compose。公共 `BasicPlatformView` 管理宿主引用，平台 `PlatformView` 实现负责创建和渲染原生对象。
 
-## 平台映射
+## 平台宿主
 
-| 目标 | `PlatformView<V>` 的 V | Compose 宿主 |
+| 平台 | 原生类型 | Compose 宿主 |
 | --- | --- | --- |
 | Android | `android.view.View` | `AndroidView` |
-| Desktop | `java.awt.Component` | `SwingPanel` |
-| iOS | `UIView` | `UIKitView`，NonCooperative 交互并作为 overlay |
+| JVM Desktop | `java.awt.Component` | `SwingPanel` |
+| iOS | `UIView` | `UIKitView` |
 | Web | `HTMLElement` | `HtmlElementView` |
 
-平台类负责实现 `build(...)`；公共 `BasicPlatformView` 缓存唯一 host 实例，并向平台宿主提供更新、重置和释放回调。
+Android 的 `build` 接收 Context、LifecycleOwner 和可空 ActivityResultRegistry。其他三个平台使用无参数 `build()`。iOS 当前配置 `NonCooperative` 交互模式，并将原生视图作为 overlay 放置。
 
 ## 内部状态模式
 
-简单控件只有可提升参数和事件时，可以把实现藏在 Composable 内并使用 `rememberPlatformView`：
+参数能够完整描述原生控件、事件能够通过回调输出时，可使用 `rememberPlatformView`：
 
 ```kotlin
 @Composable
 fun NativeLabel(text: String, modifier: Modifier = Modifier) {
-    val view = rememberPlatformView(text) { currentText ->
-        NativeLabelView(currentText)
+    val view = rememberPlatformView(text) { textState ->
+        NativeLabelView(textState)
     }
     view.HostView(modifier)
 }
 ```
 
-传入 factory 的是 `State<S>`，对象本身只创建一次，却能在 `update(view)` 中读取最新参数。不要把变化参数直接捕获在无参数 `remember` 的 factory 中，否则原生控件会永久看到第一次的值。
+`NativeLabelView` 是使用方在平台源集中实现的类。带参数重载将参数包装为 `State<S>`，实例通过 `remember` 保留，`update(view)` 读取 `textState.value` 获取最新输入。最多支持四个参数状态。
 
-适用条件：原生控件没有必须由调用方主动操作的历史状态，所有可变输入都能由 Compose 单向写入，事件能通过回调向上报告。
+更新阶段应读取参数 State 中的最新值，避免原生控件持续使用初始值。
 
 ## 外部状态模式
 
-WebView 这类控件拥有自己的导航历史、实际 URL、加载进度，并提供 `goBack`、`evaluateJavaScript` 等命令，必须暴露稳定状态对象：
+具有导航历史、播放进度或主动命令的控件应暴露稳定状态对象。例如：
 
 ```kotlin
 val state = remember { WebViewState("https://example.com") }
 
 WebView(
     state = state,
-    config = WebViewConfig(enableJavaScript = true),
-    modifier = Modifier.fillMaxSize()
+    modifier = Modifier.fillMaxSize(),
+    config = WebViewConfig(enableJavaScript = true)
 )
 
 PrimaryButton("后退", enabled = state.canGoBack) {
@@ -49,35 +49,25 @@ PrimaryButton("后退", enabled = state.canGoBack) {
 }
 ```
 
-`config` 是由调用方控制、可以在更新阶段写入的状态；当前 URL 是原生控件也会改变的“失控状态”，唯一可信来源必须是 `WebViewState`。如果把 URL 同时作为普通 Compose 参数并监听后每次 `loadUrl`，原生页面内跳转会与外部状态互相覆盖，甚至形成加载循环。
+WebView 类型位于 `love.yinlin.compose.ui`。`WebViewState` 提供 `url`、`loadingState`、标题、图标、前进与返回状态、错误及命令方法。
 
-初始 URL 可以作为状态构造参数；之后的导航用 state 方法发给 host，等待 host 回调再更新可观察 URL。先改外部字段、再命令 host 的做法会在加载失败时制造假状态。
+当前 API 使用 `state.url = newUrl` 发起导航，使用 `goBack()`、`goForward()` 和 `evaluateJavaScript()` 执行命令。URL 也可能由原生页面内部跳转改变，不能另外维护一份外部 URL 并在每次回调后重复加载。
 
-## 更新、复用和释放
+## 更新、复用与释放
 
-实现类按需要附加接口：
+| 接口 | 职责 |
+| --- | --- |
+| `Updatable<V>` | 将最新受控属性写入宿主 |
+| `Resettable<V>` | 在宿主复用时重置瞬态状态 |
+| `Releasable<V>` | 解除监听、停止任务并释放原生资源 |
 
-```kotlin
-class MyPlatformView : PlatformView<NativeView>(),
-    Updatable<NativeView>,
-    Resettable<NativeView>,
-    Releasable<NativeView> {
+Android、iOS 与 Web 将相应回调传给平台宿主。Desktop 在 `DisposableEffect` 中调用释放逻辑。`hostRelease` 完成后清空缓存宿主引用；释放操作应可靠且可重复处理。
 
-    override fun update(view: NativeView) { /* 写入最新可控参数 */ }
-    override fun reset(view: NativeView) { /* Lazy 容器复用前清空瞬态状态 */ }
-    override fun release(view: NativeView) { /* 停止任务、解除监听、释放资源 */ }
-}
-```
+同一个状态或包装实例应对应一个活动宿主，不应同时挂载到多个组合位置。
 
-- `Updatable`：每次宿主更新时同步外部可控属性。
-- `Resettable`：在可复用容器重新使用实例前清理内容。
-- `Releasable`：离开组合时解除 listener、关闭媒体/网页等资源。
+## 等待宿主
 
-Desktop 的 `SwingPanel` 没有同样的 reset/release 参数，框架会在 `DisposableEffect` 中调用 release。所有平台都应让 release 幂等。
-
-## 等待 host 建立
-
-重组和原生 host 创建没有固定先后。`Monitor` 把 host 本身也放入 effect key，避免参数先变化、host 后创建时漏掉命令：
+原生宿主的创建时机可能晚于参数变化。`Monitor` 将宿主引用也纳入 effect key：
 
 ```kotlin
 view.Monitor(command) { host ->
@@ -85,15 +75,16 @@ view.Monitor(command) { host ->
 }
 ```
 
-直接 `LaunchedEffect(command) { view.host?... }` 可能在 host 仍为空时什么都不做，之后也不会重启。
+它会在参数变化或宿主建立时运行。单独使用 `LaunchedEffect(command)` 并读取空的 `host`，可能遗漏后续宿主创建事件。
 
-## 实现检查表
+## 实现约束
 
-1. 列出每个状态的唯一所有者：Compose、state object 或原生 host。
-2. `build` 只创建实例与固定监听，不执行每次更新逻辑。
-3. `update` 只写可外部控制的属性，且能重复调用。
-4. host 回调更新外部可观察状态，但不再次触发同一命令。
-5. listener、协程、媒体、网页和平台句柄在 `release` 中清理。
-6. 检查 iOS overlay、Desktop Swing 混合和 Web DOM 的绘制/输入层级。
+创建阶段负责原生实例与固定监听，更新阶段负责可重复写入的受控属性，宿主回调负责上报原生状态。文件、媒体、网页和系统监听等资源应在相应释放路径关闭。
 
-平台组件的难点不是写四份 factory，而是维护单一事实来源。先画清状态流，再写 `expect/actual`，通常会比在重组问题出现后补条件判断更省力。
+绘制与输入行为需分别验证 Android View、Desktop Swing 混合、iOS overlay 与 Web DOM 的平台差异。
+
+## 源码入口
+
+- `ylcs-module/compose/platform-view/src/commonMain/kotlin/love/yinlin/compose/ui/BasicPlatformView.kt`
+- `ylcs-module/compose/platform-view/src/commonMain/kotlin/love/yinlin/compose/ui/PlatformViewWrapper.kt`
+- `ylcs-module/compose/components/webview/src/commonMain/kotlin/love/yinlin/compose/ui/`

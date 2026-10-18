@@ -1,96 +1,77 @@
 # 客户端 WebSocket
 
-共享 `Sockets` 只声明路径和标题，客户端通过 `WebSocketClient.Connection` 实现连接生命周期与文本消息处理。
+共享 `Sockets` 声明连接路径，客户端通过 `WebSocketClient.Connection` 处理文本消息和连接事件。
 
-## 声明协议入口
+## 声明入口
 
 ```kotlin
-object GameSockets : Sockets(
-    path = "/game",
-    title = "实时游戏"
-)
-
-@Serializable
-sealed interface ClientMessage {
-    @Serializable data class Login(val token: String) : ClientMessage
-    @Serializable data class Answer(val value: String) : ClientMessage
-}
-
-@Serializable
-sealed interface ServerMessage {
-    @Serializable data class Error(val message: String) : ServerMessage
-    @Serializable data class State(val value: GameState) : ServerMessage
-}
+object DemoSockets : Sockets("/demo/events", "示例事件")
 ```
 
-消息结构属于应用协议，不由 `Sockets` 自动生成。密封序列化模型应保留兼容策略；服务端新增消息时，旧客户端至少要能忽略未知内容或安全断开。
+消息 DTO、序列化格式、鉴权和业务确认由应用协议定义。`Sockets` 不自动生成这些规则。
 
-## 建立连接
+## 连接示例
+
+以下片段放置在页面中：
 
 ```kotlin
 private val connection = object : WebSocketClient.Connection() {
     override suspend fun onConnect() {
-        isConnected = true
-        send(ClientMessage.Login(token).toJsonString())
+        send("hello")
+        Coroutines.main { isConnected = true }
     }
 
     override suspend fun onMessage(msg: String) {
-        when (val data = catchingNull { msg.parseJsonValue<ServerMessage>() }) {
-            is ServerMessage.Error -> slot.tip.warning(data.message)
-            is ServerMessage.State -> state = data.value
-            null -> Unit
-        }
+        val message = decodeMessage(msg)
+        Coroutines.main { applyMessage(message) }
     }
 
     override suspend fun onError(err: Throwable) {
-        slot.tip.error(err.message)
+        Coroutines.main { slot.tip.error(err.message) }
     }
 
     override suspend fun onDisconnect() {
-        isConnected = false
+        Coroutines.main { isConnected = false }
     }
 }
 
-override suspend fun initialize() {
-    launch { GameSockets.openConnection(connection) }
+override fun initialize() {
+    launch {
+        DemoSockets.openConnection(connection)
+    }
 }
 ```
 
-`openConnection` 会一直挂起并收集文本帧，适合放在页面 `viewModelScope` 或应用服务作用域中。再次连接同一 `Connection` 会先关闭已有 session。
+`openConnection` 切换到 I/O 上下文并持续挂起收取消息。页面 `initialize()` 为普通函数，连接工作通过 `launch` 绑定 `viewModelScope`。共享服务连接也应使用明确的协程所有者。
 
-`send(text)` 在 session 存在并成功交给 Ktor 时返回 `true`，否则返回 `false`；这不代表对端已经处理或持久化消息。重要操作需要协议层的确认 ID 与超时。
+`send(text)` 在 session 不存在时返回 `false`；底层发送异常会传播。返回 `true` 只代表本地发送调用完成，不代表对端已经处理消息。
 
-## 当前连接地址规则
+## 地址规则
 
 ```text
 ClientEngine.baseUrl = https://api.example.com:8443/base
-实际 Socket       = wss://api.example.com:443/<Sockets.path>
+实际连接地址         = wss://api.example.com:443/demo/events
 ```
 
-当前实现只解析基础 URL 的 host，然后固定 `WSS`、默认端口 443 和声明 path；它不会继承 scheme、端口或基础路径。因此开发环境的 `http://localhost:1211` 不能直接通过该帮助函数连接本地明文 Socket。
+当前实现只解析基础地址的 host，固定使用 WSS 默认端口与 `Sockets.path`，不会继承基础 scheme、端口和路径。`http://localhost:1211` 不能通过此辅助函数直接建立明文 WS 连接。
 
-生产部署应在 443 上由反向代理终止 TLS 并转发路径。若必须支持自定义端口、`ws` 或 base path，应扩展 `WebSocketClient.connect`/客户端引擎，而不是通过字符串技巧修改 host。
+需要自定义 scheme、端口或握手参数时，应在网络层实现对应能力，不能将其作为当前辅助函数已有的配置。
 
-## 生命周期顺序
+## 消息与退出
 
-正常或异常结束时：
+只有文本帧进入 `onMessage`。回调在连接收集流程中执行，耗时处理会延迟后续消息，应按工作性质切换上下文。
 
-1. 连接/收包异常交给 `onError`。
-2. 调用 `onDisconnect`。
-3. 关闭 session。
-4. 清空 connection 内部 session 引用。
+正常结束或普通收包异常后，当前代码调用 `onDisconnect`、关闭 session 并清空引用。取消异常会由 `catchingError` 重新抛出；`onError` 或 `onDisconnect` 本身抛错也可提前中断后续代码。因此不能将这些回调描述为所有退出情况下均保证执行的 `finally` 清理钩子。
 
-只有文本帧进入 `onMessage`，二进制帧会被忽略。回调运行在连接收集协程中，长耗时处理会阻塞后续消息；应快速验证并把 CPU/I/O 工作切到合适调度器。
+同一个 `Connection` 不应被并发用于多次连接。再次连接时虽然会尝试关闭已有 session，但封装不提供并发连接状态机。
 
 ## 重连与可靠性
 
-框架不自动重连。推荐在外层状态机中实现：
+当前封装不自动重连。应用需要按协议定义断线状态、退避、重新鉴权、心跳与消息确认。重试循环应等待本次连接结束，并在所属生命周期取消后停止，避免在错误回调中递归连接。
 
-- 指数退避和最大等待；
-- 前后台/网络可用性判断；
-- 每次重连重新鉴权；
-- 心跳与服务端超时；
-- 消息序号、去重和确认；
-- 页面销毁后停止重连。
+服务端注册与消息管理见[服务端 WebSocket](../4_server/sockets.md)。
 
-不要在 `onError` 中直接调用 `openConnection`，因为旧连接的结束清理尚未完成，也容易形成无延迟递归。让外层循环等待本次 `openConnection` 返回，再决定是否重试。
+## 源码入口
+
+- `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/ClientEngine.kt`
+- `ylcs-module/foundation/network/src/commonMain/kotlin/love/yinlin/foundation/WebSocketClient.kt`

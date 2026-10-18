@@ -1,164 +1,113 @@
-# Music / MOD v5 协议
+# Music / MOD v5 文件格式
 
-MOD 是银临茶舍使用的音乐资源容器。当前 `ModFactory.VERSION = 5`，文件扩展名为 `.rachel`；工作目录中的单项资源扩展名为 `.rachelres`。格式由 `ylcs-app/mod` 实现，不是 ZIP，也没有使用媒体文件本身的扩展名。
+MOD 是 `ylcs-app/mod` 实现的音乐资源容器。当前 `ModFactory.VERSION` 为 `5`，归档扩展名为 `.rachel`，工作目录资源扩展名为 `.rachelres`。
 
-## 三种形态
-
-### 工作/解包目录
-
-每首媒体一个以 ID 命名的目录：
+## 工作目录与分发形式
 
 ```text
 music/
-├─ 1077/
-│  ├─ config.rachelres
-│  ├─ audio.rachelres
-│  ├─ record.rachelres
-│  ├─ background.rachelres
-│  ├─ lyrics.rachelres
-│  ├─ animation.rachelres
-│  ├─ video.rachelres
-│  ├─ rhyme.rachelres
-│  └─ accompaniment.rachelres
-└─ 2013/
-   └─ ...
+└─ demo001/
+   ├─ config.rachelres
+   ├─ audio.rachelres
+   ├─ record.rachelres
+   ├─ background.rachelres
+   ├─ lyrics.rachelres
+   ├─ animation.rachelres
+   ├─ video.rachelres
+   ├─ rhyme.rachelres
+   └─ accompaniment.rachelres
 ```
 
-`.rachelres` 只是资源槽位名，内容仍是原始 JSON、音频、图片或视频字节。
+单项资源仍保存原始 JSON、音频、图片、文本或视频字节。扩展名表示资源槽位，归档格式本身不使用 ZIP。
 
-### 分发归档
+| 资源 type | 内容约定 | 基础资源 |
+| --- | --- | --- |
+| `config` | `MusicInfo` JSON | 是 |
+| `audio` | 音源 | 是 |
+| `record` | 封面 | 是 |
+| `background` | 背景图片 | 是 |
+| `lyrics` | 逐行歌词 | 是 |
+| `animation` | 动态背景 | 否 |
+| `video` | 视频 | 否 |
+| `rhyme` | 动态歌词配置 | 否 |
+| `accompaniment` | 伴奏音频 | 否 |
 
-一个 `.rachel` 可以包含一首或多首媒体及筛选后的资源。`ModFactory.Merge` 负责写入，`Preview` 只查看元数据与清单，`Release` 解包到工作目录。
-
-### 服务端部署目录
-
-MOD Manager 的“部署”会为每首媒体生成 `base.rachel`（只打包基础资源），同时把除音源外的资源作为 `.rachelres` 旁路文件复制到部署目录。这样客户端可先读取封面/配置，真正下载歌曲时再取得基础归档。它是当前工具的部署策略，不是 v5 二进制本身的额外结构。
-
-## 资源类型
-
-| type | 文件名 | `base` | 内容约定 |
-| --- | --- | --- | --- |
-| `config` | `config.rachelres` | 是 | UTF-8 `MusicInfo` JSON |
-| `audio` | `audio.rachelres` | 是 | 原始音频字节 |
-| `record` | `record.rachelres` | 是 | 方形封面图片 |
-| `background` | `background.rachelres` | 是 | 9:16 背景图片 |
-| `lyrics` | `lyrics.rachelres` | 是 | LRC 逐行歌词文本 |
-| `animation` | `animation.rachelres` | 否 | 动态背景资源 |
-| `video` | `video.rachelres` | 否 | PV 视频 |
-| `rhyme` | `rhyme.rachelres` | 否 | 动态歌词/琴韵数据 |
-| `accompaniment` | `accompaniment.rachelres` | 否 | 伴奏音频 |
-
-`ModResourceType.BASE` 是前五项；`ALL` 是全部；`DEPLOYMENT` 是除 `audio` 外的全部资源。协议实现只检查资源 type 与长度，不验证 MIME、分辨率或 codec。表中的媒体形态是应用约定，导入工具应实际解析后再接受。
+`ModResourceType.BASE` 为前五项，`ALL` 为全部资源，`DEPLOYMENT` 为除音源外的全部资源。媒体格式、尺寸和编码约束属于应用约定，协议 reader 不执行完整媒体内容校验。
 
 ## 配置 JSON
 
-`config.rachelres` 对应：
-
-```kotlin
-@Serializable
-data class MusicInfo(
-    val version: String,
-    val author: String,
-    val id: String,
-    val name: String,
-    val singer: String,
-    val lyricist: String,
-    val composer: String,
-    val album: String,
-    val chorus: List<Long>?,
-    @Transient val modification: Int = 0
-)
-```
-
-示例：
+`config.rachelres` 对应 `MusicInfo`。以下为虚构示例：
 
 ```json
 {
   "version": "1.0",
-  "author": "官方",
-  "id": "1054",
-  "name": "棠梨煎雪",
-  "singer": "银临",
-  "lyricist": "商连",
-  "composer": "银临",
-  "album": "腐草为萤",
-  "chorus": [71670, 161140, 210400]
+  "author": "示例作者",
+  "id": "demo001",
+  "name": "示例曲目",
+  "singer": "示例演唱者",
+  "lyricist": "示例作词者",
+  "composer": "示例作曲者",
+  "album": "示例专辑",
+  "chorus": [60000, 120000]
 }
 ```
 
-`chorus` 单位为毫秒，可为 null。`modification` 不进入 JSON。打包时媒体 ID 从 config 内容读取，而不是直接使用目录名；两者应保持一致。应用创建页面要求 ID 只含字母或数字，这也是跨平台路径最安全的约束。
+`chorus` 为可空毫秒列表，`modification` 为带默认值的 `@Transient` 运行时字段，不进入 JSON。打包时媒体 ID 从配置内容读取，工作目录名称应与其保持一致。
 
-归档级 `ModInfo` 当前只有 `author`，默认值为“无名”，它与每首 `MusicInfo.author` 是不同层级。
+归档级 `ModInfo` 当前仅包含 `author`，默认值为“无名”，与单首媒体配置的作者字段分别保存。
 
-## v5 二进制布局
+## 二进制布局
 
-所有 Int 为 4 字节大端序；字符串为 `Int byteLength + UTF-8 bytes`。
+整数为 4 字节大端 Int，字符串为字节长度前缀与 UTF-8 内容：
 
 ```text
 Archive
 ├─ magic: Int = 1211
 ├─ version: Int = 5
 ├─ mediaCount: Int
-├─ info: LengthString              # ModInfo JSON
+├─ info: LengthString          # ModInfo JSON
 └─ Media × mediaCount
    ├─ id: LengthString
    ├─ resourceCount: Int
    └─ Resource × resourceCount
-      ├─ type: LengthString        # config/audio/...
-      ├─ dataLength: Int           # 真实资源字节数，不含填充
-      └─ chunkedData
+      ├─ type: LengthString
+      ├─ dataLength: Int
+      └─ payload
 ```
 
-资源负载以 65,536 字节为间隔插入填充：
-
-```text
-[最多 65536 个真实字节][1 个随机字节]
-[最多 65536 个真实字节][1 个随机字节]
-...
-[不足 65536 的最后真实字节，不追加随机字节]
-```
-
-精确规则是：完整块数量 `times = dataLength / 65536`，每个完整块后写一个 `0..126` 的随机 byte；余数直接写入。因而负载占用为：
+`dataLength` 表示真实资源长度。每完整读取 65,536 个真实字节后写入一个取值为 `0..126` 的随机填充字节，剩余不足一块的数据直接写入：
 
 ```text
 storedLength = dataLength + floor(dataLength / 65536)
 ```
 
-当长度恰好是 65,536 的整数倍时，最后一个完整块后仍有填充 byte。`Preview` 按同一公式跳过非 config 数据；`Release` 逐块复制并丢弃填充。
+长度恰好为完整块整数倍时，最后一块后仍有填充。填充不提供加密或完整性校验，同一输入多次打包可能得到不同二进制内容。
 
-这些随机字节只是格式扰动，不是加密、水印或完整性保护。同一输入的两次归档会不同；资源遍历顺序也不应被当作稳定摘要来源。当前源码没有独立的规范摘要字段。
-
-## API 用法
-
-### 打包
+## 打包
 
 ```kotlin
 output.write { sink ->
     ModFactory.Merge(
-        mediaPaths = listOf(songFolder),
+        mediaPaths = [songFolder],
         sink = sink,
-        info = ModInfo(author = "Alice")
+        info = ModInfo(author = "示例作者")
     ).process(filters = ModResourceType.ALL) { index, total, name ->
         println("$index / $total: $name")
     }
 }
 ```
 
-资源长度必须大于 0，并被转换为 Int；单资源不应接近/超过 2 GiB。`Merge` 会读取 config 取得 ID，只收集扩展名为 `rachelres` 且 type 已知、位于 filters 中的文件。它不会强制 BASE 完整，调用方要先校验。
+`Merge` 读取每个媒体目录中的配置，收集扩展名正确、type 已知且符合 filters 的资源。它不强制基础资源完整。
 
-### 预览
+资源长度转换为 Int 后需大于零，调用方应提前限制单资源大小，避免超出 Int 表示范围。进度 index 从零开始，回调通过 `Coroutines.main` 交付。
+
+## 预览与解包
 
 ```kotlin
 val preview = input.read { source ->
     ModFactory.Preview(source).process()
 }
-```
 
-预览验证 magic、精确版本、计数、资源 type/正长度，并完整解析 config；其他资源只记录类型和长度后跳过。它不会验证音频/图片内容，也没有内置总大小、媒体数或字符串长度上限。
-
-### 解包
-
-```kotlin
 val released = input.read { source ->
     ModFactory.Release(source, libraryRoot).process { index, total, id ->
         println("$index / $total: $id")
@@ -166,34 +115,32 @@ val released = input.read { source ->
 }
 ```
 
-Release 为每个 ID 建目录，并把资源写为规范文件名。如果同名资源重复，后写内容可能覆盖前者；目标已有内容也可能被覆盖。应先释放到临时空目录，全部验证成功后再原子合并到正式曲库。
+`Preview` 返回归档元数据、媒体 ID、配置及资源类型和长度，非配置负载按包含填充的长度跳过。`Release` 按完整块读取资源并丢弃填充，将文件写入 `<libraryRoot>/<id>/<type>.rachelres`。
 
-## 兼容性与安全
+当前 `Preview` 的配置分支直接读取 `dataLength` 字节并解析 JSON，未像解包分支逐块跳过填充。因此达到 65,536 字节的配置可能预览失败或导致后续读取错位。现有格式生产流程应保持配置小于该边界；不能将预览器视为任意大小配置的完整校验器。
 
-解析器要求 `version == 5`，没有内置 v1–v4 迁移。升级格式时应新增 reader 或先迁移旧文件，不能只增加 `VERSION`。
+## 兼容性与导入边界
 
-对不可信归档尤其注意：
+reader 要求 magic 和版本精确匹配，媒体数与长度有部分合法性检查，但不统一限制字符串长度、媒体数量、资源数量和总解包大小，也未验证重复 ID、资源覆盖或路径归属。
 
-- magic/version 不是签名，文件可被任意伪造；
-- 长度、数量虽有基本正负检查，但没有合理上限；
-- `Release` 直接用归档 ID 构造目标目录，reader 内部不净化路径；
-- 没有摘要、校验和、压缩或加密；
-- 损坏/恶意数据可能留下已创建的部分目录。
+`Release` 直接使用归档 ID 构造目录，目标已有内容可能被覆盖。导入方应限制安全 ID、文件总量及资源大小，并先在隔离临时目录完成验证，再纳入正式曲库。预览结果不代替媒体内容识别，也不提供数字签名或来源认证。
 
-安全导入流程应先限制文件总大小，用 `Preview` 检查媒体数、ID 只含允许字符、资源集合和各长度，再重新打开同一个不可变文件释放到临时目录；解析真实媒体格式后才移动到曲库。失败时删除整个临时目录。
+当前 reader 不包含旧版本自动迁移。升级版本号时应同步提供兼容 reader 或转换流程。
 
 ## MOD Manager
 
-桌面工具提供预览、解包、合并/分别打包、资源过滤与部署：
-
 ```powershell
 .\gradlew.bat :ylcs-app:mod-manager:modManagerRunDebug
-```
-
-发布任务：
-
-```powershell
 .\gradlew.bat :ylcs-app:mod-manager:modManagerPublish
 ```
 
-工具认定可用源目录至少具有 config、audio、record、background、lyrics。协议层本身更宽松，所以自动化生产 MOD 时也应采用同一完整性检查，而不是只以 `Merge.process` 未抛错作为合格标准。
+工具支持预览、解包、合并或分别打包、资源筛选和部署。源目录发现流程检查 config、audio、record、background 与 lyrics 等基础资源。
+
+部署流程为每首媒体生成只包含 BASE 的 `base.rachel`，同时复制 DEPLOYMENT 资源作为旁路文件。该目录组织是工具部署策略，不增加 v5 归档字段。
+
+## 源码入口
+
+- `ylcs-app/mod/src/commonMain/kotlin/love/yinlin/mod/ModFactory.kt`
+- `ylcs-app/mod/src/commonMain/kotlin/love/yinlin/data/mod/ModResourceType.kt`
+- `ylcs-app/mod/src/commonMain/kotlin/love/yinlin/data/music/MusicInfo.kt`
+- `ylcs-app/mod-manager/src/desktopMain/kotlin/love/yinlin/screen/ScreenMain.kt`

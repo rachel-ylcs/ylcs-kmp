@@ -1,86 +1,73 @@
 # 服务端 WebSocket
 
-服务端用共享 `Sockets` 声明注册路径，并为每条连接创建独立的 `SocketsManager`。WebSocket 插件负责 ping、超时、帧大小与序列化配置；业务 Manager 负责鉴权、消息状态机和共享房间。
+服务端通过共享 `Sockets` 注册 WebSocket 路径，并为每条连接创建独立的 `SocketsManager`。
 
-## 安装插件
+## 插件配置
 
 ```kotlin
-override val plugins: List<BasicServerPlugin> = listOf(
+override val plugins: List<BasicServerPlugin> = [
     JsonPlugin,
     WebSocketPlugin(
         socketPingPeriod = 15.seconds,
         socketTimeout = 15.seconds,
-        socketMaxFrameSize = 1L * 1024 * 1024,
+        socketMaxFrameSize = 1024L * 1024L,
         socketMasking = false
-    )
-)
+    ),
+]
 ```
 
-仓库真实服务把 `socketMaxFrameSize` 设为 `Long.MAX_VALUE`；对外部署时应按协议设置合理上限，避免单帧耗尽内存。TLS 通常由本机前面的反向代理处理。
+`seconds` 来自 `kotlin.time.Duration.Companion`。以上为示例配置，帧上限应依据实际消息规模确定。仓库业务入口目前使用 `Long.MAX_VALUE`，不代表框架具有自动业务消息大小限制。
 
 ## 注册连接
 
 ```kotlin
-object GameSockets : Sockets("/game", "实时游戏")
+object DemoSockets : Sockets("/demo/events", "示例事件")
 
-fun AppServerScope.gameAPI() {
-    GameSockets.connect { session ->
-        GameSocketsManager(session, rooms, auth)
+fun DemoScope.demoSockets() {
+    DemoSockets.connect { session ->
+        DemoSocketsManager(session)
     }
 }
 ```
 
-`connect` 只能在 `APIScope.api()` 注册阶段调用，因为它依赖当前 Routing。每次连接都会调用 factory 创建 Manager。
-
-## 实现 Manager
+该注册函数需从 `APIScope.api()` 调用。每次握手建立后调用 factory，新建连接管理器。
 
 ```kotlin
-class GameSocketsManager(
-    session: Any,
-    private val rooms: RoomRegistry,
-    private val auth: Auth
-) : SocketsManager(session) {
-
+class DemoSocketsManager(session: Any) : SocketsManager(session) {
     override suspend fun onMessage(msg: String) {
-        when (val data = msg.parseJsonValue<ClientMessage>()) {
-            is ClientMessage.Login -> login(data.token)
-            is ClientMessage.Answer -> submit(data)
-        }
+        send(msg)
     }
 
     override suspend fun onError(err: Throwable) {
-        send(ServerMessage.Error("连接异常").toJsonString())
+        recordConnectionError(err)
     }
 
     override suspend fun onClose() {
-        rooms.leave(this)
+        removeConnectionState()
     }
 }
 ```
 
-`send(String)` 是受保护方法，底层把 `session: Any` 转为 `WebSocketServerSession`。只有文本帧会传给 `onMessage`，其他帧被跳过。
+错误记录与连接状态清理由业务实现。`send(String)` 为受保护方法，底层将 session 转为 Ktor WebSocket session。连接循环仅转发文本帧。
 
-## 结束顺序
+## 退出路径
 
-连接循环中的异常交给 `onError`；随后总会调用 `onClose`，最后用 NORMAL 原因关闭 socket。`onError` 自己再抛异常会影响后续清理，因此它应尽量简单、容错，资源释放放在 `onClose` 并保证幂等。
+正常结束后执行 `onClose()`，再以 NORMAL 原因关闭 socket。普通收包或处理异常先交给 `onError()`，随后继续上述路径。
 
-正常客户端断开也进入 `onClose`。不要只在错误回调移除在线用户。
+取消异常由 `catchingError` 重新抛出；`onError` 与 `onClose` 本身抛错也可中断后续代码。当前循环不使用统一 `finally`，因此这些回调并非所有断开情况下均保证完成的资源清理机制。
 
-## 鉴权与并发
+## 鉴权与共享状态
 
-HTTP API 的令牌不会自动带到 WebSocket Manager。常见做法是连接后第一条消息登录，并在成功前拒绝其他消息；也可以在代理/握手层扩展鉴权，但当前 helper 没有暴露 call 参数。
+HTTP 请求参数不会自动成为 Socket 鉴权上下文。业务应定义连接后登录、登录前消息限制与会话失效处理。
 
-房间、在线列表等结构会被多个连接协程并发访问，必须使用 Mutex/Actor/线程安全数据结构。Manager 实例只属于单连接；共享状态应注入专门 registry，而不是放进 companion object 后无保护修改。
+每个 Manager 只属于单条连接；房间、在线列表等跨连接状态应由独立所有者管理，并按并发访问方式同步。传输层 ping 不替代业务消息确认、去重与恢复规则。
 
-## 协议可靠性
+## 客户端地址配合
 
-ping 只检查传输连接，不保证业务状态。实时协议还应定义：
+当前客户端辅助函数固定使用 WSS 443。部署端应将声明路径转发到原生服务端的本机监听端口。客户端具体限制见[客户端 WebSocket](../3_client/sockets.md)。
 
-- 登录超时和重新鉴权；
-- 消息类型/协议版本；
-- 客户端消息 ID 与服务端确认；
-- 重复消息处理；
-- 房间恢复或明确不可恢复；
-- 服务关闭时的通知与排空。
+## 源码入口
 
-当前客户端 helper 固定 `wss:443`，部署代理必须把声明路径原样转发到本机 Native 服务端。
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APIScope.kt` 中的 `Sockets.connect`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/SocketsManager.kt`
+- `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/plugin/WebSocketPlugin.kt`

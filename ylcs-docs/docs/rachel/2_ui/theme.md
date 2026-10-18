@@ -1,113 +1,94 @@
-# 主题与响应式布局
+# 主题系统
 
-Rachel 的 UI 不依赖 Material 组件体系。`Theme` 从颜色系统、排版、形状、几何尺寸、动画和文案工具等多个小主题组装出一套 CompositionLocal，组件直接读取这些令牌。
+`compose:theme` 提供 Rachel 的颜色、排版、形状、尺寸、动画和界面文案。组件通过 `Theme` 与 CompositionLocal 读取统一配置。
 
-## 应用级配置
+## 根主题
 
-继承 `Application` 时可以覆写：
+`Application` 提供以下可覆写属性：
+
+| 属性 | 用途 |
+| --- | --- |
+| `themeMode` | `SYSTEM`、`LIGHT` 或 `DARK` |
+| `fontScale` | 根字体缩放 |
+| `mainFontResource` | 公共字体资源 |
+| `background` | 根背景覆盖值 |
+| `colorSystem` | 明暗两套颜色主题 |
+| `typographyTheme`、`shapeTheme` | 排版与形状 |
+| `geometryTheme` | 尺寸、间距、边框与阴影 |
+| `animationTheme` | 动画配置 |
+| `toolingTheme` | 气泡提示等交互工具配置 |
+| `valueTheme` | 通用界面文案 |
+
+标准平台入口调用 `ComposedLayout()` 安装主题。独立预览或嵌入场景可直接使用 `Theme(...) { ... }`。动态主题属性应通过 Compose 可观察状态驱动。
 
 ```kotlin
-override val themeMode: ThemeMode
-    get() = config.themeMode
-
-override val fontScale: Float
-    get() = config.fontScale.value
-
-override val colorSystem: ColorSystem = MyColorSystem
-override val typographyTheme: TypographyTheme = MyTypography
-override val shapeTheme: ShapeTheme = MyShapes
-override val geometryTheme: GeometryTheme = MyGeometry
-override val animationTheme: AnimationTheme = MyAnimations
-override val toolingTheme: ToolingTheme = MyTooling
-override val valueTheme: ValueTheme = MyWords
+override val themeMode: ThemeMode get() = config.themeMode
+override val fontScale: Float get() = config.fontScale
 ```
 
-`ThemeMode` 有 `SYSTEM`、`LIGHT`、`DARK`。`ColorSystem` 同时包含明暗两套 `ColorTheme`，切换模式不会改变组件使用的令牌名。
-
-可选的 `mainFontResource` 会注入排版主题；`fontScale` 会调整 Compose density 的字体缩放；`background` 可覆盖根背景。所有覆写值都应稳定，或由 Compose 可观察状态驱动。
-
-## 读取令牌
+## 读取主题值
 
 ```kotlin
 Surface(
-    color = Theme.color.surface,
+    modifier = Modifier.padding(Theme.padding.eValue),
     shape = Theme.shape.v1,
     shadowElevation = Theme.shadow.v2,
-    modifier = Modifier.padding(Theme.padding.eValue)
+    contentPadding = Theme.padding.value9
 ) {
-    Text(
-        text = "当前主题",
-        style = Theme.typography.v6.bold
-    )
+    Text("主题内容", style = Theme.typography.v6.bold)
 }
 ```
 
-`Theme` 当前暴露：
+当前 `Surface` 从主题读取表面颜色，通过 `tonalLevel` 控制色调层次；它不提供 `color` 参数。自定义背景可使用合适的容器或绘制 Modifier。
 
-| 分组 | 用途 |
+| 分组 | 作用 |
 | --- | --- |
-| `color` / `darkMode` | 表面、内容、强调、轮廓、遮罩和当前明暗模式 |
-| `typography` | 字号、行高、字重与默认字体 |
-| `shape` | 矩形、圆形和分级圆角 |
-| `size` / `padding` | 控件、图标、单元格与间距尺度 |
-| `border` / `shadow` | 边框宽度与阴影高度 |
-| `animation` | 统一动画时长 |
-| `tool` | 气泡提示等交互工具开关 |
-| `value` | 返回、确认等可替换的运行时文案 |
+| `Theme.color`、`darkMode` | 语义颜色与当前明暗模式 |
+| `Theme.typography` | 字号、行高、字重与字体 |
+| `Theme.shape` | 标准形状与分级圆角 |
+| `Theme.size` | 图标、图片、输入、单元格及面板尺寸 |
+| `Theme.padding` | 水平、垂直和统一间距 |
+| `Theme.border`、`shadow` | 边框与阴影尺度 |
+| `Theme.animation` | 动画参数 |
+| `Theme.tool`、`value` | 工具开关与通用文案 |
 
-组件外不要复制令牌的具体数值。语义令牌使同一控件能随设备、品牌主题和可访问性配置一起变化。
+`LocalColor`、`LocalColorVariant` 与 `LocalStyle` 表示当前子树的默认内容颜色和文本样式。容器在自身语义范围内覆盖这些值。
 
-## 局部颜色和明暗模式
-
-`LocalColor`、`LocalColorVariant` 与 `LocalStyle` 提供当前内容默认值。容器组件会在需要时建立局部内容颜色。只想让一个子树以另一明暗模式预览时，可使用：
+## 局部明暗模式
 
 ```kotlin
 Theme.ThemeModeWrapper(isDarkMode = true) {
-    PreviewCard()
+    PreviewContent()
 }
 ```
 
-它替换颜色相关 Local，但不会创建一套全新的尺寸、排版和动画主题。完整品牌切换应在应用根的 `Theme` 参数上完成。
+该包装替换明暗颜色、内容颜色和文本选择色，不重新建立整套几何与排版配置。品牌主题应通过根 `ColorSystem` 等参数统一声明。
 
-## 响应式设备模型
+## 响应式布局
 
-`rememberDevice()` 根据当前窗口容器大小返回 `Device(size, type)`，不是根据操作系统名称猜测：
+`rememberDevice()`、`rememberDeviceSize()` 与 `rememberDeviceType()` 根据当前窗口容器的 `Dp` 尺寸派生布局分类。它们不依据平台名称或硬件型号判断设备类型。
 
-| 宽度 | `Device.Size` |
-| --- | --- |
-| `<= 420.dp` | `SMALL` |
-| `<= 900.dp` | `MEDIUM` |
-| `> 900.dp` | `LARGE` |
+宽度断点为 `420.dp` 与 `900.dp`；形态根据宽高比例划分为 `PORTRAIT`、`SQUARE` 与 `LANDSCAPE`。完整规则与示例见[设备模型](device.md)。
 
-方向判断使用比例：高度至少为宽度的 1.5 倍是 `PORTRAIT`；宽度至少为高度的约 1.3333 倍是 `LANDSCAPE`；中间区域是 `SQUARE`。
+## 安全区
+
+导航宿主提供 `LocalImmersivePadding`，表示系统栏或窗口安全区。`Screen` 的标题、内容与底栏分别消费所需边距，浮层也按自身位置处理安全区。
 
 ```kotlin
-val device by rememberDevice()
-
-when (device.type) {
-    Device.Type.PORTRAIT -> PortraitContent()
-    Device.Type.LANDSCAPE -> WideContent()
-    Device.Type.SQUARE -> CompactTwoPaneContent()
+val padding = LocalImmersivePadding.current
+Box(Modifier.padding(padding)) {
+    Content()
 }
 ```
 
-这套模型能正确处理可调整大小的桌面窗口、平板分屏和浏览器，不要把 `Platform.Phone` 等同于竖屏。
+使用前应确认父容器是否已经消费相应方向的边距，避免重复应用完整安全区。
 
-## 沉浸式安全区域
+## 配置约束
 
-根导航提供 `LocalImmersivePadding`，统一表示状态栏、导航栏或窗口安全区。页面标题栏、底栏、Sheet 和 Dialog 会按自身位置消费一部分 padding。
+主题定制应保持颜色语义、内容对比度和尺寸用途一致。明暗切换、字体缩放和窗口尺寸变化需要共同验证。默认值可通过相应主题的 `Default.copy(...)` 等接口局部调整，具体复制方式以类型定义为准。
 
-```kotlin
-val safe = LocalImmersivePadding.current
-Box(Modifier.padding(safe)) { /* ... */ }
-```
+## 源码入口
 
-已经位于 `Screen.Content` 或框架浮层内部时，Local 往往已被裁剪，不要再次无条件应用完整安全区。检查父容器的契约，避免顶部或底部出现双倍留白。
-
-## 自定义主题的原则
-
-- 从 `Default` 复制并替换少量语义值，缺少字段时仍有一致默认。
-- 颜色必须同时检查 light/dark 下的内容对比度。
-- 动画速度为 0 或极小时，也要确保浮层和导航状态能完成。
-- 尺寸令牌表达用途，而不是某个页面的偶然像素值。
-- 用户可配置值通过状态 getter 返回，让根主题重组，不要在每个组件分别读取配置。
+- `ylcs-module/compose/theme/src/commonMain/kotlin/love/yinlin/compose/Theme.kt`
+- `ylcs-module/compose/theme/src/commonMain/kotlin/love/yinlin/compose/GeometryTheme.kt`
+- `ylcs-module/compose/theme/src/commonMain/kotlin/love/yinlin/compose/ImmersivePadding.kt`

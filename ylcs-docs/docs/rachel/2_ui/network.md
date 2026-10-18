@@ -1,32 +1,28 @@
 # 通用网络
 
-`love.yinlin.foundation:network` 是对 Ktor Client 的轻量跨平台封装，适合访问第三方 HTTP、下载文件或建立自定义 WebSocket。调用 Rachel 自己的类型化后端时，应优先使用[客户端引擎](../3_client/entry.md)，不要手工重复协议编码。
+`foundation:network` 封装 Ktor Client，用于通用 HTTP、下载与文本 WebSocket。访问采用 Rachel 共享契约的后端时，使用[客户端引擎](../3_client/entry.md)。
 
-## 客户端类型
+## 客户端选择
 
 ```kotlin
-NetClient.Common   // 默认请求超时 10 秒
-NetClient.File     // 默认请求超时 180 秒
+NetClient.Common
+NetClient.File
 
-buildCommonNetClient(timeout = 15_000)
-buildFileClient(timeout = 300_000)
-buildSocketClient()
+val commonClient = buildCommonNetClient(timeout = 15_000L)
+val fileClient = buildFileClient(timeout = 300_000L)
+val socketClient = buildSocketClient()
 ```
 
-实例使用 `lazy` 创建并可复用。不要为每次请求创建新的底层 `HttpClient`；连接池、Cookie/插件初始化和 Native 资源都会因此浪费。
+默认普通请求超时为 10 秒，文件请求超时为 180 秒，连接超时配置为 5 秒。平台 `actual` 选择底层引擎。公共客户端惰性创建并复用，调用方创建的客户端应在所属生命周期结束时关闭。
 
-## 发起请求
-
-`RequestScope` 统一 method、URL、body、表单、headers 和 cookies；`ResponseScope` 暴露状态码、最终 URL、响应头、Cookie、原始字节、字符串和解析后的 body。
+## HTTP 请求
 
 ```kotlin
-val profile: Profile? = NetClient.Common.request<Profile, Profile>(
+val profile = NetClient.Common.request<Profile, Profile>(
     onRequest = {
         method = HttpMethod.Get
         url = "https://example.com/profile.json"
-        headers = headers {
-            append(HttpHeaders.Authorization, "Bearer $token")
-        }
+        headers = NetHeader(HttpHeaders.Authorization to "Bearer $token")
     },
     onResponse = {
         require(status.isSuccess())
@@ -35,60 +31,95 @@ val profile: Profile? = NetClient.Common.request<Profile, Profile>(
 )
 ```
 
-也有按 `String`、`ByteArray`、`JsonObject` 提供响应体的重载：
+`RequestScope` 提供 `method`、`url`、`contentType`、`data`、`form`、`headers` 和 `cookies`。`NetHeader` 位于 `love.yinlin.foundation.http`。
+
+`ResponseScope<Body>` 提供状态码、最终 URL、响应头、Cookie、`rawBody`、`bodyString` 与 JSON 解码后的 `body`。实现会先读取完整响应字节，因此该请求接口不适合不受控的大文件。
+
+文本响应可使用重载：
 
 ```kotlin
-val html: String? = NetClient.Common.request(
+val text: String? = NetClient.Common.request(
     onRequest = { url = "https://example.com" },
-    onResponse = { text: String -> text }
+    onResponse = { body: String -> body }
 )
 ```
 
-异常由 `catchingNull` 转为 `null`，HTTP 非 2xx 也不会自动抛错；是否接受状态码由 `onResponse` 决定。如果业务需要区分网络失败、解析失败和 HTTP 失败，应在这一层包装成自己的结果类型，而不是只向 UI 返回空值。
+普通异常转换为 `null`，取消异常继续传播。此封装不统一拒绝非成功状态码；需要状态判断时应在响应回调中显式执行。
 
-`form` 表示 `application/x-www-form-urlencoded`。`data` 是原始 `ByteArray`；设置 JSON body 时还要显式提供正确 Content-Type。multipart 文件上传不是这个 RequestScope 的职责，类型化上传见[客户端文件](../3_client/file.md)。
+## 请求体
 
-## 下载
-
-大文件直接写入 `Sink`：
+`data` 表示原始字节，`form` 表示 URL 编码表单。设置 `form` 会同步调整 Content-Type。JSON 字节请求应明确声明类型：
 
 ```kotlin
-val ok = target.write { sink ->
-    NetClient.File.download(
-        url = url,
-        sink = sink,
-        isCancel = { !coroutineContext.isActive },
-        onGetSize = { total -> expectedSize = total },
-        onTick = { current, total -> progress = current.toFloat() / total }
-    )
+onRequest = {
+    method = HttpMethod.Post
+    url = "https://example.com/query"
+    contentType = ContentType.Application.Json
+    data = query.toJsonString().encodeToByteArray()
 }
 ```
 
-进度回调按大约 64 KiB 的增量节流。服务器未提供总长度时，`total` 可能暂时为 0；计算比例前必须检查。取消回调抛出取消异常并返回失败，临时文件是否删除由调用方决定。
+multipart 文件请求不由 `RequestScope.form` 表示，相关接口见[客户端文件上传](../3_client/file.md)。
 
-小内容可以 `download(url): ByteArray?`，但不要用它载入不受控的大文件。更稳妥的下载流程是写临时文件、校验长度/摘要，再移动到最终路径。
+## 文件下载
+
+```kotlin
+target.write { sink ->
+    val success = NetClient.File.download(
+        url = downloadUrl,
+        sink = sink,
+        isCancel = { cancelRequested },
+        onGetSize = { total ->
+            Coroutines.main { expectedSize = total }
+        },
+        onTick = { current, total ->
+            Coroutines.main {
+                if (total > 0L) progress = current.toFloat() / total
+            }
+        }
+    )
+    require(success)
+}
+```
+
+写入型下载在成功状态且实际复制字节数大于零时返回 `true`。普通失败返回 `false`，取消仍抛出取消异常。调用方负责失败后的临时文件处理。
+
+进度按约 64 KiB 增量更新，未知总长度时可能传入 `0`，也不保证最后一次回调恰好对应完成值。完成状态应依据函数结果或上层任务状态确定。小内容可使用返回 `ByteArray?` 的下载重载。
 
 ## WebSocket
 
 ```kotlin
 val connection = object : WebSocketClient.Connection() {
-    override suspend fun onConnect() { send("hello") }
-    override suspend fun onMessage(msg: String) { /* decode */ }
-    override suspend fun onError(err: Throwable) { /* report */ }
-    override suspend fun onDisconnect() { /* update state */ }
+    override suspend fun onConnect() {
+        send("hello")
+    }
+
+    override suspend fun onMessage(msg: String) {
+        processMessage(msg)
+    }
+
+    override suspend fun onError(err: Throwable) {
+        reportError(err)
+    }
+
+    override suspend fun onDisconnect() {
+        updateDisconnectedState()
+    }
 }
 
-buildSocketClient().connect(
-    host = "api.example.com",
-    path = "/events",
-    connection = connection
-)
+socketClient.connect("api.example.com", "/events", connection)
 ```
 
-当前封装固定使用 `wss` 与默认 443 端口，只处理文本帧。`connect` 会挂起并持续收集消息，结束后调用 `onDisconnect`、关闭 session 并清空引用。调用方应在页面/服务协程域中启动它，以便生命周期结束时取消。
+`connect` 固定使用 `wss` 与 443 端口，只将文本帧交给 `onMessage`，并持续挂起至连接结束。`send` 返回值仅反映本地发送调用，不代表对端业务确认。
 
-重连、退避、心跳、鉴权刷新和消息确认均不是封装内置能力。若需要可靠长连接，应在 `Connection` 外层建立状态机；不要从 `onError` 直接无延迟递归连接。
+正常结束或普通异常后的代码会依次通知断开、关闭 session 并清空引用。取消异常与回调异常可能提前中断该后续路径；当前实现未用统一 `finally` 保证所有退出情况的回调与清理。重连、退避和业务确认由应用管理。
 
-## 平台差异
+## 平台约束
 
-底层引擎由各平台 `actual` 构建，公共调用方式相同，但浏览器仍受 CORS、Cookie 和混合内容策略限制；移动端还受网络权限与 TLS 配置约束。客户端 URL 拼接工具不能绕过这些安全策略，必要的跨域代理必须由可信服务端显式实现。
+浏览器请求仍受 CORS、Cookie 与混合内容策略限制。移动端需具备对应网络权限及平台配置。公共 URL 或请求封装不会改变平台网络访问规则。
+
+## 源码入口
+
+- `ylcs-module/foundation/network/src/commonMain/kotlin/love/yinlin/foundation/NetClient.kt`
+- `ylcs-module/foundation/network/src/commonMain/kotlin/love/yinlin/foundation/RequestScope.kt`
+- `ylcs-module/foundation/network/src/commonMain/kotlin/love/yinlin/foundation/WebSocketClient.kt`
