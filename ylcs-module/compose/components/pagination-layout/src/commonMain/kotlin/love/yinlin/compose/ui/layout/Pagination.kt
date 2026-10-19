@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.fastFilter
-import androidx.compose.ui.util.fastMap
 import love.yinlin.extension.replaceAll
 
 // 分页数据实现
@@ -40,7 +39,7 @@ abstract class Pagination<E, K, out T>(
             processArgs(null)
         }
         else {
-            val existingItems = items.fastMap { distinctValue(it) }.toSet()
+            val existingItems = items.mapTo(HashSet(items.size)) { distinctValue(it) }
             items += newItems.fastFilter { distinctValue(it) !in existingItems }
             val last = newItems.lastOrNull()
             mOffset = last?.let(::offset) ?: default

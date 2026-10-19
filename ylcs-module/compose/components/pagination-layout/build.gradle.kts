@@ -18,5 +18,9 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.compose.ui
             )
         }
+
+        commonTest.configure {
+            lib(libs.test)
+        }
     }
 })
