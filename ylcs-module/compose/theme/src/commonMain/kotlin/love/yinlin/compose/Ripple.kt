@@ -168,10 +168,10 @@ data object Ripple : IndicationNodeFactory {
                     ripples[pressInteraction] = rippleAnimation
                     coroutineScope.launch {
                         cleaning({
+                            rippleAnimation.animate()
+                        }) {
                             ripples.remove(pressInteraction)
                             invalidateDraw()
-                        }) {
-                            rippleAnimation.animate()
                         }
                     }
                     invalidateDraw()

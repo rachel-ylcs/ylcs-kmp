@@ -72,7 +72,7 @@ inline fun <R> catchingDefault(default: (Throwable) -> R, block: () -> R): R {
 /**
  * 清理
  */
-inline fun <R> cleaning(clean: () -> Unit, block: () -> R): R {
+inline fun <R> cleaning(block: () -> R, clean: () -> Unit): R {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         callsInPlace(clean, InvocationKind.EXACTLY_ONCE)

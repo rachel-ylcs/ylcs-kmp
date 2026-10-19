@@ -140,13 +140,13 @@ internal class NestedRootScreen(scope: NestedRoutes) : NestedPage(scope, "Root",
         resource = DemoResource(journal, scope.name, instanceId)
         viewModelScope.launch {
             cleaning({
-                journal.event(scope.name, "协程结束", "$instanceId · 子根页计时结束")
-            }) {
                 while (isActive) {
                     delay(1000.milliseconds)
                     ticks++
                     publish()
                 }
+            }) {
+                journal.event(scope.name, "协程结束", "$instanceId · 子根页计时结束")
             }
         }
     }

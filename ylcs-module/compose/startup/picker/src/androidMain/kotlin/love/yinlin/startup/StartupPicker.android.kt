@@ -47,7 +47,7 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
         return Coroutines.main {
             val registry = pool.activityResultRegistry ?: return@main false
             var launcher: ActivityResultLauncher<String>? = null
-            cleaning({ launcher?.unregister() }) {
+            cleaning({
                 Coroutines.sync { future ->
                     future.catching {
                         launcher = registry.register(
@@ -57,6 +57,8 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
                         launcher.launch(permission)
                     }
                 } == true
+            }) {
+                launcher?.unregister()
             }
         }
     }
@@ -70,11 +72,6 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
         var prepared = false
 
         return cleaning({
-            if (!prepared) {
-                catching { stream?.close() }
-                catching { file?.delete() }
-            }
-        }) {
             catchingNull {
                 val result = Coroutines.io {
                     val name = File(filename.replace('\\', '/')).name
@@ -94,6 +91,11 @@ actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(p
                 }
                 prepared = true
                 result
+            }
+        }) {
+            if (!prepared) {
+                catching { stream?.close() }
+                catching { file?.delete() }
             }
         }
     }

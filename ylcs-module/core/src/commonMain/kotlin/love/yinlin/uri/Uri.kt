@@ -54,8 +54,10 @@ data class Uri(
                 buffer[writePosition++] = byte
             }
 
-            fun decodeToStringAndReset() = cleaning({ writePosition = 0 }) {
+            fun decodeToStringAndReset() = cleaning({
                 buffer.decodeToString(startIndex = 0, endIndex = writePosition, throwOnInvalidSequence = false)
+            }) {
+                writePosition = 0
             }
 
             fun flushDecodingByteAccumulator(builder: StringBuilder) {

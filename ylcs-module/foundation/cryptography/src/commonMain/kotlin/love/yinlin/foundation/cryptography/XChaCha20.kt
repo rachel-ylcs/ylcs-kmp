@@ -98,7 +98,9 @@ class XChaCha20(private val key: ByteArray) : Cipher() {
             val subkey = ChaCha20.hChaCha20(key, nonce.copyOfRange(0, 16))
             val shortNonce = ByteArray(12)
             nonce.copyInto(shortNonce, 4, 16, 24)
-            return cleaning({ subkey.fill(0) }) { ChaCha20.transform(subkey, shortNonce, data, counter, byteOffset) }
+            return cleaning({
+                ChaCha20.transform(subkey, shortNonce, data, counter, byteOffset)
+            }) { subkey.fill(0) }
         }
     }
 

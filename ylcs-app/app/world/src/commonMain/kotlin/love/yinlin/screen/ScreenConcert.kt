@@ -168,10 +168,12 @@ class ScreenConcert : BasicScreen() {
         if (token.isEmpty()) return
         pendingCid = item.concert.cid
         launch {
-            cleaning({ pendingCid = null }) {
+            cleaning({
                 ApiConcertSetAttended.request(token, item.concert.cid, !item.attended) { attended ->
                     memory = memory.withAttended(attended)
                 }.errorTip
+            }) {
+                pendingCid = null
             }
         }
     }

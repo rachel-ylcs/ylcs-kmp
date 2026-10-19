@@ -65,13 +65,13 @@ internal class StateScreen(routes: GalleryRoutes) : GalleryScreen(routes, Galler
         journal.event("状态实验", "协程启动", "$instanceId · viewModelScope，每秒一次")
         ticker = viewModelScope.launch {
             cleaning({
-                journal.event("状态实验", "协程结束", "$instanceId · 计时任务 finally，ticks=$ticks")
-            }) {
                 while (isActive) {
                     delay(1000.milliseconds)
                     ticks++
                     publish()
                 }
+            }) {
+                journal.event("状态实验", "协程结束", "$instanceId · 计时任务 finally，ticks=$ticks")
             }
         }
         publish()

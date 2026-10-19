@@ -300,12 +300,12 @@ class Screen404Test {
         val job = assertNotNull(fallback.viewModelScope.coroutineContext[Job])
         val reference = manager.store.retain(missing.id)
 
-        cleaning(reference::close) {
+        cleaning({
             assertTrue(fallback.pop())
             assertSame(entry, manager.navEntry(missing))
             assertEquals(0, fallback.clearCount)
             assertTrue(job.isActive)
-        }
+        }, reference::close)
 
         assertEquals(1, fallback.clearCount)
         assertTrue(job.isCancelled)

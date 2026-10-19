@@ -113,8 +113,10 @@ class ScreenWorld : BasicScreen() {
                     awaitEachGesture {
                         awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
                         pointerPressed = true
-                        cleaning({ pointerPressed = false }) {
+                        cleaning({
                             waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                        }) {
+                            pointerPressed = false
                         }
                     }
                 }.clickable(interactionSource = interactionSource, onClick = onClick)

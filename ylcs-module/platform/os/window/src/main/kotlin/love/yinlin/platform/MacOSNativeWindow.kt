@@ -13,13 +13,15 @@ internal object MacOSNativeWindow : NativeWindowImpl, NativeLibrary("/usr/lib/li
 
     override fun updateClickThrough(handle: Long, enabled: Boolean) {
         val pool = objc_autoreleasePoolPush()
-        cleaning({ objc_autoreleasePoolPop(pool) }) {
+        cleaning({
             val windowPtr = Address.ofAddress(handle)
             useMemory { arena ->
                 val selName = arena.allocateFrom("setIgnoresMouseEvents:")
                 val sel = sel_registerName(selName) as Address
                 objc_msgSend(windowPtr, sel, enabled)
             }
+        }) {
+            objc_autoreleasePoolPop(pool)
         }
     }
 }

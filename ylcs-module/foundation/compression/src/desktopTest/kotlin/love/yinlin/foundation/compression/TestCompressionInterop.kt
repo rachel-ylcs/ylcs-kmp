@@ -21,7 +21,7 @@ class TestCompressionInterop {
 
     private fun deflateWithJdk(source: ByteArray, level: Int, raw: Boolean): ByteArray {
         val deflater = Deflater(level, raw)
-        cleaning(deflater::end) {
+        cleaning({
             deflater.setInput(source)
             deflater.finish()
             val output = ByteArrayOutputStream()
@@ -32,12 +32,12 @@ class TestCompressionInterop {
                 output.write(buffer, 0, count)
             }
             return output.toByteArray()
-        }
+        }, deflater::end)
     }
 
     private fun inflateWithJdk(encoded: ByteArray, raw: Boolean): ByteArray {
         val inflater = Inflater(raw)
-        cleaning(inflater::end) {
+        cleaning({
             inflater.setInput(encoded)
             val output = ByteArrayOutputStream()
             val buffer = ByteArray(1024)
@@ -48,7 +48,7 @@ class TestCompressionInterop {
             }
             assertEquals(0, inflater.remaining)
             return output.toByteArray()
-        }
+        }, inflater::end)
     }
 
     @Test

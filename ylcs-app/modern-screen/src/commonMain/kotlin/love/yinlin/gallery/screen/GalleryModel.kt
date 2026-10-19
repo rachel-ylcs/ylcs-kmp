@@ -116,7 +116,9 @@ internal abstract class ObservedScreen(
     }
 
     final override fun uninitialize() {
-        cleaning({ journal.clear(instanceId) }, ::onUninitialize)
+        cleaning(::onUninitialize) {
+            journal.clear(instanceId)
+        }
     }
 
     protected open fun onInitialize() { }
@@ -125,7 +127,6 @@ internal abstract class ObservedScreen(
 
     @Composable
     final override fun ModelContent() {
-        // 离开组合仅记录 UI 事件；业务资源仍由 uninitialize 释放。
         DisposableEffect(instanceId) {
             journal.composition(instanceId, true)
             onDispose { journal.composition(instanceId, false) }

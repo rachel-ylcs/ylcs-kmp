@@ -149,11 +149,6 @@ class ReorderingState internal constructor(
         val owner = generation
         driver = scope.launch {
             cleaning({
-                if (generation === owner) {
-                    driver = null
-                    if (gestures.isNotEmpty()) cancelDrag()
-                }
-            }) {
                 var previousTime = 0L
                 while (gestures.isNotEmpty()) {
                     val time = withFrameNanos { it }
@@ -233,6 +228,11 @@ class ReorderingState internal constructor(
                         }
                     }
                 }
+            }) {
+                if (generation === owner) {
+                    driver = null
+                    if (gestures.isNotEmpty()) cancelDrag()
+                }
             }
         }
     }
@@ -299,14 +299,14 @@ class ReorderingState internal constructor(
         if (drop !in drops) return
         drop.job = scope.launch {
             cleaning({
-                if (drop in drops) drops = drops - drop
-                drop.release()
-            }) {
                 drop.animation.animateTo(Offset.Zero, spring(
                     stiffness = Spring.StiffnessMediumLow,
                     visibilityThreshold = Offset.VisibilityThreshold,
                 ))
                 commit(drop)
+            }) {
+                if (drop in drops) drops = drops - drop
+                drop.release()
             }
         }
     }

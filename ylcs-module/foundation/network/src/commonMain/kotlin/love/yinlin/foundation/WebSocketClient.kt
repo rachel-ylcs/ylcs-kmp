@@ -35,15 +35,6 @@ class WebSocketClient internal constructor(@PublishedApi internal val delegate: 
         var activeSession = connection.session
 
         cleaning({
-            Coroutines.with(NonCancellable) {
-                cleaning({
-                    if (connection.session === activeSession) connection.session = null
-                    activeSession?.close()
-                }) {
-                    connection.onDisconnect()
-                }
-            }
-        }) {
             catchingError {
                 activeSession?.close()
                 val newSession = delegate.webSocketSession {
@@ -57,6 +48,15 @@ class WebSocketClient internal constructor(@PublishedApi internal val delegate: 
                     if (frame is Frame.Text) connection.onMessage(frame.readText())
                 }
             }?.then { connection.onError(it) }
+        }) {
+            Coroutines.with(NonCancellable) {
+                cleaning({
+                    connection.onDisconnect()
+                }) {
+                    if (connection.session === activeSession) connection.session = null
+                    activeSession?.close()
+                }
+            }
         }
     }
 }

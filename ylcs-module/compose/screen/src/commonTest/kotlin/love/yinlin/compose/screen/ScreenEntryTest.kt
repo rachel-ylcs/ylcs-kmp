@@ -232,11 +232,11 @@ class ScreenEntryTest {
 
         val reference = manager.store.provider.acquireToken(entry.contentKey)
 
-        cleaning(reference::close) {
+        cleaning({
             assertTrue(manager.pop())
             assertSame(entry, manager.navEntry(screen.screenKey))
             assertEquals(0, screen.clearCount)
-        }
+        }, reference::close)
 
         manager.store.provider.clearKey(entry.contentKey)
 
@@ -254,13 +254,13 @@ class ScreenEntryTest {
         val job = assertNotNull(screen.viewModelScope.coroutineContext[Job])
         val reference = manager.store.retain(key.id)
 
-        cleaning(reference::close) {
+        cleaning({
             assertTrue(manager.pop())
             assertFalse(key.id in manager.store)
             assertSame(entry, manager.navEntry(key))
             assertEquals(0, screen.clearCount)
             assertTrue(job.isActive)
-        }
+        }, reference::close)
 
         assertEquals(1, screen.clearCount)
         assertTrue(job.isCancelled)

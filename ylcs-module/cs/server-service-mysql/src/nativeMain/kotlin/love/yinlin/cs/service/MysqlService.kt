@@ -48,7 +48,7 @@ class MysqlService(scope: APIScope) : ServerService(scope) {
     @PublishedApi
     internal suspend inline fun <R> withConnection(block: (Connection) -> R): R {
         val connection = client!!.acquire().getOrThrow()
-        return cleaning({ connection.close() }) { block(connection) }
+        return cleaning({ block(connection) }) { connection.close() }
     }
 
     suspend inline fun <R> throwTransaction(crossinline block: suspend (QueryExecutor) -> R): R = client!!.transaction {

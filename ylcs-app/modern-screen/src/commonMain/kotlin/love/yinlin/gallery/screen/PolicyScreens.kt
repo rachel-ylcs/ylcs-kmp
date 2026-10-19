@@ -92,7 +92,7 @@ internal class PolicyRoutes(val journal: GalleryJournal, val name: String) {
         if (!seedOnResume) return
         seedOnResume = false
         seeding = true
-        cleaning({ seeding = false }) {
+        cleaning({
             caller.navigate(::alpha, 1)
             val a1 = lastCreatedId
             caller.navigate(::beta, 1)
@@ -104,6 +104,8 @@ internal class PolicyRoutes(val journal: GalleryJournal, val name: String) {
             seedDescription = "本轮创建：H $rootId → A1 $a1 → B1 $b1 → A2 $a2 → B2 $b2。编号由注册工厂记录，只保存字符串。"
             lastResult = "示例栈创建完成。当前显示 B2 $b2；目标 A 应匹配 A2 $a2。"
             journal.event(name, "示例就绪", seedDescription)
+        }) {
+            seeding = false
         }
     }
 

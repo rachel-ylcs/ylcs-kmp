@@ -198,7 +198,7 @@ private fun HexViewBody(
                 state.select(anchor, extend = false)
                 dragAscii = ascii
                 dragPosition = press.position
-                cleaning({ dragPosition = Offset.Unspecified }) {
+                cleaning({
                     while (true) {
                         val event = awaitPointerEvent(PointerEventPass.Initial)
                         val change = event.changes.firstOrNull { it.id == press.id } ?: break
@@ -208,6 +208,8 @@ private fun HexViewBody(
                         metrics.indexAt(change.position, listState, state.size, ascii, clamp = true)?.let { state.select(it, extend = true) }
                         if (!change.pressed || (change.type == PointerType.Mouse && !event.buttons.isPrimaryPressed)) break
                     }
+                }) {
+                    dragPosition = Offset.Unspecified
                 }
             }
         },

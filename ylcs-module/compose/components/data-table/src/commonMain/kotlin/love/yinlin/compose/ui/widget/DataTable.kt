@@ -105,7 +105,7 @@ private fun Modifier.dataTableRowGestures(
         drag.rowPointer = start.position.y
         drag.targetIndex = item.index
 
-        cleaning(drag::clear) {
+        cleaning({
             var dropped = false
             while (true) {
                 val event = awaitPointerEvent(PointerEventPass.Initial)
@@ -120,7 +120,7 @@ private fun Modifier.dataTableRowGestures(
                 }
             }
             if (dropped && drag.targetIndex in 0 until state.rowCount) state.moveRowById(rowId, drag.targetIndex)
-        }
+        }, drag::clear)
     }
 }
 

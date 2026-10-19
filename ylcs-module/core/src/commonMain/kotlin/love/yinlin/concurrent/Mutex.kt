@@ -20,6 +20,6 @@ class Mutex(locked: Boolean = false) {
         }
         lock()
 
-        return cleaning(clean = ::unlock, block = block)
+        return cleaning(block, ::unlock)
     }
 }

@@ -92,11 +92,13 @@ fun LogOutput(
     LaunchedEffect(state.revision, entryChange) {
         if (entryChange) {
             programmatic = true
-            cleaning({ programmatic = false}) {
+            cleaning({
                 withFrameNanos { }
                 // 滚动到底部
                 listState.scrollToItem(entries.lastIndex)
                 listState.scrollBy(listState.layoutInfo.viewportEndOffset.toFloat())
+            }) {
+                programmatic = false
             }
         }
     }

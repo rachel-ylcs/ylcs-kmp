@@ -209,9 +209,9 @@ class ScreenResumeTest {
         val screen = CallbackScreen {
             if (depth == 0) {
                 ++depth
-                cleaning({ --depth }) {
+                cleaning({
                     dispatchResume(ScreenArgs.build(2))
-                }
+                }) { --depth }
             }
             decodeResume { value: Int -> values += value }
         }
@@ -253,10 +253,10 @@ class ScreenResumeTest {
             val screen = CallbackScreen {
                 if (depth == 0) {
                     ++depth
-                    cleaning({ --depth }) {
+                    cleaning({
                         val inner = if (decodeFailure) ScreenArgs.build("not-an-int") else ScreenArgs.build(2)
                         caught = catchingError { dispatchResume(inner) }
-                    }
+                    }) { --depth }
                     decodeResume { value: Int -> values += value }
                 }
                 else decodeResume { _: Int -> throw failure }

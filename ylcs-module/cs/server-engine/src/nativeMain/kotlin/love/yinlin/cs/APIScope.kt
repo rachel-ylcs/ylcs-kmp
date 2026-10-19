@@ -487,7 +487,7 @@ abstract class APIScope(val engine: ServerEngine) {
             val dataItems = mutableMapOf<Int, JsonElement>()
             val fileItems = mutableMapOf<Int, MutableList<String>>()
             multipartData.forEachPart { part ->
-                cleaning({ part.release() }) {
+                cleaning({
                     val name = requireNotNull(part.name) { "part.name == null" }
                     val parameterIndex = requireNotNull(name.toIntOrNull()) { "Invalid form key: $name" }
                     require(parameterIndex >= 0 && name == parameterIndex.toString()) { "Invalid form key: $name" }
@@ -516,6 +516,8 @@ abstract class APIScope(val engine: ServerEngine) {
                         else -> error("Unsupported form part at parameter $parameterIndex")
                     }
                     currentCoroutineContext().ensureActive()
+                }) {
+                    part.release()
                 }
             }
 
@@ -861,20 +863,20 @@ abstract class APIScope(val engine: ServerEngine) {
         routing?.webSocket(this.path) {
             val manager = factory(this)
             cleaning({
-                Coroutines.with(NonCancellable) {
-                    cleaning({
-                        this@webSocket.close(CloseReason(CloseReason.Codes.NORMAL, "websockets closed"))
-                    }) {
-                        manager.onClose()
-                    }
-                }
-            }) {
                 catchingError {
                     for (frame in incoming) {
                         if (frame !is Frame.Text) continue
                         manager.onMessage(frame.readText())
                     }
                 }?.then { manager.onError(it) }
+            }) {
+                Coroutines.with(NonCancellable) {
+                    cleaning({
+                        manager.onClose()
+                    }) {
+                        this@webSocket.close(CloseReason(CloseReason.Codes.NORMAL, "websockets closed"))
+                    }
+                }
             }
         }
     }

@@ -984,7 +984,7 @@ class ScreenManagerTest {
                     if (changed.any { state -> observed.any { it === state } }) published.add(manager.backStack.toList())
                 }
 
-                cleaning(observer::dispose) {
+                cleaning({
                     manager.navigate(::NumberScreen, 7, policy = create + clear)
                     val result = manager.requireTopScreen<NumberScreen>()
                     val expected = if (clear == ClearPolicy.Clear) [root.screenKey, result.screenKey]
@@ -992,7 +992,7 @@ class ScreenManagerTest {
 
                     assertEquals([expected], published, "$create + $clear")
                     assertContentEquals(expected, manager.backStack)
-                }
+                }, observer::dispose)
             }
         }
     }
@@ -1008,9 +1008,9 @@ class ScreenManagerTest {
         val before = manager.backStack.toList()
         val snapshot = Snapshot.takeSnapshot()
 
-        cleaning(snapshot::dispose) {
+        cleaning({
             assertFailsWith<IllegalStateException> { snapshot.enter { manager.navigate(::NumberScreen, 7) } }
-        }
+        }, snapshot::dispose)
 
         val screen = assertNotNull(created)
         assertEquals(1, screen.clearCount)

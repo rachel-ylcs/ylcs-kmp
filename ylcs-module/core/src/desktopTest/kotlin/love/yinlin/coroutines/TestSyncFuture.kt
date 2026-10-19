@@ -18,7 +18,7 @@ class TestSyncFuture {
         Coroutines.io {
             val executor = Executors.newFixedThreadPool(8)
 
-            cleaning({ executor.shutdownNow() }) {
+            cleaning({
                 repeat(200) {
                     val barrier = CyclicBarrier(8)
                     val callbacks = mutableListOf<Future<*>>()
@@ -34,7 +34,7 @@ class TestSyncFuture {
                     for (callback in callbacks) callback.get(10, TimeUnit.SECONDS)
                     assertTrue(result in 0 ..< 8)
                 }
-            }
+            }, executor::shutdownNow)
         }
     }
 

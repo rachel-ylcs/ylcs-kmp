@@ -71,7 +71,7 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
         require(!isClosed) { "The screen manager is closed." }
         require(!changing) { "The navigation stack is already being changed." }
         changing = true
-        return cleaning({ changing = false}, block)
+        return cleaning(block) { changing = false }
     }
 
     private fun finish(removed: List<ScreenKey>, action: () -> Unit = {}) {

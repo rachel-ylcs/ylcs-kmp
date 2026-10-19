@@ -45,7 +45,7 @@ class ReorderingItemScope internal constructor(private val state: ReorderingStat
                 }
             }
 
-            cleaning(stop) {
+            cleaning({
                 when {
                     longPress -> detectDragGesturesAfterLongPress(start, stop, stop, drag)
                     state.dragOrientation == Orientation.Vertical -> detectVerticalDragGestures(start, stop, stop) { change, amount ->
@@ -56,7 +56,7 @@ class ReorderingItemScope internal constructor(private val state: ReorderingStat
                     }
                     else -> detectDragGestures(start, stop, stop, drag)
                 }
-            }
+            }, stop)
         }
     }
 }

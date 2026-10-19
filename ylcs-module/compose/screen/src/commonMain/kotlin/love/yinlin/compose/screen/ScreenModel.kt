@@ -49,7 +49,7 @@ abstract class ScreenModel : ViewModel() {
     final override fun onCleared() {
         if (uninitialized) return
         uninitialized = true
-        cleaning({ super.onCleared() }, ::uninitialize)
+        cleaning(::uninitialize) { super.onCleared() }
     }
 
     final override fun addCloseable(closeable: AutoCloseable) = super.addCloseable(closeable)
@@ -76,7 +76,7 @@ abstract class ScreenModel : ViewModel() {
     internal fun dispatchResume(args: ScreenArgs) {
         val previous = currentResumeArgs
         currentResumeArgs = args
-        cleaning({ currentResumeArgs = previous }, ::resume)
+        cleaning(::resume) { currentResumeArgs = previous }
     }
 
     @PublishedApi
