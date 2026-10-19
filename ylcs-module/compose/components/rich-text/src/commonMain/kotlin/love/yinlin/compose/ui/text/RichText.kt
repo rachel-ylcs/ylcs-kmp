@@ -22,7 +22,7 @@ fun RichText(
     fixLineHeight: Boolean = false,
 ) {
     val fontSize = LocalStyle.current.fontSize
-    val result = remember(renderer, text) {
+    val result = remember(renderer, text, fontSize) {
         renderer.render(fontSize, text)
     }
     Text(

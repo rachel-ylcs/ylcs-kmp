@@ -40,5 +40,5 @@ fun rememberRichRenderer(
     onAction: (RichObject) -> Unit  = {}
 ): RichRenderer {
     val onActionUpdate by rememberUpdatedState(onAction)
-    return remember { RichRenderer(drawerProvider(), onActionUpdate) }
+    return remember { RichRenderer(drawerProvider()) { onActionUpdate(it) } }
 }
