@@ -158,6 +158,7 @@ data class Uri(
                         }
                         '%' -> {
                             var hexValue: Byte = 0
+                            var vaild = true
                             for (_ in 0..1) {
                                 if (i >= length) {
                                     flushDecodingByteAccumulator(builder)
@@ -173,11 +174,12 @@ data class Uri(
                                 if (newDigit < 0) {
                                     flushDecodingByteAccumulator(builder)
                                     builder.append('\uFFFD')
+                                    vaild = false
                                     break
                                 }
                                 hexValue = (hexValue * 0x10 + newDigit).toByte()
                             }
-                            writeByte(hexValue)
+                            if (vaild) writeByte(hexValue)
                         }
                         else -> {
                             flushDecodingByteAccumulator(builder)
