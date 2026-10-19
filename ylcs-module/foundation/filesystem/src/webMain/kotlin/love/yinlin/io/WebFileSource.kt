@@ -21,9 +21,7 @@ class WebFileSource(private val file: File) : RawSource {
         return readTotal.toLong()
     }
 
-    override fun close() {
-        if (!file.isClosed) file.close()
-    }
+    override fun close() { }
 
     override fun toString(): String = "WebFileSource"
 }
