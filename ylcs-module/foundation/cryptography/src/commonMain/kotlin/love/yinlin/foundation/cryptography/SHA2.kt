@@ -1,5 +1,6 @@
 package love.yinlin.foundation.cryptography
 
+import love.yinlin.extension.cleaning
 import love.yinlin.io.ByteArrayIO
 import love.yinlin.io.Endian
 
@@ -128,6 +129,7 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
     private class Sha256Stream(private val type: BitType) : Sha2Stream {
         private val state = IntArray(8)
         private val buffer = ByteArray(64)
+        private val words = IntArray(64)
         private var buffered = 0
         private var totalBytes = 0uL
 
@@ -145,6 +147,11 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
             val end = offset + length
 
             while (cursor < end) {
+                if (buffered == 0 && end - cursor >= buffer.size) {
+                    compress(data, cursor)
+                    cursor += buffer.size
+                    continue
+                }
                 val count = minOf(buffer.size - buffered, end - cursor)
                 data.copyInto(buffer, buffered, cursor, cursor + count)
                 buffered += count
@@ -152,7 +159,6 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
 
                 if (buffered == buffer.size) {
                     compress(buffer)
-                    buffer.fill(0)
                     buffered = 0
                 }
             }
@@ -161,36 +167,30 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
         }
 
         override fun finish(): ByteArray {
-            val copy = Sha256Stream(type)
-            state.copyInto(copy.state)
-            buffer.copyInto(copy.buffer)
-            copy.buffered = buffered
-            copy.totalBytes = totalBytes
-            copy.buffer[copy.buffered++] = 0x80.toByte()
+            buffer[buffered++] = 0x80.toByte()
 
-            if (copy.buffered > 56) {
-                copy.buffer.fill(0, copy.buffered, 64)
-                copy.compress(copy.buffer)
-                copy.buffer.fill(0)
-                copy.buffered = 0
+            if (buffered > 56) {
+                buffer.fill(0, buffered, 64)
+                compress(buffer)
+                buffered = 0
             }
 
-            copy.buffer.fill(0, copy.buffered, 56)
-            ByteArrayIO(copy.buffer).writeULong(56, copy.totalBytes shl 3, Endian.BIG)
-            copy.compress(copy.buffer)
+            buffer.fill(0, buffered, 56)
+            ByteArrayIO(buffer).writeULong(56, totalBytes shl 3, Endian.BIG)
+            compress(buffer)
 
             return ByteArrayIO(type.bits / 8).write {
                 for (i in 0 ..< type.bits / 32) {
-                    writeInt(i * 4, copy.state[i], Endian.BIG)
+                    writeInt(i * 4, state[i], Endian.BIG)
                 }
             }
         }
 
-        private fun compress(block: ByteArray) {
+        private fun compress(block: ByteArray, offset: Int = 0) {
             val words = IntArray(64)
 
             val blockIO = ByteArrayIO(block)
-            for (i in 0 ..< 16) words[i] = blockIO.readInt(i * 4, Endian.BIG)
+            for (i in 0 ..< 16) words[i] = blockIO.readInt(offset + i * 4, Endian.BIG)
 
             for (i in 16 ..< 64) {
                 val x = words[i - 15]
@@ -246,6 +246,7 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
             }.copyInto(state)
 
             buffer.fill(0)
+            words.fill(0)
             buffered = 0
             totalBytes = 0uL
 
@@ -256,6 +257,7 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
     private class Sha512Stream(private val type: BitType) : Sha2Stream {
         private val state = LongArray(8)
         private val buffer = ByteArray(128)
+        private val words = LongArray(80)
         private var buffered = 0
         private var totalBytes = 0uL
 
@@ -273,6 +275,12 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
             val end = offset + length
 
             while (cursor < end) {
+                if (buffered == 0 && end - cursor >= buffer.size) {
+                    compress(data, cursor)
+                    cursor += buffer.size
+                    continue
+                }
+
                 val count = minOf(buffer.size - buffered, end - cursor)
 
                 data.copyInto(buffer, buffered, cursor, cursor + count)
@@ -281,7 +289,6 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
 
                 if (buffered == buffer.size) {
                     compress(buffer)
-                    buffer.fill(0)
                     buffered = 0
                 }
             }
@@ -290,41 +297,35 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
         }
 
         override fun finish(): ByteArray {
-            val copy = Sha512Stream(type)
-            state.copyInto(copy.state)
-            buffer.copyInto(copy.buffer)
-            copy.buffered = buffered
-            copy.totalBytes = totalBytes
-            copy.buffer[copy.buffered++] = 0x80.toByte()
+            buffer[buffered++] = 0x80.toByte()
 
-            if (copy.buffered > 112) {
-                copy.buffer.fill(0, copy.buffered, 128)
-                copy.compress(copy.buffer)
-                copy.buffer.fill(0)
-                copy.buffered = 0
+            if (buffered > 112) {
+                buffer.fill(0, buffered, 128)
+                compress(buffer)
+                buffered = 0
             }
 
-            copy.buffer.fill(0, copy.buffered, 112)
+            buffer.fill(0, buffered, 112)
 
-            val copyBufferIO = ByteArrayIO(copy.buffer)
-            copyBufferIO.writeULong(112, copy.totalBytes shr 61, Endian.BIG)
-            copyBufferIO.writeULong(120, copy.totalBytes shl 3, Endian.BIG)
+            val bufferIO = ByteArrayIO(buffer)
+            bufferIO.writeULong(112, totalBytes shr 61, Endian.BIG)
+            bufferIO.writeULong(120, totalBytes shl 3, Endian.BIG)
 
-            copy.compress(copy.buffer)
+            compress(buffer)
 
             return ByteArrayIO(type.bits / 8).write {
-                for (i in 0 ..< type.bits / 61) {
-                    writeLong(i * 8, copy.state[i], Endian.BIG)
+                for (i in 0 ..< type.bits / Long.SIZE_BITS) {
+                    writeLong(i * 8, state[i], Endian.BIG)
                 }
             }
         }
 
-        private fun compress(block: ByteArray) {
+        private fun compress(block: ByteArray, offset: Int = 0) {
             val words = LongArray(80)
 
             val blockIO = ByteArrayIO(block)
             for (i in 0 ..< 16) {
-                words[i] = blockIO.readLong(i * 8, Endian.BIG)
+                words[i] = blockIO.readLong(offset + i * 8, Endian.BIG)
             }
 
             for (i in 16 ..< 80) {
@@ -380,6 +381,7 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
             }.copyInto(state)
 
             buffer.fill(0)
+            words.fill(0)
             buffered = 0
             totalBytes = 0uL
 
@@ -392,9 +394,7 @@ class SHA2(type: BitType = BitType.B256) : ByteDigest() {
         BitType.B384, BitType.B512 -> Sha512Stream(type)
     }
 
-    override fun encode(data: ByteArray): ByteArray {
-        val result = stream.update(data).finish()
-        stream.reset()
-        return result
-    }
+    override fun encode(data: ByteArray): ByteArray = cleaning({
+        stream.update(data).finish()
+    }, stream::reset)
 }
