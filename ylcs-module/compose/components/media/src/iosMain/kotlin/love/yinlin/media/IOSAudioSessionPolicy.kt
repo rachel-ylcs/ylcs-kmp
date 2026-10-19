@@ -9,9 +9,9 @@ import platform.Foundation.*
 
 internal object IOSAudioSessionPolicy {
     enum class Kind { Media, Effect }
-    data class Token(val kind: Kind, val mixWithOthers: Boolean = false)
+    class Token(val kind: Kind, val mixWithOthers: Boolean = false)
 
-    private val users = mutableSetOf<Token>()
+    private val users: MutableSet<Token> = []
     private var active = false
     private var unavailable = false
     private var category: String? = null
