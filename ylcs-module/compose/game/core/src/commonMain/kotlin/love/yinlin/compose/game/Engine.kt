@@ -87,15 +87,15 @@ class Engine(
                         val taskMap = mutableMapOf<String, Deferred<Boolean>>()
                         plugins.fastMap { plugin ->
                             val id = plugin.id
+                            val dependencies = pluginDependencyMap[id] ?: []
+                            val dependencyTasks = dependencies.map { dependentId ->
+                                requireNotNull(taskMap[dependentId]) { "Dependent plugin $dependentId is not created" }
+                            }
+
                             // 并行加载
                             val task = async {
-                                val dependencies = pluginDependencyMap[id] ?: []
                                 // 等待依赖插件完成
-                                for (dependentId in dependencies) {
-                                    val dependencyTask = taskMap[dependentId]
-                                    require(dependencyTask != null) { "Dependent plugin $dependentId is not created" }
-                                    dependencyTask.await()
-                                }
+                                for (dependencyTask in dependencyTasks) dependencyTask.await()
                                 if (!plugin.isInitialized) {
                                     val pluginResult = plugin.onInitialize()
                                     Coroutines.main { plugin.isInitialized = pluginResult }
