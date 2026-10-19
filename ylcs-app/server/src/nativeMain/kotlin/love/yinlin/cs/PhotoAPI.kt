@@ -1,5 +1,6 @@
 package love.yinlin.cs
 
+import love.yinlin.cs.APIConfig.coercePageNum
 import love.yinlin.extension.to
 
 fun ServerScope.photoAPI() {
@@ -7,16 +8,16 @@ fun ServerScope.photoAPI() {
         val photos = if (keyword == null) mysql.throwQuerySQL("""
             SELECT aid, name, title, ts, location, author, keyword, picNum
             FROM photo
-            WHERE picNum > 0 AND ts < ? OR (ts = ? AND aid < ?)
+           WHERE picNum > 0 AND (ts < ? OR (ts = ? AND aid < ?))
             ORDER BY ts DESC, aid DESC
             LIMIT ?
-        """, ts, ts, aid, num) else mysql.throwQuerySQL("""
+        """, ts, ts, aid, num.coercePageNum) else mysql.throwQuerySQL("""
             SELECT aid, name, title, ts, location, author, keyword, picNum
             FROM photo
             WHERE picNum > 0 AND (ts < ? OR (ts = ? AND aid < ?)) AND (JSON_CONTAINS(keyword, JSON_QUOTE(?)) OR location = ? OR author = ? OR title LIKE CONCAT('%', ?, '%'))
             ORDER BY ts DESC, aid DESC
             LIMIT ?
-        """, ts, ts, aid, keyword, keyword, keyword, keyword, num)
+        """, ts, ts, aid, keyword, keyword, keyword, keyword, num.coercePageNum)
         result(photos.to())
     }
 }
