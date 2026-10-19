@@ -1,5 +1,8 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.androidLibrary,
         libs.plugins.mavenPublish,
@@ -7,34 +10,36 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        val posixMain = createPosix(commonMain)
+        sources {
+            val posixMain = createPosix(commonMain)
 
-        val jvmMain = createJvm(commonMain)
+            val jvmMain = createJvm(commonMain)
 
-        androidMain.configure(jvmMain)
+            androidMain(jvmMain)
 
-        iosMain.configure(posixMain)
+            iosMain(posixMain)
 
-        iosMainList.configure(iosMain)
+            iosMainList(iosMain)
 
-        desktopMain.configure(jvmMain)
+            desktopMain(jvmMain)
 
-        webMain.configure(commonMain)
+            webMain(commonMain)
 
-        jsMain.configure(webMain)
+            jsMain(webMain)
 
-        wasmJsMain.configure(webMain)
+            wasmJsMain(webMain)
 
-        windowsMain.configure(commonMain)
+            windowsMain(commonMain)
 
-        linuxMain.configure(posixMain)
+            linuxMain(posixMain)
 
-        macosMain.configure(posixMain)
+            macosMain(posixMain)
+        }
     }
-})
+}

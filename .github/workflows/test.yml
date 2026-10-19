@@ -53,7 +53,7 @@ jobs:
               - '.github/scripts/**'
               - '.gitmodules'
               - 'gradle/**'
-              - 'buildSrc/**'
+              - 'build-logic/**'
               - 'gradlew'
               - 'gradlew.bat'
               - 'gradle.properties'

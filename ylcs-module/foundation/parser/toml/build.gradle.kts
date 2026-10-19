@@ -1,5 +1,8 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.androidLibrary,
@@ -8,22 +11,24 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                libs.jetbrains.annotation,
-                ExportLib,
-                projects.ylcsModule.core,
-            )
-        }
+        sources {
+            commonMain {
+                lib(
+                    libs.jetbrains.annotation,
+                    ExportLib,
+                    projects.ylcsModule.core,
+                )
+            }
 
-        commonTest.configure {
-            lib(libs.test)
+            commonTest {
+                lib(libs.test)
+            }
         }
     }
-})
+}

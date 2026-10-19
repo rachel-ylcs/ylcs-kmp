@@ -4,7 +4,7 @@
 
 Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化开发框架。仓库提供公共基础库、跨平台界面体系、应用启动与导航能力、客户端与原生服务端通信引擎，以及业务应用和独立工具示例。
 
-本文档依据当前仓库源码编写。依赖版本以 `libs.versions.toml` 为准，平台与应用常量以 `buildSrc/src/main/kotlin/love/yinlin/project/Constants.kt` 为准。各模块的目标平台、依赖导出范围和构建任务以对应 `build.gradle.kts` 及构建模板为准。配置详情见[编译环境与工程结构](rachel/1_start/environment.md)。
+本文档依据当前仓库源码编写。依赖、自有构建插件、框架与应用版本以 `libs.versions.toml` 为准，其他平台与应用常量以 根目录 `settings.gradle.kts` 的 `repository {}` 为准。各模块的目标平台、依赖导出范围和构建任务以对应 `build.gradle.kts` 及构建模板为准。配置详情见[编译环境与工程结构](rachel/1_start/environment.md)。
 
 ## 模块体系
 
@@ -20,7 +20,7 @@ Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化开�
 | `ylcs-module/cs/*` | 共享接口契约、客户端引擎、原生服务端引擎及数据库服务 |
 | `ylcs-module/platform/*`、`native/*` | FFI、动态库加载、操作系统集成及 Win32 封装 |
 | `ylcs-app/*` | 业务应用、组件展厅、导航示例、服务端与 MOD 工具 |
-| `buildSrc` | 插件安装、源集组织、代码生成、原生构建、打包与发布 DSL |
+| `build-logic` | 插件安装、源集组织、代码生成、原生构建、打包与发布 DSL |
 
 基础库与业务应用保持单向依赖。共享协议集中声明接口和传输模型，具体网络请求、数据库访问与界面交互分别由相应模块实现。
 

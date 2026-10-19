@@ -19,13 +19,13 @@ Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化框�
 | ------------- | ----------------------------- |
 | `ylcs-module` | 公共基础库                         |
 | `ylcs-app`    | 作为范例的跨平台APP的客户端与服务端           |
-| `buildSrc`    | 插件安装、源集组织、代码生成、原生构建、打包与发布 DSL |
+| `build-logic`    | 插件安装、源集组织、代码生成、原生构建、打包与发布 DSL |
 | `ylcs-docs`   | MkDocs 文档与站点配置                |
 
 ## 环境与命令
 
 - 在仓库根目录使用 Gradle Wrapper。当前构建脚本与 JVM target 要求 **JDK 25**，IDE 的 Gradle JVM 也需匹配。
-- Gradle 版本以 `gradle/wrapper/gradle-wrapper.properties` 为准；依赖与插件版本以根目录 `libs.versions.toml` 为准；SDK、ABI、环境和应用常量见 `buildSrc/src/main/kotlin/love/yinlin/project/Constants.kt`。
+- Gradle 版本以 `gradle/wrapper/gradle-wrapper.properties` 为准；依赖、插件、框架与应用版本以根目录 `libs.versions.toml` 为准；SDK、ABI、环境和应用常量统一配置在根目录 `settings.gradle.kts` 的 `repository {}` 中。
 - 每个模块的目标平台由其 `build.gradle.kts` 和模板共同决定。先核对启用的目标及源集关系，再选择任务；`.run` 与 `.github/workflows` 可作参考，存在差异时核对实际脚本。
 - iOS 构建需要 macOS/Xcode；其他 Native 目标及 C/C++ 组件也受宿主和工具链限制。原生依赖按 `.gitmodules` 按需初始化，并参考 `.github/actions/setup-build/action.yml` 准备平台工具。
 - 构建和执行的命令可以参见各模块的`build.gradle.kts`中`task`相关的内容。
@@ -35,7 +35,7 @@ Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化框�
 - 遵循 Kotlin 官方风格、四空格缩进和所在文件既有写法，使用 UTF-8。命名、导入和 DSL 格式优先保持局部一致，不为个人偏好重排整份文件。
 - 优先使用已有抽象和依赖，避免重复封装或为单个调用引入通用框架。对语义不明显的公共 API 补充 KDoc，说明边界、异常和资源所有权。
 - 框架能力放在 `ylcs-module`，应用业务放在 `ylcs-app`；保持依赖方向，避免框架反向依赖应用或产生循环依赖。新增模块同步 `settings.gradle.kts`。
-- 依赖统一通过版本目录和类型安全的 `projects.*` 引用；沿用 `buildSrc` 的 `install`、`template`、`lib` 等 DSL。`lib(...)` 中 `ExportLib` 之前是实现依赖，之后是向消费者导出的 API 依赖，调整顺序前检查公开类型。
+- 依赖统一通过版本目录和类型安全的 `projects.*` 引用；沿用 `build-logic` 的 `install`、`rachel {}`、`lib` 等 DSL。`lib(...)` 中 `ExportLib` 之前是实现依赖，之后是向消费者导出的 API 依赖，调整顺序前检查公开类型。
 - 共享逻辑放在实际可用的最上层公共源集，平台 API 放在对应平台或中间源集。`commonMain` 不直接引入 JVM、Android 或其他平台专属 API；修改 `expect/actual` 时同步所有启用的实现。
 - 本仓库显式组织 `clientMain`、`webMain`、`jvmMain`、`skikoMain`、`posixMain` 等中间源集，默认层级模板已关闭。不要按标准 KMP 目录名推断继承关系。
 - 保持公共 API、默认行为及序列化格式兼容。涉及协议、持久化、字段命名或默认值的修改，应检查消费者与旧数据；确需破坏性变更时明确记录迁移方式。

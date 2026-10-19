@@ -4,24 +4,40 @@
 
 ## 声明模块依赖
 
-仓库内模块沿用 `KotlinMultiplatformTemplate` 与源集 DSL。以下片段放置在已有模板的 `source()` 中：
+仓库内模块使用 `rachel { multiplatform {} }` 与源集 DSL。根项目已统一预加载插件版本，模块通过 `install` 声明所需插件：
 
 ```kotlin
-override fun KotlinMultiplatformSourceSetsScope.source() {
-    commonMain.configure {
-        lib(
-            projects.ylcsModule.compose.app,
-            projects.ylcsModule.compose.screen,
-        )
-    }
+import love.yinlin.gradle.*
 
-    androidMain.configure(commonMain)
-    iosMain.configure(commonMain)
-    iosMainList.configure(iosMain)
-    desktopMain.configure(commonMain)
-    webMain.configure(commonMain)
-    jsMain.configure(webMain)
-    wasmJsMain.configure(webMain)
+plugins {
+    install(
+        libs.plugins.rachel,
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.androidLibrary,
+        libs.plugins.composeMultiplatform,
+        libs.plugins.composeCompiler,
+    )
+}
+
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    projects.ylcsModule.compose.app,
+                    projects.ylcsModule.compose.screen,
+                )
+            }
+
+            androidMain(commonMain)
+            iosMain(commonMain)
+            iosMainList(iosMain)
+            desktopMain(commonMain)
+            webMain(commonMain)
+            jsMain(webMain)
+            wasmJsMain(webMain)
+        }
+    }
 }
 ```
 

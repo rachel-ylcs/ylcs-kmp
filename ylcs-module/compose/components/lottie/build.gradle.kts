@@ -1,5 +1,8 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -10,33 +13,35 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                ExportLib,
-                projects.ylcsModule.compose.core,
-            )
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.compose.core,
+                )
+            }
+
+            androidMain(commonMain) {
+                lib(libs.lottie.android)
+            }
+
+            val skikoMain = createSkiko(commonMain) {
+                lib(libs.skiko.lottie)
+            }
+
+            iosMainList(skikoMain)
+
+            desktopMain(skikoMain) {
+                lib(libs.skiko.lottie.jvm)
+            }
+
+            webMain(skikoMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
-
-        androidMain.configure(commonMain) {
-            lib(libs.lottie.android)
-        }
-
-        val skikoMain = createSkiko(commonMain) {
-            lib(libs.skiko.lottie)
-        }
-
-        iosMainList.configure(skikoMain)
-
-        desktopMain.configure(skikoMain) {
-            lib(libs.skiko.lottie.jvm)
-        }
-
-        webMain.configure(skikoMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
     }
-})
+}

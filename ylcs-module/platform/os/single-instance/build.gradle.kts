@@ -1,18 +1,23 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinJvm,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
     )
 }
 
-template(object : KotlinJvmTemplate() {
-    override fun KotlinJvmSourceSetsScope.source() {
-        main.configure {
-            lib(
-                projects.ylcsModule.platform.ffi.posix,
-                projects.ylcsModule.platform.ffi.win32,
-            )
+rachel {
+    jvm {
+        sources {
+            main {
+                lib(
+                    projects.ylcsModule.platform.ffi.posix,
+                    projects.ylcsModule.platform.ffi.win32,
+                )
+            }
         }
     }
-})
+}

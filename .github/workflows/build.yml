@@ -48,7 +48,7 @@ jobs:
               - '.github/actions/**'
               - '.github/workflows/**'
               - 'gradle/**'
-              - 'buildSrc/**'
+              - 'build-logic/**'
               - 'ylcs-module/**/commonMain/**'
               - 'ylcs-app/cs/**'
               - 'ylcs-app/mod/**'

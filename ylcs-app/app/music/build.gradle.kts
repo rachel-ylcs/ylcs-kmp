@@ -1,5 +1,8 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -8,41 +11,43 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                libs.compose.resources,
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    libs.compose.resources,
 
-                projects.ylcsApp.app.global,
-                projects.ylcsApp.app.viewer,
+                    projects.ylcsApp.app.global,
+                    projects.ylcsApp.app.viewer,
 
-                projects.ylcsModule.foundation.parser.lrc,
+                    projects.ylcsModule.foundation.parser.lrc,
 
-                projects.ylcsModule.compose.components.blur,
-                projects.ylcsModule.compose.components.dragDrop,
-                projects.ylcsModule.compose.components.paginationLayout,
-                projects.ylcsModule.compose.components.media,
-                projects.ylcsModule.compose.components.reordering,
-            )
+                    projects.ylcsModule.compose.components.blur,
+                    projects.ylcsModule.compose.components.dragDrop,
+                    projects.ylcsModule.compose.components.paginationLayout,
+                    projects.ylcsModule.compose.components.media,
+                    projects.ylcsModule.compose.components.reordering,
+                )
+            }
+
+            commonTest {
+                lib(libs.test)
+            }
+
+            iosMain(commonMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(commonMain) {
+                lib(projects.ylcsModule.platform.os.window)
+            }
+
+            webMain(commonMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
-
-        commonTest.configure {
-            lib(libs.test)
-        }
-
-        iosMain.configure(commonMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(commonMain) {
-            lib(projects.ylcsModule.platform.os.window)
-        }
-
-        webMain.configure(commonMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
     }
-})
+}

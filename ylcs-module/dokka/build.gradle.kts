@@ -1,7 +1,12 @@
+import love.yinlin.gradle.*
+import love.yinlin.repository.C
 import org.jetbrains.dokka.gradle.DokkaPlugin
 
 plugins {
-    install(libs.plugins.dokka)
+    install(
+        libs.plugins.rachel,
+        libs.plugins.dokka,
+    )
 }
 
 parent!!.subprojects.forEach { p ->

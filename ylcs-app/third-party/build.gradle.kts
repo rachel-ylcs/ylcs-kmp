@@ -1,5 +1,8 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -8,23 +11,25 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                projects.ylcsModule.foundation.cryptography,
-                projects.ylcsModule.foundation.parser.lrc,
-                projects.ylcsModule.foundation.network,
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    projects.ylcsModule.foundation.cryptography,
+                    projects.ylcsModule.foundation.parser.lrc,
+                    projects.ylcsModule.foundation.network,
 
-                libs.compose.runtime,
-            )
-        }
+                    libs.compose.runtime,
+                )
+            }
 
-        desktopTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
+            desktopTest {
+                lib(
+                    libs.test,
+                    libs.kotlinx.coroutines.test,
+                )
+            }
         }
     }
-})
+}

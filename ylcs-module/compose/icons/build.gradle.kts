@@ -1,5 +1,8 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -10,10 +13,12 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(projects.ylcsModule.compose.core)
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(projects.ylcsModule.compose.core)
+            }
         }
     }
-})
+}

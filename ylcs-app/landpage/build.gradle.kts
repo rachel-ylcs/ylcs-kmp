@@ -1,52 +1,57 @@
-import love.yinlin.task.spec.zip
+import love.yinlin.gradle.*
+import love.yinlin.repository.C
+import love.yinlin.gradle.task.spec.zip
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
     )
 }
 
-template(object : KotlinJsTemplate() {
-    override fun KotlinJsSourceSetsScope.source() {
-        jsMain.configure(commonMain) {
-            lib(
-                libs.kotlinx.html,
-                projects.ylcsModule.core,
-                projects.ylcsApp.cs,
-            )
-        }
-    }
-
-    override fun KotlinWebpackConfig.webpack() {
-        devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-            port = C.host.webServerPort
-            client?.overlay = false
-            open = false
-        }
-    }
-
-    override fun Project.actions() {
-        tasks.register("landpageRun") {
-            description = "运行落地页"
-            dependsOn(tasks.named("jsBrowserDevelopmentRun"))
+rachel {
+    js {
+        sources {
+            jsMain(commonMain) {
+                lib(
+                    libs.kotlinx.html,
+                    projects.ylcsModule.core,
+                    projects.ylcsApp.cs,
+                )
+            }
         }
 
-        tasks.register("landpagePublish") {
-            description = "发布落地页"
-            dependsOn(tasks.named("jsBrowserDistribution"))
+        webpack {
+            devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                port = C.host.webServerPort
+                client?.overlay = false
+                open = false
+            }
+        }
 
-            doLast {
-                val outputAppDir = C.root.app.landpage.output
-                copy {
-                    from(C.root.app.landpage.originOutput)
-                    into(outputAppDir)
+        actions {
+            tasks.register("landpageRun") {
+                description = "运行落地页"
+                dependsOn(tasks.named("jsBrowserDevelopmentRun"))
+            }
+
+            tasks.register("landpagePublish") {
+                description = "发布落地页"
+                dependsOn(tasks.named("jsBrowserDistribution"))
+
+                doLast {
+                    val outputAppDir = C.root.app.landpage.output
+                    copy {
+                        from(C.root.app.landpage.originOutput)
+                        into(outputAppDir)
+                    }
+                    delete(*outputAppDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                    zip(outputAppDir, C.root.outputs.file("landpage.zip"))
+                    delete(outputAppDir)
                 }
-                delete(*outputAppDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                zip(outputAppDir, C.root.outputs.file("landpage.zip"))
-                delete(outputAppDir)
             }
         }
     }
-})
+}

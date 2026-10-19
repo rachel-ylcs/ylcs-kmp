@@ -1,49 +1,52 @@
+import love.yinlin.gradle.*
+import love.yinlin.repository.C
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
     )
 }
 
-template(object : KotlinNativeExecutableTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    nativeExecutable {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override val args: List<String> = buildList {
-        if ("serverPublish" !in currentTaskName) add("--cd=${C.root.work.server.asFile}")
-    }
+        args = listOf("--cd=${C.root.work.server.asFile}")
 
-    override fun KotlinNativeSourceSetsScope.source() {
-        nativeMain.configure(commonMain) {
-            lib(
-                projects.ylcsApp.cs,
+        sources {
+            nativeMain(commonMain) {
+                lib(
+                    projects.ylcsApp.cs,
 
-                projects.ylcsModule.foundation.cryptography,
+                    projects.ylcsModule.foundation.cryptography,
 
-                projects.ylcsModule.cs.serverEngine,
-                projects.ylcsModule.cs.serverServiceMysql,
-                projects.ylcsModule.cs.serverServiceRedis,
-            )
+                    projects.ylcsModule.cs.serverEngine,
+                    projects.ylcsModule.cs.serverServiceMysql,
+                    projects.ylcsModule.cs.serverServiceRedis,
+                )
+            }
+
+            windowsMain(nativeMain)
+            linuxMain(nativeMain)
+            macosMain(nativeMain)
         }
 
-        windowsMain.configure(nativeMain)
-        linuxMain.configure(nativeMain)
-        macosMain.configure(nativeMain)
-    }
+        actions {
+            tasks.register("serverPublish") {
+                description = "发布服务端"
+                dependsOn(tasks.named("linkReleaseExecutableLinux"))
 
-    override fun Project.actions() {
-        tasks.register("serverPublish") {
-            description = "发布服务端"
-            dependsOn(tasks.named("linkReleaseExecutableLinux"))
-
-            doLast {
-                delete(C.root.outputs.file("${uniqueName}.kexe"))
-                copy {
-                    from(C.root.app.server.originOutput)
-                    into(C.root.outputs)
+                doLast {
+                    delete(C.root.outputs.file("${uniqueName}.kexe"))
+                    copy {
+                        from(C.root.app.server.originOutput)
+                        into(C.root.outputs)
+                    }
                 }
             }
         }
     }
-})
+}

@@ -1,5 +1,12 @@
 [versions]
 
+# ----- [Rachel] -----
+
+rachel = "3.7.1"
+rachelCode = "371"
+rachelMinimum = "3.7.0"
+rachelMinimumCode = "370"
+
 # ----- [Plugin] -----
 
 kotlin = "2.5.0-Beta1"
@@ -31,6 +38,8 @@ media3 = "1.11.1"
 
 # ----- [Plugin] -----
 
+rachel = { id = "love.yinlin.rachel", version.ref = "rachel" }
+repository = { id = "ylcs.repository", version.ref = "rachel" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

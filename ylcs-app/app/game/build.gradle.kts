@@ -1,5 +1,8 @@
+import love.yinlin.gradle.*
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -8,16 +11,18 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                projects.ylcsApp.app.global,
-                projects.ylcsApp.app.gameGuessLyrics,
-                projects.ylcsApp.app.gameRhyme,
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    projects.ylcsApp.app.global,
+                    projects.ylcsApp.app.gameGuessLyrics,
+                    projects.ylcsApp.app.gameRhyme,
 
-                projects.ylcsModule.compose.components.paginationLayout
-            )
+                    projects.ylcsModule.compose.components.paginationLayout
+                )
+            }
         }
     }
-})
+}
