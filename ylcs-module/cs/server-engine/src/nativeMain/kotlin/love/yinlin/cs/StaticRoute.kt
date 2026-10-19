@@ -2,10 +2,11 @@ package love.yinlin.cs
 
 import io.ktor.http.*
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondSource
+import io.ktor.server.response.respondBytesWriter
 import io.ktor.server.routing.*
 import io.ktor.util.AttributeKey
 import io.ktor.utils.io.charsets.Charsets
+import io.ktor.utils.io.writeBuffer
 import love.yinlin.fs.File
 import love.yinlin.fs.PlatformFileSystem
 import kotlin.collections.firstOrNull
@@ -30,6 +31,7 @@ private fun ContentType.matchApplicationTypeWithCharset(): Boolean = match(Conte
     else -> false
 }
 
+// fork Ktor Source, keep...
 internal fun Route.staticFiles(remotePath: String, dir: File): Route = createChild(TailcardSelector).route(remotePath) {
     route("{${pathParameterName}...}") {
         get {
@@ -46,12 +48,17 @@ internal fun Route.staticFiles(remotePath: String, dir: File): Route = createChi
                         type.matchApplicationTypeWithCharset() -> type.withCharsetUTF8IfNeeded()
                         else -> type
                     }
+                    val contentLength = requestedFile.fileSize()
 
-                    call.attributes.put(AttributeKey("StaticFileLocation"), requestedFile.path)
-                    requestedFile.rawSource().use { source ->
-                        call.respondSource(source, contentType, contentLength = requestedFile.fileSize())
+                    if (contentLength != 0L) {
+                        call.attributes.put(AttributeKey("StaticFileLocation"), requestedFile.path)
+                        requestedFile.bufferedSource().use { source ->
+                            call.respondBytesWriter(contentType = contentType, contentLength = contentLength) {
+                                writeBuffer(source)
+                            }
+                        }
+                        return@get
                     }
-                    return@get
                 }
             }
             call.respond(HttpStatusCode.NotFound)
