@@ -12,7 +12,7 @@ class ArrayBufferSource(buffer: ArrayBuffer) : RawSource {
     override fun readAtMostTo(sink: Buffer, byteCount: Long): Long {
         if (byteCount == 0L) return 0L
         require(byteCount >= 0L) { "byteCount $byteCount < 0" }
-        val endPos = minOf((position + byteCount).toInt(), bytes.size)
+        val endPos = position + minOf(byteCount, (bytes.size - position).toLong()).toInt()
         val readTotal = endPos - position
         if (readTotal == 0) return -1L
         sink.write(bytes, position, endPos)
