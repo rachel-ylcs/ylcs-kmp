@@ -6,7 +6,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
-class EncodingTest {
+class TestEncoding {
     private fun supplementary(code: Int): String = charArrayOf(
         (0xD800 + ((code - 0x10000) shr 10)).toChar(),
         (0xDC00 + ((code - 0x10000) and 0x3FF)).toChar(),
