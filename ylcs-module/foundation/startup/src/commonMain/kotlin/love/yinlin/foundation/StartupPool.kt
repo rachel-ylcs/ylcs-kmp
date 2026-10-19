@@ -1,6 +1,5 @@
 package love.yinlin.foundation
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -8,6 +7,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import love.yinlin.collection.DependencyAnalyzer
+import love.yinlin.concurrent.Lock
 import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
@@ -36,6 +36,7 @@ open class StartupPool(
     private var dependenciesMap = emptyMap<String, List<String>>()
     private var dependenciesList: List<StartupFactory<*>> = []
     private val taskMap = mutableMapOf<String, Deferred<Unit>>()
+    private val taskLock = Lock()
 
     inline fun <reified S : Startup, F : StartupFactory<S>> startup(factory: F): StartupDelegate<S> {
         if (isClean) throw IllegalStateException("startup pool is already clean, don't call it outside the scope of the application")
@@ -127,15 +128,19 @@ open class StartupPool(
                     val dispatcher = factory.dispatcher
 
                     if (dispatcher != null) {
+                        // 任务统计
+                        val dependencyTasks = taskLock.synchronized {
+                            dependencies.mapNotNull { dependentId ->
+                                val dependencyTask = taskMap[dependentId]
+                                if (dependencyTask == null) require(dependentId in syncStartupSet) { "Dependent startup $dependentId is not created" }
+                                dependencyTask
+                            }
+                        }
+
                         // 并行加载
                         val task = async(dispatcher) {
                             // 等待依赖服务完成
-                            for (dependentId in dependencies) {
-                                val dependencyTask = taskMap[dependentId]
-                                // 依赖服务已经启动或依赖服务为同步服务
-                                if (dependencyTask == null) require(dependentId in syncStartupSet) { "Dependent startup $dependentId is not created"}
-                                else dependencyTask.await()
-                            }
+                            for (dependencyTask in dependencyTasks) dependencyTask.await()
                             // 初始化异步服务
                             val startup = throwing({ StartupError(id, "init", it) }) {
                                 factory.build(pool).also { it.init() }
@@ -144,13 +149,13 @@ open class StartupPool(
                                 mutex.with { startupMap[id] = startup } // LinkedHashMap线程不安全
                             }
                         }
-                        taskMap[id] = task
+                        taskLock.synchronized { taskMap[id] = task }
                         task
                     }
                     else null
                 }.awaitAll()
                 dependenciesMap = emptyMap()
-                taskMap.clear()
+                taskLock.synchronized { taskMap.clear() }
             }
         }
     }
@@ -160,10 +165,11 @@ open class StartupPool(
             coroutineScope {
                 dependenciesList.map { factory ->
                     val id = factory.id
+                    val task = taskLock.synchronized { taskMap[id] }
                     // 并行加载
                     async(factory.dispatcher ?: cpuContext) {
                         // 等待init完成，同步任务不影响
-                        taskMap[id]?.await()
+                        task?.await()
                         // 继续initLater
                         val startup = startupMap[id]
                         if (startup != null) {

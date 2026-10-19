@@ -20,5 +20,12 @@ template(object : KotlinMultiplatformTemplate() {
                 projects.ylcsModule.foundation.context,
             )
         }
+
+        commonTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test
+            )
+        }
     }
 })
