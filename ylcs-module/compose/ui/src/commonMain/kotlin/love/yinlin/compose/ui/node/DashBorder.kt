@@ -69,5 +69,4 @@ private data class DashBorderElement(
 }
 
 @Stable
-fun Modifier.dashBorder(width: Dp, color: Color, shape: Shape = RectangleShape): Modifier =
-    this then DashBorderElement(width, color, shape)
+fun Modifier.dashBorder(width: Dp, color: Color, shape: Shape = RectangleShape): Modifier = this then DashBorderElement(width, color, shape)

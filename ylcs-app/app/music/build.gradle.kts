@@ -19,6 +19,7 @@ template(object : KotlinMultiplatformTemplate() {
 
                 projects.ylcsModule.foundation.parser.lrc,
 
+                projects.ylcsModule.compose.components.blur,
                 projects.ylcsModule.compose.components.dragDrop,
                 projects.ylcsModule.compose.components.paginationLayout,
                 projects.ylcsModule.compose.components.media,

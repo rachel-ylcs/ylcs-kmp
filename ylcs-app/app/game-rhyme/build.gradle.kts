@@ -18,6 +18,9 @@ template(object : KotlinMultiplatformTemplate() {
 
                 projects.ylcsModule.compose.components.media,
                 projects.ylcsModule.compose.game.core,
+
+                ExportLib,
+                projects.ylcsModule.compose.components.blur,
             )
         }
     }

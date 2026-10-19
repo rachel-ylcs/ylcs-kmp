@@ -52,6 +52,7 @@ include(
 
     "ylcs-module:compose:app",
     "ylcs-module:compose:cache",
+    "ylcs-module:compose:components:blur",
     "ylcs-module:compose:components:calendar",
     "ylcs-module:compose:components:data-table",
     "ylcs-module:compose:components:drag-drop",

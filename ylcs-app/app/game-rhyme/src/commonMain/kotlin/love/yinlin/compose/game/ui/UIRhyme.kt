@@ -8,11 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
@@ -22,8 +24,9 @@ import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.node.BlurParameters
 import love.yinlin.compose.ui.node.BlurState
-import love.yinlin.compose.ui.node.acrylicTarget
+import love.yinlin.compose.ui.node.blurTarget
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.data.mod.ModResourceType
@@ -159,21 +162,29 @@ internal fun RhymeIllustrationSelector(
     }
 }
 
+private val RhymeBlurParameters = BlurParameters(
+    blurRadius = 10.dp,
+    backgroundColor = Color(0xDD292929),
+    tintColor = Color(0x6C292929),
+    noiseFactor = 0.15f,
+    qualityFraction = 0.66667f,
+)
+
 @Composable
 internal fun RhymeBlurSurface(
     blurState: BlurState,
+    modifier: Modifier = Modifier,
     shape: Shape = Theme.shape.rectangle,
     border: Dp = Theme.border.v7,
     contentAlignment: Alignment = Alignment.Center,
     contentPadding: PaddingValues = PaddingValues.Zero,
-    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     Box(
         modifier = modifier
             .clip(shape)
             .border(border, Theme.color.outline, shape)
-            .acrylicTarget(state = blurState)
+            .blurTarget(blurState, RhymeBlurParameters)
             .padding(contentPadding),
         contentAlignment = contentAlignment
     ) {

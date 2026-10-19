@@ -56,6 +56,11 @@ internal data class PageItem(
                 ComponentItem("Icon", "比较图标大小、悬浮提示、点击、异步加载与带底色的图标。", "LoadingIcon ColorIcon"),
                 ComponentItem("NineGrid", "对照 1–9 张图片、视频标记和超过九张时的展示。"),
             ]),
+            PageItem("blur", Icons.Cloud, "模糊", "Source & Target Blur", "连接背景来源与模糊面板，实时比较半径、颜色、噪点和采样质量。", BlurPage, PageGroup.Layout, [
+                ComponentItem("Source / Target", "配置 BlurParameters 并通过 copy 调节参数，切换播放页与暂停面板参数，比较透明度、零半径和无噪点。", "BlurState BlurParameters blurSource blurTarget blurRadius backgroundColor tintColor noiseFactor qualityFraction"),
+                ComponentItem("多个 Target", "同一背景连接不同半径和质量的圆角面板，移动面板并缩放窗口检查对齐与边缘。"),
+                ComponentItem("动态与重挂载", "开关动态背景、来源和目标，替换状态并切换页面，检查画面保留与恢复。", "生命周期 KeepLastFrame Android iOS Desktop Web JS Wasm"),
+            ]),
             PageItem("animation", Icons.Animation, "动画", "Motion & Progress", "让等待、进度与展开过程拥有清晰、连贯的视觉反馈。", AnimationPage, PageGroup.Interaction, [
                 ComponentItem("Loading", "观察环形与波浪加载动画，比较不同的等待反馈。", "CircleLoading WaveLoading"),
                 ComponentItem("Progress", "同一份循环进度驱动线性与环形指示器。", "LinearProgress CircleProgress"),

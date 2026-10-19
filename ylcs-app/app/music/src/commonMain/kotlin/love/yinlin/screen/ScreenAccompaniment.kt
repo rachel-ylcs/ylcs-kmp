@@ -180,7 +180,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                 )
 
                 Box(
-                    modifier = Modifier.fillMaxSize().blurTarget(blurState).padding(LocalImmersivePadding.current).zIndex(2f),
+                    modifier = Modifier.fillMaxSize().blurTarget(blurState, MusicBlurParameters).padding(LocalImmersivePadding.current).zIndex(2f),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(

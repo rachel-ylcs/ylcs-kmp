@@ -1,0 +1,37 @@
+plugins {
+    install(
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinSerialization,
+        libs.plugins.composeMultiplatform,
+        libs.plugins.composeCompiler,
+        libs.plugins.androidLibrary,
+        libs.plugins.mavenPublish,
+        libs.plugins.dokka,
+    )
+}
+
+template(object : KotlinMultiplatformTemplate() {
+    override fun KotlinMultiplatformSourceSetsScope.source() {
+        commonMain.configure {
+            lib(
+                libs.jetbrains.annotation,
+                ExportLib,
+                projects.ylcsModule.compose.core
+            )
+        }
+
+        val skikoMain = createSkiko(commonMain)
+
+        iosMain.configure(skikoMain)
+
+        iosMainList.configure(iosMain)
+
+        desktopMain.configure(skikoMain)
+
+        webMain.configure(skikoMain)
+
+        jsMain.configure(webMain)
+
+        wasmJsMain.configure(webMain)
+    }
+})

@@ -402,7 +402,7 @@ class ScreenMusic : BasicScreen() {
                 }
 
                 Column(
-                    modifier = Modifier.fillMaxSize().blurTarget(blurState).padding(LocalImmersivePadding.current).zIndex(2f),
+                    modifier = Modifier.fillMaxSize().blurTarget(blurState, MusicBlurParameters).padding(LocalImmersivePadding.current).zIndex(2f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val deviceType by rememberDeviceType()
