@@ -99,11 +99,13 @@ extern "C" {
 			outPaths.reset(outPathsPtr);
 			NFD::PathSet::Count(outPaths.get(), numPaths);
 		}
+        if (maxNum <= 0) numPaths = 0;
+        else if (numPaths > static_cast<nfdpathsetsize_t>(maxNum)) numPaths = static_cast<nfdpathsetsize_t>(maxNum);
 		jclass cls = env->GetObjectClass(title);
 		auto arr = env->NewObjectArray((jsize)numPaths, cls, nullptr);
 		env->DeleteLocalRef(cls);
 		if (numPaths > 0) {
-			for (nfdpathsetsize_t i = 0; i < numPaths && i < static_cast<nfdpathsetsize_t>(maxNum); i++) {
+			for (nfdpathsetsize_t i = 0; i < numPaths; i++) {
 				NFD::UniquePathSetPath path;
 				NFD::PathSet::GetPath(outPaths, i, path);
 				auto pathStr = std::string{ path.get() };
