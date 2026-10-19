@@ -99,7 +99,6 @@ include(
     "ylcs-module:platform:ffi:posix",
     "ylcs-module:platform:ffi:win32",
     "ylcs-module:platform:native-lib-loader",
-    "ylcs-module:platform:os:auto-update",
     "ylcs-module:platform:os:single-instance",
     "ylcs-module:platform:os:window",
 

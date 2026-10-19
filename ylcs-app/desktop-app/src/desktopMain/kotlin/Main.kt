@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ApplicationScope
-import kotlinx.coroutines.launch
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.img_logo
 import love.yinlin.compose.Colors
@@ -15,10 +14,7 @@ import love.yinlin.compose.WindowController
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.coroutines.ioContext
-import love.yinlin.data.MimeType
 import love.yinlin.foundation.PlatformContext
-import love.yinlin.platform.AutoUpdate
 import love.yinlin.platform.Platform
 import love.yinlin.platform.SingleInstance
 import love.yinlin.uri.toUri
@@ -50,17 +46,6 @@ fun main(args: Array<String>) {
                     modifier = Modifier.size(Theme.size.smallIcon)
                 )
             }
-
-            Icon(
-                icon = Icons.RocketLaunch,
-                tip = "加载更新包",
-                onClick = {
-                    mainScope.launch(ioContext) {
-                        picker.pickPath(mimeType = [MimeType.ZIP], filter = ["*.zip"])?.path?.let(AutoUpdate::start)
-                    }
-                },
-                modifier = Modifier.size(Theme.size.smallIcon)
-            )
 
             Icon(
                 icon = if (controller.alwaysOnTop) Icons.MobiledataOff else Icons.VerticalAlignTop,
