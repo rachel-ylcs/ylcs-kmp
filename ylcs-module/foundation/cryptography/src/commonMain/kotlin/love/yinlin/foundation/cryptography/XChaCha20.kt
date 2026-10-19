@@ -4,7 +4,6 @@ import love.yinlin.encoding.convert
 import love.yinlin.extension.cleaning
 import love.yinlin.io.ByteArrayIO
 import love.yinlin.io.Endian
-import kotlin.collections.listOf
 
 class XChaCha20(private val key: ByteArray) : Cipher() {
     constructor(key: String) : this(key.convert())
@@ -52,15 +51,15 @@ class XChaCha20(private val key: ByteArray) : Cipher() {
             }
         }
 
-        fun block(key: ByteArray, nonce: ByteArray, counter: UInt = 0u): ByteArray {
+        private fun block(key: ByteArray, nonce: ByteArray, counter: UInt): ByteArray {
             require(key.size == 32 && nonce.size == 12)
             val initial = IntArray(16)
             Constants.copyInto(initial)
             val keyIO = ByteArrayIO(key)
             val nonceIO = ByteArrayIO(nonce)
-            for (index in 0..7) initial[4 + index] = keyIO.readInt(index * 4, Endian.LITTLE)
+            for (index in 0 .. 7) initial[4 + index] = keyIO.readInt(index * 4, Endian.LITTLE)
             initial[12] = counter.toInt()
-            for (index in 0..2) initial[13 + index] = nonceIO.readInt(index * 4, Endian.LITTLE)
+            for (index in 0 .. 2) initial[13 + index] = nonceIO.readInt(index * 4, Endian.LITTLE)
             val working = initial.copyOf()
             permute(working)
             return ByteArrayIO(64).write {
@@ -70,36 +69,82 @@ class XChaCha20(private val key: ByteArray) : Cipher() {
             }
         }
 
-        fun transform(key: ByteArray, nonce: ByteArray, data: ByteArray, counter: UInt = 0u, byteOffset: Int = 0): ByteArray {
+        fun transform(key: ByteArray, nonce: ByteArray, data: ByteArray, counter: UInt = 0u, byteOffset: Int = 0, inputOffset: Int = 0, outputOffset: Int = 0): ByteArray {
             require(key.size == 32 && nonce.size == 12)
-            require(byteOffset in 0..63)
-            val blocks = (byteOffset.toLong() + data.size + 63) / 64
+            require(byteOffset in 0 .. 63)
+            require(inputOffset in 0 .. data.size)
+            val size = data.size - inputOffset
+            require(outputOffset >= 0 && size <= Int.MAX_VALUE - outputOffset)
+            val blocks = (byteOffset.toLong() + size + 63) / 64
             require(blocks == 0L || counter.toLong() + blocks - 1 <= UInt.MAX_VALUE.toLong()) { "ChaCha20 counter overflow" }
-            val output = ByteArray(data.size)
-            var cursor = 0
-            var blockCounter = counter
-            var skip = byteOffset
-            while (cursor < data.size) {
-                val block = block(key, nonce, blockCounter)
-                val count = minOf(64 - skip, data.size - cursor)
-                for (index in 0 until count) output[cursor + index] = (data[cursor + index].toInt() xor block[skip + index].toInt()).toByte()
+
+            val output = ByteArray(size + outputOffset)
+            if (size == 0) return output
+            if (size <= 64 - byteOffset) {
+                val block = block(key, nonce, counter)
+                for (index in 0 ..< size) {
+                    output[outputOffset + index] = (data[inputOffset + index].toInt() xor block[byteOffset + index].toInt()).toByte()
+                }
                 block.fill(0)
-                cursor += count
-                blockCounter++
-                skip = 0
+                return output
             }
-            return output
+
+            val initial = IntArray(16)
+            Constants.copyInto(initial)
+            val keyIO = ByteArrayIO(key)
+            val nonceIO = ByteArrayIO(nonce)
+            for (index in 0 .. 7) initial[4 + index] = keyIO.readInt(index * 4, Endian.LITTLE)
+            for (index in 0 .. 2) initial[13 + index] = nonceIO.readInt(index * 4, Endian.LITTLE)
+            val working = IntArray(16)
+            val inputIO = ByteArrayIO(data)
+            val outputIO = ByteArrayIO(output)
+
+            return cleaning({
+                var cursor = 0
+                var blockCounter = counter
+                var skip = byteOffset
+                while (cursor < size) {
+                    initial[12] = blockCounter.toInt()
+                    initial.copyInto(working)
+                    permute(working)
+                    val count = minOf(64 - skip, size - cursor)
+                    var index = 0
+                    while (index < count) {
+                        val blockIndex = skip + index
+                        val wordIndex = blockIndex ushr 2
+                        val word = working[wordIndex] + initial[wordIndex]
+                        val position = cursor + index
+                        val inputPosition = inputOffset + position
+                        val outputPosition = outputOffset + position
+                        if ((blockIndex and 3) == 0 && count - index >= 4) {
+                            outputIO.writeInt(outputPosition, inputIO.readInt(inputPosition, Endian.LITTLE) xor word, Endian.LITTLE)
+                            index += 4
+                        }
+                        else {
+                            output[outputPosition] = (data[inputPosition].toInt() xor (word ushr ((blockIndex and 3) * 8))).toByte()
+                            index++
+                        }
+                    }
+                    cursor += count
+                    blockCounter++
+                    skip = 0
+                }
+                output
+            }) {
+                initial.fill(0)
+                working.fill(0)
+            }
         }
     }
 
     private object XChaCha20 {
-        fun transform(key: ByteArray, nonce: ByteArray, data: ByteArray, counter: UInt = 0u, byteOffset: Int = 0): ByteArray {
+        fun transform(key: ByteArray, nonce: ByteArray, data: ByteArray, counter: UInt = 0u, byteOffset: Int = 0, inputOffset: Int = 0, outputOffset: Int = 0): ByteArray {
             require(key.size == 32 && nonce.size == 24)
             val subkey = ChaCha20.hChaCha20(key, nonce.copyOfRange(0, 16))
             val shortNonce = ByteArray(12)
             nonce.copyInto(shortNonce, 4, 16, 24)
             return cleaning({
-                ChaCha20.transform(subkey, shortNonce, data, counter, byteOffset)
+                ChaCha20.transform(subkey, shortNonce, data, counter, byteOffset, inputOffset, outputOffset)
             }) { subkey.fill(0) }
         }
     }
@@ -111,11 +156,11 @@ class XChaCha20(private val key: ByteArray) : Cipher() {
     override fun encode(data: ByteArray): ByteArray {
         val nonce = SecureEntropy.bytes(24)
         require(data.size <= Int.MAX_VALUE - nonce.size)
-        return nonce + XChaCha20.transform(key, nonce, data)
+        return XChaCha20.transform(key, nonce, data, outputOffset = nonce.size).also { nonce.copyInto(it) }
     }
 
     override fun decode(data: ByteArray): ByteArray {
         require(data.size >= 24) { "Truncated XChaCha20 packet." }
-        return XChaCha20.transform(key, data.copyOfRange(0, 24), data.copyOfRange(24, data.size))
+        return XChaCha20.transform(key, data.copyOfRange(0, 24), data, inputOffset = 24)
     }
 }
