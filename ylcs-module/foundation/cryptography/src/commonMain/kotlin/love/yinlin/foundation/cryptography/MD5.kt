@@ -32,23 +32,25 @@ class MD5(private val half: Boolean = false) : ByteDigest() {
         ]
 
         private fun calculate(input: ByteArray): ByteArray {
-            val oldLen = input.size
-            val newLen = ((oldLen + 8).ushr(6) shl 6) + 64
-            val padded = ByteArray(newLen)
-
-            input.copyInto(padded)
-            padded[oldLen] = 0x80.toByte()
-            ByteArrayIO(padded).writeLong(newLen - 8, oldLen.toLong() shl 3, Endian.LITTLE)
+            val fullBlocks = input.size / 64
+            val remaining = input.size % 64
+            val padding = ByteArray(if (remaining < 56) 64 else 128)
+            input.copyInto(padding, startIndex = input.size - remaining)
+            padding[remaining] = 0x80.toByte()
+            val paddingIO = ByteArrayIO(padding)
+            paddingIO.writeLong(padding.size - 8, input.size.toLong() shl 3, Endian.LITTLE)
 
             var a = 0x67452301
             var b = 0xefcdab89.toInt()
             var c = 0x98badcfe.toInt()
             var d = 0x10325476
 
-            val inputIO = ByteArrayIO(padded)
+            val inputIO = if (fullBlocks == 0) paddingIO else ByteArrayIO(input)
             val x = IntArray(16)
-            for (offset in padded.indices step 64) {
-                for (j in 0 .. 15) x[j] = inputIO.readInt(offset + j * 4, Endian.LITTLE)
+            for (block in 0 ..< fullBlocks + padding.size / 64) {
+                val source = if (block < fullBlocks) inputIO else paddingIO
+                val offset = (if (block < fullBlocks) block else block - fullBlocks) * 64
+                for (j in 0 .. 15) x[j] = source.readInt(offset + j * 4, Endian.LITTLE)
 
                 val aa = a
                 var bb = b
