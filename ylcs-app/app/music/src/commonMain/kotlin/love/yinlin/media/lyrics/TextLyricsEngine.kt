@@ -44,6 +44,7 @@ internal interface TextLine {
 @Stable
 internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
     protected var lines: List<E>? by mutableRefStateOf(null)
+    private val timeline by derivedStateOf { lines?.let { LyricsTimeline(it) } }
     protected var currentIndex by mutableIntStateOf(-1)
     private var lastPosition: Long = 0L
 
@@ -82,13 +83,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
                 }
             }
             else lastPosition = position
-            val targetIndex = items.indexOfFirst { it.position > position }
-            if (targetIndex == -1) {
-                if (currentIndex != items.lastIndex) items.lastIndex
-                else return // 到达最后一句不需要更新
-            }
-            else if (targetIndex > 0) targetIndex - 1
-            else -1
+            timeline?.indexAt(position) ?: -1
         }
         else -1
     }
@@ -133,7 +128,7 @@ internal abstract class TextLyricsEngine<E : TextLine> : LyricsEngine {
             lines?.then {
                 itemsIndexed(
                     items = it,
-                    key = { _, item -> item.position }
+                    key = { index, _ -> index }
                 ) { index, item ->
                     LineItemWrapper(onClick = {
                         scope.launch { host.seekTo(item.position) }

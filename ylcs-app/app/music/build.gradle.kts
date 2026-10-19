@@ -26,6 +26,10 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        commonTest.configure {
+            lib(libs.test)
+        }
+
         iosMain.configure(commonMain)
 
         iosMainList.configure(iosMain)
