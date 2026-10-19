@@ -32,7 +32,7 @@ object XXHash64 : StringDigest() {
             h = h xor (h ushr 33)
             var n = if (h < 0) -(h + 1) else h
             repeat(LENGTHS[index]) {
-                append(ALPHABET[(n % 26).toInt()])
+                append(ALPHABET[n.mod(26L).toInt()])
                 n /= 26
                 if (n == 0L) n = h xor 0x5555555555555555L
             }
