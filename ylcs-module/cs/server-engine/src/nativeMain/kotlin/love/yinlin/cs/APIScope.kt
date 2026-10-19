@@ -20,6 +20,7 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.JsonArray
@@ -859,14 +860,22 @@ abstract class APIScope(val engine: ServerEngine) {
     fun Sockets.connect(factory: (Any) -> SocketsManager) {
         routing?.webSocket(this.path) {
             val manager = factory(this)
-            catchingError {
-                for (frame in incoming) {
-                    if (frame !is Frame.Text) continue
-                    manager.onMessage(frame.readText())
+            cleaning({
+                Coroutines.with(NonCancellable) {
+                    cleaning({
+                        this@webSocket.close(CloseReason(CloseReason.Codes.NORMAL, "websockets closed"))
+                    }) {
+                        manager.onClose()
+                    }
                 }
-            }?.then { manager.onError(it) }
-            manager.onClose()
-            this.close(CloseReason(CloseReason.Codes.NORMAL, "websockets closed"))
+            }) {
+                catchingError {
+                    for (frame in incoming) {
+                        if (frame !is Frame.Text) continue
+                        manager.onMessage(frame.readText())
+                    }
+                }?.then { manager.onError(it) }
+            }
         }
     }
 }

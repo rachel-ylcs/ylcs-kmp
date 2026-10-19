@@ -10,8 +10,11 @@ import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.consumeAsFlow
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingError
+import love.yinlin.extension.cleaning
 import love.yinlin.extension.then
 
 class WebSocketClient internal constructor(@PublishedApi internal val delegate: HttpClient) : AutoCloseable {
@@ -29,20 +32,31 @@ class WebSocketClient internal constructor(@PublishedApi internal val delegate: 
     override fun close() = delegate.close()
 
     suspend fun connect(host: String?, path: String, connection: Connection) {
-        catchingError {
-            connection.session?.close()
-            val newSession = delegate.webSocketSession {
-                method = HttpMethod.Get
-                url(scheme = URLProtocol.WSS.name, host = host, port = URLProtocol.WSS.defaultPort, path = path)
+        var activeSession = connection.session
+
+        cleaning({
+            Coroutines.with(NonCancellable) {
+                cleaning({
+                    if (connection.session === activeSession) connection.session = null
+                    activeSession?.close()
+                }) {
+                    connection.onDisconnect()
+                }
             }
-            connection.session = newSession
-            connection.onConnect()
-            newSession.incoming.consumeAsFlow().collect { frame ->
-                if (frame is Frame.Text) connection.onMessage(frame.readText())
-            }
-        }?.then { connection.onError(it) }
-        connection.onDisconnect()
-        connection.session?.close()
-        connection.session = null
+        }) {
+            catchingError {
+                activeSession?.close()
+                val newSession = delegate.webSocketSession {
+                    method = HttpMethod.Get
+                    url(scheme = URLProtocol.WSS.name, host = host, port = URLProtocol.WSS.defaultPort, path = path)
+                }
+                activeSession = newSession
+                connection.session = newSession
+                connection.onConnect()
+                newSession.incoming.consumeAsFlow().collect { frame ->
+                    if (frame is Frame.Text) connection.onMessage(frame.readText())
+                }
+            }?.then { connection.onError(it) }
+        }
     }
 }
