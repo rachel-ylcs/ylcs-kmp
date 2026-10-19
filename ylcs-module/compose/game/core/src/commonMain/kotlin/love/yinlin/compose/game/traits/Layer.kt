@@ -88,8 +88,9 @@ open class Layer(
 
     final override fun onDetached(scene: ScenePlugin) {
         onLayerDetached(scene)
+        val previous = items.toList()
         items.clear()
-        items.fastForEachReversed { it.onVisibleDetached() }
+        previous.fastForEachReversed { it.onVisibleDetached() }
         this.scene = null
     }
 

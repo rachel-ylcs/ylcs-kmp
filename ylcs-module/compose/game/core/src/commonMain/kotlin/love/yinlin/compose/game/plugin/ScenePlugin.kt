@@ -96,8 +96,9 @@ class ScenePlugin private constructor(
     }
 
     fun reset() {
+        val previous = entities.toList()
         entities.clear()
-        entities.fastForEachReversed { it.onDetached(this) }
+        previous.fastForEachReversed { it.onDetached(this) }
         camera.reset()
     }
 
