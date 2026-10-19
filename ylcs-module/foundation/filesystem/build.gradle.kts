@@ -25,6 +25,13 @@ template(object : KotlinMultiplatformTemplate() {
             )
         }
 
+        commonTest.configure {
+            lib(
+                libs.test,
+                libs.kotlinx.coroutines.test
+            )
+        }
+
         val jvmMain = createJvm(commonMain)
 
         nativeMain.configure(commonMain)
@@ -45,21 +52,7 @@ template(object : KotlinMultiplatformTemplate() {
 
         wasmJsMain.configure(webMain)
 
-        wasmJsTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
-        }
-
         windowsMain.configure(nativeMain)
-
-        windowsTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
-        }
 
         linuxMain.configure(nativeMain)
 
