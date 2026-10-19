@@ -132,12 +132,12 @@ data class Uri(
                 catchingError {
                     val bytes: ByteArray = toEncode.convert()
                     val bytesLength = bytes.size
-                    for(i in 0 until bytesLength) {
+                    for(i in 0 ..< bytesLength) {
                         encoded.append('%')
                         encoded.append(hexDigits[bytes[i].toInt() and 0xf0 shr 4])
                         encoded.append(hexDigits[bytes[i].toInt() and 0xf])
                     }
-                } ?: return str
+                }?.then { return str }
                 current = nextAllowed
             }
             return encoded.toString()
