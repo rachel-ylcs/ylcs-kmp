@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -10,17 +13,19 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                ExportLib,
-                projects.ylcsModule.compose.ui
-            )
-        }
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.compose.ui
+                )
+            }
 
-        commonTest.configure {
-            lib(libs.test)
+            commonTest {
+                lib(libs.test)
+            }
         }
     }
-})
+}

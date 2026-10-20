@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.androidLibrary,
@@ -8,56 +11,58 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                libs.ktor.json,
-                libs.ktor.client.negotiation,
-                libs.ktor.client.encoding,
-                libs.ktor.client.websockets,
-                ExportLib,
-                libs.ktor.client,
-                projects.ylcsModule.foundation.filesystem,
-            )
+        sources {
+            commonMain {
+                lib(
+                    libs.ktor.json,
+                    libs.ktor.client.negotiation,
+                    libs.ktor.client.encoding,
+                    libs.ktor.client.websockets,
+                    ExportLib,
+                    libs.ktor.client,
+                    projects.ylcsModule.foundation.filesystem,
+                )
+            }
+
+            androidMain(commonMain) {
+                lib(libs.ktor.okhttp)
+            }
+
+            appleMain(commonMain) {
+                lib(libs.ktor.apple)
+            }
+
+            iosMain(appleMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(commonMain) {
+                lib(libs.ktor.okhttp)
+            }
+
+            webMain(commonMain) {
+                lib(libs.ktor.js)
+            }
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
+
+            windowsMain(commonMain) {
+                lib(libs.ktor.windows)
+            }
+
+            linuxMain(commonMain) {
+                lib(libs.ktor.cio)
+            }
+
+            macosMain(appleMain)
         }
-
-        androidMain.configure(commonMain) {
-            lib(libs.ktor.okhttp)
-        }
-
-        val appleMain = createApple(commonMain) {
-            lib(libs.ktor.apple)
-        }
-
-        iosMain.configure(appleMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(commonMain) {
-            lib(libs.ktor.okhttp)
-        }
-
-        webMain.configure(commonMain) {
-            lib(libs.ktor.js)
-        }
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
-
-        windowsMain.configure(commonMain) {
-            lib(libs.ktor.windows)
-        }
-
-        linuxMain.configure(commonMain) {
-            lib(libs.ktor.cio)
-        }
-
-        macosMain.configure(appleMain)
     }
-})
+}

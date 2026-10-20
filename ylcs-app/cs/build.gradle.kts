@@ -1,32 +1,32 @@
+import love.yinlin.gradle.ExportLib
+import love.yinlin.repository.C
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.androidLibrary,
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            kotlin.srcDir(generateSourceDir)
-            lib(
-                projects.ylcsModule.foundation.cryptography,
-                ExportLib,
-                projects.ylcsModule.cs.core,
-                libs.compose.runtime,
-            )
-        }
-    }
-
-    override fun Project.actions() {
-        setupGenerateCode("generateConstants") {
-            className = "love.yinlin.Local"
-            code = """
+        sources {
+            commonMain {
+                lib(
+                    projects.ylcsModule.foundation.cryptography,
+                    ExportLib,
+                    projects.ylcsModule.cs.core,
+                    libs.compose.runtime,
+                )
+                generateCode("generateConstants") {
+                    className = "love.yinlin.Local"
+                    code = """
 package love.yinlin
 
 import love.yinlin.data.AppInfo
@@ -36,18 +36,18 @@ object Local {
     val info = AppInfo(
         appName = "${C.app.name}",
         name = "${C.app.displayName}",
-        version = ${C.app.version},
-        versionName = "${C.app.versionName}",
+        version = ${C.version},
+        versionName = "${C.versionName}",
         minVersion = ${C.app.minVersion},
         minVersionName = "${C.app.minVersionName}",
-        packageName = "${C.app.packageName}",
+        packageName = "${C.namespace}",
     )
     
-    const val MAIN_HOST: String = "${C.host.mainHost}"
-    const val API_HOST: String = "${C.host.apiHost}"
-    const val API_BASE_URL: String = "${C.host.apiUrl}"
+    const val API_BASE_URL: String = "${C.cs.apiUrl}"
 }
-            """.trimIndent()
+                    """.trimIndent()
+                }
+            }
         }
     }
-})
+}

@@ -1,6 +1,6 @@
 # 编译环境与工程结构
 
-Rachel 使用仓库根目录的 Gradle Wrapper，以及 `buildSrc` 中的统一构建模板。环境配置应与当前源码保持一致。
+Rachel 使用仓库根目录的 Gradle Wrapper，以及 `build-logic` 中的统一构建模板。环境配置应与当前源码保持一致。
 
 ## 版本基线
 
@@ -14,11 +14,11 @@ Rachel 使用仓库根目录的 Gradle Wrapper，以及 `buildSrc` 中的统一�
 | Coroutines | 1.11.0 | `libs.versions.toml` |
 | Lifecycle | 2.11.0 | `libs.versions.toml` |
 | Navigation 3 | 1.2.0-rc01 | `libs.versions.toml` |
-| JDK / JVM target | 25 | `Constants.kt` |
-| Android | minSdk 29、compileSdk 37.1、targetSdk 37 | `Constants.kt` |
-| Android NDK / ABI | 29.0.14206865 / `arm64-v8a` | `Constants.kt` |
-| iOS deployment target | 26.0 | `Constants.kt` |
-| 应用版本 | 3.7.0，versionCode 370 | `Constants.kt` |
+| JDK / JVM target | 25 | `settings.gradle.kts` 的 `repository {}` |
+| Android | minSdk 26、compileSdk 37.1、targetSdk 37 | `settings.gradle.kts` 的 `repository {}` |
+| Android NDK / ABI | 29.0.14206865 / `arm64-v8a` | `settings.gradle.kts` 的 `repository {}` |
+| iOS deployment target | 26.0 | `settings.gradle.kts` 的 `repository {}` |
+| 构建插件 / 框架 / 应用版本 | 3.7.1，versionCode 371 | `libs.versions.toml` 的 `rachel` / `rachelCode` |
 
 IDE 的 Gradle JVM 与命令行构建均需使用 JDK 25。Gradle 版本由 Wrapper 管理。上述表格记录源码配置，不代表所有工具链组合均已在当前主机验证。
 
@@ -26,7 +26,7 @@ IDE 的 Gradle JVM 与命令行构建均需使用 JDK 25。Gradle 版本由 Wrap
 
 ```text
 ylcs-kmp/
-├─ buildSrc/                 # 构建模板与任务
+├─ build-logic/              # 通用构建插件与本仓库约定
 ├─ ylcs-module/              # 公共框架模块
 ├─ ylcs-app/
 │  ├─ app/                   # 共享业务模块
@@ -43,7 +43,9 @@ ylcs-kmp/
 └─ ylcs-docs/                # MkDocs 指南与生成页面入口
 ```
 
-新增 Gradle 模块时，需在 `settings.gradle.kts` 中注册，并按照相邻模块使用 `install`、`template` 与 `lib` DSL。依赖通过版本目录与 `projects.*` 引用声明。
+新增 Gradle 模块时，需在 `settings.gradle.kts` 中注册，并按照相邻模块使用 `install`、`rachel {}` 与 `lib` DSL。依赖通过版本目录与 `projects.*` 引用声明。
+
+通用模板、轻量配置类型与 `install` 入口统一位于 `build-logic/public-plugin`；`repository-conventions` 只服务本仓库。根目录 `settings.gradle.kts` 的 `repository {}` 分为 `shared`、`rachel` 和 `ylcs` 三部分，框架与业务共用 `shared` 的命名空间，版本统一读取根版本目录。公开插件的接入和发布方式见仓库 `build-logic/README.md`。
 
 ## 目标平台与主机限制
 
@@ -74,12 +76,12 @@ ylcs-kmp/
 
 `lib(...)` 中，`ExportLib` 之前为实现依赖，之后为向消费者导出的 API 依赖。调整位置会改变消费者可见的类型范围。
 
-Maven 发布坐标由模块路径和应用版本名生成，例如：
+Maven 发布坐标由模块路径和共享版本名生成，例如：
 
 ```text
-:ylcs-module:compose:app         → love.yinlin.compose:app:3.7.0
-:ylcs-module:foundation:network  → love.yinlin.foundation:network:3.7.0
-:ylcs-module:cs:client-engine    → love.yinlin.cs:client-engine:3.7.0
+:ylcs-module:compose:app         → love.yinlin.compose:app:3.7.1
+:ylcs-module:foundation:network  → love.yinlin.foundation:network:3.7.1
+:ylcs-module:cs:client-engine    → love.yinlin.cs:client-engine:3.7.1
 ```
 
 坐标生成规则不证明某个版本已经发布。仓库内部开发优先使用项目依赖；仓库外使用前应确认目标仓库中的实际产物。
@@ -142,7 +144,7 @@ CI 的 `.github/actions/package-ios` 会先生成 SwiftPM 链接包，再以 Rel
 
 ## 源码入口
 
-- `buildSrc/src/main/kotlin/KotlinTemplate.kt`
-- `buildSrc/src/main/kotlin/KotlinMultiplatformTemplate.kt`
-- `buildSrc/src/main/kotlin/KotlinNativeTemplate.kt`
-- `buildSrc/src/main/kotlin/love/yinlin/project/Constants.kt`
+- `build-logic/public-plugin/src/main/kotlin/love/yinlin/gradle/KotlinTemplate.kt`
+- `build-logic/public-plugin/src/main/kotlin/love/yinlin/gradle/KotlinMultiplatformTemplate.kt`
+- `build-logic/public-plugin/src/main/kotlin/love/yinlin/gradle/KotlinNativeTemplate.kt`
+- `settings.gradle.kts`

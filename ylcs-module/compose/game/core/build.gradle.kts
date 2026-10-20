@@ -1,5 +1,6 @@
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -10,25 +11,27 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                libs.compose.resources,
-                projects.ylcsModule.compose.core
-            )
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    libs.compose.resources,
+                    projects.ylcsModule.compose.core
+                )
+            }
+
+            skikoMain(commonMain)
+
+            iosMainList(skikoMain)
+
+            desktopMain(skikoMain)
+
+            webMain(skikoMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
-
-        val skikoMain = createSkiko(commonMain)
-
-        iosMainList.configure(skikoMain)
-
-        desktopMain.configure(skikoMain)
-
-        webMain.configure(skikoMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
     }
-})
+}

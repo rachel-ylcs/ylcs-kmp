@@ -1,9 +1,9 @@
-package love.yinlin
-
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ApplicationScope
+import love.yinlin.Local
+import love.yinlin.RachelApplication
 import love.yinlin.app.global.resources.Res
 import love.yinlin.app.global.resources.img_logo
 import love.yinlin.compose.Colors

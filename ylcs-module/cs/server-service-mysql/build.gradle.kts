@@ -1,5 +1,6 @@
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
@@ -7,22 +8,24 @@ plugins {
     )
 }
 
-template(object : KotlinNativeLibTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    nativeLibrary {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override fun KotlinNativeSourceSetsScope.source() {
-        nativeMain.configure(commonMain) {
-            lib(
-                libs.jetbrains.annotation,
-                libs.sqlx4k,
-                projects.ylcsModule.cs.serverEngine,
-            )
+        sources {
+            nativeMain(commonMain) {
+                lib(
+                    libs.jetbrains.annotation,
+                    libs.sqlx4k,
+                    projects.ylcsModule.cs.serverEngine,
+                )
+            }
+
+            windowsMain(nativeMain)
+            linuxMain(nativeMain)
+            macosMain(nativeMain)
         }
-
-        windowsMain.configure(nativeMain)
-        linuxMain.configure(nativeMain)
-        macosMain.configure(nativeMain)
     }
-})
+}

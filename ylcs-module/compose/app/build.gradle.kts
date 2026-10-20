@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -10,36 +13,38 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                projects.ylcsModule.platform.nativeLibLoader,
-                libs.compose.resources,
-                ExportLib,
-                projects.ylcsModule.foundation.startup,
-                projects.ylcsModule.foundation.filesystem,
-                projects.ylcsModule.compose.ui,
-            )
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    projects.ylcsModule.platform.nativeLibLoader,
+                    libs.compose.resources,
+                    ExportLib,
+                    projects.ylcsModule.foundation.startup,
+                    projects.ylcsModule.foundation.filesystem,
+                    projects.ylcsModule.compose.ui,
+                )
+            }
+
+            androidMain(commonMain) {
+                lib(
+                    ExportLib,
+                    libs.androidx.activity.compose
+                )
+            }
+
+            iosMain(commonMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(commonMain)
+
+            webMain(commonMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
-
-        androidMain.configure(commonMain) {
-            lib(
-                ExportLib,
-                libs.androidx.activity.compose
-            )
-        }
-
-        iosMain.configure(commonMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(commonMain)
-
-        webMain.configure(commonMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
     }
-})
+}

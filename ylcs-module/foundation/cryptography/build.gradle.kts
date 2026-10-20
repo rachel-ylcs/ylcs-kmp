@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.androidLibrary,
@@ -8,50 +11,52 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                ExportLib,
-                projects.ylcsModule.core,
-            )
+        sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.core,
+                )
+            }
+
+            commonTest {
+                lib(
+                    libs.test,
+                    libs.kotlinx.coroutines.test,
+                )
+            }
+
+            appleMain(commonMain)
+
+            jvmMain(commonMain)
+
+            androidMain(jvmMain)
+
+            iosMain(appleMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(jvmMain)
+
+            webMain(commonMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
+
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(appleMain)
         }
-
-        commonTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
-        }
-
-        appleMain.configure(commonMain)
-
-        val jvmMain = createJvm(commonMain)
-
-        androidMain.configure(jvmMain)
-
-        iosMain.configure(appleMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(jvmMain)
-
-        webMain.configure(commonMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
-
-        nativeMain.configure(commonMain)
-
-        windowsMain.configure(nativeMain)
-
-        linuxMain.configure(nativeMain)
-
-        macosMain.configure(appleMain)
     }
-})
+}

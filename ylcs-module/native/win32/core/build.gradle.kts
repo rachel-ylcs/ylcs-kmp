@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.mavenPublish,
@@ -7,15 +10,17 @@ plugins {
     )
 }
 
-template(object : KotlinNativeLibTemplate() {
-    override val windowsTarget: Boolean = true
+rachel {
+    nativeLibrary {
+        windowsTarget = true
 
-    override fun KotlinNativeSourceSetsScope.source() {
-        windowsMain.configure {
-            lib(
-                ExportLib,
-                projects.ylcsModule.core,
-            )
+        sources {
+            windowsMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.core,
+                )
+            }
         }
     }
-})
+}

@@ -1,5 +1,6 @@
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -8,23 +9,25 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                libs.compose.resources,
-                projects.ylcsApp.app.global,
-                projects.ylcsApp.app.viewer,
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    libs.compose.resources,
+                    projects.ylcsApp.app.global,
+                    projects.ylcsApp.app.viewer,
 
-                projects.ylcsModule.compose.components.paginationLayout,
-            )
-        }
+                    projects.ylcsModule.compose.components.paginationLayout,
+                )
+            }
 
-        commonTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test,
-            )
+            commonTest {
+                lib(
+                    libs.test,
+                    libs.kotlinx.coroutines.test,
+                )
+            }
         }
     }
-})
+}

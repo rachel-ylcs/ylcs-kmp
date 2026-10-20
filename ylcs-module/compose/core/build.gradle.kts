@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -10,41 +13,43 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                ExportLib,
-                libs.androidx.savedstate,
-                libs.androidx.viewmodel,
-                libs.androidx.lifecycle,
-                libs.compose.runtime,
-                libs.compose.ui,
-                libs.compose.foundation,
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    libs.androidx.savedstate,
+                    libs.androidx.viewmodel,
+                    libs.androidx.lifecycle,
+                    libs.compose.runtime,
+                    libs.compose.ui,
+                    libs.compose.foundation,
 
-                projects.ylcsModule.foundation.context,
-            )
+                    projects.ylcsModule.foundation.context,
+                )
+            }
+
+            appleMain(commonMain)
+
+            skikoMain(commonMain) {
+                lib(
+                    ExportLib,
+                    libs.skiko
+                )
+            }
+
+            iosMain(skikoMain, appleMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(skikoMain)
+
+            webMain(skikoMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
-
-        appleMain.configure(commonMain)
-
-        val skikoMain = createSkiko(commonMain) {
-            lib(
-                ExportLib,
-                libs.skiko
-            )
-        }
-
-        iosMain.configure(skikoMain, appleMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(skikoMain)
-
-        webMain.configure(skikoMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
     }
-})
+}

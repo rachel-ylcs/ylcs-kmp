@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.androidLibrary,
@@ -8,46 +11,48 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                ExportLib,
-                projects.ylcsModule.core,
-            )
+        sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.core,
+                )
+            }
+
+            androidMain(commonMain) {
+                lib(
+                    ExportLib,
+                    libs.androidx.activity,
+                )
+            }
+
+            skikoMain(commonMain)
+
+            iosMain(skikoMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(skikoMain)
+
+            webMain(skikoMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
+
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
         }
-
-        androidMain.configure(commonMain) {
-            lib(
-                ExportLib,
-                libs.androidx.activity,
-            )
-        }
-
-        val skikoMain = createSkiko(commonMain)
-
-        iosMain.configure(skikoMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(skikoMain)
-
-        webMain.configure(skikoMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
-
-        nativeMain.configure(commonMain)
-
-        windowsMain.configure(nativeMain)
-
-        linuxMain.configure(nativeMain)
-
-        macosMain.configure(nativeMain)
     }
-})
+}

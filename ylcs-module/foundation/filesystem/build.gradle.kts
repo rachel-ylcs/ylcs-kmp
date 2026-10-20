@@ -1,7 +1,8 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.androidLibrary,
@@ -10,58 +11,60 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val windowsTarget: Boolean = true
-    override val linuxTarget: Boolean = true
-    override val macosTarget: Boolean = true
+rachel {
+    multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
 
-    override val webTestHeadless: Boolean = false
+        webTestHeadless = false
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                ExportLib,
-                projects.ylcsModule.foundation.context
-            )
+        sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.foundation.context
+                )
+            }
+
+            commonTest {
+                lib(
+                    libs.test,
+                    libs.kotlinx.coroutines.test
+                )
+            }
+
+            jvmMain(commonMain)
+
+            nativeMain(commonMain)
+
+            appleMain(nativeMain)
+
+            androidMain(jvmMain)
+
+            iosMain(appleMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(jvmMain)
+
+            webMain(commonMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(appleMain)
         }
 
-        commonTest.configure {
-            lib(
-                libs.test,
-                libs.kotlinx.coroutines.test
-            )
+        windows {
+            compilations.getByName("main") {
+                cinterops.create("win32")
+            }
         }
-
-        val jvmMain = createJvm(commonMain)
-
-        nativeMain.configure(commonMain)
-
-        appleMain.configure(nativeMain)
-
-        androidMain.configure(jvmMain)
-
-        iosMain.configure(appleMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(jvmMain)
-
-        webMain.configure(commonMain)
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
-
-        windowsMain.configure(nativeMain)
-
-        linuxMain.configure(nativeMain)
-
-        macosMain.configure(appleMain)
     }
-
-    override fun KotlinNativeTarget.windows() {
-        compilations.getByName("main") {
-            cinterops.create("win32")
-        }
-    }
-})
+}

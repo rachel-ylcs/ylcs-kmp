@@ -62,12 +62,6 @@ jobs:
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
-          name: ylcs-windows-upgrade
-          path: outputs/ylcs-windows-upgrade.zip
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
           name: ylcs-windows
           path: outputs/ylcs-windows.zip
 
@@ -87,12 +81,6 @@ jobs:
         env:
           SKIKO_RENDER_API: SOFTWARE_FAST
         run: xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" ./gradlew ylcs-app:desktop-app:desktopArtifact
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-linux-upgrade
-          path: outputs/ylcs-linux-upgrade.zip
 
       - name: Upload
         uses: actions/upload-artifact@v7
@@ -277,9 +265,7 @@ jobs:
             artifacts/ylcs-android/*
             artifacts/ylcs-ios/*
             artifacts/ylcs-windows/*
-            artifacts/ylcs-windows-upgrade/*
             artifacts/ylcs-linux/*
-            artifacts/ylcs-linux-upgrade/*
             artifacts/ylcs-macos/*
             artifacts/ylcs-js/*
             artifacts/ylcs-wasm/*

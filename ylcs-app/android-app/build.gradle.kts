@@ -1,81 +1,83 @@
-import com.android.build.api.dsl.ApkSigningConfig
-import com.android.build.api.dsl.ApplicationExtension
-import java.util.Properties
+import love.yinlin.repository.C
+import love.yinlin.repository.localProperties
 
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinSerialization,
         libs.plugins.androidApplication,
         libs.plugins.composeCompiler,
     )
 }
 
-template(object : KotlinAndroidTemplate() {
-    override val packageName: String = C.app.packageName
-    override val packageVersion: Int = C.app.version
-    override val packageVersionName: String = C.app.versionName
+rachel {
+    androidApplication {
+        packageName = C.namespace
+        packageVersion = C.version
+        packageVersionName = C.versionName
 
-    override fun KotlinAndroidSourceSetsScope.source() {
-        lib(projects.ylcsApp.app.portal)
-    }
-
-    override fun ApplicationExtension.android() {
-        androidResources {
-            @Suppress("UnstableApiUsage")
-            localeFilters += listOf("zh-rCN")
+        sources {
+            lib(projects.ylcsApp.app.portal)
         }
-    }
 
-    override fun ApplicationExtension.sign(): ApkSigningConfig? = try {
-        val localProperties = Properties().also { p ->
-            C.root.localProperties.asFile.inputStream().use { p.load(it) }
-        }
-        val androidKeyName = localProperties.getProperty("androidKeyName")
-        val androidKeyPassword = localProperties.getProperty("androidKeyPassword")
-        signingConfigs {
-            register(androidKeyName) {
-                keyAlias = androidKeyName
-                keyPassword = androidKeyPassword
-                storeFile = C.root.app.config.androidKey.asFile
-                storePassword = androidKeyPassword
+        android {
+            androidResources {
+                @Suppress("UnstableApiUsage")
+                localeFilters += listOf("zh-rCN")
             }
         }
-        signingConfigs.getByName(androidKeyName)
-    } catch (e: Throwable) {
-        println("[AndroidSigning] can't load android signing config, error: ${e.message}")
-        null
-    }
 
-    override fun Project.actions() {
-        tasks.register("androidPackage") {
-            description = "安卓端Debug编译"
-            dependsOn(tasks.named("assembleDebug"))
+        sign {
+            val androidKeyName = localProperties.androidKeyName
+            val androidKeyPassword = localProperties.androidKeyPassword
+            val androidKey = C.root.app.config.androidKey.asFile
+            if (androidKeyName.isNullOrBlank() || androidKeyPassword.isNullOrBlank() || !androidKey.isFile) {
+                signingConfigs.getByName("debug")
+            }
+            else {
+                signingConfigs {
+                    register(androidKeyName) {
+                        keyAlias = androidKeyName
+                        keyPassword = androidKeyPassword
+                        storeFile = androidKey
+                        storePassword = androidKeyPassword
+                    }
+                }
+                signingConfigs.getByName(androidKeyName)
+            }
         }
 
-        tasks.register("androidArtifact") {
-            description = "安卓端Release打包"
-            dependsOn(tasks.named("assembleRelease"))
+        actions {
+            tasks.register("androidPackage") {
+                description = "安卓端Debug编译"
+                dependsOn(tasks.named("assembleDebug"))
+            }
 
-            doLast {
-                copy {
-                    from(originOutput)
-                    into(C.root.outputs)
-                    rename { _ -> "ylcs-android.apk" }
+            tasks.register("androidArtifact") {
+                description = "安卓端Release打包"
+                dependsOn(tasks.named("assembleRelease"))
+
+                doLast {
+                    copy {
+                        from(originOutput)
+                        into(C.root.outputs)
+                        rename { _ -> "ylcs-android.apk" }
+                    }
+                }
+            }
+
+            tasks.register("androidPublish") {
+                description = "发布安卓端安装包"
+                dependsOn(tasks.named("assembleRelease"))
+
+                doLast {
+                    copy {
+                        from(originOutput)
+                        into(C.root.outputs)
+                        rename { _ -> "[Android]${C.app.displayName}${C.versionName}.apk" }
+                    }
                 }
             }
         }
-
-        tasks.register("androidPublish") {
-            description = "发布安卓端安装包"
-            dependsOn(tasks.named("assembleRelease"))
-
-            doLast {
-                copy {
-                    from(originOutput)
-                    into(C.root.outputs)
-                    rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.apk" }
-                }
-            }
-        }
     }
-})
+}

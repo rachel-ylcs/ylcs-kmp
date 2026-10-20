@@ -1,12 +1,14 @@
-import love.yinlin.task.CopyDesktopNativeTask
-import love.yinlin.task.spec.zip
-import org.gradle.api.internal.catalog.DelegatingProjectDependency
-import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
-import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
-import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
+import love.yinlin.gradle.BuildPlatform
+import love.yinlin.gradle.desktopBinaryDir
+import love.yinlin.gradle.packageResourcesDir
+import love.yinlin.repository.C
+import love.yinlin.gradle.task.CopyDesktopNativeTask
+import love.yinlin.gradle.task.spec.zip
+import org.gradle.api.tasks.JavaExec
 
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -14,146 +16,136 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val iosTarget: Boolean = false
-    override val webTarget: Boolean = false
+rachel {
+    multiplatform {
+        iosTarget = false
+        webTarget = false
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(libs.compose.resources)
-        }
+        sources {
+            commonMain {
+                lib(libs.compose.resources)
+            }
 
-        desktopMain.configure(commonMain) {
-            lib(
-                projects.ylcsApp.app.portal,
-                projects.ylcsModule.platform.nativeLibLoader,
-                projects.ylcsModule.platform.os.singleInstance,
-            )
-        }
-    }
-
-    override val desktopPackage = object : DesktopPackage(), DesktopPackage.Windows, DesktopPackage.Linux, DesktopPackage.MacOS {
-        override val useAOT: Boolean = true
-        override val packageName: String = C.app.name
-        override val mainClass: String = C.app.mainClass
-        override val jvmArgs: List<String> = buildList {
-            if ("desktopRun" in currentTaskName) {
-                val desktopWorkSpace = C.root.work.desktop.asFile
-                desktopWorkSpace.mkdirs()
-                add("-Duser.dir=$desktopWorkSpace")
-                // 不使用资源方式加载 native 库
-                add("-Dnative.library.resource.disabled=true")
-                add("-Djava.library.path=${C.root.artifacts.desktopNative}")
+            desktopMain(commonMain) {
+                lib(
+                    projects.ylcsApp.app.portal,
+                    projects.ylcsModule.platform.nativeLibLoader,
+                    projects.ylcsModule.platform.os.singleInstance,
+                )
             }
         }
-        override val jvmModules: List<String> = C.desktop.modules.toList()
-        override val proguard: List<DelegatingProjectDependency> = listOf(
-            projects.ylcsModule.core,
-            projects.ylcsModule.cs.core,
-            projects.ylcsModule.foundation.network,
-            projects.ylcsModule.platform.ffi.core,
-            projects.ylcsModule.platform.os.singleInstance,
-            projects.ylcsModule.compose.core,
-            projects.ylcsModule.compose.components.urlImage,
-            projects.ylcsModule.compose.components.media,
-        )
-        override fun onSettings(settings: WindowsPlatformSettings) {
-            settings.iconFile.set(C.root.app.config.icon)
-        }
-        override fun onSettings(settings: LinuxPlatformSettings) {
-            settings.iconFile.set(C.root.app.config.icon)
-        }
-        override fun onSettings(settings: JvmMacOSPlatformSettings) {
-            settings.iconFile.set(C.root.app.config.icon)
-        }
-    }
 
-    override fun Project.actions() {
-        tasks.register("desktopRunDebug") {
-            description = "运行Debug桌面端"
-            dependsOn(tasks.named("run"))
-        }
+        val targetName = C.app.name
 
-        tasks.register("desktopRunRelease") {
-            description = "运行Release桌面端"
-            dependsOn(tasks.named("runRelease"))
-        }
-
-        tasks.register("desktopCheckModules") {
-            description = "检查桌面端模块完整性"
-            dependsOn(tasks.named("suggestRuntimeModules"))
+        desktopPackage {
+            useAOT = true
+            packageName = targetName
+            jvmModules = listOf(
+                "java.instrument",
+                "java.net.http",
+                "java.management",
+                "jdk.unsupported"
+            )
+            proguard = listOf(
+                projects.ylcsModule.core,
+                projects.ylcsModule.cs.core,
+                projects.ylcsModule.foundation.network,
+                projects.ylcsModule.platform.ffi.core,
+                projects.ylcsModule.platform.os.singleInstance,
+                projects.ylcsModule.compose.core,
+                projects.ylcsModule.compose.components.urlImage,
+                projects.ylcsModule.compose.components.media,
+            )
+            windows {
+                iconFile.set(C.root.app.config.icon)
+            }
+            linux {
+                iconFile.set(C.root.app.config.icon)
+            }
+            macos {
+                iconFile.set(C.root.app.config.icon)
+            }
         }
 
-        val desktopCopyNativeLib = tasks.register<CopyDesktopNativeTask>("desktopCopyNativeLib") {
-            description = "复制桌面端动态库"
-            dependsOn(tasks.named("desktopJar"))
-        }
+        actions {
+            val desktopWorkspace = C.root.work.desktop.asFile
+            val desktopNativeDirectory = C.root.artifacts.desktopNative.asFile
+            tasks.withType<JavaExec>().matching { it.name == "run" || it.name == "runRelease" }.configureEach {
+                jvmArgs(
+                    "-Duser.dir=$desktopWorkspace",
+                    "-Dnative.library.resource.disabled=true",
+                    "-Djava.library.path=$desktopNativeDirectory",
+                )
+                doFirst { desktopWorkspace.mkdirs() }
+            }
 
-        val taskName = currentTaskName
-        if ("desktopPublish" in taskName || "desktopArtifact" in taskName) {
+            tasks.register("desktopRunDebug") {
+                description = "运行Debug桌面端"
+                dependsOn(tasks.named("run"))
+            }
+
+            tasks.register("desktopRunRelease") {
+                description = "运行Release桌面端"
+                dependsOn(tasks.named("runRelease"))
+            }
+
+            tasks.register("desktopCheckModules") {
+                description = "检查桌面端模块完整性"
+                dependsOn(tasks.named("suggestRuntimeModules"))
+            }
+
+            val desktopCopyNativeLib = tasks.register<CopyDesktopNativeTask>("desktopCopyNativeLib") {
+                description = "复制桌面端动态库"
+                dependsOn(tasks.named("desktopJar"))
+            }
+
             tasks.named("prepareAppResources") {
                 dependsOn(desktopCopyNativeLib)
             }
-        }
 
-        tasks.register("desktopArtifact") {
-            description = "桌面端打包"
-            dependsOn(tasks.named("createReleaseDistributable"))
+            tasks.register("desktopArtifact") {
+                description = "桌面端打包"
+                dependsOn(tasks.named("createReleaseDistributable"))
 
-            doLast {
-                val outputDir = C.root.outputs
-                delete(packageResourcesDir)
-                copy {
-                    from(C.root.app.desktopApp.originOutput)
-                    into(outputDir)
-                }
-
-                when (C.platform) {
-                    BuildPlatform.Windows -> {
-                        zip(outputDir.dir(C.app.name).dir("app"), outputDir.file("ylcs-windows-upgrade.zip"))
-                        zip(outputDir.dir(C.app.name), outputDir.file("ylcs-windows.zip"))
+                doLast {
+                    val outputDir = C.root.outputs
+                    delete(packageResourcesDir)
+                    copy {
+                        from(desktopBinaryDir)
+                        into(outputDir)
                     }
-                    BuildPlatform.Linux -> {
-                        zip(outputDir.dir(C.app.name).dir("lib").dir("app"), outputDir.file("ylcs-linux-upgrade.zip"))
-                        zip(outputDir.dir(C.app.name), outputDir.file("ylcs-linux.zip"))
-                    }
-                    BuildPlatform.Mac -> {
-                        zip(outputDir.dir("${C.app.name}.app"), outputDir.file("ylcs-macos.zip"))
+
+                    when (C.platform) {
+                        BuildPlatform.Windows -> zip(outputDir.dir(targetName), outputDir.file("ylcs-windows.zip"))
+                        BuildPlatform.Linux -> zip(outputDir.dir(targetName), outputDir.file("ylcs-linux.zip"))
+                        BuildPlatform.Mac -> zip(outputDir.dir("$targetName.app"), outputDir.file("ylcs-macos.zip"))
                     }
                 }
             }
-        }
 
-        tasks.register("desktopPublish") {
-            description = "发布桌面端"
-            dependsOn(tasks.named("createReleaseDistributable"))
+            tasks.register("desktopPublish") {
+                description = "发布桌面端"
+                dependsOn(tasks.named("createReleaseDistributable"))
 
-            doLast {
-                val outputDir = C.root.outputs
-                delete(packageResourcesDir)
-                copy {
-                    from(C.root.app.desktopApp.originOutput)
-                    into(outputDir)
+                doLast {
+                    val outputDir = C.root.outputs
+                    delete(packageResourcesDir)
+                    copy {
+                        from(desktopBinaryDir)
+                        into(outputDir)
+                    }
+
+                    val artifactName = "${C.app.displayName}${C.versionName}"
+                    val outputAppDir = outputDir.dir(targetName)
+                    when (C.platform) {
+                        BuildPlatform.Windows -> zip(outputAppDir, outputDir.file("[Windows]${artifactName}.zip"))
+                        BuildPlatform.Linux -> zip(outputAppDir, outputDir.file("[Linux]${artifactName}.zip"))
+                        BuildPlatform.Mac -> zip(outputDir.dir("$targetName.app"), outputDir.file("[macOS]${artifactName}.zip"))
+                    }
+
+                    delete(outputAppDir)
                 }
-
-                val artifactName = "${C.app.displayName}${C.app.versionName}"
-                val outputAppDir = outputDir.dir(C.app.name)
-                when (C.platform) {
-                    BuildPlatform.Windows -> {
-                        zip(outputAppDir.dir("app"), outputDir.file("[Windows]${artifactName}升级包.zip"))
-                        zip(outputAppDir, outputDir.file("[Windows]${artifactName}.zip"))
-                    }
-                    BuildPlatform.Linux -> {
-                        zip(outputAppDir.dir("lib").dir("app"), outputDir.file("[Linux]${artifactName}升级包.zip"))
-                        zip(outputAppDir, outputDir.file("[Linux]${artifactName}.zip"))
-                    }
-                    BuildPlatform.Mac -> {
-                        zip(outputDir.dir("${C.app.name}.app"), outputDir.file("[macOS]${artifactName}.zip"))
-                    }
-                }
-
-                delete(outputAppDir)
             }
         }
     }
-})
+}

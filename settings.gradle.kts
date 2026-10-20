@@ -1,134 +1,184 @@
 pluginManagement {
-    val useMirror = try {
-        val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
-        localProperties.containsKey("mirror.enabled")
-    }
-    catch (_: Throwable) { false }
-    repositories {
-        if (useMirror) {
-            maven("https://maven.aliyun.com/repository/central")
-            maven("https://maven.aliyun.com/repository/google")
-            maven("https://maven.aliyun.com/repository/gradle-plugin")
-        }
-        mavenCentral()
-        google()
-        gradlePluginPortal()
-    }
+    includeBuild("build-logic")
 }
 
-@Suppress("UnstableApiUsage")
-dependencyResolutionManagement {
-    val useMirror = try {
-        val localProperties = file("local.properties").inputStream().use { java.util.Properties().apply { load(it) } }
-        localProperties.containsKey("mirror.enabled")
-    }
-    catch (_: Throwable) { false }
-    repositories {
-        if (useMirror) {
-            maven("https://maven.aliyun.com/repository/central")
-            maven("https://maven.aliyun.com/repository/google")
+plugins {
+    id("ylcs.repository")
+}
+
+repository {
+    name = "ylcs-kmp"
+    namespace = "love.yinlin"
+    homepage = "https://github.com/rachel-ylcs/ylcs-kmp"
+    organization = "银临茶舍"
+    copyright = "© 2024-2026 银临茶舍 版权所有"
+
+    rachel {
+        stripFirstPathSegment = true
+
+        languageFeatures = listOf(
+            "-Xexpect-actual-classes",
+            "-Xreturn-value-checker=check",
+            "-Xcollection-literals",
+        )
+
+        resourceExcludes = listOf(
+            "/META-INF/{AL2.0,LGPL2.1}",
+            "DebugProbesKt.bin"
+        )
+
+        composeReports = true
+
+        jvm {
+            version = 25
+            androidVersion = 25
+            args = listOf(
+                "--enable-native-access=ALL-UNNAMED",
+                "-XX:+UseCompactObjectHeaders"
+            )
         }
-        mavenCentral()
-        google()
+
+        android {
+            minSdk = 26
+            compileSdk = 37 to 1
+            targetSdk = 37
+            ndkAbi = listOf("arm64-v8a")
+            ndkVersion = "29.0.14206865"
+        }
+
+        ios {
+            target = "26.0"
+            linkUIKit = true
+        }
+
+        desktop {
+            proguardVersion = "7.10.0"
+        }
+
+        web {
+            webServerPort = 8000
+            jsTarget = "es2020"
+        }
+
+        native {
+            outputDirectory = "artifacts/desktopNative"
+            jniHeadersDirectory = "artifacts/include"
+            buildType = "Release"
+            parallelism = 8
+        }
+
+        publishing {
+            central = true
+            automaticRelease = true
+            validateDeployment = false
+            sign = true
+            inceptionYear = "2025"
+            licenseName = "MIT License"
+            licenseUrl = "https://opensource.org/license/MIT"
+        }
     }
 
-    versionCatalogs {
-        create("libs").apply {
-            from(files("libs.versions.toml"))
+    ylcs {
+        app {
+            name = "ylcs"
+            projectName = "ylcs-app"
+            displayName = "银临茶舍"
+        }
+
+        cs {
+            apiUrl = "https://api.yinlin.love"
+        }
+    }
+
+    modules {
+        module("ylcs-module") {
+            /* -----------------  工具模块  ----------------- */
+
+            module("build-tool", "dokka")
+
+            /* -----------------  库模块  ----------------- */
+
+            module("core")
+
+            module("foundation") {
+                module("context")
+                module("filesystem", "network", "startup")
+                module("compression", "cryptography")
+                module("fts")
+                module("parser") {
+                    module("arguments", "lrc", "markdown", "toml", "yaml")
+                }
+            }
+
+            module("compose") {
+                module("core")
+                module("theme", "ui", "icons", "platform-view", "screen", "cache", "app")
+                module("game") {
+                    module("core")
+                }
+                module("startup") {
+                    module("config", "exception", "mmkv-kmp", "picker")
+                }
+                module("components") {
+                    module(
+                        "blur",
+                        "calendar",
+                        "data-table",
+                        "drag-drop",
+                        "hexview",
+                        "log-output",
+                        "lottie",
+                        "media",
+                        "pagination-layout",
+                        "qrcode",
+                        "reordering",
+                        "rich-text",
+                        "url-image",
+                        "webview"
+                    )
+                }
+            }
+
+            module("cs") {
+                module("core")
+                module("client-engine")
+                module("server-engine")
+                module("server-service-mysql", "server-service-redis")
+            }
+
+            module("native") {
+                module("win32") {
+                    module("core")
+                }
+            }
+
+            module("platform") {
+                module("native-lib-loader")
+                module("ffi") {
+                    module("core")
+                    module("posix", "win32")
+                }
+                module("os") {
+                    module("single-instance")
+                    module("window")
+                }
+            }
+        }
+
+        /* -----------------  应用模块  ----------------- */
+
+        module("ylcs-app") {
+            module("app") {
+                module("global", "portal")
+                module("viewer")
+                module("information", "activity", "community", "account", "music", "photo", "radio", "world")
+                module("game", "game-guess-lyrics", "game-rhyme")
+            }
+
+            module("cs", "mod", "third-party")
+            module("gallery", "modern-screen")
+            module("mod-manager", "landpage")
+            module("android-app", "desktop-app", "web-app", "server")
         }
     }
 }
-
-rootProject.name = "ylcs-kmp"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
-include(
-    /* -----------------  工具模块  ----------------- */
-
-    "ylcs-module:build-tool",
-    "ylcs-module:dokka",
-
-    /* -----------------  库模块  ----------------- */
-
-    "ylcs-module:compose:app",
-    "ylcs-module:compose:cache",
-    "ylcs-module:compose:components:blur",
-    "ylcs-module:compose:components:calendar",
-    "ylcs-module:compose:components:data-table",
-    "ylcs-module:compose:components:drag-drop",
-    "ylcs-module:compose:components:hexview",
-    "ylcs-module:compose:components:log-output",
-    "ylcs-module:compose:components:lottie",
-    "ylcs-module:compose:components:media",
-    "ylcs-module:compose:components:pagination-layout",
-    "ylcs-module:compose:components:qrcode",
-    "ylcs-module:compose:components:reordering",
-    "ylcs-module:compose:components:rich-text",
-    "ylcs-module:compose:components:url-image",
-    "ylcs-module:compose:components:webview",
-    "ylcs-module:compose:core",
-    "ylcs-module:compose:game:core",
-    "ylcs-module:compose:icons",
-    "ylcs-module:compose:platform-view",
-    "ylcs-module:compose:screen",
-    "ylcs-module:compose:startup:config",
-    "ylcs-module:compose:startup:exception",
-    "ylcs-module:compose:startup:mmkv-kmp",
-    "ylcs-module:compose:startup:picker",
-    "ylcs-module:compose:theme",
-    "ylcs-module:compose:ui",
-    "ylcs-module:core",
-    "ylcs-module:cs:core",
-    "ylcs-module:cs:client-engine",
-    "ylcs-module:cs:server-engine",
-    "ylcs-module:cs:server-service-mysql",
-    "ylcs-module:cs:server-service-redis",
-    "ylcs-module:foundation:compression",
-    "ylcs-module:foundation:context",
-    "ylcs-module:foundation:cryptography",
-    "ylcs-module:foundation:filesystem",
-    "ylcs-module:foundation:fts",
-    "ylcs-module:foundation:network",
-    "ylcs-module:foundation:parser:arguments",
-    "ylcs-module:foundation:parser:lrc",
-    "ylcs-module:foundation:parser:markdown",
-    "ylcs-module:foundation:parser:toml",
-    "ylcs-module:foundation:parser:yaml",
-    "ylcs-module:foundation:startup",
-    "ylcs-module:native:win32:core",
-    "ylcs-module:platform:ffi:core",
-    "ylcs-module:platform:ffi:posix",
-    "ylcs-module:platform:ffi:win32",
-    "ylcs-module:platform:native-lib-loader",
-    "ylcs-module:platform:os:single-instance",
-    "ylcs-module:platform:os:window",
-
-    /* -----------------  应用模块  ----------------- */
-
-    "ylcs-app:app:global",
-    "ylcs-app:app:portal",
-    "ylcs-app:app:account",
-    "ylcs-app:app:activity",
-    "ylcs-app:app:community",
-    "ylcs-app:app:game",
-    "ylcs-app:app:game-guess-lyrics",
-    "ylcs-app:app:game-rhyme",
-    "ylcs-app:app:information",
-    "ylcs-app:app:music",
-    "ylcs-app:app:photo",
-    "ylcs-app:app:radio",
-    "ylcs-app:app:viewer",
-    "ylcs-app:app:world",
-
-    "ylcs-app:android-app",
-    "ylcs-app:cs",
-    "ylcs-app:desktop-app",
-    "ylcs-app:gallery",
-    "ylcs-app:landpage",
-    "ylcs-app:mod",
-    "ylcs-app:mod-manager",
-    "ylcs-app:modern-screen",
-    "ylcs-app:server",
-    "ylcs-app:third-party",
-    "ylcs-app:web-app",
-)

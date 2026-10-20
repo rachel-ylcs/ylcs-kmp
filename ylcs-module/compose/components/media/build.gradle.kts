@@ -1,5 +1,8 @@
+import love.yinlin.gradle.ExportLib
+
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -10,41 +13,43 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                libs.compose.resources,
-                ExportLib,
-                projects.ylcsModule.foundation.filesystem,
-                projects.ylcsModule.compose.ui,
-                projects.ylcsModule.compose.platformView,
-            )
+rachel {
+    multiplatform {
+        sources {
+            commonMain {
+                lib(
+                    libs.compose.resources,
+                    ExportLib,
+                    projects.ylcsModule.foundation.filesystem,
+                    projects.ylcsModule.compose.ui,
+                    projects.ylcsModule.compose.platformView,
+                )
+            }
+
+            androidMain(commonMain) {
+                lib(
+                    ExportLib,
+                    libs.media3.ui,
+                    libs.media3.player,
+                    libs.media3.session,
+                )
+            }
+
+            iosMain(commonMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(commonMain) {
+                lib(projects.ylcsModule.platform.nativeLibLoader)
+            }
+
+            webMain(commonMain) {
+                lib(projects.ylcsModule.compose.platformView)
+            }
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
-
-        androidMain.configure(commonMain) {
-            lib(
-                ExportLib,
-                libs.media3.ui,
-                libs.media3.player,
-                libs.media3.session,
-            )
-        }
-
-        iosMain.configure(commonMain)
-
-        iosMainList.configure(iosMain)
-
-        desktopMain.configure(commonMain) {
-            lib(projects.ylcsModule.platform.nativeLibLoader)
-        }
-
-        webMain.configure(commonMain) {
-            lib(projects.ylcsModule.compose.platformView)
-        }
-
-        jsMain.configure(webMain)
-
-        wasmJsMain.configure(webMain)
     }
-})
+}

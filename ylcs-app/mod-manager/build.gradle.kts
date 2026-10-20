@@ -1,9 +1,11 @@
-import love.yinlin.task.spec.zip
-import org.gradle.api.internal.catalog.DelegatingProjectDependency
-import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
+import love.yinlin.gradle.desktopBinaryDir
+import love.yinlin.gradle.task.spec.zip
+import love.yinlin.repository.C
+import org.gradle.api.tasks.JavaExec
 
 plugins {
     install(
+        libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
@@ -11,64 +13,71 @@ plugins {
     )
 }
 
-template(object : KotlinMultiplatformTemplate() {
-    override val iosTarget: Boolean = false
-    override val webTarget: Boolean = false
+rachel {
+    multiplatform {
+        iosTarget = false
+        webTarget = false
 
-    override fun KotlinMultiplatformSourceSetsScope.source() {
-        commonMain.configure {
-            lib(
-                libs.compose.resources,
-                projects.ylcsApp.mod,
-                projects.ylcsModule.compose.app,
-                projects.ylcsModule.compose.screen,
-                projects.ylcsModule.compose.components.dragDrop,
+        sources {
+            commonMain {
+                lib(
+                    libs.compose.resources,
+                    projects.ylcsApp.mod,
+                    projects.ylcsModule.compose.app,
+                    projects.ylcsModule.compose.screen,
+                    projects.ylcsModule.compose.components.dragDrop,
+                    projects.ylcsModule.compose.components.urlImage,
+                )
+            }
+        }
+
+        val targetName = "ModManager"
+
+        desktopPackage {
+            packageName = targetName
+            jvmModules = listOf(
+                "java.instrument",
+                "java.net.http",
+                "java.management",
+                "jdk.unsupported"
+            )
+            proguard = listOf(
+                projects.ylcsModule.core,
+                projects.ylcsModule.cs.core,
+                projects.ylcsModule.foundation.network,
+                projects.ylcsModule.compose.core,
                 projects.ylcsModule.compose.components.urlImage,
             )
+            windows { }
         }
-    }
 
-    override val desktopPackage = object : DesktopPackage(), DesktopPackage.Windows {
-        override val packageName: String = C.modManager.name
-        override val mainClass: String = C.modManager.mainClass
-        override val jvmArgs: List<String> = buildList {
-            if ("modManagerRun" in currentTaskName) {
-                val desktopWorkSpace = C.root.work.modManager.asFile
-                desktopWorkSpace.mkdirs()
-                add("-Duser.dir=$desktopWorkSpace")
+        actions {
+            val desktopWorkspace = C.root.work.modManager.asFile
+            tasks.withType<JavaExec>().matching { it.name == "run" || it.name == "runRelease" }.configureEach {
+                jvmArgs("-Duser.dir=$desktopWorkspace")
+                doFirst { desktopWorkspace.mkdirs() }
             }
-        }
-        override val jvmModules: List<String> = C.desktop.modules.toList()
-        override val proguard: List<DelegatingProjectDependency> = listOf(
-            projects.ylcsModule.core,
-            projects.ylcsModule.cs.core,
-            projects.ylcsModule.foundation.network,
-            projects.ylcsModule.compose.core,
-            projects.ylcsModule.compose.components.urlImage,
-        )
-        override fun onSettings(settings: WindowsPlatformSettings) { }
-    }
 
-    override fun Project.actions() {
-        tasks.register("modManagerRunDebug") {
-            description = "运行MOD编辑器Debug桌面版"
-            dependsOn(tasks.named("run"))
-        }
+            tasks.register("modManagerRunDebug") {
+                description = "运行MOD编辑器Debug桌面版"
+                dependsOn(tasks.named("run"))
+            }
 
-        tasks.register("modManagerPublish") {
-            description = "发布MOD编辑器桌面版"
-            dependsOn(tasks.named("createReleaseDistributable"))
+            tasks.register("modManagerPublish") {
+                description = "发布MOD编辑器桌面版"
+                dependsOn(tasks.named("createReleaseDistributable"))
 
-            doLast {
-                val outputAppDir = C.root.outputs.dir(desktopPackage.packageName)
-                delete(outputAppDir)
-                copy {
-                    from(C.root.app.modManager.originOutput)
-                    into(C.root.outputs)
+                doLast {
+                    val outputAppDir = C.root.outputs.dir(targetName)
+                    delete(outputAppDir)
+                    copy {
+                        from(desktopBinaryDir)
+                        into(C.root.outputs)
+                    }
+                    zip(outputAppDir, C.root.outputs.file("$targetName.zip"))
+                    delete(outputAppDir)
                 }
-                zip(outputAppDir, C.root.outputs.file("${desktopPackage.packageName}.zip"))
-                delete(outputAppDir)
             }
         }
     }
-})
+}

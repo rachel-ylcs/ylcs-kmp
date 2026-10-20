@@ -1,7 +1,11 @@
+import love.yinlin.repository.C
 import org.jetbrains.dokka.gradle.DokkaPlugin
 
 plugins {
-    install(libs.plugins.dokka)
+    install(
+        libs.plugins.rachel,
+        libs.plugins.dokka,
+    )
 }
 
 parent!!.subprojects.forEach { p ->
@@ -13,7 +17,7 @@ parent!!.subprojects.forEach { p ->
 dokka {
     dokkaPublications.html {
         moduleName = "Rachel"
-        moduleVersion = C.app.versionName
+        moduleVersion = C.versionName
         outputDirectory = C.root.docs.dokka
         failOnWarning = false
     }
