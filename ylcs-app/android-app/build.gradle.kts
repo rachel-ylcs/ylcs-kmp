@@ -28,19 +28,23 @@ rachel {
         }
 
         sign {
-            val androidKeyName = localProperties.androidKeyName ?: "default"
+            val androidKeyName = localProperties.androidKeyName
             val androidKeyPassword = localProperties.androidKeyPassword
-            signingConfigs {
-                register(androidKeyName) {
-                    keyAlias = androidKeyName
-                    keyPassword = androidKeyPassword
-                    storeFile = C.root.app.config.androidKey.asFile.let {
-                        if (it.exists()) it else null
-                    }
-                    storePassword = androidKeyPassword
-                }
+            val androidKey = C.root.app.config.androidKey.asFile
+            if (androidKeyName.isNullOrBlank() || androidKeyPassword.isNullOrBlank() || !androidKey.isFile) {
+                signingConfigs.getByName("debug")
             }
-            signingConfigs.getByName(androidKeyName)
+            else {
+                signingConfigs {
+                    register(androidKeyName) {
+                        keyAlias = androidKeyName
+                        keyPassword = androidKeyPassword
+                        storeFile = androidKey
+                        storePassword = androidKeyPassword
+                    }
+                }
+                signingConfigs.getByName(androidKeyName)
+            }
         }
 
         actions {

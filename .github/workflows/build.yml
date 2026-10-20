@@ -50,6 +50,7 @@ jobs:
               - 'gradle/**'
               - 'build-logic/**'
               - 'ylcs-module/**/commonMain/**'
+              - 'ylcs-module/**/build.gradle.kts'
               - 'ylcs-app/cs/**'
               - 'ylcs-app/mod/**'
               - 'gradle.properties'
