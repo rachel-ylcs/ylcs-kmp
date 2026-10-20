@@ -2,7 +2,6 @@ package love.yinlin.repository
 
 import java.util.Properties
 
-/** Version data generated from the root catalog when this local plugin is built. */
 internal object RepositoryVersions {
     private val values = Properties().apply {
         val resource = RepositoryVersions::class.java.getResourceAsStream("/rachel-repository-versions.properties")

@@ -1,5 +1,6 @@
-import love.yinlin.gradle.*
 import love.yinlin.gradle.BuildPlatform
+import love.yinlin.gradle.desktopBinaryDir
+import love.yinlin.gradle.packageResourcesDir
 import love.yinlin.repository.C
 import love.yinlin.gradle.task.CopyDesktopNativeTask
 import love.yinlin.gradle.task.spec.zip
@@ -34,11 +35,17 @@ rachel {
             }
         }
 
+        val targetName = C.app.name
+
         desktopPackage {
             useAOT = true
-            packageName = C.app.name
-            mainClass = C.app.mainClass
-            jvmModules = C.desktop.modules.toList()
+            packageName = targetName
+            jvmModules = listOf(
+                "java.instrument",
+                "java.net.http",
+                "java.management",
+                "jdk.unsupported"
+            )
             proguard = listOf(
                 projects.ylcsModule.core,
                 projects.ylcsModule.cs.core,
@@ -104,22 +111,14 @@ rachel {
                     val outputDir = C.root.outputs
                     delete(packageResourcesDir)
                     copy {
-                        from(C.root.app.desktopApp.originOutput)
+                        from(desktopBinaryDir)
                         into(outputDir)
                     }
 
                     when (C.platform) {
-                        BuildPlatform.Windows -> {
-                            zip(outputDir.dir(C.app.name).dir("app"), outputDir.file("ylcs-windows-upgrade.zip"))
-                            zip(outputDir.dir(C.app.name), outputDir.file("ylcs-windows.zip"))
-                        }
-                        BuildPlatform.Linux -> {
-                            zip(outputDir.dir(C.app.name).dir("lib").dir("app"), outputDir.file("ylcs-linux-upgrade.zip"))
-                            zip(outputDir.dir(C.app.name), outputDir.file("ylcs-linux.zip"))
-                        }
-                        BuildPlatform.Mac -> {
-                            zip(outputDir.dir("${C.app.name}.app"), outputDir.file("ylcs-macos.zip"))
-                        }
+                        BuildPlatform.Windows -> zip(outputDir.dir(targetName), outputDir.file("ylcs-windows.zip"))
+                        BuildPlatform.Linux -> zip(outputDir.dir(targetName), outputDir.file("ylcs-linux.zip"))
+                        BuildPlatform.Mac -> zip(outputDir.dir("$targetName.app"), outputDir.file("ylcs-macos.zip"))
                     }
                 }
             }
@@ -132,24 +131,16 @@ rachel {
                     val outputDir = C.root.outputs
                     delete(packageResourcesDir)
                     copy {
-                        from(C.root.app.desktopApp.originOutput)
+                        from(desktopBinaryDir)
                         into(outputDir)
                     }
 
-                    val artifactName = "${C.app.displayName}${C.app.versionName}"
-                    val outputAppDir = outputDir.dir(C.app.name)
+                    val artifactName = "${C.app.displayName}${C.versionName}"
+                    val outputAppDir = outputDir.dir(targetName)
                     when (C.platform) {
-                        BuildPlatform.Windows -> {
-                            zip(outputAppDir.dir("app"), outputDir.file("[Windows]${artifactName}升级包.zip"))
-                            zip(outputAppDir, outputDir.file("[Windows]${artifactName}.zip"))
-                        }
-                        BuildPlatform.Linux -> {
-                            zip(outputAppDir.dir("lib").dir("app"), outputDir.file("[Linux]${artifactName}升级包.zip"))
-                            zip(outputAppDir, outputDir.file("[Linux]${artifactName}.zip"))
-                        }
-                        BuildPlatform.Mac -> {
-                            zip(outputDir.dir("${C.app.name}.app"), outputDir.file("[macOS]${artifactName}.zip"))
-                        }
+                        BuildPlatform.Windows -> zip(outputAppDir, outputDir.file("[Windows]${artifactName}.zip"))
+                        BuildPlatform.Linux -> zip(outputAppDir, outputDir.file("[Linux]${artifactName}.zip"))
+                        BuildPlatform.Mac -> zip(outputDir.dir("$targetName.app"), outputDir.file("[macOS]${artifactName}.zip"))
                     }
 
                     delete(outputAppDir)

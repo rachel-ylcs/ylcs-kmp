@@ -1,5 +1,6 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.nativeBinaryDir
 import love.yinlin.repository.C
+
 plugins {
     install(
         libs.plugins.rachel,
@@ -14,7 +15,7 @@ rachel {
         linuxTarget = true
         macosTarget = true
 
-        args = listOf("--cd=${C.root.work.server.asFile}")
+        commandArgs = listOf("--cd=${C.root.work.server.asFile}")
 
         sources {
             nativeMain(commonMain) {
@@ -40,9 +41,9 @@ rachel {
                 dependsOn(tasks.named("linkReleaseExecutableLinux"))
 
                 doLast {
-                    delete(C.root.outputs.file("${uniqueName}.kexe"))
+                    delete(C.root.outputs.file("server.kexe"))
                     copy {
-                        from(C.root.app.server.originOutput)
+                        from(nativeBinaryDir("linux", "server.kexe"))
                         into(C.root.outputs)
                     }
                 }

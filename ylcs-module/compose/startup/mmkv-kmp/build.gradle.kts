@@ -1,4 +1,5 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
+import love.yinlin.gradle.SwiftPackage
 
 plugins {
     install(

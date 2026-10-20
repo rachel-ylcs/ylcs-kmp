@@ -20,20 +20,19 @@ internal fun Project.registerDesktopNative(source: Directory, jarTaskName: Strin
     }
     tasks.matching { it.name == jarTaskName }.configureEach { dependsOn(producer) }
 
-    // Select these artifacts from the existing desktop dependency graph, rather than resolving every platform.
     val elements = configurations.create("rachelDesktopNativeElements") {
         isCanBeConsumed = true
         isCanBeResolved = false
         attributes.attribute(Usage.USAGE_ATTRIBUTE, objects.named<Usage>(NativeUsage))
     }
-    // An ignored/absent CMake source may still have a prebuilt library, as in the original copier.
-    // Keeping the artifact provider also lets a file appear after project configuration finishes.
+
     artifacts.add(elements.name, producer.flatMap { it.outputFile })
     tasks.withType<CopyDesktopNativeTask>().configureEach {
         nativeLibraries.from(this@registerDesktopNative.desktopNativeLibraries())
     }
 }
 
+@Suppress("UnstableApiUsage")
 fun Project.desktopNativeLibraries(): FileCollection {
     val runtime = configurations.findByName("desktopRuntimeClasspath") ?: configurations.getByName("runtimeClasspath")
     val dependencies = runtime.incoming.artifactView {

@@ -1,12 +1,10 @@
 package love.yinlin.gradle
 
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
-import love.yinlin.gradle.task.BuildDesktopNativeTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.register
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.AotMode
@@ -70,6 +68,11 @@ class KotlinMultiplatformSourceSetsScope(
     val linuxTest: KotlinSourceSet by lazy { set.getByName("linuxTest") }
     val macosMain: KotlinSourceSet by lazy { set.getByName("macosMain") }
     val macosTest: KotlinSourceSet by lazy { set.getByName("macosTest") }
+
+    val skikoMain: KotlinSourceSet by lazy { set.maybeCreate("skikoMain") }
+    val jvmMain: KotlinSourceSet by lazy { set.maybeCreate("jvmMain") }
+    val clientMain: KotlinSourceSet by lazy { set.maybeCreate("clientMain") }
+    val posixMain: KotlinSourceSet by lazy { set.maybeCreate("posixMain") }
 }
 
 // swift 依赖包结构
@@ -123,8 +126,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
     var iosFrameworkBaseName: String? = null
     var iosFrameworkIsStatic: Boolean? = null
     var swiftPackages: List<SwiftPackage> = emptyList()
-    /** 是否自动发现 SwiftPM 的 Clang 模块；关闭后按声明的模块列表导入。 */
-    var swiftDiscoverClangModulesImplicitly: Boolean = true
+    var swiftDiscoverClangModulesImplicitly: Boolean = true  // 是否自动发现 SwiftPM 的 Clang 模块；关闭后按声明的模块列表导入
 
     // Desktop
     var desktopTarget: Boolean = true
@@ -285,7 +287,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                             iosFrameworkIsStatic?.let { isStatic = it }
                             if (buildDefaults.ios.linkUIKit) linkerOpts("-framework", "UIKit")
                             @OptIn(KotlinNativeCacheApi::class)
-                            if (buildDefaults.ios.disableKotlin250NativeCache) disableNativeCache(
+                            disableNativeCache(
                                 version = DisableCacheInKotlinVersion.`2_5_0`,
                                 reason = "cache bug",
                                 issueUrl = java.net.URI("https://youtrack.jetbrains.com/issue/KT-80715")
@@ -340,7 +342,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                 @OptIn(ExperimentalWasmDsl::class)
                 wasmJs {
                     compilerOptions {
-                        target.set(buildDefaults.jsTarget)
+                        target.set(buildDefaults.web.jsTarget)
                         useLanguageFeature()
                     }
 
@@ -368,7 +370,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
 
                 js {
                     compilerOptions {
-                        target.set(buildDefaults.jsTarget)
+                        target.set(buildDefaults.web.jsTarget)
                         useLanguageFeature()
                     }
 
@@ -415,7 +417,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                 reportsDestination.set(composeCompilerOutput)
                 metricsDestination.set(composeCompilerOutput)
             }
-            val stabilityFileDir = layout.projectDirectory.dir(buildDefaults.stabilityDirectory)
+            val stabilityFileDir = layout.projectDirectory.dir("config")
             val stabilityFiles = (stabilityFileDir.asFile.listFiles { it.extension == "conf" } ?: emptyArray<File>()).map {
                 stabilityFileDir.file(it.name)
             }
@@ -425,7 +427,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
         extensions.findByType<ComposeExtension>()?.apply {
             if (exportResources) {
                 this.extensions.findByType<ResourcesExtension>()?.apply {
-                    publicResClass = buildDefaults.resourceClassPublic
+                    publicResClass = true
                     packageOfResClass = "$uniqueSafeModuleName.resources"
                 }
             }
@@ -434,7 +436,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                 val dpkg = desktopPackage
                 if (dpkg != null && dpkg.usePlatformPackage()) {
                     application {
-                        mainClass = dpkg.mainClass
+                        mainClass = dpkg.mainClass ?: "MainKt"
                         jvmArgs += dpkg.jvmArgs
                         jvmArgs += buildDefaults.jvm.args
 
@@ -485,11 +487,10 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                         }
 
                         nativeDistributions {
-                            packageName = dpkg.packageName
+                            packageName = dpkg.packageName ?: uniqueSafeName
                             packageVersion = buildDefaults.desktop.packageVersion
-                            description = buildDefaults.desktop.description
-                            copyright = buildDefaults.desktop.copyright
-                            vendor = buildDefaults.desktop.vendor
+                            copyright = buildDefaults.copyright
+                            vendor = buildDefaults.organization
                             buildDefaults.desktop.licenseFile?.let { licenseFile.set(project.file(it)) }
 
                             modules(*dpkg.jvmModules.toTypedArray())

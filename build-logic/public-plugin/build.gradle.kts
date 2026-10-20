@@ -7,8 +7,6 @@ plugins {
 group = "love.yinlin"
 version = libs.versions.rachel.get()
 
-// The settings plugin needs these types before project plugin requests are resolved.
-// Keep this internal artifact free of KGP/AGP/Compose implementation dependencies.
 val bootstrap = sourceSets.create("bootstrap")
 sourceSets.main {
     compileClasspath += bootstrap.output
@@ -32,6 +30,7 @@ kotlin {
 }
 
 val bootstrapJar = tasks.register<Jar>("bootstrapJar") {
+    description = "编译构建启动器"
     archiveClassifier = bootstrap.name
     from(bootstrap.output)
 }

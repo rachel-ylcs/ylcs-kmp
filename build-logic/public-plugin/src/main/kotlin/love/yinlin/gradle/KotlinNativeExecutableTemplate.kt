@@ -4,7 +4,8 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 open class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
-    var args: List<String> = emptyList()
+    var commandArgs: List<String> = emptyList()
+
     private var executableBlock: Executable.() -> Unit = {}
     fun executable(block: Executable.() -> Unit) {
         val previous = executableBlock
@@ -14,6 +15,7 @@ open class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
         }
     }
     internal fun Executable.executable() { executableBlock(this) }
+
     private var nativeBlock: KotlinNativeTarget.() -> Unit = {}
     fun native(block: KotlinNativeTarget.() -> Unit) {
         val previous = nativeBlock
@@ -29,7 +31,7 @@ open class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
             executable {
                 baseName = uniqueSafeName
                 entryPoint = "main"
-                val runArguments = this@KotlinNativeExecutableTemplate.args
+                val runArguments = commandArgs
                 runTaskProvider?.configure { setArgs(runArguments) }
 
                 executable()

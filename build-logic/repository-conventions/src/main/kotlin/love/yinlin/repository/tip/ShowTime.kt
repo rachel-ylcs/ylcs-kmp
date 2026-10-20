@@ -1,7 +1,6 @@
 package love.yinlin.repository.tip
 
 import love.yinlin.repository.C
-import love.yinlin.repository.currentTaskName
 import org.gradle.api.Project
 
 fun buildLyrics(): List<String> {
@@ -13,20 +12,23 @@ fun buildLyrics(): List<String> {
     }
 }
 
+@Suppress("unused")
 fun Project.showtime() {
+    val currentTaskName = this.gradle.startParameter.taskNames.firstOrNull() ?: "sync"
     val s0 = System.getProperty("user.dir")
     val s1 = currentTaskName.split(":").last().padStart(22).take(22)
     val s2 = C.platform.toString().padStart(22).take(22)
-    val s3 = C.platformVersion.padStart(22).take(22)
+    val s3 = System.getProperty("os.version").padStart(22).take(22)
     val s4 = C.architecture.toString().padStart(22).take(22)
-    val s5 = C.environment.toString().padStart(22).take(22)
-    val s6 = C.gradleVersion.padStart(22).take(22)
-    val s7 = C.javaVersion.padStart(22).take(22)
-    val s8 = "${"%.1f".format(C.freeMemory / 1073741824.0)}G/${"%.1f".format(C.totalMemory / 1073741824.0)}G/${"%.1f".format(C.maxMemory / 1073741824.0)}G".padStart(22).take(22)
+    val s5 = C.namespace.padStart(22).take(22)
+    val s6 = gradle.gradleVersion.padStart(22).take(22)
+    val s7 = System.getProperty("java.version").padStart(22).take(22)
+    val runtime = Runtime.getRuntime()
+    val s8 = "${"%.1f".format(runtime.freeMemory() / 1073741824.0)}G/${"%.1f".format(runtime.totalMemory() / 1073741824.0)}G/${"%.1f".format(runtime.maxMemory() / 1073741824.0)}G".padStart(22).take(22)
 
     val (l1, l2, l3, l4) = buildLyrics()
 
-    val appV = C.app.versionName
+    val appV = C.versionName
 
     val art = """
                  ╔════════════════════════════════════════════╗
@@ -53,7 +55,7 @@ $l4
 ╠════════════════╬════════════════════════════╣ @@@@@.+=%+.+:...%=...@:#@@@@@@ ║
 ║  Architecture  ║   $s4   ║ @@@@@::..+.=:-..=..%=#*:@@@@@@ ║
 ╠════════════════╬════════════════════════════╣ @@@@@:@%=%==++*..+%===++=@@@@@ ║
-║   Environment  ║   $s5   ║ @@@#::@#####=..++.-=*==::@@+@@ ║
+║    Namespace   ║   $s5   ║ @@@#::@#####=..++.-=*==::@@+@@ ║
 ╠════════════════╬════════════════════════════║ @@@#::@#####......====:-:@@@@@ ║
 ║     Gradle     ║   $s6   ║ @@@@:=@#####.....=%-==**:@@@@@ ║
 ╠════════════════╬════════════════════════════║ @@@@@::##@##....+--%..*+:@@@@@ ║

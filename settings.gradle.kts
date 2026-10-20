@@ -1,5 +1,3 @@
-import love.yinlin.repository.BuildEnvironment
-
 pluginManagement {
     includeBuild("build-logic")
 }
@@ -10,53 +8,65 @@ plugins {
 
 repository {
     name = "ylcs-kmp"
-    typeSafeProjectAccessors = true
-
-    shared {
-        namespace = "love.yinlin"
-        homepage = "https://github.com/rachel-ylcs/ylcs-kmp"
-    }
+    namespace = "love.yinlin"
+    homepage = "https://github.com/rachel-ylcs/ylcs-kmp"
+    organization = "银临茶舍"
+    copyright = "© 2024-2026 银临茶舍 版权所有"
 
     rachel {
         stripFirstPathSegment = true
+
         languageFeatures = listOf(
             "-Xexpect-actual-classes",
             "-Xreturn-value-checker=check",
             "-Xcollection-literals",
         )
-        resourceExcludes = listOf("/META-INF/{AL2.0,LGPL2.1}", "DebugProbesKt.bin")
-        resourceClassPublic = true
+
+        resourceExcludes = listOf(
+            "/META-INF/{AL2.0,LGPL2.1}",
+            "DebugProbesKt.bin"
+        )
+
         composeReports = true
-        stabilityDirectory = "config"
-        jsTarget = "es2020"
 
         jvm {
             version = 25
             androidVersion = 25
-            args = listOf("--enable-native-access=ALL-UNNAMED", "-XX:+UseCompactObjectHeaders")
+            args = listOf(
+                "--enable-native-access=ALL-UNNAMED",
+                "-XX:+UseCompactObjectHeaders"
+            )
         }
+
         android {
             minSdk = 26
-            compileSdk(37, 1)
+            compileSdk = 37 to 1
             targetSdk = 37
             ndkAbi = listOf("arm64-v8a")
             ndkVersion = "29.0.14206865"
-            proguardRule = "proguard-android-optimize.txt"
         }
+
         ios {
             target = "26.0"
             linkUIKit = true
-            disableKotlin250NativeCache = true
         }
+
         desktop {
             proguardVersion = "7.10.0"
         }
+
+        web {
+            webServerPort = 8000
+            jsTarget = "es2020"
+        }
+
         native {
             outputDirectory = "artifacts/desktopNative"
             jniHeadersDirectory = "artifacts/include"
             buildType = "Release"
-            parallelism = 4
+            parallelism = 8
         }
+
         publishing {
             central = true
             automaticRelease = true
@@ -73,21 +83,10 @@ repository {
             name = "ylcs"
             projectName = "ylcs-app"
             displayName = "银临茶舍"
-            description = "银临茶舍KMP跨平台APP"
-            vendor = "银临茶舍"
-            copyright = "© 2024-2026 银临茶舍 版权所有"
         }
-        desktopModules = listOf("java.instrument", "java.net.http", "java.management", "jdk.unsupported")
-        modManager {
-            name = "ModManager"
-            displayName = "银临茶舍Mod管理器"
-            mainClass = "love.yinlin.ModManagerKt"
-        }
-        host {
-            environment = BuildEnvironment.Prod
-            mainHost = "yinlin.love"
-            mainPort = 1211
-            webServerPort = 8000
+
+        cs {
+            apiUrl = "https://api.yinlin.love"
         }
     }
 
@@ -95,82 +94,70 @@ repository {
         module("ylcs-module") {
             /* -----------------  工具模块  ----------------- */
 
-            module("build-tool")
-            module("dokka")
+            module("build-tool", "dokka")
 
             /* -----------------  库模块  ----------------- */
 
-            module("compose") {
-                module("app")
-                module("cache")
-                module("components") {
-                    module("blur")
-                    module("calendar")
-                    module("data-table")
-                    module("drag-drop")
-                    module("hexview")
-                    module("log-output")
-                    module("lottie")
-                    module("media")
-                    module("pagination-layout")
-                    module("qrcode")
-                    module("reordering")
-                    module("rich-text")
-                    module("url-image")
-                    module("webview")
+            module("core")
+
+            module("foundation") {
+                module("context")
+                module("filesystem", "network", "startup")
+                module("compression", "cryptography")
+                module("fts")
+                module("parser") {
+                    module("arguments", "lrc", "markdown", "toml", "yaml")
                 }
+            }
+
+            module("compose") {
                 module("core")
+                module("theme", "ui", "icons", "platform-view", "screen", "cache", "app")
                 module("game") {
                     module("core")
                 }
-                module("icons")
-                module("platform-view")
-                module("screen")
                 module("startup") {
-                    module("config")
-                    module("exception")
-                    module("mmkv-kmp")
-                    module("picker")
+                    module("config", "exception", "mmkv-kmp", "picker")
                 }
-                module("theme")
-                module("ui")
+                module("components") {
+                    module(
+                        "blur",
+                        "calendar",
+                        "data-table",
+                        "drag-drop",
+                        "hexview",
+                        "log-output",
+                        "lottie",
+                        "media",
+                        "pagination-layout",
+                        "qrcode",
+                        "reordering",
+                        "rich-text",
+                        "url-image",
+                        "webview"
+                    )
+                }
             }
-            module("core")
+
             module("cs") {
                 module("core")
                 module("client-engine")
                 module("server-engine")
-                module("server-service-mysql")
-                module("server-service-redis")
+                module("server-service-mysql", "server-service-redis")
             }
-            module("foundation") {
-                module("compression")
-                module("context")
-                module("cryptography")
-                module("filesystem")
-                module("fts")
-                module("network")
-                module("parser") {
-                    module("arguments")
-                    module("lrc")
-                    module("markdown")
-                    module("toml")
-                    module("yaml")
-                }
-                module("startup")
-            }
+
             module("native") {
                 module("win32") {
                     module("core")
                 }
             }
+
             module("platform") {
+                module("native-lib-loader")
                 module("ffi") {
                     module("core")
-                    module("posix")
-                    module("win32")
+                    module("posix", "win32")
                 }
-                module("native-lib-loader")
                 module("os") {
                     module("single-instance")
                     module("window")
@@ -182,32 +169,16 @@ repository {
 
         module("ylcs-app") {
             module("app") {
-                module("global")
-                module("portal")
-                module("account")
-                module("activity")
-                module("community")
-                module("game")
-                module("game-guess-lyrics")
-                module("game-rhyme")
-                module("information")
-                module("music")
-                module("photo")
-                module("radio")
+                module("global", "portal")
                 module("viewer")
-                module("world")
+                module("information", "activity", "community", "account", "music", "photo", "radio", "world")
+                module("game", "game-guess-lyrics", "game-rhyme")
             }
-            module("android-app")
-            module("cs")
-            module("desktop-app")
-            module("gallery")
-            module("landpage")
-            module("mod")
-            module("mod-manager")
-            module("modern-screen")
-            module("server")
-            module("third-party")
-            module("web-app")
+
+            module("cs", "mod", "third-party")
+            module("gallery", "modern-screen")
+            module("mod-manager", "landpage")
+            module("android-app", "desktop-app", "web-app", "server")
         }
     }
 }

@@ -1,6 +1,5 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.wasmBinaryDir
 import love.yinlin.repository.C
-import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -39,8 +38,6 @@ rachel {
         }
 
         desktopPackage {
-            packageName = uniqueSafeName
-            mainClass = C.app.mainClass
             windows { }
         }
 
@@ -48,7 +45,7 @@ rachel {
             outputFileName = "$uniqueSafeModuleName.js"
 
             devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                port = C.host.webServerPort
+                port = C.web.webServerPort
                 client?.overlay = false
             }
         }
@@ -65,8 +62,8 @@ rachel {
 
                 doLast {
                     copy {
-                        from(C.root.app.gallery.originOutput)
-                        into(C.root.app.gallery.output)
+                        from(wasmBinaryDir)
+                        into(C.root.docs.gallery)
                     }
                 }
             }

@@ -1,4 +1,4 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(
@@ -34,7 +34,7 @@ rachel {
 
             appleMain(commonMain)
 
-            val jvmMain = createJvm(commonMain)
+            jvmMain(commonMain)
 
             androidMain(jvmMain)
 

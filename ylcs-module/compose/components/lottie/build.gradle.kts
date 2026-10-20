@@ -1,4 +1,4 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(
@@ -27,7 +27,7 @@ rachel {
                 lib(libs.lottie.android)
             }
 
-            val skikoMain = createSkiko(commonMain) {
+            skikoMain(commonMain) {
                 lib(libs.skiko.lottie)
             }
 

@@ -1,5 +1,6 @@
 import love.yinlin.gradle.*
 import love.yinlin.repository.C
+
 plugins {
     install(
         libs.plugins.rachel,
@@ -46,9 +47,9 @@ rachel {
             tasks.register("appleGenVersionConfig") {
                 description = "生成苹果版本号配置"
                 val content = """
-                BUNDLE_VERSION=${C.app.version}
-                BUNDLE_SHORT_VERSION_STRING=${C.app.versionName}
-            """.trimIndent()
+                    BUNDLE_VERSION=${C.version}
+                    BUNDLE_SHORT_VERSION_STRING=${C.versionName}
+                """.trimIndent()
 
                 val configFile = C.root.app.iosApp.configurationFile.asFile
                 outputs.file(configFile)

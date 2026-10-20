@@ -25,7 +25,7 @@ rachel {
 
         webpack {
             devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                port = C.host.webServerPort
+                port = C.web.webServerPort
                 client?.overlay = false
                 open = false
             }
@@ -42,9 +42,9 @@ rachel {
                 dependsOn(tasks.named("jsBrowserDistribution"))
 
                 doLast {
-                    val outputAppDir = C.root.app.landpage.output
+                    val outputAppDir = C.root.outputs.dir("landpage")
                     copy {
-                        from(C.root.app.landpage.originOutput)
+                        from(jsBinaryDir)
                         into(outputAppDir)
                     }
                     delete(*outputAppDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })

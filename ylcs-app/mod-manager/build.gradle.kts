@@ -1,6 +1,6 @@
-import love.yinlin.gradle.*
-import love.yinlin.repository.C
+import love.yinlin.gradle.desktopBinaryDir
 import love.yinlin.gradle.task.spec.zip
+import love.yinlin.repository.C
 import org.gradle.api.tasks.JavaExec
 
 plugins {
@@ -31,10 +31,16 @@ rachel {
             }
         }
 
+        val targetName = "ModManager"
+
         desktopPackage {
-            packageName = C.modManager.name
-            mainClass = C.modManager.mainClass
-            jvmModules = C.desktop.modules.toList()
+            packageName = targetName
+            jvmModules = listOf(
+                "java.instrument",
+                "java.net.http",
+                "java.management",
+                "jdk.unsupported"
+            )
             proguard = listOf(
                 projects.ylcsModule.core,
                 projects.ylcsModule.cs.core,
@@ -62,13 +68,13 @@ rachel {
                 dependsOn(tasks.named("createReleaseDistributable"))
 
                 doLast {
-                    val outputAppDir = C.root.outputs.dir(C.modManager.name)
+                    val outputAppDir = C.root.outputs.dir(targetName)
                     delete(outputAppDir)
                     copy {
-                        from(C.root.app.modManager.originOutput)
+                        from(desktopBinaryDir)
                         into(C.root.outputs)
                     }
-                    zip(outputAppDir, C.root.outputs.file("${C.modManager.name}.zip"))
+                    zip(outputAppDir, C.root.outputs.file("$targetName.zip"))
                     delete(outputAppDir)
                 }
             }

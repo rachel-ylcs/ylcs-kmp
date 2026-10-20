@@ -1,5 +1,3 @@
-import love.yinlin.gradle.*
-
 plugins {
     install(
         libs.plugins.rachel,
@@ -17,9 +15,9 @@ rachel {
         macosTarget = true
 
         sources {
-            val posixMain = createPosix(commonMain)
+            posixMain(commonMain)
 
-            val jvmMain = createJvm(commonMain)
+            jvmMain(commonMain)
 
             androidMain(jvmMain)
 

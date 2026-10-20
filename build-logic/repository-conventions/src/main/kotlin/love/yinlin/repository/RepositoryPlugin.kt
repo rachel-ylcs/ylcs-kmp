@@ -1,7 +1,5 @@
 package love.yinlin.repository
 
-import love.yinlin.gradle.BuildDefaults
-import love.yinlin.gradle.BuildPlatform
 import love.yinlin.gradle.GeneratedBuildSources
 import org.gradle.api.IsolatedAction
 import org.gradle.api.Plugin
@@ -17,16 +15,15 @@ import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import javax.inject.Inject
 
+@Suppress("unused", "UnstableApiUsage")
 class RepositoryPlugin @Inject constructor(private val objects: ObjectFactory) : Plugin<Settings> {
     override fun apply(target: Settings) {
         val configuration = RepositorySettings()
         val localProperties = LocalProperties.load(target)
-        configuration.repositories.aliyun = localProperties.mirrorEnabled
         target.extensions.add("repository", configuration)
         target.extensions.add("localProperties", localProperties)
         target.gradle.settingsEvaluated {
             configureSettings(target, configuration)
-            // Freeze plain data before registering the isolated project callback.
             val bytes = ByteArrayOutputStream().use { buffer ->
                 ObjectOutputStream(buffer).use { it.writeObject(configuration) }
                 buffer.toByteArray()
@@ -47,34 +44,34 @@ class RepositoryPlugin @Inject constructor(private val objects: ObjectFactory) :
         if (configuration.typeSafeProjectAccessors) target.enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
         target.include(*configuration.modulePaths.toTypedArray())
 
-        val sources = configuration.repositories
-        configureRepositories(target.pluginManagement.repositories, sources, plugins = true)
+        val properties = target.localProperties
+        configureRepositories(target.pluginManagement.repositories, properties, plugins = true)
         target.dependencyResolutionManagement {
-            configureRepositories(repositories, sources, plugins = false)
-            configuration.versionCatalogFile?.let { path ->
-                versionCatalogs {
-                    create("libs") {
-                        from(objects.fileCollection().from(target.layout.settingsDirectory.file(path)))
-                    }
+            configureRepositories(repositories, properties, plugins = false)
+            versionCatalogs {
+                create("libs") {
+                    from(objects.fileCollection().from(target.layout.settingsDirectory.file("libs.versions.toml")))
                 }
             }
         }
     }
 
-    private fun configureRepositories(target: RepositoryHandler, sources: RepositorySettings.Repositories, plugins: Boolean) {
+    private fun configureRepositories(target: RepositoryHandler, properties: LocalProperties, plugins: Boolean) {
         with(target) {
-            if (sources.aliyun) {
-                if (sources.mavenCentral) maven("https://maven.aliyun.com/repository/central")
-                if (sources.google) maven("https://maven.aliyun.com/repository/google")
-                if (plugins && sources.gradlePluginPortal) maven("https://maven.aliyun.com/repository/gradle-plugin")
+            val mirror = properties.mirror?.removeSuffix("/")
+            if (mirror != null) {
+                maven("$mirror/central")
+                maven("$mirror/google")
+                if (plugins) maven("$mirror/gradle-plugin")
             }
-            if (sources.mavenCentral) mavenCentral()
-            if (sources.google) google()
-            if (plugins && sources.gradlePluginPortal) gradlePluginPortal()
+            mavenCentral()
+            google()
+            if (plugins) gradlePluginPortal()
         }
     }
 }
 
+@Suppress("UnstableApiUsage")
 internal class ConfigureRepository(
     private val data: ByteArray,
     private val rootDirectory: String,
@@ -82,32 +79,24 @@ internal class ConfigureRepository(
     private val localProperties: LocalProperties,
 ) : IsolatedAction<Project> {
     override fun execute(target: Project) {
-        // Each project owns its copy even when project configuration is sequential.
         val configuration = ObjectInputStream(ByteArrayInputStream(data)).use { it.readObject() as RepositorySettings }
         val defaults = configuration.rachel
-        val shared = configuration.shared
         val app = configuration.ylcs.app
         val root = File(rootDirectory)
-        defaults.namespace = shared.namespace
-        defaults.projectVersion = shared.versionCode
-        defaults.desktop.packageVersion = shared.versionName
-        defaults.desktop.description = app.description
-        defaults.desktop.copyright = app.copyright
-        defaults.desktop.vendor = app.vendor
+        defaults.namespace = configuration.namespace
+        defaults.organization = configuration.organization
+        defaults.copyright = configuration.copyright
+        defaults.versionCode = configuration.versionCode
+        defaults.desktop.packageVersion = configuration.versionName
         defaults.desktop.licenseFile = root.resolve("LICENSE").absolutePath
         defaults.native.outputDirectory = root.resolve(defaults.native.outputDirectory ?: "artifacts/desktopNative").absolutePath
         defaults.native.jniHeadersDirectory = root.resolve(defaults.native.jniHeadersDirectory ?: "artifacts/include").absolutePath
-        defaults.native.resourceTag = when (defaults.platform) {
-            BuildPlatform.Windows -> "windows-x64"
-            BuildPlatform.Linux -> "linux-x64"
-            BuildPlatform.Mac -> "macos-arm64"
-        }
         defaults.publishing.apply {
-            version = shared.versionName
-            homepage = shared.homepage
+            version = configuration.versionName
+            homepage = configuration.homepage
             developerId = app.name
             developerName = app.displayName
-            scmConnection = "scm:git:git${shared.homepage.removePrefix("https")}.git"
+            scmConnection = "scm:git:git${configuration.homepage.removePrefix("https")}.git"
         }
         target.extensions.add("rachelDefaults", defaults)
         val directory = target.objects.directoryProperty().fileValue(root).get()

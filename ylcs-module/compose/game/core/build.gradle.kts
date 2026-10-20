@@ -1,5 +1,3 @@
-import love.yinlin.gradle.*
-
 plugins {
     install(
         libs.plugins.rachel,
@@ -23,7 +21,7 @@ rachel {
                 )
             }
 
-            val skikoMain = createSkiko(commonMain)
+            skikoMain(commonMain)
 
             iosMainList(skikoMain)
 

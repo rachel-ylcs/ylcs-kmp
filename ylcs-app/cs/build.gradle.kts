@@ -1,5 +1,6 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
 import love.yinlin.repository.C
+
 plugins {
     install(
         libs.plugins.rachel,
@@ -35,18 +36,16 @@ object Local {
     val info = AppInfo(
         appName = "${C.app.name}",
         name = "${C.app.displayName}",
-        version = ${C.app.version},
-        versionName = "${C.app.versionName}",
+        version = ${C.version},
+        versionName = "${C.versionName}",
         minVersion = ${C.app.minVersion},
         minVersionName = "${C.app.minVersionName}",
-        packageName = "${C.app.packageName}",
+        packageName = "${C.namespace}",
     )
     
-    const val MAIN_HOST: String = "${C.host.mainHost}"
-    const val API_HOST: String = "${C.host.apiHost}"
-    const val API_BASE_URL: String = "${C.host.apiUrl}"
+    const val API_BASE_URL: String = "${C.cs.apiUrl}"
 }
-            """.trimIndent()
+                    """.trimIndent()
                 }
             }
         }

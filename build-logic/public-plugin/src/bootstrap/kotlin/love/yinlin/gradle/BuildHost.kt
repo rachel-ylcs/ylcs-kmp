@@ -1,7 +1,7 @@
 package love.yinlin.gradle
 
 object BuildHost {
-    val platform: BuildPlatform get() = System.getProperty("os.name").lowercase().let {
+    internal val platform: BuildPlatform get() = System.getProperty("os.name").lowercase().let {
         when {
             it.startsWith("windows") -> BuildPlatform.Windows
             it.startsWith("mac") -> BuildPlatform.Mac
@@ -9,7 +9,7 @@ object BuildHost {
         }
     }
 
-    val architecture: BuildArchitecture get() = System.getProperty("os.arch").lowercase().let {
+    internal val architecture: BuildArchitecture get() = System.getProperty("os.arch").lowercase().let {
         when {
             it.startsWith("aarch64") -> BuildArchitecture.AARCH64
             it.startsWith("arm") -> BuildArchitecture.ARM
@@ -18,7 +18,7 @@ object BuildHost {
         }
     }
 
-    val resourceTag: String get() {
+    internal val resourceTag: String get() {
         val platformName = when (platform) {
             BuildPlatform.Windows -> "windows"
             BuildPlatform.Linux -> "linux"

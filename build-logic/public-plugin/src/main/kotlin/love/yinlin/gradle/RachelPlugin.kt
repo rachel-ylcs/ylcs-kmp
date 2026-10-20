@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.findByType
 
+@Suppress("unused")
 class RachelPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         if (target.extensions.findByType<BuildDefaults>() == null) {

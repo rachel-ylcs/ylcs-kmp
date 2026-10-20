@@ -6,40 +6,36 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 
-/** Connects generated sources to IDE preparation through ordinary project artifacts. */
 object GeneratedBuildSources {
-    private const val Elements = "rachelGeneratedBuildSourcesElements"
-    private const val IdeSources = "rachelIdeGeneratedBuildSources"
-    private const val SourcesUsage = "rachel-generated-build-sources"
-    private const val PrepareModel = "prepareKotlinBuildScriptModel"
+    private const val ELEMENTS = "rachelGeneratedBuildSourcesElements"
+    private const val IDE_SOURCES = "rachelIdeGeneratedBuildSources"
+    private const val SOURCES_USAGE = "rachel-generated-build-sources"
+    private const val PREPARE_MODEL = "prepareKotlinBuildScriptModel"
 
-    /** An empty variant also lets a repository aggregate projects without generators. */
-    fun elements(project: Project): Configuration = project.configurations.maybeCreate(Elements).apply {
+    fun elements(project: Project): Configuration = project.configurations.maybeCreate(ELEMENTS).apply {
         isCanBeConsumed = true
         isCanBeResolved = false
-        attributes.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, SourcesUsage))
+        attributes.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, SOURCES_USAGE))
     }
 
-    /** The provider retains the producing task without realizing it during configuration. */
     fun publish(project: Project, source: Provider<RegularFile>) {
         project.artifacts.add(elements(project).name, source)
-        project.tasks.matching { it.name == PrepareModel }.configureEach {
+        project.tasks.matching { it.name == PREPARE_MODEL }.configureEach {
             dependsOn(source)
         }
     }
 
-    /** Called on the root project with descriptor paths collected during settings evaluation. */
     fun aggregate(project: Project, modulePaths: List<String>) {
-        val sources = project.configurations.create(IdeSources) {
+        val sources = project.configurations.create(IDE_SOURCES) {
             isCanBeConsumed = false
             isCanBeResolved = true
             isTransitive = false
-            attributes.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, SourcesUsage))
+            attributes.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, SOURCES_USAGE))
         }
         for (path in modulePaths) {
-            sources.dependencies.add(project.dependencies.project(mapOf("path" to path, "configuration" to Elements)))
+            sources.dependencies.add(project.dependencies.project(mapOf("path" to path, "configuration" to ELEMENTS)))
         }
-        project.tasks.matching { it.name == PrepareModel }.configureEach {
+        project.tasks.matching { it.name == PREPARE_MODEL }.configureEach {
             dependsOn(sources)
         }
     }

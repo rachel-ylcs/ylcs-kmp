@@ -1,5 +1,4 @@
-import love.yinlin.gradle.*
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(
@@ -35,7 +34,7 @@ rachel {
                 )
             }
 
-            val jvmMain = createJvm(commonMain)
+            jvmMain(commonMain)
 
             nativeMain(commonMain)
 

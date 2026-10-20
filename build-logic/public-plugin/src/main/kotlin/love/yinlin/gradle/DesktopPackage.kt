@@ -6,10 +6,9 @@ import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.WindowsPlatformSettings
 
-/** Desktop package configuration; platform blocks opt into their respective distribution formats. */
 class DesktopPackage {
-    var packageName: String = ""
-    var mainClass: String = ""
+    var packageName: String? = null
+    var mainClass: String? = null
     var jvmArgs: List<String> = emptyList()
     var jvmModules: List<String> = emptyList()
     var proguard: List<ProjectDependency> = emptyList()

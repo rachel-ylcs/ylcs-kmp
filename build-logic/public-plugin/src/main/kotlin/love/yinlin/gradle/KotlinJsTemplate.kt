@@ -68,7 +68,7 @@ open class KotlinJsTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
                 binaries.executable()
                 generateTypeScriptDefinitions()
                 compilerOptions {
-                    target.set(buildDefaults.jsTarget)
+                    target.set(buildDefaults.web.jsTarget)
                     useLanguageFeature()
                 }
 

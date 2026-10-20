@@ -1,4 +1,4 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(

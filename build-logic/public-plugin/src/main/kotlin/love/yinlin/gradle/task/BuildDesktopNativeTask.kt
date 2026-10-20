@@ -26,7 +26,6 @@ import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import javax.inject.Inject
 
-/** CMake/JNI producer. Toolchain-dependent binaries are not eligible for the remote build cache. */
 @DisableCachingByDefault(because = "CMake output depends on the locally installed compiler and system libraries")
 abstract class BuildDesktopNativeTask : DefaultTask() {
     @get:InputDirectory
@@ -124,7 +123,7 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
             commands.add(0, "call \"$vcvars\"")
             commands.add("cmake \"%NATIVE_SOURCE_DIR%\" -G Ninja $options")
         }
-        else commands.add("cmake \"\${NATIVE_SOURCE_DIR}\" $options")
+        else commands.add($$"cmake \"${NATIVE_SOURCE_DIR}\" $$options")
         commands.add("cmake --build . --config $type --parallel ${parallelism.get()}")
         execOperations.exec {
             workingDir(build)

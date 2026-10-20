@@ -4,8 +4,6 @@ import love.yinlin.gradle.BuildPlatform
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
 
-class BuildLogicNode(root: RootProjectNode) : Directory by root.dir("build-logic")
-
 class AppNode(val root: RootProjectNode, c: Constants) : Directory by root.dir("ylcs-app") {
     class ConfigNode(parent: AppNode, c: Constants) : Directory by parent.dir("config") {
         val icon: RegularFile = file(when (c.platform) {
@@ -18,68 +16,10 @@ class AppNode(val root: RootProjectNode, c: Constants) : Directory by root.dir("
     }
     val config = ConfigNode(this, c)
 
-    class ScriptNode(parent: AppNode) : Directory by parent.dir("script")
-
-    class AndroidAppNode(parent: AppNode) : Directory by parent.dir("android-app")
-
     class IosAppNode(parent: AppNode) : Directory by parent.dir("iosApp") {
-        val podfile: RegularFile = file("Podfile")
-        val configuration: Directory = dir("Configuration")
-        val configurationFile: RegularFile = configuration.file("Version.xcconfig")
+        val configurationFile: RegularFile = dir("Configuration").file("Version.xcconfig")
     }
     val iosApp = IosAppNode(this)
-
-    class DesktopAppNode(parent: AppNode) : Directory by parent.dir("desktop-app") {
-        private val build: Directory = dir("build")
-
-        val originOutput: Directory = build.dir("compose").dir("binaries").dir("main-release").dir("app")
-    }
-    val desktopApp = DesktopAppNode(this)
-
-    class WebAppNode(parent: AppNode) : Directory by parent.dir("web-app") {
-        private val build: Directory = dir("build")
-
-        val originJsOutput: Directory = build.dir("dist").dir("js").dir("productionExecutable")
-        val originWasmOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
-        val jsOutput: Directory = parent.root.outputs.dir("webJs")
-        val wasmOutput: Directory = parent.root.outputs.dir("webWasm")
-    }
-    val webApp = WebAppNode(this)
-
-    class LandpageNode(parent: AppNode) : Directory by parent.dir("landpage") {
-        private val build: Directory = dir("build")
-
-        val originOutput: Directory = build.dir("dist").dir("js").dir("productionExecutable")
-        val output: Directory = parent.root.outputs.dir("landpage")
-    }
-    val landpage = LandpageNode(this)
-
-    class ServerNode(parent: AppNode, c: Constants) : Directory by parent.dir("server") {
-        val originOutput: RegularFile = dir("build").dir("bin").dir("linux").dir("releaseExecutable").file("server.kexe")
-    }
-    val server = ServerNode(this, c)
-
-    class ModManagerNode(parent: AppNode) : Directory by parent.dir("mod-manager") {
-        private val build: Directory = dir("build")
-        val originOutput: Directory = build.dir("compose").dir("binaries").dir("main-release").dir("app")
-    }
-    val modManager = ModManagerNode(this)
-
-    class GalleryNode(parent: AppNode) : Directory by parent.dir("gallery") {
-        private val build: Directory = dir("build")
-
-        val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
-        val output: Directory = parent.root.docs.gallery
-    }
-    val gallery = GalleryNode(this)
-
-    class ModernScreenNode(parent: AppNode) : Directory by parent.dir("modern-screen") {
-        private val build: Directory = dir("build")
-
-        val originOutput: Directory = build.dir("dist").dir("wasmJs").dir("productionExecutable")
-        val output: Directory = parent.root.docs.modernScreen
-    }
-    val modernScreen = ModernScreenNode(this)
 }
 
 class DocsNode(root: RootProjectNode) : Directory by root.dir("ylcs-docs") {
@@ -96,7 +36,6 @@ class OutputsNode(root: RootProjectNode) : Directory by root.dir("outputs")
 class ArtifactsNode(root: RootProjectNode) : Directory by root.dir("artifacts") {
     val include: Directory = dir("include")
     val desktopNative: Directory = dir("desktopNative")
-    val tool: Directory = dir("tool")
 }
 
 class WorkNode(root: RootProjectNode) : Directory by root.dir("work") {
@@ -114,6 +53,5 @@ class RootProjectNode(root: Directory, c: Constants) : Directory by root {
     val artifacts = ArtifactsNode(this)
     val work = WorkNode(this)
     val outputs = OutputsNode(this)
-    val buildLogic = BuildLogicNode(this)
     val app = AppNode(this, c)
 }

@@ -1,6 +1,7 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.jsBinaryDir
 import love.yinlin.repository.C
 import love.yinlin.gradle.task.spec.zip
+import love.yinlin.gradle.wasmBinaryDir
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -32,11 +33,11 @@ rachel {
             outputFileName = "${C.app.projectName}.js"
 
             devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                port = C.host.webServerPort
+                port = C.web.webServerPort
                 client?.overlay = false
                 proxy = mutableListOf(KotlinWebpackConfig.DevServer.Proxy(
                     context = mutableListOf(),
-                    target = C.host.apiUrl,
+                    target = C.cs.apiUrl,
                     changeOrigin = true,
                     secure = false,
                 ))
@@ -54,21 +55,22 @@ rachel {
                 dependsOn(tasks.named("wasmJsBrowserDevelopmentRun"))
             }
 
+            val outputJsDir = C.root.outputs.dir("webJs")
+            val outputWasmDir = C.root.outputs.dir("webWasm")
+
             tasks.register("webArtifact") {
                 description = "打包网页版"
                 dependsOn(tasks.named("jsBrowserDistribution"))
                 dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
                 doLast {
-                    val outputJsDir = C.root.app.webApp.jsOutput
-                    val outputWasmDir = C.root.app.webApp.wasmOutput
                     copy {
-                        from(C.root.app.webApp.originJsOutput)
+                        from(jsBinaryDir)
                         into(outputJsDir)
                     }
                     delete(*outputJsDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
                     copy {
-                        from(C.root.app.webApp.originWasmOutput)
+                        from(wasmBinaryDir)
                         into(outputWasmDir)
                     }
                     delete(*outputWasmDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
@@ -82,14 +84,13 @@ rachel {
                 dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
                 doLast {
-                    val outputAppDir = C.root.app.webApp.wasmOutput
                     copy {
-                        from(C.root.app.webApp.originWasmOutput)
-                        into(outputAppDir)
+                        from(wasmBinaryDir)
+                        into(outputWasmDir)
                     }
-                    delete(*outputAppDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                    zip(outputAppDir, C.root.outputs.file("[WebWasm]${C.app.displayName}${C.app.versionName}.zip"))
-                    delete(outputAppDir)
+                    delete(*outputWasmDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
+                    zip(outputWasmDir, C.root.outputs.file("[WebWasm]${C.app.displayName}${C.versionName}.zip"))
+                    delete(outputWasmDir)
                 }
             }
         }

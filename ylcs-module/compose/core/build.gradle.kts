@@ -1,4 +1,4 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(
@@ -32,7 +32,7 @@ rachel {
 
             appleMain(commonMain)
 
-            val skikoMain = createSkiko(commonMain) {
+            skikoMain(commonMain) {
                 lib(
                     ExportLib,
                     libs.skiko

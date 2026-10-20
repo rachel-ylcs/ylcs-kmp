@@ -1,4 +1,4 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(
@@ -34,7 +34,7 @@ rachel {
                 lib(libs.ktor.okhttp)
             }
 
-            val appleMain = createApple(commonMain) {
+            appleMain(commonMain) {
                 lib(libs.ktor.apple)
             }
 

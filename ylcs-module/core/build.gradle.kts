@@ -1,4 +1,4 @@
-import love.yinlin.gradle.*
+import love.yinlin.gradle.ExportLib
 
 plugins {
     install(
@@ -37,11 +37,11 @@ rachel {
                 )
             }
 
-            val clientMain = createClient(commonMain)
+            clientMain(commonMain)
 
             nativeMain(clientMain)
 
-            val jvmMain = createJvm(clientMain) {
+            jvmMain(clientMain) {
                 lib(
                     ExportLib,
                     libs.androidx.collection,

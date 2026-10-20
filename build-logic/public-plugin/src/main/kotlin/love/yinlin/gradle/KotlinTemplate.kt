@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 // 在 ExportLib 后面的库将会被导出给其他模块可见
-object ExportLib
+data object ExportLib
 
 // Npm
 class NpmInfo internal constructor(val name: String, val version: String)
@@ -69,46 +69,6 @@ abstract class KotlinSourceSetsScope(
         block()
     }
 
-    fun createSkiko(
-        vararg parents: KotlinSourceSet,
-        block: KotlinSourceSet.() -> Unit = {}
-    ) : KotlinSourceSet = set.create("skikoMain") {
-        for (parent in parents) dependsOn(parent)
-        block()
-    }
-
-    fun createJvm(
-        vararg parents: KotlinSourceSet,
-        block: KotlinSourceSet.() -> Unit = {}
-    ) : KotlinSourceSet = set.create("jvmMain") {
-        for (parent in parents) dependsOn(parent)
-        block()
-    }
-
-    fun createApple(
-        vararg parents: KotlinSourceSet,
-        block: KotlinSourceSet.() -> Unit = {}
-    ) : KotlinSourceSet = set.create("appleMain") {
-        for (parent in parents) dependsOn(parent)
-        block()
-    }
-
-    fun createClient(
-        vararg parents: KotlinSourceSet,
-        block: KotlinSourceSet.() -> Unit = {}
-    ) : KotlinSourceSet = set.create("clientMain") {
-        for (parent in parents) dependsOn(parent)
-        block()
-    }
-
-    fun createPosix(
-        vararg parents: KotlinSourceSet,
-        block: KotlinSourceSet.() -> Unit = {}
-    ) : KotlinSourceSet = set.create("posixMain") {
-        for (parent in parents) dependsOn(parent)
-        block()
-    }
-
     operator fun KotlinSourceSet.invoke(
         vararg parents: KotlinSourceSet,
         block: KotlinSourceSet.() -> Unit = {}
@@ -132,11 +92,11 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
     private var actionBlock: T.() -> Unit = {}
     fun kotlin(block: T.() -> Unit) { actionBlock = block }
     internal fun T.action() { actionBlock(this) }
+
     private var projectActionsBlock: (Project.() -> Unit)? = null
     fun actions(block: Project.() -> Unit) { projectActionsBlock = block }
     internal fun Project.configureActions() {
         val block = projectActionsBlock ?: return
-        // Compose and Android register some workflow tasks late in project configuration.
         afterEvaluate { block(this) }
     }
 
@@ -191,14 +151,12 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
         freeCompilerArgs.addAll(defaults.languageFeatures + features)
     }
 
-    /** Registers generated Kotlin sources for this source set, including their producing task. */
     fun KotlinSourceSet.generateCode(taskName: String, block: GenerateCodeTask.() -> Unit): TaskProvider<GenerateCodeTask> {
         val generateTask = owner.setupGenerateCode(taskName, block)
         kotlin.srcDir(generateTask.flatMap { it.outputDirectory })
         return generateTask
     }
 
-    /** Registers a generator and retains the original module-wide compiler dependency. */
     fun Project.setupGenerateCode(taskName: String, block: GenerateCodeTask.() -> Unit): TaskProvider<GenerateCodeTask> {
         val generateTask = tasks.register(taskName, GenerateCodeTask::class, configurationAction = block)
         GeneratedBuildSources.publish(this, generateTask.flatMap { it.outputFile })
@@ -211,7 +169,7 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
 
 internal inline fun <reified T : KotlinBaseExtension> Project.configureTemplate(t: KotlinTemplate<T>) {
     group = t.uniqueGroupName
-    buildDefaults.projectVersion?.let { version = it }
+    buildDefaults.versionCode?.let { version = it }
 
     with(t) {
         extensions.configure<T> { build(this) }

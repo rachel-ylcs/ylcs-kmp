@@ -1,4 +1,3 @@
-import love.yinlin.gradle.*
 import love.yinlin.repository.C
 import love.yinlin.repository.localProperties
 
@@ -13,9 +12,9 @@ plugins {
 
 rachel {
     androidApplication {
-        packageName = C.app.packageName
-        packageVersion = C.app.version
-        packageVersionName = C.app.versionName
+        packageName = C.namespace
+        packageVersion = C.version
+        packageVersionName = C.versionName
 
         sources {
             lib(projects.ylcsApp.app.portal)
@@ -29,23 +28,19 @@ rachel {
         }
 
         sign {
-            try {
-                val androidKeyName = localProperties.androidKeyName
-                val androidKeyPassword = localProperties.androidKeyPassword
-                signingConfigs {
-                    register(androidKeyName) {
-                        keyAlias = androidKeyName
-                        keyPassword = androidKeyPassword
-                        storeFile = C.root.app.config.androidKey.asFile
-                        storePassword = androidKeyPassword
+            val androidKeyName = localProperties.androidKeyName ?: "default"
+            val androidKeyPassword = localProperties.androidKeyPassword
+            signingConfigs {
+                register(androidKeyName) {
+                    keyAlias = androidKeyName
+                    keyPassword = androidKeyPassword
+                    storeFile = C.root.app.config.androidKey.asFile.let {
+                        if (it.exists()) it else null
                     }
+                    storePassword = androidKeyPassword
                 }
-                signingConfigs.getByName(androidKeyName)
             }
-            catch (e: Throwable) {
-                println("[AndroidSigning] can't load android signing config, error: ${e.message}")
-                null
-            }
+            signingConfigs.getByName(androidKeyName)
         }
 
         actions {
@@ -75,7 +70,7 @@ rachel {
                     copy {
                         from(originOutput)
                         into(C.root.outputs)
-                        rename { _ -> "[Android]${C.app.displayName}${C.app.versionName}.apk" }
+                        rename { _ -> "[Android]${C.app.displayName}${C.versionName}.apk" }
                     }
                 }
             }

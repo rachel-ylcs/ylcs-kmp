@@ -1,6 +1,5 @@
 package love.yinlin.gradle.task
 
-import love.yinlin.gradle.BuildHost
 import love.yinlin.gradle.buildDefaults
 import love.yinlin.gradle.packageResourcesDir
 import org.gradle.api.DefaultTask
@@ -28,7 +27,7 @@ abstract class CopyDesktopNativeTask : DefaultTask() {
     abstract val fileSystemOperations: FileSystemOperations
 
     init {
-        val tag = project.buildDefaults.native.resourceTag ?: BuildHost.resourceTag
+        val tag = project.buildDefaults.resourceTag
         targetDirectory.convention(project.packageResourcesDir.dir(tag))
     }
 

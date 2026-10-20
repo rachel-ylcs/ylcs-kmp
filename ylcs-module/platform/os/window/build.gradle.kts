@@ -1,5 +1,3 @@
-import love.yinlin.gradle.*
-
 plugins {
     install(
         libs.plugins.rachel,
