@@ -11,7 +11,8 @@ import love.yinlin.extension.cleaning
 import love.yinlin.fs.File
 
 /**
- * 同目录临时文件、关闭流后原子 rename、读写互斥。每个目录只允许一个实例拥有。
+ * 同目录临时文件、关闭流后原子 rename、读取与提交互斥。每个目录只允许一个实例拥有。
+ * 写入回调不持有元数据锁，已有条目可在其他下载期间命中；删除和清理仍与写入互斥。
  * Persistent 保留原文件名并可读取旧 DiskCache 数据；Lru 目录必须独占。
  * Lru 以小型访问日志恢复重启后的顺序，日志定期压缩，容量预算计算数据文件。
  */
@@ -19,6 +20,7 @@ class FileDiskStorage(
     private val directory: File,
     private val policy: DiskPolicy = DiskPolicy.Persistent
 ) : DiskStorage {
+    private val writeMutex = Mutex()
     private val mutex = Mutex()
     private val entries = LinkedHashMap<String, Long>()
     private var initialized = false
@@ -124,17 +126,32 @@ class FileDiskStorage(
 
     override suspend fun getOrWrite(key: String, block: suspend (Sink) -> Unit): File? = store(key, true, block)
 
-    private suspend fun store(key: String, existing: Boolean, block: suspend (Sink) -> Unit): File? = mutex.with {
-        Coroutines.io {
-            checkKey(key)
-            initialize()
+    private suspend fun findExisting(key: String): File? {
+        val file = File(directory, key)
+        val size = file.fileSize()
+        if (size <= 0L) return null
+        touch(key, size)
+        return file
+    }
+
+    private suspend fun store(key: String, existing: Boolean, block: suspend (Sink) -> Unit): File? = Coroutines.io {
+        checkKey(key)
+        if (existing) {
+            val cached = mutex.with {
+                initialize()
+                findExisting(key)
+            }
+            if (cached != null) return@io cached
+        }
+
+        writeMutex.with writing@{
+            val cached = mutex.with {
+                initialize()
+                if (existing) findExisting(key) else null
+            }
+            if (cached != null) return@writing cached
 
             val target = File(directory, key)
-            if (existing && target.fileSize() > 0L) {
-                touch(key, target.fileSize())
-                return@io target
-            }
-
             val temporary = File(directory, ".$key.tmp")
 
             cleaning({
@@ -144,12 +161,14 @@ class FileDiskStorage(
 
                 if (policy is DiskPolicy.Lru && size > policy.maxBytes) return@cleaning null
 
-                temporary.move(target)
-                check(!temporary.exists() && target.fileSize() == size) { "Cache rename failed" }
+                mutex.with {
+                    temporary.move(target)
+                    check(!temporary.exists() && target.fileSize() == size) { "Cache rename failed" }
 
-                touch(key, size)
-                trim()
-                target
+                    touch(key, size)
+                    trim()
+                    target
+                }
             }) {
                 Coroutines.with(NonCancellable) {
                     temporary.delete()
@@ -158,19 +177,23 @@ class FileDiskStorage(
         }
     }
 
-    override suspend fun remove(key: String) = mutex.with {
-        Coroutines.io {
-            checkKey(key)
-            initialize()
-            removeEntry(key)
+    override suspend fun remove(key: String) = writeMutex.with {
+        mutex.with {
+            Coroutines.io {
+                checkKey(key)
+                initialize()
+                removeEntry(key)
+            }
         }
     }
 
-    override suspend fun clear() = mutex.with {
-        Coroutines.io {
-            initialize()
-            for (key in entries.keys.toList()) removeEntry(key)
-            if (policy is DiskPolicy.Lru) compactJournal()
+    override suspend fun clear() = writeMutex.with {
+        mutex.with {
+            Coroutines.io {
+                initialize()
+                for (key in entries.keys.toList()) removeEntry(key)
+                if (policy is DiskPolicy.Lru) compactJournal()
+            }
         }
     }
 }

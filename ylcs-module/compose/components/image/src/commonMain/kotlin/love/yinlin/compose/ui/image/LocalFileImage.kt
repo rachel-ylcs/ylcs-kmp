@@ -1,0 +1,41 @@
+package love.yinlin.compose.ui.image
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import love.yinlin.compose.image.data.ImageOptions
+import love.yinlin.compose.image.input.ImageSource
+import love.yinlin.fs.File
+
+@Composable
+fun LocalFileImage(
+    source: File,
+    modifier: Modifier = Modifier,
+    state: ImageState = rememberImageState(),
+    version: String = "",
+    contentScale: ContentScale = ContentScale.Fit,
+    alignment: Alignment = Alignment.Center,
+    alpha: Float = 1f,
+    onClick: (() -> Unit)? = null,
+    contentDescription: String = "",
+    placeholder: ImagePlaceholder = ImagePlaceholder.Default,
+    options: ImageOptions = ImageOptions()
+) {
+    val input = remember(source.path) { ImageSource.LocalFile(source) }
+
+    BasicImage(
+        input,
+        modifier = modifier,
+        state = state,
+        version = version,
+        contentScale = contentScale,
+        alignment = alignment,
+        alpha = alpha,
+        onClick = onClick,
+        contentDescription = contentDescription,
+        placeholder = placeholder,
+        options = options
+    )
+}

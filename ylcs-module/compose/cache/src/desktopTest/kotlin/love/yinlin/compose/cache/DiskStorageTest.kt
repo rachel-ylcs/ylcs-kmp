@@ -1,7 +1,12 @@
 package love.yinlin.compose.cache
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import kotlinx.io.readByteArray
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.cleaning
@@ -11,6 +16,8 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -35,6 +42,121 @@ class DiskStorageTest {
                 val store = FileDiskStorage(File(directory.path))
                 repeat(4) { index -> store.write("key$index") { it.write(ByteArray(1024)) } }
                 assertEquals("legacy", cache.loadString("source"))
+            }) {
+                directory.deleteRecursively()
+            }
+        }
+    }
+
+    @Test
+    fun persistentHitDoesNotWaitForUnrelatedDownload() = runTest {
+        Coroutines.io {
+            val directory = Files.createTempDirectory("rachel-cache-hit").toFile()
+
+            cleaning({
+                java.io.File(directory, "cached").writeText("cached-value")
+                val started = CompletableDeferred<Unit>()
+                val release = CompletableDeferred<Unit>()
+                val cache = DiskCache<String>(File(directory.path), key = { it }) { source, sink ->
+                    assertEquals("slow", source)
+                    started.complete(Unit)
+                    release.await()
+                    sink.write("downloaded-value".encodeToByteArray())
+                }
+
+                coroutineScope {
+                    val download = async { cache.store("slow") }
+                    cleaning({
+                        withTimeout(5000) { started.await() }
+                        assertEquals("cached-value", withTimeout(5000) { cache.loadString("cached") })
+                        assertTrue(download.isActive)
+                    }) {
+                        release.complete(Unit)
+                    }
+                    assertTrue(download.await() != null)
+                }
+            }) {
+                directory.deleteRecursively()
+            }
+        }
+    }
+
+    @Test
+    fun concurrentGetOrWriteReusesFirstCommittedFile() = runTest {
+        Coroutines.io {
+            val directory = Files.createTempDirectory("rachel-cache-concurrent").toFile()
+
+            cleaning({
+                val store = FileDiskStorage(File(directory.path))
+                val started = CompletableDeferred<Unit>()
+                val release = CompletableDeferred<Unit>()
+                var fetches = 0
+
+                coroutineScope {
+                    val first = async {
+                        store.getOrWrite("key") {
+                            fetches++
+                            started.complete(Unit)
+                            release.await()
+                            it.write("first-value".encodeToByteArray())
+                        }
+                    }
+                    cleaning({
+                        withTimeout(5000) { started.await() }
+                        val second = async(start = CoroutineStart.UNDISPATCHED) {
+                            store.getOrWrite("key") {
+                                fetches++
+                                it.write("second-value".encodeToByteArray())
+                            }
+                        }
+                        release.complete(Unit)
+                        val firstFile = assertNotNull(withTimeout(5000) { first.await() })
+                        val secondFile = withTimeout(5000) { second.await() }
+                        assertEquals(firstFile.path, secondFile?.path)
+                        assertEquals("first-value", secondFile?.readText())
+                        assertEquals(1, fetches)
+                    }) {
+                        release.complete(Unit)
+                    }
+                }
+            }) {
+                directory.deleteRecursively()
+            }
+        }
+    }
+
+    @Test
+    fun clearWaitsForPendingWriteAndRemovesItsResult() = runTest {
+        Coroutines.io {
+            val directory = Files.createTempDirectory("rachel-cache-clear").toFile()
+
+            cleaning({
+                val store = FileDiskStorage(File(directory.path))
+                val started = CompletableDeferred<Unit>()
+                val release = CompletableDeferred<Unit>()
+
+                coroutineScope {
+                    val writer = async {
+                        store.write("key") {
+                            started.complete(Unit)
+                            release.await()
+                            it.write("pending-value".encodeToByteArray())
+                        }
+                    }
+                    cleaning({
+                        withTimeout(5000) { started.await() }
+                        val clear = async(start = CoroutineStart.UNDISPATCHED) { store.clear() }
+                        assertFalse(clear.isCompleted)
+                        release.complete(Unit)
+                        assertTrue(withTimeout(5000) { writer.await() } != null)
+                        withTimeout(5000) { clear.await() }
+                        assertNull(store.read("key") { it.readByteArray() })
+                        assertFalse(java.io.File(directory, "key").exists())
+                        assertTrue(directory.listFiles().orEmpty().none { it.extension == "tmp" })
+                    }) {
+                        release.complete(Unit)
+                    }
+                }
             }) {
                 directory.deleteRecursively()
             }

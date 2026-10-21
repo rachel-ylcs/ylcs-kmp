@@ -158,9 +158,9 @@ class ByteArrayIO(val bytes: ByteArray) {
 
     fun writeString(index: Int, value: String, encoding: Encoding = Encoding.Default) = writeByteArray(index, value.convert(encoding))
 
-    fun writeByteArray(index: Int, value: ByteArray) {
-        checkRange(index, value.size)
-        value.copyInto(bytes, destinationOffset = index)
+    fun writeByteArray(index: Int, value: ByteArray, start: Int = 0, end: Int = value.size) {
+        checkRange(index, end - start)
+        value.copyInto(bytes, index, start, end)
     }
 
     inline fun write(block: ByteArrayIO.() -> Unit): ByteArray {

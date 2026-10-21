@@ -52,9 +52,21 @@ internal data class PageItem(
                 ComponentItem("Filter", "体验单选与多选筛选，部分项目携带图标或处于禁用状态。"),
                 ComponentItem("ColorPicker", "拖动颜色选择器，观察颜色、透明度与预览的变化。"),
             ]),
-            PageItem("image", Icons.Image, "图片", "Icons & Images", "从单个图标到九宫格，比较大小、加载反馈和图片排列。", ImagePage, PageGroup.Layout, [
+            PageItem("picture", Icons.GridOn, "图片集", "Icons & Picture", "比较图标大小、提示、操作反馈与九宫格配图排列。", PicturePage, PageGroup.Layout, [
                 ComponentItem("Icon", "比较图标大小、悬浮提示、点击、异步加载与带底色的图标。", "LoadingIcon ColorIcon"),
-                ComponentItem("NineGrid", "对照 1–9 张图片、视频标记和超过九张时的展示。"),
+                ComponentItem("NineGrid", "对照 1–9 张图片、视频标记和超过九张时的展示。", "Image Picture 配图 九宫格 视频"),
+            ]),
+            PageItem("image", Icons.Image, "图像", "Image", "从多种输入到动图、缩放、缓存与裁剪，交互预览独立实现的异步图片组件。", ImagePage, PageGroup.Layout, [
+                ComponentItem("ResourceFileImage", "离线比较 JPEG、PNG、BMP、静态 WebP、交错 GIF 与 EXIF 方向样本。", "ImageSource Resource JPEG PNG BMP GIF WebP EXIF 格式 资源"),
+                ComponentItem("WebImage", "点击公开小图预设或输入网络地址，观察下载进度、请求头、来源、重试与版本刷新。", "BasicImage Network headers ImageState ImageProgress status error origin HTTP PNG JPEG WebP 缓存"),
+                ComponentItem("LocalFileImage / Bytes", "读取本地路径、准备内置本地文件，并比较字节输入的独立状态。", "ImageSource LocalFile Bytes ByteArrayImageInput File 本地文件"),
+                ComponentItem("占位与重试", "使用内置输入切换空内容、网络加载、读取失败、损坏数据和恢复，对照默认状态图标、进度与小图边界。", "ImagePlaceholder rememberImagePlaceholder loading empty error retry canRetry Icons.Image Icons.Refresh Icons.Error 警告 错误 进度 小图 边界"),
+                ComponentItem("布局与点击", "切换七种 ContentScale 与对齐方式，检查实际图片的点击范围及默认、单边尺寸布局。", "ContentScale alignment onClick placeholder aspectRatio size ImageSizeResolver 键盘 无障碍"),
+                ComponentItem("外观与画质", "调节采样质量、圆形裁剪、主题着色、透明度和淡入，查看解码尺寸。", "ImageQuality Low Medium High Full circle alpha colorFilter crossfade imageSize originalSize"),
+                ComponentItem("动图与生命周期", "比较 GIF / WebP 播放与首帧模式，暂停、重播、卸载并切换 80 帧样本。", "ImageOptions animated isPlaying isAnimated GIF WebP 透明 叠帧 disposal 循环 生命周期"),
+                ComponentItem("图片缩放 / Pager", "使用双击、双指、滚轮、拖动和键盘缩放静态图与动图，检查翻页手势协作。", "ImageZoomState zoom scale translation reset HorizontalPager 手势"),
+                ComponentItem("版本与缓存", "使用内置资源观察三个消费者的请求合并、版本更新、状态重挂载、内存命中与全局缓存清理。", "ResourceFileImage vararg key ImageManager clearCache memoryCacheSize Memory Disk Network LRU 缓存 并发"),
+                ComponentItem("cropImageRegion", "为资源和网络图片附加裁剪选区，拖动自由或固定比例区域并查看原图比例坐标。", "cropImageRegion ResourceFileImage WebImage ImageState CropImageState CropRegion aspectRatio 裁剪 比例"),
             ]),
             PageItem("blur", Icons.Cloud, "模糊", "Source & Target Blur", "连接背景来源与模糊面板，实时比较半径、颜色、噪点和采样质量。", BlurPage, PageGroup.Layout, [
                 ComponentItem("Source / Target", "配置 BlurParameters 并通过 copy 调节参数，切换播放页与暂停面板参数，比较透明度、零半径和无噪点。", "BlurState BlurParameters blurSource blurTarget blurRadius backgroundColor tintColor noiseFactor qualityFraction"),

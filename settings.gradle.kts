@@ -121,6 +121,7 @@ repository {
                 }
                 module("components") {
                     module(
+                        "image",
                         "blur",
                         "calendar",
                         "data-table",
