@@ -1,62 +1,23 @@
 package love.yinlin.compose.cache
 
-import kotlinx.coroutines.NonCancellable
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import love.yinlin.concurrent.Mutex
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingNull
-import love.yinlin.extension.cleaning
 import love.yinlin.fs.File
 
 class DiskCache<S : Any>(
-    private val cachePath: File,
+    cachePath: File,
     private val key: (S) -> Any =  { it },
     private val fetcher: suspend (source: S, sink: Sink) -> Unit
 ) {
-    private val mutex = Mutex()
-
-    private suspend fun check(target: File): File? {
-        val metadata = target.metadata()
-        if (metadata != null && metadata.isRegularFile && metadata.size > 0L) return target
-        return null
-    }
+    private val storage: DiskStorage = FileDiskStorage(cachePath, DiskPolicy.Persistent)
 
     /**
      * 存储指定数据源，如果本地存在缓存则直接返回对应路径，否则提取后再返回
      */
-    suspend fun store(source: S): File? {
-        val sourceKey = key(source).toString()
-        val target = File(cachePath, sourceKey)
-        // 检查缓存是否存在
-        if (check(target) != null) return target
-
-        // 提取
-        return mutex.with {
-            Coroutines.io {
-                if (check(target) != null) target
-                else {
-                    val temp = File(cachePath, "$sourceKey.tmp")
-                    var stored = false
-                    cleaning({
-                        catchingNull {
-                            cachePath.mkdir()
-                            temp.write { sink -> fetcher(source, sink) }
-                            require(check(temp) != null)
-                            temp.move(target)
-                            require(check(target) != null)
-                            stored = true
-                            target
-                        }
-                    }) {
-                        if (!stored) {
-                            Coroutines.with(NonCancellable) {
-                                temp.delete()
-                            }
-                        }
-                    }
-                }
-            }
+    suspend fun store(source: S): File? = catchingNull {
+        storage.getOrWrite(key(source).toString()) {
+            fetcher(source, it)
         }
     }
 

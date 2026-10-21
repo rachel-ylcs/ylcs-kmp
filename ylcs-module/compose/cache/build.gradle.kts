@@ -24,6 +24,13 @@ rachel {
                     projects.ylcsModule.compose.core,
                 )
             }
+
+            commonTest {
+                lib(
+                    libs.test,
+                    libs.kotlinx.coroutines.test
+                )
+            }
         }
     }
 }
