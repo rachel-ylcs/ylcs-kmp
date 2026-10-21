@@ -34,9 +34,11 @@ rachel {
                 )
             }
 
-            jvmMain(commonMain)
+            clientMain(commonMain)
 
-            nativeMain(commonMain)
+            jvmMain(clientMain)
+
+            nativeMain(clientMain)
 
             appleMain(nativeMain)
 

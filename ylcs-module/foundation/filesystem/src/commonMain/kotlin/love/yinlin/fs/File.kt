@@ -135,7 +135,12 @@ abstract class File {
      * 文件大小
      */
     @IOCoroutine
-    suspend fun fileSize(): Long = Coroutines.io { fileSizeSync() }
+    suspend fun fileSize(): Long = Coroutines.io {
+        catchingDefault(0L) {
+            val fileInfo = metadata()
+            if (fileInfo?.isRegularFile == true) fileInfo.size else 0L
+        }
+    }
 
     fun fileSizeSync(): Long = catchingDefault(0L) {
         val fileInfo = metadataSync()
@@ -146,7 +151,31 @@ abstract class File {
      * 文件或目录大小
      */
     @IOCoroutine
-    suspend fun size(): Long = Coroutines.io { sizeSync() }
+    suspend fun size(): Long = Coroutines.io {
+        catchingDefault(0L) {
+            val current = this@File
+            var size = 0L
+            val fileInfo = current.metadata()
+            when {
+                fileInfo == null -> {}
+                fileInfo.isRegularFile -> size += fileInfo.size
+                fileInfo.isDirectory -> {
+                    val queue = ArrayDeque<File>()
+                    queue.add(current)
+                    while (queue.isNotEmpty()) {
+                        val front = queue.removeAt(0)
+                        val frontInfo = front.metadata()
+                        when {
+                            frontInfo == null -> {}
+                            frontInfo.isRegularFile -> size += frontInfo.size
+                            frontInfo.isDirectory -> queue.addAll(front.list())
+                        }
+                    }
+                }
+            }
+            size
+        }
+    }
 
     fun sizeSync(): Long = catchingDefault(0L) {
         val current = this
@@ -176,7 +205,32 @@ abstract class File {
      * 删除文件或目录
      */
     @IOCoroutine
-    suspend fun deleteRecursively(): Boolean = Coroutines.io { deleteRecursivelySync() }
+    suspend fun deleteRecursively(): Boolean = Coroutines.io {
+        catchingDefault(false) {
+            val stack = ArrayDeque<File>()
+            stack.add(this@File)
+            while (stack.isNotEmpty()) {
+                val top = stack.last()
+                val fileInfo = top.metadata()
+                when {
+                    fileInfo == null -> stack.removeAt(stack.lastIndex)
+                    fileInfo.isRegularFile -> {
+                        top.delete()
+                        stack.removeAt(stack.lastIndex)
+                    }
+                    fileInfo.isDirectory -> {
+                        val list = top.list()
+                        if (list.isEmpty()) {
+                            top.delete()
+                            stack.removeAt(stack.lastIndex)
+                        }
+                        else stack.addAll(list)
+                    }
+                }
+            }
+            true
+        }
+    }
 
     fun deleteRecursivelySync(): Boolean = catchingDefault(false) {
         val stack = ArrayDeque<File>()
@@ -207,7 +261,14 @@ abstract class File {
      * 重命名
      */
     @IOCoroutine
-    suspend fun rename(filename: String): File? = Coroutines.io { renameSync(filename) }
+    suspend fun rename(filename: String): File? = Coroutines.io {
+        catchingNull {
+            val current = this@File
+            val newFile = current.parent?.let { File(it, filename) } ?: File(filename)
+            move(newFile)
+            newFile
+        }
+    }
 
     fun renameSync(filename: String): File? = catchingNull {
         val current = this
@@ -240,7 +301,9 @@ abstract class File {
      * 读文本文件
      */
     @IOCoroutine
-    suspend fun readText(): String? = Coroutines.io { readTextSync() }
+    suspend fun readText(): String? = Coroutines.io {
+        catchingNull { read { it.readString() } }
+    }
 
     fun readTextSync(): String? = catchingNull { readSync { it.readString() } }
 
@@ -248,7 +311,9 @@ abstract class File {
      * 读字节文件
      */
     @IOCoroutine
-    suspend fun readByteArray(): ByteArray? = Coroutines.io { readByteArraySync() }
+    suspend fun readByteArray(): ByteArray? = Coroutines.io {
+        catchingNull { read { it.readByteArray() } }
+    }
 
     fun readByteArraySync(): ByteArray? = catchingNull { readSync { it.readByteArray() } }
 
@@ -257,7 +322,18 @@ abstract class File {
      */
     @IOCoroutine
     suspend inline fun write(@IOCoroutine crossinline block: suspend (Sink) -> Unit) = Coroutines.io {
-        bufferedSink().use { block(it) }
+        val raw = rawSink()
+        var failure: Throwable? = null
+        try {
+            raw.buffered().use { block(it) }
+        }
+        catch (error: Throwable) {
+            failure = error
+            throw error
+        }
+        finally {
+            awaitFileSinkClosed(raw, failure)
+        }
     }
 
     inline fun writeSync(@IOCoroutine crossinline block: (Sink) -> Unit) = bufferedSinkSync().use { block(it) }

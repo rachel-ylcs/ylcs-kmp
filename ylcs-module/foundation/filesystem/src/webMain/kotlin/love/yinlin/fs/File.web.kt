@@ -11,15 +11,17 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.IOCoroutine
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
+import love.yinlin.io.ArrayBufferSource
 import love.yinlin.io.WebFileSink
-import love.yinlin.io.WebFileSource
 import love.yinlin.platform.unsupportedPlatform
+import org.khronos.webgl.ArrayBuffer
 import kotlin.js.*
 
-private fun emptyOption(): JsAny = js("{}")
-private fun recursiveOption(): JsAny = js("{ recursive: true }")
-private fun createOption(): JsAny = js("{ create: true }")
-private fun keepExistingDataOption(): JsAny = js("{ keepExistingData: true }")
+private fun emptyOption(): JsAny = js("({})")
+private fun recursiveOption(): JsAny = js("({ recursive: true })")
+private fun createOption(): JsAny = js("({ create: true })")
+private fun keepExistingDataOption(): JsAny = js("({ keepExistingData: true })")
+private fun fileArrayBuffer(file: org.w3c.files.File): Promise<ArrayBuffer> = js("file.arrayBuffer()")
 
 @Suppress("unused")
 private class WebFile private constructor(private val uri: String, private val unused: Boolean) : File() {
@@ -119,7 +121,8 @@ private class WebFile private constructor(private val uri: String, private val u
     override suspend fun rawSource(): RawSource = Coroutines.io {
         val [parent, name] = castParent() ?: error("File not found: $uri")
         val fileHandle = parent.getFileHandle(name).await()
-        WebFileSource(fileHandle.getFile().await())
+        // FileReaderSync 仅存在于 worker；Compose 浏览器主线程使用异步 Blob 读取。
+        ArrayBufferSource(fileArrayBuffer(fileHandle.getFile().await()).await())
     }
 
     override fun rawSourceSync(): RawSource = unsupportedPlatform()
