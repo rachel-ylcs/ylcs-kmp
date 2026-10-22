@@ -37,9 +37,9 @@ rachel {
                     projects.ylcsModule.compose.icons,
                     projects.ylcsModule.compose.screen,
 
+                    projects.ylcsModule.compose.components.image,
                     projects.ylcsModule.compose.components.lottie,
                     projects.ylcsModule.compose.components.richText,
-                    projects.ylcsModule.compose.components.urlImage,
                 )
             }
         }

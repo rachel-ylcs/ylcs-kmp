@@ -77,7 +77,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
             // 封面
             if (coverPath != null) {
                 WebImage(
-                    uri = coverPath,
+                    source = coverPath,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().aspectRatio(2f)
                 )
@@ -272,7 +272,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     modifier = Modifier.padding(Theme.padding.value)
                 )
                 WebImage(
-                    uri = seatPath,
+                    source = seatPath,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().aspectRatio(2f).padding(vertical = Theme.padding.v)
                 )
@@ -297,7 +297,7 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     }
                 ) { contentScale, pic, onClick ->
                     WebImage(
-                        uri = pic.image,
+                        source = pic.image,
                         contentScale = contentScale,
                         modifier = Modifier.fillMaxSize(),
                         onClick = onClick

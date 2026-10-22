@@ -23,6 +23,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.OverlayAction
 import love.yinlin.compose.ui.container.OverlayTopBar
@@ -143,7 +144,7 @@ class ScreenGame : BasicScreen() {
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                 ) {
                     WebImage(
-                        uri = game.logo.url,
+                        source = game.logo.url,
                         modifier = Modifier.size(Theme.size.image5).clip(Theme.shape.v7),
                     )
                     GameActionLayout(game = game, modifier = Modifier.weight(1f))
@@ -237,9 +238,9 @@ class ScreenGame : BasicScreen() {
                         }
 
                         WebImage(
-                            uri = rank.avatarPath.url,
-                            circle = true,
-                            modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+                            source = rank.avatarPath.url,
+                            modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                            options = ImageOptions.Circular
                         )
 
                         SimpleEllipsisText(

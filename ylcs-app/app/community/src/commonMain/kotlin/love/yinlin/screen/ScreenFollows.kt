@@ -14,6 +14,7 @@ import love.yinlin.app
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.image.WebImage
@@ -138,11 +139,11 @@ class ScreenFollows(initTabItem: FollowTabItem) : Screen() {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
             WebImage(
-                uri = item.avatarPath,
-                key = DateEx.TodayLong,
+                source = item.avatarPath,
+                version = DateEx.TodayLong.toString(),
                 contentScale = ContentScale.Crop,
-                circle = true,
-                modifier = Modifier.size(Theme.size.image9)
+                modifier = Modifier.size(Theme.size.image9),
+                options = ImageOptions.Circular
             )
             SimpleEllipsisText(text = item.name, modifier = Modifier.weight(1f))
         }

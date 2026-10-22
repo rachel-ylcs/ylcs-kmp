@@ -21,6 +21,7 @@ import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.crop
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
+import love.yinlin.compose.image.input.ImageSource
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.ReplaceableBox
 import love.yinlin.compose.ui.floating.DialogCrop
@@ -77,7 +78,7 @@ class ScreenCreateMusic : Screen() {
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (file != null) {
-            cropDialog.open(url = file.path, aspectRatio = aspectRatio)?.then { rect ->
+            cropDialog.open(source = ImageSource.LocalFile(file), aspectRatio = aspectRatio)?.then { rect ->
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(rect)
@@ -232,7 +233,7 @@ class ScreenCreateMusic : Screen() {
                 onDelete = { input.record = null }
             ) { uri ->
                 WebImage(
-                    uri = uri,
+                    source = uri,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(Theme.size.image5)
                 )
@@ -249,7 +250,7 @@ class ScreenCreateMusic : Screen() {
                 onDelete = { input.background = null }
             ) { uri ->
                 WebImage(
-                    uri = uri,
+                    source = uri,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.width(Theme.size.image5).aspectRatio(0.5625f)
                 )

@@ -119,7 +119,7 @@ class ScreenPhotoAlbum : BasicScreen() {
                         items(album.picNum) { index ->
                             Row(modifier = Modifier.width(Theme.size.cell4).aspectRatio(0.66667f)) {
                                 WebImage(
-                                    uri = album.thumbPath(index).url,
+                                    source = album.thumbPath(index).url,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.weight(1f).fillMaxHeight(),
                                     onClick = {

@@ -133,7 +133,6 @@ repository {
                         "qrcode",
                         "reordering",
                         "rich-text",
-                        "url-image",
                         "webview"
                     )
                 }

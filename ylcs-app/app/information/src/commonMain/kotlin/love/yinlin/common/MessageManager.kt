@@ -13,6 +13,7 @@ import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
@@ -71,12 +72,12 @@ sealed class MessageManager<T : UnifiedMessage> {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
         ) {
             WebImage(
-                uri = user.avatar,
-                key = DateEx.TodayLong,
+                source = user.avatar,
+                version = DateEx.TodayLong.toString(),
                 contentScale = ContentScale.Crop,
-                circle = true,
                 modifier = Modifier.fillMaxHeight().aspectRatio(1f),
-                onClick = { onAvatarClick(user) }
+                onClick = { onAvatarClick(user) },
+                options = ImageOptions.Circular
             )
             Column(
                 modifier = Modifier.weight(1f),

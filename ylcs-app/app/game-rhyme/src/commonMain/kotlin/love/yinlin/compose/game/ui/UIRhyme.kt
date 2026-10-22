@@ -75,7 +75,7 @@ internal fun RhymeMusicCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             LocalFileImage(
-                uri = info.path(app.modPath, ModResourceType.Record).path,
+                source = info.path(app.modPath, ModResourceType.Record),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(Theme.size.image7)
             )
@@ -106,8 +106,8 @@ internal fun RhymeIllustrationLayout(
         val info = illustration.info
 
         WebImage(
-            uri = illustration.url,
-            key = info.id,
+            source = illustration.url,
+            version = info.id.toString(),
             modifier = Modifier.fillMaxSize()
         )
         Column(
@@ -148,8 +148,8 @@ internal fun RhymeIllustrationSelector(
         val info = illustration.info
 
         WebImage(
-            uri = illustration.url,
-            key = info.id,
+            source = illustration.url,
+            version = info.id.toString(),
             modifier = Modifier.fillMaxSize()
         )
         SimpleEllipsisText(

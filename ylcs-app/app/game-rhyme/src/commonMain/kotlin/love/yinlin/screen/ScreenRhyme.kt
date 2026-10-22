@@ -549,8 +549,8 @@ class ScreenRhyme : BasicScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     WebImage(
-                        uri = args.url,
-                        key = info.id,
+                        source = args.url,
+                        version = info.id.toString(),
                         modifier = Modifier.size(Theme.size.image6).clip(Theme.shape.v5)
                     )
 

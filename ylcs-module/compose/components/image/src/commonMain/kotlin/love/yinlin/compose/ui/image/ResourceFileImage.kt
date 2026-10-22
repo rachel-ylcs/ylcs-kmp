@@ -7,10 +7,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.image.input.ImageSource
+import love.yinlin.extension.catchingNull
 
 @Composable
 fun ResourceFileImage(
-    source: String,
+    source: String?,
     modifier: Modifier = Modifier,
     state: ImageState = rememberImageState(),
     version: String? = null,
@@ -23,7 +24,7 @@ fun ResourceFileImage(
     options: ImageOptions = ImageOptions.Default
 ) {
     val input = remember(source) {
-        ImageSource.resource(source)
+        if (source.isNullOrBlank()) null else catchingNull { ImageSource.resource(source) }
     }
 
     BasicImage(

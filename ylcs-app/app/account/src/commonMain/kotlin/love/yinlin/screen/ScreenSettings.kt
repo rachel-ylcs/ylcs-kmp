@@ -23,6 +23,8 @@ import love.yinlin.compose.graphics.crop
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
 import love.yinlin.compose.graphics.thumbnail
+import love.yinlin.compose.image.data.ImageOptions
+import love.yinlin.compose.image.input.ImageSource
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.ContributorLayout
 import love.yinlin.compose.ui.common.SettingsLayout
@@ -66,7 +68,7 @@ class ScreenSettings : Screen() {
         return app.picker.pickPicture()?.use { source ->
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }?.let { file ->
-            cropDialog.open(url = file.path, aspectRatio = aspectRatio)?.let { region ->
+            cropDialog.open(source = ImageSource.LocalFile(file), aspectRatio = aspectRatio)?.let { region ->
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(region)
@@ -111,11 +113,11 @@ class ScreenSettings : Screen() {
                     }
                 ) {
                     WebImage(
-                        uri = profile.avatarPath.url,
-                        key = app.config.cacheUserAvatar,
+                        source = profile.avatarPath.url,
+                        version = app.config.cacheUserAvatar.toString(),
                         contentScale = ContentScale.Crop,
-                        circle = true,
-                        modifier = Modifier.size(Theme.size.image8).shadow(Theme.shape.circle, Theme.shadow.v7)
+                        modifier = Modifier.size(Theme.size.image8).shadow(Theme.shape.circle, Theme.shadow.v7),
+                        options = ImageOptions.Circular
                     )
                 }
                 ItemText(
@@ -152,8 +154,8 @@ class ScreenSettings : Screen() {
                     }
                 ) {
                     WebImage(
-                        uri = profile.wallPath.url,
-                        key = app.config.cacheUserWall,
+                        source = profile.wallPath.url,
+                        version = app.config.cacheUserWall.toString(),
                         modifier = Modifier.width(Theme.size.image5).aspectRatio(1.77778f)
                     )
                 }
@@ -296,7 +298,7 @@ class ScreenSettings : Screen() {
                     if (cacheSizeText == null) slot.tip.warning("请等待缓存计算完成")
                     else {
                         Coroutines.io {
-                            app.urlImage.clearCache()
+                            app.image.clearCache()
                             app.clearCache()
                             cacheSizeText = app.calcCacheSize().fileSizeString
                         }

@@ -106,7 +106,7 @@ class ScreenUserCard(private val uid: Int) : Screen() {
             Column(modifier = Modifier.fillMaxWidth().heightIn(min = Theme.size.cell4 * 0.777777f)) {
                 topic.picPath?.url?.then {
                     WebImage(
-                        uri = it,
+                        source = it,
                         modifier = Modifier.fillMaxWidth().height(Theme.size.cell4 * 1.333333f),
                         contentScale = ContentScale.Crop
                     )

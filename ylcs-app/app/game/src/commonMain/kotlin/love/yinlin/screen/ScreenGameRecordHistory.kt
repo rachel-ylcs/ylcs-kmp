@@ -97,8 +97,8 @@ class ScreenGameRecordHistory : Screen() {
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                 ) {
                     WebImage(
-                        uri = record.type.logo.url,
-                        key = Local.info.version,
+                        source = record.type.logo.url,
+                        version = Local.info.version.toString(),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v7)
                     )

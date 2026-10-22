@@ -23,6 +23,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberValueState
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
@@ -201,10 +202,10 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
                 WebImage(
-                    uri = info.userAvatar.url,
-                    key = DateEx.TodayLong,
-                    circle = true,
-                    modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+                    source = info.userAvatar.url,
+                    version = DateEx.TodayLong.toString(),
+                    modifier = Modifier.fillMaxWidth().aspectRatio(1f),
+                    options = ImageOptions.Circular
                 )
                 SimpleEllipsisText(text = info.name, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 content?.invoke(this)
@@ -224,10 +225,10 @@ class ScreenGuessLyrics(private val uid: Int, private val name: String) : Screen
             verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
         ) {
             WebImage(
-                uri = result.userAvatar.url,
-                key = DateEx.TodayLong,
-                circle = true,
-                modifier = Modifier.size(Theme.size.image7)
+                source = result.userAvatar.url,
+                version = DateEx.TodayLong.toString(),
+                modifier = Modifier.size(Theme.size.image7),
+                options = ImageOptions.Circular
             )
             ThemeContainer(if (isWinner) Theme.color.primary else LocalColor.current) {
                 TextIconAdapter(modifier = Modifier.align(Alignment.CenterHorizontally)) { idIcon, idText ->

@@ -27,6 +27,7 @@ import love.yinlin.compose.ds.DataSourceDiscovery
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.BoxText
@@ -268,11 +269,11 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         WebImage(
-                            uri = info.avatarPath,
-                            key = DateEx.TodayLong,
+                            source = info.avatarPath,
+                            version = DateEx.TodayLong.toString(),
                             contentScale = ContentScale.Crop,
-                            circle = true,
-                            modifier = Modifier.size(Theme.size.image10)
+                            modifier = Modifier.size(Theme.size.image10),
+                            options = ImageOptions.Circular
                         )
                         SimpleEllipsisText(info.name)
                     }
@@ -340,7 +341,7 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
                         onImageClick = { index, _ -> onImageClick(pics, index) }
                     ) { contentScale, pic, onClick ->
                         WebImage(
-                            uri = pic.image,
+                            source = pic.image,
                             contentScale = contentScale,
                             modifier = Modifier.fillMaxSize(),
                             onClick = onClick

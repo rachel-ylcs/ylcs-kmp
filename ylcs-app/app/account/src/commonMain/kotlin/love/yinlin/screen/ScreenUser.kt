@@ -30,6 +30,7 @@ import love.yinlin.compose.ds.DataSourceActivity
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.graphics.qrcode.QrcodeShape
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.screen.DeepLink
@@ -275,11 +276,11 @@ class ScreenUser : BasicScreen() {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v4)
             ) {
                 WebImage(
-                    uri = args.avatarPath.url,
-                    key = app.config.cacheUserAvatar,
+                    source = args.avatarPath.url,
+                    version = app.config.cacheUserAvatar.toString(),
                     contentScale = ContentScale.Crop,
-                    circle = true,
-                    modifier = Modifier.size(Theme.size.image4).shadow(Theme.shape.circle, Theme.shadow.v4)
+                    modifier = Modifier.size(Theme.size.image4).shadow(Theme.shape.circle, Theme.shadow.v4),
+                    options = ImageOptions.Circular
                 )
                 SimpleEllipsisText(
                     text = args.name,
@@ -327,11 +328,11 @@ class ScreenUser : BasicScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         WebImage(
-                            uri = args.avatarPath.url,
-                            key = app.config.cacheUserAvatar,
+                            source = args.avatarPath.url,
+                            version = app.config.cacheUserAvatar.toString(),
                             contentScale = ContentScale.Crop,
-                            circle = true,
-                            modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+                            modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                            options = ImageOptions.Circular
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             SimpleEllipsisText(text = args.name, style = Theme.typography.v6.bold, modifier = Modifier.fillMaxWidth())

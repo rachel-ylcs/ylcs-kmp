@@ -183,7 +183,7 @@ class ScreenAddTopic : Screen() {
                     onDelete = { index, _ -> deletePic(index) }
                 ) { _, pic ->
                     WebImage(
-                        uri = pic.image,
+                        source = pic.image,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )

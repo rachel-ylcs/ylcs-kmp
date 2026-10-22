@@ -14,6 +14,7 @@ import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.image.Icon
@@ -69,10 +70,10 @@ internal fun ContributorLayout(
                                     verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
                                 ) {
                                     WebImage(
-                                        uri = ServerRes.Users.User(contributor.uid).avatar.url,
-                                        key = DateEx.TodayLong,
-                                        circle = true,
-                                        modifier = Modifier.size(Theme.size.image8)
+                                        source = ServerRes.Users.User(contributor.uid).avatar.url,
+                                        version = DateEx.TodayLong.toString(),
+                                        modifier = Modifier.size(Theme.size.image8),
+                                        options = ImageOptions.Circular
                                     )
                                     SimpleEllipsisText(text = contributor.name)
                                 }

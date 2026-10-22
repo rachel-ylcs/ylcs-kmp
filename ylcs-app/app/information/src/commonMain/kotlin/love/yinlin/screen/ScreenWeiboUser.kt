@@ -25,6 +25,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceInformation
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
@@ -107,11 +108,11 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
         ) {
             WebImage(
-                uri = weiboUser.user.avatar,
-                key = DateEx.TodayLong,
+                source = weiboUser.user.avatar,
+                version = DateEx.TodayLong.toString(),
                 contentScale = ContentScale.Crop,
-                circle = true,
-                modifier = Modifier.size(Theme.size.image8)
+                modifier = Modifier.size(Theme.size.image8),
+                options = ImageOptions.Circular
             )
             Column(
                 modifier = Modifier.weight(1f),
@@ -148,8 +149,8 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
 
     private val userInfoLayout = movableComposable { weiboUser: WeiboUser ->
         WebImage(
-            uri = weiboUser.background,
-            key = DateEx.TodayLong,
+            source = weiboUser.background,
+            version = DateEx.TodayLong.toString(),
             modifier = Modifier.fillMaxWidth().aspectRatio(2f),
             contentScale = ContentScale.Crop,
             alpha = 0.75f
@@ -167,7 +168,7 @@ class ScreenWeiboUser(private val userId: String) : Screen() {
     private fun UserAlbumItem(album: WeiboAlbum, modifier: Modifier = Modifier) {
         Row(modifier = modifier) {
             WebImage(
-                uri = album.pic,
+                source = album.pic,
                 modifier = Modifier.fillMaxHeight().aspectRatio(1f)
             )
             Column(

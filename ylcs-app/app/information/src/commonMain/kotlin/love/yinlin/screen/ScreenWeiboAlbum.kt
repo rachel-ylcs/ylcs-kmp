@@ -106,7 +106,7 @@ class ScreenWeiboAlbum(private val containerId: String, private val albumTitle: 
                             key = { _, item -> item.key }
                         ){ index, [pic] ->
                             WebImage(
-                                uri = pic.image,
+                                source = pic.image,
                                 modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                                 contentScale = ContentScale.Crop,
                                 onClick = { navigate(::ScreenImagePreview, data.items.data, index) }

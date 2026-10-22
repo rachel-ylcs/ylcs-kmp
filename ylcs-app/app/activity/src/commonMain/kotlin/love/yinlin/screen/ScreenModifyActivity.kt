@@ -23,6 +23,7 @@ import love.yinlin.compose.graphics.crop
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
 import love.yinlin.compose.graphics.thumbnail
+import love.yinlin.compose.image.input.ImageSource
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TagView
 import love.yinlin.compose.ui.container.AdderBox
@@ -202,7 +203,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
             app.createTempFile { sink -> source.transferTo(sink) > 0L }
         }
         if (file != null) {
-            cropDialog.open(url = file.path, aspectRatio = 2f)?.then { region ->
+            cropDialog.open(source = ImageSource.LocalFile(file), aspectRatio = 2f)?.then { region ->
                 app.createTempFile { sink ->
                     val image = PlatformImage.decode(file.readByteArray()!!)!!
                     image.crop(region)
@@ -347,7 +348,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 }
             ) {
                 WebImage(
-                    uri = it.url,
+                    source = it.url,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().aspectRatio(2f)
                 )
@@ -370,7 +371,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 }
             ) {
                 WebImage(
-                    uri = it.url,
+                    source = it.url,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().aspectRatio(2f)
                 )
@@ -399,7 +400,7 @@ class ScreenModifyActivity(private val aid: Int) : Screen() {
                 }
             ) { _, item ->
                 WebImage(
-                    uri = photo.posterPath(item).url,
+                    source = photo.posterPath(item).url,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )

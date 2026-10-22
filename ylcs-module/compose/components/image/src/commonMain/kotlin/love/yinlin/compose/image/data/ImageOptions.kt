@@ -15,5 +15,12 @@ data class ImageOptions(
 ) {
     companion object {
         val Default: ImageOptions = ImageOptions()
+
+        val Zoom: ImageOptions = ImageOptions(zoom = true)
+        val Circular: ImageOptions = ImageOptions(circular = true)
+        val DisableAnimate: ImageOptions = ImageOptions(animated = false)
+
+        fun quality(value: ImageQuality): ImageOptions = ImageOptions(quality = value)
+        fun colorFilter(colorFilter: ColorFilter): ImageOptions = ImageOptions(colorFilter = colorFilter)
     }
 }

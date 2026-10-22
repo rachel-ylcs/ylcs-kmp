@@ -12,6 +12,7 @@ import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.node.verticalFade
 import love.yinlin.compose.ui.text.SelectionBox
@@ -61,8 +62,8 @@ fun UserProfileCard(
     ) {
         // 背景墙
         WebImage(
-            uri = profile.wallPath.url,
-            key = if (isOwner) app.config.cacheUserWall else DateEx.TodayLong,
+            source = profile.wallPath.url,
+            version = (if (isOwner) app.config.cacheUserWall else DateEx.TodayLong).toString(),
             modifier = Modifier.fillMaxWidth()
                 .aspectRatio(1.77777f)
                 .verticalFade(if (topBar != null) FadeWallImageWithTopBar else FadeWallImage)
@@ -84,12 +85,12 @@ fun UserProfileCard(
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
         ) {
             WebImage(
-                uri = profile.avatarPath.url,
-                key = if (isOwner) app.config.cacheUserAvatar else DateEx.TodayLong,
+                source = profile.avatarPath.url,
+                version = (if (isOwner) app.config.cacheUserAvatar else DateEx.TodayLong).toString(),
                 contentScale = ContentScale.Crop,
-                circle = true,
                 modifier = Modifier.fillMaxHeight().aspectRatio(1f).border(Theme.border.v5, Colors.White, Theme.shape.circle),
-                onClick = onAvatarClick
+                onClick = onAvatarClick,
+                options = ImageOptions.Circular
             )
             Column(
                 modifier = Modifier.weight(1f),

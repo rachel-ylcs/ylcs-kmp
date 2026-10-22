@@ -26,7 +26,7 @@ rachel {
                     projects.ylcsModule.compose.app,
                     projects.ylcsModule.compose.screen,
                     projects.ylcsModule.compose.components.dragDrop,
-                    projects.ylcsModule.compose.components.urlImage,
+                    projects.ylcsModule.compose.components.image,
                 )
             }
         }
@@ -46,7 +46,6 @@ rachel {
                 projects.ylcsModule.cs.core,
                 projects.ylcsModule.foundation.network,
                 projects.ylcsModule.compose.core,
-                projects.ylcsModule.compose.components.urlImage,
             )
             windows { }
         }

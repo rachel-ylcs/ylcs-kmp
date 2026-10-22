@@ -16,6 +16,7 @@ import androidx.compose.ui.zIndex
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.pointerIcon
@@ -69,7 +70,7 @@ fun UserLabel(
             val labelName = if (label.isEmpty()) UserLabelMeta.image(level, Theme.darkMode) else UserLabelMeta.image(label)
 
             WebImage(
-                uri = ServerRes.Assets.Label.pic(labelName).url,
+                source = ServerRes.Assets.Label.pic(labelName).url,
                 modifier = Modifier.fillMaxSize().zIndex(1f)
             )
             SimpleClipText(
@@ -97,12 +98,12 @@ fun UserBar(
         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
     ) {
         WebImage(
-            uri = avatar,
-            key = DateEx.TodayLong,
+            source = avatar,
+            version = DateEx.TodayLong.toString(),
             contentScale = ContentScale.Crop,
-            circle = true,
             onClick = onAvatarClick,
-            modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+            modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+            options = ImageOptions.Circular
         )
         Column(
             modifier = Modifier.weight(1f),

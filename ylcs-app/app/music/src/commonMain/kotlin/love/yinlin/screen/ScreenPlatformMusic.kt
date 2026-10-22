@@ -147,7 +147,7 @@ class ScreenPlatformMusic(private val deeplink: Uri?, private val platformType: 
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                 ) {
                     WebImage(
-                        uri = info.pic,
+                        source = info.pic,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v7)
                     )

@@ -220,8 +220,8 @@ class ScreenMusic : BasicScreen() {
         }
 
         LocalFileImage(
-            uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
-            musicInfo,
+            source = musicInfo.path(app.modPath, ModResourceType.Record),
+            version = "${musicInfo.id}-${musicInfo.modification}",
             contentScale = ContentScale.Crop,
             modifier = modifier.fastRotate(animationRecord),
             onClick = {
@@ -396,8 +396,13 @@ class ScreenMusic : BasicScreen() {
                 Box(modifier = Modifier.fillMaxSize().blurSource(blurState).zIndex(1f)) {
                     if (musicInfo != null) {
                         val infoType = if (player.currentUseAnimationBackground) ModResourceType.Animation else ModResourceType.Background
-                        val path = musicInfo.path(app.modPath, infoType).path
-                        LocalFileImage(uri = path, path, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                        val path = musicInfo.path(app.modPath, infoType)
+                        LocalFileImage(
+                            source = path,
+                            version = path.path,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
 
@@ -517,7 +522,7 @@ class ScreenMusic : BasicScreen() {
                                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                             ) {
                                 LocalFileImage(
-                                    uri = musicInfo?.path(app.modPath, ModResourceType.Record)?.path ?: "",
+                                    source = musicInfo?.path(app.modPath, ModResourceType.Record),
                                     modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v8)
                                 )
                                 Column(

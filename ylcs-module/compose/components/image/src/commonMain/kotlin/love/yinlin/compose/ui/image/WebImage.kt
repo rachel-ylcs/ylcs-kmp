@@ -10,7 +10,7 @@ import love.yinlin.compose.image.input.ImageSource
 
 @Composable
 fun WebImage(
-    source: String,
+    source: String?,
     modifier: Modifier = Modifier,
     state: ImageState = rememberImageState(),
     version: String? = null,
@@ -23,7 +23,7 @@ fun WebImage(
     options: ImageOptions = ImageOptions.Default
 ) {
     val input = remember(source) {
-        if (source.isBlank()) null else ImageSource.Network(source)
+        if (source.isNullOrBlank()) null else ImageSource.Network(source)
     }
 
     BasicImage(

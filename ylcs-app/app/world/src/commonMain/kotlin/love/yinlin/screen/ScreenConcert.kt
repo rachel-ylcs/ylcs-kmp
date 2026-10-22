@@ -268,7 +268,7 @@ class ScreenConcert : BasicScreen() {
                 }
 
                 WebImage(
-                    uri = cover,
+                    source = cover,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(Theme.size.image9).clip(Theme.shape.v7).background(Colors.Black),
                 )
@@ -323,7 +323,7 @@ class ScreenConcert : BasicScreen() {
             }
             else {
                 WebImage(
-                    uri = poster.url,
+                    source = poster.url,
                     modifier = Modifier.matchParentSize().zIndex(1f),
                     contentScale = ContentScale.Crop
                 )
@@ -412,7 +412,7 @@ class ScreenConcert : BasicScreen() {
         ) {
             if (background != null) {
                 WebImage(
-                    uri = background,
+                    source = background,
                     modifier = Modifier.matchParentSize().zIndex(1f),
                     contentScale = ContentScale.Crop,
                     alpha = 0.12f
@@ -429,7 +429,7 @@ class ScreenConcert : BasicScreen() {
                 }
 
                 WebImage(
-                    uri = cover,
+                    source = cover,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.size(Theme.size.image8).clip(Theme.shape.v7).background(Colors.Black),
                 )

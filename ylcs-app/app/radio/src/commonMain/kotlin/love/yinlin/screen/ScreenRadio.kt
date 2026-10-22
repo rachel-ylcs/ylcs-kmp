@@ -33,13 +33,13 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.download
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.Slider
 import love.yinlin.compose.ui.layout.Divider
@@ -234,10 +234,10 @@ class ScreenRadio : BasicScreen() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             WebImage(
-                uri = user?.avatar ?: "",
-                key = user?.id,
-                circle = true,
-                modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+                source = user?.avatar,
+                version = user?.id,
+                modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                options = ImageOptions.Circular
             )
             SimpleEllipsisText(
                 text = user?.name ?: "",
@@ -273,8 +273,8 @@ class ScreenRadio : BasicScreen() {
                     contentAlignment = Alignment.Center
                 ) {
                     WebImage(
-                        uri = program.pic,
-                        key = program.id,
+                        source = program.pic,
+                        version = program.id,
                         modifier = Modifier.fillMaxSize().zIndex(1f)
                     )
 
@@ -357,7 +357,13 @@ class ScreenRadio : BasicScreen() {
                 shape = coverShape
             )) {
                 val cover = radioUser?.cover
-                if (cover != null) LocalFileImage(uri = cover, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                if (cover != null) {
+                    WebImage(
+                        source = cover,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Column(

@@ -300,8 +300,8 @@ class ScreenMusicLibrary : Screen() {
                     .combinedClickable(onClick = onClick, onLongClick = if (enableLongClick) onLongClick else null)
             ) {
                 LocalFileImage(
-                    uri = musicInfo.path(ModResourceType.Record).path,
-                    musicInfo.id,
+                    source = musicInfo.path(ModResourceType.Record),
+                    version = musicInfo.id,
                     contentScale = ContentScale.Crop,
                     alpha = 0.3f,
                     modifier = Modifier.matchParentSize().zIndex(1f)

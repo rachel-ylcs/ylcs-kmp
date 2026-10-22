@@ -296,7 +296,7 @@ class ScreenPlaylistLibrary : Screen() {
                             ) {
                                 if (!item.isDeleted) {
                                     LocalFileImage(
-                                        uri = item.path(ModResourceType.Record).path,
+                                        source = item.path(ModResourceType.Record),
                                         modifier = Modifier.fillMaxSize()
                                     )
                                 }

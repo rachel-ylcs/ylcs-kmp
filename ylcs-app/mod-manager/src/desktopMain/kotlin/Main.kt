@@ -3,8 +3,10 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import love.yinlin.compose.PlatformApplication
 import love.yinlin.compose.ToolingTheme
+import love.yinlin.compose.image.ImageManager
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.extension.LazyReference
+import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 import love.yinlin.mod.ModFactory
 import love.yinlin.screen.ScreenMain
@@ -21,6 +23,8 @@ class MainApplication(override val commandArgs: Array<String>) : PlatformApplica
     val modPath = File(rootPath, "mod")
 
     init {
+        ImageManager.initialize(PlatformContext.Instance, "ModManager")
+
         async {
             libraryPath.mkdir()
             outputPath.mkdir()

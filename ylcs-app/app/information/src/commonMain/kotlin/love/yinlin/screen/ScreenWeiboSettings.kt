@@ -15,6 +15,7 @@ import love.yinlin.common.BasicWeiboManager
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.animation.CircleLoading
 import love.yinlin.compose.ui.container.RachelStatefulProvider
@@ -105,11 +106,11 @@ class ScreenWeiboSettings : Screen() {
             if (user.avatar.isEmpty()) CircleLoading.Content()
             else {
                 WebImage(
-                    uri = user.avatar,
-                    key = DateEx.TodayLong,
+                    source = user.avatar,
+                    version = DateEx.TodayLong.toString(),
                     contentScale = ContentScale.Crop,
-                    circle = true,
-                    modifier = Modifier.size(Theme.size.image9)
+                    modifier = Modifier.size(Theme.size.image9),
+                    options = ImageOptions.Circular
                 )
             }
             SimpleEllipsisText(user.name)

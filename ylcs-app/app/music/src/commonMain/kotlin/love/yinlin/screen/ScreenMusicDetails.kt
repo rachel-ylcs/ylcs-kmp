@@ -31,6 +31,7 @@ import love.yinlin.compose.graphics.PlatformImage
 import love.yinlin.compose.graphics.crop
 import love.yinlin.compose.graphics.decode
 import love.yinlin.compose.graphics.encode
+import love.yinlin.compose.image.input.ImageSource
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.UserBar
 import love.yinlin.compose.ui.container.ActionScope
@@ -306,7 +307,7 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 app.picker.pickPicture()?.use { source ->
                     app.createTempFile { sink -> source.transferTo(sink) > 0L }
                 }?.then { src ->
-                    cropDialog.open(url = src.path, aspectRatio = aspectRatio)?.then { region ->
+                    cropDialog.open(source = ImageSource.LocalFile(src), aspectRatio = aspectRatio)?.then { region ->
                         catchingError {
                             Coroutines.io {
                                 val image = PlatformImage.decode(src.readByteArray()!!)!!
@@ -372,14 +373,14 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
 
             clientSong?.let {
                 LocalFileImage(
-                    uri = it.clientPath(ModResourceType.Background).path,
-                    modifyFlag,
+                    source = it.clientPath(ModResourceType.Background),
+                    version = modifyFlag.toString(),
                     modifier = Modifier.matchParentSize().zIndex(1f),
                     contentScale = ContentScale.Crop
                 )
             } ?: remoteSong?.let {
                 WebImage(
-                    uri = it.remotePath(ModResourceType.Background),
+                    source = it.remotePath(ModResourceType.Background),
                     modifier = Modifier.matchParentSize().zIndex(1f),
                     contentScale = ContentScale.Crop
                 )
@@ -397,14 +398,14 @@ class ScreenMusicDetails(private val sid: String) : Screen() {
                 ) {
                     clientSong?.let {
                         LocalFileImage(
-                            uri = it.clientPath(ModResourceType.Record).path,
-                            modifyFlag,
+                            source = it.clientPath(ModResourceType.Record),
+                            version = modifyFlag.toString(),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
                     } ?: remoteSong?.let {
                         WebImage(
-                            uri = it.remotePath(ModResourceType.Record),
+                            source = it.remotePath(ModResourceType.Record),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )

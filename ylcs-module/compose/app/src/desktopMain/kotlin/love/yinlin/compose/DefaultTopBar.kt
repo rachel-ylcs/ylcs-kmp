@@ -45,7 +45,7 @@ fun DefaultTopBarActions(controller: WindowController, onExit: () -> Unit) {
 fun DefaultTopBar(
     controller: WindowController,
     onExit: () -> Unit,
-    backgroundColor: Color = Theme.color.primaryContainer,
+    backgroundColor: Color = Colors.Transparent,
     actions: @Composable RowScope.() -> Unit = { DefaultTopBarActions(controller, onExit) },
 ) {
     val bgBrush = remember(backgroundColor) {

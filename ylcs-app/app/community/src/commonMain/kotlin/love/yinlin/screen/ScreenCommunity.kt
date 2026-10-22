@@ -15,6 +15,7 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceDiscovery
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.RachelStatefulProvider
@@ -91,7 +92,7 @@ class ScreenCommunity : BasicScreen() {
             Column(modifier = Modifier.fillMaxWidth().heightIn(min = Theme.size.cell4 * 0.777777f)) {
                 topic.picPath?.url?.then {
                     WebImage(
-                        uri = it,
+                        source = it,
                         modifier = Modifier.fillMaxWidth().height(Theme.size.cell4 * 1.333333f),
                         contentScale = ContentScale.Crop
                     )
@@ -108,11 +109,11 @@ class ScreenCommunity : BasicScreen() {
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
                 ) {
                     WebImage(
-                        uri = topic.avatarPath.url,
-                        key = DateEx.TodayLong,
+                        source = topic.avatarPath.url,
+                        version = DateEx.TodayLong.toString(),
                         contentScale = ContentScale.Crop,
-                        circle = true,
                         modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                        options = ImageOptions.Circular,
                         onClick = { navigate(::ScreenUserCard, topic.uid) }
                     )
                     Column(

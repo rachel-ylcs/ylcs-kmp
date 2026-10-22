@@ -22,6 +22,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.mutableEnumStateOf
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.icon.Icons
@@ -173,11 +174,11 @@ open class RichEditorState(
                     key = { it.id }
                 ) { emoji ->
                     WebImage(
-                        uri = remember(emoji) { emoji.previewPath },
-                        animated = false,
+                        source = remember(emoji) { emoji.previewPath },
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f).clickable {
                             closeLayout("[em|${emoji.id}]")
-                        }
+                        },
+                        options = ImageOptions.DisableAnimate
                     )
                 }
             }

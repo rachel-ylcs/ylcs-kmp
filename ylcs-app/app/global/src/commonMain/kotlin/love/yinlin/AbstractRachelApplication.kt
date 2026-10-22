@@ -9,7 +9,7 @@ import love.yinlin.compose.DurationTheme
 import love.yinlin.compose.PlatformApplication
 import love.yinlin.compose.ThemeMode
 import love.yinlin.compose.ToolingTheme
-import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.image.data.ImageConfiguration
 import love.yinlin.compose.screen.DeepLink
 import love.yinlin.cs.ClientEngine
 import love.yinlin.extension.DateEx
@@ -46,10 +46,12 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
 
     val picker by startup(StartupPickerFactory())
 
-    val urlImage by startup(StartupUrlImage.Factory(
-        cachePath = cachePath,
-        maxCacheSize = Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024),
-        imageQuality = ImageQuality.Medium)
+    val image by startup(StartupImage.Factory(
+        appName = Local.info.appName,
+        configuration = ImageConfiguration(
+            cacheDirectory = cachePath,
+            maxDiskCacheBytes = Platform.use(*Platform.Phone, ifTrue = 400, ifFalse = 1024) * 1024 * 1024L)
+        )
     )
 
     val kv by startup(StartupKVFactory(configPath))

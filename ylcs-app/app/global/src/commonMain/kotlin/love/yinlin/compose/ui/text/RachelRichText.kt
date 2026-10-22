@@ -12,6 +12,7 @@ import love.yinlin.compose.LocalStyle
 import love.yinlin.compose.Theme
 import love.yinlin.compose.cache.StateCache
 import love.yinlin.compose.data.ImageQuality
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.lottie.Lottie
 import love.yinlin.data.rachel.emoji.Emoji
@@ -36,7 +37,7 @@ data object RichEmojiDrawer : RichDrawer {
         val size = if (emojiType == EmojiType.Lottie) 1.5f else 3f
         renderCompose(size, size) {
             if (emojiType == EmojiType.Lottie) cache[emojiPath]?.then { Lottie(it, modifier = Modifier.fillMaxSize()) }
-            else WebImage(uri = emojiPath, modifier = Modifier.fillMaxSize())
+            else WebImage(source = emojiPath, modifier = Modifier.fillMaxSize())
         }
     }
 }
@@ -48,9 +49,9 @@ data object RichImageDrawer : RichDrawer {
     override fun RichRenderScope.render(item: RichObject) = item.cast<RichNodeImage> {
         renderCompose(item.width, item.height) {
             WebImage(
-                uri = item.uri,
-                quality = ImageQuality.Low,
-                modifier = Modifier.padding(horizontal = Theme.padding.g * item.width / 2).fillMaxSize()
+                source = item.uri,
+                modifier = Modifier.padding(horizontal = Theme.padding.g * item.width / 2).fillMaxSize(),
+                options = ImageOptions.quality(ImageQuality.Low)
             )
         }
     }

@@ -3,8 +3,13 @@ package love.yinlin.compose.ui.image
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -38,6 +43,8 @@ import androidx.compose.ui.node.invalidateMeasurement
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.*
 import love.yinlin.compose.Theme
@@ -224,13 +231,10 @@ private class ImageLayoutNode(
         return layout(target.width, target.height) { child.place(0, 0) }
     }
 
-    override fun IntrinsicMeasureScope.minIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int = imageLayoutSize(placeholder, Constraints(maxHeight = height)).width
-
-    override fun IntrinsicMeasureScope.maxIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int = imageLayoutSize(placeholder, Constraints(maxHeight = height)).width
-
-    override fun IntrinsicMeasureScope.minIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int = imageLayoutSize(placeholder, Constraints(maxWidth = width)).height
-
-    override fun IntrinsicMeasureScope.maxIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int = imageLayoutSize(placeholder, Constraints(maxWidth = width)).height
+    override fun IntrinsicMeasureScope.minIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int = 0
+    override fun IntrinsicMeasureScope.maxIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int = 0
+    override fun IntrinsicMeasureScope.minIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int = 0
+    override fun IntrinsicMeasureScope.maxIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int = 0
 }
 
 private data class ImageLayoutElement(
@@ -400,46 +404,35 @@ private fun rememberImageTap(state: ImageState, onClick: () -> Unit): (Offset) -
     }
 }
 
-@Suppress("ModifierFactoryExtensionFunction")
-@Composable
-private fun rememberImageZoomModifier(state: ImageState, onClick: (() -> Unit)?): Modifier {
-    val focus = remember { FocusRequester() }
-    val onTap = if (onClick != null) rememberImageTap(state, onClick) else null
 
-    return Modifier.focusRequester(focus).imageZoomGestures(state.zoom, onTap) { focus.requestFocus() }
-}
 
-@Composable
-private fun ImageClickOverlay(state: ImageState, geometry: ImageGeometry, onClick: () -> Unit) {
-    if (state.activeResult(geometry.source, geometry.version, geometry.ready) == null) return
+private fun Modifier.imageZoomGestures(state: ImageState, interactionSource: MutableInteractionSource, onTap: ((Offset) -> Unit)? = null, onInteract: () -> Unit): Modifier = this
+    .focusable(interactionSource = interactionSource)
+    .pointerInput(state, onTap, interactionSource) {
+        detectTapGestures(
+            onDoubleTap = state.zoom::toggle,
+            onPress = { position ->
+                if (onTap != null && state.contentRect.contains(position)) {
+                    val press = PressInteraction.Press(position)
+                    var released = false
 
-    val bounds = state.contentRect
-    val viewport = state.contentViewport
-    val visible = bounds.intersect(Rect(Offset.Zero, viewport.toSize()))
-    if (visible.isEmpty) return
-    val density = LocalDensity.current
-    val focus = remember { FocusRequester() }
-    val currentClick by rememberUpdatedState(onClick)
-
-    Box(modifier = Modifier.offset { visible.topLeft.round() }
-        .size(with(density) { visible.width.toDp() }, with(density) { visible.height.toDp() })
-        .focusRequester(focus).focusable().pointerInput(Unit) {
-            detectTapGestures { point ->
-                if (point.x >= 0f && point.y >= 0f && point.x < size.width && point.y < size.height) {
-                    focus.requestFocus()
-                    currentClick()
+                    cleaning({
+                        interactionSource.emit(press)
+                        released = tryAwaitRelease()
+                    }) {
+                        Coroutines.with(NonCancellable) {
+                            interactionSource.emit(if (released) PressInteraction.Release(press) else PressInteraction.Cancel(press))
+                        }
+                    }
                 }
-            }
-        })
-}
-
-private fun Modifier.imageZoomGestures(state: ImageZoomState, onTap: ((Offset) -> Unit)? = null, onInteract: () -> Unit): Modifier = this
-    .focusable()
-    .pointerInput(state, onTap) { detectTapGestures(onDoubleTap = state::toggle, onTap = onTap) }
-    .pointerInput(state) {
+            },
+            onTap = onTap
+        )
+    }.pointerInput(state) {
         awaitEachGesture {
             awaitFirstDown(requireUnconsumed = false)
             onInteract()
+
             var accepted = false
             var accumulatedZoom = 1f
             var accumulatedPan = Offset.Zero
@@ -447,6 +440,7 @@ private fun Modifier.imageZoomGestures(state: ImageZoomState, onTap: ((Offset) -
             do {
                 val event = awaitPointerEvent()
                 if (event.changes.any { it.isConsumed }) break
+
                 val zoom = event.calculateZoom()
                 val pan = event.calculatePan()
                 val pivot = event.calculateCentroid(useCurrent = false)
@@ -454,12 +448,13 @@ private fun Modifier.imageZoomGestures(state: ImageZoomState, onTap: ((Offset) -
                 if (!accepted) {
                     accumulatedZoom *= zoom
                     accumulatedPan += pan
+
                     val zoomMotion = abs(1f - accumulatedZoom) * event.calculateCentroidSize(useCurrent = false)
-                    accepted = zoomMotion > viewConfiguration.touchSlop ||
-                            (state.scale > 1f && accumulatedPan.getDistance() > viewConfiguration.touchSlop)
+
+                    accepted = zoomMotion > viewConfiguration.touchSlop || (state.zoom.scale > 1f && accumulatedPan.getDistance() > viewConfiguration.touchSlop)
                 }
 
-                if (accepted && state.transform(pivot, pan, zoom)) {
+                if (accepted && state.zoom.transform(pivot, pan, zoom)) {
                     for (change in event.changes) {
                         if (change.positionChanged()) change.consume()
                     }
@@ -473,13 +468,63 @@ private fun Modifier.imageZoomGestures(state: ImageZoomState, onTap: ((Offset) -
 
                 if (event.type == PointerEventType.Scroll) {
                     onInteract()
+
                     val change = event.changes.firstOrNull() ?: continue
                     val delta = change.scrollDelta.y
-                    if (delta != 0f && state.transform(change.position, zoom = exp((-delta * 0.15f).coerceIn(-2f, 2f)))) change.consume()
+
+                    if (delta != 0f && state.zoom.transform(pivot = change.position, zoom = exp((-delta * 0.15f).coerceIn(-2f, 2f)))) {
+                        change.consume()
+                    }
                 }
             }
         }
     }
+
+@Suppress("ModifierFactoryExtensionFunction")
+@Composable
+private fun rememberImageZoomModifier(state: ImageState, onClick: (() -> Unit)?): Modifier {
+    val focus = remember { FocusRequester() }
+    val interactionSource = remember { MutableInteractionSource() }
+    val onTap = if (onClick != null) rememberImageTap(state, onClick) else null
+
+    return Modifier.focusRequester(focus)
+        .indication(interactionSource, LocalIndication.current)
+        .imageZoomGestures(state, interactionSource, onTap) { focus.requestFocus() }
+}
+
+@Composable
+private fun ImageClickOverlay(state: ImageState, geometry: ImageGeometry, onClick: () -> Unit) {
+    if (state.activeResult(geometry.source, geometry.version, geometry.ready) == null) return
+
+    val bounds = state.contentRect
+    val viewport = state.contentViewport
+    val visible = bounds.intersect(Rect(Offset.Zero, viewport.toSize()))
+    if (visible.isEmpty) return
+
+    val density = LocalDensity.current
+    val width = with(density) { visible.width.toDp() }
+    val height = with(density) { visible.height.toDp() }
+
+    val viewConfiguration = LocalViewConfiguration.current
+    val touchTargetSize = DpSize(
+        minOf(viewConfiguration.minimumTouchTargetSize.width, width),
+        minOf(viewConfiguration.minimumTouchTargetSize.height, height)
+    )
+    val boundedConfiguration = remember(viewConfiguration, touchTargetSize) {
+        object : ViewConfiguration by viewConfiguration {
+            override val minimumTouchTargetSize = touchTargetSize
+        }
+    }
+
+    CompositionLocalProvider(LocalViewConfiguration provides boundedConfiguration) {
+        Box(modifier = Modifier
+            .offset { visible.topLeft.round() }
+            .size(width, height)
+            .clipToBounds()
+            .clickable(onClick = onClick)
+        )
+    }
+}
 
 @Composable
 private fun BoxScope.ImageContent(state: ImageState, geometry: ImageGeometry, contentDescription: String, alpha: Float, options: ImageOptions) {

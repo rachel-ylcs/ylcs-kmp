@@ -11,7 +11,7 @@ import love.yinlin.fs.File
 
 @Composable
 fun LocalFileImage(
-    source: File,
+    source: File?,
     modifier: Modifier = Modifier,
     state: ImageState = rememberImageState(),
     version: String? = null,
@@ -23,8 +23,8 @@ fun LocalFileImage(
     placeholder: ImagePlaceholder = ImagePlaceholder.Default,
     options: ImageOptions = ImageOptions.Default
 ) {
-    val input = remember(source.path) {
-        ImageSource.LocalFile(source)
+    val input = remember(source) {
+        if (source != null) ImageSource.LocalFile(source) else null
     }
 
     BasicImage(

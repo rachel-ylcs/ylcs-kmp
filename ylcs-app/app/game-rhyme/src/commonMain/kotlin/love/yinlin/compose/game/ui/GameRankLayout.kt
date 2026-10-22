@@ -18,6 +18,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.game.data.RhymePlayConfig
 import love.yinlin.compose.game.data.RhymeRankItem
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
@@ -98,9 +99,9 @@ internal fun GameRankLayout(
                                 }
 
                                 WebImage(
-                                    uri = item.avatarPath,
-                                    circle = true,
-                                    modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+                                    source = item.avatarPath,
+                                    modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                                    options = ImageOptions.Circular
                                 )
 
                                 SimpleEllipsisText(

@@ -75,7 +75,7 @@ class DouyinManager : MessageManager<Douyin>() {
             }
         ) { contentScale, media, onClick ->
             WebImage(
-                uri = media.image,
+                source = media.image,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = contentScale,
                 onClick = onClick

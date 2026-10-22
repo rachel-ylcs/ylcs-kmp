@@ -21,6 +21,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.data.*
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.OverlayAction
@@ -250,9 +251,9 @@ class ScreenLyricsEditor(private val musicInfo: MusicInfo) : BasicScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     LocalFileImage(
-                        uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
-                        circle = true,
-                        modifier = Modifier.fillMaxHeight().aspectRatio(1f)
+                        source = musicInfo.path(app.modPath, ModResourceType.Record),
+                        modifier = Modifier.fillMaxHeight().aspectRatio(1f),
+                        options = ImageOptions.Circular
                     )
                     SimpleEllipsisText(text = musicInfo.name, style = Theme.typography.v6.bold)
                 }

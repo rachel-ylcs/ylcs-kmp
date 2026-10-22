@@ -122,7 +122,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
         }
 
         LocalFileImage(
-            uri = music.path(app.modPath, ModResourceType.Record).path,
+            source = music.path(app.modPath, ModResourceType.Record),
             contentScale = ContentScale.Crop,
             modifier = modifier.fastRotate(animationRecord)
         )
@@ -174,7 +174,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
                 contentAlignment = Alignment.Center
             ) {
                 LocalFileImage(
-                    uri = music.path(app.modPath, ModResourceType.Background).path,
+                    source = music.path(app.modPath, ModResourceType.Background),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize().blurSource(blurState).zIndex(1f)
                 )

@@ -73,8 +73,8 @@ internal fun GameItem(
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h)
             ) {
                 WebImage(
-                    uri = gameDetails.type.logo.url,
-                    key = Local.info.version,
+                    source = gameDetails.type.logo.url,
+                    version = Local.info.version.toString(),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxHeight().aspectRatio(1f).clip(Theme.shape.v7)
                 )

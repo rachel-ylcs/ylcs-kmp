@@ -216,8 +216,8 @@ class ScreenMain : BasicScreen() {
                 library[index] = item.copy(selected = !item.selected)
             }.padding(Theme.padding.eValue)) {
                 LocalFileImage(
-                    uri = File(item.path, ModResourceType.Record.filename).path,
-                    item.id,
+                    source = File(item.path, ModResourceType.Record.filename),
+                    version = item.id,
                     modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                     contentScale = ContentScale.Crop
                 )
@@ -535,13 +535,13 @@ class ScreenMain : BasicScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     LocalFileImage(
-                        uri = File(args.path, ModResourceType.Record.filename).path,
-                        args.id,
+                        source = File(args.path, ModResourceType.Record.filename),
+                        version = args.id,
                         modifier = Modifier.weight(1f).aspectRatio(1f)
                     )
                     LocalFileImage(
-                        uri = File(args.path, ModResourceType.Background.filename).path,
-                        args.id,
+                        source = File(args.path, ModResourceType.Background.filename),
+                        version = args.id,
                         modifier = Modifier.weight(1f).aspectRatio(0.5625f)
                     )
                 }

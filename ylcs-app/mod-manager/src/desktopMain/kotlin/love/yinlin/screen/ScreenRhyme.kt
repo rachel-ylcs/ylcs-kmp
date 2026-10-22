@@ -30,6 +30,7 @@ import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.data.keyList
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberFontFamily
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.ActionScope
@@ -40,7 +41,7 @@ import love.yinlin.compose.ui.floating.FlyoutPosition
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.LoadingIcon
-import love.yinlin.compose.ui.image.ZoomWebImage
+import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.input.LoadingTextButton
 import love.yinlin.compose.ui.input.Switch
@@ -81,13 +82,14 @@ class ScreenRhyme(private val path: String?) : Screen() {
 
     private var selectedTab by mutableIntStateOf(0)
 
-    private var notationImage by mutableRefStateOf<String?>(null)
+    private var notationImage by mutableRefStateOf<File?>(null)
 
     private var currentSelectItem: Pair<Int, Int>? by mutableStateOf(null)
     private var isHotKeyAddMode by mutableStateOf(false)
 
     private var copyData by mutableRefStateOf<List<RhymeAction>?>(null)
 
+    @Suppress("unused")
     private fun parseNrc(nrc: String) {
 
     }
@@ -538,15 +540,15 @@ class ScreenRhyme(private val path: String?) : Screen() {
                         }
                         1 -> {
                             Box(modifier = Modifier.fillMaxSize().dragDrop(true, DragFlag.File) { dropResult ->
-                                catching { notationImage = (dropResult as DropResult.File).path.first().path }
+                                catching { notationImage = (dropResult as DropResult.File).path.first() }
                             }) {
                                 val showImage = notationImage
                                 if (showImage != null) {
-                                    ZoomWebImage(
-                                        uri = showImage,
+                                    LocalFileImage(
+                                        source = showImage,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.FillWidth,
-                                        quality = ImageQuality.Full
+                                        options = ImageOptions(zoom = true, quality = ImageQuality.Full)
                                     )
                                 }
                                 else {

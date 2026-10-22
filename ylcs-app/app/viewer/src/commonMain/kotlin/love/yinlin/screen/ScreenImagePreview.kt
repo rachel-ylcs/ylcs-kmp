@@ -14,17 +14,19 @@ import androidx.compose.ui.layout.ContentScale
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.data.getByData
 import love.yinlin.compose.data.keyList
 import love.yinlin.compose.extension.movableComposable
+import love.yinlin.compose.image.data.ImageOptions
+import love.yinlin.compose.image.input.ImageSource
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.downloadPhoto
 import love.yinlin.compose.ui.icon.Icons
+import love.yinlin.compose.ui.image.BasicImage
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.image.WebImage
-import love.yinlin.compose.ui.image.ZoomWebImage
 import love.yinlin.compose.ui.input.CheckBox
 import love.yinlin.compose.ui.layout.Divider
 import love.yinlin.compose.ui.node.condition
@@ -56,7 +58,13 @@ class ScreenImagePreview(rawImages: List<ThumbImage>, initIndex: Int) : Screen()
     }
 
     private val previewImageLayout = movableComposable { index: Int, modifier: Modifier ->
-        ZoomWebImage(uri = images.getByData(index).image, modifier = modifier)
+        val uri = images.getByData(index).image
+
+        BasicImage(
+            source = remember(uri) { ImageSource.from(uri) },
+            modifier = modifier,
+            options = ImageOptions(zoom = true, quality = ImageQuality.High)
+        )
     }
 
     @Composable
@@ -84,8 +92,8 @@ class ScreenImagePreview(rawImages: List<ThumbImage>, initIndex: Int) : Screen()
                     items = images,
                     key = { _, item -> item.key },
                 ) { index, [item] ->
-                    WebImage(
-                        uri = item.image,
+                    BasicImage(
+                        source = remember(item.image) { ImageSource.from(item.image) },
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxWidth().aspectRatio(1f).condition(index == pagerState.settledPage) {
                             border(Theme.border.v5, Theme.color.primary)

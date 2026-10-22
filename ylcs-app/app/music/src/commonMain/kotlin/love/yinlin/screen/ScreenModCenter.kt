@@ -98,7 +98,7 @@ class ScreenModCenter : Screen() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             WebImage(
-                uri = ServerRes.Mod.Song(song.sid).res(ModResourceType.Record.filename).url,
+                source = ServerRes.Mod.Song(song.sid).res(ModResourceType.Record.filename).url,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(Theme.size.image8).clip(Theme.shape.v6)
             )

@@ -34,6 +34,7 @@ import love.yinlin.compose.ds.DataSourceAccount
 import love.yinlin.compose.ds.DataSourceActivity
 import love.yinlin.compose.extension.movableComposable
 import love.yinlin.compose.extension.rememberDerivedState
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.common.PlayControlUI
@@ -96,11 +97,11 @@ class ScreenMain : BasicScreen() {
             )
 
             WebImage(
-                uri = app.config.userProfile?.avatarPath?.url ?: "",
-                key = app.config.cacheUserAvatar,
+                source = app.config.userProfile?.avatarPath?.url,
+                version = app.config.cacheUserAvatar.toString(),
                 contentScale = ContentScale.Crop,
-                circle = true,
                 modifier = Modifier.size(Theme.size.image9),
+                options = ImageOptions.Circular,
                 onClick = {
                     navigate(::ScreenUser)
                 }
@@ -119,7 +120,7 @@ class ScreenMain : BasicScreen() {
         ) { index ->
             val activity = pics[index]
             WebImage(
-                uri = activity.photo.coverPath?.url ?: "",
+                source = activity.photo.coverPath?.url,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
                 onClick = {
@@ -259,10 +260,9 @@ class ScreenMain : BasicScreen() {
                 val musicInfo = player?.currentMusic
 
                 if (musicInfo != null) {
-                    val path = musicInfo.path(app.modPath, ModResourceType.Background).path
                     LocalFileImage(
-                        uri = path,
-                        musicInfo,
+                        source = musicInfo.path(app.modPath, ModResourceType.Background),
+                        version = musicInfo.id,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.matchParentSize().graphicsLayer {
                             compositingStrategy = CompositingStrategy.Offscreen
@@ -300,8 +300,8 @@ class ScreenMain : BasicScreen() {
                     val shape = Theme.shape.v8
                     if (musicInfo != null) {
                         LocalFileImage(
-                            uri = musicInfo.path(app.modPath, ModResourceType.Record).path,
-                            musicInfo,
+                            source = musicInfo.path(app.modPath, ModResourceType.Record),
+                            version = musicInfo.id,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.size(Theme.size.image8).clip(shape).border(Theme.border.v9, Theme.color.outline.copy(alpha = 0.5f), shape),
                         )

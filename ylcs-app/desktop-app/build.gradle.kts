@@ -53,7 +53,6 @@ rachel {
                 projects.ylcsModule.platform.ffi.core,
                 projects.ylcsModule.platform.os.singleInstance,
                 projects.ylcsModule.compose.core,
-                projects.ylcsModule.compose.components.urlImage,
                 projects.ylcsModule.compose.components.media,
             )
             windows {

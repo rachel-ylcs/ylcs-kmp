@@ -53,7 +53,7 @@ class RedBookManager : MessageManager<RedBook>() {
             }
         ) { contentScale, media, onClick ->
             WebImage(
-                uri = media.image,
+                source = media.image,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = contentScale,
                 onClick = onClick

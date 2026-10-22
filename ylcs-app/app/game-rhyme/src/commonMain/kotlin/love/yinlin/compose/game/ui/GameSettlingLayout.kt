@@ -35,6 +35,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.game.common.BlockResult
 import love.yinlin.compose.game.data.RhymeState
+import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
 import love.yinlin.compose.rememberFontFamily
 import love.yinlin.compose.ui.container.Surface
@@ -77,7 +78,7 @@ private fun SettlingMusicInfo(
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9)
         ) {
             LocalFileImage(
-                uri = info.path(app.modPath, ModResourceType.Record).path,
+                source = info.path(app.modPath, ModResourceType.Record),
                 modifier = Modifier.fillMaxHeight().aspectRatio(1f)
             )
             Column(
@@ -111,8 +112,8 @@ private fun SettlingIllustration(
         border = BorderStroke(Theme.border.v4, Theme.color.primary)
     ) {
         WebImage(
-            uri = ServerRes.Game.Rhyme.CV.illustration(info.id).url,
-            key = info.id,
+            source = ServerRes.Game.Rhyme.CV.illustration(info.id).url,
+            version = info.id.toString(),
             modifier = Modifier.fillMaxSize()
         )
         SimpleEllipsisText(
@@ -276,11 +277,11 @@ internal fun GameSettlingLayout(
 
     Box(modifier = Modifier.fillMaxSize()) {
         WebImage(
-            uri = Game.Rhyme.logo.url,
-            key = Local.info.version,
-            quality = ImageQuality.Full,
+            source = Game.Rhyme.logo.url,
+            version = Local.info.version.toString(),
             contentScale = ContentScale.Crop,
             alpha = 0.75f,
+            options = ImageOptions.quality(ImageQuality.Full),
             modifier = Modifier.fillMaxSize().zIndex(1f)
         )
 
