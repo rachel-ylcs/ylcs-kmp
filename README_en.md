@@ -126,7 +126,6 @@ Sort by first letter.
 | Library  |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
 | Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
 | Library  |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
-| Library  |      panpf      |                                                             [sketch](https://github.com/panpf/sketch)                                                              |
 | Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
 | Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
 | Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |
