@@ -14,14 +14,16 @@ import java.nio.ByteBuffer
 import kotlin.concurrent.Volatile
 
 @UnstableApi
+@Suppress("UNCHECKED_CAST")
 class FfmpegAudioDecoder(
     format: Format,
     numInputBuffers: Int,
     numOutputBuffers: Int,
     initialInputBufferSize: Int,
     outputFloat: Boolean
-) : SimpleDecoder<DecoderInputBuffer?, SimpleDecoderOutputBuffer?, FfmpegDecoderException?>(
-    arrayOfNulls(numInputBuffers), arrayOfNulls(numOutputBuffers)
+) : SimpleDecoder<DecoderInputBuffer, SimpleDecoderOutputBuffer, FfmpegDecoderException>(
+    arrayOfNulls<DecoderInputBuffer>(numInputBuffers) as Array<DecoderInputBuffer>,
+    arrayOfNulls<SimpleDecoderOutputBuffer>(numOutputBuffers) as Array<SimpleDecoderOutputBuffer>
 ) {
     private val codecName: String
     private val extraData: ByteArray?

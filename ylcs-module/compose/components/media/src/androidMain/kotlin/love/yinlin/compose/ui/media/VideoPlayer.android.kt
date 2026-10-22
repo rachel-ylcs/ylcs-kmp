@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.mainContext
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.FfmpegRenderersFactory
@@ -102,7 +101,7 @@ private class AndroidVideoController(context: PlatformContext, topBar: VideoActi
         PlayerSurface(
             player = exoPlayer,
             surfaceType = SURFACE_TYPE_SURFACE_VIEW,
-            modifier = modifier.resizeWithContentScale(ContentScale.Inside, presentationState.videoSizeDp)
+            modifier = modifier.resizeWithContentScale(ContentScale.Inside, presentationState.videoAspectRatio)
         )
     }
 }
