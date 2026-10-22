@@ -13,6 +13,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
+import org.jetbrains.skia.EncodedOrigin
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Rect
@@ -27,6 +28,7 @@ internal class SkiaImageDecoder(
     override val originalSize: IntSize,
     override val size: IntSize,
     animated: Boolean,
+    private val origin: EncodedOrigin = EncodedOrigin.TOP_LEFT,
 ) : ImageDecoder {
     private val frames: Array<AnimationFrameInfo> = if (animated) requireNotNull(codec).framesInfo else []
     override val durations: IntArray = if (animated) frames.map { normalizedFrameDuration(it.duration) }.toIntArray() else [0]
@@ -53,28 +55,50 @@ internal class SkiaImageDecoder(
         context.ensureActive()
         lastFrame = index
 
-        val image = Image.makeFromBitmap(bitmap)
-        return cleaning({ render(image, context) }, image::close)
+        val pixels = requireNotNull(bitmap.peekPixels())
+
+        return cleaning({
+            val view = Data.makeWithoutCopy(pixels.addr, pixels.computeByteSize(), bitmap)
+            cleaning({
+                val image = Image.makeRaster(bitmap.imageInfo, view, bitmap.rowBytes)
+                cleaning({
+                    render(image, context)
+                }, image::close)
+            }, view::close)
+        }, pixels::close)
     }
 
     private fun render(image: Image, context: CoroutineContext): ImageBitmap {
         val bitmap = Bitmap()
         var transferred = false
+
         return cleaning({
             check(bitmap.allocPixels(ImageInfo.makeN32Premul(size.width, size.height)))
 
             val canvas = Canvas(bitmap)
             cleaning({
                 canvas.clear(0)
-                canvas.drawImageRect(image,
-                    Rect.makeWH(image.width.toFloat(), image.height.toFloat()),
-                    Rect.makeWH(size.width.toFloat(), size.height.toFloat()),
-                    SamplingMode.LINEAR, null, true)
+                val source = Rect.makeWH(image.width.toFloat(), image.height.toFloat())
+
+                if (origin == EncodedOrigin.TOP_LEFT) {
+                    canvas.drawImageRect(image, source, Rect.makeWH(size.width.toFloat(), size.height.toFloat()), SamplingMode.LINEAR, null, true)
+                }
+                else {
+                    val rotated = origin.swapsWidthHeight()
+                    val width = if (rotated) image.height else image.width
+                    val height = if (rotated) image.width else image.height
+
+                    canvas.scale(size.width.toFloat() / width, size.height.toFloat() / height)
+                    canvas.concat(origin.toMatrix(width, height))
+                    canvas.drawImageRect(image, source, source, SamplingMode.LINEAR, null, true)
+                }
             }, canvas::close)
 
             context.ensureActive()
             bitmap.setImmutable()
-            bitmap.asComposeImageBitmap().also { transferred = true }
+            val imageBitmap = bitmap.asComposeImageBitmap()
+            transferred = true
+            imageBitmap
         }) {
             if (!transferred) bitmap.close()
         }

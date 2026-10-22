@@ -16,18 +16,20 @@ import love.yinlin.compose.image.cache.ImageMemoryCache
 import love.yinlin.compose.image.data.*
 import love.yinlin.compose.image.decoder.ImageDecodeException
 import love.yinlin.compose.image.decoder.openImageDecoder
-import love.yinlin.compose.image.input.ImageInputContext
-import love.yinlin.compose.image.input.ImageSource
+import love.yinlin.compose.image.input.*
 import love.yinlin.concurrent.Lock
 import love.yinlin.concurrent.Mutex
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.ioContext
+import love.yinlin.coroutines.cpuContext
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingNull
 import love.yinlin.extension.cleaning
 import love.yinlin.extension.throwing
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 internal class ImageLoader(
     private val client: HttpClient,
@@ -54,9 +56,25 @@ internal class ImageLoader(
     val cacheGeneration: Long get() = lock.synchronized { generation }
     val memoryCacheSize: Long get() = lock.synchronized { memory.size }
 
-    suspend fun load(request: ImageRequest, onProgress: (ImageProgress) -> Unit = {}): ImageResult {
+    suspend fun load(request: ImageRequest, onProgress: ((ImageProgress) -> Unit)? = null): ImageResult {
+        currentCoroutineContext().ensureActive()
+
         val input = components.input(request.source)
-        val sourceKey = Coroutines.cpu { request.sourceKey(input.cacheKey(request.source)) }
+        if (input === ByteArrayImageInput && request.source is ImageSource.Bytes) {
+            require(request.source.data.size in 1 .. configuration.maxSourceBytes) { "Image input exceeds the byte budget" }
+        }
+
+        val sourceKey = if (input === LocalFileImageInput || input === ResourceFileImageInput ||
+            (input === WebImageInput && request.source is ImageSource.Network && (request.source.headers.isEmpty() || request.source.hasContentKey)) ||
+            (input === ByteArrayImageInput && request.source is ImageSource.Bytes && request.source.hasContentKey)) {
+            request.sourceKey(input.cacheKey(request.source))
+        }
+        else {
+            Coroutines.cpu {
+                request.sourceKey(input.cacheKey(request.source))
+            }
+        }
+
         val resultKey = request.resultKey(sourceKey)
         val epoch = maintenance.with {
             lock.synchronized {
@@ -64,29 +82,36 @@ internal class ImageLoader(
                 generation
             }
         }
+
         lock.synchronized { memory.get(resultKey) }?.let { return it }
 
+        val reportsProgress = input !== LocalFileImageInput && input !== ResourceFileImageInput && input !== ByteArrayImageInput
         val flightKey = "$resultKey:${request.diskCache}:$epoch"
+
         val flight = lock.synchronized {
             check(!closed && generation == epoch) { "Image cache was cleared" }
 
             outputs.getOrPut(flightKey) {
                 val progress = MutableStateFlow(ImageProgress())
-                ImageFlight(scope.async(start = CoroutineStart.LAZY) {
+
+                ImageFlight(scope.async(cpuContext, start = CoroutineStart.LAZY) {
                     operations.withPermit {
-                        decode(request, sourceKey, resultKey, epoch) { progress.value = it }
+                        decode(request, sourceKey, resultKey, epoch, if (reportsProgress) { { progress.value = it } } else null)
                     }
                 }, progress)
             }.also { it.users++ }
         }
 
-        return consumeFlight(flightKey, flight, outputs, onProgress)
+        return consumeFlight(flightKey, flight, outputs, if (reportsProgress) onProgress else null)
     }
 
-    private suspend fun decode(request: ImageRequest, sourceKey: String, resultKey: String, epoch: Long, onProgress: (ImageProgress) -> Unit): ImageResult {
+    private suspend fun decode(request: ImageRequest, sourceKey: String, resultKey: String, epoch: Long, onProgress: ((ImageProgress) -> Unit)?): ImageResult {
         lock.synchronized { memory.get(resultKey) }?.let { return it }
 
-        val data = acquireData(sourceKey, request, epoch, onProgress)
+        val data = if (request.source is ImageSource.Bytes && components.input(request.source) === ByteArrayImageInput) {
+            ImageInputData(request.source.data, ImageOrigin.Local)
+        } else acquireData(sourceKey, request, epoch, onProgress)
+
         currentCoroutineContext().ensureActive()
 
         return throwing(::ImageDecodeException) {
@@ -122,8 +147,9 @@ internal class ImageLoader(
         }
     }
 
-    private suspend fun acquireData(key: String, request: ImageRequest, epoch: Long, onProgress: (ImageProgress) -> Unit): ImageInputData {
+    private suspend fun acquireData(key: String, request: ImageRequest, epoch: Long, onProgress: ((ImageProgress) -> Unit)?): ImageInputData {
         val flightKey = "$key:${request.diskCache}:$epoch"
+
         val flight = lock.synchronized {
             check(!closed && generation == epoch) { "Image cache was cleared" }
 
@@ -131,7 +157,9 @@ internal class ImageLoader(
                 val progress = MutableStateFlow(ImageProgress())
 
                 ImageFlight(scope.async(start = CoroutineStart.LAZY) {
-                    downloads.withPermit { fetch(key, request, progress) }
+                    downloads.withPermit {
+                        fetch(key, request, progress)
+                    }
                 }, progress)
             }.also { it.users++ }
         }
@@ -139,12 +167,19 @@ internal class ImageLoader(
         return consumeFlight(flightKey, flight, flights, onProgress)
     }
 
-    private suspend fun <T> consumeFlight(key: String, flight: ImageFlight<T>, active: MutableMap<String, ImageFlight<T>>, onProgress: (ImageProgress) -> Unit): T = cleaning({
-        coroutineScope {
-            val observer = launch {
-                flight.progress.collect { onProgress(it) }
+    private suspend fun <T> consumeFlight(key: String, flight: ImageFlight<T>, active: MutableMap<String, ImageFlight<T>>, onProgress: ((ImageProgress) -> Unit)?): T = cleaning({
+        if (onProgress == null) flight.result.await()
+        else {
+            coroutineScope {
+                val observer = launch(start = CoroutineStart.UNDISPATCHED) {
+                    flight.progress.collect { onProgress(it) }
+                }
+
+                val result = cleaning({ flight.result.await() }) { observer.cancelAndJoin() }
+
+                onProgress(flight.progress.value)
+                result
             }
-            cleaning({ flight.result.await() }, observer::cancel)
         }
     }) {
         lock.synchronized {
@@ -159,13 +194,18 @@ internal class ImageLoader(
 
     private suspend fun fetch(key: String, request: ImageRequest, progress: MutableStateFlow<ImageProgress>): ImageInputData {
         val input = components.input(request.source)
-        val data = input.read(request.source, ImageInputContext(
-            context = context,
-            maxBytes = configuration.maxSourceBytes,
-            onProgress = { progress.value = it }
-        ) { source ->
-            fetchNetwork(key, source, request.diskCache, progress)
-        })
+
+        val data = input.read(
+            source = request.source,
+            context = ImageInputContext(
+                context = context,
+                maxBytes = configuration.maxSourceBytes,
+                onProgress = { progress.value = it },
+                network =  { source ->
+                    fetchNetwork(key, source, request.diskCache, progress)
+                }
+            )
+        )
 
         require(data.bytes.size in 1 .. configuration.maxSourceBytes) { "Image input exceeds the byte budget" }
         return data
@@ -176,7 +216,9 @@ internal class ImageLoader(
         if (cached != null) return cached
 
         val result = client.prepareGet(source.url) {
-            for (entry in source.headers) headers.append(entry.key, entry.value)
+            for ([key, value] in source.headers) {
+                headers.append(key, value)
+            }
         }.execute { response ->
             check(response.status.value in 200 .. 299) { "Image HTTP ${response.status.value}" }
 
@@ -184,26 +226,64 @@ internal class ImageLoader(
             require(total == null || total <= configuration.maxSourceBytes) { "Image response exceeds the byte budget" }
 
             val channel = response.bodyAsChannel()
-            val output = Buffer()
+
+            currentCoroutineContext().ensureActive()
+
+            val bytes = total?.takeIf { it > 0L }?.let { ByteArray(it.toInt()) }
+            var offset = 0
+            var extra: Buffer? = null
             val chunk = ByteArray(8192)
+
             progress.value = ImageProgress(0, total)
+            var lastProgress = TimeSource.Monotonic.markNow()
 
             while (true) {
                 currentCoroutineContext().ensureActive()
+                val direct = bytes != null && offset < bytes.size
+                val count = if (direct) channel.readAvailable(bytes, offset, minOf(bytes.size - offset, chunk.size)) else channel.readAvailable(chunk, 0, chunk.size)
 
-                val count = channel.readAvailable(chunk, 0, chunk.size)
                 if (count < 0) break
-                require(output.size + count <= configuration.maxSourceBytes) { "Image response exceeds the byte budget" }
+                if (count == 0) continue
 
-                output.write(chunk, 0, count)
-                progress.value = ImageProgress(output.size, total)
+                if (direct) offset += count
+                else {
+                    require(offset.toLong() + (extra?.size ?: 0L) + count <= configuration.maxSourceBytes) { "Image response exceeds the byte budget" }
+
+                    val buffer = extra ?: Buffer().also { extra = it }
+                    buffer.write(chunk, 0, count)
+                }
+
+                if (lastProgress.elapsedNow() >= 100.milliseconds) {
+                    progress.value = ImageProgress(offset.toLong() + (extra?.size ?: 0L), total)
+                    lastProgress = TimeSource.Monotonic.markNow()
+                }
             }
 
-            require(output.size > 0L) { "Empty image response" }
-            ImageInputData(output.readByteArray(), ImageOrigin.Network)
+            val tail = extra
+            val received = offset.toLong() + (tail?.size ?: 0L)
+            require(received > 0L) { "Empty image response" }
+
+            progress.value = ImageProgress(received, total)
+
+            val result = when {
+                bytes == null -> requireNotNull(tail).readByteArray()
+                tail == null -> if (offset == bytes.size) bytes else bytes.copyOf(offset)
+                else -> {
+                    val result = bytes.copyOf(received.toInt())
+
+                    while (!tail.exhausted()) {
+                        offset += tail.readAtMostTo(result, offset, result.size)
+                    }
+                    result
+                }
+            }
+
+            ImageInputData(result, ImageOrigin.Network)
         }
 
-        if (useDisk) catching { disk?.write(key, result) }
+        if (useDisk) {
+            catching { disk?.write(key, result) }
+        }
         return result
     }
 

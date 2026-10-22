@@ -1,12 +1,6 @@
 package love.yinlin.compose.ui.image
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.IntSize
@@ -18,84 +12,137 @@ import love.yinlin.compose.image.data.ImageResult
 import love.yinlin.compose.image.decoder.ImageDecodeException
 import love.yinlin.compose.image.input.ImageSource
 
-/** 单个显示位置的状态和 UI 缓存；在 Compose 主线程观察/操作，不由不同位置共用。 */
 @Stable
 class ImageState {
     var status by mutableStateOf(ImageLoadStatus.Empty)
         internal set
+
+    internal var feedbackStatus: ImageLoadStatus? by mutableStateOf(null)
     internal var result: ImageResult? by mutableStateOf(null)
+
     var error: Throwable? by mutableStateOf(null)
         internal set
-    /** 读取失败可重试；数据无法解码时默认占位不提供重试入口。 */
+
     val canRetry: Boolean get() = status == ImageLoadStatus.Error && error !is ImageDecodeException
     var progress by mutableStateOf(ImageProgress())
         internal set
     var size: IntSize? by mutableStateOf(null)
         internal set
+
     var isPlaying by mutableStateOf(true)
+
     val imageSize: IntSize? get() = result?.size
     val originalSize: IntSize? get() = result?.originalSize
-    val isAnimated: Boolean get() = result?.isAnimated == true
+
+    private var animated by mutableStateOf(false)
+    val isAnimated: Boolean get() = animated
+
     val origin: ImageOrigin? get() = result?.origin
-    val zoom = ImageZoomState()
+    private var zoomState: ImageZoomState? = null
 
-    private var contentBounds by mutableStateOf(Rect.Zero)
-    private var zoomEnabled by mutableStateOf(false)
-    internal var contentViewport by mutableStateOf(IntSize.Zero)
-        private set
-
-    /** 图片在组件本地坐标中的实际绘制区域，包含 ContentScale、对齐和缩放平移，可能超出组件边界。 */
-    val contentRect: Rect get() {
-        if (result == null || contentBounds.isEmpty) return Rect.Zero
-        if (!zoomEnabled) return contentBounds
-        val viewport = contentViewport
-        val center = Offset(viewport.width / 2f, viewport.height / 2f)
-        return Rect(center + (contentBounds.topLeft - center) * zoom.scale + zoom.translation,
-            contentBounds.size * zoom.scale)
+    val zoom: ImageZoomState get() = zoomState ?: ImageZoomState().also {
+        it.updateBounds(contentViewport, contentBounds)
+        zoomState = it
     }
 
-    internal fun updateContentBounds(bounds: Rect, viewport: IntSize, zoom: Boolean) {
-        contentBounds = bounds
-        contentViewport = viewport
-        zoomEnabled = zoom
+    private var geometry: ImageGeometry? by mutableStateOf(null)
+    private var cachedGeometry: ImageGeometry? = null
+    private var cachedResult: ImageResult? = null
+    private var cachedViewport = IntSize.Zero
+    private var cachedBounds = Rect.Zero
+    internal val contentViewport: IntSize get() = size ?: IntSize.Zero
+
+    private val contentBounds: Rect get() {
+        val geometry = geometry ?: return Rect.Zero
+        val result = activeResult(geometry.source, geometry.version, geometry.ready) ?: return Rect.Zero
+        val viewport = contentViewport
+        if (cachedGeometry !== geometry || cachedResult !== result || cachedViewport != viewport) {
+            cachedGeometry = geometry
+            cachedResult = result
+            cachedViewport = viewport
+            cachedBounds = geometry.bounds(result.size, viewport)
+        }
+        return cachedBounds
+    }
+
+    val contentRect: Rect get() {
+        val bounds = contentBounds
+        if (bounds.isEmpty) return Rect.Zero
+        if (geometry?.zoom != true) return bounds
+        val viewport = contentViewport
+        val center = Offset(viewport.width / 2f, viewport.height / 2f)
+        return Rect(center + (bounds.topLeft - center) * zoom.scale + zoom.translation,
+            bounds.size * zoom.scale)
+    }
+
+    internal fun activeResult(source: ImageSource?, version: String?, ready: Boolean): ImageResult? =
+        result.takeIf { ready && this.source == source && this.version == version }
+
+    internal fun updateGeometry(geometry: ImageGeometry) {
+        if (this.geometry != geometry) {
+            this.geometry = geometry
+            updateZoomBounds()
+        }
+    }
+
+    internal fun updateSize(size: IntSize) {
+        if (this.size != size) {
+            this.size = size
+            updateZoomBounds()
+        }
+    }
+
+    private fun updateZoomBounds() {
+        zoomState?.updateBounds(contentViewport, contentBounds)
     }
 
     internal var reloadKey by mutableIntStateOf(0)
         private set
     internal var source: ImageSource? = null
-    internal var version = ""
+    internal var version: String? = null
     internal var retainedRequest: ImageRequest? = null
     internal var retainedGeneration = -1L
     internal var visible by mutableStateOf(false)
 
-    /** 使用相同输入源和版本重试加载，已有缓存仍可复用；刷新内容请改变图片的 vararg key。 */
     fun retry() {
         retainedRequest = null
         reloadKey++
     }
 
-    internal fun begin(source: ImageSource?, version: String) {
-        if (this.source != source || this.version != version) {
+    internal fun begin(source: ImageSource?, version: String?) {
+        val changed = this.source != source || this.version != version
+        if (changed) {
             result = null
+            animated = false
+            cachedResult = null
+            cachedGeometry = null
+            cachedBounds = Rect.Zero
             retainedRequest = null
-            zoom.reset()
+            zoomState?.reset()
         }
         this.source = source
         this.version = version
+        if (changed) updateZoomBounds()
         error = null
         progress = ImageProgress()
         status = if (source == null) ImageLoadStatus.Empty else ImageLoadStatus.Loading
+        feedbackStatus = if (source == null) ImageLoadStatus.Empty else null
     }
 
     internal fun success(result: ImageResult) {
         this.result = result
+        animated = result.isAnimated
+        if (cachedResult !== result) cachedResult = null
+        updateZoomBounds()
         error = null
         status = ImageLoadStatus.Success
+        feedbackStatus = null
     }
 
     internal fun failure(error: Throwable) {
         this.error = error
         status = ImageLoadStatus.Error
+        feedbackStatus = ImageLoadStatus.Error
     }
 }
 

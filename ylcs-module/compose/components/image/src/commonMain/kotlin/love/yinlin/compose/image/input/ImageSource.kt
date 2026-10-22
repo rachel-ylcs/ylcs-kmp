@@ -13,6 +13,9 @@ interface ImageSource {
     @Stable
     class Network(val url: String, headers: Map<String, String> = emptyMap()) : ImageSource {
         val headers: Map<String, String> = headers.toMap()
+        private val key = lazy { WebImageInput.buildCacheKey(this) }
+        internal val contentKey: String get() = key.value
+        internal val hasContentKey: Boolean get() = key.isInitialized()
 
         override fun equals(other: Any?): Boolean = other is Network && url == other.url && headers == other.headers
         override fun hashCode(): Int = 31 * url.hashCode() + headers.hashCode()
@@ -34,7 +37,9 @@ interface ImageSource {
     @Stable
     class Bytes(bytes: ByteArray) : ImageSource {
         internal val data = bytes.copyOf()
-        internal val contentKey by lazy { ImageDiskCache.imageCacheHash(data) }
+        private val key = lazy { ImageDiskCache.imageCacheHash(data) }
+        internal val contentKey: String get() = key.value
+        internal val hasContentKey: Boolean get() = key.isInitialized()
     }
 
     companion object {

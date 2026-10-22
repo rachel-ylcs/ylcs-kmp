@@ -11,6 +11,14 @@ internal fun openImageDecoder(bytes: ByteArray, request: ImageRequest): ImageDec
 
 internal expect fun openPlatformImageDecoder(bytes: ByteArray, request: ImageDecodeOptions): ImageDecoder
 
+internal fun ByteArray.matchesImageSignature(offset: Int, signature: String): Boolean {
+    if (size < offset + signature.length) return false
+    for (index in signature.indices) {
+        if (this[offset + index] != signature[index].code.toByte()) return false
+    }
+    return true
+}
+
 internal fun sampledImageSize(original: IntSize, request: ImageDecodeOptions): IntSize {
     val maxDecodePixels = ImageManager.configuration.maxDecodePixels
     require(original.width > 0 && original.height > 0) { "Invalid image dimensions" }

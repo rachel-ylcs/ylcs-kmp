@@ -1,6 +1,5 @@
 package love.yinlin.page
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -200,7 +199,7 @@ object ImagePage : Page() {
             }
             if (message != null) Text(message!!, color = Theme.color.error)
             ExampleRow(maxItemsInEachRow = 2) {
-                Example("LocalFileImage · 默认 Full 画质", Modifier.weight(1f)) {
+                Example("LocalFileImage · 默认 Medium 画质", Modifier.weight(1f)) {
                     val state = rememberImageState()
                     val selected = file
                     if (selected == null) BasicImage(null, state = state, modifier = Modifier.size(Theme.size.image2))
@@ -259,7 +258,7 @@ object ImagePage : Page() {
                     }
                 }
             }
-            GalleryParagraph("网络加载使用公开 PNG 样例展示真实下载进度，加载时长取决于网络。读取失败使用不存在的资源路径，显示警告色刷新图标，可点击重试；损坏数据使用无法解码的字节，显示不可点击的错误色图标。点击恢复加载内置资源，空内容不会发起读取。下方小图用于检查占位和重试范围是否影响相邻文字。")
+            GalleryParagraph("图片与默认占位均使用透明背景，空内容保留尺寸并显示空态图标。网络加载使用公开 PNG 样例展示真实下载进度，加载时长取决于网络。读取失败使用不存在的资源路径，显示警告色刷新图标，可点击重试；损坏数据使用无法解码的字节，显示不可点击的错误色图标。点击恢复加载内置资源，空内容不会发起读取。下方小图用于检查占位和重试范围是否影响相邻文字。")
         }
     }
 
@@ -286,7 +285,7 @@ object ImagePage : Page() {
                 contentScale = scales[scale], alignment = alignments[alignment], onClick = { clicks++ },
                 modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
             )
-            GalleryParagraph("Fit / Inside 的留白不计入点击；可用 Tab 聚焦后按 Enter 或空格激活图片。切换窗口宽度观察固定高度的绘制范围。")
+            GalleryParagraph("Fit / Inside 的留白不计入点击。切换窗口宽度观察固定高度的绘制范围。")
             ExampleRow {
                 Example("无显式尺寸 · 主题默认占位") {
                     ResourceFileImage(Res.getUri("drawable/img0.webp"), contentDescription = "默认尺寸图片")
@@ -310,6 +309,7 @@ object ImagePage : Page() {
             var quality by rememberValueState(1)
             var circular by rememberFalse()
             var tint by rememberFalse()
+            var fadeIn by rememberFalse()
             var alpha by rememberValueState(1f)
             var version by rememberValueState(0)
             val qualities = remember { [ImageQuality.Low, ImageQuality.Medium, ImageQuality.High, ImageQuality.Full] }
@@ -319,6 +319,7 @@ object ImagePage : Page() {
                     modifier = Modifier.width(Theme.size.input2))
                 CheckBox(circular, { circular = it }, "圆形裁剪")
                 CheckBox(tint, { tint = it }, "主题着色")
+                CheckBox(fadeIn, { fadeIn = it }, "首次加载淡入")
                 TextButton("重新加载以比较淡入") { version++ }
             }
             GalleryCaption("透明度 ${(alpha * 100).toInt()}%")
@@ -333,10 +334,12 @@ object ImagePage : Page() {
                 options = ImageOptions(
                     quality = qualities[quality],
                     circular = circular,
-                    colorFilter = if (tint) ColorFilter.tint(Theme.color.primary) else null
+                    colorFilter = if (tint) ColorFilter.tint(Theme.color.primary) else null,
+                    fadeIn = fadeIn,
                 )
             )
             ImageStateDetails(state)
+            GalleryParagraph("淡入默认关闭；勾选首次加载淡入后，点击重新加载以比较淡入。重组、滚出后返回、保留状态重挂载及内存缓存命中均不重播。")
         }
     }
 
@@ -407,7 +410,7 @@ object ImagePage : Page() {
                 )
             }
             ImageStateDetails(state)
-            GalleryParagraph("双击、双指、滚轮可缩放，放大后拖动平移；聚焦图片后可用 + / − / 0 / Esc。未缩放或平移到边缘后继续横拖，可切换 Pager；第三页为动图，可观察缩放时的播放。")
+            GalleryParagraph("双击、双指、滚轮可缩放，放大后拖动平移；也可使用上方按钮放大、缩小或复位。未缩放或平移到边缘后继续横拖，可切换 Pager；第三页为动图，可观察缩放时的播放。")
         }
     }
 
@@ -415,6 +418,7 @@ object ImagePage : Page() {
     private fun ColumnScope.CacheExamples() {
         Component("版本与缓存") {
             var version by rememberValueState(1)
+            var useVersion by rememberFalse()
             var mount by rememberValueState(0)
             var stateGeneration by rememberValueState(0)
             var mounted by rememberTrue()
@@ -423,7 +427,8 @@ object ImagePage : Page() {
             val source = remember { Res.getUri("drawable/img0.webp") }
             val states = remember(stateGeneration) { List(3) { ImageState() } }
             GalleryActions {
-                TextButton("更新版本") { version++ }
+                CheckBox(useVersion, { useVersion = it }, "附加版本键")
+                TextButton("更新版本", enabled = useVersion) { version++ }
                 TextButton("保留状态重挂载") { mount++ }
                 TextButton("新状态重挂载") {
                     stateGeneration++
@@ -442,20 +447,21 @@ object ImagePage : Page() {
                     message = error?.message
                 }
             }
-            GalleryCaption("版本 $version · 内存缓存快照 $memoryBytes B")
+            GalleryCaption("${if (useVersion) "版本 $version" else "无附加版本"} · 内存缓存快照 $memoryBytes B")
             if (message != null) Text(message!!, color = Theme.color.error)
             if (mounted) key(mount) {
                 ExampleRow {
                     for (index in 1 .. 3) {
                         Example("消费者 $index") {
                             val state = states[index - 1]
-                            ResourceFileImage(source, contentDescription = "共享请求的图片 $index", state = state, version = "cache$version", modifier = Modifier.size(Theme.size.image2))
+                            ResourceFileImage(source, contentDescription = "共享请求的图片 $index", state = state,
+                                version = if (useVersion) "cache$version" else null, modifier = Modifier.size(Theme.size.image2))
                             GalleryCaption("${state.status} · ${state.origin ?: "—"}")
                         }
                     }
                 }
             }
-            GalleryParagraph("三个位置使用相同内置资源、版本和尺寸，各自持有 ImageState。首次加载共享同一请求；保留状态重挂载复用 UI 结果，新状态重挂载可观察 Memory 命中。更新版本会重新读取内置资源，卸载后重新挂载可查看缓存复用。")
+            GalleryParagraph("三个位置使用相同内置资源和尺寸，各自持有 ImageState。默认 version 为 null，仅按输入源识别内容；勾选附加版本键后，更新版本会重新读取资源。首次加载共享同一请求；保留状态重挂载复用 UI 结果，新状态重挂载可观察 Memory 命中，卸载后重新挂载可查看缓存复用。")
             GalleryParagraph("清理按钮等待 ImageManager.clearCache() 完成后重新挂载本组。上方 WebImage 保持相同地址和版本时可复用图片磁盘缓存，更新版本后重新下载。")
         }
     }
@@ -476,7 +482,7 @@ object ImagePage : Page() {
                 TextButton("重置选区") { state.reset() }
             }
             val modifier = Modifier.fillMaxWidth().height(Theme.size.image1 * 2)
-                .background(Theme.color.scrim).cropImageRegion(imageState, state, ratios[ratio])
+                .cropImageRegion(imageState, state, ratios[ratio])
             if (sample == 0) {
                 ResourceFileImage(Res.getUri("drawable/img0.webp"), state = imageState,
                     contentDescription = "可裁剪的资源图片", contentScale = ContentScale.Inside, modifier = modifier)

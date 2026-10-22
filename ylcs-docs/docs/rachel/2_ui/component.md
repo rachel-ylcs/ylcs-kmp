@@ -68,6 +68,7 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 | `data-table` | 表格、单元格、排序、编辑及选择 |
 | `drag-drop` | 拖放交互 |
 | `hexview` | 十六进制数据查看 |
+| `image` | 独立实现的异步图片加载、GIF / WebP 动画、缩放、缓存与裁剪选区 |
 | `log-output` | 日志输出组件 |
 | `lottie` | Lottie 动画 |
 | `media` | 音频、视频及播放控制 |
@@ -79,6 +80,28 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 | `webview` | 原生网页视图与状态 |
 
 这些模块需按使用范围添加项目依赖。日历已位于独立模块，不属于基础 `compose:ui` 的 `widget` 包内容。各模块目标与平台实现以其构建脚本和源集为准。
+
+## 异步图片
+
+`compose/components/image` 提供 `BasicImage`、`WebImage`、`LocalFileImage` 和 `ResourceFileImage`，与基于 Sketch 的 `url-image` 模块分开。使用前调用 `ImageManager.initialize(context, appName, configuration)`；管理器只能成功初始化一次，`shutdown()` 释放资源后也不能重新初始化。管理器未就绪时，图片组件显示空占位。
+
+`BasicImage` 接受网络、本地文件、Compose 资源、字节数组及已注册的自定义 `ImageSource`。网络请求头通过 `ImageSource.Network` 传入。每个显示位置单独持有 `rememberImageState()`；同源、同版本、同解码参数的并发请求共享加载结果，各位置独立控制动画播放和缩放。
+
+`version: String? = null` 是可选缓存版本，不拼入 URL 或文件路径。为 `null` 时只根据输入源识别原始内容；非空值时附加版本键，空字符串也是一个明确版本，与 `null` 区分。解码结果仍按目标尺寸、画质采样倍率与动图模式分别缓存。本地文件内容改变后需设置或更新 `version`。`state.retry()` 允许复用已有缓存；读取失败可重试，解码失败时默认占位不提供重试入口。内存缓存保存解码结果，磁盘缓存保存网络图片原始字节，浏览器不启用图片磁盘缓存。`ImageManager.clearCache()` 取消在途加载并清理两级缓存；已经显示的图片不会自动刷新。网络进度按约 50ms 间隔更新，加载成功返回前同步最终字节数；响应没有内容长度时 `progress.total` 为 `null`。
+
+默认画质为 `ImageQuality.Medium`。Low、Medium、High、Full 的目标采样倍率依次为 1、2、3、4，实际解码尺寸还受原图尺寸和像素预算限制。`ImagePlaceholder` 决定未显式指定尺寸时的保留空间，成功加载后保持容器尺寸。组件不绘制背景，也不提供背景配置；空态图标、加载圈、读取失败和损坏图标均保持透明底色；`ContentScale` 和 `alignment` 决定图片绘制范围，留白不触发图片的 `onClick`。
+
+淡入默认关闭，可通过 `ImageOptions(fadeIn = true)` 开启。开启后，当前输入源和版本从空内容首次成功加载时使用主题默认时长淡入。重组、滚出后返回、保留状态重挂载、内存缓存命中及已显示后开启淡入均不重播；只有需要首次淡入时才创建动画状态和启动 Effect。尺寸变化或结果替换直接结束已有淡入，`alpha` 仍独立控制图片透明度。
+
+GIF / WebP 按文件循环次数逐帧播放，`ImageOptions(animated = false)` 只显示首帧。缩放通过 `ImageOptions(zoom = true)` 开启，支持双击、双指、滚轮与放大后的拖动，也可调用 `state.zoom`。`Modifier.cropImageRegion(imageState, cropImageState, aspectRatio)` 添加裁剪选区，`cropImageState.result` 返回相对于原图的比例坐标。
+
+请求由布局节点管理，尺寸就绪后立即尝试内存缓存，读取和解码使用框架的 IO / CPU 协程上下文；能否并行执行由平台运行时决定，浏览器默认上下文不等同于独立 Worker。普通静态图在绘制节点观察结果；缩放、淡入和动图使用独立的 Composable。缩放状态在启用缩放或显式访问 `state.zoom` 时创建，此后持续同步边界。静态图不注册动图的可见性监听；未配置点击、缩放或淡入时不创建对应的交互或动画辅助状态。`state.contentRect` 和裁剪使用的几何信息按需计算并缓存，尺寸、内容和显示参数改变后自动失效，不依赖每次重组的 `SideEffect`。
+
+内置字节数组输入复用 `ImageSource.Bytes` 已持有的防御性副本，跳过无 IO 的原始读取任务；自定义输入仍保留读取、进度和共享语义。稳定长度的本地文件与已知长度的网络响应直接填充最终数组；未知长度或读取期间长度改变时使用有界缓冲，始终受原始字节预算限制，不额外缓存整图字节来换取速度。
+
+Skia 实现对 JPEG 缩略图使用原生 1/2、1/4、1/8 预采样，再绘制到目标尺寸，保留 EXIF 方向；非 sRGB ICC 图片沿用完整解码路径。预采样保留目标尺寸约定，像素结果可能与完整解码后缩放不同。
+
+静态 WebP 从容器标志识别后直接进入静态解码，避免额外打开动画解码器。Skia 动图保留可复用的工作帧，只在同步栅格绘制期间借用其像素，绘制结束即关闭借用视图；返回给 Compose 的帧是独立的不可变位图，不会被下一帧解码修改。
 
 ## 示例与 API
 

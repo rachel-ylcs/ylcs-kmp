@@ -10,7 +10,8 @@ data class ImageOptions(
     val zoom: Boolean = false,
     val circular: Boolean = false,
     val quality: ImageQuality = ImageQuality.Medium,
-    val colorFilter: ColorFilter? = null
+    val colorFilter: ColorFilter? = null,
+    val fadeIn: Boolean = false,
 ) {
     companion object {
         val Default: ImageOptions = ImageOptions()

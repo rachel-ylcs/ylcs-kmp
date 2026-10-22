@@ -13,16 +13,18 @@ fun WebImage(
     source: String,
     modifier: Modifier = Modifier,
     state: ImageState = rememberImageState(),
-    version: String = "",
+    version: String? = null,
     contentScale: ContentScale = ContentScale.Fit,
     alignment: Alignment = Alignment.Center,
     alpha: Float = 1f,
     onClick: (() -> Unit)? = null,
     contentDescription: String = "",
     placeholder: ImagePlaceholder = ImagePlaceholder.Default,
-    options: ImageOptions = ImageOptions()
+    options: ImageOptions = ImageOptions.Default
 ) {
-    val input = remember(source) { if (source.isBlank()) null else ImageSource.Network(source) }
+    val input = remember(source) {
+        if (source.isBlank()) null else ImageSource.Network(source)
+    }
 
     BasicImage(
         input,

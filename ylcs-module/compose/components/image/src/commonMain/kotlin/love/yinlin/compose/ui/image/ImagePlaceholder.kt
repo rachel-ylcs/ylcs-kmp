@@ -12,36 +12,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.semantics.ProgressBarRangeInfo
-import androidx.compose.ui.semantics.progressBarRangeInfo
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpSize
 import love.yinlin.compose.Theme
 import love.yinlin.compose.image.data.ImageLoadStatus
 import love.yinlin.compose.ui.icon.Icons
 
-/**
- * size 是无显式尺寸时的保留空间；单边确定时按 aspectRatio（或 size 比例）计算另一边。
- * 容器从占位到成功保持尺寸。外部 modifier 的固定尺寸和父约束优先，ContentScale 决定图像绘制。
- */
 @Stable
 data class ImagePlaceholder(
     val size: DpSize,
     val aspectRatio: Float? = null,
-    val background: Color? = null,
     val loading: @Composable BoxScope.(ImageState) -> Unit = DefaultBlock,
     val error: @Composable BoxScope.(ImageState) -> Unit = DefaultBlock,
     val empty: @Composable BoxScope.(ImageState) -> Unit = DefaultBlock,
@@ -56,28 +47,40 @@ data class ImagePlaceholder(
             val viewportSize = with(LocalDensity.current) { DpSize(viewport.width.toDp(), viewport.height.toDp()) }
             val availableSize = minOf(viewportSize.width, viewportSize.height) * 0.75f
             val iconSize = minOf(Theme.size.icon, availableSize)
-            Box(Modifier.matchParentSize().clipToBounds(), contentAlignment = Alignment.Center) {
+
+            Box(
+                modifier = Modifier.matchParentSize().clipToBounds(),
+                contentAlignment = Alignment.Center
+            ) {
                 when (state.status) {
-                    ImageLoadStatus.Empty -> Icon(Icons.Image, color = Theme.color.onSurfaceVariant, tip = "暂无图片",
-                        modifier = Modifier.size(iconSize))
+                    ImageLoadStatus.Empty -> Icon(icon = Icons.Image, color = Theme.color.onSurfaceVariant, modifier = Modifier.size(iconSize))
                     ImageLoadStatus.Loading -> {
                         val feedbackSize = minOf(Theme.size.input7, availableSize)
                         val fraction = state.progress.fraction
                         val color = Theme.color.primaryContainer
-                        val rotation by rememberInfiniteTransition().animateFloat(0f, 360f,
-                            infiniteRepeatable(tween(Theme.animation.duration.v2, easing = LinearEasing)))
-                        Canvas(Modifier.size(feedbackSize).semantics {
-                            progressBarRangeInfo = fraction?.let { ProgressBarRangeInfo(it, 0f .. 1f) } ?: ProgressBarRangeInfo.Indeterminate
-                        }) {
+                        val rotation = if (fraction == null) rememberInfiniteTransition().animateFloat(0f, 360f, infiniteRepeatable(tween(Theme.animation.duration.v2, easing = LinearEasing))) else null
+
+                        Canvas(modifier = Modifier.size(feedbackSize)) {
                             val radius = size.minDimension / 2f
                             val stroke = radius * 0.2f
-                            drawCircle(color.copy(alpha = 0.25f), radius - stroke / 2, style = Stroke(stroke))
                             val arcSize = Size(radius * 2 - stroke, radius * 2 - stroke)
-                            drawArc(color, if (fraction == null) rotation else 270f, fraction?.times(360f) ?: 90f, false,
+
+                            drawCircle(color.copy(alpha = 0.25f), radius - stroke / 2, style = Stroke(stroke))
+                            drawArc(
+                                color = color,
+                                startAngle = rotation?.value ?: 270f,
+                                sweepAngle = fraction?.times(360f) ?: 90f,
+                                useCenter = false,
                                 topLeft = Offset((size.width - arcSize.width) / 2, (size.height - arcSize.height) / 2),
-                                size = arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
+                                size = arcSize,
+                                style = Stroke(stroke, cap = StrokeCap.Round)
+                            )
                         }
-                        Icon(Icons.Image, color = Theme.color.onSurfaceVariant, modifier = Modifier.size(feedbackSize * 0.4f))
+
+                        val iconColor = Theme.color.onSurfaceVariant
+                        val iconFilter = remember(iconColor) { ColorFilter.tint(iconColor) }
+
+                        Image(icon = Icons.Image, colorFilter = iconFilter, modifier = Modifier.size(feedbackSize * 0.4f))
                     }
                     ImageLoadStatus.Error -> {
                         if (state.canRetry) {
@@ -91,12 +94,14 @@ data class ImagePlaceholder(
                                     override val minimumTouchTargetSize = touchTargetSize
                                 }
                             }
+
                             CompositionLocalProvider(LocalViewConfiguration provides boundedConfiguration) {
-                                Icon(Icons.Refresh, color = Theme.color.warning, tip = "图片读取失败，点击重试",
-                                    onClick = state::retry, modifier = Modifier.size(iconSize))
+                                Icon(icon = Icons.Refresh, color = Theme.color.warning, onClick = state::retry, modifier = Modifier.size(iconSize))
                             }
                         }
-                        else Icon(Icons.Error, color = Theme.color.error, tip = "图片数据无法解码", modifier = Modifier.size(iconSize))
+                        else {
+                            Icon(icon = Icons.Error, color = Theme.color.error, modifier = Modifier.size(iconSize))
+                        }
                     }
                     else -> { }
                 }
@@ -106,13 +111,11 @@ data class ImagePlaceholder(
         @Stable
         val Default: ImagePlaceholder @Composable get() {
             val size = DpSize(Theme.size.input7, Theme.size.input7)
-            val background = Theme.color.scrim
 
-            return remember(size, background) {
+            return remember(size) {
                 ImagePlaceholder(
                     size = size,
                     aspectRatio = null,
-                    background = background,
                     loading = DefaultBlock,
                     error = DefaultBlock,
                     empty = DefaultBlock

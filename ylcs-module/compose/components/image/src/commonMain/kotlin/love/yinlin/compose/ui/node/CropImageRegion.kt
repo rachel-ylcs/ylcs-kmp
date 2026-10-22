@@ -47,7 +47,7 @@ import love.yinlin.extension.then
 
 @Stable
 private enum class CropImageHandle {
-    TopLeft, TopRight, BottomLeft, BottomRight, Inside
+    TopLeft, TopRight, BottomLeft, BottomRight, Inside;
 }
 
 private fun DrawScope.drawCorner(
@@ -59,6 +59,7 @@ private fun DrawScope.drawCorner(
     val width = 2.dp.toPx()
     val offsetFromVertex = width * 2f
     val offsetLine = width / 2f
+
     rect.topLeft.translate(offsetFromVertex, offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = -offsetLine),
@@ -75,6 +76,7 @@ private fun DrawScope.drawCorner(
             strokeWidth = width
         )
     }
+
     rect.topRight.translate(-offsetFromVertex, offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = offsetLine),
@@ -91,6 +93,7 @@ private fun DrawScope.drawCorner(
             strokeWidth = width
         )
     }
+
     rect.bottomLeft.translate(offsetFromVertex, -offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = -offsetLine),
@@ -107,6 +110,7 @@ private fun DrawScope.drawCorner(
             strokeWidth = width
         )
     }
+
     rect.bottomRight.translate(-offsetFromVertex, -offsetFromVertex).then { start ->
         drawLine(
             start = start.translate(x = offsetLine),
@@ -133,6 +137,7 @@ private fun DrawScope.drawGrid(
     val width = 1.dp.toPx()
     val width13 = rect.size.width / 3
     val width23 = width13 * 2
+
     drawLine(
         color = gridColor,
         alpha = gridAlpha,
@@ -147,8 +152,10 @@ private fun DrawScope.drawGrid(
         end = rect.bottomLeft.translate(x = width23),
         strokeWidth = width
     )
+
     val height13 = rect.size.height / 3
     val height23 = height13 * 2
+
     drawLine(
         color = gridColor,
         alpha = gridAlpha,
@@ -177,7 +184,7 @@ private class CropImageRegionNode(
     private var imageViewport = IntSize.Zero
     private var originalSize: IntSize? = null
     private var source: ImageSource? = null
-    private var version = ""
+    private var version: String? = null
     private var resetGeneration = -1
     private var displayRatio = 0f
     private var tolerance = 0f
@@ -189,18 +196,23 @@ private class CropImageRegionNode(
     private val pointerInputNode = delegate(SuspendingPointerInputModifierNode {
         awaitEachGesture {
             val down = awaitFirstDown(requireUnconsumed = false)
+
             if (!geometryReady || cropImageState.frameRect.isEmpty) return@awaitEachGesture
+
             handle = hitTest(down.position) ?: return@awaitEachGesture
+
             val start = awaitTouchSlopOrCancellation(down.id) { change, amount ->
                 moveFrame(amount)
                 change.consume()
             }
+
             if (start != null) {
                 drag(start.id) { change ->
                     moveFrame(change.positionChange())
                     change.consume()
                 }
             }
+
             handle = null
         }
     })
@@ -238,6 +250,7 @@ private class CropImageRegionNode(
 
     private fun updateGeometry(reset: Boolean = false) {
         if (!isAttached) return
+
         val oldSource = source
         val oldVersion = version
         val oldReset = resetGeneration
@@ -258,6 +271,7 @@ private class CropImageRegionNode(
 
         resetPending = resetPending || reset || oldSource != source || oldVersion != version || oldReset != resetGeneration
         geometryReady = imageViewport == viewport && !imageBounds.isEmpty && viewport.width > 0 && viewport.height > 0
+
         if (imageBounds.isEmpty) {
             handle = null
             cropImageState.imageRect = Rect.Zero
@@ -265,12 +279,14 @@ private class CropImageRegionNode(
             invalidateDraw()
             return
         }
+
         if (!geometryReady) {
             invalidateDraw()
             return
         }
 
         visibleBounds = imageBounds.intersect(Rect(Offset.Zero, viewport.toSize()))
+
         if (visibleBounds.isEmpty) {
             geometryReady = false
             cropImageState.imageRect = Rect.Zero
@@ -278,14 +294,14 @@ private class CropImageRegionNode(
             invalidateDraw()
             return
         }
+
         val original = originalSize
-        displayRatio = if (aspectRatio == 0f || original == null) 0f else
-            (aspectRatio.toDouble() * imageBounds.width * original.height / (imageBounds.height.toDouble() * original.width)).toFloat()
+        displayRatio = if (aspectRatio == 0f || original == null) 0f else (aspectRatio.toDouble() * imageBounds.width * original.height / (imageBounds.height.toDouble() * original.width)).toFloat()
 
         val initialize = resetPending || !hadFrame
         cropImageState.imageRect = imageBounds
-        cropImageState.frameRect = if (initialize) initialFrame() else
-            fitFrame((region * imageBounds.size).translate(imageBounds.topLeft))
+        cropImageState.frameRect = if (initialize) initialFrame() else fitFrame((region * imageBounds.size).translate(imageBounds.topLeft))
+
         if (initialize || oldBounds != imageBounds || oldRatio != displayRatio) {
             handle = null
             pointerInputNode.resetPointerInputHandler()
@@ -298,6 +314,7 @@ private class CropImageRegionNode(
         val available = minOf(visibleBounds.width, visibleBounds.height) * 0.8f
         val width: Float
         val height: Float
+
         if (displayRatio == 0f) {
             width = visibleBounds.width * 0.8f
             height = visibleBounds.height * 0.8f
@@ -310,6 +327,7 @@ private class CropImageRegionNode(
             width = available * displayRatio
             height = available
         }
+
         return Rect(visibleBounds.center - Offset(width / 2f, height / 2f), Size(width, height))
     }
 
@@ -319,11 +337,13 @@ private class CropImageRegionNode(
         val height = frame.height * factor
         val left = frame.left.coerceIn(visibleBounds.left, maxOf(visibleBounds.left, visibleBounds.right - width))
         val top = frame.top.coerceIn(visibleBounds.top, maxOf(visibleBounds.top, visibleBounds.bottom - height))
+
         return Rect(left, top, left + width, top + height)
     }
 
     private fun hitTest(position: Offset): CropImageHandle? = with(cropImageState.frameRect) {
         val radius = minOf(tolerance, width / 3f, height / 3f)
+
         when {
             Rect(topLeft, radius).contains(position) -> CropImageHandle.TopLeft
             Rect(topRight, radius).contains(position) -> CropImageHandle.TopRight
@@ -337,8 +357,8 @@ private class CropImageRegionNode(
     private fun moveFrame(amount: Offset) {
         val selected = handle ?: return
         if (!geometryReady) return
-        cropImageState.frameRect = if (selected == CropImageHandle.Inside) fitFrame(cropImageState.frameRect.translate(amount))
-            else resizeFrame(selected, amount)
+
+        cropImageState.frameRect = if (selected == CropImageHandle.Inside) fitFrame(cropImageState.frameRect.translate(amount)) else resizeFrame(selected, amount)
     }
 
     private fun resizeFrame(handle: CropImageHandle, amount: Offset): Rect {
@@ -353,6 +373,7 @@ private class CropImageRegionNode(
         val minimum = tolerance * 2f
         val width: Float
         val height: Float
+
         if (displayRatio == 0f) {
             width = wantedWidth.coerceIn(minOf(minimum, maxWidth), maxWidth)
             height = wantedHeight.coerceIn(minOf(minimum, maxHeight), maxHeight)
@@ -365,14 +386,21 @@ private class CropImageRegionNode(
             height = desired.coerceIn(minimumHeight, maximum)
             width = height * displayRatio
         }
-        return Rect(if (left) anchor.x - width else anchor.x, if (top) anchor.y - height else anchor.y,
-            if (left) anchor.x else anchor.x + width, if (top) anchor.y else anchor.y + height)
+
+        return Rect(
+            left = if (left) anchor.x - width else anchor.x,
+            top = if (top) anchor.y - height else anchor.y,
+            right = if (left) anchor.x else anchor.x + width,
+            bottom = if (top) anchor.y else anchor.y + height
+        )
     }
 
     override fun ContentDrawScope.draw() {
         drawContent()
+
         if (!geometryReady || imageState.contentRect.isEmpty || cropImageState.frameRect.isEmpty) return
         val frame = cropImageState.frameRect
+
         clipRect {
             drawIntoCanvas { canvas ->
                 canvas.saveLayer(Rect(Offset.Zero, size), maskPaint)
@@ -409,13 +437,6 @@ private data class CropImageRegionElement(
     }
 }
 
-/**
- * 在图片之上绘制并拖动裁剪选区，不改变组件的测量和图片加载。
- * 使用与图片相同的 imageState，并添加在尺寸、padding 等布局修饰之后。
- * aspectRatio 为原图裁剪结果的宽高比，0 表示自由比例；结果通过 cropImageState.result 获取。
- * 选区限制在可见图片内；ContentScale、对齐、缩放和平移均参与原图比例换算。
- * 一个 cropImageState 只由一个裁剪位置持有。
- */
 @Stable
 fun Modifier.cropImageRegion(imageState: ImageState, cropImageState: CropImageState, aspectRatio: Float = 0f): Modifier {
     require(aspectRatio.isFinite() && aspectRatio >= 0f)

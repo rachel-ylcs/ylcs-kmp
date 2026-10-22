@@ -7,7 +7,7 @@ import love.yinlin.compose.image.input.ImageSource
 @Stable
 internal data class ImageRequest(
     val source: ImageSource,
-    val version: String = "",
+    val version: String? = null,
     val targetSize: IntSize? = null,
     val sizeMultiplier: Float = 1f,
     val scaleToFill: Boolean = false,
@@ -19,7 +19,7 @@ internal data class ImageRequest(
         require(targetSize == null || (targetSize.width > 0 && targetSize.height > 0))
     }
 
-    fun sourceKey(inputKey: String): String = "${inputKey.length}:$inputKey:$version"
+    fun sourceKey(inputKey: String): String = if (version == null) "s:$inputKey" else "${inputKey.length}:$inputKey:$version"
     fun resultKey(sourceKey: String): String = "$sourceKey:${targetSize?.width}:${targetSize?.height}:$sizeMultiplier:$scaleToFill:$animated"
     fun decodeOptions(): ImageDecodeOptions = ImageDecodeOptions(targetSize, sizeMultiplier, scaleToFill, animated)
 }
