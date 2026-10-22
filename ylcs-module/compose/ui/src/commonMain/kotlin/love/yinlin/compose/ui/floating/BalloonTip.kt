@@ -59,6 +59,6 @@ private fun BalloonTip(text: String, content: @Composable () -> Unit) {
 @NonRestartableComposable
 fun BalloonTip(text: String, enabled: Boolean, content: @Composable () -> Unit) {
     val movableContent = rememberMovableContent(content)
-    if (enabled && text.isNotEmpty()) BalloonTip(text, movableContent)
+    if (enabled && text.isNotBlank()) BalloonTip(text, movableContent)
     else movableContent()
 }
