@@ -1,6 +1,5 @@
 package love.yinlin.gradle
 
-import org.gradle.api.artifacts.ProjectDependency
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.JvmMacOSPlatformSettings
 import org.jetbrains.compose.desktop.application.dsl.LinuxPlatformSettings
@@ -11,7 +10,6 @@ class DesktopPackage {
     var mainClass: String? = null
     var jvmArgs: List<String> = emptyList()
     var jvmModules: List<String> = emptyList()
-    var proguard: List<ProjectDependency> = emptyList()
     var useAOT: Boolean = false
 
     internal var windowsSettings: (WindowsPlatformSettings.() -> Unit)? = null

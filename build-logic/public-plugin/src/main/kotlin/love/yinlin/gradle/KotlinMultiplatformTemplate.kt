@@ -12,7 +12,6 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExtension
@@ -339,7 +338,6 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
 
             // Web
             if (webTarget) {
-                @OptIn(ExperimentalWasmDsl::class)
                 wasmJs {
                     compilerOptions {
                         target.set(buildDefaults.web.jsTarget)
@@ -424,6 +422,8 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
             if (stabilityFiles.isNotEmpty()) stabilityConfigurationFiles.addAll(stabilityFiles)
         }
 
+        if (desktopTarget) registerDesktopProguard(extension.targets.getByName("desktop").compilations.getByName("main"))
+
         extensions.findByType<ComposeExtension>()?.apply {
             if (exportResources) {
                 this.extensions.findByType<ResourcesExtension>()?.apply {
@@ -449,31 +449,9 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                                     obfuscate.set(true)
                                     joinOutputJars.set(true)
 
-                                    /*
-                                     * Compose Desktop 似乎还不支持内嵌 Proguard 规则
-                                     * 手动解析依赖
-                                     */
-                                    val proguardFiles = mutableListOf<File>()
-                                    for (dependency in dpkg.proguard) {
-                                        findProjectDirectory(dependency)?.let { directory ->
-                                            directory.dir("src/desktopMain/resources/META-INF/proguard").asFile.let { subDir ->
-                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
-                                            }
-                                            directory.dir("src/main/resources/META-INF/proguard").asFile.let { subDir ->
-                                                if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
-                                            }
-                                        }
-                                    }
-                                    // 再添加自身
-                                    desktopProguardKMPDir.asFile.let { subDir ->
-                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
-                                    }
-                                    desktopProguardJVMDir.asFile.let { subDir ->
-                                        if (subDir.isDirectory) proguardFiles += subDir.listFiles { it.extension == "pro" }!!
-                                    }
-
-                                    // 合并所有混淆规则
-                                    configurationFiles.from(*proguardFiles.toTypedArray())
+                                    // 自动收集桌面运行时递归项目依赖和项目自身的规则
+                                    val compilation = extension.targets.getByName("desktop").compilations.getByName("main")
+                                    configurationFiles.from(this@build.desktopProguardFiles(compilation))
                                 }
 
                                 if (dpkg.useAOT) {

@@ -46,15 +46,6 @@ rachel {
                 "java.management",
                 "jdk.unsupported"
             )
-            proguard = listOf(
-                projects.ylcsModule.core,
-                projects.ylcsModule.cs.core,
-                projects.ylcsModule.foundation.network,
-                projects.ylcsModule.platform.ffi.core,
-                projects.ylcsModule.platform.os.singleInstance,
-                projects.ylcsModule.compose.core,
-                projects.ylcsModule.compose.components.media,
-            )
             windows {
                 iconFile.set(C.root.app.config.icon)
             }

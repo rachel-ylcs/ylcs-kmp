@@ -71,6 +71,7 @@ open class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
         }
 
         configureActions()
+        registerDesktopProguard(extension.target.compilations.getByName("main"))
         registerDesktopNative(desktopNativeJVMSourceDir, "jar")
     }
 }

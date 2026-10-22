@@ -41,12 +41,6 @@ rachel {
                 "java.management",
                 "jdk.unsupported"
             )
-            proguard = listOf(
-                projects.ylcsModule.core,
-                projects.ylcsModule.cs.core,
-                projects.ylcsModule.foundation.network,
-                projects.ylcsModule.compose.core,
-            )
             windows { }
         }
 

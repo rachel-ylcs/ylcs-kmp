@@ -1,14 +1,10 @@
 package love.yinlin.gradle
 
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.Directory
 import org.gradle.kotlin.dsl.getByType
 
 val Project.buildDefaults: BuildDefaults get() = extensions.getByType<BuildDefaults>()
-
-@Suppress("UnstableApiUsage")
-internal fun Project.findProjectDirectory(dependency: ProjectDependency): Directory? = findProject(dependency.path)?.isolated?.projectDirectory
 
 // KMP 项目资源目录
 val Project.packageResourcesDir: Directory get() = layout.buildDirectory.get().dir("packageResources")
