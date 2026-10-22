@@ -452,17 +452,17 @@ class ScreenMusic : BasicScreen() {
 
                     if (deviceType == Device.Type.LANDSCAPE) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(Theme.padding.value5),
+                            modifier = Modifier.fillMaxWidth().padding(Theme.padding.eValue5),
                             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            MusicControlLayout(player, modifier = Modifier.widthIn(min = Theme.size.cell1).weight(1f))
+                            MusicControlLayout(player, modifier = Modifier.widthIn(min = Theme.size.cell1 * 1.5f).weight(1f))
                             MusicProgressLayout(player, musicInfo, modifier = Modifier.weight(3f))
                         }
                     }
                     else {
                         MusicProgressLayout(player, musicInfo, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9))
-                        MusicControlLayout(player, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value5))
+                        MusicControlLayout(player, modifier = Modifier.fillMaxWidth().padding(Theme.padding.value6))
                     }
                 }
             }
