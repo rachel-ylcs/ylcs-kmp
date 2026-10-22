@@ -18,7 +18,6 @@ repository {
 
         languageFeatures = listOf(
             "-Xexpect-actual-classes",
-            "-Xreturn-value-checker=check",
             "-Xcollection-literals",
         )
 
