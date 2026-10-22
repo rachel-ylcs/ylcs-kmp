@@ -19,7 +19,6 @@ import love.yinlin.extension.catching
 import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toAndroidUri
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 abstract class FloatingView {
@@ -44,7 +43,6 @@ abstract class FloatingView {
 
     private val Context.windowManager get() = this.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
 
-    @OptIn(ExperimentalUuidApi::class)
     fun attach(activity: ComponentActivity, onPermissionFailed: (() -> Unit)? = null) {
         if (canAttach(activity)) {
             val manager = activity.windowManager

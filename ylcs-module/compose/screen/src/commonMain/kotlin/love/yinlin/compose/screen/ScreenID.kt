@@ -5,10 +5,9 @@ import kotlinx.serialization.Serializable
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.extension.StringSerializer
 import love.yinlin.reflect.metaClassName
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class, CompatibleRachelApi::class)
+@OptIn(CompatibleRachelApi::class)
 @Stable
 @Serializable(ScreenID.Serializer::class)
 internal data class ScreenID(internal val id: Uuid = Uuid.generateV7()) {

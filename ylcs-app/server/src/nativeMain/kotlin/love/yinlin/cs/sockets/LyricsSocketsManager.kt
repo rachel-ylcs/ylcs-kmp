@@ -21,7 +21,6 @@ import love.yinlin.extension.toJsonString
 import love.yinlin.fs.File
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 class LyricsSocketsManager(
@@ -67,7 +66,6 @@ class LyricsSocketsManager(
             set.map { library[it] }
         }
 
-        @OptIn(ExperimentalUuidApi::class)
         val roomId: String = Uuid.generateV7().toString()
         var createTime: Long = DateEx.CurrentLong
         var submitTime1: Long? = null

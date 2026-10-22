@@ -1,10 +1,8 @@
 package love.yinlin.compose.game.traits
 
 import androidx.compose.runtime.Stable
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 @Stable
 abstract class Unique : Identifiable<Uuid> {
     final override val id: Uuid = Uuid.generateV7()

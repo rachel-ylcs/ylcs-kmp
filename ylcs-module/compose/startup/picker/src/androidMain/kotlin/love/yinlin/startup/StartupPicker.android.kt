@@ -29,11 +29,9 @@ import love.yinlin.uri.ContentUri
 import love.yinlin.uri.ImplicitUri
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 actual class StartupPicker actual constructor(pool: StartupPool) : SyncStartup(pool) {
-    @OptIn(ExperimentalUuidApi::class)
     private val generateKey: String get() = Uuid.generateV7().toString()
 
     private val isLegacy: Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q

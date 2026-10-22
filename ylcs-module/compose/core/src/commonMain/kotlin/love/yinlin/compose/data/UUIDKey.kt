@@ -1,17 +1,11 @@
 package love.yinlin.compose.data
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.util.fastFilter
-import androidx.compose.ui.util.fastFirstOrNull
-import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastForEachIndexed
-import androidx.compose.ui.util.fastLastOrNull
-import androidx.compose.ui.util.fastMap
+import androidx.compose.ui.util.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import love.yinlin.extension.DelegateSerializer
 import love.yinlin.extension.replaceAll
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @Stable
@@ -22,7 +16,6 @@ class UUIDKey<T>(val data: T) {
         override fun decode(value: T): UUIDKey<T> = UUIDKey(value)
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     val key: Uuid = Uuid.generateV7()
 
     operator fun component1(): T = data

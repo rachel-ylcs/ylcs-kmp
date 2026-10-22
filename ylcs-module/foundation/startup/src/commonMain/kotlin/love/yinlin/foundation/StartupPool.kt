@@ -16,7 +16,6 @@ import love.yinlin.extension.catchingError
 import love.yinlin.extension.then
 import love.yinlin.extension.throwing
 import kotlin.reflect.KProperty
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 /**
@@ -50,14 +49,12 @@ open class StartupPool(
     inline fun <reified S : Startup, F : StartupFactory<S>> startup(factory: F, dependencies: List<String>): StartupDelegate<S> =
         startup(StartupFactoryWithDependency(factory, dependencies))
 
-    @OptIn(ExperimentalUuidApi::class)
     inline fun sync(
         id: String = Uuid.generateV7().toString(),
         dependencies: List<String> = [],
         crossinline block: () -> Unit
     ): StartupDelegate<Startup> = startup(StartupFactory.sync(id, dependencies, block))
 
-    @OptIn(ExperimentalUuidApi::class)
     inline fun async(
         id: String = Uuid.generateV7().toString(),
         dependencies: List<String> = [],

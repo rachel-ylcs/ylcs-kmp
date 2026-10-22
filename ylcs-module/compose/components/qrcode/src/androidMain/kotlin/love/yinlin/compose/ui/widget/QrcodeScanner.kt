@@ -37,7 +37,6 @@ import love.yinlin.compose.ui.image.ColorIcon
 import love.yinlin.compose.ui.rememberPlatformView
 import love.yinlin.coroutines.ioContext
 import love.yinlin.extension.then
-import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @Stable
@@ -46,7 +45,6 @@ private class QrCodeScannerWrapper : PlatformView<PreviewView>(), Releasable<Pre
 
     var cameraScan: BaseCameraScan<Result>? = null
 
-    @OptIn(ExperimentalUuidApi::class)
     override fun build(context: Context, lifecycleOwner: LifecycleOwner, activityResultRegistry: ActivityResultRegistry?): PreviewView {
         val previewView = PreviewView(context)
         cameraScan = BaseCameraScan<Result>(context, lifecycleOwner, previewView).apply {
