@@ -31,8 +31,7 @@ internal abstract class BlurNode : Modifier.Node(), DrawModifierNode, Compositio
         when (event) {
             Lifecycle.Event.ON_STOP -> {
                 hostStopped = true
-                releaseResources()
-                invalidateDraw()
+                onHostStopped()
             }
             Lifecycle.Event.ON_START -> {
                 hostStopped = false
@@ -63,6 +62,10 @@ internal abstract class BlurNode : Modifier.Node(), DrawModifierNode, Compositio
             if (lifecycle !== newLifecycle) {
                 lifecycle?.removeObserver(lifecycleObserver)
                 lifecycle = newLifecycle
+
+                hostStopped = !newLifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+                if (hostStopped) onHostStopped()
+
                 newLifecycle.addObserver(lifecycleObserver)
             }
 
@@ -97,5 +100,6 @@ internal abstract class BlurNode : Modifier.Node(), DrawModifierNode, Compositio
     protected abstract fun detachBlur()
     protected abstract fun releaseResources()
     protected open fun resetBlur() = Unit
+    protected open fun onHostStopped() = Unit
     protected open fun onHostStarted() = Unit
 }

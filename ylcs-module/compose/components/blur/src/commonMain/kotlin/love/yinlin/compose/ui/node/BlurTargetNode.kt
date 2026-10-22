@@ -82,7 +82,7 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
     }
 
     override fun ContentDrawScope.draw() {
-        if (hostStopped || size.width <= 0f || size.height <= 0f) {
+        if (size.width <= 0f || size.height <= 0f) {
             releaseResources()
             drawContent()
             return

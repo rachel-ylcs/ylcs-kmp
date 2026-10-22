@@ -73,7 +73,7 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     }
 
     private fun updateInvalidationObserver() {
-        if (!captureDemand || !needsBlurInvalidationWorkaround()) {
+        if (hostStopped || !captureDemand || !needsBlurInvalidationWorkaround()) {
             stopInvalidationObserver()
         }
         else if (snapshotObserver == null) {
@@ -87,7 +87,8 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     }
 
     private fun scheduleRefresh() {
-        if (refreshJob?.isActive == true) return
+        if (!isAttached || !captureDemand || hostStopped || refreshJob?.isActive == true) return
+
         refreshJob = coroutineScope.launch {
             withFrameNanos { }
             if (isAttached && captureDemand && !hostStopped) {
@@ -123,7 +124,7 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
     }
 
     override fun ContentDrawScope.draw() {
-        if (!captureDemand || hostStopped || !supportsBlur() || size.minDimension.roundToInt() < 1) {
+        if (!captureDemand || !supportsBlur() || size.minDimension.roundToInt() < 1) {
             releaseCapture()
             drawContent()
             return
@@ -169,8 +170,13 @@ internal class BlurSourceNode(private var state: BlurState) : BlurNode(), Global
         invalidatePlacement()
     }
 
+    override fun onHostStopped() {
+        stopInvalidationObserver()
+    }
+
     override fun onHostStarted() {
+        resetBlur()
         updateInvalidationObserver()
-        invalidatePlacement()
+        state.invalidateTargets()
     }
 }
