@@ -27,7 +27,7 @@ mmkv = "2.4.3"
 # ----- [Android] -----
 
 androidx-activity = "1.13.0"
-media3 = "1.11.1"
+media3 = "1.12.0-alpha01"
 
 
 
