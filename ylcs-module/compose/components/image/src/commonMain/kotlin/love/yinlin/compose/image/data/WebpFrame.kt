@@ -27,14 +27,19 @@ internal class WebpFrame(
         }
     }
 
-    fun encoded(bytes: ByteArray): ByteArray = ByteArrayIO(30 + length).write {
-        writeByteArray(0, RIFF)
-        writeInt(4, 22 + length, Endian.LITTLE)
-        writeByteArray(8, WEBP_VP8X)
-        writeInt(16, 10, Endian.LITTLE)
-        writeByte(20, 0x10)
-        writeUInt24(24, width - 1)
-        writeUInt24(27, height - 1)
-        writeByteArray(30, bytes, offset, offset + length)
+    val encodedSize: Int get() = 30 + length
+
+    fun encodeInto(bytes: ByteArray, destination: ByteArray) {
+        with(ByteArrayIO(destination)) {
+            require(destination.size >= encodedSize)
+            writeByteArray(0, RIFF)
+            writeInt(4, 22 + length, Endian.LITTLE)
+            writeByteArray(8, WEBP_VP8X)
+            writeInt(16, 10, Endian.LITTLE)
+            writeInt(20, 0x10, Endian.LITTLE) // 缓冲区跨帧复用，必须重置 VP8X 的保留位。
+            writeUInt24(24, width - 1)
+            writeUInt24(27, height - 1)
+            writeByteArray(30, bytes, offset, offset + length)
+        }
     }
 }

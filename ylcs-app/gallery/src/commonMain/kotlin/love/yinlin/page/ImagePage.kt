@@ -285,7 +285,7 @@ object ImagePage : Page() {
                 contentScale = scales[scale], alignment = alignments[alignment], onClick = { clicks++ },
                 modifier = Modifier.fillMaxWidth().height(Theme.size.image1),
             )
-            GalleryParagraph("Fit / Inside 的留白不计入点击。切换窗口宽度观察固定高度的绘制范围。")
+            GalleryParagraph("Fit / Inside 的留白不计入点击。切换窗口宽度观察固定高度的绘制范围；同一请求保持首次解码结果，后续布局变化由 UI 缩放。")
             ExampleRow {
                 Example("无显式尺寸 · 主题默认占位") {
                     ResourceFileImage(Res.getUri("drawable/img0.webp"), contentDescription = "默认尺寸图片")
@@ -309,7 +309,7 @@ object ImagePage : Page() {
             var quality by rememberValueState(1)
             var circular by rememberFalse()
             var tint by rememberFalse()
-            var fadeIn by rememberFalse()
+            var fadeIn by rememberTrue()
             var alpha by rememberValueState(1f)
             var version by rememberValueState(0)
             val qualities = remember { [ImageQuality.Low, ImageQuality.Medium, ImageQuality.High, ImageQuality.Full] }
@@ -339,7 +339,7 @@ object ImagePage : Page() {
                 )
             )
             ImageStateDetails(state)
-            GalleryParagraph("淡入默认关闭；勾选首次加载淡入后，点击重新加载以比较淡入。重组、滚出后返回、保留状态重挂载及内存缓存命中均不重播。")
+            GalleryParagraph("quality 统一选择平台支持的重采样与绘制滤波，不按画质放大或分档解码尺寸。首次有效布局确定本次请求尺寸，后续布局变化只缩放已有图片；可在布局示例中调整窗口，观察容器变化时解码尺寸保持不变。淡入默认开启，重组、滚出后返回、保留状态重挂载及内存缓存命中均不重播；静态图淡入结束后直接绘制，不保留动画层。")
         }
     }
 
@@ -410,7 +410,7 @@ object ImagePage : Page() {
                 )
             }
             ImageStateDetails(state)
-            GalleryParagraph("双击、双指、滚轮可缩放，放大后拖动平移；也可使用上方按钮放大、缩小或复位。未缩放或平移到边缘后继续横拖，可切换 Pager；第三页为动图，可观察缩放时的播放。")
+            GalleryParagraph("双击、双指、滚轮可缩放，放大后拖动平移；也可使用上方按钮放大、缩小或复位。未缩放或平移到边缘后继续横拖，可切换 Pager；第三页为动图，可观察缩放时的播放。Android WebP 使用独立的系统播放器；停止后再次播放、切页后返回或回到前台会从头播放，可据此检查生命周期。")
         }
     }
 

@@ -13,6 +13,7 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
+import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.EncodedOrigin
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageInfo
@@ -29,13 +30,15 @@ internal class SkiaImageDecoder(
     override val size: IntSize,
     animated: Boolean,
     private val origin: EncodedOrigin = EncodedOrigin.TOP_LEFT,
+    private val sampling: SamplingMode = SamplingMode.LINEAR,
 ) : ImageDecoder {
     private val frames: Array<AnimationFrameInfo> = if (animated) requireNotNull(codec).framesInfo else []
-    override val durations: IntArray = if (animated) frames.map { normalizedFrameDuration(it.duration) }.toIntArray() else [0]
+    override val durations: IntArray = if (animated) IntArray(frames.size) { normalizedFrameDuration(frames[it].duration) } else [0]
     override val repeatCount: Int = if (animated) requireNotNull(codec).repetitionCount else 0
 
     private var scratch: Bitmap? = null
     private var lastFrame = -1
+    private val frameSize = if (codec?.encodedImageFormat == EncodedImageFormat.WEBP) size else originalSize
 
     override suspend fun frame(index: Int): ImageBitmap {
         require(index in durations.indices)
@@ -45,7 +48,7 @@ internal class SkiaImageDecoder(
 
         val bitmap = scratch ?: Bitmap().also {
             scratch = it
-            check(it.allocPixels(ImageInfo.makeN32Premul(originalSize.width, originalSize.height)))
+            check(it.allocPixels(ImageInfo.makeN32Premul(frameSize.width, frameSize.height)))
         }
         val required = frames[index].requiredFrame
         val prior = if (lastFrame in 0 ..< index && required >= 0 && lastFrame >= required && frames[lastFrame].disposalMethod != AnimationDisposalMode.RESTORE_PREVIOUS) lastFrame else -1
@@ -55,17 +58,7 @@ internal class SkiaImageDecoder(
         context.ensureActive()
         lastFrame = index
 
-        val pixels = requireNotNull(bitmap.peekPixels())
-
-        return cleaning({
-            val view = Data.makeWithoutCopy(pixels.addr, pixels.computeByteSize(), bitmap)
-            cleaning({
-                val image = Image.makeRaster(bitmap.imageInfo, view, bitmap.rowBytes)
-                cleaning({
-                    render(image, context)
-                }, image::close)
-            }, view::close)
-        }, pixels::close)
+        return bitmap.copyImageBitmap(size, context, sampling)
     }
 
     private fun render(image: Image, context: CoroutineContext): ImageBitmap {
@@ -81,7 +74,7 @@ internal class SkiaImageDecoder(
                 val source = Rect.makeWH(image.width.toFloat(), image.height.toFloat())
 
                 if (origin == EncodedOrigin.TOP_LEFT) {
-                    canvas.drawImageRect(image, source, Rect.makeWH(size.width.toFloat(), size.height.toFloat()), SamplingMode.LINEAR, null, true)
+                    canvas.drawImageRect(image, source, Rect.makeWH(size.width.toFloat(), size.height.toFloat()), sampling, null, true)
                 }
                 else {
                     val rotated = origin.swapsWidthHeight()
@@ -90,7 +83,7 @@ internal class SkiaImageDecoder(
 
                     canvas.scale(size.width.toFloat() / width, size.height.toFloat() / height)
                     canvas.concat(origin.toMatrix(width, height))
-                    canvas.drawImageRect(image, source, source, SamplingMode.LINEAR, null, true)
+                    canvas.drawImageRect(image, source, source, sampling, null, true)
                 }
             }, canvas::close)
 

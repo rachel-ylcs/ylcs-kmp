@@ -26,11 +26,12 @@ rachel {
                 )
             }
 
+            jvmMain(commonMain)
+            androidMain(jvmMain)
             skikoMain(commonMain)
             iosMain(skikoMain)
             iosMainList(iosMain)
-            desktopMain(skikoMain)
-
+            desktopMain(skikoMain, jvmMain)
             webMain(skikoMain)
             jsMain(webMain)
             wasmJsMain(webMain)

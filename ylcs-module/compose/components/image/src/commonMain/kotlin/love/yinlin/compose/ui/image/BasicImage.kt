@@ -1,6 +1,6 @@
 package love.yinlin.compose.ui.image
 
-import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.LocalIndication
@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.ImageBitmap
@@ -39,15 +40,23 @@ import androidx.compose.ui.layout.*
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.ObserverModifierNode
+import androidx.compose.ui.node.observeReads
+import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.invalidateMeasurement
 import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.*
 import love.yinlin.compose.Theme
+import love.yinlin.compose.data.ImageQuality
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberState
 import love.yinlin.compose.image.ImageLoader
@@ -64,6 +73,7 @@ import love.yinlin.extension.cleaning
 import kotlin.math.abs
 import kotlin.math.exp
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 private class AnimationCursor(private val frameCount: Int, private val repeatCount: Int) {
     var index = 0
@@ -106,19 +116,47 @@ private fun Density.imageLayoutSize(placeholder: ImagePlaceholder, constraints: 
     return IntSize(constraints.constrainWidth(width), constraints.constrainHeight(height))
 }
 
-private class ImageLayoutNode(
+private class ImageNode(
     var state: ImageState,
     var loader: ImageLoader?,
     var placeholder: ImagePlaceholder,
     var geometry: ImageGeometry,
-    var multiplier: Float,
+    var decodeScale: Float,
+    var quality: ImageQuality,
     var animated: Boolean,
+    var hardwareAllowed: Boolean,
     var reloadKey: Int,
-) : Modifier.Node(), LayoutModifierNode {
+    var alpha: Float,
+    var colorFilter: ColorFilter?,
+    var filterQuality: FilterQuality,
+    var bitmapContent: Boolean,
+    var fadeIn: Boolean,
+    var fadeMillis: Int,
+) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, ObserverModifierNode {
+    // 绘制参数变化不应使布局失效；合并节点后分别调度测量与重绘
+    override val shouldAutoInvalidate: Boolean get() = false
+
     private var pending: Job? = null
-    private var layout: ImageLayoutSize? = null
     private var requested = true
     private var configured = true
+    private var layoutData: ImageLayoutData? = null
+    private var result: ImageResult? = null
+    private var viewport = IntSize.Zero
+    private var viewportState: ImageState? = null
+    private var bounds = Rect.Zero
+    private var fading: Job? = null
+    private var fadeAlpha = 1f
+    private var fadePaint: Paint? = null
+
+    private fun resetDrawing() {
+        fading?.cancel()
+        fading = null
+        result = null
+        viewportState = null
+        bounds = Rect.Zero
+        fadeAlpha = 1f
+        fadePaint = null
+    }
 
     private fun prepare() {
         pending?.cancel()
@@ -129,7 +167,10 @@ private class ImageLayoutNode(
     }
 
     override fun onAttach() {
-        if (configured) prepare()
+        if (configured) {
+            prepare()
+            observeContent()
+        }
         invalidateMeasurement()
     }
 
@@ -137,42 +178,51 @@ private class ImageLayoutNode(
         pending?.cancel()
         pending = null
         requested = true
+        resetDrawing()
     }
 
     override fun onReset() {
         pending?.cancel()
         pending = null
-        layout = null
         requested = true
         configured = false
+        resetDrawing()
     }
 
-    fun update(element: ImageLayoutElement) {
+    fun update(element: ImageLayoutData): Boolean {
+        // alpha / 滤色变化时复用布局参数，不重复读取状态或运行加载配置判断
+        if (configured && layoutData === element) return false
+        layoutData = element
+
+        val layoutChanged = !configured || state !== element.state || loader !== element.loader ||
+                placeholder != element.placeholder || geometry != element.geometry || decodeScale != element.decodeScale ||
+                quality != element.quality || animated != element.animated || hardwareAllowed != element.hardwareAllowed || reloadKey != element.reloadKey
+
         val reload = !configured || state !== element.state || loader !== element.loader ||
-            geometry.source != element.geometry.source || geometry.version != element.geometry.version ||
-            geometry.contentScale != element.geometry.contentScale || multiplier != element.multiplier ||
-            animated != element.animated || reloadKey != element.reloadKey
+                geometry.source != element.geometry.source || geometry.version != element.geometry.version ||
+                geometry.contentScale != element.geometry.contentScale || decodeScale != element.decodeScale ||
+                quality != element.quality || animated != element.animated || hardwareAllowed != element.hardwareAllowed || reloadKey != element.reloadKey
 
         state = element.state
         loader = element.loader
         placeholder = element.placeholder
         geometry = element.geometry
-        multiplier = element.multiplier
+        decodeScale = element.decodeScale
+        quality = element.quality
         animated = element.animated
+        hardwareAllowed = element.hardwareAllowed
         reloadKey = element.reloadKey
         configured = true
 
         if (isAttached) {
             if (reload) prepare()
             else state.updateGeometry(geometry)
+            if (layoutChanged) invalidateMeasurement()
         }
+        return reload
     }
 
     private fun load(size: IntSize) {
-        pending?.cancel()
-        pending = null
-
-        if (size.width == 0 || size.height == 0) return
         val source = geometry.source ?: return
         val loader = loader ?: return
 
@@ -180,27 +230,39 @@ private class ImageLayoutNode(
         val version = geometry.version
         val contentScale = geometry.contentScale
 
+        val scaled = IntSize((size.width * decodeScale).roundToInt(), (size.height * decodeScale).roundToInt())
         val target = when (contentScale) {
             ContentScale.None -> null
-            ContentScale.FillWidth -> IntSize(size.width, Int.MAX_VALUE)
-            ContentScale.FillHeight -> IntSize(Int.MAX_VALUE, size.height)
-            else -> size
+            ContentScale.FillWidth -> IntSize(scaled.width, Int.MAX_VALUE)
+            ContentScale.FillHeight -> IntSize(Int.MAX_VALUE, scaled.height)
+            else -> scaled
         }
-        val request = ImageRequest(source, version, target, multiplier, contentScale == ContentScale.Crop || contentScale == ContentScale.FillBounds, animated)
+        val request = ImageRequest(source, version, target, contentScale == ContentScale.Crop || contentScale == ContentScale.FillBounds, animated, quality = quality, hardwareAllowed = hardwareAllowed)
 
         val retained = state.result
-        if (retained != null && state.retainedRequest == request && state.retainedGeneration == loader.cacheGeneration) {
-            state.success(retained)
+        val retainedRequest = state.retainedRequest
+        if (retained != null && retainedRequest != null && request.sameContent(retainedRequest) &&
+            state.retainedGeneration == loader.cacheGeneration && request.canReuse(retained)) {
+            pending?.cancel()
+            pending = null
+            if (state.status != ImageLoadStatus.Success) state.success(retained)
             return
         }
+        pending?.cancel()
+        pending = null
         state.begin(source, version)
 
         pending = coroutineScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            currentCoroutineContext().ensureActive()
             val error = try {
                 catchingError {
                     val generation = loader.cacheGeneration
-                    val result = loader.load(request) { state.progress = it }
+                    val result = coroutineScope {
+                        val feedback = launch {
+                            delay(loader.configuration.loadingDelayMillis.milliseconds)
+                            if (state.result == null) state.feedbackStatus = ImageLoadStatus.Loading
+                        }
+                        cleaning({ loader.load(request) { state.progress = it } }, feedback::cancel)
+                    }
                     state.retainedRequest = request
                     state.retainedGeneration = generation
                     state.success(result)
@@ -212,19 +274,21 @@ private class ImageLayoutNode(
             }
             if (error != null) state.failure(error)
         }
-
-        if (pending?.isCompleted == false && state.result == null) state.feedbackStatus = ImageLoadStatus.Loading
     }
 
     override fun MeasureScope.measure(measurable: Measurable, constraints: Constraints): MeasureResult {
         val target = imageLayoutSize(placeholder, constraints)
         if (configured) {
-            state.updateSize(target)
-            if (requested || layout?.target != target) {
+            val resized = viewport != target || viewportState !== state
+            viewport = target
+            viewportState = state
+            if (resized) state.updateSize(target)
+            // 每次请求只解析首个有效布局尺寸；后续布局变化仅缩放已有结果，不重启加载。
+            if (requested && target.width > 0 && target.height > 0) {
                 requested = false
-                layout = ImageLayoutSize(target)
                 load(target)
             }
+            if (resized) observeContent()
         }
 
         val child = measurable.measure(Constraints.fixed(target.width, target.height))
@@ -235,84 +299,114 @@ private class ImageLayoutNode(
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(measurable: IntrinsicMeasurable, height: Int): Int = 0
     override fun IntrinsicMeasureScope.minIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int = 0
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(measurable: IntrinsicMeasurable, width: Int): Int = 0
-}
 
-private data class ImageLayoutElement(
-    val state: ImageState,
-    val loader: ImageLoader?,
-    val placeholder: ImagePlaceholder,
-    val geometry: ImageGeometry,
-    val multiplier: Float,
-    val animated: Boolean,
-    val reloadKey: Int,
-) : ModifierNodeElement<ImageLayoutNode>() {
-    override fun create(): ImageLayoutNode = ImageLayoutNode(state, loader, placeholder, geometry, multiplier, animated, reloadKey)
+    override fun onObservedReadsChanged() = observeContent()
 
-    override fun update(node: ImageLayoutNode) = node.update(this)
+    fun observeContent() {
+        observeReads {
+            val current = state.activeResult(geometry.source, geometry.version, geometry.ready)
+            // 静态几何仅随结果、布局和配置变化；每帧绘制直接使用缓存，不再重复读取快照状态
+            bounds = if (bitmapContent && current != null) geometry.bounds(current.size, viewport) else Rect.Zero
+            if (result !== current || !fadeIn) {
+                fading?.cancel()
+                fading = null
+                fadeAlpha = 1f
+                result = current
 
-    override fun InspectorInfo.inspectableProperties() = inspector("imageLayout")
-}
+                if (current != null && state.consumeFade(current) && fadeIn) {
+                    fadeAlpha = 0f
+                    fading = coroutineScope.launch {
+                        animate(0f, 1f, animationSpec = tween(fadeMillis)) { value, _ ->
+                            fadeAlpha = value
+                            invalidateDraw()
+                        }
+                        fadeAlpha = 1f
+                        fading = null
+                        fadePaint = null
+                        invalidateDraw()
+                    }
+                }
+            }
+        }
+        invalidateDraw()
+    }
 
-private class ImageDrawNode(
-    var state: ImageState,
-    var geometry: ImageGeometry,
-    var alpha: Float,
-    var colorFilter: ColorFilter?,
-    var quality: FilterQuality,
-    var description: String,
-    var bitmapContent: Boolean,
-) : Modifier.Node(), DrawModifierNode {
     override fun ContentDrawScope.draw() {
         clipRect {
             if (bitmapContent) {
-                val result = state.activeResult(geometry.source, geometry.version, geometry.ready)
+                val result = this@ImageNode.result
                 if (result != null && alpha > 0f) {
-                    val bounds = state.contentRect
+                    val bounds = this@ImageNode.bounds
                     if (!bounds.isEmpty) {
                         drawImage(
                             image = result.image,
                             dstOffset = bounds.topLeft.round(),
                             dstSize = bounds.size.roundToIntSize(),
-                            alpha = alpha,
+                            alpha = alpha * fadeAlpha,
                             colorFilter = colorFilter,
-                            filterQuality = quality
+                            filterQuality = filterQuality
                         )
                     }
                 }
             }
-            this@draw.drawContent()
+            if (!bitmapContent && fadeAlpha < 1f) {
+                val paint = fadePaint ?: Paint().also { fadePaint = it }
+                paint.alpha = fadeAlpha
+                val canvas = drawContext.canvas
+                canvas.saveLayer(Rect(Offset.Zero, size), paint)
+                cleaning({ this@draw.drawContent() }, canvas::restore)
+            }
+            else this@draw.drawContent()
         }
     }
 }
 
-private data class ImageDrawElement(
+@Stable
+private data class ImageLayoutData(
     val state: ImageState,
+    val loader: ImageLoader?,
+    val placeholder: ImagePlaceholder,
     val geometry: ImageGeometry,
+    val decodeScale: Float,
+    val quality: ImageQuality,
+    val animated: Boolean,
+    val hardwareAllowed: Boolean,
+    val reloadKey: Int,
+)
+
+private data class ImageElement(
+    val layout: ImageLayoutData,
     val alpha: Float,
     val colorFilter: ColorFilter?,
-    val quality: FilterQuality,
-    val description: String,
+    val filterQuality: FilterQuality,
     val bitmapContent: Boolean,
-) : ModifierNodeElement<ImageDrawNode>() {
-    override fun create(): ImageDrawNode = ImageDrawNode(state, geometry, alpha, colorFilter, quality, description, bitmapContent)
+    val fadeIn: Boolean,
+    val fadeMillis: Int,
+) : ModifierNodeElement<ImageNode>() {
+    override fun create(): ImageNode = ImageNode(layout.state, layout.loader, layout.placeholder, layout.geometry,
+        layout.decodeScale, layout.quality, layout.animated, layout.hardwareAllowed, layout.reloadKey,
+        alpha, colorFilter, filterQuality, bitmapContent, fadeIn, fadeMillis)
 
-    override fun update(node: ImageDrawNode) {
-        node.state = state
-        node.geometry = geometry
+    override fun update(node: ImageNode) {
+        val contentChanged = node.state !== layout.state || node.geometry != layout.geometry || node.fadeIn != fadeIn || node.bitmapContent != bitmapContent
+        val reload = node.update(layout)
         node.alpha = alpha
         node.colorFilter = colorFilter
-        node.quality = quality
-        node.description = description
+        node.filterQuality = filterQuality
         node.bitmapContent = bitmapContent
+        node.fadeIn = fadeIn
+        node.fadeMillis = fadeMillis
+        if (node.isAttached && (contentChanged || reload)) node.observeContent()
+        else if (node.isAttached) node.invalidateDraw()
     }
 
-    override fun InspectorInfo.inspectableProperties() = inspector("imageContent")
+    override fun InspectorInfo.inspectableProperties() = inspector("image")
 }
 
 @Composable
-private fun rememberAnimatedImageFrame(result: ImageResult, state: ImageState): ImageBitmap {
-    val animation = result.animation ?: return result.image
-    var frame by rememberState(result) { result.image }
+private fun rememberAnimatedImageFrame(result: ImageResult, state: ImageState): State<ImageBitmap> {
+    val animation = requireNotNull(result.animation)
+    val frame = rememberState(result) { result.image }
     val foreground by rememberOffScreenWindowState()
     val cursor = remember(result) { AnimationCursor(animation.durations.size, animation.repeatCount) }
 
@@ -331,8 +425,12 @@ private fun rememberAnimatedImageFrame(result: ImageResult, state: ImageState): 
                     val next = cursor.next() ?: break
                     val nextFrame = Coroutines.cpu { requireNotNull(decoder).frame(next) }
                     var now = withFrameNanos { it }
-                    while (now < deadline) now = withFrameNanos { it }
-                    frame = nextFrame
+                    while (now < deadline) {
+                        val remaining = (deadline - now) / 1000000L
+                        if (remaining > 16L) delay((remaining - 16L).milliseconds)
+                        now = withFrameNanos { it }
+                    }
+                    frame.value = nextFrame
                     cursor.advance(next)
                     deadline = maxOf(deadline, now) + animation.durations[next] * 1000000L
                 }
@@ -344,25 +442,6 @@ private fun rememberAnimatedImageFrame(result: ImageResult, state: ImageState): 
         if (error != null) state.failure(ImageDecodeException(error))
     }
     return frame
-}
-
-@Composable
-private fun rememberImageFade(source: ImageSource?, version: String?, state: ImageState, result: ImageResult?): State<Float>? {
-    val displayed = remember(source, version, state) { result != null }
-    if (displayed || result == null) return null
-
-    val fade = remember(source, version, state) {
-        if (result.origin == ImageOrigin.Memory) null else Animatable(0f)
-    } ?: return null
-
-    val fadeMillis = Theme.animation.duration.default
-
-    LaunchedEffect(result) {
-        if (fade.targetValue == 1f) fade.snapTo(1f)
-        else fade.animateTo(1f, tween(fadeMillis))
-    }
-
-    return fade.asState()
 }
 
 @Composable
@@ -529,18 +608,19 @@ private fun ImageClickOverlay(state: ImageState, geometry: ImageGeometry, onClic
 @Composable
 private fun BoxScope.ImageContent(state: ImageState, geometry: ImageGeometry, contentDescription: String, alpha: Float, options: ImageOptions) {
     val result = state.activeResult(geometry.source, geometry.version, geometry.ready)
-    val frame = if (result?.isAnimated == true) rememberAnimatedImageFrame(result, state) else result?.image
-    val painter = remember(frame, options.quality) {
-        frame?.let { BitmapPainter(it, filterQuality = options.quality.filterQuality) } ?: ColorPainter(Color.Transparent)
+    val platform = if (result?.isAnimated == true) rememberPlatformAnimatedPainter(result, state) else null
+    val frame = if (result?.isAnimated == true && platform == null) rememberAnimatedImageFrame(result, state) else null
+    val painter = platform ?: remember(result, frame, options.quality) {
+        val filterQuality = ImageQualityPolicy.from(options.quality).filterQuality
+        if (frame != null) AnimatedImagePainter(frame, requireNotNull(result).size, filterQuality)
+        else result?.image?.let { BitmapPainter(it, filterQuality = filterQuality) } ?: ColorPainter(Color.Transparent)
     }
-    val fade = if (options.fadeIn) rememberImageFade(geometry.source, geometry.version, state, result) else null
     val zoom = if (options.zoom) state.zoom else null
-    val drawing = if (zoom != null || fade != null) Modifier.graphicsLayer {
-        this.alpha = fade?.value ?: 1f
-        scaleX = zoom?.scale ?: 1f
+    val drawing = if (zoom != null) Modifier.graphicsLayer {
+        scaleX = zoom.scale
         scaleY = scaleX
-        translationX = zoom?.translation?.x ?: 0f
-        translationY = zoom?.translation?.y ?: 0f
+        translationX = zoom.translation.x
+        translationY = zoom.translation.y
     } else Modifier
 
     Image(
@@ -584,25 +664,49 @@ fun BasicImage(
 ) {
     val loader = if (source == null) null else ImageManager.loaderOrNull
     val decodeScale = if (options.zoom) rememberImageDecodeScale(state) else 1f
-    val multiplier = options.quality.sizeMultiplier * decodeScale
     val animated = options.animated
-    val geometry = ImageGeometry(source, version, loader != null, contentScale, alignment, LocalLayoutDirection.current, options.zoom)
+    val hardwareAllowed = imageHardwareAllowed()
+    val direction = LocalLayoutDirection.current
+    val geometry = remember(source, version, loader != null, contentScale, alignment, direction, options.zoom) {
+        ImageGeometry(source, version, loader != null, contentScale, alignment, direction, options.zoom)
+    }
+    val reloadKey = state.reloadKey
+    val layout = remember(state, loader, placeholder, geometry, decodeScale, options.quality, animated, hardwareAllowed, reloadKey) {
+        ImageLayoutData(state, loader, placeholder, geometry, decodeScale, options.quality, animated, hardwareAllowed, reloadKey)
+    }
     val animatedResult = state.isAnimated && state.activeResult(source, version, loader != null) != null
     val interaction = if (options.zoom) rememberImageZoomModifier(state, onClick) else Modifier
     val visibility = if (animatedResult) rememberImageVisibilityModifier(state) else Modifier
     val shape = if (options.circular) Modifier.clip(Theme.shape.circle) else Modifier
-    val separateContent = options.zoom || options.fadeIn || animatedResult
+    val separateContent = options.zoom || animatedResult
     val clipping = if (separateContent) Modifier.clipToBounds() else Modifier
-    val drawing = ImageDrawElement(state, geometry, alpha, options.colorFilter, options.quality.filterQuality, contentDescription, !separateContent)
+    val semantics = remember(contentDescription, separateContent) {
+        if (!separateContent && contentDescription.isNotEmpty()) Modifier.semantics {
+            this.contentDescription = contentDescription
+            role = Role.Image
+        } else Modifier
+    }
+    val drawing = ImageElement(layout, alpha, options.colorFilter, ImageQualityPolicy.from(options.quality).filterQuality,
+        !separateContent, options.fadeIn, if (options.fadeIn) Theme.animation.duration.default else 0)
+
+    val overlayClick = if (options.zoom) null else onClick
+    val overlays: @Composable BoxScope.() -> Unit = remember(state, geometry, placeholder, overlayClick) {
+        {
+            if (overlayClick != null) ImageClickOverlay(state, geometry, overlayClick)
+            ImageFeedback(state, geometry, placeholder)
+        }
+    }
+
+    // 静态图的 alpha / 滤色变化只更新绘制节点，不使占位与点击内容的组合失效
+    val content: @Composable BoxScope.() -> Unit = if (separateContent) {
+        {
+            ImageContent(state, geometry, contentDescription, alpha, options)
+            overlays()
+        }
+    } else overlays
 
     Box(
-        modifier = modifier.then(ImageLayoutElement(state, loader, placeholder, geometry, multiplier, animated, state.reloadKey))
-            .then(visibility).then(shape).then(clipping).then(interaction).then(drawing)
-    ) {
-        if (separateContent) ImageContent(state, geometry, contentDescription, alpha, options)
-
-        if (!options.zoom && onClick != null) ImageClickOverlay(state, geometry, onClick)
-
-        ImageFeedback(state, geometry, placeholder)
-    }
+        modifier = modifier.then(visibility).then(shape).then(clipping).then(interaction).then(semantics).then(drawing),
+        content = content
+    )
 }

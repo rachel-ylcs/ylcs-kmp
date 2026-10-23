@@ -15,7 +15,9 @@ import love.yinlin.compose.image.cache.ImageDiskCache
 import love.yinlin.compose.image.cache.ImageMemoryCache
 import love.yinlin.compose.image.data.*
 import love.yinlin.compose.image.decoder.ImageDecodeException
+import love.yinlin.compose.image.decoder.decodePlatformImageFile
 import love.yinlin.compose.image.decoder.openImageDecoder
+import love.yinlin.compose.image.decoder.platformAnimation
 import love.yinlin.compose.image.input.*
 import love.yinlin.concurrent.Lock
 import love.yinlin.concurrent.Mutex
@@ -76,6 +78,7 @@ internal class ImageLoader(
         }
 
         val resultKey = request.resultKey(sourceKey)
+        val cacheGroup = request.cacheGroup(sourceKey)
         val epoch = maintenance.with {
             lock.synchronized {
                 check(!closed) { "ImageLoader is closed" }
@@ -83,7 +86,7 @@ internal class ImageLoader(
             }
         }
 
-        lock.synchronized { memory.get(resultKey) }?.let { return it }
+        lock.synchronized { memory.get(resultKey, cacheGroup, request) }?.let { return it }
 
         val reportsProgress = input !== LocalFileImageInput && input !== ResourceFileImageInput && input !== ByteArrayImageInput
         val flightKey = "$resultKey:${request.diskCache}:$epoch"
@@ -106,7 +109,20 @@ internal class ImageLoader(
     }
 
     private suspend fun decode(request: ImageRequest, sourceKey: String, resultKey: String, epoch: Long, onProgress: ((ImageProgress) -> Unit)?): ImageResult {
-        lock.synchronized { memory.get(resultKey) }?.let { return it }
+        val cacheGroup = request.cacheGroup(sourceKey)
+        lock.synchronized { memory.get(resultKey, cacheGroup, request) }?.let { return it }
+
+        if (request.source is ImageSource.LocalFile && components.platformFilesAllowed && components.input(request.source) === LocalFileImageInput) {
+            val decoded = decodes.withPermit {
+                decodePlatformImageFile(request.source.file, request.decodeOptions(), configuration.maxSourceBytes)
+            }
+            if (decoded != null) {
+                lock.synchronized {
+                    if (generation == epoch && !closed) memory.put(resultKey, cacheGroup, decoded)
+                }
+                return decoded
+            }
+        }
 
         val data = if (request.source is ImageSource.Bytes && components.input(request.source) === ByteArrayImageInput) {
             ImageInputData(request.source.data, ImageOrigin.Local)
@@ -117,7 +133,7 @@ internal class ImageLoader(
         return throwing(::ImageDecodeException) {
             decodes.withPermit {
                 Coroutines.cpu {
-                    val decoder = openImageDecoder(data.bytes, request)
+                    val decoder = components.open(data.bytes, request.decodeOptions())
 
                     val decoded = cleaning({
                         require(decoder.size.width > 0 && decoder.size.height > 0 && decoder.size.width.toLong() * decoder.size.height <= configuration.maxDecodePixels) { "Decoder exceeded the pixel budget" }
@@ -132,13 +148,14 @@ internal class ImageLoader(
                             durations = decoder.durations,
                             repeatCount = decoder.repeatCount,
                             request = request,
+                            platform = decoder.platformAnimation(),
                         ) else null
 
                         ImageResult(frame, decoder.originalSize, data.origin, animation)
                     }, decoder::close)
 
                     lock.synchronized {
-                        if (generation == epoch && !closed) memory.put(resultKey, decoded)
+                        if (generation == epoch && !closed) memory.put(resultKey, cacheGroup, decoded)
                     }
 
                     decoded

@@ -58,7 +58,10 @@ data class ImagePlaceholder(
                         val feedbackSize = minOf(Theme.size.input7, availableSize)
                         val fraction = state.progress.fraction
                         val color = Theme.color.primaryContainer
-                        val rotation = if (fraction == null) rememberInfiniteTransition().animateFloat(0f, 360f, infiniteRepeatable(tween(Theme.animation.duration.v2, easing = LinearEasing))) else null
+
+                        val rotationMillis = Theme.animation.duration.v2.coerceAtLeast(1)
+                        val phase = remember(state) { (state.loadingElapsedMillis() % rotationMillis).toFloat() / rotationMillis * 360f }
+                        val rotation = if (fraction == null) rememberInfiniteTransition().animateFloat(phase, phase + 360f, infiniteRepeatable(tween(rotationMillis, easing = LinearEasing))) else null
 
                         Canvas(modifier = Modifier.size(feedbackSize)) {
                             val radius = size.minDimension / 2f

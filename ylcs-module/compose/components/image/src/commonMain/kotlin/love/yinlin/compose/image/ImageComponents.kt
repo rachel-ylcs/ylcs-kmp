@@ -8,6 +8,7 @@ import kotlin.reflect.KClass
 
 @Stable
 internal class ImageComponents(customInputs: List<ImageInput<*>>, customFormats: List<ImageFormat>) {
+    val platformFilesAllowed: Boolean = customFormats.isEmpty() && supportsPlatformImageFiles
     private val inputs: Map<KClass<out ImageSource>, ImageInput<*>>
     private val formats: List<ImageFormat>
 
@@ -25,5 +26,10 @@ internal class ImageComponents(customInputs: List<ImageInput<*>>, customFormats:
     @Suppress("UNCHECKED_CAST")
     fun input(source: ImageSource): ImageInput<ImageSource> = checkNotNull(inputs[source::class]) { "Image input is not configured for this source type" } as ImageInput<ImageSource>
 
-    fun open(bytes: ByteArray, options: ImageDecodeOptions): ImageDecoder = (formats.firstOrNull { it.matches(bytes) } ?: error("Image format is not configured")).open(bytes, options)
+    fun open(bytes: ByteArray, options: ImageDecodeOptions): ImageDecoder {
+        val format = formats.firstOrNull { it.matches(bytes) } ?: error("Image format is not configured")
+        // 无关格式注册不影响内置 WebP；自定义逐帧实现仍保留完整控制权
+        options.platformAnimationAllowed = format === WebpImageFormat
+        return format.open(bytes, options)
+    }
 }

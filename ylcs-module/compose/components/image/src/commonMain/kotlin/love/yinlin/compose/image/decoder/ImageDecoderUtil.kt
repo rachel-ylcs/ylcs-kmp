@@ -4,12 +4,15 @@ import androidx.compose.ui.unit.IntSize
 import love.yinlin.compose.image.ImageManager
 import love.yinlin.compose.image.data.ImageDecodeOptions
 import love.yinlin.compose.image.data.ImageRequest
+import love.yinlin.compose.image.data.PlatformImageAnimation
 import kotlin.math.min
 import kotlin.math.sqrt
 
 internal fun openImageDecoder(bytes: ByteArray, request: ImageRequest): ImageDecoder = ImageManager.loader.components.open(bytes, request.decodeOptions())
 
 internal expect fun openPlatformImageDecoder(bytes: ByteArray, request: ImageDecodeOptions): ImageDecoder
+
+internal expect fun ImageDecoder.platformAnimation(): PlatformImageAnimation?
 
 internal fun ByteArray.matchesImageSignature(offset: Int, signature: String): Boolean {
     if (size < offset + signature.length) return false
@@ -26,8 +29,8 @@ internal fun sampledImageSize(original: IntSize, request: ImageDecodeOptions): I
 
     var multiplier = 1.0
     request.targetSize?.let { target ->
-        val sx = target.width.toDouble() * request.sizeMultiplier / original.width
-        val sy = target.height.toDouble() * request.sizeMultiplier / original.height
+        val sx = target.width.toDouble() / original.width
+        val sy = target.height.toDouble() / original.height
         multiplier = min(1.0, if (request.scaleToFill) maxOf(sx, sy) else minOf(sx, sy))
     }
     multiplier = min(multiplier, sqrt(maxDecodePixels.toDouble() / (original.width.toDouble() * original.height)))

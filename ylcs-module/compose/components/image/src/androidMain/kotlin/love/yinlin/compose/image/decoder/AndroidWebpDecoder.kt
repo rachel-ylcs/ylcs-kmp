@@ -17,6 +17,7 @@ import love.yinlin.compose.image.data.WebpInfo
 import love.yinlin.extension.cleaning
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
+import love.yinlin.extension.catchingError
 
 @Stable
 internal class AndroidWebpDecoder(
@@ -26,7 +27,7 @@ internal class AndroidWebpDecoder(
 ) : ImageDecoder {
     override val originalSize: IntSize = info.size
     override val size: IntSize = request.sampledSize(originalSize)
-    override val durations: IntArray = if (request.animated) info.frames.map { it.duration }.toIntArray() else [info.frames[0].duration]
+    override val durations: IntArray = if (request.animated) IntArray(info.frames.size) { info.frames[it].duration } else [info.frames[0].duration]
     override val repeatCount: Int = info.repeatCount
     private val bitmap = createBitmap(originalSize.width, originalSize.height)
     private val canvas = Canvas(bitmap)
@@ -37,6 +38,12 @@ internal class AndroidWebpDecoder(
         xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC)
     }
     private var previous = -1
+    private val encoded = ByteArray(info.frames.maxOf { it.encodedSize })
+    private val decodeOptions = BitmapFactory.Options().apply {
+        inMutable = true
+        inPreferredConfig = Bitmap.Config.ARGB_8888
+    }
+    private var decodedFrame: Bitmap? = null
 
     override suspend fun frame(index: Int): ImageBitmap {
         require(index in durations.indices)
@@ -53,15 +60,33 @@ internal class AndroidWebpDecoder(
                     (before.x + before.width).toFloat(), (before.y + before.height).toFloat(), backgroundPaint)
             }
             val frame = info.frames[position]
-            val encoded = frame.encoded(bytes)
-            context.ensureActive()
-            val decoded = requireNotNull(BitmapFactory.decodeByteArray(encoded, 0, encoded.size)) { "Invalid WebP frame" }
+            frame.encodeInto(bytes, encoded)
 
-            cleaning({
-                context.ensureActive()
-                require(decoded.width == frame.width && decoded.height == frame.height)
-                canvas.drawBitmap(decoded, frame.x.toFloat(), frame.y.toFloat(), if (frame.blend) blendPaint else sourcePaint)
-            }, decoded::recycle)
+            context.ensureActive()
+
+            val reusable = decodedFrame?.takeIf { it.allocationByteCount.toLong() >= frame.width.toLong() * frame.height * 4L }
+            decodeOptions.inBitmap = reusable
+
+            var decoded: Bitmap? = null
+            val error = catchingError {
+                decoded = BitmapFactory.decodeByteArray(encoded, 0, frame.encodedSize, decodeOptions)
+            }
+
+            if (error != null) {
+                if (reusable == null || error !is IllegalArgumentException) throw error
+                decodeOptions.inBitmap = null
+                decoded = BitmapFactory.decodeByteArray(encoded, 0, frame.encodedSize, decodeOptions)
+            }
+            val current = requireNotNull(decoded) { "Invalid WebP frame" }
+
+            if (decodedFrame !== current) decodedFrame?.recycle()
+            decodedFrame = current
+
+            context.ensureActive()
+
+            require(current.width == frame.width && current.height == frame.height)
+
+            canvas.drawBitmap(current, frame.x.toFloat(), frame.y.toFloat(), if (frame.blend) blendPaint else sourcePaint)
         }
 
         context.ensureActive()
@@ -71,11 +96,16 @@ internal class AndroidWebpDecoder(
         var transferred = false
         return cleaning({
             context.ensureActive()
+            result.prepareToDraw()
             result.asImageBitmap().also { transferred = true }
         }) {
             if (!transferred) result.recycle()
         }
     }
 
-    override fun close() = bitmap.recycle()
+    override fun close() {
+        decodeOptions.inBitmap = null
+        decodedFrame?.recycle()
+        bitmap.recycle()
+    }
 }

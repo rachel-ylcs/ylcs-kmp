@@ -11,6 +11,7 @@ import love.yinlin.compose.image.data.ImageRequest
 import love.yinlin.compose.image.data.ImageResult
 import love.yinlin.compose.image.decoder.ImageDecodeException
 import love.yinlin.compose.image.input.ImageSource
+import kotlin.time.TimeSource
 
 @Stable
 class ImageState {
@@ -26,6 +27,12 @@ class ImageState {
     val canRetry: Boolean get() = status == ImageLoadStatus.Error && error !is ImageDecodeException
     var progress by mutableStateOf(ImageProgress())
         internal set
+
+    private var loadingStarted: TimeSource.Monotonic.ValueTimeMark? = null
+    fun loadingElapsedMillis(): Long = loadingStarted?.elapsedNow()?.inWholeMilliseconds ?: 0L
+    private var displayed = false
+    private var fadeResult: ImageResult? = null
+
     var size: IntSize? by mutableStateOf(null)
         internal set
 
@@ -118,6 +125,8 @@ class ImageState {
             cachedGeometry = null
             cachedBounds = Rect.Zero
             retainedRequest = null
+            displayed = false
+            fadeResult = null
             zoomState?.reset()
         }
         this.source = source
@@ -125,11 +134,14 @@ class ImageState {
         if (changed) updateZoomBounds()
         error = null
         progress = ImageProgress()
+        loadingStarted = if (source == null) null else TimeSource.Monotonic.markNow()
         status = if (source == null) ImageLoadStatus.Empty else ImageLoadStatus.Loading
         feedbackStatus = if (source == null) ImageLoadStatus.Empty else null
     }
 
     internal fun success(result: ImageResult) {
+        fadeResult = result.takeIf { !displayed && it.origin != ImageOrigin.Memory }
+        displayed = true
         this.result = result
         animated = result.isAnimated
         if (cachedResult !== result) cachedResult = null
@@ -137,12 +149,20 @@ class ImageState {
         error = null
         status = ImageLoadStatus.Success
         feedbackStatus = null
+        loadingStarted = null
+    }
+
+    internal fun consumeFade(result: ImageResult): Boolean {
+        val pending = fadeResult === result
+        fadeResult = null
+        return pending
     }
 
     internal fun failure(error: Throwable) {
         this.error = error
         status = ImageLoadStatus.Error
         feedbackStatus = ImageLoadStatus.Error
+        loadingStarted = null
     }
 }
 

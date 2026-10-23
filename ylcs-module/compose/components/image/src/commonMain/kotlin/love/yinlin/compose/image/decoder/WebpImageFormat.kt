@@ -16,6 +16,6 @@ object WebpImageFormat : ImageFormat {
             (bytes.size >= 30 && bytes.matchesImageSignature(12, "VP8X") && bytes[16] == 10.toByte() &&
                 bytes[17] == 0.toByte() && bytes[18] == 0.toByte() && bytes[19] == 0.toByte() && (bytes[20].toInt() and 2) == 0))
 
-        return openPlatformImageDecoder(bytes, if (static) options.copy(animated = false) else options)
+        return openPlatformImageDecoder(bytes, if (static) options.staticOptions() else options)
     }
 }

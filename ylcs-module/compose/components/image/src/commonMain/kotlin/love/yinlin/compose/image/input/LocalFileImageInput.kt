@@ -14,6 +14,8 @@ object LocalFileImageInput : ImageInput<ImageSource.LocalFile> {
     override fun cacheKey(source: ImageSource.LocalFile): String = "file:${source.file.path}"
 
     override suspend fun read(source: ImageSource.LocalFile, context: ImageInputContext): ImageInputData = Coroutines.io {
+        readPlatformImageFile(source.file, context.maxBytes)?.let { return@io ImageInputData(it, ImageOrigin.Local) }
+
         val size = source.file.fileSize()
         require(size in 1L .. context.maxBytes.toLong()) { "Image file is empty or exceeds the byte budget" }
 

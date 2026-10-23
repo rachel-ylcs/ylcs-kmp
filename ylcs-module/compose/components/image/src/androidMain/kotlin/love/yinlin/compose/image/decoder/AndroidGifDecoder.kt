@@ -38,6 +38,7 @@ internal class AndroidGifDecoder(
         var transferred = false
         return cleaning({
             context.ensureActive()
+            scaled.prepareToDraw()
             scaled.asImageBitmap().also { transferred = true }
         }) {
             if (!transferred) scaled.recycle()
