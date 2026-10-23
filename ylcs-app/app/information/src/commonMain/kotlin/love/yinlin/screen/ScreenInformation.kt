@@ -31,6 +31,7 @@ import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.layout.PaginationStaggeredGrid
 import love.yinlin.compose.ui.node.squareByContentSize
 import love.yinlin.compose.ui.text.SimpleClipText
+import love.yinlin.extension.cleaning
 
 @Stable
 class ScreenInformation : BasicScreen() {
@@ -61,14 +62,16 @@ class ScreenInformation : BasicScreen() {
 
     private suspend fun requestNewData(manager: MessageManager<*>) {
         isNavigating = true
-        provider.withLoading { manager.requestNewData(::flushContent) }
-        isNavigating = false
+        cleaning({
+            provider.withLoading { manager.requestNewData(::flushContent) }
+        }) { isNavigating = false }
     }
 
     private suspend fun requestMoreData(manager: MessageManager<*>) {
         isNavigating = true
-        manager.requestMoreData()
-        isNavigating = false
+        cleaning({
+            manager.requestMoreData()
+        }) { isNavigating = false }
     }
 
     override fun initialize() {
