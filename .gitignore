@@ -20,11 +20,9 @@ work/
 # Xcode
 xcuserdata/
 **/xcshareddata/IDEWorkspaceChecks.plist
-Pods/
 .swiftpm-locks/
 /ylcs-app/iosApp/KotlinMultiplatformLinkedPackage/
 **/Version.xcconfig
-*.podspec
 
 # native
 **/.cxx/
