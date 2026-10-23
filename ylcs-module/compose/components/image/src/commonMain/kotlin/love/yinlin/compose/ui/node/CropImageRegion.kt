@@ -259,14 +259,32 @@ private class CropImageRegionNode(
         val region = Snapshot.withoutReadObservation { cropImageState.result }
         val hadFrame = region.widthPercent > 0f && region.heightPercent > 0f
 
+        // zoom 条件下禁止 crop
+        var zoomEnabled = false
         observeReads {
-            imageBounds = imageState.contentRect
-            imageViewport = imageState.contentViewport
-            originalSize = imageState.originalSize
-            source = imageState.source
-            version = imageState.version
-            resetGeneration = cropImageState.resetGeneration
-            tolerance = with(currentValueOf(LocalDensity)) { 24.dp.toPx() }
+            zoomEnabled = imageState.zoomEnabled
+            if (!zoomEnabled) {
+                imageBounds = imageState.contentRect
+                imageViewport = imageState.contentViewport
+                originalSize = imageState.originalSize
+                source = imageState.source
+                version = imageState.version
+                resetGeneration = cropImageState.resetGeneration
+                tolerance = with(currentValueOf(LocalDensity)) { 24.dp.toPx() }
+            }
+        }
+
+        if (zoomEnabled) {
+            handle = null
+            geometryReady = false
+            resetPending = true
+            imageBounds = Rect.Zero
+            visibleBounds = Rect.Zero
+            cropImageState.imageRect = Rect.Zero
+            cropImageState.frameRect = Rect.Zero
+            pointerInputNode.resetPointerInputHandler()
+            invalidateDraw()
+            return
         }
 
         resetPending = resetPending || reset || oldSource != source || oldVersion != version || oldReset != resetGeneration
@@ -437,6 +455,15 @@ private data class CropImageRegionElement(
     }
 }
 
+/**
+ * 为关联的图片添加区域裁剪交互。
+ *
+ * 对应 BasicImage 开启 ImageOptions.zoom 时，裁剪交互停用。
+ *
+ * 不绘制裁剪层、不处理裁剪手势，并清空裁剪范围。
+ *
+ * 关闭 zoom 后重新初始化裁剪框。
+ */
 @Stable
 fun Modifier.cropImageRegion(imageState: ImageState, cropImageState: CropImageState, aspectRatio: Float = 0f): Modifier {
     require(aspectRatio.isFinite() && aspectRatio >= 0f)

@@ -58,6 +58,7 @@ class ImageState {
     private var cachedViewport = IntSize.Zero
     private var cachedBounds = Rect.Zero
     internal val contentViewport: IntSize get() = size ?: IntSize.Zero
+    internal val zoomEnabled: Boolean get() = geometry?.zoom == true
 
     private val contentBounds: Rect get() {
         val geometry = geometry ?: return Rect.Zero
