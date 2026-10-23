@@ -3,11 +3,9 @@ package love.yinlin.compose.ui.image
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.*
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.BoxScope
@@ -566,9 +564,7 @@ private fun rememberImageZoomModifier(state: ImageState, onClick: (() -> Unit)?)
     val interactionSource = remember { MutableInteractionSource() }
     val onTap = if (onClick != null) rememberImageTap(state, onClick) else null
 
-    return Modifier.focusRequester(focus)
-        .indication(interactionSource, LocalIndication.current)
-        .imageZoomGestures(state, interactionSource, onTap) { focus.requestFocus() }
+    return Modifier.focusRequester(focus).imageZoomGestures(state, interactionSource, onTap) { focus.requestFocus() }
 }
 
 @Composable
