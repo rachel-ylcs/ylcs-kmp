@@ -16,13 +16,6 @@ enum class ImageQuality {
         Full -> 100
     }
 
-    val sizeMultiplier: Float get() = when (this) {
-        Low -> 1f
-        Medium -> 2f
-        High -> 3f
-        Full -> 4f
-    }
-
     val filterQuality: FilterQuality get() = when (this) {
         Low -> FilterQuality.Low
         Medium -> FilterQuality.Medium

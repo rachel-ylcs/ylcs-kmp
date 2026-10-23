@@ -14,7 +14,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!-- Android 8/9 保存到公共相册时使用，Android 10 及以上不申请此权限。 -->
+    <!-- Android 9 保存到公共相册时使用，Android 10 及以上不申请此权限。 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:ignore="PhotoAndVideoPolicy"/>
