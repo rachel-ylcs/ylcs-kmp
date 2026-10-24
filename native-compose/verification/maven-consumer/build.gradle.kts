@@ -25,10 +25,7 @@ kotlin {
                 implementation("org.jetbrains.skiko:skiko:0.150.1")
             }
         }
-        val nativeMain = create("nativeMain") {
-            dependsOn(commonMain.get())
-            kotlin.srcDir("../../adaptation/samples/skiko-offscreen/src/nativeMain/kotlin")
-        }
+        val nativeMain = create("nativeMain") { dependsOn(commonMain.get()) }
         getByName("windowsMain").dependsOn(nativeMain)
         getByName("linuxMain").dependsOn(nativeMain)
         getByName("macosMain").dependsOn(nativeMain)
@@ -38,7 +35,8 @@ kotlin {
 nativeApplication {
     enabled.set(true)
     baseName.set("maven-skiko-consumer")
-    entryPoint.set("love.yinlin.nativecompose.offscreen.main")
+    entryPoint.set("love.yinlin.nativecompose.consumer.main")
+    if (providers.gradleProperty("native.window").getOrElse("false").toBoolean()) arguments.add("--window")
     runtime("mingw_x64") {
         artifacts.put("$portGroup:skiko-mingwx64:$skikoVersion:icudtl@dat", "icudtl.dat")
     }

@@ -38,7 +38,7 @@ fun Settings.nativeCompose() {
         module("native-compose") {
             module("adaptation") {
                 module("samples") {
-                    module("skiko-offscreen", "skiko-window")
+                    module("skiko")
                 }
             }
         }
@@ -86,6 +86,9 @@ private fun Settings.includeNativeComposeSources(directory: File) {
     extensions.getByType<NativeBridgeSourcesExtension>().include(sourceDirectory, "skiko", mapOf(
         "skiko-core" to ("${lock["group"]}:skiko" to ":"),
         "skiko-skottie" to ("${lock["group"]}:skiko-skottie" to ":skiko-skottie"),
+    ), mapOf(
+        "skiko-core" to directory.resolve("adaptation/org.jetbrains.skiko_skiko"),
+        "skiko-skottie" to directory.resolve("adaptation/org.jetbrains.skiko_skiko-skottie"),
     ))
 }
 

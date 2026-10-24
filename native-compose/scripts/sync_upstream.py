@@ -128,6 +128,7 @@ def prepare(lock, sources, skia_archive):
     fingerprint = hashlib.sha256()
     inputs = [ROOT / "upstream/lock.json", ROOT / "upstream/skiko-native-files.json", ROOT / "upstream/adaptation-origins.json", ROOT / "scripts/skiko_adapt.py", ROOT / "scripts/upstream_versions.py", Path(__file__), ROOT / "licenses/THIRD_PARTY_NOTICES.md"]
     inputs += sorted((ROOT / "licenses").glob("*.txt"), key=lambda path: path.relative_to(ROOT).as_posix())
+    inputs += [ROOT / "scripts/prepare_sdl.py", ROOT / "upstream/sdl.json"]
     inputs += [ROOT.parent / name for name in ["gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat"]]
     for module in (ROOT / "adaptation").iterdir():
         if module.is_dir() and module.name != "samples":
@@ -137,7 +138,7 @@ def prepare(lock, sources, skia_archive):
         relative = path.relative_to(ROOT.parent).as_posix()
         input_hashes[relative] = digest(path)
         fingerprint.update(relative.encode("utf-8") + b"\0" + path.read_bytes())
-    effective = {"versions": lock["versions"], "libraries": profile["libraries"], "java": profile["java"]}
+    effective = {"versions": lock["versions"], "libraries": profile["libraries"], "java": profile["java"], "gradleProperties": profile["gradleProperties"]}
     fingerprint.update(json.dumps(effective, sort_keys=True).encode("utf-8"))
     destination = SKIKO_VENDOR / "prepared" / fingerprint.hexdigest()[:16]
     marker = destination / ".rachel-prepared.json"

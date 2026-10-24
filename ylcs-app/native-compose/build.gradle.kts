@@ -16,7 +16,6 @@ rachel {
             commonMain {
                 lib(
                     projects.ylcsModule.core,
-                    projects.nativeCompose.adaptation.samples.skikoWindow,
                     libs.skiko,
                     libs.skiko.lottie,
                 )

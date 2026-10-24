@@ -52,8 +52,11 @@ def verify_module(repository, target, lock, artifact):
         expected = "skia.lib" if artifact == "skiko" else "skottie.lib"
         checked(any(Path(name).name in [expected, "libskia_static.a"] for name in binaries), f"{artifact} static archive is not embedded")
         checked(any("native-bridges" in name for name in binaries), "C++ bridge archive is not embedded")
+    exported_linker_options = []
+    sdl_archives = []
     for klib in target_directory.glob("*.klib"):
         with zipfile.ZipFile(klib) as archive:
+            sdl_archives += [name for name in archive.namelist() if "/included/" in name and Path(name).name in ["SDL3-static.lib", "libSDL3.a"]]
             for name in archive.namelist():
                 if name.endswith("/manifest"):
                     manifest = archive.read(name).decode("utf-8")
@@ -61,12 +64,22 @@ def verify_module(repository, target, lock, artifact):
                     checked(f"native_targets={target}" in manifest, f"Wrong KLIB target: {klib}")
                     for line in manifest.splitlines():
                         if line.startswith("linkerOpts="):
+                            exported_linker_options.append(line)
+                        if line.startswith(("linkerOpts=", "libraryPaths=")):
                             checked(not re.search(r"[A-Za-z]:[\\/]|/(?:Users|home|workspace|tmp|private|Volumes)/", line), f"Build-machine linker path leaked into {klib}")
+    if artifact == "skiko":
+        checked(sdl_archives, "Core publication must embed the SDL static implementation in its CInterop")
+    if artifact == "skiko" and target == "linux_x64":
+        options = " ".join(exported_linker_options)
+        for library in ["fontconfig", "GL", "dl"]:
+            checked(f"-l{library}" in options, f"Linux KLIB must export the {library} system link dependency")
     sources = target_directory / f"{artifact}-{suffix}-{version}-sources.jar"
     with zipfile.ZipFile(sources) as archive:
         names = archive.namelist()
         checked("META-INF/licenses/Apache-2.0.txt" in names, "Source artifact is missing the Skiko license")
         checked("META-INF/licenses/THIRD_PARTY_NOTICES.md" in names, "Source artifact is missing provenance")
+        if artifact == "skiko":
+            checked("META-INF/licenses/SDL.txt" in names, "Static SDL publication is missing its license")
         checked(any(n.startswith("native-sources/") and n.endswith((".cc", ".cpp")) for n in names), "Source artifact is missing compiled C++ sources")
     if target == "mingw_x64" and artifact == "skiko":
         data = target_directory / f"{artifact}-{suffix}-{version}-icudtl.dat"

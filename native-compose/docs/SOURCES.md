@@ -1,6 +1,6 @@
-# 适配源码与上游缓存
+# 适配源码与构建归属
 
-`adaptation/` 是主仓库维护并提交的代码，目录名使用官方 Maven 坐标的 `group_artifact`，不使用移植后的 group。`vendor/` 是 Git 忽略的下载源码、准备结果及构建输出。
+`adaptation/` 保存提交到 Git 的维护代码；`vendor/` 保存忽略的原始源码、准备后的 fork、SDK 和输出。
 
 ```text
 native-compose/
@@ -8,52 +8,95 @@ native-compose/
     org.jetbrains.skiko_skiko/
       build.gradle.kts
       src/
-        windowsMain/kotlin/     # Windows layer、D3D12、Win32 actual
-        windowsMain/cpp/        # D3D12 C++ bridge
-        linuxMain/kotlin/       # Linux layer、Vulkan、OpenGL、CPU actual
-        macosMain/kotlin/       # macOS layer、Metal、AppKit actual
-        nativeMain/kotlin/      # 共享 Native 适配
-        nativeJsMain/cpp/       # 共享 C++ 适配、Linux Vulkan WSI
+        commonMain/kotlin/org/jetbrains/skiko/window/
+        nativeMain/kotlin/       # 共享 Native 实现、SDL 窗口循环
+        nativeMain/cpp/          # Image、GL interface 等共享 bridge
+        windowsMain/kotlin/      # Windows/D3D12，包括窗口 backend
+        windowsMain/cpp/
+        linuxMain/kotlin/        # Linux/Vulkan，包括窗口 backend
+        linuxMain/cpp/           # Vulkan WSI、Linux C++ ABI 兼容
+        macosMain/kotlin/        # macOS/Metal，包括窗口 backend
         darwinMain/kotlin/
+        nativeInterop/cinterop/sdl.def
     org.jetbrains.skiko_skiko-skottie/
-      build.gradle.kts          # 缺失的 Windows target、Core API 项目依赖
+      build.gradle.kts
+    samples/skiko/              # 当前阶段：公共示例、Native 回归
   vendor/
-    skiko/
-      sources/                 # 经校验的原始官方/社区源码
-      prepared/                # 可重现的完整上游构建
-      skia/                    # 经校验的 Skia 下载缓存
-      state.json
+    skiko/sources/              # 校验过的原始上游/社区源码，不改名
+    skiko/prepared/             # 重现并规范化的 Native-only fork
+    sdl-source-*/               # 校验过的 SDL 源码
+    sdl-static/<konan-target>/  # SDL 静态 SDK、系统链接依赖清单
     build/
-      native-compose/          # 验证 Maven 仓库等根项目输出
-      samples/                 # 示例的编译、CInterop、运行暂存和 ZIP
-      maven-consumer/           # 独立消费者输出
-      logs/                    # 本地验证日志
-    sdl-*/                     # SDL SDK 和源码缓存
-  samples/                     # 本项目维护的验证 host
-  scripts/                     # 同步、上游构建兼容与验证工具
-  upstream/                    # 版本/提交/校验锁及来源映射
+      logs/
+      samples/
+      native-compose/          # 本地验证 Maven 仓库
+      maven-consumer/
+  scripts/
+  upstream/
   docs/
   licenses/
+ylcs-app/native-compose/
+  build.gradle.kts
+  src/commonMain/kotlin/       # 只有业务场景与公共窗口 API 调用
 ```
 
-## 直接维护和编译的平台源码
+## 共享代码统一到 Native
 
-Core 的 37 份适配源文件直接在 `adaptation/org.jetbrains.skiko_skiko/src/` 中维护。其中 34 份是此前通过锁定社区差异复用的相关文件，已成为本仓库维护的适配源码；来源映射记录在 `upstream/adaptation-origins.json`，继续保留原有许可与第三方声明。新增的 3 份文件是 `LinuxVulkanWindow.kt`、`LinuxVulkanRenderer.kt` 和 `LinuxVulkanWindow.cc`。
+维护代码与准备后的活动源集都使用 `nativeMain/nativeTest`。
+同步脚本合并上游历史共享目录，删除多余的 Native/JS hierarchy 节点，并对重名文件检查冲突。
+只读的原始上游缓存及来源映射保留原路径，便于升级比较；它们不构成本项目的活动源集。
 
-`windowsMain`、`linuxMain`、`macosMain` 是实际中间源集，由 `mingwX64Main`、`linuxX64Main`、`macosArm64Main` 继承，无需给每个具体 target 重复一份 actual。
+维护的 Image/GL C++ 放在 nativeMain；Linux Vulkan WSI 和 ABI 兼容放在 linuxMain。
+`upstream/adaptation-origins.json` 将维护文件映射回原始社区路径，同步时按映射移除 vendor 的遮蔽文件。
+不将手写代码复制成另一份可编辑的 vendor 副本；编译直接读取 adaptation。
 
-Windows 入口为 `src/windowsMain/kotlin/org/jetbrains/skiko/SkiaLayer.windows.kt`，Linux 对应 `src/linuxMain/kotlin/org/jetbrains/skiko/SkiaLayer.linux.kt`。D3D12 C++ bridge 位于 `src/windowsMain/cpp/WindowsDirect3DBridge.cc`；Linux Vulkan WSI 位于 `src/nativeJsMain/cpp/LinuxVulkanWindow.cc`，由平台宏保护。
+## 窗口与 SDL 是库的实现
 
-每个适配目录的 `build.gradle.kts` 是实际执行的适配配置：准备后的上游模块应用它，由它注册缺失 target、绑定维护的 source roots、接入静态 C++ 编译和 sources 发布。继续复用上游 `buildSrc` 的编译和发布任务，避免另写一套 Skiko 构建系统。
+公共 API 位于 `org.jetbrains.skiko.window`：NativeWindow、NativeWindowOptions、NativeWindowBackend、NativeWindowKey。
+NativeWindow 在 Native 层拥有 SDL 事件循环，内部接 Windows D3D12、Linux Vulkan、macOS Metal；软件基线也由库提供。
 
-Kotlin 和 C++ 编译直接读取 `adaptation/`；准备过程只移除 vendor 中同路径的遮蔽文件，不把维护源码复制成 vendor 中的编辑副本。原始下载源码始终保留。
+SDL CInterop 的定义、平台 adapters 和静态链接全部属于 Skiko Core。
+生产者从锁定源码构建 SDL，Windows 与 Skia 共用 MSVC 静态 CRT 兼容方案，并过滤不兼容的 COFF directives。
+SDK 静态归档与系统 linkerOpts 进入发布的 SDL CInterop KLIB。
+消费方不配置 CInterop、不编译 SDL、不需要 SDL SDK 或平台窗口源码。
 
-Skottie 已有官方共享 Native Kotlin/C++ 实现，当前无需重复复制或生成空的 `windowsMain`。其适配模块负责新增 Windows target 和 Core 的 `api(project(":"))` 依赖；以后需要手写的实际差异再加入本模块的 `src/`。Graphite 未接入；JVM/AWT runtime 不在本轮 Native 迁移范围内。
+APP 只在 commonMain 引用官方 Skiko/Skottie 坐标并调用公共 API。
+桥插件做 target 重定向、ICU 收集和启动/打包，不再承担 SDL SDK 下载、链接或 DLL 收集。
+许可证保留在源码目录与 sources 工件中，不复制到程序暂存目录或 ZIP。
 
-## 主工程和 IDE
+## Gradle 和 IDE
 
-在 `ylcs-kmp` 开启 `native.compose=true` 后同步 Gradle，Settings 关联 vendor 中的完整 `skiko` included build；其适配 source roots 指向上述 `adaptation/`。仍从主工程执行示例任务，不需要单独打开适配目录或手动关联新 Gradle build。
+两个适配库属于同一个 Skiko included build。Settings 的 buildFileName 将 adaptation 的 build.gradle.kts
+指定为正式项目脚本，项目目录仍在 vendor，以复用上游 buildSrc 和相对路径。
+上游基础配置自动生成为 vendor 内的 rachel-upstream.gradle.kts。
+不需要将库重复 include 为 ylcs-kmp 的普通子项目。
 
-官方共享 API、已有 Native 实现和构建工具可在完整 vendor checkout 中查看。当前构建位置由 `vendor/skiko/state.json` 的 `build` 字段记录，路径相对于 `native-compose/`。版本升级时审核固定提交、相关公共 API 差异和维护源码；同步脚本不会自动覆盖 `adaptation/`。维护源码和构建脚本的路径及内容参与源指纹，修改后由根 Gradle 重新准备。
+窗口绑定只在 Core 中 commonize；APP 没有额外的 CInterop 源集需求。
+改变准备规则后 Reload All Gradle Projects，让 IDE 导入新的指纹目录。
+维护开关仍默认 false；普通模式不准备或关联这些源码构建。
 
-普通消费模式 `native.compose=false` 保持早返回，不配置这些源码构建；手动安装桥插件的 Native 消费者按 target 选择 Maven 工件。迁移目录不会改变这一开关的职责。
+桥插件的两个生命周期入口统一维护在 build-logic/native-bridge：src/main 是 Project 实现，
+src/settings 是不依赖 KGP 的 Settings 实现。发布时 Settings marker 选择同一 GAV 的 settings classifier。
+规则及 adaptation 路径可由消费模块的 nativeBridgeReport 查看；实际依赖选择使用 dependencyInsight。
+
+## Skottie 为什么只有构建脚本
+
+adaptation 只保存本项目维护的差异，不保存完整上游副本。
+Skottie 的公共 API、共享 Native Kotlin 实现和 C++ bridge 已可复用，当前没有新增平台 Kotlin/C++ 文件。
+adaptation/org.jetbrains.skiko_skiko-skottie/build.gradle.kts 注册 Windows target、
+关联 Core 的 Native 符号输入并以 API 依赖 Core，继续应用生成的上游构建脚本。
+
+实际源码位置以 vendor/skiko/state.json 的 build 字段为准：
+
+```text
+vendor/skiko/prepared/<fingerprint>/skiko/skiko-skottie/src/
+  commonMain/kotlin/org/jetbrains/skia/skottie/  # Animation、AnimationBuilder 等 API
+  nativeMain/kotlin/org/jetbrains/skia/skottie/  # Native 文件入口、静态加载实现
+  nativeMain/cpp/skottie/                      # Animation/AnimationBuilder/Logger bridge
+  nativeMain/cpp/sksg/                         # InvalidationController bridge
+```
+
+本项目的功能回归位于 adaptation/samples/skiko/src/nativeTest，涵盖实际时间轴像素变化及无效输入。
+如果后续发现平台实现缺口，手写修复再加入此 adaptation 模块的对应源集；现有上游代码不重复复制。
+
+Graphite 按确定的路线排除；AWT/JVM runtime 不迁移。

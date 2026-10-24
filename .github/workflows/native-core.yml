@@ -112,8 +112,8 @@ jobs:
           bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             -Pnative.compose=true :build-logic:native-bridge:test \
-            :build-logic:native-bridge:validatePlugins :build-logic:native-bridge-settings:validatePlugins
-      - name: Core and Skottie functional tests, samples and local Maven publication
+            :build-logic:native-bridge:validatePlugins
+      - name: Current Skiko regression suite, independent app and Maven publication
         run: |
           display=()
           if [[ "$RUNNER_OS" == Linux ]]; then
@@ -123,23 +123,20 @@ jobs:
           "${display[@]}" bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             -Pnative.compose=true -Pnative.smoke=true -Pnative.renderer=software \
-            ":native-compose:adaptation:samples:skiko-offscreen:${NATIVE_TEST_TASK}" \
-            ":native-compose:adaptation:samples:skiko-offscreen:run${TARGET_NAME}DebugExecutable" \
-            ":native-compose:adaptation:samples:skiko-window:run${TARGET_NAME}DebugExecutable" \
-            ":native-compose:adaptation:samples:skiko-offscreen:package${TARGET_NAME}DebugExecutable" \
-            ":native-compose:adaptation:samples:skiko-window:package${TARGET_NAME}DebugExecutable" \
-            ":ylcs-app:native-compose:run${TARGET_NAME}DebugExecutable" \
-            ":ylcs-app:native-compose:package${TARGET_NAME}DebugExecutable" \
+            ":native-compose:adaptation:samples:skiko:${NATIVE_TEST_TASK}" \
+            ":native-compose:adaptation:samples:skiko:run${TARGET_NAME}DebugExecutable" \
+            ":native-compose:adaptation:samples:skiko:package${TARGET_NAME}DebugExecutable" \
+            ":ylcs-app:native-compose:run${TARGET_NAME}ReleaseExecutable" \
+            ":ylcs-app:native-compose:package${TARGET_NAME}ReleaseExecutable" \
             :native-compose:publishSkikoToVerificationRepository \
-            :build-logic:native-bridge:publishAllPublicationsToLocalVerificationRepository \
-            :build-logic:native-bridge-settings:publishAllPublicationsToLocalVerificationRepository
+            :build-logic:native-bridge:publishAllPublicationsToLocalVerificationRepository
       - name: Require real Native test results and audit Maven artifacts
         run: |
           python - <<'PY'
           import os
           from pathlib import Path
           import xml.etree.ElementTree as ET
-          reports = list(Path('native-compose/vendor/build/samples/skiko-offscreen/test-results').glob('**/TEST-*.xml'))
+          reports = list(Path('native-compose/vendor/build/samples/skiko/test-results').glob('**/TEST-*.xml'))
           assert reports, 'Native tests produced no JUnit reports'
           suites = [ET.parse(path).getroot() for path in reports]
           assert sum(int(suite.attrib['tests']) for suite in suites) == 6, 'Expected four Core and two Skottie integration tests'
@@ -169,8 +166,8 @@ jobs:
           "${display[@]}" bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             -Pnative.compose=true -Pnative.smoke=true -Pnative.renderer=gpu \
-            ":native-compose:adaptation:samples:skiko-window:run${TARGET_NAME}DebugExecutable" \
-            ":ylcs-app:native-compose:run${TARGET_NAME}DebugExecutable"
+            ":native-compose:adaptation:samples:skiko:run${TARGET_NAME}DebugExecutable" \
+            ":ylcs-app:native-compose:run${TARGET_NAME}ReleaseExecutable"
       - name: Host Maven publication
         uses: actions/upload-artifact@v7
         with:
@@ -192,9 +189,8 @@ jobs:
           path: |
             native-compose/vendor/build/samples/*/distributions/*.zip
             ylcs-app/native-compose/build/distributions/*.zip
-            native-compose/vendor/build/samples/skiko-offscreen/nativeApplication/*/debugExecutable/*.png
-            native-compose/vendor/build/samples/skiko-offscreen/test-results/
-            native-compose/vendor/build/samples/skiko-offscreen/reports/tests/
+            native-compose/vendor/build/samples/skiko/test-results/
+            native-compose/vendor/build/samples/skiko/reports/tests/
             build-logic/native-bridge/build/test-results/
             build-logic/native-bridge/build/reports/tests/
           if-no-files-found: warn
@@ -248,6 +244,7 @@ jobs:
         shell: bash
     env:
       TARGET_NAME: ${{ matrix.target-name }}
+      SDL_RENDER_DRIVER: software
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-java@v6
@@ -267,7 +264,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfontconfig1 libgl1 fonts-dejavu-core
+          sudo apt-get install -y libfontconfig1-dev libgl-dev fonts-dejavu-core xvfb xauth \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev
       - name: Compile, link and run using only Maven artifacts
         run: |
           test ! -e native-compose/vendor/skiko/state.json
@@ -275,10 +273,15 @@ jobs:
           if [[ "$RUNNER_OS" == Windows ]]; then
             repositoryRoot="$(pwd -W)"
           fi
-          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --max-workers=2 \
+          display=()
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            export SDL_VIDEODRIVER=x11
+            display=(xvfb-run --auto-servernum --server-args='-screen 0 1280x800x24')
+          fi
+          "${display[@]}" bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --max-workers=2 \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             "-Pnative.repository=$repositoryRoot/maven-core" "-Pnative.plugin.repository=$repositoryRoot/maven-plugins" \
-            -Pnative.legacyRequest=true "run${TARGET_NAME}DebugExecutable"
+            -Pnative.legacyRequest=true -Pnative.window=true "run${TARGET_NAME}DebugExecutable"
       - name: Consumer rendering evidence
         uses: actions/upload-artifact@v7
         with:

@@ -27,7 +27,7 @@ Graphite 当前直接支持 Metal/Vulkan 等后端，没有可直接复用的原
 本项目选择 Ganesh；按当前任务范围不迁移 Graphite，也不生成 Graphite publication。
 Dawn 的其他后端也不等于现有 Skiko Native 绑定已经提供完整路径。
 
-窗口样例现在显式对接了三个后端：
+Skiko Core 的 Native 窗口实现显式对接了三个后端，样例只调用公共入口：
 
 - Windows：SDL HWND 交给现有 Native `SkiaLayer` 和 D3D12 renderer；本机 RTX 4060 的绘制和 resize 已通过。
 - Linux：新增 toolkit 无关的 Vulkan window/renderer；SDL 提供 instance extensions 和 surface factory。
@@ -35,7 +35,7 @@ Dawn 的其他后端也不等于现有 Skiko Native 绑定已经提供完整路�
   拥有自己的呈现完成 semaphore，图像取得使用有界 CPU fence 等待；resize/销毁前等待设备空闲。
   场景保存在 GPU surface，以免 screenshot 读取已交还窗口系统的图像。
   本机已编译 Linux Kotlin 源码，并通过 Linux ABI 的 C++ 语法检查；尚未在 Linux 驱动上运行。
-- macOS：示例 host 用 SDL Metal view 提供 `CAMetalLayer`，复用现有 `MacosMetalRenderer`。
+- macOS：Core 中的 SDL host 用 Metal view 提供 `CAMetalLayer`，复用现有 `MacosMetalRenderer`。
   此接入尚需 macOS 宿主编译和运行，不能用 Windows 结果替代。
 
 Linux 原有 host 的 OpenGL 默认值保留；示例明确要求 `VULKAN`。

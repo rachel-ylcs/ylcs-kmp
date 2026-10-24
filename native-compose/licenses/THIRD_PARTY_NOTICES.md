@@ -15,9 +15,11 @@ builds and must not be presented as official JetBrains Skiko releases.
   release `m156-24300fbbcb`, as selected by Skiko `0.156.0`. Its original
   licenses and notices must accompany redistributed binaries. Archive hashes
   are recorded in `upstream/lock.json`.
-- **SDL 3.4.18** — Sam Lantinga and contributors, zlib license. The window
-  sample uses the official SDL development package. Sources and binary hashes
-  are recorded in `upstream/sdl.json`. See `licenses/SDL.txt`.
+- **SDL 3.4.18** — Sam Lantinga and contributors, zlib license. The Native
+  Skiko window host includes a static SDL build from the audited source archive
+  recorded in `upstream/sdl.json`. SDL is embedded in the published Core
+  CInterop KLIB; consumers do not need an SDL SDK or SDL shared library.
+  See `licenses/SDL.txt`.
 
 The original copyright/license files remain in the ignored source checkouts.
 Rachel's reviewed file selection and adaptations are recorded in

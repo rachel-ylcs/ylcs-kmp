@@ -1,5 +1,4 @@
 import groovy.json.JsonSlurper
-import love.yinlin.nativebridge.NativeApplicationExtension
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins { idea }
@@ -42,7 +41,6 @@ if (sourceBuild != null && hostPublication != null) {
 
 subprojects {
     layout.buildDirectory.set(nativeDirectory.dir("vendor/build/samples/$name"))
-    extensions.extraProperties.set("kotlin.mpp.enableCInteropCommonization", providers.gradleProperty("kotlin.mpp.enableCInteropCommonization").getOrElse("true"))
 }
 
 tasks.register<Exec>("doctorNative") {

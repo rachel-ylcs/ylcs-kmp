@@ -1,3 +1,5 @@
+import org.gradle.api.publish.maven.MavenPublication
+
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
@@ -9,14 +11,17 @@ version = libs.versions.rachel.get()
 
 kotlin { jvmToolchain(25) }
 
-val settingsPluginTestRuntime = configurations.create("settingsPluginTestRuntime") {
-    isCanBeConsumed = false
+val settingsSource = sourceSets.create("settings")
+sourceSets.main {
+    compileClasspath += settingsSource.output
+    runtimeClasspath += settingsSource.output
 }
 
 dependencies {
+    add(settingsSource.compileOnlyConfigurationName, gradleApi())
+    add(settingsSource.compileOnlyConfigurationName, gradleKotlinDsl())
     implementation(libs.gradle.plugin.kotlin)
     testImplementation(gradleTestKit())
-    add(settingsPluginTestRuntime.name, project(":native-bridge-settings"))
     testImplementation(kotlin("test-junit"))
 }
 
@@ -30,9 +35,22 @@ val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
 }
 tasks.processResources { from(writeCompatibility) }
 
-tasks.pluginUnderTestMetadata {
-    pluginClasspath.from(settingsPluginTestRuntime)
+val settingsJar = tasks.register<Jar>("settingsJar") {
+    description = "Lightweight Settings entry without the Kotlin Gradle Plugin runtime"
+    archiveClassifier.set("settings")
+    from(settingsSource.output)
+    from(tasks.pluginDescriptors) {
+        include("${libs.plugins.nativeBridgeSettings.get().pluginId}.properties")
+        into("META-INF/gradle-plugins")
+    }
 }
+configurations.create("settingsElements") {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+    outgoing.artifact(settingsJar)
+}
+tasks.jar { from(settingsSource.output) }
+tasks.pluginUnderTestMetadata { pluginClasspath.from(settingsSource.output) }
 
 gradlePlugin {
     plugins {
@@ -42,6 +60,12 @@ gradlePlugin {
             displayName = "Rachel Native Bridge"
             description = "Target-specific Native dependency routing and executable distributions"
         }
+        create("nativeBridgeSettings") {
+            id = libs.plugins.nativeBridgeSettings.get().pluginId
+            implementationClass = "love.yinlin.nativebridge.NativeBridgeSettingsPlugin"
+            displayName = "Rachel Native Bridge Sources"
+            description = "Connect Native source builds during Settings evaluation"
+        }
     }
 }
 
@@ -50,6 +74,23 @@ publishing {
         maven {
             name = "LocalVerification"
             url = uri(rootProject.layout.buildDirectory.dir("native-bridge-repository"))
+        }
+    }
+}
+
+// Both entry IDs share one implementation GAV. Settings selects a small
+// classifier and excludes KGP, preserving the repository bootstrap boundary.
+afterEvaluate {
+    publishing.publications.named<MavenPublication>("pluginMaven") { artifact(settingsJar) }
+    publishing.publications.named<MavenPublication>("nativeBridgeSettingsPluginMarkerMaven") {
+        pom.withXml {
+            val dependencies = asNode().get("dependencies") as groovy.util.NodeList
+            for (dependency in dependencies.flatMap { (it as groovy.util.Node).children() }.filterIsInstance<groovy.util.Node>()) {
+                dependency.appendNode("classifier", "settings")
+                val exclusion = dependency.appendNode("exclusions").appendNode("exclusion")
+                exclusion.appendNode("groupId", "*")
+                exclusion.appendNode("artifactId", "*")
+            }
         }
     }
 }

@@ -9,10 +9,26 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import sync_upstream
-from upstream_versions import align_catalog, sync_wrappers
+from upstream_versions import align_catalog, apply_build_profile, main_profile, sync_wrappers
 
 
 class UpstreamVersionsTest(unittest.TestCase):
+    def test_shared_native_warning_option_reaches_the_included_build_only(self):
+        with tempfile.TemporaryDirectory() as work:
+            repository, fork = Path(work) / "root", Path(work) / "fork"
+            repository.mkdir()
+            (repository / "libs.versions.toml").write_text('[versions]\nkotlin="2.5.0-Beta2"\n')
+            (repository / "settings.gradle.kts").write_text('repository { rachel { jvm { version = 25 } } }')
+            (repository / "gradle.properties").write_text('kotlin.native.ignoreDisabledTargets=true\nnotShared=placeholder\n')
+            (fork / "skiko/buildSrc").mkdir(parents=True)
+            (fork / "skiko/buildSrc/build.gradle.kts").write_text('plugins { kotlin("jvm") }\n')
+            properties = fork / "skiko/gradle.properties"
+            properties.write_text('kotlin.native.ignoreDisabledTargets=false\nexisting=value\n')
+            profile = main_profile(repository)
+            apply_build_profile(fork, repository, profile)
+            self.assertEqual(profile["gradleProperties"], {"kotlin.native.ignoreDisabledTargets": "true"})
+            self.assertEqual(properties.read_text(), 'kotlin.native.ignoreDisabledTargets=true\nexisting=value\n')
+
     def test_catalog_uses_shared_coordinates_and_retains_upstream_only_tools(self):
         with tempfile.TemporaryDirectory() as work:
             catalog = Path(work) / "dependencies.toml"

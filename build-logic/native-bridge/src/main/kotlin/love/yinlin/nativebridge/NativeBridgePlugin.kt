@@ -38,12 +38,44 @@ class NativeBridgePlugin : Plugin<Project> {
         application.baseName.convention(project.name)
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             val kotlin = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+            configureReport(project, kotlin, bridge)
             configureRedirects(project, kotlin, bridge)
             project.afterEvaluate {
                 bridge.redirects.forEach(NativeDependencyRule::validate)
                 if (application.enabled.get()) {
-                    SkikoApplicationDependencies.configure(project, kotlin, application, bridge, compatibility)
+                    SkikoApplicationDependencies.configure(project, application, bridge)
                     configureApplication(project, kotlin, application)
+                }
+            }
+        }
+    }
+
+    private fun configureReport(project: Project, kotlin: KotlinMultiplatformExtension, bridge: NativeBridgeExtension) {
+        project.tasks.register("nativeBridgeReport") {
+            group = "help"
+            description = "Show configured Native redirects, local adaptation scripts and resolution configurations"
+            doLast {
+                val nativeTargets = kotlin.targets.withType(KotlinNativeTarget::class.java)
+                project.logger.lifecycle("Native Bridge configured redirects for ${project.path} (no dependency resolution)")
+                if (nativeTargets.isEmpty()) project.logger.lifecycle("No Native targets; no Native redirects apply.")
+                for (target in nativeTargets) {
+                    val configuration = target.compilations.getByName("main").compileDependencyConfigurationName
+                    project.logger.lifecycle("Target ${target.name} (${target.konanTarget.name}); configuration=$configuration")
+                    for (rule in bridge.redirects.filter { target.konanTarget.name in it.targets.get() }) {
+                        val extras = project.gradle.extensions.extraProperties
+                        val sourceKey = "love.yinlin.nativeBridge.sourceInfo.${rule.name}"
+                        val source = if (extras.has(sourceKey)) extras.get(sourceKey) as Map<*, *> else null
+                        val replacement = when {
+                            source != null -> "included build ${source["build"]}, project ${source["project"]}"
+                            rule.projectPath.isPresent -> "project ${rule.projectPath.get()}"
+                            else -> "Maven ${rule.module.get()}"
+                        }
+                        project.logger.lifecycle("  ${rule.name}: ${rule.upstream.get()}:${rule.upstreamVersion.get()} -> $replacement")
+                        val adaptation = source?.get("adaptation") as? String
+                        if (!adaptation.isNullOrBlank()) project.logger.lifecycle("    adaptation: $adaptation")
+                    }
+                    val insight = if (project.path == ":") ":dependencyInsight" else "${project.path}:dependencyInsight"
+                    project.logger.lifecycle("  Actual graph: $insight --configuration $configuration --dependency org.jetbrains.skiko")
                 }
             }
         }

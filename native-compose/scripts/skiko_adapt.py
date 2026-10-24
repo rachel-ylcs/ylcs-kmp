@@ -1,7 +1,10 @@
 """Rachel's small, reviewable delta over the locked Skiko three-way source merge."""
 from pathlib import Path
+import json
+import os
 import re
 import shutil
+import tomllib
 from upstream_versions import align_catalog, main_profile
 
 
@@ -60,6 +63,7 @@ def adapt(root: Path, lock):
     notices = root / "skiko/rachel-notices"
     notices.mkdir()
     own_root = Path(__file__).resolve().parents[1]
+    origins = json.loads((own_root / "upstream/adaptation-origins.json").read_text(encoding="utf-8"))["files"]
     shutil.copyfile(own_root / "licenses/THIRD_PARTY_NOTICES.md", notices / "THIRD_PARTY_NOTICES.md")
     shutil.copyfile(own_root / "upstream/adaptation-origins.json", notices / "adaptation-origins.json")
     for license_file in (own_root / "licenses").glob("*.txt"):
@@ -72,7 +76,16 @@ def adapt(root: Path, lock):
     props = root / "skiko/gradle.properties"
     text = props.read_text(encoding="utf-8")
     kotlin_language_version = ".".join(lock["versions"]["kotlin"].split(".")[:2])
+    # Three-host CI builds each platform's CInterop on its matching host. KGP
+    # reports this expected host limitation separately from disabled-task warnings.
+    warning_property = "kotlin.suppressGradlePluginWarnings"
+    previous_warnings = re.search(rf"(?m)^{re.escape(warning_property)}[ \t]*=[ \t]*([^\r\n]*)", text)
+    suppressed_warnings = [value.strip() for value in previous_warnings[1].split(",") if value.strip()] if previous_warnings else []
+    if "CrossCompilationWithCinterops" not in suppressed_warnings:
+        suppressed_warnings.append("CrossCompilationWithCinterops")
     changes = {
+        warning_property: ",".join(suppressed_warnings),
+        "kotlin.mpp.enableCInteropCommonization": "true",
         "deploy.version": lock["versions"]["skiko"],
         "deploy.group": lock["group"],
         "deploy.release": "true",
@@ -196,6 +209,18 @@ CHECKSUMS
             // KLIBs must remain linkable after leaving the producer's machine.
             mutableListOfLinkerOptions(resolvedBinaryInputs.frameworks + resolvedBinaryInputs.linkFlags)
         }''')
+    # NativeCompile linker flags alone are not exported in the KLIB manifest.
+    # Consumers (including test binaries and Maven users) need the system libs too.
+    text = replace_once(text, '''            mutableListOfLinkerOptions(options)
+        }
+        OS.Windows -> {''', '''            configureCinterop(cinteropName, os, arch, target, targetString, options)
+            mutableListOfLinkerOptions(options)
+        }
+        OS.Windows -> {''')
+    text = replace_once(text, '''                    *project.appleMacOsSdkFlags().toTypedArray(),
+                    *buildType.clangFlags,''', '''                    *project.appleMacOsSdkFlags().toTypedArray(),
+                    "-mmacosx-version-min=12.0",
+                    *buildType.clangFlags,''')
     native.write_text(text, encoding="utf-8", newline="\n")
 
     # Gradle 9 rejects an explicitly null ExecSpec working directory. The default
@@ -248,10 +273,12 @@ CHECKSUMS
         for source in (adaptation / "src").rglob("*"):
             if source.is_file():
                 (project_dir / "src" / source.relative_to(adaptation / "src")).unlink(missing_ok=True)
+                original = origins.get(source.relative_to(own_root).as_posix())
+                if original:
+                    (root / original).unlink(missing_ok=True)
         build_file = project_dir / "build.gradle.kts"
-        binding = f'\n    project.extensions.extraProperties["rachel.skiko.context"] = {context_name}\n'
-        binding += f'    project.extensions.extraProperties["rachel.native.adaptation"] = "{adaptation.as_posix()}"\n'
-        binding += f'    project.apply(from = "{(adaptation / "build.gradle.kts").as_posix()}")\n'
+        binding = '\n    @Suppress("UNCHECKED_CAST")\n'
+        binding += f'    (project.extensions.extraProperties["rachel.skiko.configure"] as (SkikoProjectContext) -> Unit)({context_name})\n'
         # Register after Skia tasks/the hierarchy exist, before the publication target snapshot.
         anchor = "    skikoProjectContext.declareSkiaTasks()\n" if module.endswith("_skiko") else "    applyHierarchyTemplate(skikoSourceSetHierarchyTemplate)\n"
         text = replace_once(build_file.read_text(encoding="utf-8"), anchor, anchor + binding)
@@ -265,7 +292,7 @@ CHECKSUMS
 tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
     if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
         from(rootProject.file("rachel-notices")) { into("META-INF/licenses") }
-        listOf("commonMain/cpp", "nativeJsMain/cpp", "nativeNativeJs/cpp", "windowsMain/cpp").forEach { path ->
+        listOf("commonMain/cpp", "nativeMain/cpp", "windowsMain/cpp", "linuxMain/cpp").forEach { path ->
             from("src/$path") { into("native-sources/$path") }
         }
     }
@@ -291,3 +318,60 @@ tasks.withType<org.gradle.api.publish.maven.tasks.AbstractPublishToMaven>().conf
     # Apply the same complete-publication guard and source/license provenance to Skottie.
     with skottie.open("a", encoding="utf-8", newline="\n") as output:
         output.write(text[text.index("// Rachel: sources artifacts"):])
+
+    # This fork builds desktop Native only. Merge upstream's historical shared
+    # Native/JS directories and remove the redundant hierarchy node.
+    hierarchy = root / "skiko/buildSrc/src/main/kotlin/sourceHierarchy.kt"
+    text = hierarchy.read_text(encoding="utf-8")
+    text = remove_block(text, 'group("nativeJs") {')
+    hierarchy.write_text(text, encoding="utf-8", newline="\n")
+    for module_dir in [root / "skiko", root / "skiko/skiko-skottie", root / "skiko/test-utils"]:
+        for old, new in [("nativeJsMain", "nativeMain"), ("nativeJsTest", "nativeTest"), ("nativeNativeJs", "nativeMain")]:
+            directory = module_dir / "src" / old
+            if not directory.is_dir():
+                continue
+            for source in directory.rglob("*"):
+                if not source.is_file():
+                    continue
+                relative = source.relative_to(directory).as_posix().replace(".nativejs.kt", ".shared.kt")
+                destination = module_dir / "src" / new / relative
+                if destination.exists():
+                    raise ValueError(f"Native source merge collision: {destination}")
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(source, destination)
+            if not directory.resolve().is_relative_to(root.resolve()):
+                raise ValueError(f"Unsafe normalized source directory: {directory}")
+            shutil.rmtree(directory)
+    for directory in [root / "skiko/buildSrc/src", root / "skiko"]:
+        for source in directory.rglob("*.kt" if directory.name == "src" else "*.gradle.kts"):
+            text = source.read_text(encoding="utf-8")
+            updated = text.replace("src/nativeJsMain/", "src/nativeMain/").replace("src/nativeNativeJs/", "src/nativeMain/").replace("src/nativeJsTest/", "src/nativeTest/")
+            updated = updated.replace('"src/nativeMain/cpp", "src/nativeMain/cpp"', '"src/nativeMain/cpp"')
+            if updated != text:
+                source.write_text(updated, encoding="utf-8", newline="\n")
+
+    # The maintained script is the actual project build file, so IDEA imports its
+    # buildSrc and plugin classpath. Project directories stay upstream: its tasks
+    # and buildSrc intentionally resolve source/dependency paths against them.
+    libraries = tomllib.loads(catalog.read_text(encoding="utf-8"))["libraries"]
+    accessors = '''val kotlin = extensions.getByType<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension>()
+fun kotlin(configure: org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.() -> Unit) = kotlin.configure()
+val publishing = extensions.getByType<org.gradle.api.publish.PublishingExtension>()
+fun signing(configure: org.gradle.plugins.signing.SigningExtension.() -> Unit) = extensions.configure(configure)
+val rachelCatalog = extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
+
+'''
+    for module, project_dir, descriptor in [
+        ("org.jetbrains.skiko_skiko", root / "skiko", "rootProject"),
+        ("org.jetbrains.skiko_skiko-skottie", root / "skiko/skiko-skottie", 'project(":skiko-skottie")'),
+    ]:
+        build_file = project_dir / "build.gradle.kts"
+        text = remove_block(build_file.read_text(encoding="utf-8"), "plugins {")
+        for alias in sorted(libraries, key=len, reverse=True):
+            accessor = "libs." + re.sub(r"[-_]", ".", alias)
+            text = re.sub(re.escape(accessor) + r"\b", f'rachelCatalog.findLibrary("{alias}").get()', text)
+        text = replace_once(text, "val skiko =", accessors + "val skiko =")
+        (project_dir / "rachel-upstream.gradle.kts").write_text(text, encoding="utf-8", newline="\n")
+        relative = os.path.relpath(own_root / "adaptation" / module / "build.gradle.kts", project_dir).replace("\\", "/")
+        with settings.open("a", encoding="utf-8", newline="\n") as output:
+            output.write(f'\n{descriptor}.buildFileName = "{relative}"\n')

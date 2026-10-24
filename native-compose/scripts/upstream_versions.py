@@ -27,11 +27,19 @@ def main_profile(repository):
     toolchain = re.search(r"\bjvm\s*\{\s*version\s*=\s*(\d+)", settings)
     if not toolchain:
         raise ValueError("Cannot read repository { rachel { jvm { version = ... } } } from root settings")
+    properties_file = repository / "gradle.properties"
+    properties = properties_file.read_text(encoding="utf-8") if properties_file.is_file() else ""
+    shared_properties = {}
+    for name in ["kotlin.native.ignoreDisabledTargets"]:
+        value = re.search(rf"(?m)^{re.escape(name)}[ \t]*=[ \t]*([^\r\n]*)", properties)
+        if value:
+            shared_properties[name] = value[1].strip()
     return {
         "versions": catalog["versions"],
         "libraries": library_versions(catalog),
         "java": int(toolchain[1]),
         "catalogSha256": hashlib.sha256(catalog_file.read_bytes()).hexdigest(),
+        "gradleProperties": shared_properties,
     }
 
 
@@ -74,6 +82,14 @@ def sync_wrappers(fork, repository):
 
 def apply_build_profile(fork, repository, profile):
     sync_wrappers(fork, repository)
+    properties_file = fork / "skiko/gradle.properties"
+    text = properties_file.read_text(encoding="utf-8")
+    for name, value in profile.get("gradleProperties", {}).items():
+        line = f"{name}={value}"
+        text, count = re.subn(rf"(?m)^{re.escape(name)}[^\r\n]*", line, text)
+        if not count:
+            text += "\n" + line + "\n"
+    properties_file.write_text(text, encoding="utf-8", newline="\n")
     build_src = fork / "skiko/buildSrc/build.gradle.kts"
     with build_src.open("a", encoding="utf-8", newline="\n") as output:
         output.write(f'\n// Rachel: share the main build toolchain.\nkotlin {{ jvmToolchain({profile["java"]}) }}\n')

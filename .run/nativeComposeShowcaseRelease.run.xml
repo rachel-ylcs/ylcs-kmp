@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="nativeComposeShowcaseRelease" type="GradleRunConfiguration" factoryName="Gradle" folderName="Native Compose">
+    <ExternalSystemSettings>
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="-Pnative.compose=true" />
+      <option name="taskNames">
+        <list>
+          <option value=":ylcs-app:native-compose:runWindowsReleaseExecutable" />
+        </list>
+      </option>
+    </ExternalSystemSettings>
+    <method v="2" />
+  </configuration>
+</component>

@@ -17,7 +17,6 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
     abstract val resources: ConfigurableFileCollection
     val skikoRuntimeEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
     val skikoWindowEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
-    val sdlDefinition: Property<String> = objects.property(String::class.java)
 
     val runtimes: NamedDomainObjectContainer<NativeRuntime> = objects.domainObjectContainer(NativeRuntime::class.java) {
         objects.newInstance(NativeRuntime::class.java, it)
@@ -37,11 +36,10 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
     /** Stage Skiko's target-specific runtime data; source mode uses the local producer task. */
     fun skikoRuntime() { skikoRuntimeEnabled.set(true) }
 
-    /** Link/package SDL3 and Skiko; an optional definition also creates the SDL CInterop. */
-    fun skikoWindow(cinteropDefinition: String? = null) {
+    /** Configure runtime data and launch arguments for Skiko's self-contained Native window host. */
+    fun skikoWindow() {
         enabled.set(true)
         skikoRuntime()
         skikoWindowEnabled.set(true)
-        if (cinteropDefinition != null) sdlDefinition.set(cinteropDefinition)
     }
 }
