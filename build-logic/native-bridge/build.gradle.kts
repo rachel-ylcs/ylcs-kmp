@@ -1,5 +1,3 @@
-import groovy.json.JsonSlurper
-
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
@@ -22,11 +20,13 @@ dependencies {
     testImplementation(kotlin("test-junit"))
 }
 
-val compatibility = JsonSlurper().parse(file("../../native-compose/upstream/lock.json")) as Map<*, *>
 val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     destinationFile.set(layout.buildDirectory.file("generated/compatibility/rachel-native-bridge.properties"))
     property("skiko.upstream.version", libs.versions.skiko.get())
-    property("skiko.port.module", "${compatibility["group"]}:skiko:${compatibility["portVersion"]}")
+    val nativeSkiko = libs.skikoNative.get()
+    property("skiko.port.module", "${nativeSkiko.module.group}:${nativeSkiko.module.name}:${nativeSkiko.versionConstraint.requiredVersion}")
+    property("skiko.skottie.module", libs.skikoNativeSkottie.get().toString())
+    property("sdl.version", libs.versions.sdl.get())
 }
 tasks.processResources { from(writeCompatibility) }
 

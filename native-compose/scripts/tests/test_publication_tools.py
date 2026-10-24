@@ -6,7 +6,7 @@ import unittest
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from merge_repositories import TARGETS, merge
+from merge_repositories import ARTIFACTS, TARGETS, merge
 from verify_distributions import extract
 
 
@@ -18,16 +18,17 @@ class PublicationToolsTest(unittest.TestCase):
             for target, suffix in TARGETS.items():
                 repository = work / target
                 inputs[target] = repository
-                for module in ["skiko", f"skiko-{suffix}"]:
+                for module in [name for artifact in ARTIFACTS for name in [artifact, f"{artifact}-{suffix}"]]:
                     directory = repository / "test/group" / module / "1.0"
                     directory.mkdir(parents=True)
                     (directory / "artifact").write_text(target)
-            output = merge(inputs, work / "merged", {"group": "test.group", "portVersion": "1.0"})
-            self.assertEqual((output / "test/group/skiko/1.0/artifact").read_text(), "macos_arm64")
-            for target, suffix in TARGETS.items():
-                self.assertEqual((output / f"test/group/skiko-{suffix}/1.0/artifact").read_text(), target)
+            output = merge(inputs, work / "merged", {"group": "test.group", "versions": {"skiko": "1.0"}})
+            for artifact in ARTIFACTS:
+                self.assertEqual((output / f"test/group/{artifact}/1.0/artifact").read_text(), "macos_arm64")
+                for target, suffix in TARGETS.items():
+                    self.assertEqual((output / f"test/group/{artifact}-{suffix}/1.0/artifact").read_text(), target)
             with self.assertRaisesRegex(ValueError, "non-empty"):
-                merge(inputs, output, {"group": "test.group", "portVersion": "1.0"})
+                merge(inputs, output, {"group": "test.group", "versions": {"skiko": "1.0"}})
 
     def test_missing_host_fails_before_creating_a_repository(self):
         with tempfile.TemporaryDirectory() as work:
@@ -35,6 +36,17 @@ class PublicationToolsTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Exactly"):
                 merge({"mingw_x64": Path(work) / "windows"}, output, {})
             self.assertFalse(output.exists())
+
+    def test_missing_extension_fails_before_copying_the_core(self):
+        with tempfile.TemporaryDirectory() as work:
+            work = Path(work)
+            inputs = {target: work / target for target in TARGETS}
+            for target, suffix in TARGETS.items():
+                for module in ["skiko", f"skiko-{suffix}"]:
+                    (inputs[target] / "test/group" / module / "1.0").mkdir(parents=True)
+            with self.assertRaisesRegex(ValueError, "skiko-skottie"):
+                merge(inputs, work / "merged", {"group": "test.group", "versions": {"skiko": "1.0"}})
+            self.assertFalse((work / "merged").exists())
 
     def test_archive_cannot_write_outside_its_destination(self):
         with tempfile.TemporaryDirectory() as work:

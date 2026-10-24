@@ -15,6 +15,9 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
     abstract val baseName: Property<String>
     abstract val arguments: ListProperty<String>
     abstract val resources: ConfigurableFileCollection
+    val skikoRuntimeEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val skikoWindowEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    val sdlDefinition: Property<String> = objects.property(String::class.java)
 
     val runtimes: NamedDomainObjectContainer<NativeRuntime> = objects.domainObjectContainer(NativeRuntime::class.java) {
         objects.newInstance(NativeRuntime::class.java, it)
@@ -29,5 +32,16 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
     /** Uses the Konan identifier, e.g. mingw_x64, even when the Gradle target is called windows. */
     fun runtime(target: String, configure: Action<NativeRuntime>) {
         configure.execute(runtimes.maybeCreate(target))
+    }
+
+    /** Stage Skiko's target-specific runtime data; source mode uses the local producer task. */
+    fun skikoRuntime() { skikoRuntimeEnabled.set(true) }
+
+    /** Link/package SDL3 and Skiko; an optional definition also creates the SDL CInterop. */
+    fun skikoWindow(cinteropDefinition: String? = null) {
+        enabled.set(true)
+        skikoRuntime()
+        skikoWindowEnabled.set(true)
+        if (cinteropDefinition != null) sdlDefinition.set(cinteropDefinition)
     }
 }

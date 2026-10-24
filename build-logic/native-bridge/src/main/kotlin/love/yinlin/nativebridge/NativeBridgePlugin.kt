@@ -1,6 +1,5 @@
 package love.yinlin.nativebridge
 
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentSelector
@@ -25,9 +24,15 @@ class NativeBridgePlugin : Plugin<Project> {
         }
         bridge.redirect("skiko-core") {
             upstream.set("org.jetbrains.skiko:skiko")
-            upstreamVersion.set(compatibility.getProperty("skiko.upstream.version"))
+            upstreamVersion.set(selectedVersion(project, "skiko-core", compatibility.getProperty("skiko.upstream.version")))
             targets.set(setOf("mingw_x64", "linux_x64", "macos_arm64"))
-            module.set(compatibility.getProperty("skiko.port.module"))
+            module.set(compatibility.getProperty("skiko.port.module").substringBeforeLast(':') + ":" + upstreamVersion.get())
+        }
+        bridge.redirect("skiko-skottie") {
+            upstream.set("org.jetbrains.skiko:skiko-skottie")
+            upstreamVersion.set(selectedVersion(project, "skiko-skottie", compatibility.getProperty("skiko.upstream.version")))
+            targets.set(setOf("mingw_x64", "linux_x64", "macos_arm64"))
+            module.set(compatibility.getProperty("skiko.skottie.module").substringBeforeLast(':') + ":" + upstreamVersion.get())
         }
         val application = project.extensions.create("nativeApplication", NativeApplicationExtension::class.java)
         application.baseName.convention(project.name)
@@ -36,7 +41,10 @@ class NativeBridgePlugin : Plugin<Project> {
             configureRedirects(project, kotlin, bridge)
             project.afterEvaluate {
                 bridge.redirects.forEach(NativeDependencyRule::validate)
-                if (application.enabled.get()) configureApplication(project, kotlin, application)
+                if (application.enabled.get()) {
+                    SkikoApplicationDependencies.configure(project, kotlin, application, bridge, compatibility)
+                    configureApplication(project, kotlin, application)
+                }
             }
         }
     }
@@ -81,12 +89,16 @@ class NativeBridgePlugin : Plugin<Project> {
                     require(rules.size == 1) { "Ambiguous Native redirects for ${requested.displayName} in ${configuration.name}" }
                     val rule = rules.single()
                     rule.validate()
-                    if (requested.version != rule.upstreamVersion.get()) {
-                        throw GradleException("Native Bridge: ${requested.displayName} is outside the tested version ${rule.upstreamVersion.get()} (${rule.name})")
-                    }
+                    NativeVersionSelection.validate(requested, rule.upstreamVersion.get(), rule.name)
                     val localKey = "love.yinlin.nativeBridge.source.${rule.name}"
                     val sourceSelector = project.gradle.extensions.extraProperties.let {
                         if (it.has(localKey)) it.get(localKey) as ComponentSelector else null
+                    }
+                    val maintainer = project.gradle.extensions.extraProperties.let {
+                        it.has("love.yinlin.nativeCompose.maintainer") && it.get("love.yinlin.nativeCompose.maintainer") == true
+                    }
+                    check(!maintainer || sourceSelector != null || rule.projectPath.isPresent) {
+                        "Native Compose maintainer mode requires a local project for ${rule.name}; Maven fallback is disabled. Register its source project in nativeBridgeSources."
                     }
                     val replacement = sourceSelector ?: if (rule.projectPath.isPresent) substitutions.project(rule.projectPath.get())
                     else substitutions.module(rule.module.get())
@@ -94,6 +106,13 @@ class NativeBridgePlugin : Plugin<Project> {
                 }
             }
         }
+    }
+
+    private fun selectedVersion(project: Project, rule: String, fallback: String): String {
+        val properties = project.gradle.extensions.extraProperties
+        val key = "love.yinlin.nativeBridge.version.$rule"
+        return if (properties.has("love.yinlin.nativeCompose.maintainer") && properties.get("love.yinlin.nativeCompose.maintainer") == true && properties.has(key)) properties.get(key) as String
+        else fallback
     }
 
     private fun configureApplication(project: Project, kotlin: KotlinMultiplatformExtension, application: NativeApplicationExtension) {

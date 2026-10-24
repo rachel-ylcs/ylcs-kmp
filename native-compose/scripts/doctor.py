@@ -76,7 +76,7 @@ def main():
             print(f"macOS SDK: {result.stdout.strip() or 'MISSING'}")
             if result.returncode:
                 failed.append("macOS SDK")
-    print(f"Prepared source state: {(ROOT / 'vendor/state.json').is_file()}")
+    print(f"Prepared source state: {(ROOT / 'vendor/skiko/state.json').is_file()}")
     if failed:
         print("Missing requirements: " + ", ".join(failed))
         return 1

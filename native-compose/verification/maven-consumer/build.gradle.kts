@@ -7,8 +7,9 @@ plugins {
 
 val lock = JsonSlurper().parse(file("../../upstream/lock.json")) as Map<*, *>
 val portGroup = lock["group"] as String
-val portVersion = lock["portVersion"] as String
+val skikoVersion = libs.versions.skiko.get()
 val explicit = providers.gradleProperty("native.explicit").getOrElse("false").toBoolean()
+layout.buildDirectory.set(layout.projectDirectory.dir("../../vendor/build/maven-consumer"))
 
 kotlin {
     compilerOptions { freeCompilerArgs.add("-Xcollection-literals") }
@@ -17,12 +18,16 @@ kotlin {
     macosArm64("macos")
     sourceSets {
         commonMain.dependencies {
-            if (explicit) implementation("$portGroup:skiko:$portVersion")
-            else implementation(libs.skiko)
+            // Deliberately request only the extension: Core must arrive through its API metadata.
+            if (explicit) implementation(libs.skikoNativeSkottie)
+            else implementation(libs.skiko.lottie)
+            if (providers.gradleProperty("native.legacyRequest").getOrElse("false").toBoolean()) {
+                implementation("org.jetbrains.skiko:skiko:0.150.1")
+            }
         }
         val nativeMain = create("nativeMain") {
             dependsOn(commonMain.get())
-            kotlin.srcDir("../../samples/skiko-offscreen/src/nativeMain/kotlin")
+            kotlin.srcDir("../../adaptation/samples/skiko-offscreen/src/nativeMain/kotlin")
         }
         getByName("windowsMain").dependsOn(nativeMain)
         getByName("linuxMain").dependsOn(nativeMain)
@@ -35,6 +40,6 @@ nativeApplication {
     baseName.set("maven-skiko-consumer")
     entryPoint.set("love.yinlin.nativecompose.offscreen.main")
     runtime("mingw_x64") {
-        artifacts.put("$portGroup:skiko-mingwx64:$portVersion:icudtl@dat", "icudtl.dat")
+        artifacts.put("$portGroup:skiko-mingwx64:$skikoVersion:icudtl@dat", "icudtl.dat")
     }
 }

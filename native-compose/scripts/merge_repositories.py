@@ -8,6 +8,7 @@ import sys
 from sync_upstream import ROOT, load_lock
 
 TARGETS = {"mingw_x64": "mingwx64", "linux_x64": "linuxx64", "macos_arm64": "macosarm64"}
+ARTIFACTS = ["skiko", "skiko-skottie"]
 
 
 def merge(inputs, output, lock):
@@ -21,13 +22,14 @@ def merge(inputs, output, lock):
     if output.exists() and any(output.iterdir()):
         raise ValueError(f"Refusing to mix publications with a non-empty repository: {output}")
     group = Path(*lock["group"].split("."))
-    modules = [(inputs["macos_arm64"], "skiko")]
-    modules += [(inputs[target], f"skiko-{suffix}") for target, suffix in TARGETS.items()]
+    modules = [(inputs["macos_arm64"], artifact) for artifact in ARTIFACTS]
+    modules += [(inputs[target], f"{artifact}-{suffix}") for artifact in ARTIFACTS for target, suffix in TARGETS.items()]
     # Validate every input before copying anything. Do not let one host overwrite another's root.
     for repository, module in modules:
         directory = repository / group / module
-        if not (directory / lock["portVersion"]).is_dir():
-            raise ValueError(f"Missing publication: {directory / lock['portVersion']}")
+        version = lock["versions"]["skiko"]
+        if not (directory / version).is_dir():
+            raise ValueError(f"Missing publication: {directory / version}")
         if any(path.is_symlink() for path in [directory, *directory.rglob("*")]):
             raise ValueError(f"Symlink in Maven publication: {directory}")
     for repository, module in modules:

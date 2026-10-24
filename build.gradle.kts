@@ -19,7 +19,7 @@ plugins {
 }
 
 idea.module {
-    excludeDirs.add(file("native-compose"))
+    excludeDirs.add(file("native-compose/vendor"))
 }
 
 showtime()

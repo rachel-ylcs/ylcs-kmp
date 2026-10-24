@@ -33,12 +33,14 @@ def main():
             raise ValueError(f"SDL SHA-256 mismatch: {archive}")
         destination = VENDOR / f"sdl-{kind}-{lock['version']}"
         unpack(archive, destination)
+        if kind == "windows":
+            (destination / "x86_64-w64-mingw32/.rachel-sdl-version").write_text(version, encoding="utf-8")
         print(f"SDL {lock['version']}: {destination}")
     if args.build and platform.system() != "Windows":
         if platform.system() not in ("Linux", "Darwin"):
             raise ValueError("SDL SDK builds require Linux or macOS")
         suffix = "macos" if platform.system() == "Darwin" else "linux"
-        build = ROOT / "build" / f"sdl-{suffix}"
+        build = VENDOR / "build" / f"sdl-{suffix}"
         prefix = VENDOR / f"sdl-{suffix}"
         options = [
             f"-DCMAKE_INSTALL_PREFIX={prefix}", "-DCMAKE_INSTALL_LIBDIR=lib",
@@ -50,6 +52,7 @@ def main():
         subprocess.run(["cmake", "-S", str(VENDOR / f"sdl-source-{version}"), "-B", str(build), *options], check=True)
         subprocess.run(["cmake", "--build", str(build), "--parallel", str(args.jobs)], check=True)
         subprocess.run(["cmake", "--install", str(build)], check=True)
+        (prefix / ".rachel-sdl-version").write_text(version, encoding="utf-8")
 
 
 if __name__ == "__main__":

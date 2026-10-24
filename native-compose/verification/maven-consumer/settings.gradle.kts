@@ -9,7 +9,7 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         maven {
-            url = uri(providers.gradleProperty("native.repository").getOrElse("../../build/repository"))
+            url = uri(providers.gradleProperty("native.repository").getOrElse("../../vendor/build/native-compose/repository"))
         }
         mavenCentral()
     }

@@ -45,11 +45,16 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
                 useLanguageFeature()
             }
 
-            buildList {
+            val nativeTargets = buildList {
                 if (windowsTarget) add(mingwX64("windows"))
                 if (linuxTarget) add(linuxX64("linux"))
                 if (macosTarget) add(macosArm64("macos"))
-            }.forEach { target ->
+            }
+            val nativeMain = sourceSets.maybeCreate("nativeMain").apply { dependsOn(sourceSets.commonMain.get()) }
+            val nativeTest = sourceSets.maybeCreate("nativeTest").apply { dependsOn(sourceSets.commonTest.get()) }
+            nativeTargets.forEach { target ->
+                target.compilations.getByName("main").defaultSourceSet.dependsOn(nativeMain)
+                target.compilations.getByName("test").defaultSourceSet.dependsOn(nativeTest)
                 target.baseNative()
             }
 

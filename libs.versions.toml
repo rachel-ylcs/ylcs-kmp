@@ -74,6 +74,8 @@ jetbrains-annotation = { module = "org.jetbrains:annotations", version = "26.1.0
 
 # skiko
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
+skikoNative = { module = "love.yinlin.native.skiko:skiko", version.ref = "skiko" }
+skikoNativeSkottie = { module = "love.yinlin.native.skiko:skiko-skottie", version.ref = "skiko" }
 skiko-lottie = { module = "org.jetbrains.skiko:skiko-skottie", version.ref = "skiko" }
 
 # androidx

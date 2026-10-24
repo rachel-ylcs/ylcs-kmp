@@ -35,26 +35,34 @@ def extract(archive, destination):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", choices=list(HOST_TARGETS.values()), required=True)
+    parser.add_argument("--renderer", choices=["gpu", "software"], default="software")
+    parser.add_argument("--include-showcase", action="store_true")
     args = parser.parse_args()
     if HOST_TARGETS[host_skia_key()] != args.target:
         parser.error("Run distributions on their matching host")
-    work = ROOT / "build/distribution-verification"
+    work = ROOT / "vendor/build/distribution-verification"
     work.mkdir(parents=True, exist_ok=True)
-    for sample in ["skiko-offscreen", "skiko-window"]:
-        archives = list((ROOT / "samples" / sample / "build/distributions").glob(f"{sample}-*-{args.target}-debug.zip"))
+    samples = [(sample, ROOT / "vendor/build/samples" / sample / "distributions", sample, sample == "skiko-window")
+               for sample in ["skiko-offscreen", "skiko-window"]]
+    if args.include_showcase:
+        samples.append(("native-compose", ROOT.parent / "ylcs-app/native-compose/build/distributions", "native_compose", True))
+    for sample, distributions, binary_name, window in samples:
+        archives = list(distributions.glob(f"{sample}-*-{args.target}-debug.zip"))
         # Gradle omits the version segment when project.version is unspecified.
-        archives += list((ROOT / "samples" / sample / "build/distributions").glob(f"{sample}-{args.target}-debug.zip"))
+        archives += list(distributions.glob(f"{sample}-{args.target}-debug.zip"))
         if len(archives) != 1:
             raise ValueError(f"Expected one Debug distribution for {sample}/{args.target}: {archives}")
         destination = Path(tempfile.mkdtemp(prefix=f"{sample} relocated ", dir=work))
         extract(archives[0], destination)
-        executables = [destination / name for name in [sample, f"{sample}.exe", f"{sample}.kexe"] if (destination / name).is_file()]
+        executables = [destination / name for name in [binary_name, f"{binary_name}.exe", f"{binary_name}.kexe"] if (destination / name).is_file()]
         if len(executables) != 1:
             raise ValueError(f"Missing executable in {archives[0]}")
         executable = executables[0]
         if args.target != "mingw_x64" and not executable.stat().st_mode & 0o111:
             raise ValueError(f"Executable permissions lost in {archives[0]}")
-        command = [str(executable)] + (["--smoke"] if sample == "skiko-window" else [])
+        command = [str(executable)] + (["--smoke"] if window else [])
+        if window and args.renderer == "software":
+            command.append("--software")
         subprocess.run(command, cwd=destination, check=True, timeout=30)
         print(f"PASS: relocated {sample}/{args.target}: {destination}", flush=True)
 

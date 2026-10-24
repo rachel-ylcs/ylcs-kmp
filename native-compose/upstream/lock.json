@@ -8,7 +8,6 @@
     "agp": "9.3.3",
     "dokka": "2.3.0-Beta"
   },
-  "portVersion": "0.156.0-rachel.1",
   "group": "love.yinlin.native.skiko",
   "skia": "m156-24300fbbcb",
   "skiaAssets": {
