@@ -1,8 +1,10 @@
 import love.yinlin.repository.tip.showtime
 
 plugins {
+    idea
     install(
         libs.plugins.rachel,
+        libs.plugins.nativeBridge,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.kotlinSerialization,
         libs.plugins.kotlinJvm,
@@ -14,6 +16,10 @@ plugins {
         libs.plugins.dokka,
         apply = false
     )
+}
+
+idea.module {
+    excludeDirs.add(file("native-compose"))
 }
 
 showtime()

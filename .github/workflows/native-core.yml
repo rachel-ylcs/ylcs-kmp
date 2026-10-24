@@ -1,0 +1,260 @@
+name: Native Skiko Core
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'native-compose/**'
+      - 'build-logic/native-bridge*/**'
+      - 'build-logic/repository-conventions/**'
+      - 'build-logic/settings.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - 'libs.versions.toml'
+      - 'gradle/wrapper/**'
+      - '.github/workflows/native-core.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'native-compose/**'
+      - 'build-logic/native-bridge*/**'
+      - 'build-logic/repository-conventions/**'
+      - 'build-logic/settings.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'build.gradle.kts'
+      - 'libs.versions.toml'
+      - 'gradle/wrapper/**'
+      - '.github/workflows/native-core.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-core-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Core / ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: mingw_x64
+            target-name: Windows
+            test-task: windowsTest
+          - runner: ubuntu-24.04
+            target: linux_x64
+            target-name: Linux
+            test-task: linuxTest
+          - runner: macos-26
+            target: macos_arm64
+            target-name: Macos
+            test-task: macosTest
+    defaults:
+      run:
+        shell: bash
+    env:
+      PYTHONUTF8: '1'
+      NATIVE_TARGET: ${{ matrix.target }}
+      TARGET_NAME: ${{ matrix.target-name }}
+      NATIVE_TEST_TASK: ${{ matrix.test-task }}
+      # This baseline validates Skia CPU rendering and SDL presentation, independently of a GPU.
+      SDL_RENDER_DRIVER: software
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: oracle
+          java-version: '25'
+          cache: gradle
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: MSVC and Windows SDK
+        if: runner.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+          export-path-to-vs: VS_PATH
+      - name: Linux build and display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build pkg-config \
+            libfontconfig1-dev libfreetype6-dev fonts-dejavu-core libgl-dev libegl-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev \
+            libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev libdbus-1-dev \
+            libudev-dev libasound2-dev libpulse-dev libibus-1.0-dev libvulkan-dev xvfb xauth
+      - name: Python publication tools
+        run: python -m unittest discover -s native-compose/scripts/tests -v
+      - name: Prepare locked sources and host SDKs
+        run: |
+          python native-compose/scripts/sync_upstream.py
+          python native-compose/scripts/prepare_sdl.py --build --jobs 2
+          python native-compose/scripts/doctor.py
+      - name: Bridge integration tests
+        run: |
+          bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            -Pnative.compose=true :build-logic:native-bridge:test \
+            :build-logic:native-bridge:validatePlugins :build-logic:native-bridge-settings:validatePlugins
+      - name: Core functional tests, samples and local Maven publication
+        run: |
+          display=()
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            export SDL_VIDEODRIVER=x11
+            display=(xvfb-run --auto-servernum --server-args='-screen 0 1280x800x24')
+          fi
+          "${display[@]}" bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            -Pnative.compose=true -Pnative.smoke=true \
+            ":native-compose:samples:skiko-offscreen:${NATIVE_TEST_TASK}" \
+            ":native-compose:samples:skiko-offscreen:run${TARGET_NAME}DebugExecutable" \
+            ":native-compose:samples:skiko-window:run${TARGET_NAME}DebugExecutable" \
+            ":native-compose:samples:skiko-offscreen:package${TARGET_NAME}DebugExecutable" \
+            ":native-compose:samples:skiko-window:package${TARGET_NAME}DebugExecutable" \
+            :native-compose:publishSkikoToVerificationRepository \
+            :build-logic:native-bridge:publishAllPublicationsToLocalVerificationRepository \
+            :build-logic:native-bridge-settings:publishAllPublicationsToLocalVerificationRepository
+      - name: Require real Native test results and audit Maven artifacts
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          reports = list(Path('native-compose/samples/skiko-offscreen/build/test-results').glob('**/TEST-*.xml'))
+          assert reports, 'Native tests produced no JUnit reports'
+          suites = [ET.parse(path).getroot() for path in reports]
+          assert sum(int(suite.attrib['tests']) for suite in suites) == 4, 'Expected four Core integration tests'
+          assert all(int(suite.attrib.get(key, 0)) == 0 for suite in suites for key in ['failures', 'errors', 'skipped'])
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write(f"Core `{os.environ['NATIVE_TARGET']}`: 4 Native tests, offscreen rendering and SDL resize passed.\n")
+          PY
+          python native-compose/scripts/verify_repository.py --target "$NATIVE_TARGET"
+      - name: Run relocated distribution ZIPs
+        run: |
+          display=()
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            export SDL_VIDEODRIVER=x11
+            display=(xvfb-run --auto-servernum --server-args='-screen 0 1280x800x24')
+          fi
+          "${display[@]}" python native-compose/scripts/verify_distributions.py --target "$NATIVE_TARGET"
+      - name: Host Maven publication
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-core-maven-${{ matrix.target }}
+          path: native-compose/build/repository/
+          if-no-files-found: error
+      - name: Bridge Maven publication
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-bridge-maven
+          path: build-logic/build/native-bridge-repository/
+          if-no-files-found: error
+      - name: Samples and test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-core-evidence-${{ matrix.target }}
+          path: |
+            native-compose/samples/*/build/distributions/*.zip
+            native-compose/samples/skiko-offscreen/build/nativeApplication/*/debugExecutable/*.png
+            native-compose/samples/skiko-offscreen/build/test-results/
+            native-compose/samples/skiko-offscreen/build/reports/tests/
+            build-logic/native-bridge/build/test-results/
+            build-logic/native-bridge/build/reports/tests/
+          if-no-files-found: warn
+
+  assemble:
+    name: Assemble three-target Maven repository
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: native-core-maven-*
+          path: host-publications
+      - name: Choose one root and require all three target publications
+        run: |
+          python native-compose/scripts/merge_repositories.py \
+            --input mingw_x64=host-publications/native-core-maven-mingw_x64 \
+            --input linux_x64=host-publications/native-core-maven-linux_x64 \
+            --input macos_arm64=host-publications/native-core-maven-macos_arm64 \
+            --output native-compose/build/assembled-repository
+      - uses: actions/upload-artifact@v7
+        with:
+          name: native-core-maven
+          path: native-compose/build/assembled-repository/
+          if-no-files-found: error
+
+  consume:
+    name: Maven consumer / ${{ matrix.target }}
+    needs: assemble
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: mingw_x64
+            target-name: Windows
+          - runner: ubuntu-24.04
+            target: linux_x64
+            target-name: Linux
+          - runner: macos-26
+            target: macos_arm64
+            target-name: Macos
+    defaults:
+      run:
+        shell: bash
+    env:
+      TARGET_NAME: ${{ matrix.target-name }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: oracle
+          java-version: '25'
+          cache: gradle
+      - uses: actions/download-artifact@v8
+        with:
+          name: native-core-maven
+          path: maven-core
+      - uses: actions/download-artifact@v8
+        with:
+          name: native-bridge-maven
+          path: maven-plugins
+      - name: Linux runtime dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1 libgl1 fonts-dejavu-core
+      - name: Compile, link and run using only Maven artifacts
+        run: |
+          test ! -e native-compose/vendor/state.json
+          repositoryRoot="$PWD"
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            repositoryRoot="$(pwd -W)"
+          fi
+          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --max-workers=2 \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            "-Pnative.repository=$repositoryRoot/maven-core" "-Pnative.plugin.repository=$repositoryRoot/maven-plugins" \
+            "run${TARGET_NAME}DebugExecutable"
+      - name: Consumer rendering evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-core-consumer-${{ matrix.target }}
+          path: native-compose/verification/maven-consumer/build/nativeApplication/*/debugExecutable/*.png
+          if-no-files-found: error

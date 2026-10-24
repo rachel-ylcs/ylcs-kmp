@@ -8,6 +8,7 @@ version = libs.versions.rachel.get()
 
 dependencies {
     implementation(project(path = ":public-plugin", configuration = "bootstrapElements"))
+    implementation(project(":native-bridge-settings"))
 }
 
 kotlin {

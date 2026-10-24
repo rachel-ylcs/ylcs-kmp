@@ -1,0 +1,36 @@
+headers = SDL3/SDL.h
+headerFilter = SDL3/**
+package = love.yinlin.nativecompose.sdl
+---
+// Keep SDL's private object layouts opaque while exposing handles that the IDE can resolve.
+// Kotlin's exported cnames forward declarations currently have IDE indexing limitations.
+static inline void *RachelSDL_CreateWindow(const char *title, int width, int height, SDL_WindowFlags flags) {
+    return SDL_CreateWindow(title, width, height, flags);
+}
+static inline void RachelSDL_DestroyWindow(void *window) {
+    SDL_DestroyWindow((SDL_Window *)window);
+}
+static inline bool RachelSDL_GetWindowSizeInPixels(void *window, int *width, int *height) {
+    return SDL_GetWindowSizeInPixels((SDL_Window *)window, width, height);
+}
+static inline bool RachelSDL_SetWindowSize(void *window, int width, int height) {
+    return SDL_SetWindowSize((SDL_Window *)window, width, height);
+}
+static inline void *RachelSDL_CreateRenderer(void *window, const char *name) {
+    return SDL_CreateRenderer((SDL_Window *)window, name);
+}
+static inline void RachelSDL_DestroyRenderer(void *renderer) {
+    SDL_DestroyRenderer((SDL_Renderer *)renderer);
+}
+static inline SDL_Texture *RachelSDL_CreateTexture(void *renderer, SDL_PixelFormat format, SDL_TextureAccess access, int width, int height) {
+    return SDL_CreateTexture((SDL_Renderer *)renderer, format, access, width, height);
+}
+static inline bool RachelSDL_RenderClear(void *renderer) {
+    return SDL_RenderClear((SDL_Renderer *)renderer);
+}
+static inline bool RachelSDL_RenderTexture(void *renderer, SDL_Texture *texture, const SDL_FRect *source, const SDL_FRect *destination) {
+    return SDL_RenderTexture((SDL_Renderer *)renderer, texture, source, destination);
+}
+static inline bool RachelSDL_RenderPresent(void *renderer) {
+    return SDL_RenderPresent((SDL_Renderer *)renderer);
+}

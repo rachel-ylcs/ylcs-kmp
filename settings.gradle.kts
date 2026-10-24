@@ -1,3 +1,5 @@
+import love.yinlin.repository.nativeCompose
+
 pluginManagement {
     includeBuild("build-logic")
 }
@@ -5,6 +7,8 @@ pluginManagement {
 plugins {
     id("ylcs.repository")
 }
+
+nativeCompose()
 
 repository {
     name = "ylcs-kmp"

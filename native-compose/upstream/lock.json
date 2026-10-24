@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "versions": {
+    "kotlin": "2.5.0-Beta2",
+    "cmp": "1.13.0-beta01",
+    "skiko": "0.156.0",
+    "coroutines": "1.11.0",
+    "agp": "9.3.3",
+    "dokka": "2.3.0-Beta"
+  },
+  "portVersion": "0.156.0-rachel.1",
+  "group": "love.yinlin.native.skiko",
+  "skia": "m156-24300fbbcb",
+  "skiaAssets": {
+    "windows-Release-x64": "a51a1d52c706129b7c695a3e9ade630758d392a053faac9ae88420ecaea40dbf",
+    "linux-Release-x64": "39c68325dd756c9ecd56d6a9c1fdec0fa03ab9d8dc72e9fa4f23bd1e8a29f551",
+    "macos-Release-arm64": "e1caf783f4d1412759632c6727d7ac3b91670bb5cfb66e45f81de968d27e65ed"
+  },
+  "sources": {
+    "skiko-upstream": {
+      "repository": "JetBrains/skiko",
+      "ref": "v0.156.0",
+      "commit": "71d1a686fe49bac19ef1767b9bded4800a5a67c5",
+      "sha256": "7e1589bc4b46d5c0752774165257b3727171c330e658fb2d9b6f5f51b2b9048a"
+    },
+    "skiko-reference": {
+      "repository": "brahmkshatriya/skiko-native",
+      "ref": "master",
+      "commit": "85a7cf78045555f885fa774ac6007c6258d2bfb7",
+      "sha256": "9d56d23fa900258dfa6fb40d94d52acf9f8c463e3167d49b5493d95afd87ba12"
+    },
+    "skiko-merge-base": {
+      "repository": "JetBrains/skiko",
+      "ref": "c4b1940eaa73abfcbaa3f3f5d5972ab0ac7b9810",
+      "commit": "c4b1940eaa73abfcbaa3f3f5d5972ab0ac7b9810",
+      "sha256": "a0ba13f7cafdeeb75c788f649eb742f680f360582762497dc8614c88075e4b4c"
+    }
+  }
+}

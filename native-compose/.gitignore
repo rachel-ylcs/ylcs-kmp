@@ -1,0 +1,5 @@
+/vendor/
+/build/
+/.gradle/
+/.kotlin/
+!/verification/maven-consumer/gradle.properties
