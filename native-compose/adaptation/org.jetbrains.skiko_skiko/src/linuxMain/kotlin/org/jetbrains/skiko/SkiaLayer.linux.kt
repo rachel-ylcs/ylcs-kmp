@@ -1,7 +1,4 @@
-@file:OptIn(
-    kotlinx.cinterop.ExperimentalForeignApi::class,
-    org.jetbrains.skiko.ExperimentalSkikoApi::class,
-)
+@file:OptIn(ExperimentalSkikoApi::class)
 
 package org.jetbrains.skiko
 
@@ -27,20 +24,17 @@ actual open class SkiaLayer(
     private var lastRenderFailure: String? = null
 
     private val softwareFrameLimiter = LinuxFrameLimiter()
-    private val fpsCounter =
-        if (SkikoProperties.fpsEnabled) {
-            FPSCounter(
-                periodSeconds = SkikoProperties.fpsPeriodSeconds,
-                showLongFrames = SkikoProperties.fpsLongFramesShow,
-                getLongFrameMillis = {
-                    SkikoProperties.fpsLongFramesMillis
-                        ?: (1.5 * 1_000.0 / (linuxComponent?.displayRefreshRate ?: 60f))
-                },
-                logOnTick = true,
-            )
-        } else {
-            null
-        }
+    private val fpsCounter = if (SkikoProperties.fpsEnabled) {
+        FPSCounter(
+            periodSeconds = SkikoProperties.fpsPeriodSeconds,
+            showLongFrames = SkikoProperties.fpsLongFramesShow,
+            getLongFrameMillis = { SkikoProperties.fpsLongFramesMillis ?: (1.5 * 1_000.0 / (linuxComponent?.displayRefreshRate ?: 60f)) },
+            logOnTick = true,
+        )
+    }
+    else {
+        null
+    }
 
     private var activeRenderApi: GraphicsApi = properties.renderApi
 
@@ -58,8 +52,7 @@ actual open class SkiaLayer(
             }
         }
 
-    actual val contentScale: Float
-        get() = linuxComponent?.contentScale ?: 1f
+    actual val contentScale: Float get() = linuxComponent?.contentScale ?: 1f
 
     actual var fullscreen: Boolean
         get() = linuxComponent?.fullscreen ?: false
@@ -70,13 +63,11 @@ actual open class SkiaLayer(
             component.fullscreen = value
         }
 
-    actual val component: Any?
-        get() = linuxComponent?.windowHandle
+    actual val component: Any? get() = linuxComponent?.windowHandle
 
     actual fun needRender(throttledToVsync: Boolean) {
         if (renderDelegate == null || linuxComponent == null) return
-        pendingRenderWaitsForVsync =
-            if (renderPending) pendingRenderWaitsForVsync && throttledToVsync else throttledToVsync
+        pendingRenderWaitsForVsync = if (renderPending) pendingRenderWaitsForVsync && throttledToVsync else throttledToVsync
         renderPending = true
         linuxComponent?.requestRender()
     }
@@ -89,13 +80,12 @@ actual open class SkiaLayer(
 
     actual fun attachTo(container: Any) {
         check(linuxComponent == null) { "SkiaLayer is already attached" }
-        val component =
-            container as? LinuxSkiaLayerComponent
-                ?: error("container must implement LinuxSkiaLayerComponent")
+        val component = container as? LinuxSkiaLayerComponent ?: error("container must implement LinuxSkiaLayerComponent")
         linuxComponent = component
         try {
             replaceRenderer(renderApi, countAsFallback = false)
-        } catch (failure: Throwable) {
+        }
+        catch (failure: Throwable) {
             linuxComponent = null
             throw failure
         }
@@ -124,38 +114,34 @@ actual open class SkiaLayer(
             if (value != null && linuxComponent != null) needRender(throttledToVsync = false)
         }
 
-    actual val pixelGeometry: PixelGeometry
-        get() = linuxComponent?.pixelGeometry ?: PixelGeometry.UNKNOWN
+    actual val pixelGeometry: PixelGeometry get() = linuxComponent?.pixelGeometry ?: PixelGeometry.UNKNOWN
 
     /** True when [needRender] has requested a frame that has not been presented yet. */
     @InternalSkikoApi
-    val hasPendingRender: Boolean
-        get() = renderPending
+    val hasPendingRender: Boolean get() = renderPending
 
     /** Current renderer and recovery counters for diagnostics and support tooling. */
     @InternalSkikoApi
-    val diagnostics: LinuxSkiaLayerDiagnostics
-        get() =
-            LinuxSkiaLayerDiagnostics(
-                renderApi = renderApi,
-                rendererDescription = renderer?.description,
-                deviceName = renderer?.deviceName,
-                renderedFrameCount = renderedFrameCount,
-                fallbackCount = fallbackCount,
-                contextRecoveryCount = contextRecoveryCount,
-                lastFailure = lastRenderFailure,
-                isVsyncEnabled = properties.isVsyncEnabled,
-                frameBuffering = properties.frameBuffering,
-                effectiveFrameBufferCount = linuxComponent?.effectiveFrameBufferCount,
-                transparencyRequested = linuxComponent?.transparency == true,
-                hasTransparentWindowBuffer = linuxComponent?.transparencySupported == true,
-                adapterPriority = properties.adapterPriority,
-                gpuResourceCacheLimit = properties.gpuResourceCacheLimit,
-                pixelGeometry = pixelGeometry,
-                fpsAverage = fpsCounter?.average,
-                fpsMinimum = fpsCounter?.min,
-                fpsMaximum = fpsCounter?.max,
-            )
+    val diagnostics: LinuxSkiaLayerDiagnostics get() = LinuxSkiaLayerDiagnostics(
+        renderApi = renderApi,
+        rendererDescription = renderer?.description,
+        deviceName = renderer?.deviceName,
+        renderedFrameCount = renderedFrameCount,
+        fallbackCount = fallbackCount,
+        contextRecoveryCount = contextRecoveryCount,
+        lastFailure = lastRenderFailure,
+        isVsyncEnabled = properties.isVsyncEnabled,
+        frameBuffering = properties.frameBuffering,
+        effectiveFrameBufferCount = linuxComponent?.effectiveFrameBufferCount,
+        transparencyRequested = linuxComponent?.transparency == true,
+        hasTransparentWindowBuffer = linuxComponent?.transparencySupported == true,
+        adapterPriority = properties.adapterPriority,
+        gpuResourceCacheLimit = properties.gpuResourceCacheLimit,
+        pixelGeometry = pixelGeometry,
+        fpsAverage = fpsCounter?.average,
+        fpsMinimum = fpsCounter?.min,
+        fpsMaximum = fpsCounter?.max,
+    )
 
     /**
      * Renders a pending frame. The embedding toolkit calls this from its native window thread.
@@ -171,7 +157,7 @@ actual open class SkiaLayer(
         val height = component.drawableHeight
         if (width <= 0 || height <= 0) return false
 
-        val waitForVsync = if (renderPending) pendingRenderWaitsForVsync else true
+        val waitForVsync = !renderPending || pendingRenderWaitsForVsync
         rendering = true
         renderPending = false
         pendingRenderWaitsForVsync = true
@@ -179,26 +165,27 @@ actual open class SkiaLayer(
             renderWithRecovery(width, height, waitForVsync) { canvas ->
                 try {
                     delegate.onRender(canvas, width, height, currentNanoTime())
-                } catch (failure: Throwable) {
+                }
+                catch (failure: Throwable) {
                     throw RenderDelegateFailure(failure)
                 }
             }
             true
-        } catch (failure: RenderDelegateFailure) {
+        }
+        catch (failure: RenderDelegateFailure) {
             throw failure.cause ?: failure
-        } finally {
+        }
+        finally {
             rendering = false
             if (renderPending) component.requestRender()
         }
     }
 
     @InternalSkikoApi
-    fun snapshot(width: Int, height: Int): Bitmap =
-        rendererOperationWithRecovery { it.snapshot(width, height) }
+    fun snapshot(width: Int, height: Int): Bitmap = rendererOperationWithRecovery { it.snapshot(width, height) }
 
     @InternalSkikoApi
-    fun <T> withOpenGlContext(block: () -> T): T =
-        rendererOperationWithRecovery { it.withExternalOpenGl(block) }
+    fun <T> withOpenGlContext(block: () -> T): T = rendererOperationWithRecovery { it.withExternalOpenGl(block) }
 
     @InternalSkikoApi
     fun drawOpenGlTexture(textureId: Int, width: Int, height: Int, canvas: Canvas) {
@@ -206,25 +193,12 @@ actual open class SkiaLayer(
     }
 
     @InternalSkikoApi
-    val rendererDescription: String
-        get() = checkNotNull(renderer) { "SkiaLayer is not attached" }.description
+    val rendererDescription: String get() = checkNotNull(renderer) { "SkiaLayer is not attached" }.description
 
-    private fun renderWithRecovery(
-        width: Int,
-        height: Int,
-        waitForVsync: Boolean,
-        block: (Canvas) -> Unit,
-    ) {
+    private fun renderWithRecovery(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit) {
         var activeRenderer = healthyRenderer()
-        if (
-            waitForVsync &&
-                activeRenderer.renderApi != GraphicsApi.OPENGL &&
-                properties.isVsyncEnabled &&
-                properties.isVsyncFramelimitFallbackEnabled
-        ) {
-            softwareFrameLimiter.awaitNextFrame(
-                refreshRate = linuxComponent?.displayRefreshRate ?: 60f,
-            )
+        if (waitForVsync && activeRenderer.renderApi != GraphicsApi.OPENGL && properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
+            softwareFrameLimiter.awaitNextFrame(refreshRate = linuxComponent?.displayRefreshRate ?: 60f)
         }
 
         var recoveryAttempt = 0
@@ -232,9 +206,11 @@ actual open class SkiaLayer(
             try {
                 renderFrame(activeRenderer, width, height, waitForVsync, block)
                 return
-            } catch (failure: RenderDelegateFailure) {
+            }
+            catch (failure: RenderDelegateFailure) {
                 throw failure
-            } catch (failure: Throwable) {
+            }
+            catch (failure: Throwable) {
                 if (recoveryAttempt >= 2) throw failure
                 recoverRenderer(
                     failedRenderer = activeRenderer,
@@ -265,13 +241,12 @@ actual open class SkiaLayer(
         deviceAnalytics?.afterFrameRender()
     }
 
-    private inline fun <T> rendererOperationWithRecovery(
-        operation: (LinuxLayerRenderer) -> T,
-    ): T {
+    private inline fun <T> rendererOperationWithRecovery(operation: (LinuxLayerRenderer) -> T): T {
         val activeRenderer = healthyRenderer()
         return try {
             operation(activeRenderer)
-        } catch (failure: Throwable) {
+        }
+        catch (failure: Throwable) {
             recoverRenderer(activeRenderer, failure, attemptSameApiRecreation = true)
             operation(checkNotNull(renderer))
         }
@@ -306,7 +281,8 @@ actual open class SkiaLayer(
                 installRenderer(GraphicsApi.OPENGL)
                 contextRecoveryCount += 1
                 return
-            } catch (recreationFailure: Throwable) {
+            }
+            catch (recreationFailure: Throwable) {
                 lastRenderFailure = recreationFailure.message ?: recreationFailure::class.simpleName
             }
         }
@@ -323,17 +299,15 @@ actual open class SkiaLayer(
         )
     }
 
-    private fun installFirstWorkingRenderer(
-        candidates: List<GraphicsApi>,
-        countAsFallback: Boolean,
-    ) {
+    private fun installFirstWorkingRenderer(candidates: List<GraphicsApi>, countAsFallback: Boolean) {
         var lastFailure: Throwable? = null
         candidates.forEachIndexed { index, api ->
             try {
                 installRenderer(api)
                 if (countAsFallback || index > 0) fallbackCount += 1
                 return
-            } catch (failure: Throwable) {
+            }
+            catch (failure: Throwable) {
                 lastFailure = failure
                 lastRenderFailure = failure.message ?: failure::class.simpleName
             }
@@ -343,20 +317,17 @@ actual open class SkiaLayer(
 
     private fun installRenderer(api: GraphicsApi) {
         val component = checkNotNull(linuxComponent)
-        val nextRenderer =
-            linuxLayerRendererFactoryOverride?.invoke(api, component, properties)
-                ?: when (api) {
-                    GraphicsApi.VULKAN -> LinuxVulkanRenderer(component, properties)
-                    GraphicsApi.OPENGL -> LinuxOpenGLRenderer(component, properties)
-                    GraphicsApi.SOFTWARE_FAST,
-                    GraphicsApi.SOFTWARE_COMPAT -> LinuxSoftwareRenderer(component, api)
-                    else -> error("Kotlin/Native Linux does not support $api rendering")
-                }
+        val nextRenderer = linuxLayerRendererFactoryOverride?.invoke(api, component, properties) ?: when (api) {
+            GraphicsApi.VULKAN -> LinuxVulkanRenderer(component, properties)
+            GraphicsApi.OPENGL -> LinuxOpenGLRenderer(component, properties)
+            GraphicsApi.SOFTWARE_FAST,
+            GraphicsApi.SOFTWARE_COMPAT -> LinuxSoftwareRenderer(component, api)
+            else -> error("Kotlin/Native Linux does not support $api rendering")
+        }
         val nextRendererAnalytics = analytics.renderer(LinuxNativeSkikoVersion, hostOs, api)
         nextRendererAnalytics.init()
         nextRendererAnalytics.deviceChosen()
-        val nextDeviceAnalytics =
-            analytics.device(LinuxNativeSkikoVersion, hostOs, api, nextRenderer.deviceName)
+        val nextDeviceAnalytics = analytics.device(LinuxNativeSkikoVersion, hostOs, api, nextRenderer.deviceName)
         nextDeviceAnalytics.init()
         nextDeviceAnalytics.contextInit()
 
@@ -374,36 +345,13 @@ actual open class SkiaLayer(
         deviceAnalytics = null
         try {
             oldRenderer.close(contextLost)
-        } catch (failure: Throwable) {
+        }
+        catch (failure: Throwable) {
             if (!ignoreFailure) throw failure
             lastRenderFailure = failure.message ?: failure::class.simpleName
         }
     }
 }
-
-@InternalSkikoApi
-data class LinuxSkiaLayerDiagnostics(
-    val renderApi: GraphicsApi,
-    val rendererDescription: String?,
-    val deviceName: String?,
-    val renderedFrameCount: Long,
-    val fallbackCount: Int,
-    val contextRecoveryCount: Int,
-    val lastFailure: String?,
-    val isVsyncEnabled: Boolean,
-    val frameBuffering: FrameBuffering,
-    val effectiveFrameBufferCount: Int?,
-    val transparencyRequested: Boolean,
-    val hasTransparentWindowBuffer: Boolean,
-    val adapterPriority: GpuPriority,
-    val gpuResourceCacheLimit: Long,
-    val pixelGeometry: PixelGeometry,
-    val fpsAverage: Int?,
-    val fpsMinimum: Int?,
-    val fpsMaximum: Int?,
-)
-
-private class RenderDelegateFailure(cause: Throwable) : RuntimeException(cause)
 
 private var linuxCurrentSystemTheme: SystemTheme = SystemTheme.UNKNOWN
 
@@ -415,5 +363,4 @@ fun updateLinuxSystemTheme(theme: SystemTheme) {
     linuxCurrentSystemTheme = theme
 }
 
-actual val currentSystemTheme: SystemTheme
-    get() = linuxCurrentSystemTheme
+actual val currentSystemTheme: SystemTheme get() = linuxCurrentSystemTheme

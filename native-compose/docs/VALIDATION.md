@@ -5,7 +5,11 @@ Kotlin 2.5.0-Beta2、Skiko 0.156.0、Skia m156-24300fbbcb、MSVC 14.50.35717、S
 Gradle 经 IDEA MCP 终端执行；日志统一位于 Git 忽略的 native-compose/vendor/build/logs/。
 本页只记录当前阶段及仍有意义的回归，不累积已替换的临时样例。
 
-## 当前实际通过
+本轮固定工作目录、renderer val 初始化、编译参数及 Kotlin 规范整理仅修改源码与配置。
+按用户要求，本轮没有执行源码准备、构建、测试或程序运行；新增的工作目录回归用例留给 CI。
+以下记录是这些调整之前的实际验证结果，不能作为新版准备流程和 renderer 的验收结果。
+
+## 此前实际通过
 
 | 验证 | 结果 / 日志 |
 | --- | --- |
@@ -24,7 +28,15 @@ Gradle 经 IDEA MCP 终端执行；日志统一位于 Git 忽略的 native-compo
 | 运行文件 | APP Release ZIP 只有 native_compose.exe 和 icudtl.dat；不复制许可证，不需要 SDL3.dll/skiko.dll/JVM；源码和 sources 工件保留许可证 |
 | 禁用 target 警告 | 根 ignoreDisabledTargets 属性自动传给生成的 included build，独立消费者也设置；merged-native-final.log / merged-maven-final.log 无 Native task ... is disabled 警告 |
 | CInterop 宿主提示 | cinterop-warning-and-skottie.log：1m42s、56 tasks；定向抑制 CrossCompilationWithCinterops 后，该提示未再出现；报告仍列出三个 target，Core 4 项/Skottie 2 项 Native 回归通过 |
-| 源码与工作流工具 | Python 14 项测试和 actionlint 通过 |
+| 当前 CI 故障修复的 Windows 链路 | ci-sdl-toolchain-fix-windows.log：5m3s、123 tasks；SDL、6 项 Native 回归、软件窗口 resize、阶段 Debug/APP Release ZIP、Core/Skottie 发布通过 |
+| 修复后独立 Maven 消费 | ci-sdl-toolchain-fix-maven.log：54s、6 tasks；PNG 和公共窗口 resize 通过，无 SDK/CInterop/源码接入 |
+| 修复后 ZIP 与 GPU | ci-sdl-toolchain-relocated-software.log / ci-sdl-toolchain-relocated-gpu.log：阶段 Debug 和 APP Release 的搬移运行、软件/D3D12、resize 通过 |
+| Windows bridge 符号审计 | Core 976 个、Skottie 31 个活动 ExternalSymbolName 均存在于实际编译的 bridge 归档；不等于逐 API 运行验收 |
+| macOS 源集合并 | macos-source-merge-validation.log：5m37s、122 tasks；Gradle 断言三个桌面 target、无 Darwin/NativeJS 活动源集且 macosMain 含全部共享实现；6 项 Native 回归、APP Release D3D12、ZIP 和本地发布通过 |
+| 当前最终复核 | skiko-final-desktop-check.log：2m2s、121 tasks；C++ 4 空格、macOS 源集合并、删除手工 licenses 目录后，6 项 Native 回归、APP Release D3D12/resize、ZIP、Core/Skottie 发布及工件审计通过；源码声明直接取自锁定上游 |
+| 当前独立消费与搬移运行 | skiko-final-maven-consumer.log：28s、6 tasks；仅从 Maven 验证仓库消费 Skottie/Core，旧官方版本请求、PNG/动画像素及软件窗口 resize 通过；skiko-final-distributions.log 验证阶段 Debug/APP Release ZIP 搬移后的 D3D12/resize 和无动态 SDL 依赖 |
+| C++ 4 空格 | adaptation 的 5 个 C++ 文件按 4 空格格式化；检查代码 token、字面量与宏续行，确认排版外内容不变；未保留独立格式配置文件 |
+| 源码与工作流工具 | Python 20 项测试和 actionlint 通过；包括失效 pkg-config、framework 参数、所选 Linux sysroot、缺失工具链失败行为和无手工 licenses 目录的来源生成 |
 
 APP Debug EXE 为 24,276,480 bytes，Release 为 20,896,256 bytes；这是磁盘文件大小，不是内存或性能基准。
 维护模式直接依赖源码项目；上述文件 Maven 仓库专用于验证 publication/独立消费，
@@ -33,7 +45,8 @@ APP Debug EXE 为 24,276,480 bytes，Release 为 20,896,256 bytes；这是磁盘
 ## IDE 与普通工程边界
 
 IDE 通过 included build 关联 adaptation 和准备后的上游源码。
-准备规则变更后应 Reload All Gradle Projects，更新带指纹的 included build 路径。
+本轮将 included build 改为固定的 vendor/skiko/workspace/skiko；首次切换后需要 Reload All Gradle Projects。
+准备脚本会在工作目录准备成功后清理旧的、可识别的生成副本；本轮未运行该迁移。
 最近一次通过 IDEA MCP 对独立 APP 的 Main.kt、ShowcaseScene.kt，以及 Core 的公共 NativeWindow.kt、
 NativeWindow.native.kt 批量检查，返回零错误。APP 不再有自己的 SDL CInterop，绑定由 Core 提供。
 正式维护脚本仍直接使用 adaptation/build.gradle.kts，生成的上游基础脚本与 buildSrc 保留在 vendor。
@@ -57,16 +70,21 @@ C++/CInterop 和最终链接仍由匹配宿主执行；该设置不证明跨宿�
 Core/Skottie/APP 的 Linux Kotlin 交叉编译已通过（skiko-static-window-final.log）；
 Linux 和 macOS 的静态 SDK、C++ 最终链接与运行仍需要各自宿主 CI。
 
-已读取远程 [run 40072504340](https://github.com/rachel-ylcs/ylcs-kmp/actions/runs/40072504340)，
-对应旧提交 44091c05d198b8523000187c84d32fac6dcb4c22：Windows 成功，Linux/macOS 最终链接失败。
-当前修复包括：
+最新读取的 Native [run 40089308385](https://github.com/rachel-ylcs/ylcs-kmp/actions/runs/40089308385)
+对应提交 46ab8533770218d0bd59566614c155030a1a3bd3，三个构建 job 均失败，汇总及独立消费 job 跳过。
+完整原始日志保存为 vendor/build/logs/ci-40089308385-{windows,linux,macos}.log。
 
-- Linux Fc*/glX*：通过库的 CInterop linkerOpts 导出 fontconfig/GL/dl，不只修某个样例。
-- macOS Image 三个 bridge 符号：在上游任务全部注册后配置 adaptation C++ sourceRoots，防止后注册配置覆盖。
-- SDL 和 bridge 使用 macOS 12.0 deployment target。
-- 当前静态 SDL、阶段样例、独立 APP、ZIP 和独立 Maven 窗口消费均已接入三宿主工作流。
+| 平台 | 实际失败 | 当前修复 |
+| --- | --- | --- |
+| Windows | SDL 已构建完成，随后调用 runner 上失效的 C:/Strawberry/perl/bin/pkg-config.BAT，退出码 29 | 无传递包依赖时直接解析 SDL 自身 .pc；有 Requires 时仍要求完整解析器 |
+| Linux | SDL 使用 Ubuntu 宿主 libc 构建，最终链接缺失 __isoc23_*、memfd_create、posix_spawn_file_actions_addchdir_np 等符号 | SDL 改用项目所选 Kotlin/Native Clang/sysroot；独立 CMake 缓存，宿主桌面头文件后置 |
+| macOS | Core/Skottie Kotlin、C++/KLIB 已编译，ld 拒绝 -Wl,-framework,... / -Wl,-weak_framework,... | SDL linkerOpts 展开为直接 ld 参数；publication 审计拒绝 SDL 遗留 driver 包装 |
 
-这些修改尚未推送，没有新的远程 CI 结果；Windows 成功不能证明 Linux/macOS 已修复。
+此前 Linux Fc*/glX* 和 macOS Image bridge 缺失未在这次日志中重现；本次问题来自新增静态 SDL 链路。
+Windows 修复已完成上面的本地完整验证。Linux 另外使用相同版本 Clang 对目标 sysroot 的头文件优先级做了
+交叉编译探针，确认选用 glibc 2.19 且 strtol 不生成 __isoc23_* 调用；这不是 Linux SDL 宿主构建或运行验收。
+
+当前修复尚未提交/推送，没有修复后的 Linux/macOS 远程 CI 结果；Windows 成功不能证明其他宿主已通过。
 CI 默认软件窗口基线，手动 gpu-smoke 另行要求 D3D12/Vulkan/Metal 实际后端。
 
 ## 当前复现命令

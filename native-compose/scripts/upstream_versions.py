@@ -92,4 +92,9 @@ def apply_build_profile(fork, repository, profile):
     properties_file.write_text(text, encoding="utf-8", newline="\n")
     build_src = fork / "skiko/buildSrc/build.gradle.kts"
     with build_src.open("a", encoding="utf-8", newline="\n") as output:
-        output.write(f'\n// Rachel: share the main build toolchain.\nkotlin {{ jvmToolchain({profile["java"]}) }}\n')
+        output.write(f'''\n// Rachel: share the main build toolchain and compiler features.
+kotlin {{
+    jvmToolchain({profile["java"]})
+    compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
+}}
+''')

@@ -1,15 +1,6 @@
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Color
-import org.jetbrains.skia.ColorAlphaType
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.PixelGeometry
-import org.jetbrains.skia.Pixmap
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceProps
+import org.jetbrains.skia.*
 
 internal class WindowsSoftwareRenderer(
     private val window: WindowsNativeWindow,
@@ -20,11 +11,10 @@ internal class WindowsSoftwareRenderer(
         require(renderApi == GraphicsApi.SOFTWARE_FAST || renderApi == GraphicsApi.SOFTWARE_COMPAT)
     }
 
-    override val description: String =
-        when (renderApi) {
-            GraphicsApi.SOFTWARE_FAST -> "Skia Raster/Win32 GDI"
-            else -> "Skia Raster/Win32 GDI (compatibility)"
-        }
+    override val description: String = when (renderApi) {
+        GraphicsApi.SOFTWARE_FAST -> "Skia Raster/Win32 GDI"
+        else -> "Skia Raster/Win32 GDI (compatibility)"
+    }
 
     override val deviceName: String = "Software"
     override val effectiveFrameBufferCount: Int = 1
@@ -36,12 +26,7 @@ internal class WindowsSoftwareRenderer(
     private var height = 0
     private var closed = false
 
-    override fun render(
-        width: Int,
-        height: Int,
-        waitForVsync: Boolean,
-        block: (Canvas) -> Unit,
-    ) {
+    override fun render(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit) {
         check(!closed) { "Renderer is closed" }
         ensureSurface(width, height)
         val rasterSurface = checkNotNull(surface)
@@ -73,18 +58,16 @@ internal class WindowsSoftwareRenderer(
         closeSurface()
         width = newWidth
         height = newHeight
-        bitmap =
-            Bitmap().also {
-                check(it.allocPixels(imageInfo(width, height))) {
-                    "Could not allocate a Skia software framebuffer"
-                }
+        bitmap = Bitmap().also {
+            check(it.allocPixels(imageInfo(width, height))) {
+                "Could not allocate a Skia software framebuffer"
             }
+        }
         pixmap = checkNotNull(bitmap?.peekPixels())
-        surface =
-            Surface.makeRasterDirect(
-                pixmap = checkNotNull(pixmap),
-                surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry),
-            )
+        surface = Surface.makeRasterDirect(
+            pixmap = checkNotNull(pixmap),
+            surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry)
+        )
     }
 
     override fun close(contextLost: Boolean) {
@@ -102,6 +85,5 @@ internal class WindowsSoftwareRenderer(
         bitmap = null
     }
 
-    private fun imageInfo(width: Int, height: Int): ImageInfo =
-        ImageInfo.makeN32(width, height, ColorAlphaType.PREMUL, ColorSpace.sRGB)
+    private fun imageInfo(width: Int, height: Int): ImageInfo = ImageInfo.makeN32(width, height, ColorAlphaType.PREMUL, ColorSpace.sRGB)
 }

@@ -50,6 +50,7 @@ strictly/reject 冲突、未支持的动态和范围请求明确失败。
 - adaptation/：提交的 Kotlin/C++、CInterop 定义、构建配置和当前阶段样例。
 - vendor/：忽略的上游源码、准备后的 fork、静态 SDK、输出及 logs。
 - 上游历史共享代码由脚本合并到 nativeMain/nativeTest，活动源集不使用 Native/JS 名称。
+- 当前仅有 macosArm64，Darwin 共享层统一合并到 macosMain/macosTest；三个平台层为 windows/linux/macos。
 - 两个库属于同一个 Skiko included build；正式 buildFile 指向 adaptation，继续复用上游 buildSrc。
 
 详见 [SOURCES.md](docs/SOURCES.md)。不要手改 vendor。
@@ -78,7 +79,8 @@ Skiko 内的 org.jetbrains.skiko.window.NativeWindow 封装窗口、事件循环
 
 从 ylcs-kmp 根目录，Gradle JVM 使用 JDK 25。Windows 生产者使用现有 VS_PATH，例如 E:\VS2026。
 维护模式首次构建自动准备锁定源码与静态 SDL；SDL 使用 CMake，Windows 使用 MSVC/Ninja，
-Linux 使用本机 C 工具链/pkg-config，macOS 使用 Apple Silicon/Xcode。
+Linux 的 SDL 使用当前 Kotlin/Native 自带的 Clang/sysroot，系统提供桌面开发包及 pkg-config；
+macOS 使用 Apple Silicon/Xcode。
 可先手动执行：
 
 ```powershell
@@ -86,6 +88,14 @@ python native-compose/scripts/sync_upstream.py
 python native-compose/scripts/prepare_sdl.py --build
 python native-compose/scripts/doctor.py
 ```
+
+Linux 的 prepareSdlStatic 会先依赖 downloadKotlinNativeDistribution，再读取该构建的 konan.txt；
+手动执行 prepare_sdl.py --build 时也会按需准备同一发行包，避免 SDL 引用比 Kotlin/Native 更新的 glibc ABI。
+CI 准备步骤只获取源码、检查宿主工具，SDK 编译由库的 Gradle 任务管理。
+
+Skiko 的唯一工作源码位于 vendor/skiko/workspace，Gradle/IDE 始终引用其中的 skiko 子目录。
+上游、参考实现和共同基线只缓存锁定归档；需要更新时临时合并并原地同步生成文件。
+维护源码的内容变化不再产生新指纹目录；工作目录准备成功后会清理可识别的旧 prepared/sources 缓存。
 
 ```powershell
 # 独立 APP
@@ -187,5 +197,6 @@ ZIP 搬移及动态 SDL 依赖检查、三宿主 Maven 汇总，以及干净 run
 Linux 使用 Xvfb/X11；Wayland、性能和完整输入行为不在当前验收范围内。
 工作流上传 Actions 工件，不自动发布 Maven Central。
 
-第三方来源见 [THIRD_PARTY_NOTICES.md](licenses/THIRD_PARTY_NOTICES.md)，
+第三方来源由 upstream/lock.json、upstream/sdl.json 和 upstream/adaptation-origins.json 记录。
+源代码包所需声明从锁定的上游源码直接取得，来源说明由脚本生成在 vendor 中，不维护额外的 licenses 副本。
 图形后端与社区参考见 [RENDERING.md](docs/RENDERING.md)。

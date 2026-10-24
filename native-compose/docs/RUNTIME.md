@@ -24,6 +24,16 @@ Windows 静态 SDL 使用 VS_PATH/vcvars64，与项目现有 BuildDesktopNativeT
 SDL_SHARED=OFF、SDL_STATIC=ON；Windows 产物为 SDL3-static.lib，Linux/macOS 为 libSDL3.a。
 Windows 的 SDL 归档经过与 Skia 相同的 COFF directive 过滤，不额外引入一套默认 CRT 初始化。
 
+Linux SDL 使用当前 Gradle 选择的 Kotlin/Native 发行包中的 Clang、GNU toolchain 和 sysroot。
+宿主 X11/Wayland/audio 开发头文件作为后置搜索目录，避免 Ubuntu 新版 glibc 头文件引入
+__isoc23_*、memfd_create 等 Kotlin/Native 链接 sysroot 中不存在的符号。
+Gradle 的 prepareSdlStatic 依赖下载发行包的任务，再通过 konan.txt 传递实际位置；
+该设置只影响生产者，Maven 消费者不编译 SDL。
+
+SDL 的独立 pkg-config 元数据直接解析；有 Requires/Requires.private 时才调用解析器。
+元数据中的 -Wl,-framework,... 等 driver 参数转换成 Native ld 接受的参数，保留 weak framework 语义。
+Windows Core 自身用于 CRT 的 clang driver 选项保持其原有处理，SDL 元数据审计单独检查规范化结果。
+
 完整 Maven publication 包含主 KLIB、cinterop-skiko、cinterop-sdl、根 metadata、sources 和对应的数据工件。
 只复制一个主 KLIB 不等于完整发布；消费者通过 Gradle metadata 自动获得配套 CInterop。
 维护模式直接使用项目构建，普通模式使用这些 Maven 工件。

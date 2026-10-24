@@ -23,29 +23,23 @@ interface LinuxSkiaLayerComponent {
     /** Scale from logical coordinates to physical pixels. */
     val contentScale: Float
 
-    val pixelGeometry: PixelGeometry
-        get() = PixelGeometry.UNKNOWN
+    val pixelGeometry: PixelGeometry get() = PixelGeometry.UNKNOWN
 
     /** Refresh rate of the display containing this window. */
-    val displayRefreshRate: Float
-        get() = 60f
+    val displayRefreshRate: Float get() = 60f
 
     var fullscreen: Boolean
 
-    val transparency: Boolean
-        get() = false
+    val transparency: Boolean get() = false
 
     /** Whether the host created a window buffer whose alpha channel reaches the window system. */
-    val transparencySupported: Boolean
-        get() = false
+    val transparencySupported: Boolean get() = false
 
     /** Effective number of buffers exposed by the presentation API, or null when it is unknown. */
-    val effectiveFrameBufferCount: Int?
-        get() = null
+    val effectiveFrameBufferCount: Int? get() = null
 
     /** Transfers ownership of a toolkit-backed Vulkan window to this layer's renderer. */
-    fun createVulkanWindow(properties: SkiaLayerProperties): LinuxVulkanWindow =
-        error("The Linux SkiaLayer host does not provide a Vulkan surface")
+    fun createVulkanWindow(properties: SkiaLayerProperties): LinuxVulkanWindow = error("The Linux SkiaLayer host does not provide a Vulkan surface")
 
     /** Context passed to [openGlResolver]. */
     val openGlResolverContext: NativePointer
@@ -80,12 +74,7 @@ interface LinuxSkiaLayerComponent {
     fun beginSoftwareRendering() = Unit
 
     /** Presents premultiplied native N32 pixels to the window. */
-    fun presentSoftwareFrame(
-        pixels: NativePointer,
-        width: Int,
-        height: Int,
-        rowBytes: Int,
-    ) {
+    fun presentSoftwareFrame(pixels: NativePointer, width: Int, height: Int, rowBytes: Int) {
         error("The Linux SkiaLayer host does not support software presentation")
     }
 

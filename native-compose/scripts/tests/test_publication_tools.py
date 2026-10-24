@@ -1,5 +1,6 @@
 """Exercise artifact aggregation and archive boundaries without a Native toolchain."""
 from pathlib import Path
+import json
 import sys
 import tempfile
 import unittest
@@ -7,10 +8,36 @@ import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from merge_repositories import ARTIFACTS, TARGETS, merge
+from skiko_adapt import prepare_notices
 from verify_distributions import extract
 
 
 class PublicationToolsTest(unittest.TestCase):
+    def test_source_notices_follow_locked_inputs_without_a_manual_license_directory(self):
+        with tempfile.TemporaryDirectory() as work:
+            work = Path(work)
+            upstream = work / "upstream-checkout"
+            upstream.mkdir()
+            (upstream / "skiko").mkdir()
+            (upstream / "LICENSE").write_bytes(b"original upstream license\n")
+            (upstream / "NOTICE").write_bytes(b"original upstream notice\n")
+            own = work / "native-compose"
+            (own / "upstream").mkdir(parents=True)
+            origins = {"files": {"maintained.kt": "upstream.kt"}}
+            (own / "upstream/adaptation-origins.json").write_text(json.dumps(origins))
+            sdl = {"version": "future-sdl", "source": {"url": "https://example.invalid/sdl.zip", "sha256": "audited-sdl"}}
+            (own / "upstream/sdl.json").write_text(json.dumps(sdl))
+            lock = {"skia": "future-skia", "sources": {"skiko-upstream": {"repository": "JetBrains/skiko", "commit": "audited-commit"}}}
+            prepare_notices(upstream, lock, own)
+            notices = upstream / "skiko/rachel-notices"
+            self.assertFalse((own / "licenses").exists())
+            self.assertEqual((notices / "Apache-2.0.txt").read_bytes(), (upstream / "LICENSE").read_bytes())
+            self.assertEqual((notices / "NOTICE").read_bytes(), (upstream / "NOTICE").read_bytes())
+            self.assertEqual(json.loads((notices / "upstream-lock.json").read_text()), lock)
+            text = (notices / "THIRD_PARTY_NOTICES.md").read_text()
+            for identity in ["audited-commit", "future-skia", "future-sdl", "audited-sdl"]:
+                self.assertIn(identity, text)
+
     def test_all_hosts_keep_their_binaries_and_only_the_apple_root(self):
         with tempfile.TemporaryDirectory() as work:
             work = Path(work)

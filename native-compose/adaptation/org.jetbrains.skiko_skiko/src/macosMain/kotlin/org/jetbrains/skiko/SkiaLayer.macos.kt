@@ -47,14 +47,8 @@ actual open class SkiaLayer {
      * The scale factor of [NSWindow]
      * https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor
      */
-    actual val contentScale: Float
-        get() =
-            macosComponent?.contentScale
-                ?: if (this::nsView.isInitialized) {
-                    nsView.window?.backingScaleFactor?.toFloat() ?: 1.0f
-                } else {
-                    1.0f
-                }
+    actual val contentScale: Float get() = macosComponent?.contentScale ?: if (this::nsView.isInitialized) { nsView.window?.backingScaleFactor?.toFloat() ?: 1.0f }
+    else 1.0f
 
     /**
      * Fullscreen is not supported
@@ -65,7 +59,8 @@ actual open class SkiaLayer {
             val component = macosComponent
             if (component != null) {
                 component.fullscreen = value
-            } else if (value) {
+            }
+            else if (value) {
                 throw IllegalArgumentException("fullscreen unsupported")
             }
         }
@@ -76,8 +71,7 @@ actual open class SkiaLayer {
     lateinit var nsView: NSView
         private set
 
-    actual val component: Any?
-        get() = macosComponent?.windowHandle ?: if (this::nsView.isInitialized) nsView else null
+    actual val component: Any? get() = macosComponent?.windowHandle ?: if (this::nsView.isInitialized) nsView else null
 
     /**
      * Implements rendering logic and events processing.
@@ -113,11 +107,11 @@ actual open class SkiaLayer {
         fun addObserver() {
             val center = NSNotificationCenter.defaultCenter()
             center.addObserver(
-                    observer = this,
-                    selector = NSSelectorFromString("frameDidChange:"),
-                    name = NSViewFrameDidChangeNotification,
-                    `object` = nsView,
-                )
+                observer = this,
+                selector = NSSelectorFromString("frameDidChange:"),
+                name = NSViewFrameDidChangeNotification,
+                `object` = nsView,
+            )
             center.addObserver(
                 observer = this,
                 selector = NSSelectorFromString("windowDidChangeBackingProperties:"),
@@ -140,13 +134,13 @@ actual open class SkiaLayer {
             check(macosComponent == null && redrawer == null) { "SkiaLayer is already attached" }
             macosComponent = container
             try {
-                macosRenderer =
-                    when (renderApi) {
-                        GraphicsApi.OPENGL -> MacosOpenGLRenderer(container)
-                        GraphicsApi.METAL -> MacosMetalRenderer(container)
-                        else -> error("Unsupported macOS native renderer: $renderApi")
-                    }
-            } catch (failure: Throwable) {
+                macosRenderer = when (renderApi) {
+                    GraphicsApi.OPENGL -> MacosOpenGLRenderer(container)
+                    GraphicsApi.METAL -> MacosMetalRenderer(container)
+                    else -> error("Unsupported macOS native renderer: $renderApi")
+                }
+            }
+            catch (failure: Throwable) {
                 macosComponent = null
                 throw failure
             }
@@ -183,12 +177,11 @@ actual open class SkiaLayer {
         val component = macosComponent
         if (component != null) {
             if (renderDelegate == null) return
-            macosRenderWaitsForVsync =
-                if (macosRenderPending) macosRenderWaitsForVsync && throttledToVsync
-                else throttledToVsync
+            macosRenderWaitsForVsync = if (macosRenderPending) macosRenderWaitsForVsync && throttledToVsync else throttledToVsync
             macosRenderPending = true
             component.requestRender()
-        } else {
+        }
+        else {
             redrawer?.needRender(throttledToVsync)
         }
     }
@@ -207,7 +200,7 @@ actual open class SkiaLayer {
         val height = component.drawableHeight.coerceAtLeast(0)
         if (width <= 0 || height <= 0) return false
 
-        val waitForVsync = if (macosRenderPending) macosRenderWaitsForVsync else true
+        val waitForVsync = !macosRenderPending || macosRenderWaitsForVsync
         macosRenderPending = false
         macosRenderWaitsForVsync = true
         val rendered = renderer.render(width, height, waitForVsync) { canvas ->
@@ -222,8 +215,7 @@ actual open class SkiaLayer {
     }
 
     @InternalSkikoApi
-    val rendererDescription: String
-        get() = macosRenderer?.description ?: "Skiko ${renderApi.name}"
+    val rendererDescription: String get() = macosRenderer?.description ?: "Skiko ${renderApi.name}"
 
     @InternalSkikoApi
     fun snapshot(width: Int, height: Int): Bitmap {
@@ -240,7 +232,8 @@ actual open class SkiaLayer {
         val canvas = Canvas(bitmap)
         try {
             renderDelegate?.onRender(canvas, safeWidth, safeHeight, 0L)
-        } finally {
+        }
+        finally {
             canvas.close()
         }
         bitmap.notifyPixelsChanged()
@@ -248,16 +241,11 @@ actual open class SkiaLayer {
     }
 
     @InternalSkikoApi
-    fun <T> withOpenGlContext(block: () -> T): T =
-        checkNotNull(macosRenderer as? MacosOpenGLRenderer) {
-            "The macOS native renderer is not OpenGL"
-        }.withExternalOpenGl(block)
+    fun <T> withOpenGlContext(block: () -> T): T = checkNotNull(macosRenderer as? MacosOpenGLRenderer) { "The macOS native renderer is not OpenGL" }.withExternalOpenGl(block)
 
     @InternalSkikoApi
     fun drawOpenGlTexture(textureId: Int, width: Int, height: Int, canvas: Canvas) {
-        checkNotNull(macosRenderer as? MacosOpenGLRenderer) {
-            "The macOS native renderer is not OpenGL"
-        }.drawTexture(textureId, width, height, canvas)
+        checkNotNull(macosRenderer as? MacosOpenGLRenderer) { "The macOS native renderer is not OpenGL" }.drawTexture(textureId, width, height, canvas)
     }
 
     @Deprecated(
@@ -291,8 +279,7 @@ actual open class SkiaLayer {
         }
     }
 
-    actual val pixelGeometry: PixelGeometry
-        get() = PixelGeometry.UNKNOWN
+    actual val pixelGeometry: PixelGeometry get() = PixelGeometry.UNKNOWN
 
     private fun createDrawScope() = LayerDrawScope(
         pixelGeometry = pixelGeometry,

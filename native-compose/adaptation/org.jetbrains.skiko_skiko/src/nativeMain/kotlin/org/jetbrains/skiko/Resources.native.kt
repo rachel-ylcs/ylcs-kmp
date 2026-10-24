@@ -35,7 +35,7 @@ actual suspend fun loadBytesFromPath(path: String): ByteArray {
 
     if (size == 0L) {
         fclose(file)
-        return byteArrayOf()
+        return []
     }
 
     val bytes = ByteArray(size.toInt())

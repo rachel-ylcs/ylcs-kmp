@@ -22,7 +22,9 @@ rachel {
             }
         }
 
-        executable { entryPoint = "love.yinlin.main" }
+        executable {
+            entryPoint = "love.yinlin.main"
+        }
     }
 }
 

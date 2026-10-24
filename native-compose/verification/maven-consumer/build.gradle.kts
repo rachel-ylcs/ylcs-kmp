@@ -12,7 +12,7 @@ val explicit = providers.gradleProperty("native.explicit").getOrElse("false").to
 layout.buildDirectory.set(layout.projectDirectory.dir("../../vendor/build/maven-consumer"))
 
 kotlin {
-    compilerOptions { freeCompilerArgs.add("-Xcollection-literals") }
+    compilerOptions { freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals") }
     mingwX64("windows")
     linuxX64("linux")
     macosArm64("macos")

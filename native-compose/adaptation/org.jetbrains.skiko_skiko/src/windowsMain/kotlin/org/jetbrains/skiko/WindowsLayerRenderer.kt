@@ -8,10 +8,8 @@ internal interface WindowsLayerRenderer {
     val renderApi: GraphicsApi
     val description: String
     val deviceName: String?
-    val effectiveFrameBufferCount: Int?
-        get() = null
-    val transparencySupported: Boolean
-        get() = false
+    val effectiveFrameBufferCount: Int? get() = null
+    val transparencySupported: Boolean get() = false
 
     fun render(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit)
 
@@ -19,8 +17,7 @@ internal interface WindowsLayerRenderer {
 
     fun isContextLost(): Boolean = false
 
-    fun <T> withExternalOpenGl(block: () -> T): T =
-        error("External OpenGL access requires the OpenGL renderer")
+    fun <T> withExternalOpenGl(block: () -> T): T = error("External OpenGL access requires the OpenGL renderer")
 
     fun drawTexture(textureId: Int, width: Int, height: Int, canvas: Canvas) {
         error("OpenGL textures require the OpenGL renderer")
@@ -29,5 +26,4 @@ internal interface WindowsLayerRenderer {
     fun close(contextLost: Boolean = false)
 }
 
-internal var windowsLayerRendererFactoryOverride:
-    ((GraphicsApi, WindowsNativeWindow, SkiaLayerProperties, PixelGeometry) -> WindowsLayerRenderer)? = null
+internal var windowsLayerRendererFactoryOverride: ((GraphicsApi, WindowsNativeWindow, SkiaLayerProperties, PixelGeometry) -> WindowsLayerRenderer)? = null

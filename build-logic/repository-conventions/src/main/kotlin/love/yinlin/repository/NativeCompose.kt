@@ -81,7 +81,8 @@ private fun Settings.includeNativeComposeSources(directory: File) {
     }
 
     val sourceDirectory = directory.resolve(state["build"] as String).canonicalFile
-    require(sourceDirectory.toPath().startsWith(directory.resolve("vendor/skiko/prepared").canonicalFile.toPath())) { "Invalid prepared source directory" }
+    require(sourceDirectory == directory.resolve("vendor/skiko/workspace/skiko").canonicalFile) { "Invalid prepared source directory" }
+    check(sourceDirectory.isDirectory) { "Prepared Native Compose working tree is missing" }
     val lock = JsonSlurper().parse(directory.resolve("upstream/lock.json")) as Map<*, *>
     extensions.getByType<NativeBridgeSourcesExtension>().include(sourceDirectory, "skiko", mapOf(
         "skiko-core" to ("${lock["group"]}:skiko" to ":"),

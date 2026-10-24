@@ -17,8 +17,7 @@ fun drawSkikoDemo(canvas: Canvas, width: Int, height: Int) {
         canvas.drawRect(Rect.makeXYWH(24f, 24f, width - 48f, height / 2f), paint)
         val fonts = FontMgr.default
         val families: Array<String?> = ["Arial", "DejaVu Sans", "Liberation Sans", "Noto Sans"]
-        val face = fonts.matchFamiliesStyle(families, FontStyle.NORMAL)
-            ?: if (fonts.familiesCount > 0) fonts.matchFamilyStyle(fonts.getFamilyName(0), FontStyle.NORMAL) else null
+        val face = fonts.matchFamiliesStyle(families, FontStyle.NORMAL) ?: if (fonts.familiesCount > 0) fonts.matchFamilyStyle(fonts.getFamilyName(0), FontStyle.NORMAL) else null
         face?.use { face ->
             Font(face, 26f).use { font ->
                 paint.color = Color.BLACK

@@ -1,13 +1,19 @@
 # Skiko 当前状态与下一步
 
-以当前源码和已执行验证为准。Windows 基线可用，三平台完整验收尚未完成；
+结论：**Core/Skottie 已接齐本阶段约定的三个桌面 Native 目标，当前处于三平台验收与发行收尾阶段。**
+源码审计尚未发现新增的 target actual 或 bridge 符号遗漏；Linux/macOS 的完整运行、三目标 Maven 汇总消费
+和正式发布尚未完成，因此不能把当前状态宣布为三个平台均已验收完成。
 不能将目标已经声明、Kotlin 已编译和宿主实际运行混为同一结果。
+
+本轮将源码准备改为唯一固定 workspace，renderer 改用 val 并保留构造失败清理，
+统一编译参数和 adaptation Kotlin 规范。按用户要求未执行准备、构建、测试或运行；
+下表为本轮调整前的验证记录，新流程与调整后的代码等待 CI 验收。
 
 | 能力 | Windows x64 | Linux x64 | macOS ARM64 |
 | --- | --- | --- | --- |
-| Kotlin target / Native actual | 已实现并编译 | 已实现，Kotlin 交叉编译通过 | 实现已接入，待对应宿主完整验收 |
-| Skia/Core C++ 与静态归档 | 已编译、链接 | 配置/实现已接入，待宿主 CI | 配置/实现已接入，待宿主 CI |
-| SDL 静态 SDK 与配套 CInterop KLIB | 已构建、嵌入并本地发布 | 静态构建路径已接入，待宿主 CI | 静态构建路径已接入，待宿主 CI |
+| Kotlin target / Native actual | 已实现并编译 | 最新 CI 已编译 Core/Skottie/APP | 最新 CI 已编译 Core/Skottie/APP |
+| Skia/Core C++ 与静态归档 | 已编译、链接 | 最新 CI 已编译 bridge 和 KLIB，程序最终链接失败 | 最新 CI 已编译 bridge 和 KLIB，程序最终链接失败 |
+| SDL 静态 SDK 与配套 CInterop KLIB | 已构建、嵌入并本地发布 | sysroot ABI 修复已接入，待宿主 CI | framework 参数修复已接入，待宿主 CI |
 | 窗口 GPU | D3D12 实际绘制/resize 通过 | Vulkan 实现已接入，待驱动运行 | Metal 实现已接入，待驱动运行 |
 | Core/Skottie Native 回归 | 6 项通过 | 待宿主执行 | 待宿主执行 |
 | 独立 Maven 窗口消费 | 已运行；不需要 SDL SDK/平台源码 | 待 CI | 待 CI |
@@ -20,15 +26,41 @@
 - 公共 NativeWindow 宿主：窗口循环、resize、基本键盘、软件路径、D3D12/Vulkan/Metal adapters。
 - SDL 静态实现、绑定和平台代码均在移植层；APP 与阶段样例使用公共 API。
 - nativeMain/nativeTest 统一源集、根版本覆盖、源码 project 引用、普通 Maven 消费、ICU 暂存和 ZIP。
+- Skiko 使用固定 vendor/skiko/workspace，原地更新生成文件；不再按输入指纹创建完整源码副本。
+- 移植库、测试工具与维护/消费样例统一启用 -Xexpect-actual-classes；Kotlin 源码按仓库规范组织。
+- 只有 macosArm64 一个 Apple 目标，Darwin 共享代码与层级已合并到 macosMain/macosTest。
+- adaptation 的 5 个 C++ 文件统一为 4 空格缩进，不额外维护 .clang-format。
 - 桥插件统一为一个构建模块，保留 Project/Settings 入口和轻量 Settings 产物；nativeBridgeReport 显示 target 规则及 adaptation 位置。
 
 这些是当前功能回归覆盖，不代表 Skiko 的全部 API 都经过逐项运行测试。
 Graphite 按路线排除，AWT/JVM runtime 不属于 Native 迁移缺口。
 
+## 完整性审计
+
+范围以锁定的 Skiko 0.156.0 为准：Core 和 Skottie，以及它们在三个桌面 Native 目标所需的
+Kotlin/C++、静态归档、CInterop、运行数据和 publication。ci/docs/import-generator/test-utils
+是上游构建或测试模块，不作为需要移植发布的 Native 运行时工件。
+
+Windows 静态 bridge 符号审计：当前 commonMain/nativeMain/windowsMain 中 Core 的 976 个、
+Skottie 的 31 个 ExternalSymbolName 均在编译的 bridge 归档中找到定义。
+这能检查声明与 bridge 的连接，不能证明每个 API 的语义、资源寿命或其他平台行为均已通过测试。
+
+源码还继承了官方已有的边界：
+
+- Native 的 reachabilityBarrier 当前为空实现；GC、回调与资源寿命需要压力验证，不能仅由 smoke 推断安全性。
+- Native 的 InteropPointer.fromInteropNativePointerArray 仍为 TODO；当前源码未发现其调用，需明确支持范围。
+- 公共源码中的若干迭代器 remove() 仍为 TODO。这是上游共有限制，不应算作新增的桌面 Native 漏移植。
+
+这些点已与官方锁定源码对照，本轮不为清除 TODO 数量而改写既有 API。
+完整输入/IME、多窗口及窗口 API 统一继续放在后续 Compose 宿主阶段权衡；
+它们不替代本阶段需要先完成的三宿主编译、运行与发布验收。
+
 ## 待完成
 
 1. **三平台宿主验收**：重跑修复后的 Linux/macOS C++、最终链接、测试、窗口、静态 SDK、ZIP、Maven 消费。
-   最新远程 run 仍是 40072504340 的旧提交，修复尚未推送；实际结果记录在 VALIDATION.md。
+   最新 Native run 为 [40089308385](https://github.com/rachel-ylcs/ylcs-kmp/actions/runs/40089308385)，
+   提交 46ab85337702：Windows 的 pkg-config 环境故障、Linux SDL libc ABI、macOS framework 参数导致失败。
+   当前修复已在工作区，本地 Windows 链路通过；Linux/macOS 修复后的 CI 尚未运行。
 2. **完整性与稳健性**：扩展 API 覆盖，验证长时间运行、快速 resize、最小化/恢复、DPI 变化、资源重复释放、
    设备丢失/恢复和显存/内存行为。当前 smoke 不能替代这些场景。
 3. **完整窗口能力**：多窗口及其生命周期、鼠标/滚轮/焦点、文本输入与 IME、剪贴板、拖放和无障碍。

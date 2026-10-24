@@ -1,76 +1,13 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package org.jetbrains.skiko
 
-import kotlinx.cinterop.ByteVar
-import kotlinx.cinterop.CFunction
-import kotlinx.cinterop.COpaquePointer
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.IntVar
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.invoke
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.rawValue
-import kotlinx.cinterop.reinterpret
-import kotlinx.cinterop.sizeOf
-import kotlinx.cinterop.staticCFunction
-import kotlinx.cinterop.toKString
-import kotlinx.cinterop.value
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.BackendTexture
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Color
-import org.jetbrains.skia.ColorAlphaType
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.ColorType
-import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.FramebufferFormat
-import org.jetbrains.skia.GLAssembledInterface
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.PixelGeometry
-import org.jetbrains.skia.Rect
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
-import org.jetbrains.skia.SurfaceProps
-import org.jetbrains.skia.makeGLWithInterface
+import kotlinx.cinterop.*
+import org.jetbrains.skia.*
 import platform.opengl32.GL_RENDERER
 import platform.opengl32.glFlush
 import platform.opengl32.glGetString
-import platform.windows.ChoosePixelFormat
-import platform.windows.CreateRectRgn
-import platform.windows.DWM_BB_BLURREGION
-import platform.windows.DWM_BB_ENABLE
-import platform.windows.DWM_BLURBEHIND
-import platform.windows.DescribePixelFormat
-import platform.windows.DeleteObject
-import platform.windows.DwmEnableBlurBehindWindow
-import platform.windows.DwmFlush
-import platform.windows.DwmIsCompositionEnabled
-import platform.windows.GetDC
-import platform.windows.GetLastError
-import platform.windows.GetModuleHandleW
-import platform.windows.GetPixelFormat
-import platform.windows.GetProcAddress
-import platform.windows.PFD_DOUBLEBUFFER
-import platform.windows.PFD_DRAW_TO_WINDOW
-import platform.windows.PFD_SUPPORT_COMPOSITION
-import platform.windows.PFD_SUPPORT_OPENGL
-import platform.windows.PFD_TYPE_RGBA
-import platform.windows.PIXELFORMATDESCRIPTOR
-import platform.windows.ReleaseDC
-import platform.windows.SetPixelFormat
-import platform.windows.SwapBuffers
-import platform.windows.wglCreateContext
-import platform.windows.wglDeleteContext
-import platform.windows.wglGetCurrentContext
-import platform.windows.wglGetCurrentDC
-import platform.windows.wglGetProcAddress
-import platform.windows.wglMakeCurrent
+import platform.windows.*
 
 internal class WindowsOpenGLRenderer(
     private val window: WindowsNativeWindow,
@@ -88,18 +25,15 @@ internal class WindowsOpenGLRenderer(
 
     override val renderApi: GraphicsApi = GraphicsApi.OPENGL
     override val effectiveFrameBufferCount: Int = if (wglDevice.doubleBuffered) 2 else 1
-    override val transparencySupported: Boolean
-        get() = transparencyRequested && wglDevice.hasTransparentWindowBuffer
+    override val transparencySupported: Boolean get() = transparencyRequested && wglDevice.hasTransparentWindowBuffer
 
-    private val openGlContext =
-        wglCreateContext(deviceContext)
-            ?: run {
-                ReleaseDC(window.hwnd(), deviceContext)
-                throw RenderException("Could not create a WGL context (Win32 error ${GetLastError()})")
-            }
+    private val openGlContext = wglCreateContext(deviceContext) ?: run {
+        ReleaseDC(window.hwnd(), deviceContext)
+        throw RenderException("Could not create a WGL context (Win32 error ${GetLastError()})")
+    }
 
-    private lateinit var openGlInterface: GLAssembledInterface
-    private lateinit var directContext: DirectContext
+    private val openGlInterface: GLAssembledInterface
+    private val directContext: DirectContext
     private var renderTarget: BackendRenderTarget? = null
     private var surface: Surface? = null
     private var width = 0
@@ -118,56 +52,42 @@ internal class WindowsOpenGLRenderer(
         private set
 
     init {
+        var createdInterface: GLAssembledInterface? = null
+        var createdContext: DirectContext? = null
         try {
             makeCurrent()
-            swapIntervalFunction =
-                validWglFunctionPointer(wglGetProcAddress("wglSwapIntervalEXT"))
-                    ?.reinterpret<CFunction<(Int) -> Int>>()
-            graphicsResetStatusFunction =
-                (
-                    validWglFunctionPointer(wglGetProcAddress("glGetGraphicsResetStatus"))
-                        ?: validWglFunctionPointer(wglGetProcAddress("glGetGraphicsResetStatusARB"))
-                )?.reinterpret<CFunction<() -> UInt>>()
-            openGlInterface =
-                GLAssembledInterface.createFromNativePointers(
-                    ctxPtr = kotlinx.cinterop.NativePtr.NULL,
-                    fPtr = windowsOpenGlResolver,
-                )
-            directContext = DirectContext.makeGLWithInterface(openGlInterface)
+            swapIntervalFunction = validWglFunctionPointer(wglGetProcAddress("wglSwapIntervalEXT"))?.reinterpret()
+            graphicsResetStatusFunction = (validWglFunctionPointer(wglGetProcAddress("glGetGraphicsResetStatus")) ?: validWglFunctionPointer(wglGetProcAddress("glGetGraphicsResetStatusARB")))?.reinterpret()
+            val glInterface = GLAssembledInterface.createFromNativePointers(ctxPtr = NativePtr.NULL, fPtr = windowsOpenGlResolver)
+            createdInterface = glInterface
+            val context = DirectContext.makeGLWithInterface(glInterface)
+            createdContext = context
             if (properties.gpuResourceCacheLimit >= 0L) {
-                directContext.resourceCacheLimit = properties.gpuResourceCacheLimit
+                context.resourceCacheLimit = properties.gpuResourceCacheLimit
             }
             deviceName = currentOpenGlRendererName()
             if (!isOpenGlAdapterSupported(deviceName)) {
                 throw RenderException("OpenGL adapter is not supported: $deviceName")
             }
             if (transparencyRequested && !enableTransparentComposition(window)) {
-                throw RenderException(
-                    "The Win32 compositor could not enable transparency for the WGL window",
-                )
+                throw RenderException("The Win32 compositor could not enable transparency for the WGL window")
             }
-            description =
-                if (deviceName.isNullOrBlank()) "Skia Ganesh/WGL"
-                else "Skia Ganesh/WGL ($deviceName)"
-        } catch (failure: Throwable) {
-            contextFailed = true
-            releaseResources(contextLost = true, propagateFailure = false)
-            throw if (failure is RenderException) failure
-            else RenderException("Could not initialize the WGL renderer", failure)
+            description = if (deviceName.isNullOrBlank()) "Skia Ganesh/WGL" else "Skia Ganesh/WGL ($deviceName)"
         }
+        catch (failure: Throwable) {
+            contextFailed = true
+            releaseResources(contextLost = true, propagateFailure = false, context = createdContext, glInterface = createdInterface)
+            throw failure as? RenderException ?: RenderException("Could not initialize the WGL renderer", failure)
+        }
+        openGlInterface = checkNotNull(createdInterface)
+        directContext = checkNotNull(createdContext)
     }
 
-    override fun render(
-        width: Int,
-        height: Int,
-        waitForVsync: Boolean,
-        block: (Canvas) -> Unit,
-    ) {
+    override fun render(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit) {
         makeCurrent()
         checkForGraphicsReset()
         val shouldWaitForVsync = waitForVsync && properties.isVsyncEnabled
-        val platformVsyncEnabled =
-            wglDevice.doubleBuffered && configureSwapInterval(shouldWaitForVsync)
+        val platformVsyncEnabled = wglDevice.doubleBuffered && configureSwapInterval(shouldWaitForVsync)
         ensureSurface(width, height)
         val skiaSurface = checkNotNull(surface)
         skiaSurface.canvas.clear(Color.TRANSPARENT)
@@ -179,9 +99,8 @@ internal class WindowsOpenGLRenderer(
                 contextFailed = true
                 throw RenderException("SwapBuffers failed (Win32 error ${GetLastError()})")
             }
-        } else {
-            glFlush()
         }
+        else glFlush()
 
         if (shouldWaitForVsync && !platformVsyncEnabled) {
             val dwmWaitedForComposition = DwmFlush() == 0
@@ -198,7 +117,8 @@ internal class WindowsOpenGLRenderer(
         return if (function(interval) != 0) {
             appliedSwapInterval = interval
             true
-        } else {
+        }
+        else {
             // Some drivers expose WGL_EXT_swap_control but reject it for a particular drawable.
             swapIntervalFunction = null
             appliedSwapInterval = null
@@ -227,7 +147,8 @@ internal class WindowsOpenGLRenderer(
         surface?.flushAndSubmit()
         return try {
             block()
-        } finally {
+        }
+        finally {
             directContext.resetGLAll()
         }
     }
@@ -235,31 +156,31 @@ internal class WindowsOpenGLRenderer(
     override fun drawTexture(textureId: Int, width: Int, height: Int, canvas: Canvas) {
         require(textureId != 0 && width > 0 && height > 0)
         makeCurrent()
-        val texture =
-            BackendTexture.makeGL(
-                width = width,
-                height = height,
-                isMipmapped = false,
-                textureId = textureId,
-                textureTarget = GL_TEXTURE_2D,
-                textureFormat = GL_RGBA8,
+        val texture = BackendTexture.makeGL(
+            width = width,
+            height = height,
+            isMipmapped = false,
+            textureId = textureId,
+            textureTarget = GL_TEXTURE_2D,
+            textureFormat = GL_RGBA8,
+        )
+        val image = try {
+            Image.borrowTextureFrom(
+                context = directContext,
+                backendTexture = texture,
+                origin = SurfaceOrigin.BOTTOM_LEFT,
+                colorType = ColorType.RGBA_8888,
+                alphaType = ColorAlphaType.PREMUL,
             )
-        val image =
-            try {
-                Image.borrowTextureFrom(
-                    context = directContext,
-                    backendTexture = texture,
-                    origin = SurfaceOrigin.BOTTOM_LEFT,
-                    colorType = ColorType.RGBA_8888,
-                    alphaType = ColorAlphaType.PREMUL,
-                )
-            } catch (failure: Throwable) {
-                texture.close()
-                throw failure
-            }
+        }
+        catch (failure: Throwable) {
+            texture.close()
+            throw failure
+        }
         try {
             canvas.drawImageRect(image, Rect.makeWH(width.toFloat(), height.toFloat()), null)
-        } finally {
+        }
+        finally {
             image.close()
             texture.close()
         }
@@ -290,24 +211,22 @@ internal class WindowsOpenGLRenderer(
 
         width = newWidth
         height = newHeight
-        renderTarget =
-            BackendRenderTarget.makeGL(
-                width = width,
-                height = height,
-                sampleCnt = 0,
-                stencilBits = wglDevice.stencilBits,
-                fbId = 0,
-                fbFormat = FramebufferFormat.GR_GL_RGBA8,
-            )
-        surface =
-            Surface.makeFromBackendRenderTarget(
-                context = directContext,
-                rt = checkNotNull(renderTarget),
-                origin = SurfaceOrigin.BOTTOM_LEFT,
-                colorFormat = SurfaceColorFormat.RGBA_8888,
-                colorSpace = ColorSpace.sRGB,
-                surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry),
-            ) ?: throw RenderException("Skia could not wrap the WGL framebuffer")
+        renderTarget = BackendRenderTarget.makeGL(
+            width = width,
+            height = height,
+            sampleCnt = 0,
+            stencilBits = wglDevice.stencilBits,
+            fbId = 0,
+            fbFormat = FramebufferFormat.GR_GL_RGBA8,
+        )
+        surface = Surface.makeFromBackendRenderTarget(
+            context = directContext,
+            rt = checkNotNull(renderTarget),
+            origin = SurfaceOrigin.BOTTOM_LEFT,
+            colorFormat = SurfaceColorFormat.RGBA_8888,
+            colorSpace = ColorSpace.sRGB,
+            surfaceProps = SurfaceProps(pixelGeometry = pixelGeometry),
+        ) ?: throw RenderException("Skia could not wrap the WGL framebuffer")
     }
 
     override fun isContextLost(): Boolean {
@@ -322,62 +241,36 @@ internal class WindowsOpenGLRenderer(
     }
 
     override fun close(contextLost: Boolean) {
-        releaseResources(contextLost = contextLost, propagateFailure = true)
+        releaseResources(contextLost = contextLost, propagateFailure = true, context = directContext, glInterface = openGlInterface)
     }
 
-    private fun releaseResources(contextLost: Boolean, propagateFailure: Boolean) {
+    private fun releaseResources(contextLost: Boolean, propagateFailure: Boolean, context: DirectContext?, glInterface: GLAssembledInterface?) {
         if (closed) return
-        val contextIsCurrent =
-            !contextLost &&
-                !contextFailed &&
-                window.isValid &&
-                wglMakeCurrent(deviceContext, openGlContext) != 0
+        val contextIsCurrent = !contextLost && !contextFailed && window.isValid && wglMakeCurrent(deviceContext, openGlContext) != 0
         if (!contextIsCurrent) contextFailed = true
         closed = true
 
         var cleanupFailure: Throwable? = null
-        fun cleanup(block: () -> Unit) {
-            try {
-                block()
-            } catch (failure: Throwable) {
-                if (cleanupFailure == null) cleanupFailure = failure
-            }
-        }
 
-        if (!contextIsCurrent && ::directContext.isInitialized) {
-            cleanup { directContext.abandon() }
-        }
+        if (!contextIsCurrent) cleanupFailure = releaseRendererResource(cleanupFailure) { context?.abandon() }
         val oldSurface = surface
         surface = null
-        cleanup { oldSurface?.close() }
+        cleanupFailure = releaseRendererResource(cleanupFailure) { oldSurface?.close() }
         val oldRenderTarget = renderTarget
         renderTarget = null
-        cleanup { oldRenderTarget?.close() }
-        if (::directContext.isInitialized) cleanup { directContext.close() }
-        if (::openGlInterface.isInitialized) cleanup { openGlInterface.close() }
+        cleanupFailure = releaseRendererResource(cleanupFailure) { oldRenderTarget?.close() }
+        cleanupFailure = releaseRendererResource(cleanupFailure) { context?.close() }
+        cleanupFailure = releaseRendererResource(cleanupFailure) { glInterface?.close() }
 
-        cleanup {
-            val restored =
-                if (previousOpenGlContext != null) {
-                    wglMakeCurrent(previousDeviceContext, previousOpenGlContext)
-                } else {
-                    wglMakeCurrent(null, null)
-                }
-            if (restored == 0) {
-                throw RenderException(
-                    "Could not restore the previous WGL context (Win32 error ${GetLastError()})",
-                )
-            }
+        cleanupFailure = releaseRendererResource(cleanupFailure) {
+            val restored = if (previousOpenGlContext != null) wglMakeCurrent(previousDeviceContext, previousOpenGlContext) else wglMakeCurrent(null, null)
+            if (restored == 0) throw RenderException("Could not restore the previous WGL context (Win32 error ${GetLastError()})")
         }
-        cleanup {
-            if (wglDeleteContext(openGlContext) == 0) {
-                throw RenderException("wglDeleteContext failed (Win32 error ${GetLastError()})")
-            }
+        cleanupFailure = releaseRendererResource(cleanupFailure) {
+            if (wglDeleteContext(openGlContext) == 0) throw RenderException("wglDeleteContext failed (Win32 error ${GetLastError()})")
         }
-        cleanup {
-            if (ReleaseDC(window.hwnd(), deviceContext) == 0) {
-                throw RenderException("ReleaseDC failed (Win32 error ${GetLastError()})")
-            }
+        cleanupFailure = releaseRendererResource(cleanupFailure) {
+            if (ReleaseDC(window.hwnd(), deviceContext) == 0) throw RenderException("ReleaseDC failed (Win32 error ${GetLastError()})")
         }
 
         if (propagateFailure) {
@@ -398,93 +291,6 @@ internal class WindowsOpenGLRenderer(
     }
 }
 
-private data class WglDevice(
-    val deviceContext: platform.windows.HDC,
-    val stencilBits: Int,
-    val doubleBuffered: Boolean,
-    val hasTransparentWindowBuffer: Boolean,
-)
-
-private fun createDeviceContext(
-    window: WindowsNativeWindow,
-    transparencyRequested: Boolean,
-): WglDevice {
-    val deviceContext =
-        GetDC(window.hwnd()) ?: throw RenderException("GetDC failed (Win32 error ${GetLastError()})")
-    try {
-        return memScoped {
-            var pixelFormat = GetPixelFormat(deviceContext)
-            val descriptor = alloc<PIXELFORMATDESCRIPTOR>()
-            descriptor.nSize = sizeOf<PIXELFORMATDESCRIPTOR>().convert()
-            descriptor.nVersion = 1.convert()
-
-            if (pixelFormat == 0) {
-                descriptor.dwFlags =
-                    (
-                        PFD_DRAW_TO_WINDOW or PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER or
-                            if (transparencyRequested) PFD_SUPPORT_COMPOSITION else 0
-                    ).convert()
-                descriptor.iPixelType = PFD_TYPE_RGBA.convert()
-                descriptor.cColorBits = 32.convert()
-                descriptor.cAlphaBits = 8.convert()
-                descriptor.cDepthBits = 0.convert()
-                descriptor.cStencilBits = 8.convert()
-
-                pixelFormat = ChoosePixelFormat(deviceContext, descriptor.ptr)
-                if (
-                    pixelFormat == 0 ||
-                        SetPixelFormat(deviceContext, pixelFormat, descriptor.ptr) == 0
-                ) {
-                    throw RenderException(
-                        "Could not configure a WGL pixel format (Win32 error ${GetLastError()})",
-                    )
-                }
-            }
-
-            if (
-                DescribePixelFormat(
-                    deviceContext,
-                    pixelFormat,
-                    sizeOf<PIXELFORMATDESCRIPTOR>().convert(),
-                    descriptor.ptr,
-                ) == 0
-            ) {
-                throw RenderException(
-                    "Could not inspect WGL pixel format $pixelFormat (Win32 error ${GetLastError()})",
-                )
-            }
-            val requiredFlags = PFD_DRAW_TO_WINDOW or PFD_SUPPORT_OPENGL
-            if (descriptor.dwFlags.toInt() and requiredFlags != requiredFlags) {
-                throw RenderException(
-                    "HWND pixel format $pixelFormat cannot host windowed OpenGL",
-                )
-            }
-            val hasTransparentWindowBuffer =
-                descriptor.cAlphaBits.toInt() >= 8 &&
-                    descriptor.dwFlags.toInt() and PFD_SUPPORT_COMPOSITION != 0
-            if (transparencyRequested && !hasTransparentWindowBuffer) {
-                throw RenderException(
-                    "HWND pixel format $pixelFormat does not expose an alpha-composited WGL buffer",
-                )
-            }
-            WglDevice(
-                deviceContext = deviceContext,
-                stencilBits =
-                    when {
-                        descriptor.cStencilBits.toInt() >= 16 -> 16
-                        descriptor.cStencilBits.toInt() >= 8 -> 8
-                        else -> 0
-                    },
-                doubleBuffered = descriptor.dwFlags.toInt() and PFD_DOUBLEBUFFER != 0,
-                hasTransparentWindowBuffer = hasTransparentWindowBuffer,
-            )
-        }
-    } catch (failure: Throwable) {
-        ReleaseDC(window.hwnd(), deviceContext)
-        throw failure
-    }
-}
-
 private fun enableTransparentComposition(window: WindowsNativeWindow): Boolean = memScoped {
     val compositionEnabled = alloc<IntVar>()
     if (DwmIsCompositionEnabled(compositionEnabled.ptr) < 0 || compositionEnabled.value == 0) {
@@ -499,13 +305,13 @@ private fun enableTransparentComposition(window: WindowsNativeWindow): Boolean =
         blurBehind.hRgnBlur = blurRegion
         blurBehind.fTransitionOnMaximized = 0
         DwmEnableBlurBehindWindow(window.hwnd(), blurBehind.ptr) >= 0
-    } finally {
+    }
+    finally {
         DeleteObject(blurRegion)
     }
 }
 
-private fun currentOpenGlRendererName(): String? =
-    glGetString(GL_RENDERER.toUInt())?.reinterpret<ByteVar>()?.toKString()
+private fun currentOpenGlRendererName(): String? = glGetString(GL_RENDERER.toUInt())?.reinterpret<ByteVar>()?.toKString()
 
 private val windowsOpenGlResolver = staticCFunction(::resolveWindowsOpenGlProc).rawValue
 
@@ -521,9 +327,9 @@ private fun resolveWindowsOpenGlProc(
     return GetProcAddress(openGlModule, functionName)?.reinterpret()
 }
 
-private fun validWglFunctionPointer(pointer: CPointer<out kotlinx.cinterop.CPointed>?): CPointer<out kotlinx.cinterop.CPointed>? {
+private fun validWglFunctionPointer(pointer: CPointer<out CPointed>?): CPointer<out CPointed>? {
     val address = pointer?.rawValue?.toLong() ?: 0L
     return pointer.takeIf { address !in INVALID_WGL_ADDRESSES }
 }
 
-private val INVALID_WGL_ADDRESSES = setOf(0L, 1L, 2L, 3L, -1L)
+private val INVALID_WGL_ADDRESSES: Set<Long> = [0L, 1L, 2L, 3L, -1L]

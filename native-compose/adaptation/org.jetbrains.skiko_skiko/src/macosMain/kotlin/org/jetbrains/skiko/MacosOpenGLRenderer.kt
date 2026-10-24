@@ -1,33 +1,17 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package org.jetbrains.skiko
 
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.BackendTexture
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Color
-import org.jetbrains.skia.ColorAlphaType
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.ColorType
-import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.FramebufferFormat
-import org.jetbrains.skia.Image
-import org.jetbrains.skia.ImageInfo
-import org.jetbrains.skia.Rect
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
-import org.jetbrains.skia.SurfaceProps
+import kotlinx.cinterop.ExperimentalForeignApi
+import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 
 internal class MacosOpenGLRenderer(
     private val component: MacosSkiaLayerComponent,
 ) : MacosNativeRenderer {
-    private val openGlContext =
-        component.createOpenGlContext().also {
-            if (it == NullPointer) throw RenderException("Could not create an OpenGL context")
-        }
+    private val openGlContext = component.createOpenGlContext().also {
+        if (it == NullPointer) throw RenderException("Could not create an OpenGL context")
+    }
 
     private val directContext: DirectContext
     private var renderTarget: BackendRenderTarget? = null
@@ -44,22 +28,15 @@ internal class MacosOpenGLRenderer(
             component.makeOpenGlContextCurrent(openGlContext)
             directContext = DirectContext.makeGL()
             deviceName = component.openGlRendererName()
-            description =
-                if (deviceName.isNullOrBlank()) "Skia Ganesh/OpenGL (macOS SDL)"
-                else "Skia Ganesh/OpenGL (macOS SDL, $deviceName)"
-        } catch (failure: Throwable) {
+            description = if (deviceName.isNullOrBlank()) "Skia Ganesh/OpenGL (macOS SDL)" else "Skia Ganesh/OpenGL (macOS SDL, $deviceName)"
+        }
+        catch (failure: Throwable) {
             component.deleteOpenGlContext(openGlContext)
-            throw if (failure is RenderException) failure
-            else RenderException("Could not initialize the macOS OpenGL renderer", failure)
+            throw failure as? RenderException ?: RenderException("Could not initialize the macOS OpenGL renderer", failure)
         }
     }
 
-    override fun render(
-        width: Int,
-        height: Int,
-        waitForVsync: Boolean,
-        block: (Canvas) -> Unit,
-    ): Boolean {
+    override fun render(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit): Boolean {
         makeCurrent()
         component.setOpenGlSwapInterval(if (waitForVsync) 1 else 0)
         ensureSurface(width, height)
@@ -76,7 +53,8 @@ internal class MacosOpenGLRenderer(
         surface?.flushAndSubmit()
         return try {
             block()
-        } finally {
+        }
+        finally {
             directContext.resetGLAll()
         }
     }
@@ -100,13 +78,15 @@ internal class MacosOpenGLRenderer(
                 colorType = ColorType.RGBA_8888,
                 alphaType = ColorAlphaType.PREMUL,
             )
-        } catch (failure: Throwable) {
+        }
+        catch (failure: Throwable) {
             texture.close()
             throw failure
         }
         try {
             canvas.drawImageRect(image, Rect.makeWH(width.toFloat(), height.toFloat()), null)
-        } finally {
+        }
+        finally {
             image.close()
             texture.close()
         }

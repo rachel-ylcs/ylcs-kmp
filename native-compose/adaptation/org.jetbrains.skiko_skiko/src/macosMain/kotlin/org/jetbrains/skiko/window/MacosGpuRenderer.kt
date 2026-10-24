@@ -1,4 +1,4 @@
-@file:OptIn(kotlinx.cinterop.BetaInteropApi::class, kotlinx.cinterop.ExperimentalForeignApi::class, org.jetbrains.skiko.InternalSkikoApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package org.jetbrains.skiko.window
 

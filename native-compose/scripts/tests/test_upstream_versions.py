@@ -26,6 +26,9 @@ class UpstreamVersionsTest(unittest.TestCase):
             properties.write_text('kotlin.native.ignoreDisabledTargets=false\nexisting=value\n')
             profile = main_profile(repository)
             apply_build_profile(fork, repository, profile)
+            compiler_setup = (fork / "skiko/buildSrc/build.gradle.kts").read_text()
+            self.assertIn('"-Xexpect-actual-classes"', compiler_setup)
+            self.assertIn('"-Xcollection-literals"', compiler_setup)
             self.assertEqual(profile["gradleProperties"], {"kotlin.native.ignoreDisabledTargets": "true"})
             self.assertEqual(properties.read_text(), 'kotlin.native.ignoreDisabledTargets=true\nexisting=value\n')
 

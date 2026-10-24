@@ -1,6 +1,7 @@
 # 适配源码与构建归属
 
-`adaptation/` 保存提交到 Git 的维护代码；`vendor/` 保存忽略的原始源码、准备后的 fork、SDK 和输出。
+`adaptation/` 保存提交到 Git 的维护代码；`vendor/` 保存忽略的源码归档、唯一工作副本、SDK 和输出。
+C/C++ 使用 4 空格缩进，保留 include 次序和宏定义体；不单独维护格式配置文件。
 
 ```text
 native-compose/
@@ -16,14 +17,15 @@ native-compose/
         linuxMain/kotlin/        # Linux/Vulkan，包括窗口 backend
         linuxMain/cpp/           # Vulkan WSI、Linux C++ ABI 兼容
         macosMain/kotlin/        # macOS/Metal，包括窗口 backend
-        darwinMain/kotlin/
         nativeInterop/cinterop/sdl.def
     org.jetbrains.skiko_skiko-skottie/
       build.gradle.kts
     samples/skiko/              # 当前阶段：公共示例、Native 回归
   vendor/
-    skiko/sources/              # 校验过的原始上游/社区源码，不改名
-    skiko/prepared/             # 重现并规范化的 Native-only fork
+    skiko/workspace/            # 唯一、固定路径的 Native-only 工作源码
+    skiko/*.zip                 # 锁定的上游/参考/共同基线归档，不常驻展开副本
+    skiko/skia/                 # 校验过的 Skia 下载归档
+    skiko/state.json            # 当前版本、输入指纹和维护源码路径清单
     sdl-source-*/               # 校验过的 SDL 源码
     sdl-static/<konan-target>/  # SDL 静态 SDK、系统链接依赖清单
     build/
@@ -34,7 +36,6 @@ native-compose/
   scripts/
   upstream/
   docs/
-  licenses/
 ylcs-app/native-compose/
   build.gradle.kts
   src/commonMain/kotlin/       # 只有业务场景与公共窗口 API 调用
@@ -44,7 +45,17 @@ ylcs-app/native-compose/
 
 维护代码与准备后的活动源集都使用 `nativeMain/nativeTest`。
 同步脚本合并上游历史共享目录，删除多余的 Native/JS hierarchy 节点，并对重名文件检查冲突。
-只读的原始上游缓存及来源映射保留原路径，便于升级比较；它们不构成本项目的活动源集。
+当前只有 macosArm64 一个 Apple target，darwinMain/darwinTest 也统一合并到 macosMain/macosTest，
+层级中去掉 Darwin/UIKit/iOS/tvOS 节点；维护的文件位置实现直接放在 macosMain。
+platform.darwin 等 Kotlin/Native 系统 API 包名保留其官方名称。
+锁定归档和来源映射保留上游路径与提交，便于升级比较；它们不构成本项目的活动源集。
+
+只有 vendor/skiko/workspace 是持久展开的 Skiko 工作副本。
+需要重新适配时，上游源码与参考/基线中的选定文件在临时目录中合并，完成后原地同步生成文件，
+保留工作副本中已有的 build/.gradle 等输出，以及内容不变文件的时间戳。
+正常修改 adaptation 的 Kotlin/C++ 内容由 Gradle 增量处理；新增、删除或移动源码文件时更新遮蔽关系。
+指纹仅记录准备输入，不参与目录命名；准备成功后清理带有旧生成标记的 prepared/sources 副本。
+其他未识别目录和 Git checkout 不会被当作缓存删除。
 
 维护的 Image/GL C++ 放在 nativeMain；Linux Vulkan WSI 和 ABI 兼容放在 linuxMain。
 `upstream/adaptation-origins.json` 将维护文件映射回原始社区路径，同步时按映射移除 vendor 的遮蔽文件。
@@ -63,6 +74,8 @@ SDK 静态归档与系统 linkerOpts 进入发布的 SDL CInterop KLIB。
 APP 只在 commonMain 引用官方 Skiko/Skottie 坐标并调用公共 API。
 桥插件做 target 重定向、ICU 收集和启动/打包，不再承担 SDL SDK 下载、链接或 DLL 收集。
 许可证保留在源码目录与 sources 工件中，不复制到程序暂存目录或 ZIP。
+Skiko 的 LICENSE/NOTICE、SDL 源码中的 LICENSE.txt 直接用于 sources 工件；
+来源说明从锁定清单生成到 vendor，不依赖维护目录中的 licenses 副本。
 
 ## Gradle 和 IDE
 
@@ -72,8 +85,16 @@ APP 只在 commonMain 引用官方 Skiko/Skottie 坐标并调用公共 API。
 不需要将库重复 include 为 ylcs-kmp 的普通子项目。
 
 窗口绑定只在 Core 中 commonize；APP 没有额外的 CInterop 源集需求。
-改变准备规则后 Reload All Gradle Projects，让 IDE 导入新的指纹目录。
+首次切换后 Reload All Gradle Projects，让 IDE 导入 vendor/skiko/workspace/skiko。
+此后改变准备规则也继续使用同一路径；准备过程使用进程锁，避免同时改写工作副本。
 维护开关仍默认 false；普通模式不准备或关联这些源码构建。
+
+Core、Skottie、上游测试工具、维护样例、独立 Maven 消费样例及生成的 buildSrc
+统一启用 -Xexpect-actual-classes 和 -Xcollection-literals。
+独立 Rachel APP 已通过根 repository 的 languageFeatures 继承这两个参数。
+adaptation 的 Kotlin 源码使用集合字面量、4 空格和独立分支排版，并按类组织文件；
+Gradle Kotlin DSL 脚本继续使用 Gradle 内置 Kotlin 能解析的语法。
+Skiko 位于框架依赖链底层，不为语法辅助函数反向依赖 Rachel 或 Compose。
 
 桥插件的两个生命周期入口统一维护在 build-logic/native-bridge：src/main 是 Project 实现，
 src/settings 是不依赖 KGP 的 Settings 实现。发布时 Settings marker 选择同一 GAV 的 settings classifier。
@@ -89,7 +110,7 @@ adaptation/org.jetbrains.skiko_skiko-skottie/build.gradle.kts 注册 Windows tar
 实际源码位置以 vendor/skiko/state.json 的 build 字段为准：
 
 ```text
-vendor/skiko/prepared/<fingerprint>/skiko/skiko-skottie/src/
+vendor/skiko/workspace/skiko/skiko-skottie/src/
   commonMain/kotlin/org/jetbrains/skia/skottie/  # Animation、AnimationBuilder 等 API
   nativeMain/kotlin/org/jetbrains/skia/skottie/  # Native 文件入口、静态加载实现
   nativeMain/cpp/skottie/                      # Animation/AnimationBuilder/Logger bridge

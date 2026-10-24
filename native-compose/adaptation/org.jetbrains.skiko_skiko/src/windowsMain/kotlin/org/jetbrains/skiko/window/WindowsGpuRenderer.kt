@@ -1,4 +1,4 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, org.jetbrains.skiko.InternalSkikoApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package org.jetbrains.skiko.window
 
@@ -16,8 +16,7 @@ internal actual fun createGpuRenderer(window: COpaquePointer, draw: (Canvas, Int
 
 internal class WindowsGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer {
     private val layer = SkiaLayer(SkiaLayerProperties(renderApi = GraphicsApi.DIRECT3D))
-    override val description: String
-        get() = layer.rendererDescription
+    override val description: String get() = layer.rendererDescription
 
     init {
         try {

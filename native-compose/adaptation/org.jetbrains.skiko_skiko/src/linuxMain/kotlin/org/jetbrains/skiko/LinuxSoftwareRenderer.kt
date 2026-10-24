@@ -19,11 +19,10 @@ internal class LinuxSoftwareRenderer(
         component.beginSoftwareRendering()
     }
 
-    override val description: String =
-        when (renderApi) {
-            GraphicsApi.SOFTWARE_FAST -> "Skia Raster/Software"
-            else -> "Skia Raster/Software (compatibility)"
-        }
+    override val description: String = when (renderApi) {
+        GraphicsApi.SOFTWARE_FAST -> "Skia Raster/Software"
+        else -> "Skia Raster/Software (compatibility)"
+    }
 
     override val deviceName: String = "Software"
 
@@ -34,12 +33,7 @@ internal class LinuxSoftwareRenderer(
     private var height = 0
     private var closed = false
 
-    override fun render(
-        width: Int,
-        height: Int,
-        waitForVsync: Boolean,
-        block: (Canvas) -> Unit,
-    ) {
+    override fun render(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit) {
         check(!closed) { "Renderer is closed" }
         ensureSurface(width, height)
         val rasterSurface = checkNotNull(surface)
@@ -70,18 +64,16 @@ internal class LinuxSoftwareRenderer(
         closeSurface()
         width = newWidth
         height = newHeight
-        bitmap =
-            Bitmap().also {
-                check(it.allocPixels(imageInfo(width, height))) {
-                    "Could not allocate a Skia software framebuffer"
-                }
+        bitmap = Bitmap().also {
+            check(it.allocPixels(imageInfo(width, height))) {
+                "Could not allocate a Skia software framebuffer"
             }
+        }
         pixmap = checkNotNull(bitmap?.peekPixels())
-        surface =
-            Surface.makeRasterDirect(
-                pixmap = checkNotNull(pixmap),
-                surfaceProps = SurfaceProps(pixelGeometry = component.pixelGeometry),
-            )
+        surface = Surface.makeRasterDirect(
+            pixmap = checkNotNull(pixmap),
+            surfaceProps = SurfaceProps(pixelGeometry = component.pixelGeometry)
+        )
     }
 
     override fun close(contextLost: Boolean) {
@@ -100,6 +92,5 @@ internal class LinuxSoftwareRenderer(
         bitmap = null
     }
 
-    private fun imageInfo(width: Int, height: Int): ImageInfo =
-        ImageInfo.makeN32(width, height, ColorAlphaType.PREMUL, ColorSpace.sRGB)
+    private fun imageInfo(width: Int, height: Int): ImageInfo = ImageInfo.makeN32(width, height, ColorAlphaType.PREMUL, ColorSpace.sRGB)
 }

@@ -1,5 +1,3 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko.window
 
 import org.jetbrains.skia.Canvas
@@ -22,8 +20,7 @@ internal class RasterWindowRenderer(window: COpaquePointer, private val draw: (C
             draw(surface.canvas, width, height)
             Pixmap().use { pixels ->
                 check(surface.peekPixels(pixels))
-                val texture = checkNotNull(RachelSDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32,
-                    SDL_TextureAccess.SDL_TEXTUREACCESS_STREAMING, width, height))
+                val texture = checkNotNull(RachelSDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TextureAccess.SDL_TEXTUREACCESS_STREAMING, width, height))
                 try {
                     check(SDL_UpdateTexture(texture, null, interpretCPointer<ByteVar>(pixels.addr), pixels.rowBytes))
                     check(RachelSDL_RenderClear(renderer))

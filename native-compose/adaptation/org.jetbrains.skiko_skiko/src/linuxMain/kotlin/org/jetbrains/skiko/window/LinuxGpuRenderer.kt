@@ -1,5 +1,4 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, org.jetbrains.skiko.InternalSkikoApi::class)
-
+@file:OptIn(ExperimentalForeignApi::class)
 package org.jetbrains.skiko.window
 
 import org.jetbrains.skia.Canvas

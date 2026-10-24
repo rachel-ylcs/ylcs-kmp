@@ -102,10 +102,10 @@ jobs:
             libudev-dev libasound2-dev libpulse-dev libibus-1.0-dev libvulkan-dev mesa-vulkan-drivers xvfb xauth
       - name: Python publication tools
         run: python -m unittest discover -s native-compose/scripts/tests -v
-      - name: Prepare locked sources and host SDKs
+      - name: Prepare locked sources and validate host tools
         run: |
           python native-compose/scripts/sync_upstream.py
-          python native-compose/scripts/prepare_sdl.py --build --jobs 2
+          python native-compose/scripts/prepare_sdl.py --source
           python native-compose/scripts/doctor.py
       - name: Bridge integration tests
         run: |

@@ -1,32 +1,10 @@
-@file:OptIn(BetaInteropApi::class)
+@file:OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 
 package org.jetbrains.skiko.redrawer
 
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.IntVar
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.useContents
-import kotlinx.cinterop.value
-import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skia.Color
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.FramebufferFormat
-import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
-import org.jetbrains.skia.SurfaceProps
-import org.jetbrains.skia.runRestoringState
-import org.jetbrains.skiko.FrameDispatcher
-import org.jetbrains.skiko.LayerDrawScope
-import org.jetbrains.skiko.RenderException
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkikoDispatchers
-import org.jetbrains.skiko.currentNanoTime
+import kotlinx.cinterop.*
+import org.jetbrains.skia.*
+import org.jetbrains.skiko.*
 import platform.CoreFoundation.CFTimeInterval
 import platform.CoreGraphics.CGRectMake
 import platform.CoreVideo.CVTimeStamp
@@ -59,8 +37,7 @@ internal class MacOsOpenGLRedrawer(
         glLayer.init(skiaLayer, this)
     }
 
-    override val renderInfo: String
-        get() = "GraphicsApi: ${skiaLayer.renderApi}\nOS: macOS (native OpenGL)\n"
+    override val renderInfo: String get() = "GraphicsApi: ${skiaLayer.renderApi}\nOS: macOS (native OpenGL)\n"
 
     private val frameDispatcher = FrameDispatcher(SkikoDispatchers.Main) {
         renderImmediately()
@@ -130,7 +107,8 @@ internal class MacOsOpenGLRedrawer(
             if (context == null) {
                 context = DirectContext.makeGL()
             }
-        } catch (_: Exception) {
+        }
+        catch (_: Exception) {
             println("Failed to create Skia OpenGL context!")
             return false
         }
@@ -181,8 +159,7 @@ internal class MacOsOpenGLRedrawer(
                 SurfaceProps(pixelGeometry = skiaLayer.pixelGeometry)
             ) ?: throw RenderException("Cannot create surface")
 
-            canvas = surface?.canvas
-                ?: error("Could not obtain Canvas from Surface")
+            canvas = surface?.canvas ?: error("Could not obtain Canvas from Surface")
         }
     }
 
@@ -192,68 +169,5 @@ internal class MacOsOpenGLRedrawer(
         renderTarget?.close()
         renderTarget = null
         canvas = null
-    }
-}
-
-internal class MacosGLLayer : CAOpenGLLayer {
-    private lateinit var skiaLayer: SkiaLayer
-    private lateinit var redrawer: MacOsOpenGLRedrawer
-
-    @OverrideInit
-    constructor(): super()
-    @OverrideInit
-    constructor(layer: Any): super(layer)
-
-    fun init(layer: SkiaLayer, redrawer: MacOsOpenGLRedrawer) {
-        skiaLayer = layer
-        this.redrawer = redrawer
-        this.setNeedsDisplayOnBoundsChange(true)
-        this.removeAllAnimations()
-        this.setAutoresizingMask(kCALayerWidthSizable or kCALayerHeightSizable )
-        skiaLayer.nsView.layer = this
-        skiaLayer.nsView.wantsLayer = true
-        this.contentsGravity = kCAGravityTopLeft
-    }
-
-    fun setFrame(x: Int, y: Int, width: Int, height: Int) {
-        CATransaction.begin()
-        CATransaction.setDisableActions(true)
-        this.frame = CGRectMake(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())
-        CATransaction.commit()
-        CATransaction.flush()
-    }
-
-    fun dispose() {
-        this.removeFromSuperlayer()
-        if (this::skiaLayer.isInitialized && skiaLayer.nsView.layer == this) {
-            skiaLayer.nsView.layer = null
-            skiaLayer.nsView.wantsLayer = false
-        }
-    }
-
-    override fun canDrawInCGLContext(
-        ctx: CGLContextObj?,
-        pixelFormat: CGLPixelFormatObj?,
-        forLayerTime: CFTimeInterval,
-        displayTime: CPointer<CVTimeStamp>?
-    ): Boolean {
-        return true
-    }
-
-    override fun drawInCGLContext(
-        ctx: CGLContextObj?,
-        pixelFormat: CGLPixelFormatObj?,
-        forLayerTime: CFTimeInterval,
-        displayTime: CPointer<CVTimeStamp>?
-    ) {
-        CGLSetCurrentContext(ctx)
-        try {
-            redrawer.drawInLayerContext()
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            throw e
-        }
-
-        super.drawInCGLContext(ctx, pixelFormat, forLayerTime, displayTime)
     }
 }

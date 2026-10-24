@@ -1,6 +1,5 @@
 package org.jetbrains.skia
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.RefCnt
@@ -10,7 +9,6 @@ import org.jetbrains.skiko.RenderException
 /** An OpenGL function table assembled with a platform-provided proc resolver. */
 actual class GLAssembledInterface actual internal constructor(ptr: NativePointer) : RefCnt(ptr) {
     actual companion object {
-        @OptIn(ExperimentalForeignApi::class)
         actual fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
             if (fPtr == NullPointer) throw RenderException("Function pointer must not be null")
             Stats.onNativeCall()

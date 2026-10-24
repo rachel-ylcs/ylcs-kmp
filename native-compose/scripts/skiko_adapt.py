@@ -59,15 +59,31 @@ def resolve_merge(path, text):
     return text
 
 
-def adapt(root: Path, lock):
+def prepare_notices(root: Path, lock, own_root: Path):
+    """Keep source publication notices derived from the audited inputs."""
     notices = root / "skiko/rachel-notices"
     notices.mkdir()
-    own_root = Path(__file__).resolve().parents[1]
-    origins = json.loads((own_root / "upstream/adaptation-origins.json").read_text(encoding="utf-8"))["files"]
-    shutil.copyfile(own_root / "licenses/THIRD_PARTY_NOTICES.md", notices / "THIRD_PARTY_NOTICES.md")
+    shutil.copyfile(root / "LICENSE", notices / "Apache-2.0.txt")
+    shutil.copyfile(root / "NOTICE", notices / "NOTICE")
     shutil.copyfile(own_root / "upstream/adaptation-origins.json", notices / "adaptation-origins.json")
-    for license_file in (own_root / "licenses").glob("*.txt"):
-        shutil.copyfile(license_file, notices / license_file.name)
+    (notices / "upstream-lock.json").write_text(json.dumps(lock, indent=4) + "\n", encoding="utf-8")
+    sdl = json.loads((own_root / "upstream/sdl.json").read_text(encoding="utf-8"))
+    text = "# Native desktop source provenance\n\n"
+    text += "These are Rachel's modified Native desktop builds, not official JetBrains Skiko releases.\n\n"
+    for name, entry in lock["sources"].items():
+        text += f"- {name}: https://github.com/{entry['repository']} at {entry['commit']}.\n"
+    text += f"- Skia: {lock['skia']}; archive hashes are recorded in upstream-lock.json.\n"
+    text += f"- SDL {sdl['version']}: {sdl['source']['url']}; SHA-256 {sdl['source']['sha256']}.\n\n"
+    text += "Original copyright and license notices remain in the upstream sources. "
+    text += "Apache-2.0.txt and NOTICE come directly from Skiko; Core source publications also include "
+    text += "SDL.txt from the audited SDL source. adaptation-origins.json records reference-derived files.\n"
+    (notices / "THIRD_PARTY_NOTICES.md").write_text(text, encoding="utf-8", newline="\n")
+
+
+def adapt(root: Path, lock):
+    own_root = Path(__file__).resolve().parents[1]
+    prepare_notices(root, lock, own_root)
+    origins = json.loads((own_root / "upstream/adaptation-origins.json").read_text(encoding="utf-8"))["files"]
     # Existing dependency versions come exclusively from the parent version catalog.
     catalog = root / "dependencies.toml"
     align_catalog(catalog, main_profile(own_root.parent),
@@ -263,8 +279,8 @@ CHECKSUMS
     text = replace_once(text, 'dynamicSystemLibs("fontconfig", "GL")', 'dynamicSystemLibs("fontconfig", "GL", "dl")')
     core_build.write_text(text, encoding="utf-8", newline="\n")
 
-    # Compile maintained files in-place. Remove shadowed files only in this disposable
-    # prepared copy; the hash-addressed official source checkout remains untouched.
+    # Compile maintained files in-place. Remove their upstream shadows from the
+    # generated working tree; locked archives remain unchanged.
     for module, project_dir, context_name in [
         ("org.jetbrains.skiko_skiko", root / "skiko", "skikoProjectContext"),
         ("org.jetbrains.skiko_skiko-skottie", root / "skiko/skiko-skottie", "skikoSkottieProjectContext"),
@@ -288,6 +304,15 @@ CHECKSUMS
     build = root / "skiko/build.gradle.kts"
     text = build.read_text(encoding="utf-8")
     text += '''
+// Rachel: all maintained/source-build compilations use the same language features.
+allprojects {
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension> {
+            compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
+        }
+    }
+}
+
 // Rachel: sources artifacts include compiled native bridge sources and provenance.
 tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
     if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
@@ -319,34 +344,57 @@ tasks.withType<org.gradle.api.publish.maven.tasks.AbstractPublishToMaven>().conf
     with skottie.open("a", encoding="utf-8", newline="\n") as output:
         output.write(text[text.index("// Rachel: sources artifacts"):])
 
-    # This fork builds desktop Native only. Merge upstream's historical shared
-    # Native/JS directories and remove the redundant hierarchy node.
+    # This fork builds desktop Native only. Flatten historical Native/JS and
+    # Apple shared layers into the source sets used by the three desktop targets.
     hierarchy = root / "skiko/buildSrc/src/main/kotlin/sourceHierarchy.kt"
     text = hierarchy.read_text(encoding="utf-8")
     text = remove_block(text, 'group("nativeJs") {')
+    text = replace_once(text, '''            group("darwin") {
+                group("uikit") {
+                    group("tvos")
+                    group("ios") {
+                        withIos()
+                    }
+                }
+
+                group("macos") {
+                    withMacos()
+                }
+
+                group("tvos") {
+                    withTvos()
+                }
+            }''', '''            group("macos") {
+                withMacos()
+            }''')
     hierarchy.write_text(text, encoding="utf-8", newline="\n")
     for module_dir in [root / "skiko", root / "skiko/skiko-skottie", root / "skiko/test-utils"]:
-        for old, new in [("nativeJsMain", "nativeMain"), ("nativeJsTest", "nativeTest"), ("nativeNativeJs", "nativeMain")]:
+        for old, new in [("nativeJsMain", "nativeMain"), ("nativeJsTest", "nativeTest"), ("nativeNativeJs", "nativeMain"),
+                         ("darwinMain", "macosMain"), ("darwinTest", "macosTest")]:
             directory = module_dir / "src" / old
             if not directory.is_dir():
                 continue
+            if not directory.resolve().is_relative_to(root.resolve()):
+                raise ValueError(f"Unsafe normalized source directory: {directory}")
             for source in directory.rglob("*"):
                 if not source.is_file():
                     continue
                 relative = source.relative_to(directory).as_posix().replace(".nativejs.kt", ".shared.kt")
+                if old.startswith("darwin"):
+                    relative = relative.replace(".darwin.kt", ".macos.kt")
                 destination = module_dir / "src" / new / relative
                 if destination.exists():
                     raise ValueError(f"Native source merge collision: {destination}")
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(source, destination)
-            if not directory.resolve().is_relative_to(root.resolve()):
-                raise ValueError(f"Unsafe normalized source directory: {directory}")
             shutil.rmtree(directory)
     for directory in [root / "skiko/buildSrc/src", root / "skiko"]:
         for source in directory.rglob("*.kt" if directory.name == "src" else "*.gradle.kts"):
             text = source.read_text(encoding="utf-8")
             updated = text.replace("src/nativeJsMain/", "src/nativeMain/").replace("src/nativeNativeJs/", "src/nativeMain/").replace("src/nativeJsTest/", "src/nativeTest/")
+            updated = updated.replace("src/darwinMain/", "src/macosMain/").replace("src/darwinTest/", "src/macosTest/")
             updated = updated.replace('"src/nativeMain/cpp", "src/nativeMain/cpp"', '"src/nativeMain/cpp"')
+            updated = updated.replace('"src/macosMain/cpp", "src/macosMain/cpp"', '"src/macosMain/cpp"')
             if updated != text:
                 source.write_text(updated, encoding="utf-8", newline="\n")
 

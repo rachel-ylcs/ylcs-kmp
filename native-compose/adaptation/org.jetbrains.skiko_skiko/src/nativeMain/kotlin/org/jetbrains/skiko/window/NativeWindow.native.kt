@@ -1,5 +1,3 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko.window
 
 import kotlinx.cinterop.*
@@ -9,8 +7,7 @@ import org.jetbrains.skiko.internal.sdl.*
 actual object NativeWindow {
     private var running = false
 
-    actual fun run(options: NativeWindowOptions, onKey: (NativeWindowKey) -> Unit,
-                   render: (Canvas, Int, Int, Float) -> Unit) = memScoped {
+    actual fun run(options: NativeWindowOptions, onKey: (NativeWindowKey) -> Unit, render: (Canvas, Int, Int, Float) -> Unit) = memScoped {
         check(!running) { "A NativeWindow event loop is already running" }
         running = true
         try {
@@ -21,8 +18,7 @@ actual object NativeWindow {
         finally { running = false }
     }
 
-    private fun runWindow(options: NativeWindowOptions, onKey: (NativeWindowKey) -> Unit,
-                          render: (Canvas, Int, Int, Float) -> Unit) = memScoped {
+    private fun runWindow(options: NativeWindowOptions, onKey: (NativeWindowKey) -> Unit, render: (Canvas, Int, Int, Float) -> Unit) = memScoped {
         val software = options.backend == NativeWindowBackend.SOFTWARE
         val flags = SDL_WINDOW_RESIZABLE or SDL_WINDOW_HIGH_PIXEL_DENSITY or if (software) 0uL else gpuWindowFlags()
         val window = checkNotNull(RachelSDL_CreateWindow(options.title, options.width, options.height, flags)) {
@@ -79,8 +75,7 @@ actual object NativeWindow {
                             initialHeight = height.value
                             check(RachelSDL_SetWindowSize(window, (options.width + 160).coerceAtMost(16384), (options.height + 60).coerceAtMost(16384)))
                         }
-                        else if (options.smoke && frames >= (if (options.continuous) 12 else 2) &&
-                            (width.value != initialWidth || height.value != initialHeight)) {
+                        else if (options.smoke && frames >= (if (options.continuous) 12 else 2) && (width.value != initialWidth || height.value != initialHeight)) {
                             println("PASS: ${renderer.description}; static SDL; resize ${initialWidth}x$initialHeight -> ${width.value}x${height.value}; $frames frames")
                             open = false
                         }

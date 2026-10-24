@@ -12,11 +12,13 @@ plugins {
 }
 
 val adaptationDirectory = buildFile.parentFile
+
 extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectContext ->
     extensions.configure<KotlinMultiplatformExtension> {
         if (supportNativeWindows) context.configureNativeTarget(OS.Windows, Arch.X64, mingwX64())
     }
 }
+
 apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))
 
 // Configure source roots after upstream has registered every platform task.
@@ -28,9 +30,12 @@ extensions.configure<KotlinMultiplatformExtension> {
 }
 
 tasks.withType<CompileSkikoCppTask>().configureEach {
-    val sourceSets = listOf("commonMain", "nativeMain") +
-        if (name.contains("Windows")) listOf("windowsMain") else if (name.contains("Linux")) listOf("linuxMain") else listOf("macosMain")
-    for (sourceSet in sourceSets) {
+    val platformSourceSet = when {
+        name.contains("Windows") -> "windowsMain"
+        name.contains("Linux") -> "linuxMain"
+        else -> "macosMain"
+    }
+    for (sourceSet in listOf("commonMain", "nativeMain", platformSourceSet)) {
         val directory = adaptationDirectory.resolve("src/$sourceSet/cpp")
         if (directory.isDirectory) {
             sourceRoots.add(layout.dir(provider { directory }))
@@ -39,7 +44,7 @@ tasks.withType<CompileSkikoCppTask>().configureEach {
     }
 }
 
-tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
+tasks.withType<AbstractArchiveTask>().configureEach {
     if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
         from(adaptationDirectory.resolve("src")) {
             include("**/*.cc", "**/*.cpp", "**/*.h", "**/*.hh")
@@ -61,13 +66,21 @@ val prepareSdl = tasks.register<Exec>("prepareSdlStatic") {
     inputs.files(nativeComposeDirectory.resolve("scripts/prepare_sdl.py"), nativeComposeDirectory.resolve("upstream/sdl.json"))
     outputs.files(sdlSdk.resolve("rachel-sdl.json"), sdlSdk.resolve("lib/$sdlArchive"))
     commandLine(providers.gradleProperty("python.command").getOrElse("python"), nativeComposeDirectory.resolve("scripts/prepare_sdl.py"), "--build")
+    if (sdlHost == "linux_x64") {
+        dependsOn("downloadKotlinNativeDistribution")
+        val nativeLocation = layout.buildDirectory.file("konan.txt")
+        inputs.file(nativeLocation)
+        args("--konan-home-file", nativeLocation.get().asFile)
+    }
 }
+
 if (sdlHost == "mingw_x64") {
     tasks.named<StripCoffDirectivesTask>("stripCoffDirectivesWindowsX64") {
         dependsOn(prepareSdl)
         inputLibraries.add(sdlSdk.resolve("lib/$sdlArchive"))
     }
 }
+
 kotlin.targets.withType<KotlinNativeTarget>().configureEach {
     val isHost = konanTarget == HostManager.host
     val sdlLibraryDirectory = if (sdlHost == "mingw_x64") layout.buildDirectory.dir("nativeBridges/strippedCoff/windows-x64").get().asFile else sdlSdk.resolve("lib")
@@ -86,7 +99,8 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
                 val profile = JsonSlurper().parse(sdlSdk.resolve("rachel-sdl.json")) as Map<*, *>
                 val options = (profile["linkerOpts"] as List<*>).joinToString(" ")
                 "staticLibraries = $sdlArchive\nlinkerOpts = $options\n"
-            } else ""
+            }
+            else ""
             val file = output.get().asFile
             file.parentFile.mkdirs()
             file.writeText(definition.readText().replace("\r\n", "\n").replace("---\n", header + "---\n"))
@@ -99,8 +113,14 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
     }
     tasks.named(interop.interopProcessingTaskName).configure { dependsOn(writeDefinition) }
 }
-tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
+
+tasks.withType<AbstractArchiveTask>().configureEach {
     if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
+        dependsOn(prepareSdl)
         from(adaptationDirectory.resolve("src/nativeInterop")) { into("nativeInterop") }
+        from(nativeComposeDirectory.resolve("vendor/sdl-source-$sdlVersion/LICENSE.txt")) {
+            into("META-INF/licenses")
+            rename { "SDL.txt" }
+        }
     }
 }

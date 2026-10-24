@@ -14,8 +14,7 @@ internal interface LinuxLayerRenderer {
 
     fun isContextLost(): Boolean = false
 
-    fun <T> withExternalOpenGl(block: () -> T): T =
-        error("External OpenGL access requires the OpenGL renderer")
+    fun <T> withExternalOpenGl(block: () -> T): T = error("External OpenGL access requires the OpenGL renderer")
 
     fun drawTexture(textureId: Int, width: Int, height: Int, canvas: Canvas) {
         error("OpenGL textures require the OpenGL renderer")
@@ -24,5 +23,4 @@ internal interface LinuxLayerRenderer {
     fun close(contextLost: Boolean = false)
 }
 
-internal var linuxLayerRendererFactoryOverride:
-    ((GraphicsApi, LinuxSkiaLayerComponent, SkiaLayerProperties) -> LinuxLayerRenderer)? = null
+internal var linuxLayerRendererFactoryOverride: ((GraphicsApi, LinuxSkiaLayerComponent, SkiaLayerProperties) -> LinuxLayerRenderer)? = null

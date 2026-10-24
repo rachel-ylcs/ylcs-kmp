@@ -6,7 +6,6 @@ plugins {
 }
 
 kotlin {
-    compilerOptions { freeCompilerArgs.add("-Xcollection-literals") }
     mingwX64("windows")
     linuxX64("linux")
     macosArm64("macos")

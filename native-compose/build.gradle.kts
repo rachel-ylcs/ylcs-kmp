@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins { idea }
@@ -41,6 +42,11 @@ if (sourceBuild != null && hostPublication != null) {
 
 subprojects {
     layout.buildDirectory.set(nativeDirectory.dir("vendor/build/samples/$name"))
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        extensions.configure<KotlinMultiplatformExtension> {
+            compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
+        }
+    }
 }
 
 tasks.register<Exec>("doctorNative") {

@@ -1,4 +1,4 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package org.jetbrains.skiko
 
@@ -37,11 +37,10 @@ class LinuxVulkanWindow(
         }
     }
 
-    val deviceName: String
-        get() {
-            checkOpen()
-            return interpretCPointer<ByteVar>(deviceName(pointer))?.toKString() ?: "Unknown Vulkan device"
-        }
+    val deviceName: String get() {
+        checkOpen()
+        return interpretCPointer<ByteVar>(deviceName(pointer))?.toKString() ?: "Unknown Vulkan device"
+    }
 
     internal fun acquire(width: Int, height: Int, vsync: Boolean): Surface {
         checkOpen()
@@ -69,8 +68,7 @@ class LinuxVulkanWindow(
 private fun vulkanError(): String = interpretCPointer<ByteVar>(lastError())?.toKString() ?: "Vulkan window operation failed"
 
 @ExternalSymbolName("RachelVulkanWindow_Create")
-private external fun create(names: NativePointer, count: Int, factory: NativePointer, userData: NativePointer,
-    priority: Int, buffers: Int, cacheLimit: Long): NativePointer
+private external fun create(names: NativePointer, count: Int, factory: NativePointer, userData: NativePointer, priority: Int, buffers: Int, cacheLimit: Long): NativePointer
 @ExternalSymbolName("RachelVulkanWindow_Destroy")
 private external fun destroy(pointer: NativePointer)
 @ExternalSymbolName("RachelVulkanWindow_Acquire")

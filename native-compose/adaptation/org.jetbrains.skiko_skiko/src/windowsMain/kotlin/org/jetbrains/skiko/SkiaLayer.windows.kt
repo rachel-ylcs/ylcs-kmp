@@ -1,49 +1,16 @@
-@file:OptIn(
-    kotlinx.cinterop.ExperimentalForeignApi::class,
-    kotlin.concurrent.atomics.ExperimentalAtomicApi::class,
-    org.jetbrains.skiko.ExperimentalSkikoApi::class,
-)
+@file:OptIn(ExperimentalForeignApi::class, ExperimentalAtomicApi::class, ExperimentalSkikoApi::class)
 
 package org.jetbrains.skiko
 
-import kotlinx.cinterop.UIntVar
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.convert
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.reinterpret
-import kotlinx.cinterop.sizeOf
-import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.*
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.PixelGeometry
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicReference
-import platform.windows.GetMonitorInfoW
-import platform.windows.GetWindowLongPtrW
-import platform.windows.GetWindowRect
-import platform.windows.GWL_STYLE
-import platform.windows.HKEY_CURRENT_USER
-import platform.windows.HWND
-import platform.windows.MONITORINFO
-import platform.windows.MONITOR_DEFAULTTONEAREST
-import platform.windows.MonitorFromWindow
-import platform.windows.RECT
-import platform.windows.RegGetValueW
-import platform.windows.RRF_RT_REG_DWORD
-import platform.windows.SetWindowLongPtrW
-import platform.windows.SetWindowPos
-import platform.windows.ShowWindow
-import platform.windows.SWP_FRAMECHANGED
-import platform.windows.SWP_NOACTIVATE
-import platform.windows.SWP_NOOWNERZORDER
-import platform.windows.SWP_SHOWWINDOW
-import platform.windows.SW_RESTORE
-import platform.windows.WS_OVERLAPPEDWINDOW
-
-private data class WindowRect(val left: Int, val top: Int, val right: Int, val bottom: Int)
+import platform.windows.*
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 /** Kotlin/Native Windows layer backed by a Win32 HWND. */
 actual open class SkiaLayer(
@@ -85,55 +52,49 @@ actual open class SkiaLayer(
         }
 
     private val softwareFrameLimiter = WindowsFrameLimiter()
-    private val fpsCounter =
-        if (SkikoProperties.fpsEnabled) {
-            FPSCounter(
-                periodSeconds = SkikoProperties.fpsPeriodSeconds,
-                showLongFrames = SkikoProperties.fpsLongFramesShow,
-                getLongFrameMillis = {
-                    SkikoProperties.fpsLongFramesMillis
-                        ?: (1.5 * 1_000.0 / (nativeWindow?.displayRefreshRate ?: 60f))
-                },
-                logOnTick = true,
-            )
-        } else {
-            null
-        }
+    private val fpsCounter = if (SkikoProperties.fpsEnabled) {
+        FPSCounter(
+            periodSeconds = SkikoProperties.fpsPeriodSeconds,
+            showLongFrames = SkikoProperties.fpsLongFramesShow,
+            getLongFrameMillis = {
+                SkikoProperties.fpsLongFramesMillis
+                    ?: (1.5 * 1_000.0 / (nativeWindow?.displayRefreshRate ?: 60f))
+            },
+            logOnTick = true
+        )
+    }
+    else null
 
     private var activeRenderApi: GraphicsApi = properties.renderApi
 
     actual var renderApi: GraphicsApi
         get() = activeRenderApi
         set(value) {
-            require(value in SupportedWindowsRenderApis) {
-                "$value is not implemented by Kotlin/Native Windows"
-            }
+            require(value in SupportedWindowsRenderApis) { "$value is not implemented by Kotlin/Native Windows" }
             if (activeRenderApi == value) return
             activeRenderApi = value
             if (nativeWindow != null) {
                 if (rendering.load()) {
                     deferredRenderApi = value
-                } else {
+                }
+                else {
                     replaceRenderer(value, countAsFallback = false)
                     needRender(throttledToVsync = false)
                 }
             }
         }
 
-    actual val contentScale: Float
-        get() = nativeWindow?.contentScale ?: 1f
+    actual val contentScale: Float get() = nativeWindow?.contentScale ?: 1f
 
     actual var fullscreen: Boolean
         get() = savedWindowStyle != null
         set(value) {
-            val hwnd = nativeWindow?.hwnd()
-                ?: throw IllegalStateException("SkiaLayer must be attached before changing fullscreen")
-            if (value == fullscreen) return
+            val hwnd = nativeWindow?.hwnd() ?: throw IllegalStateException("SkiaLayer must be attached before changing fullscreen")
+            if (value == (savedWindowStyle != null)) return
             if (value) enterFullscreen(hwnd) else leaveFullscreen(hwnd)
         }
 
-    actual val component: Any?
-        get() = nativeWindow
+    actual val component: Any? get() = nativeWindow
 
     actual var renderDelegate: SkikoRenderDelegate?
         get() = renderDelegateReference.load()
@@ -144,12 +105,11 @@ actual open class SkiaLayer(
 
     actual fun attachTo(container: Any) {
         check(nativeWindow == null) { "SkiaLayer is already attached" }
-        val window =
-            when (container) {
-                is WindowsNativeWindow -> container
-                is Long -> WindowsNativeWindow(container)
-                else -> error("container must be WindowsNativeWindow or a non-zero HWND Long")
-            }
+        val window = when (container) {
+            is WindowsNativeWindow -> container
+            is Long -> WindowsNativeWindow(container)
+            else -> error("container must be WindowsNativeWindow or a non-zero HWND Long")
+        }
         nativeWindow = window
         renderWindow.store(window)
         try {
@@ -160,7 +120,8 @@ actual open class SkiaLayer(
                 onFailure = ::recordWindowCallbackFailure,
             )
             replaceRenderer(renderApi, countAsFallback = false)
-        } catch (failure: Throwable) {
+        }
+        catch (failure: Throwable) {
             window.detachCallbacks()
             renderWindow.store(null)
             nativeWindow = null
@@ -187,7 +148,8 @@ actual open class SkiaLayer(
             window?.detachCallbacks()
             renderWindow.store(null)
             closeRenderer(contextLost = renderer?.isContextLost() == true)
-        } finally {
+        }
+        finally {
             renderWindow.store(null)
             nativeWindow = null
             renderRequestState.store(0)
@@ -202,9 +164,7 @@ actual open class SkiaLayer(
         var previousState: Int
         while (true) {
             previousState = renderRequestState.load()
-            val nextState =
-                previousState or RENDER_REQUEST_PENDING or
-                    if (throttledToVsync) 0 else RENDER_REQUEST_UNTHROTTLED
+            val nextState = previousState or RENDER_REQUEST_PENDING or if (throttledToVsync) 0 else RENDER_REQUEST_UNTHROTTLED
             if (renderRequestState.compareAndSet(previousState, nextState)) break
         }
         if (previousState and RENDER_REQUEST_PENDING == 0) window.requestRender()
@@ -218,7 +178,7 @@ actual open class SkiaLayer(
 
     internal actual fun draw(canvas: Canvas) {
         val window = nativeWindow ?: return
-        val (width, height) = window.clientSize
+        val [width, height] = window.clientSize
         if (width > 0 && height > 0) {
             renderDelegate?.onRender(canvas, width, height, currentNanoTime())
         }
@@ -226,33 +186,30 @@ actual open class SkiaLayer(
 
     /** True when [needRender] has requested a frame that has not been presented yet. */
     @InternalSkikoApi
-    val hasPendingRender: Boolean
-        get() = renderRequestState.load() and RENDER_REQUEST_PENDING != 0
+    val hasPendingRender: Boolean get() = renderRequestState.load() and RENDER_REQUEST_PENDING != 0
 
     /** Current renderer and recovery counters for diagnostics and support tooling. */
     @InternalSkikoApi
-    val diagnostics: WindowsSkiaLayerDiagnostics
-        get() =
-            WindowsSkiaLayerDiagnostics(
-                renderApi = renderApi,
-                rendererDescription = renderer?.description,
-                deviceName = renderer?.deviceName,
-                renderedFrameCount = renderedFrameCount,
-                fallbackCount = fallbackCount,
-                contextRecoveryCount = contextRecoveryCount,
-                lastFailure = lastRenderFailure,
-                isVsyncEnabled = properties.isVsyncEnabled,
-                frameBuffering = properties.frameBuffering,
-                effectiveFrameBufferCount = renderer?.effectiveFrameBufferCount,
-                transparencyRequested = transparency,
-                hasTransparentWindowBuffer = renderer?.transparencySupported == true,
-                adapterPriority = properties.adapterPriority,
-                gpuResourceCacheLimit = properties.gpuResourceCacheLimit,
-                pixelGeometry = pixelGeometry,
-                fpsAverage = fpsCounter?.average,
-                fpsMinimum = fpsCounter?.min,
-                fpsMaximum = fpsCounter?.max,
-            )
+    val diagnostics: WindowsSkiaLayerDiagnostics get() = WindowsSkiaLayerDiagnostics(
+        renderApi = renderApi,
+        rendererDescription = renderer?.description,
+        deviceName = renderer?.deviceName,
+        renderedFrameCount = renderedFrameCount,
+        fallbackCount = fallbackCount,
+        contextRecoveryCount = contextRecoveryCount,
+        lastFailure = lastRenderFailure,
+        isVsyncEnabled = properties.isVsyncEnabled,
+        frameBuffering = properties.frameBuffering,
+        effectiveFrameBufferCount = renderer?.effectiveFrameBufferCount,
+        transparencyRequested = transparency,
+        hasTransparentWindowBuffer = renderer?.transparencySupported == true,
+        adapterPriority = properties.adapterPriority,
+        gpuResourceCacheLimit = properties.gpuResourceCacheLimit,
+        pixelGeometry = pixelGeometry,
+        fpsAverage = fpsCounter?.average,
+        fpsMinimum = fpsCounter?.min,
+        fpsMaximum = fpsCounter?.max,
+    )
 
     /** Renders one pending frame on the thread that owns the attached HWND. */
     @InternalSkikoApi
@@ -263,30 +220,31 @@ actual open class SkiaLayer(
             if (!force && requestState and RENDER_REQUEST_PENDING == 0) return false
             val window = nativeWindow ?: return false
             val delegate = renderDelegateReference.load() ?: return false
-            val (width, height) = window.clientSize
+            val [width, height] = window.clientSize
             if (width <= 0 || height <= 0) return false
 
-            val waitForVsync =
-                requestState and RENDER_REQUEST_UNTHROTTLED == 0
+            val waitForVsync = requestState and RENDER_REQUEST_UNTHROTTLED == 0
             renderWithRecovery(width, height, waitForVsync) { canvas ->
                 try {
                     delegate.onRender(canvas, width, height, currentNanoTime())
-                } catch (failure: Throwable) {
+                }
+                catch (failure: Throwable) {
                     throw RenderDelegateFailure(failure)
                 }
             }
             return true
-        } catch (failure: RenderDelegateFailure) {
+        }
+        catch (failure: RenderDelegateFailure) {
             throw failure.cause ?: failure
-        } finally {
+        }
+        finally {
             rendering.store(false)
             applyDeferredRendererActions()
         }
     }
 
     @InternalSkikoApi
-    fun snapshot(width: Int, height: Int): Bitmap =
-        rendererOperationWithRecovery { it.snapshot(width, height) }
+    fun snapshot(width: Int, height: Int): Bitmap = rendererOperationWithRecovery { it.snapshot(width, height) }
 
     @InternalSkikoApi
     fun <T> withOpenGlContext(block: () -> T): T {
@@ -297,7 +255,8 @@ actual open class SkiaLayer(
             activeRenderer.withExternalOpenGl {
                 try {
                     block()
-                } catch (failure: Throwable) {
+                }
+                catch (failure: Throwable) {
                     throw RendererUserOperationFailure(failure)
                 }
             }
@@ -306,15 +265,12 @@ actual open class SkiaLayer(
 
     @InternalSkikoApi
     fun drawOpenGlTexture(textureId: Int, width: Int, height: Int, canvas: Canvas) {
-        check(renderer?.renderApi == GraphicsApi.OPENGL) {
-            "OpenGL textures require the OpenGL renderer"
-        }
+        check(renderer?.renderApi == GraphicsApi.OPENGL) { "OpenGL textures require the OpenGL renderer" }
         rendererOperationWithRecovery { it.drawTexture(textureId, width, height, canvas) }
     }
 
     @InternalSkikoApi
-    val rendererDescription: String
-        get() = checkNotNull(renderer) { "SkiaLayer is not attached" }.description
+    val rendererDescription: String get() = checkNotNull(renderer) { "SkiaLayer is not attached" }.description
 
     private fun applyDeferredRendererActions() {
         if (detachAfterRender) {
@@ -340,7 +296,8 @@ actual open class SkiaLayer(
         savedWindowRect = null
         if (rendering.load()) {
             detachAfterRender = true
-        } else {
+        }
+        else {
             closeRenderer(contextLost = true, ignoreFailure = true)
             nativeWindow = null
             detachAfterRender = false
@@ -356,13 +313,7 @@ actual open class SkiaLayer(
     ) {
         val previousContextRecoveryCount = contextRecoveryCount
         var activeRenderer = healthyRenderer()
-        if (
-            waitForVsync &&
-                activeRenderer.renderApi in
-                setOf(GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT) &&
-                properties.isVsyncEnabled &&
-                properties.isVsyncFramelimitFallbackEnabled
-        ) {
+        if (waitForVsync && activeRenderer.renderApi in [GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT] && properties.isVsyncEnabled && properties.isVsyncFramelimitFallbackEnabled) {
             softwareFrameLimiter.awaitNextFrame(nativeWindow?.displayRefreshRate ?: 60f)
         }
 
@@ -371,9 +322,11 @@ actual open class SkiaLayer(
             try {
                 renderFrame(activeRenderer, width, height, waitForVsync, block)
                 return
-            } catch (failure: RenderDelegateFailure) {
+            }
+            catch (failure: RenderDelegateFailure) {
                 throw failure
-            } catch (failure: Throwable) {
+            }
+            catch (failure: Throwable) {
                 recoverRenderer(
                     failedRenderer = activeRenderer,
                     failure = failure,
@@ -403,18 +356,18 @@ actual open class SkiaLayer(
         deviceAnalytics?.afterFrameRender()
     }
 
-    private inline fun <T> rendererOperationWithRecovery(
-        operation: (WindowsLayerRenderer) -> T,
-    ): T {
+    private inline fun <T> rendererOperationWithRecovery(operation: (WindowsLayerRenderer) -> T): T {
         val previousContextRecoveryCount = contextRecoveryCount
         var activeRenderer = healthyRenderer()
         var attemptSameApiRecreation = contextRecoveryCount == previousContextRecoveryCount
         while (true) {
             try {
                 return operation(activeRenderer)
-            } catch (failure: RendererUserOperationFailure) {
+            }
+            catch (failure: RendererUserOperationFailure) {
                 throw failure.cause ?: failure
-            } catch (failure: Throwable) {
+            }
+            catch (failure: Throwable) {
                 recoverRenderer(activeRenderer, failure, attemptSameApiRecreation)
                 attemptSameApiRecreation = false
                 activeRenderer = checkNotNull(renderer)
@@ -446,15 +399,13 @@ actual open class SkiaLayer(
         val contextLost = knownContextLost ?: failedRenderer.isContextLost()
         closeRenderer(contextLost = contextLost, ignoreFailure = true)
 
-        if (
-            failedApi in setOf(GraphicsApi.DIRECT3D, GraphicsApi.OPENGL) &&
-                attemptSameApiRecreation
-        ) {
+        if (failedApi in [GraphicsApi.DIRECT3D, GraphicsApi.OPENGL] && attemptSameApiRecreation) {
             try {
                 installRenderer(failedApi)
                 contextRecoveryCount += 1
                 return
-            } catch (recreationFailure: Throwable) {
+            }
+            catch (recreationFailure: Throwable) {
                 lastRenderFailure = recreationFailure.message ?: recreationFailure::class.simpleName
             }
         }
@@ -481,7 +432,8 @@ actual open class SkiaLayer(
                 installRenderer(api)
                 if (countAsFallback || index > 0) fallbackCount += 1
                 return
-            } catch (failure: Throwable) {
+            }
+            catch (failure: Throwable) {
                 lastFailure = failure
                 lastRenderFailure = failure.message ?: failure::class.simpleName
             }
@@ -491,36 +443,28 @@ actual open class SkiaLayer(
 
     private fun installRenderer(api: GraphicsApi) {
         val window = checkNotNull(nativeWindow)
-        val nextRenderer =
-            windowsLayerRendererFactoryOverride?.invoke(api, window, properties, pixelGeometry)
-                ?: when (api) {
-                    GraphicsApi.DIRECT3D ->
-                        WindowsDirect3DRenderer(
-                            window,
-                            properties,
-                            pixelGeometry,
-                            transparency,
-                        )
-                    GraphicsApi.OPENGL ->
-                        WindowsOpenGLRenderer(window, properties, pixelGeometry, transparency)
-                    GraphicsApi.SOFTWARE_FAST,
-                    GraphicsApi.SOFTWARE_COMPAT -> WindowsSoftwareRenderer(window, api, pixelGeometry)
-                    else -> error("Kotlin/Native Windows does not support $api rendering")
-                }
+        val nextRenderer = windowsLayerRendererFactoryOverride?.invoke(api, window, properties, pixelGeometry) ?: when (api) {
+            GraphicsApi.DIRECT3D -> WindowsDirect3DRenderer(window, properties, pixelGeometry, transparency)
+            GraphicsApi.OPENGL -> WindowsOpenGLRenderer(window, properties, pixelGeometry, transparency)
+            GraphicsApi.SOFTWARE_FAST,
+            GraphicsApi.SOFTWARE_COMPAT -> WindowsSoftwareRenderer(window, api, pixelGeometry)
+            else -> error("Kotlin/Native Windows does not support $api rendering")
+        }
         val nextRendererAnalytics: SkiaLayerAnalytics.RendererAnalytics
         val nextDeviceAnalytics: SkiaLayerAnalytics.DeviceAnalytics
         try {
             nextRendererAnalytics = analytics.renderer(WindowsNativeSkikoVersion, hostOs, api)
             nextRendererAnalytics.init()
             nextRendererAnalytics.deviceChosen()
-            nextDeviceAnalytics =
-                analytics.device(WindowsNativeSkikoVersion, hostOs, api, nextRenderer.deviceName)
+            nextDeviceAnalytics = analytics.device(WindowsNativeSkikoVersion, hostOs, api, nextRenderer.deviceName)
             nextDeviceAnalytics.init()
             nextDeviceAnalytics.contextInit()
-        } catch (failure: Throwable) {
+        }
+        catch (failure: Throwable) {
             try {
                 nextRenderer.close(contextLost = nextRenderer.isContextLost())
-            } catch (_: Throwable) {
+            }
+            catch (_: Throwable) {
                 // Preserve the analytics failure while still making a best effort to release the renderer.
             }
             throw failure
@@ -540,7 +484,8 @@ actual open class SkiaLayer(
         deviceAnalytics = null
         try {
             oldRenderer.close(contextLost)
-        } catch (failure: Throwable) {
+        }
+        catch (failure: Throwable) {
             if (!ignoreFailure) throw failure
             lastRenderFailure = failure.message ?: failure::class.simpleName
         }
@@ -589,53 +534,26 @@ actual open class SkiaLayer(
     }
 }
 
-@InternalSkikoApi
-data class WindowsSkiaLayerDiagnostics(
-    val renderApi: GraphicsApi,
-    val rendererDescription: String?,
-    val deviceName: String?,
-    val renderedFrameCount: Long,
-    val fallbackCount: Int,
-    val contextRecoveryCount: Int,
-    val lastFailure: String?,
-    val isVsyncEnabled: Boolean,
-    val frameBuffering: FrameBuffering,
-    val effectiveFrameBufferCount: Int?,
-    val transparencyRequested: Boolean,
-    val hasTransparentWindowBuffer: Boolean,
-    val adapterPriority: GpuPriority,
-    val gpuResourceCacheLimit: Long,
-    val pixelGeometry: PixelGeometry,
-    val fpsAverage: Int?,
-    val fpsMinimum: Int?,
-    val fpsMaximum: Int?,
-)
-
-private class RenderDelegateFailure(cause: Throwable) : RuntimeException(cause)
-private class RendererUserOperationFailure(cause: Throwable) : RuntimeException(cause)
-
 private const val RENDER_REQUEST_PENDING = 1
 private const val RENDER_REQUEST_UNTHROTTLED = 1 shl 1
 
 private const val WindowsNativeSkikoVersion = "Kotlin/Native"
 
-actual val currentSystemTheme: SystemTheme
-    get() {
-        val themeValue = IntArray(1)
-        val themeValueSize = IntArray(1) { Int.SIZE_BYTES }
-        val status = themeValue.usePinned { valuePinned ->
-            themeValueSize.usePinned { sizePinned ->
-                RegGetValueW(
-                    HKEY_CURRENT_USER,
-                    "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-                    "AppsUseLightTheme",
-                    RRF_RT_REG_DWORD.convert(),
-                    null,
-                    valuePinned.addressOf(0),
-                    sizePinned.addressOf(0).reinterpret<UIntVar>(),
-                )
-            }
+actual val currentSystemTheme: SystemTheme get() {
+    val themeValue = IntArray(1)
+    val themeValueSize = IntArray(1) { Int.SIZE_BYTES }
+    val status = themeValue.usePinned { valuePinned ->
+        themeValueSize.usePinned { sizePinned ->
+            RegGetValueW(
+                HKEY_CURRENT_USER,
+                "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                "AppsUseLightTheme",
+                RRF_RT_REG_DWORD.convert(),
+                null,
+                valuePinned.addressOf(0),
+                sizePinned.addressOf(0).reinterpret<UIntVar>(),
+            )
         }
-        return if (status != 0) SystemTheme.UNKNOWN
-        else if (themeValue[0] == 0) SystemTheme.DARK else SystemTheme.LIGHT
     }
+    return if (status != 0) SystemTheme.UNKNOWN else if (themeValue[0] == 0) SystemTheme.DARK else SystemTheme.LIGHT
+}

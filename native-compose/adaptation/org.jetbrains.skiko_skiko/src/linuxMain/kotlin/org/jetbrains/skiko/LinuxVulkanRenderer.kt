@@ -6,7 +6,6 @@ import org.jetbrains.skia.Color
 import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Surface
 
-@OptIn(InternalSkikoApi::class)
 internal class LinuxVulkanRenderer(
     private val component: LinuxSkiaLayerComponent,
     private val properties: SkiaLayerProperties,

@@ -65,6 +65,11 @@ def verify_module(repository, target, lock, artifact):
                     for line in manifest.splitlines():
                         if line.startswith("linkerOpts="):
                             exported_linker_options.append(line)
+                            if "cinterop-sdl" in klib.name:
+                                # SDL pkg-config flags are normalized for direct ld.
+                                # Windows Core separately uses intentional clang-driver CRT flags.
+                                checked("-Wl," not in line and "-Xlinker" not in line,
+                                        f"SDL compiler-driver flags must be converted to native linker arguments: {klib}")
                         if line.startswith(("linkerOpts=", "libraryPaths=")):
                             checked(not re.search(r"[A-Za-z]:[\\/]|/(?:Users|home|workspace|tmp|private|Volumes)/", line), f"Build-machine linker path leaked into {klib}")
     if artifact == "skiko":

@@ -1,5 +1,3 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko
 
 import kotlin.math.ceil
