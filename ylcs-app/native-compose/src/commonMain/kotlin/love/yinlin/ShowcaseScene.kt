@@ -1,149 +1,241 @@
-@file:OptIn(androidx.compose.ui.InternalComposeUiApi::class)
+@file:Suppress("DEPRECATION")
+@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
 
 package love.yinlin
 
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.focus.*
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color as UiColor
-import androidx.compose.ui.graphics.asComposeCanvas
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.registerSkikoComposeImplementation
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.Paragraph
-import androidx.compose.ui.text.TextStyle as UiTextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.createFontFamilyResolver
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.intl.LocaleList
-import androidx.compose.ui.text.style.TextDirection
-import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.constrain
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.trace
-import org.jetbrains.skia.*
-import org.jetbrains.skia.impl.use
-import org.jetbrains.skia.skottie.Animation
-import org.jetbrains.skia.svg.SVGDOM
+import androidx.compose.ui.window.Dialog
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
-/** Owns the native drawing resources for one window; close before destroying its renderer. */
-internal class ShowcaseScene {
-    init {
-        registerSkikoComposeImplementation()
-    }
+private val Ink = Color(0xFF182D3B)
+private val Teal = Color(0xFF146C69)
 
-    private val face = checkNotNull(FontMgr.default.matchFamiliesStyle(
-        ["Arial", "DejaVu Sans", "Liberation Sans", "Helvetica"], FontStyle.NORMAL))
-    private val title = Font(face, 30f)
-    private val text = Font(face, 15f)
-    private val paint = Paint().apply { isAntiAlias = true }
-    private val animation = Animation.makeFromString(AnimationJson)
-    private val svg = Data.makeFromBytes(Svg.encodeToByteArray()).use { SVGDOM(it) }
-    private val locale = Locale("tr-TR")
-    private val sample = AnnotatedString("istanbul / straße").toUpperCase(locale)
-    private val paragraph = Paragraph(
-        text = "Compose Paragraph: ${sample.text}\nNative text: café / Ελληνικά / אבג\nFont resolution, shaping and bidirectional layout.",
-        style = UiTextStyle(color = UiColor(Ink), fontSize = 18.sp, fontFamily = FontFamily.SansSerif, textDirection = TextDirection.Content),
-        constraints = Constraints(maxWidth = 510),
-        density = Density(1f),
-        fontFamilyResolver = createFontFamilyResolver(),
-        defaultLocaleList = LocaleList(locale)
-    )
-    private val image = Surface.makeRasterN32Premul(160, 80).use { surface ->
-        surface.canvas.clear(Teal)
-        paint.color = Amber
-        surface.canvas.drawCircle(80f, 40f, 28f, paint)
-        surface.makeImageSnapshot().use { snapshot ->
-            checkNotNull(snapshot.encodeToData(EncodedImageFormat.WEBP)).use { data ->
-                Image.makeFromEncoded(data.bytes)
+/** UI primitives only: Foundation and Animation belong to the next porting stage. */
+@Composable
+internal fun ShowcaseScene() {
+    var count by remember { mutableIntStateOf(0) }
+    var dialog by remember { mutableStateOf(false) }
+    var dark by remember { mutableStateOf(false) }
+    var value by remember { mutableStateOf(TextFieldValue("你好，Native Compose")) }
+    var status by remember { mutableStateOf("点击输入区，验证中文组合输入、方向键、删除和 Ctrl / ⌘ + A") }
+    val clipboard = LocalClipboardManager.current
+    val background = if (dark) Color(0xFF182D3B) else Color(0xFFF2F5F5)
+    val foreground = if (dark) Color(0xFFF1F6F6) else Ink
+
+    LabViewport(background) {
+        LabColumn {
+            LabText("RACHEL  /  COMPOSE NATIVE", color = if (dark) Color(0xFF8ED6CF) else Teal, fontSize = 14)
+            LabText("原生窗口，真实 Compose。", color = foreground, fontSize = 30)
+            LabText("重组 · 帧时钟 · 焦点 · 中文输入 · 剪贴板 · Dialog", color = foreground)
+            LabColumn(Modifier.drawBehind { drawRoundRect(Color.White, cornerRadius = CornerRadius(18.dp.toPx())) }) {
+                LabText("01  状态与键盘交互", color = Teal)
+                LabButton("点击计数  $count") { count++ }
+                LabButton(if (dark) "切换浅色背景" else "切换深色背景") { dark = !dark }
+                LabText("02  文本输入与系统剪贴板", color = Teal)
+                LabEditor(value) { value = it }
+                LabButton("复制输入内容") {
+                    clipboard.setText(AnnotatedString(value.text))
+                    status = "已复制；切换到其他程序也可粘贴"
+                }
+                LabButton("粘贴剪贴板文本") {
+                    val text = clipboard.getText()?.text
+                    if (text != null) value = TextFieldValue(text, TextRange(text.length))
+                    status = if (text == null) "剪贴板没有文本" else "已粘贴"
+                }
+                LabText(status, fontSize = 12)
+            }
+            LabColumn(Modifier.drawBehind { drawRoundRect(Color.White, cornerRadius = CornerRadius(18.dp.toPx())) }) {
+                LabText("03  Compose 帧时钟与弹层", color = Teal)
+                LabPulse()
+                LabButton("打开 Dialog · Escape 关闭") { dialog = true }
             }
         }
     }
-    var paused = false
-    private var seconds = 0f
-
-    fun advance(deltaSeconds: Float) {
-        if (!paused) seconds += deltaSeconds.coerceIn(0f, .1f)
-    }
-
-    fun render(canvas: Canvas, width: Int, height: Int) {
-        canvas.clear(Background)
-        canvas.save()
-        try {
-            val viewport = Constraints(maxWidth = width, maxHeight = height).constrain(IntSize(width, height))
-            val designSize = with(Density(1f)) { Size(1000.dp.toPx(), 660.dp.toPx()) }
-            val scale = minOf(viewport.width / designSize.width, viewport.height / designSize.height)
-            val origin = Offset((viewport.width - designSize.width * scale) / 2f, (viewport.height - designSize.height * scale) / 2f)
-            trace("preview-transform") { canvas.translate(origin.x, origin.y) }
-            canvas.scale(scale, scale)
-            paint.color = Teal
-            canvas.drawCircle(48f, 48f, 9f, paint)
-            label(canvas, "Rachel / Native Compose backend", 72f, 59f, title)
-            label(canvas, "Compose UI Skiko  |  SDL3  |  Kotlin/Native", 36f, 96f)
-
-            card(canvas, 36f, 126f, 448f, 216f, "01  Vector drawing + SVG")
-            canvas.save()
-            canvas.translate(66f, 184f)
-            svg.render(canvas)
-            canvas.restore()
-            paint.color = Teal
-            for (index in 0 ..< 14) {
-                val bar = 20f + 46f * (1f + sin(seconds * 2f + index * .45f))
-                canvas.drawRRect(RRect.makeXYWH(236f + index * 14f, 300f - bar, 8f, bar, 4f), paint)
+    if (dialog) {
+        Dialog(onDismissRequest = { dialog = false }) {
+            LabColumn(Modifier.drawBehind { drawRoundRect(Color.White, cornerRadius = CornerRadius(18.dp.toPx())) }) {
+                LabText("Compose Dialog", fontSize = 24)
+                LabText("弹层与主页面共用原生窗口，独立处理焦点和返回。")
+                LabButton("关闭") { dialog = false }
             }
-
-            card(canvas, 504f, 126f, 460f, 216f, "02  Lottie timeline / Skottie")
-            animation.seek((seconds % 2f) / 2f).render(canvas, Rect.makeXYWH(530f, 176f, 404f, 120f))
-            label(canvas, if (paused) "PAUSED  /  Space to resume" else "PLAYING  /  Space to pause", 530f, 318f)
-
-            card(canvas, 36f, 362f, 568f, 206f, "03  Compose Paragraph + Canvas")
-            canvas.save()
-            try {
-                canvas.translate(60f, 426f)
-                paragraph.paint(canvas.asComposeCanvas())
-            }
-            finally { canvas.restore() }
-
-            card(canvas, 624f, 362f, 340f, 206f, "04  Image codec round trip")
-            canvas.drawImage(image, 650f, 420f)
-            label(canvas, "WebP encode -> decode", 650f, 540f)
-            label(canvas, "Resize the window  /  Space: pause  /  Esc: close", 36f, 615f)
-            label(canvas, "Current stage: Compose graphics/text backend / native raster and GPU rendering", 36f, 640f)
         }
-        finally { canvas.restore() }
     }
+}
 
-    private fun card(canvas: Canvas, x: Float, y: Float, width: Float, height: Float, heading: String) {
-        paint.color = Color.WHITE
-        canvas.drawRRect(RRect.makeXYWH(x, y, width, height, 14f), paint)
-        label(canvas, heading, x + 24f, y + 34f)
+@Composable
+private fun LabViewport(background: Color, content: @Composable () -> Unit) {
+    var scroll by remember { mutableFloatStateOf(0f) }
+    var maximum by remember { mutableFloatStateOf(0f) }
+    Layout(content, Modifier.clipToBounds().drawBehind { drawRect(background) }.onPointerEvent(PointerEventType.Scroll) {
+        scroll = (scroll + it.changes.sumOf { change -> change.scrollDelta.y.toDouble() }.toFloat() * 40f).coerceIn(0f, maximum)
+    }) { measurables, constraints ->
+        val child = measurables.single().measure(Constraints(maxWidth = constraints.maxWidth))
+        maximum = (child.height - constraints.maxHeight).coerceAtLeast(0).toFloat()
+        layout(constraints.maxWidth, constraints.maxHeight) { child.placeRelative(0, -scroll.coerceAtMost(maximum).roundToInt()) }
     }
+}
 
-    private fun label(canvas: Canvas, value: String, x: Float, y: Float, font: Font = text) {
-        paint.color = Ink
-        canvas.drawString(value, x, y, font, paint)
+@Composable
+private fun LabColumn(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(content, modifier) { measurables, constraints ->
+        val padding = 20.dp.roundToPx()
+        val gap = 12.dp.roundToPx()
+        val width = constraints.maxWidth.coerceAtMost(1000.dp.roundToPx())
+        val children = measurables.map { it.measure(Constraints(maxWidth = (width - padding * 2).coerceAtLeast(0))) }
+        val height = constraints.constrainHeight(padding * 2 + children.sumOf { it.height } + gap * (children.size - 1).coerceAtLeast(0))
+        layout(constraints.constrainWidth(width), height) {
+            var y = padding
+            for (child in children) {
+                child.placeRelative(padding, y)
+                y += child.height + gap
+            }
+        }
     }
+}
 
-    fun close() {
-        image.close()
-        svg.close()
-        animation.close()
-        paint.close()
-        text.close()
-        title.close()
-        face.close()
+@Composable
+private fun LabText(text: String, color: Color = Ink, fontSize: Int = 15, modifier: Modifier = Modifier) {
+    val measurer = rememberTextMeasurer()
+    val style = TextStyle(color = color, fontSize = fontSize.sp)
+    Layout(content = {}, modifier = modifier.semantics { this.text = AnnotatedString(text) }.drawWithCache {
+        val result = measurer.measure(text, style, constraints = Constraints(maxWidth = size.width.toInt().coerceAtLeast(1)))
+        onDrawBehind { drawText(result) }
+    }) { _, constraints ->
+        val result = measurer.measure(text, style, constraints = constraints)
+        layout(result.size.width, result.size.height) {}
     }
+}
 
-    private companion object {
-        val Background = Color.makeRGB(237, 242, 241)
-        val Ink = Color.makeRGB(29, 55, 57)
-        val Teal = UiColor(18, 126, 124).toArgb()
-        val Amber = Color.makeRGB(242, 173, 71)
-        const val Svg = """<svg xmlns="http://www.w3.org/2000/svg" width="140" height="120" viewBox="0 0 140 120"><path d="M15 88 L70 12 L125 88 Z" fill="#127e7c"/><circle cx="70" cy="80" r="29" fill="#f2ad47"/><path d="M22 106 Q70 72 118 106" fill="none" stroke="#1d3739" stroke-width="6"/></svg>"""
-        const val AnimationJson = """{"v":"5.7.4","fr":60,"ip":0,"op":120,"w":400,"h":120,"nm":"Rachel motion","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":1,"nm":"Moving tile","sr":1,"ks":{"o":{"a":0,"k":100},"r":{"a":1,"k":[{"t":0,"s":[0],"e":[180]},{"t":60,"s":[180],"e":[360]},{"t":120,"s":[360]}]},"p":{"a":1,"k":[{"t":0,"s":[50,60,0],"e":[350,60,0]},{"t":60,"s":[350,60,0],"e":[50,60,0]},{"t":120,"s":[50,60,0]}]},"a":{"a":0,"k":[25,25,0]},"s":{"a":0,"k":[100,100,100]}},"sw":50,"sh":50,"sc":"#127e7c","ip":0,"op":120,"st":0,"bm":0}]}"""
+@Composable
+private fun LabButton(label: String, onClick: () -> Unit) {
+    val requester = remember { FocusRequester() }
+    var focused by remember { mutableStateOf(false) }
+    LabText(label, Color.White, modifier = Modifier.focusRequester(requester).onFocusChanged { focused = it.isFocused }
+        .onKeyEvent {
+            if (it.type == KeyEventType.KeyUp && (it.key == Key.Enter || it.key == Key.Spacebar)) {
+                onClick()
+                true
+            }
+            else false
+        }.onPointerEvent(PointerEventType.Press) {
+            if (it.buttons.isPrimaryPressed) {
+                requester.requestFocus()
+                onClick()
+            }
+        }.focusTarget().semantics {
+            role = Role.Button
+            onClick {
+                onClick()
+                true
+            }
+        }.drawBehind { drawRoundRect(if (focused) Color(0xFF28578A) else Teal, cornerRadius = CornerRadius(8.dp.toPx())) }.labInset())
+}
+
+private fun Modifier.labInset(): Modifier = layout { measurable, constraints ->
+    val padding = 12.dp.roundToPx()
+    val child = measurable.measure(constraints.offset(-padding * 2, -padding * 2))
+    layout(child.width + padding * 2, child.height + padding * 2) { child.placeRelative(padding, padding) }
+}
+
+@Composable
+private fun LabPulse() {
+    var phase by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(Unit) {
+        val start = withFrameNanos { it }
+        while (true) withFrameNanos { phase = (it - start) / 1_000_000_000f }
     }
+    Layout(content = {}, modifier = Modifier.drawBehind {
+        drawRoundRect(Color(0xFFE6F1F0), cornerRadius = CornerRadius(12.dp.toPx()))
+        drawCircle(Teal, 12.dp.toPx(), Offset(size.width * (0.5f + 0.4f * sin(phase)), size.height / 2))
+    }) { _, constraints -> layout(constraints.maxWidth, 44.dp.roundToPx()) {} }
+}
+
+@Composable
+private fun LabEditor(value: TextFieldValue, onValueChange: (TextFieldValue) -> Unit) {
+    val requester = remember { FocusRequester() }
+    val service = LocalTextInputService.current
+    val processor = remember { EditProcessor() }
+    var focused by remember { mutableStateOf(false) }
+    var session by remember { mutableStateOf<TextInputSession?>(null) }
+    val currentValue by rememberUpdatedState(value)
+    val currentChange by rememberUpdatedState(onValueChange)
+    val measurer = rememberTextMeasurer()
+    SideEffect { processor.reset(value, session) }
+    DisposableEffect(focused, service) {
+        val active = if (focused) service?.startInput(currentValue, ImeOptions(singleLine = true),
+            onEditCommand = { currentChange(processor.apply(it)) }, onImeActionPerformed = {}) else null
+        session = active
+        onDispose {
+            active?.dispose()
+            if (session === active) session = null
+        }
+    }
+    Layout(content = {}, modifier = Modifier.focusRequester(requester).onFocusChanged { focused = it.isFocused }
+        .onPointerEvent(PointerEventType.Press) { if (it.buttons.isPrimaryPressed) requester.requestFocus() }
+        .onKeyEvent {
+            if (it.type != KeyEventType.KeyDown || value.composition != null) false
+            else {
+                val commands: List<EditCommand> = when {
+                    (it.isCtrlPressed || it.isMetaPressed) && it.key == Key.A -> [SetSelectionCommand(0, value.text.length)]
+                    it.key == Key.Backspace -> if (!value.selection.collapsed) [CommitTextCommand("", 1)] else [DeleteSurroundingTextInCodePointsCommand(1, 0)]
+                    it.key == Key.Delete -> if (!value.selection.collapsed) [CommitTextCommand("", 1)] else [DeleteSurroundingTextInCodePointsCommand(0, 1)]
+                    it.key == Key.DirectionLeft -> [MoveCursorCommand(-1)]
+                    it.key == Key.DirectionRight -> [MoveCursorCommand(1)]
+                    else -> []
+                }
+                if (commands.isEmpty()) false
+                else {
+                    onValueChange(processor.apply(commands))
+                    true
+                }
+            }
+        }.focusTarget().semantics { editableText = AnnotatedString(value.text) }
+        .onGloballyPositioned { session?.notifyFocusedRect(it.boundsInRoot()) }
+        .clipToBounds().drawWithCache {
+            val result = measurer.measure(value.text, TextStyle(color = Ink, fontSize = 17.sp), softWrap = false)
+            val inset = 12.dp.toPx()
+            onDrawBehind {
+                drawRoundRect(if (focused) Color(0xFFDDEEF7) else Color(0xFFEAF1F1), cornerRadius = CornerRadius(8.dp.toPx()))
+                if (!value.selection.collapsed) {
+                    val path = result.getPathForRange(value.selection.min, value.selection.max)
+                    path.translate(Offset(inset, inset))
+                    drawPath(path, Color(0xFFB4D6ED))
+                }
+                drawText(result, topLeft = Offset(inset, inset))
+                if (focused) {
+                    val caret = result.getCursorRect(value.selection.end)
+                    drawLine(Teal, caret.topLeft + Offset(inset, inset), caret.bottomLeft + Offset(inset, inset), 2.dp.toPx())
+                }
+            }
+        }) { _, constraints -> layout(constraints.maxWidth, 50.dp.roundToPx()) {} }
 }

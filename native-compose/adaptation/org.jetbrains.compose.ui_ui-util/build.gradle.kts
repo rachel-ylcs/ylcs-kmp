@@ -10,8 +10,5 @@ kotlin {
             implementation(libs.androidx.collection)
             implementation(libs.compose.runtime.asProvider())
         }
-        getByName("nativeMain").dependencies {
-            implementation(libs.compose.collection.internal)
-        }
     }
 }

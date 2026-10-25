@@ -1,6 +1,14 @@
 {
     "schema": 1,
     "files": {
+        "adaptation/org.jetbrains.compose.ui_ui/src/nativeMain/kotlin/androidx/compose/ui/input/key/Key.native.kt": {
+            "source": "compose/ui/ui/src/commonMain/kotlin/androidx/compose/ui/input/key/Key.kt",
+            "description": "Implements the complete common key contract with SDL USB scan codes, keypad navigation variants and distinct unsupported-key identities."
+        },
+        "adaptation/org.jetbrains.compose.ui_ui/src/nativeMain/kotlin/androidx/compose/ui/platform/Synchronization.native.kt": {
+            "source": "compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/Synchronization.skiko.kt",
+            "description": "Replaces the shared implementation with a Native atomicfu lock and an exactly-once contract; the prepared source shadow is removed for Gradle and IDEA."
+        },
         "adaptation/org.jetbrains.compose.ui_ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/platform/LoadNativeTypeface.kt": {
             "source": "compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/platform/NativeFont.native.kt",
             "description": "Reuses the Native font-loading contract with scoped Data and base-typeface ownership."

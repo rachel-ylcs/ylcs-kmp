@@ -11,6 +11,19 @@ import org.jetbrains.skia.Canvas
  * renderer/window resources are released. One event loop may run at a time.
  */
 expect object NativeWindow {
+    /**
+     * Runs an event-aware host. [onOpen] receives a handle valid until this call returns.
+     * Events and rendering run on the main thread; [render]'s canvas is borrowed.
+     * A close request is delivered to [onEvent]; call [NativeWindowScope.close] to accept it.
+     */
+    fun open(
+        options: NativeWindowOptions = NativeWindowOptions(),
+        onOpen: (NativeWindowScope) -> Unit = {},
+        onEvent: (NativeWindowEvent) -> Unit = {},
+        onClose: () -> Unit = {},
+        render: (canvas: Canvas, width: Int, height: Int, nanoTime: Long) -> Unit,
+    )
+
     fun run(
         options: NativeWindowOptions = NativeWindowOptions(),
         onKey: (NativeWindowKey) -> Unit = {},

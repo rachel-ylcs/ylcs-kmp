@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   build:
-    name: UI Skiko backend / ${{ matrix.target }}
+    name: Compose UI and SDL host / ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
@@ -49,14 +49,17 @@ jobs:
           - runner: windows-2025
             target: mingw_x64
             test-task: windowsTest
+            preview-task: runWindowsDebugExecutable
             skiko-publication: MingwX64
           - runner: ubuntu-24.04
             target: linux_x64
             test-task: linuxTest
+            preview-task: runLinuxDebugExecutable
             skiko-publication: LinuxX64
           - runner: macos-26
             target: macos_arm64
             test-task: macosTest
+            preview-task: runMacosDebugExecutable
             skiko-publication: MacosArm64
     defaults:
       run:
@@ -66,6 +69,7 @@ jobs:
       NATIVE_TARGET: ${{ matrix.target }}
       NATIVE_TEST_TASK: ${{ matrix.test-task }}
       SKIKO_PUBLICATION: ${{ matrix.skiko-publication }}
+      NATIVE_PREVIEW_TASK: ${{ matrix.preview-task }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -117,6 +121,7 @@ jobs:
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.ui.ci=true \
             ":ui-util:${NATIVE_TEST_TASK}" ":ui-geometry:${NATIVE_TEST_TASK}" ":ui-unit:${NATIVE_TEST_TASK}" \
             ":ui-graphics:${NATIVE_TEST_TASK}" ":ui-text:${NATIVE_TEST_TASK}" ":ui-skiko:${NATIVE_TEST_TASK}" \
+            ":ui-backhandler:${NATIVE_TEST_TASK}" ":ui:${NATIVE_TEST_TASK}" \
             publishHostToVerificationRepository
           python - <<'PY'
           import shutil
@@ -129,8 +134,16 @@ jobs:
         run: |
           python native-compose/scripts/verify_compose_ui.py --target "$NATIVE_TARGET" \
             --tests native-compose/vendor/build/compose-ui
-          printf 'Compose UI %s: 46 regressions across the Skiko backend and its Text, Graphics, Unit, Geometry, Util and Runtime foundations passed.\n' \
+          printf 'Compose UI %s: 72 regressions covering scenes, input, dispatch, back handlers and the UI foundations passed.\n' \
             "$NATIVE_TARGET" >> "$GITHUB_STEP_SUMMARY"
+      - name: Compile, link and smoke-test the current Composable application preview
+        env:
+          SDL_VIDEODRIVER: dummy
+        run: |
+          bash ./gradlew --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.compose=true \
+            -Pnative.renderer=software -Pnative.smoke=true \
+            ":ylcs-app:native-compose:${NATIVE_PREVIEW_TASK}"
       - uses: actions/upload-artifact@v7
         with:
           name: native-compose-ui-maven-${{ matrix.target }}
@@ -247,7 +260,7 @@ jobs:
           fi
           for explicit in false true; do
             bash ./gradlew -p native-compose/verification/compose-ui-consumer \
-              --no-daemon --max-workers=2 --stacktrace \
+              --no-daemon --max-workers=2 --stacktrace --rerun-tasks \
               -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
               "-Pnative.repository=$repositoryRoot/maven-ui" "-Pnative.plugin.repository=$repositoryRoot/maven-plugins" \
               "-Pnative.explicit=$explicit" verifyNativeMavenClosure "$NATIVE_TEST_TASK"
@@ -261,6 +274,7 @@ jobs:
           assert reports, 'No independent Maven consumer test reports'
           suites = [ET.parse(path).getroot() for path in reports]
           assert any('ComposeUiPublicationTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 4 for suite in suites)
+          assert any('ComposeScenePublicationTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 2 for suite in suites)
           assert all(int(suite.attrib.get(key, 0)) == 0 for suite in suites for key in ['failures', 'errors', 'skipped'])
           PY
       - name: Independent Maven consumer test evidence

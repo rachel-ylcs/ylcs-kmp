@@ -12,7 +12,6 @@ rachelMinimumCode = "370"
 kotlin = "2.5.0-Beta2"
 agp = "9.3.3"
 cmp = "1.13.0-beta01"
-cmp-internal = "1.12.0-alpha02"
 mavenPublish = "0.37.0"
 dokka = "2.3.0-Beta"
 
@@ -80,14 +79,17 @@ skiko-lottie = { module = "org.jetbrains.skiko:skiko-skottie", version.ref = "sk
 # androidx
 androidx-annotation = { module = "androidx.annotation:annotation", version = "1.11.0" }
 androidx-collection = { module = "androidx.collection:collection", version = "1.7.0" }
-androidx-navigation-event = { module = "org.jetbrains.androidx.navigationevent:navigationevent-compose", version = "1.1.0" }
+androidx-navigation-event = { module = "androidx.navigationevent:navigationevent-compose", version = "1.2.0" }
 androidx-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.2.0" }
-androidx-navigation3-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
-androidx-savedstate = { module = "org.jetbrains.androidx.savedstate:savedstate", version = "1.4.0" }
-androidx-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
-androidx-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+androidx-navigation3-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
+androidx-savedstate = { module = "androidx.savedstate:savedstate", version = "1.5.0" }
+androidx-savedstate-compose = { module = "androidx.savedstate:savedstate-compose", version = "1.5.0" }
+androidx-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
+androidx-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 
 # compose
+compose-runtime-retain = { module = "androidx.compose.runtime:runtime-retain", version = "1.12.1" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
 compose-runtime-saveable = { module = "org.jetbrains.compose.runtime:runtime-saveable", version.ref = "cmp" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
@@ -97,8 +99,7 @@ compose-ui-unit = { module = "org.jetbrains.compose.ui:ui-unit", version.ref = "
 compose-ui-graphics = { module = "org.jetbrains.compose.ui:ui-graphics", version.ref = "cmp" }
 compose-ui-text = { module = "org.jetbrains.compose.ui:ui-text", version.ref = "cmp" }
 compose-ui-skiko = { module = "org.jetbrains.compose.ui:ui-skiko", version.ref = "cmp" }
-compose-annotation-internal = { module = "org.jetbrains.compose.annotation-internal:annotation", version.ref = "cmp-internal" }
-compose-collection-internal = { module = "org.jetbrains.compose.collection-internal:collection", version.ref = "cmp-internal" }
+compose-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
@@ -201,3 +202,5 @@ native-compose-ui-unit = { module = "love.yinlin.native.compose.ui:ui-unit", ver
 native-compose-ui-graphics = { module = "love.yinlin.native.compose.ui:ui-graphics", version.ref = "cmp" }
 native-compose-ui-text = { module = "love.yinlin.native.compose.ui:ui-text", version.ref = "cmp" }
 native-compose-ui-skiko = { module = "love.yinlin.native.compose.ui:ui-skiko", version.ref = "cmp" }
+native-compose-ui-backhandler = { module = "love.yinlin.native.compose.ui:ui-backhandler", version.ref = "cmp" }
+native-compose-ui = { module = "love.yinlin.native.compose.ui:ui", version.ref = "cmp" }

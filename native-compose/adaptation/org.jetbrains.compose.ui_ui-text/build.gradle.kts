@@ -21,7 +21,6 @@ kotlin {
             dependencies {
                 implementation(libs.native.skiko.asProvider())
                 implementation(libs.kotlinx.atomicfu)
-                implementation(libs.compose.collection.internal)
             }
         }
     }

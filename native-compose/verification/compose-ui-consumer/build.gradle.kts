@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.nativeBridge)
 }
 
@@ -14,20 +15,10 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             if (explicit) {
-                implementation(libs.native.compose.ui.util)
-                implementation(libs.native.compose.ui.geometry)
-                implementation(libs.native.compose.ui.unit)
-                implementation(libs.native.compose.ui.graphics)
-                implementation(libs.native.compose.ui.text)
-                implementation(libs.native.compose.ui.skiko)
+                implementation(libs.native.compose.ui.asProvider())
             }
             else {
-                implementation(libs.compose.ui.util)
-                implementation(libs.compose.ui.geometry)
-                implementation(libs.compose.ui.unit)
-                implementation(libs.compose.ui.graphics)
-                implementation(libs.compose.ui.text)
-                implementation(libs.compose.ui.skiko)
+                implementation(libs.compose.ui.asProvider())
             }
         }
         commonTest.dependencies { implementation(kotlin("test")) }
@@ -45,7 +36,7 @@ nativeBridge { skikoTests() }
 // Explicit Native coordinates must form a complete Maven graph without upstream port requests.
 tasks.register("verifyNativeMavenClosure") {
     doLast {
-        val artifacts = setOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko")
+        val artifacts = setOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko", "ui-backhandler", "ui")
         kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().forEach { target ->
             val result = configurations.getByName(target.compilations.getByName("main").compileDependencyConfigurationName).incoming.resolutionResult
             result.allDependencies.filterIsInstance<org.gradle.api.artifacts.result.UnresolvedDependencyResult>().forEach { throw it.failure }

@@ -54,14 +54,16 @@ subprojects {
             }
             sourceSets {
                 commonTest.dependencies { implementation(kotlin("test")) }
-                val nativeMain = create("nativeMain") { dependsOn(commonMain.get()) }
+                val module = modules[project.name] as? Map<*, *>
+                val selectedSources = module?.get("sourceSets") as? Map<*, *>
+                val sharedMain = if (selectedSources?.containsKey("skikoMain") == true) create("skikoMain") { dependsOn(commonMain.get()) }
+                else commonMain.get()
+                val nativeMain = create("nativeMain") { dependsOn(sharedMain) }
                 val nativeTest = create("nativeTest") { dependsOn(commonTest.get()) }
                 for (target in listOf("windows", "linux", "macos")) {
                     getByName("${target}Main").dependsOn(nativeMain)
                     getByName("${target}Test").dependsOn(nativeTest)
                 }
-                val module = modules[project.name] as? Map<*, *>
-                val selectedSources = module?.get("sourceSets") as? Map<*, *>
                 if (selectedSources != null) {
                     val adaptation = nativeDirectory.resolve("adaptation/org.jetbrains.compose.ui_${project.name}")
                     configureEach {

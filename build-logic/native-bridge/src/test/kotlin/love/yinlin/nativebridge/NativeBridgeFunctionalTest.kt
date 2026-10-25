@@ -220,10 +220,11 @@ class NativeBridgeFunctionalTest {
             checkNotNull(NativeBridgePlugin::class.java.classLoader.getResourceAsStream("rachel-native-bridge.properties")).use { load(it) }
         }
         val version = compatibility.getProperty("compose.upstream.version")
-        val artifacts = listOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko")
+        val artifacts = listOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko", "ui-backhandler", "ui")
         for (artifact in artifacts) {
             module(project, "org.jetbrains.compose.ui", version, artifact = artifact)
             val children = when (artifact) {
+                "ui" -> listOf("ui-geometry", "ui-graphics", "ui-text", "ui-unit", "ui-util", "ui-skiko", "ui-backhandler")
                 "ui-skiko" -> listOf("ui-graphics", "ui-text")
                 "ui-text" -> listOf("ui-graphics", "ui-unit", "ui-util")
                 "ui-graphics" -> listOf("ui-unit")

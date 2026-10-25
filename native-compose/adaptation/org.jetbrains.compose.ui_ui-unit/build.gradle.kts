@@ -15,8 +15,6 @@ kotlin {
         }
         getByName("nativeMain").dependencies {
             implementation(libs.kotlinx.atomicfu)
-            implementation(libs.compose.annotation.internal)
-            implementation(libs.compose.collection.internal)
         }
     }
 }

@@ -19,6 +19,34 @@ static inline bool RachelSDL_SetWindowSize(void *window, int width, int height) 
 static inline float RachelSDL_GetWindowDisplayScale(void *window) {
     return SDL_GetWindowDisplayScale((SDL_Window *)window);
 }
+static inline float RachelSDL_GetWindowPixelDensity(void *window) {
+    return SDL_GetWindowPixelDensity((SDL_Window *)window);
+}
+static inline bool RachelSDL_StartTextInput(void *window) {
+    return SDL_StartTextInput((SDL_Window *)window);
+}
+static inline bool RachelSDL_StopTextInput(void *window) {
+    return SDL_StopTextInput((SDL_Window *)window);
+}
+static inline bool RachelSDL_SetTextInputArea(void *window, int x, int y, int width, int height) {
+    SDL_Rect area = {x, y, width, height};
+    return SDL_SetTextInputArea((SDL_Window *)window, &area, 0);
+}
+static inline void *RachelSDL_CreateCursor(SDL_SystemCursor cursor) {
+    return SDL_CreateSystemCursor(cursor);
+}
+static inline bool RachelSDL_SetCursor(void *cursor) {
+    return SDL_SetCursor((SDL_Cursor *)cursor);
+}
+static inline void RachelSDL_DestroyCursor(void *cursor) {
+    SDL_DestroyCursor((SDL_Cursor *)cursor);
+}
+static inline void RachelSDL_WakeEventLoop(Uint32 type) {
+    SDL_Event event;
+    SDL_zero(event);
+    event.type = type;
+    SDL_PushEvent(&event);
+}
 static inline bool RachelSDL_IsFullscreen(void *window) {
     return (SDL_GetWindowFlags((SDL_Window *)window) & SDL_WINDOW_FULLSCREEN) != 0;
 }

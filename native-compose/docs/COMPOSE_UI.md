@@ -1,87 +1,78 @@
-# Compose UI 第一阶段
+# Compose UI 与 SDL 场景宿主
 
-当前选择根版本目录中的 CMP 1.13.0-beta01、Kotlin 2.5.0-Beta2、JDK 25 和根 Gradle Wrapper。
-官方源码固定在 JetBrains/compose-multiplatform-core 的 v1.13.0-beta01，
-commit bb05011eb10784ada1ec00494f1a710ba6ab6252。移植工件使用相同 CMP 版本，group 为 love.yinlin.native.compose.ui。
+本阶段固定 CMP 1.13.0-beta01、Kotlin 2.5.0-Beta2、Skiko 0.156.0、SDL 3.4.18、JDK 25 和根 Gradle Wrapper。
+Compose 来源为 JetBrains/compose-multiplatform-core v1.13.0-beta01，commit bb05011eb10784ada1ec00494f1a710ba6ab6252。
+Maven group 为 love.yinlin.native.compose.ui；KLIB unique_name 保持 org.jetbrains.compose.ui:<artifact>，版本与官方一致。
 
-本阶段只建立 ui-util → ui-geometry → ui-unit 的依赖链。ui 主工件、graphics/text/ui-skiko、
-backhandler、Foundation、ComposeScene 窗口宿主尚未移植，不能用整包 libs.compose.ui 替代这三个细分依赖。
+## 本阶段范围
 
-## 实际实现审计
+| 模块 | 实现与验证范围 |
+| --- | --- |
+| ui-util / ui-geometry / ui-unit | 工具、几何、密度、单位、Native actual 和官方 Runtime 行为 |
+| ui-graphics / ui-text / ui-skiko | 图形与文本 API、Skia backend、字体、区域查询、像素与颜色矩阵 |
+| ui-backhandler | 复用上游有效 jbMain 实现，桥接 Google NavigationEvent；验证 handler 注册、禁用与释放 |
+| ui | 复用 commonMain、skikoMain、nonJvmMain/nativeMain，补齐 Native 键盘、光标、剪贴板、URI、IME 和同步 actual |
+| SDL ComposeScene 宿主 | 真实 Layout/绘制/重组、帧时钟、鼠标与滚轮、键盘焦点、Dialog、生命周期和 ViewModelStore 清理 |
 
-| 模块/依赖 | 实际源码与边界 | 当前处理 |
-| --- | --- | --- |
-| ui-util | commonMain 的位打包、数学和集合工具；nonJvmMain 的真实位转换/舍入 actual | 复用上游公共及非 JVM 源码；不加载 commonStubsMain、linuxx64StubsMain |
-| ui-util tracing | 官方 macosMain 的 trace 执行 block，traceValue 不采集事件 | Windows/Linux actual 保持同一 profiling-disabled 语义；测试返回值、次数和异常传播；没有宣称 ETW/perf 功能 |
-| ui-geometry | Offset、Rect、Size、CornerRadius 等都是公共实现，无缺失 actual | 复用 commonMain，添加几何边界回归，不伪造平台实现 |
-| ui-unit | FontScaling 使用真实 FontScalingLinear；非 JVM 的 JvmDefaultWithCompatibility 是注解兼容 typealias | 复用 nonAndroidMain/nonJvmMain 到 nativeMain；NoOp 仅对应 JVM 专属注解，不是字体缩放空实现 |
-| 官方 Runtime | 已核对 Native ThreadLocal/atomic 线程标识、atomicfu 锁和 Kotlin/Native WeakReference 实现 | 复用官方发布工件；增加 Snapshot 隔离及 Composition/effect/disposal 回归，尚待运行验证 |
-| annotation-internal / collection-internal | KLIB 名称解析兼容占位，实际 API 传递依赖 AndroidX | 使用根 cmp-internal，当前 1.12.0-alpha02；占位源码 EmptyFile.kt 是上游明确用途 |
+不引入 Foundation/Animation 来隐藏 UI 的依赖缺口。业务预览使用 UI 原语；这些上层模块是下一阶段。
+官方 Runtime、Google annotation/collection、Lifecycle、SavedState 和 NavigationEvent 继续复用真实 Native 工件。
+Navigation3 UI 保留 JetBrains 坐标，当前没有纳入本轮移植。
 
-Runtime 的核对是关键实际实现审计，不表示其所有 API、线程和 GC 压力场景均已验收。
-internal 1.12.0-alpha02 的三个目标发布变体已核实，Windows 源码包及 KLIB manifest 也已检查：
-唯一名称延续原兼容库，compiler_version 为 2.3.20，依赖实际 AndroidX annotation/collection。
-项目直接声明的 AndroidX 版本仍由根目录选定；本轮不把上游依赖的最低版本当作必须降级的要求。
+## 源码与桥接
 
-官方构建语义按各模块 build-fork.gradle 核对；实际 Native 构建使用维护脚本，避免载入整个 AndroidX 构建工具链。
-原始源码和构建脚本保留在同一 sparse checkout，修改的构建规则、actual 和回归测试提交到 adaptation/scripts/build-logic。
-上游测试源码仍保留在 checkout，本阶段执行维护的库内回归，尚未接入需要 Kruth 等额外组件的上游完整测试集。
+- adaptation/org.jetbrains.compose.ui_<artifact>/ 保存提交的构建脚本、自有实现与单元测试。
+- vendor/compose/workspace/ 为唯一锁定稀疏 checkout；不手工修改。
+- vendor/compose/workspace/native-desktop/ 为生成的八模块 Gradle included build。
+- scripts/compose_adapt.py 记录可重现的源码改动并检测漂移；compose-origins.json 记录派生来源。
+- 不编译 StubsMain；替代 actual 对应的原文件从准备工作区移除，让 Gradle 和 IDEA 看到同一份定义。
+- skikoMain 位于 commonMain 与 nativeMain 之间，保留 expect/actual fragment 边界。
 
-## 源码与 IDE
+native.compose=true 时通过 Settings/composite 直接消费源码项目；false 时不准备 vendor，使用 Maven 工件。
+桥插件精确重定向八个 UI 工件在 mingw_x64、linux_x64、macos_arm64 的依赖，并处理对应共享 metadata。
+其他平台保持官方依赖。Maven 发布保留可消费的 Native 坐标，不输出生产者源码路径。
 
-```text
-adaptation/org.jetbrains.compose.ui_ui-util/
-adaptation/org.jetbrains.compose.ui_ui-geometry/
-adaptation/org.jetbrains.compose.ui_ui-unit/
-vendor/compose/workspace/                  # 唯一稀疏 Git checkout
-vendor/compose/workspace/native-desktop/   # 生成的 Native Gradle 入口
-vendor/build/compose-ui/                  # 输出、本地验证 Maven 文件和测试消费者
-ylcs-app/native-compose/                  # 唯一窗口预览
-```
+## 窗口、调度与资源所有权
 
-native.compose 默认 false，普通业务/消费者不下载源码、不关联 adaptation，也不准备 SDK。
-维护模式 true 自动准备 Skiko 和 Compose 两个固定工作区，并关联名为 skiko / compose-ui 的 included builds。
-Compose 的三个项目使用 adaptation 的 build.gradle.kts；sourceSets 显式关联上游真实源码与维护源码。
-更新后在 IDE Reload All Gradle Projects；本轮没有执行 Gradle 同步或构建，新增源集的 IDE 导入结果尚未验证。
+commonMain 可通过 androidx.compose.ui.window.NativeWindow(options) { ... } 打开一个真实 Composable 窗口。
+这是此移植库提供的 Native-only 桌面入口；混合 JVM/Android 工程应把入口放到相应 Native 源集。
+调用阻塞到窗口关闭；onCloseRequest 返回 true 才接受 OS 关闭。Escape 交给 Compose 焦点/弹层/返回处理。
 
-sync_compose.py 只稀疏获取所选 UI 模块，锁定 commit，检查根 CMP 与源码版本一致。
-不创建指纹源码副本；重复准备更新同一固定入口，保留构建缓存。遇到 tracked 本地编辑或未知目录则停止，
-不会通过 reset/force 覆盖。原始源码不手改版本，维护构建直接读取根 catalog，所有 Native 编译启用 -Xexpect-actual-classes。
+宿主复用 CanvasLayersComposeScene、FrameRecomposer 和 SingleComposeSceneRenderingScope。
+宿主在首帧前读取实际像素尺寸，并在派发输入前同步尺寸，避免启动事件触发无限约束测量。
+窗口线程拥有 scene、composition、Lifecycle/SavedState/ViewModelStore 与 UI 队列；后台计时只入队和唤醒 SDL。
+关闭先释放 composition/effects 和 recomposer，再停止输入、销毁生命周期/清空 ViewModelStore，最后释放调度器与原生窗口资源。
+重复关闭不重复释放；构造及释放失败会继续执行其余清理并保留异常。
 
-## 桥接与 common 依赖
+org.jetbrains.skiko.window.NativeWindow.open 暴露拥有自身数据的键盘、指针、文本/IME、drop 与焦点事件。
+原 run 入口继续委托 open，保持既有 Skia 消费者兼容。借用 canvas 和窗口 scope 不得在调用结束后使用。
+SDL 文本/drop 指针被复制为 Kotlin 数据；剪贴板分配缓冲按 SDL 所有权释放。
+Compose 使用物理像素，displayScale 与 pixelDensity 分开转换；IME codepoint 偏移转成 UTF-16。
 
-业务代码只声明 libs.compose.ui.util / geometry / unit，APP 不配置任务、CInterop 或各平台源码。
-Windows/Linux 的官方请求重定向到这三个移植工件，维护模式使用 included project，普通模式使用 Maven。
-macOS 的具体目标编译保留官方依赖；本地源码构建仍编译 macosArm64，作为官方真实实现的对照和发布基线。
+## 预览与验收
 
-nativeMain 跨三个目标时，桥插件使用能覆盖三个目标的移植共享元数据：metadataTargets 描述该覆盖范围，
-targets 描述实际目标工件的重定向。默认 metadataTargets 跟随 targets，既有自定义规则保持原行为。
-仅含 Native 的公共图可选这份元数据；混合 JVM/Android 的 common 图继续使用官方元数据。
-独立消费测试会编译该三目标公共源集，覆盖共享元数据及叶子目标选择；结果等待 CI。
-
-底部别名为 native-skiko / native-skiko-skottie / native-compose-ui-util / geometry / unit；
-版本始终来自 skiko / cmp / cmp-internal。不要为 Native 另设版本或附加 native 版本后缀。
-
-## 当前任务与 CI
-
-可从主工程指定这些配置的任务，本轮没有执行：
+ylcs-app/native-compose 是唯一可视预览，安装 composeCompiler，保持 Rachel install/rachel/lib DSL 和 commonMain 官方依赖。
+当前展示点击计数、主题背景、焦点、中文输入、剪贴板、滚轮、帧时钟动画及 Dialog；不是 Foundation TextField 实现。
+移植层不维护 samples，不在 APP 复制 SDL SDK、cinterop 或平台窗口代码。
 
 ```powershell
-.\gradlew.bat "-Pnative.compose=true" :compose-ui:ui-util:windowsTest :compose-ui:ui-geometry:windowsTest :compose-ui:ui-unit:windowsTest
-.\gradlew.bat "-Pnative.compose=true" :ylcs-app:native-compose:nativeBridgeReport
+.\gradlew.bat "-Pnative.compose=true" :ylcs-app:native-compose:linkDebugExecutableWindows
 .\gradlew.bat "-Pnative.compose=true" :ylcs-app:native-compose:runWindowsDebugExecutable
+.\gradlew.bat "-Pnative.compose=true" :compose-ui:ui:windowsTest :compose-ui:ui-backhandler:windowsTest
 .\gradlew.bat "-Pnative.compose=true" :native-compose:publishComposeUiToVerificationRepository
 ```
 
-Linux/macOS 在对应宿主使用 linuxTest / macosTest，窗口命令使用 runLinuxDebugExecutable / runMacosDebugExecutable。
-库内测试为 Util 5 项、Runtime 2 项、Geometry 3 项、Unit 4 项，共 14 项；验证器拒绝缺失、失败或跳过的报告。
-Skiko 的原 6 项测试留在 Core/Skottie 各自 src/nativeTest，通过 mingwX64RegressionTest 等专用 test run 调用。
+Linux/macOS 使用各自宿主与 Linux/linuxTest、Macos/macosTest。
+库内报告契约共 72 项：原有基础 46 项，加 NativeInputTest 10、NativeDispatcherTest 5、NativeSceneTest 9、NativeBackHandlerTest 2。
+报告验证器拒绝缺失、失败、跳过或重复报告；独立 Maven 消费者另有 6 项，包含真实 ComposeScene 重组和像素回读。
 
-现有 .github/workflows/native-core.yml 保留为唯一 Native 工作流，显示名改为 Native Compose UI：
+唯一工作流 .github/workflows/native-core.yml 同步执行三宿主库内测试、APP 编译链接及 dummy/software smoke、本地 Maven 发布/汇总和独立消费者。
+消费者只直接声明主 ui，分别测试 commonMain 官方请求与显式 Native 坐标，并审计传递的八模块闭包；CI 不向公开 Maven 发布。
+本轮实际执行的命令、结果和未验证范围见 VALIDATION.md。Windows 通过不能推断 Linux/macOS 通过。
 
-1. 三宿主只准备 Compose，执行源码/发布工具测试、桥插件集成测试、14 项 UI/Runtime 回归并生成宿主 Maven 验证文件。
-2. 合并三个目标工件，选择一份 KMP root，核对校验和、KLIB target/编译器、源码来源与 license、Unit 导出的 Geometry 依赖。
-3. 全新消费者分别用官方 common 请求和显式 Native 别名运行 Maven 测试，确认不准备 vendor/SDK；macOS 也验证官方消费路径。
+## 保留的边界
 
-所有 Maven 发布任务仅允许 file: 仓库，Actions 附件不是公共 Maven 发布。当前 CI 不构建 Skiko、不启动窗口、
-不执行 GPU 或 APP 打包；这些能力按后续 UI 渲染/宿主阶段更新同一工作流。
+- SDL 接收文件/文本 drop；完整 outgoing drag、跨进程格式协商尚未实现。
+- InteropView 只提供当前 UI backend 的类型契约；没有宣称系统控件嵌入。
+- 单窗口入口；多窗口调度、完整 OS 无障碍、系统菜单/托盘及正式安装发行属于后续阶段。
+- IME 适配有 codepoint、候选区域与取消回归；中文候选窗、多显示器缩放、平台输入法仍须真机交互验收。
+- CPU/离屏测试不能替代 D3D12/Vulkan/Metal 的设备、驱动和长期资源压力验证。

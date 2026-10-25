@@ -2,6 +2,7 @@ plugins {
     install(
         libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
+        libs.plugins.composeCompiler,
         libs.plugins.nativeBridge
     )
 }
@@ -24,6 +25,7 @@ rachel {
                     libs.compose.ui.graphics,
                     libs.compose.ui.text,
                     libs.compose.ui.skiko,
+                    libs.compose.ui.asProvider(),
                 )
             }
         }

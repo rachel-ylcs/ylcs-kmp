@@ -1,4 +1,51 @@
-# 当前 Skiko 阶段的验证
+# Compose UI 主工件与 SDL 宿主验证
+
+日期：2026-10-25（Asia/Shanghai）。Windows x64、JDK 25、Gradle 9.8.0、Kotlin 2.5.0-Beta2、CMP 1.13.0-beta01、Skiko 0.156.0、SDL 3.4.18。
+本轮用户明确授权继续移植与构建。Gradle 经 IDEA MCP 终端执行；以下是实际结果，日志位于忽略的 native-compose/vendor/build/logs/。
+
+## 本轮实际验证
+
+| 检查 | 结果与证据 |
+| --- | --- |
+| 源码/发布工具 | Python unittest 36 项通过；包括工作区保护、来源漂移、发布校验和、缺失/跳过报告拒绝 |
+| 桥插件 | NativeBridgeFunctionalTest 21 项通过，validatePlugins 通过，插件仅发布至 file: 仓库；ui-bridge-verification.log |
+| 八模块库内测试 | 报告验证器确认 72 项，无失败、错误或跳过；原基础 46 项、输入 10、调度 5、场景 9、backhandler 2 |
+| 八模块 Windows Maven | verify_compose_ui.py --target mingw_x64 通过；目标、KLIB 身份/编译器、校验和、导出依赖、sources 许可/来源均校验 |
+| APP 编译和原生链接 | 真实 Composable 的 Main/ShowcaseScene，完整 Kotlin 编译、链接、运行目录暂存通过；最终日志 ui-final-cursor.log |
+| 软件 smoke | SDL_VIDEODRIVER=dummy，--software --smoke；真实 Composable 绘制、1000×660 → 1160×720 resize、退出通过；ui-software-smoke-final.log |
+| 独立 Maven 消费 | 仓库外副本，不 include 源码工程；只直接声明主 ui，commonMain 编译 PublishedUiContent，Native 测试绘制/重组/释放与像素回读。官方坐标和显式 Native 坐标分别 6 项通过；ui-maven-official-final.log、ui-maven-final-explicit.log |
+| Windows 消费依赖图 | 外部审计确认八个 UI 模块均来自 Maven，无 source project 依赖且无上游 UI KLIB 混入；三目标图的完整汇总仍留给 CI |
+| IDEA | Main、ShowcaseScene、NativeSceneHost、NativeUiDispatcher、NativeTextInputService、SdlWindowScope、SdlWindowEvents 七文件 errorsOnly 检查均为 0；ide-ui-final-inspection.json |
+| 工作流/源码静态检查 | actionlint 与 git diff --check 通过；Kotlin 源文件额外检查不保留多余末尾空行 |
+
+IDEA build_project 对预览文件返回成功，但提示构建诊断收集有限；编译/链接结论以上述实际 Gradle 日志为准。
+构建仍有上游弃用/内部可见性和 JDK native-access 等警告，不宣称零警告。
+独立消费者使用根版本目录及本地 Maven 路径，运行代码和插件全部从 Maven 获取，不依赖 vendor 源码构建。
+
+## 本轮发现并修复的边界
+
+- SDL 强类型枚举需要通过 enum 类导入，不能当作顶层常量。
+- 新 ComposeScene.setContent 使用命名 content 参数；Delay 实现显式调用协程 delay，避免同名内部方法遮蔽。
+- SDL 可在首帧前发送指针事件。宿主先读取实际像素尺寸，并在输入前更新 scene geometry，避免无限约束触发测量崩溃；库内新增先输入后绘制回归，并用真实 APP smoke 验证。
+- 调度器关闭会取消延迟/子协程，并在队列异常后继续清理；空队列与停止接收在同一把锁内完成。
+- IME preedit 的 codepoint/UTF-16 换算、空 preedit 取消、请求替换、候选区像素取整均有回归。
+- 宿主构造失败与重复关闭保留其余清理；Lifecycle 销毁及 ViewModelStore 清空不依赖其他清理成功。
+- SDL_DestroyCursor 本身会恢复活动光标的默认值，无须经 Kotlin 取得 SDL_Cursor 不透明指针。
+
+## 尚未验证与交接
+
+本轮本机只执行 Windows。没有将旧 Skiko CI、目标声明或源码准备写成这次 Linux/macOS 通过。
+同一个 .github/workflows/native-core.yml 已更新为八模块/72 项库回归、三宿主 Composable APP CPU smoke、Maven 汇总和两种独立消费者请求。
+工作流通过 actionlint，但本轮没有向远程触发 CI，也没有提交、推送或公开发布 Maven。
+
+CPU/离屏 smoke 不验证 D3D12/Vulkan/Metal 驱动、真实中文候选窗、剪贴板跨程序操作、多显示器或 OS 无障碍。
+输入逻辑有单元测试，真实鼠标/键盘/IME 交互仍需人工设备验收。Foundation/Animation、完整多窗口、outgoing drag、本机 View 嵌入及正式发行仍在后续阶段。
+
+---
+
+以下原始阶段文字属于历史记录，其“当前/最新”不代表本轮状态；本轮结论以上文为准。
+
+# 历史 Skiko 验证快照（保留原阶段记录）
 
 日期：2026-10-24（Asia/Shanghai）。环境：Windows x64、JDK 25、根 Wrapper Gradle 9.8.0、
 Kotlin 2.5.0-Beta2、Skiko 0.156.0、Skia m156-24300fbbcb、MSVC 14.50.35717、SDL 3.4.18。

@@ -18,7 +18,6 @@ kotlin {
         getByName("nativeMain").dependencies {
             api(libs.native.skiko.asProvider())
             implementation(libs.kotlinx.atomicfu)
-            implementation(libs.compose.collection.internal)
         }
     }
 }

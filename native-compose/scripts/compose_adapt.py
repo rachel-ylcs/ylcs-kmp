@@ -106,10 +106,28 @@ def skiko_source_edits(workspace, native_root):
     return edits
 
 
+def ui_source_edits(workspace, native_root):
+    base = "compose/ui/ui/src/"
+    replacement = native_root / "adaptation/org.jetbrains.compose.ui_ui/src/nativeMain/kotlin/androidx/compose/ui/platform/Synchronization.native.kt"
+    if not replacement.is_file():
+        raise ValueError("Compose UI synchronization adaptation is missing; preserve the upstream implementation")
+    edits = {base + "skikoMain/kotlin/androidx/compose/ui/platform/Synchronization.skiko.kt": None}
+    path = base + "skikoMain/kotlin/androidx/compose/ui/platform/PlatformClipboard.skiko.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    edits[path] = replace_once(text, "// TODO: https://youtrack.jetbrains.com/issue/CMP-1260\nactual class ClipMetadata private constructor()\n", "")
+    path = base + "nonJvmMain/kotlin/androidx/compose/ui/Actuals.nonJvm.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    text = replace_once(text, "import kotlinx.coroutines.Dispatchers", "import androidx.compose.ui.platform.nativeUiDispatcher")
+    edits[path] = replace_once(text, "get() = Dispatchers.Main", "get() = nativeUiDispatcher().context")
+    return edits
+
+
 def source_edits(workspace, native_root, modules):
     edits = {}
     if "ui-text" in modules:
         edits.update(text_source_edits(workspace, native_root))
     if "ui-skiko" in modules:
         edits.update(skiko_source_edits(workspace, native_root))
+    if "ui" in modules:
+        edits.update(ui_source_edits(workspace, native_root))
     return edits

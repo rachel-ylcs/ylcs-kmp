@@ -1,9 +1,9 @@
 # Rachel Native desktop / Compose UI
 
-可选的桌面 Native 移植模块组，当前推进 Compose UI 的 ui-util、ui-geometry、ui-unit，
+可选的桌面 Native 移植模块组，当前覆盖 Compose UI 的八个工件与 SDL ComposeScene 宿主，
 基于已有 Skiko Core + Skottie、静态 SDL 窗口宿主及桥插件。目标：mingwX64、linuxX64、macosArm64。
 默认 GPU：Windows Ganesh/D3D12，Linux Ganesh/Vulkan，macOS Ganesh/Metal。
-Graphite 按已确定的路线排除。Compose Runtime 复用官方 Native 工件，UI 其余模块尚待后续移植。
+Graphite 按已确定的路线排除。Compose Runtime 复用官方 Native 工件；Foundation/Animation 为下一阶段。
 本阶段实现、审计、CI 与消费边界见 [COMPOSE_UI.md](docs/COMPOSE_UI.md)。
 
 当前范围、已验收的平台及待完成项见 [STATUS.md](docs/STATUS.md)，实际检查见 [VALIDATION.md](docs/VALIDATION.md)。
@@ -61,7 +61,7 @@ strictly/reject 冲突、未支持的动态和范围请求明确失败。
 
 ylcs-app/native-compose 只包含 commonMain 的场景与公共窗口 API 调用。
 build.gradle.kts 复用 Rachel nativeExecutable DSL，commonMain 声明 projects.ylcsModule.core、
-libs.skiko、libs.skiko.lottie 及本阶段 libs.compose.ui.util / geometry / unit：
+libs.skiko、libs.skiko.lottie 及 libs.compose.ui 与相关细分 UI 工件，安装 composeCompiler：
 
 ```kotlin
 nativeApplication {
@@ -70,12 +70,12 @@ nativeApplication {
 ```
 
 APP 没有 sdl.def、nativeInterop 或各平台窗口代码。
-Skiko 内的 org.jetbrains.skiko.window.NativeWindow 封装窗口、事件循环、基本按键及平台 renderer。
+androidx.compose.ui.window.NativeWindow 提供 Composable 入口，基于 Skiko NativeWindow.open 的窗口、事件与平台 renderer。
 这是本移植库新增的桌面 Native API；当前 Native-only APP 可直接从 commonMain 调用。
 混合 JVM/Android 的工程应将该窗口入口放在桌面 Native 源集，公共绘图/UI 仍保持跨平台；
 桥插件不改写其他平台来伪造这项新 API。
 
-示例展示矢量/SVG、实时 Skottie、字体/双向段落及 WebP 编解码；Space 暂停，Escape 关闭。
+预览展示点击计数、主题背景、文本/中文输入、剪贴板、滚轮、帧时钟和 Dialog；Escape 由弹层和 Compose 返回处理。
 
 ## 构建与运行
 
@@ -106,7 +106,7 @@ Skiko 的唯一工作源码位于 vendor/skiko/workspace，Gradle/IDE 始终引�
 .\gradlew.bat "-Pnative.compose=true" :ylcs-app:native-compose:packageWindowsReleaseExecutable
 
 # 当前 UI 库内回归
-.\gradlew.bat "-Pnative.compose=true" :compose-ui:ui-util:windowsTest :compose-ui:ui-geometry:windowsTest :compose-ui:ui-unit:windowsTest
+.\gradlew.bat "-Pnative.compose=true" :compose-ui:ui:windowsTest :compose-ui:ui-backhandler:windowsTest
 
 # 既有 Skiko 库内回归（当前 CI 阶段不执行）
 .\gradlew.bat "-Pnative.compose=true" :skiko:mingwX64RegressionTest :skiko:skiko-skottie:mingwX64RegressionTest
@@ -193,12 +193,11 @@ python native-compose/scripts/sync_upstream.py --check-updates
 
 ## 渐进式 CI
 
-.github/workflows/native-core.yml 仅验证当前阶段：
-源码/静态 SDK、桥插件测试、6 项 Native 回归、阶段窗口 Debug、独立 APP Release、
-ZIP 搬移及动态 SDL 依赖检查、三宿主 Maven 汇总，以及干净 runner 的 Maven-only 窗口消费。
+.github/workflows/native-core.yml 验证当前 UI 阶段：
+源码/发布工具、桥插件测试、72 项 UI/Runtime 回归、真实 Composable APP 编译链接与 dummy/software smoke、
+八模块三宿主 Maven 汇总与独立 Maven 消费者（官方请求和显式 Native 坐标各 6 项）。
+本轮 CI 使用离屏测试及 SDL dummy/CPU smoke，不启动 GPU 窗口；IME、Wayland、多显示器和驱动行为仍需真机验收。
 
-默认窗口基线为 CPU。手动 gpu-smoke 额外要求 D3D12/Vulkan/Metal，GPU 回退会失败。
-Linux 使用 Xvfb/X11；Wayland、性能和完整输入行为不在当前验收范围内。
 工作流只生成本地验证 Maven 文件并上传为 Actions 工件，不向公开 Maven 服务发布。
 Skiko/Skottie 和桥插件发布任务只接受 file: 仓库，上游 ComposeRepo 发布配置由准备脚本移除。
 

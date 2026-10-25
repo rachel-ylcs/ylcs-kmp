@@ -15,7 +15,8 @@ from verify_repository import verify_module as verify_skiko_module
 
 SUFFIXES = {"mingw_x64": "mingwx64", "linux_x64": "linuxx64", "macos_arm64": "macosarm64"}
 TESTS = {"UiUtilTest": 5, "NativeRuntimeTest": 2, "UiGeometryTest": 3, "UiUnitTest": 4,
-         "UiGraphicsTest": 6, "UiTextTest": 8, "NativeLocaleTest": 3, "UiSkikoTest": 10, "NativeSkikoBackendTest": 5}
+         "UiGraphicsTest": 6, "UiTextTest": 8, "NativeLocaleTest": 3, "UiSkikoTest": 10, "NativeSkikoBackendTest": 5,
+         "NativeInputTest": 10, "NativeDispatcherTest": 5, "NativeSceneTest": 9, "NativeBackHandlerTest": 2}
 
 
 def require(condition, message):
@@ -70,7 +71,8 @@ def verify(repository, target, lock):
             require(not any("StubsMain/" in name for name in sources.namelist()), "Stub sources leaked into Native UI publication")
             require(any(name.endswith(".kt") for name in sources.namelist()), "Native UI sources are empty")
         dependencies = [d for v in target_metadata["variants"] for d in v.get("dependencies", [])]
-        exports = {"ui-unit": ["ui-geometry"], "ui-graphics": ["ui-unit"], "ui-text": ["ui-graphics", "ui-unit"], "ui-skiko": ["ui-graphics", "ui-text"]}
+        exports = {"ui-unit": ["ui-geometry"], "ui-graphics": ["ui-unit"], "ui-text": ["ui-graphics", "ui-unit"], "ui-skiko": ["ui-graphics", "ui-text"],
+                   "ui": ["ui-geometry", "ui-graphics", "ui-text", "ui-unit", "ui-util", "ui-skiko"]}
         for dependency in exports.get(artifact, []):
             require(any(d.get("group") == lock["group"] and d.get("module") in {dependency, f"{dependency}-{suffix}"}
                         and d.get("version", {}).get("requires") == version for d in dependencies), f"{artifact} must expose its matching Native {dependency} dependency")
