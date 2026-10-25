@@ -20,6 +20,20 @@ internal object NavigationCalculator {
     }
 
     /**
+     * 原子替换当前栈顶条目，不按目标类型搜索历史页面。
+     * 与 CreatePolicy.Replace 的同类型匹配行为不同。
+     */
+    fun replaceCurrent(backStack: List<ScreenKey>, type: String, args: ScreenArgs = ScreenArgs.Empty): NavigationPlan.Create {
+        require(type.isNotBlank())
+        require(backStack.isNotEmpty()) { "Cannot replace an entry in an empty navigation stack." }
+
+        val ids = entryIds(backStack)
+        val key = ScreenKey(type, args)
+        require(key.id !in ids) { "The ScreenID of the new entry is duplicated with the original stack." }
+        return NavigationPlan.Create(key, NavigationPlan.StackChange(backStack.lastIndex, backStack.size))
+    }
+
+    /**
      * 按类型匹配原栈中最靠近栈顶的条目，忽略其参数。
      *
      * New 以及未匹配目标时忽略 Clear。Move、Resume 保留原 key；
