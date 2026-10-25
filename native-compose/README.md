@@ -195,7 +195,8 @@ ZIP 搬移及动态 SDL 依赖检查、三宿主 Maven 汇总，以及干净 run
 
 默认窗口基线为 CPU。手动 gpu-smoke 额外要求 D3D12/Vulkan/Metal，GPU 回退会失败。
 Linux 使用 Xvfb/X11；Wayland、性能和完整输入行为不在当前验收范围内。
-工作流上传 Actions 工件，不自动发布 Maven Central。
+工作流只生成本地验证 Maven 文件并上传为 Actions 工件，不向公开 Maven 服务发布。
+Skiko/Skottie 和桥插件发布任务只接受 file: 仓库，上游 ComposeRepo 发布配置由准备脚本移除。
 
 第三方来源由 upstream/lock.json、upstream/sdl.json 和 upstream/adaptation-origins.json 记录。
 源代码包所需声明从锁定的上游源码直接取得，来源说明由脚本生成在 vendor 中，不维护额外的 licenses 副本。

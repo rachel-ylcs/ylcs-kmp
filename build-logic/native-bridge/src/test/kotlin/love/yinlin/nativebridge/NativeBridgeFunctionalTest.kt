@@ -3,8 +3,11 @@ package love.yinlin.nativebridge
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.FileSystems
+import java.nio.file.attribute.PosixFilePermissions
 import kotlin.test.Test
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -394,6 +397,10 @@ class NativeBridgeFunctionalTest {
         java.util.zip.ZipFile(archive).use { zip ->
             assertTrue(zip.getInputStream(zip.getEntry(exe.name)).readBytes().contentEquals(exe.readBytes()))
             assertTrue(zip.getInputStream(zip.getEntry("runtime.txt")).readBytes().contentEquals(stage.resolve("runtime.txt").readBytes()))
+        }
+        FileSystems.newFileSystem(archive.toPath(), emptyMap<String, Any>()).use { zip ->
+            assertEquals(PosixFilePermissions.fromString("rwxr-xr-x"), Files.getAttribute(zip.getPath("/${exe.name}"), "zip:permissions"))
+            assertEquals(PosixFilePermissions.fromString("rw-r--r--"), Files.getAttribute(zip.getPath("/runtime.txt"), "zip:permissions"))
         }
     }
 }

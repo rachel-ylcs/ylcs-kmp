@@ -38,6 +38,9 @@ on:
 permissions:
   contents: read
 
+# Maven tasks below only produce local file repositories for verification.
+# upload-artifact stores CI evidence; this workflow never deploys to a public Maven repository.
+
 concurrency:
   group: native-core-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -113,7 +116,7 @@ jobs:
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             -Pnative.compose=true :build-logic:native-bridge:test \
             :build-logic:native-bridge:validatePlugins
-      - name: Current Skiko regression suite, independent app and Maven publication
+      - name: Current Skiko regressions, independent app and local Maven verification files
         run: |
           display=()
           if [[ "$RUNNER_OS" == Linux ]]; then
@@ -168,13 +171,13 @@ jobs:
             -Pnative.compose=true -Pnative.smoke=true -Pnative.renderer=gpu \
             ":native-compose:adaptation:samples:skiko:run${TARGET_NAME}DebugExecutable" \
             ":ylcs-app:native-compose:run${TARGET_NAME}ReleaseExecutable"
-      - name: Host Maven publication
+      - name: Upload host Maven verification files to Actions
         uses: actions/upload-artifact@v7
         with:
           name: native-core-maven-${{ matrix.target }}
           path: native-compose/vendor/build/native-compose/repository/
           if-no-files-found: error
-      - name: Bridge Maven publication
+      - name: Upload bridge Maven verification files to Actions
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v7
         with:
@@ -196,7 +199,7 @@ jobs:
           if-no-files-found: warn
 
   assemble:
-    name: Assemble three-target Maven repository
+    name: Assemble three-target local Maven verification repository
     needs: build
     runs-on: ubuntu-24.04
     steps:

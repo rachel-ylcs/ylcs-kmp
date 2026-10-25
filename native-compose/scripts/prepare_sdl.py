@@ -163,7 +163,7 @@ def main():
     prefix = VENDOR / "sdl-static" / target
     profile_file = prefix / "rachel-sdl.json"
     archive_name = "SDL3-static.lib" if target == "mingw_x64" else "libSDL3.a"
-    profile = {"version": version, "target": target, "archive": archive_name, "linkage": "static",
+    profile = {"version": version, "target": target, "archive": archive_name, "linkage": "static", "buildType": "Release",
                "sourceSha256": entry["sha256"], "scriptSha256": digest(Path(__file__))}
     environment = windows_environment() if target == "mingw_x64" else dict(os.environ)
     native_options = []
@@ -187,8 +187,8 @@ def main():
     elif target == "macos_arm64":
         options += ["-DCMAKE_OSX_ARCHITECTURES=arm64", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0"]
     subprocess.run(["cmake", "-S", str(source), "-B", str(build), *options], env=environment, check=True)
-    subprocess.run(["cmake", "--build", str(build), "--parallel", str(args.jobs)], env=environment, check=True)
-    subprocess.run(["cmake", "--install", str(build)], env=environment, check=True)
+    subprocess.run(["cmake", "--build", str(build), "--config", "Release", "--parallel", str(args.jobs)], env=environment, check=True)
+    subprocess.run(["cmake", "--install", str(build), "--config", "Release"], env=environment, check=True)
     library = prefix / "lib" / archive_name
     if not library.is_file() or not library.read_bytes().startswith(b"!<arch>\n"):
         raise ValueError(f"CMake did not produce a static SDL archive: {library}")

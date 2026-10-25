@@ -59,6 +59,44 @@ def resolve_merge(path, text):
     return text
 
 
+def adapt_kotlin_sources(root: Path):
+    """Apply the pinned source's Kotlin 2.5 compatibility changes before compilation."""
+    sources = root / "skiko/src"
+    path = sources / "commonMain/kotlin/org/jetbrains/skia/Matrix33.kt"
+    # Retain the explicit inline decision for this tiny conversion; the cost
+    # heuristic is informational and is suppressed only on this declaration.
+    text = replace_once(path.read_text(encoding="utf-8"), "internal inline fun Float.toRadians()",
+                        '@Suppress("NOTHING_TO_INLINE")\ninternal inline fun Float.toRadians()')
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+    path = sources / "nativeMain/kotlin/org/jetbrains/skia/Actuals.native.kt"
+    text = replace_once(path.read_text(encoding="utf-8"), "    block()\n", "    val _ = block()\n")
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+    path = sources / "nativeMain/kotlin/org/jetbrains/skia/impl/Stats.native.kt"
+    text = replace_once(path.read_text(encoding="utf-8"), "        if (enabled) nativeCalls.incrementAndGet()",
+                        "        if (enabled) {\n            val _ = nativeCalls.incrementAndGet()\n        }")
+    for operation in ["incrementAndGet", "decrementAndGet"]:
+        text = replace_once(text, f"            allocated.{operation}()", f"            val _ = allocated.{operation}()")
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+    # This is Native-only code now. Bind directly to the same Native symbol
+    # annotation instead of suppressing optional-expectation errors inherited from JS.
+    path = sources / "nativeMain/kotlin/org/jetbrains/skia/PaintFilterCanvas.shared.kt"
+    text = replace_once(path.read_text(encoding="utf-8"),
+                        '@file:Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // https://youtrack.jetbrains.com/issue/KT-50727\n\n',
+                        '@file:OptIn(kotlin.native.SymbolNameIsInternal::class)\n\n')
+    for symbol in ["org_jetbrains_skia_PaintFilterCanvas__1nInit", "org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint"]:
+        text = replace_once(text, f'@ExternalSymbolName("{symbol}")', f'@kotlin.native.SymbolName("{symbol}")')
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+    path = sources / "nativeMain/kotlin/org/jetbrains/skia/shaper/Shaper.shared.kt"
+    text = replace_once(path.read_text(encoding="utf-8"), '            @Suppress("CAST_NEVER_SUCCEEDS")\n', "")
+    for name in ["managedFontIter", "managedBidiIter", "managedScriptIter", "managedLangIter", "managedRunHandler"]:
+        text = replace_once(text, f"getPtr({name}) as InteropPointer", f"getPtr({name})")
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
 def prepare_notices(root: Path, lock, own_root: Path):
     """Keep source publication notices derived from the audited inputs."""
     notices = root / "skiko/rachel-notices"
@@ -208,6 +246,20 @@ CHECKSUMS
     text = replace_once(text, 'System.getenv()["SKIKO_VSBT_PATH"]', '(System.getenv("SKIKO_VSBT_PATH")?.takeIf(String::isNotBlank) ?: System.getenv("VS_PATH"))')
     properties.write_text(text, encoding="utf-8", newline="\n")
 
+    # Native maintenance/CI only writes Maven verification files on disk.
+    # Do not retain upstream's credential-based remote publication destination.
+    publishing = root / "skiko/buildSrc/src/main/kotlin/publishing.kt"
+    text = replace_once(publishing.read_text(encoding="utf-8"), '''            maven {
+                name = "ComposeRepo"
+                url = project.uri(skiko.composeRepoUrl)
+                credentials {
+                    username = skiko.composeRepoUserName
+                    password = skiko.composeRepoKey
+                }
+            }
+''', "")
+    publishing.write_text(text, encoding="utf-8", newline="\n")
+
     # Native task linker flags are serialized in the KLIB. Never publish build-machine paths.
     # -include-binary embeds archives; cinterop exports only portable system link flags.
     native = root / "skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt"
@@ -324,6 +376,14 @@ tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEac
 }
 
 // Rachel: expose only complete target publications produced on the matching host.
+tasks.withType<org.gradle.api.publish.maven.tasks.PublishToMavenRepository>().configureEach {
+    doFirst {
+        check(repository.url.scheme == "file") {
+            "Native Skiko remote Maven publishing is disabled; use the local verification repository."
+        }
+    }
+}
+
 tasks.withType<org.gradle.api.publish.maven.tasks.AbstractPublishToMaven>().configureEach {
     doFirst {
         val publicationName = publication.name
@@ -388,6 +448,7 @@ tasks.withType<org.gradle.api.publish.maven.tasks.AbstractPublishToMaven>().conf
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(source, destination)
             shutil.rmtree(directory)
+    adapt_kotlin_sources(root)
     for directory in [root / "skiko/buildSrc/src", root / "skiko"]:
         for source in directory.rglob("*.kt" if directory.name == "src" else "*.gradle.kts"):
             text = source.read_text(encoding="utf-8")

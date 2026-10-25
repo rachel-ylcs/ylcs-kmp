@@ -7,7 +7,11 @@ import org.jetbrains.skiko.internal.sdl.*
 actual object NativeWindow {
     private var running = false
 
-    actual fun run(options: NativeWindowOptions, onKey: (NativeWindowKey) -> Unit, render: (Canvas, Int, Int, Float) -> Unit) = memScoped {
+    actual fun run(
+        options: NativeWindowOptions,
+        onKey: (NativeWindowKey) -> Unit,
+        render: (canvas: Canvas, width: Int, height: Int, deltaSeconds: Float) -> Unit,
+    ) = memScoped {
         check(!running) { "A NativeWindow event loop is already running" }
         running = true
         try {

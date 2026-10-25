@@ -8,6 +8,8 @@ Gradle 经 IDEA MCP 终端执行；日志统一位于 Git 忽略的 native-compo
 本轮固定工作目录、renderer val 初始化、编译参数及 Kotlin 规范整理仅修改源码与配置。
 按用户要求，本轮没有执行源码准备、构建、测试或程序运行；新增的工作目录回归用例留给 CI。
 以下记录是这些调整之前的实际验证结果，不能作为新版准备流程和 renderer 的验收结果。
+2026-10-25 又补齐 Kotlin 警告修复、ZIP 权限和仅本地 Maven 发布限制，仍只做静态检查。
+最新远程 CI 的实际结果单独记录在“三平台结果边界”，不与本地未执行的修改混淆。
 
 ## 此前实际通过
 
@@ -66,25 +68,23 @@ C++/CInterop 和最终链接仍由匹配宿主执行；该设置不证明跨宿�
 
 ## 三平台结果边界
 
-当前 Windows 的 C++/KLIB、原生测试、软件/D3D12 窗口、ZIP 和 Maven 消费实际通过。
-Core/Skottie/APP 的 Linux Kotlin 交叉编译已通过（skiko-static-window-final.log）；
-Linux 和 macOS 的静态 SDK、C++ 最终链接与运行仍需要各自宿主 CI。
+此前本地 Windows 的 C++/KLIB、原生测试、软件/D3D12 窗口、ZIP 和独立 Maven 消费通过。
+最新读取的 Native [run 40111028367](https://github.com/rachel-ylcs/ylcs-kmp/actions/runs/40111028367)
+对应提交 c5d1df6ebed9666bb9d2335499fbe72236e25bf6。三个宿主的编译、链接、6 项 Native 测试、
+软件窗口和 Maven 工件审计均通过；Windows job 成功，Linux/macOS 均在 ZIP 搬移步骤失败，
+导致三目标仓库汇总及独立消费 job 跳过。
 
-最新读取的 Native [run 40089308385](https://github.com/rachel-ylcs/ylcs-kmp/actions/runs/40089308385)
-对应提交 46ab8533770218d0bd59566614c155030a1a3bd3，三个构建 job 均失败，汇总及独立消费 job 跳过。
-完整原始日志保存为 vendor/build/logs/ci-40089308385-{windows,linux,macos}.log。
-
-| 平台 | 实际失败 | 当前修复 |
+| 平台 | 最新 CI 结果 | 当前修复 |
 | --- | --- | --- |
-| Windows | SDL 已构建完成，随后调用 runner 上失效的 C:/Strawberry/perl/bin/pkg-config.BAT，退出码 29 | 无传递包依赖时直接解析 SDL 自身 .pc；有 Requires 时仍要求完整解析器 |
-| Linux | SDL 使用 Ubuntu 宿主 libc 构建，最终链接缺失 __isoc23_*、memfd_create、posix_spawn_file_actions_addchdir_np 等符号 | SDL 改用项目所选 Kotlin/Native Clang/sysroot；独立 CMake 缓存，宿主桌面头文件后置 |
-| macOS | Core/Skottie Kotlin、C++/KLIB 已编译，ld 拒绝 -Wl,-framework,... / -Wl,-weak_framework,... | SDL linkerOpts 展开为直接 ld 参数；publication 审计拒绝 SDL 遗留 driver 包装 |
+| Windows | 整个构建 job 通过 | 本轮另修 Kotlin 警告和发布限制，待重新验证 |
+| Linux | ZIP 中 skiko.kexe 丢失执行位；编译、运行及工件审计已通过 | ZIP 显式设置程序 0755、数据 0644、目录 0755 |
+| macOS | ZIP 中 skiko.kexe 丢失执行位；编译、运行及工件审计已通过 | 使用相同的 ZIP 权限修复 |
 
-此前 Linux Fc*/glX* 和 macOS Image bridge 缺失未在这次日志中重现；本次问题来自新增静态 SDL 链路。
-Windows 修复已完成上面的本地完整验证。Linux 另外使用相同版本 Clang 对目标 sysroot 的头文件优先级做了
-交叉编译探针，确认选用 glibc 2.19 且 strtol 不生成 __isoc23_* 调用；这不是 Linux SDL 宿主构建或运行验收。
+原因是 Gradle 9 的可重现归档默认将普通文件保存为 0644，stage 的 0755 不会自动成为 ZIP 权限。
+修复放在生产 ZIP 的桥插件内；验证器保留执行权限断言，未通过补 chmod 绕过问题。
+现有桥插件功能用例增加 ZIP 中程序和数据的权限断言；本轮未执行该用例或其他构建/测试。
 
-当前修复尚未提交/推送，没有修复后的 Linux/macOS 远程 CI 结果；Windows 成功不能证明其他宿主已通过。
+当前修改尚未提交/推送，没有修改后的远程 CI 结果；本轮静态核对不能代替三个宿主重新验收。
 CI 默认软件窗口基线，手动 gpu-smoke 另行要求 D3D12/Vulkan/Metal 实际后端。
 
 ## 当前复现命令

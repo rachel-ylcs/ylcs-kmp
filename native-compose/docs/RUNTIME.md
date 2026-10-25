@@ -74,6 +74,26 @@ Debug 的 Kotlin 优化较少；Release 默认有链接时优化，通常编译�
 底层 Skia、SDL 和 C++ bridge 使用 Release，所以 Debug APP 不代表整套图形库都是 Debug。
 依据：[Kotlin Native 优化](https://kotlinlang.org/docs/native-improving-compilation-time.html)。
 
+| KLIB 中的内容 | 当前生产配置 | 消费方选择 Debug 时 |
+| --- | --- | --- |
+| SDL3 静态归档 | CMake 的 CMAKE_BUILD_TYPE=Release；Windows 使用 /MT 静态 CRT | 继续链接这份 Release 归档 |
+| Skia 及包内 zlib、图片编解码等配套归档 | 锁定的官方 Skia-*-Release-* 下载包，按 SHA-256 校验 | 继续链接同一份官方 Release 包中的归档 |
+| Skiko/Skottie C++ bridge | 默认 skiko.debug=false，Clang -O3 / MSVC /O2 | 继续链接生产者已编译的 bridge |
+| Kotlin 代码与元数据 | KLIB 保存 Kotlin IR、元数据和绑定 | 消费端按 Debug binary 的设置生成并链接 Kotlin 机器码 |
+
+SDL 构建和安装还显式传递 --config Release，兼容多配置 CMake generator；SDK 清单记录 buildType=Release。
+KLIB 不会把预编译的 C/C++ 静态库恢复成源码，再按消费方的 Debug/Release 选择重新编译。
+发布一套 Release 原生归档，可供 Debug 和 Release Kotlin 程序共同使用。
+Release 优化和调试符号是独立配置；带符号的库仍可以是优化后的 Release。
+若以后需要单步调试第三方 C++，应在生产端准备匹配的 Debug 库与工件变体，不能只切换 APP 的运行任务。
+
+## Maven 验证边界
+
+Native CI 只向本地 file: Maven 仓库写入归档，再用 Actions artifact 在 job 间传递这些文件。
+它没有向公开 Maven 服务发布，也没有给 Native 发布步骤提供网络仓库凭据。
+准备脚本移除上游 ComposeRepo 发布地址；Skiko/Skottie 和桥插件的 PublishToMavenRepository 任务
+在执行前检查仓库协议，只接受 file:。当前不进行公开 Maven 发布。
+
 80 MiB 的一次工作集观察不能直接说明 Kotlin 堆大小或 Release 的收益。
 应控制相同后端、尺寸和交互过程，区分工作集、私有提交和 GPU 资源。
 目前没有可重复的分项内存/性能基准。
@@ -83,6 +103,8 @@ Debug 的 Kotlin 优化较少；Release 默认有链接时优化，通常编译�
 stage/run/package 共用暂存文件集合，显式资源缺失或文件重名会失败。
 ZIP 验证会拒绝 SDL 动态文件，检查 Windows PE imports / Linux readelf / macOS otool 依赖，
 并解压到新的带空格目录实际运行。
+ZIP 的可执行文件显式保存 0755，数据文件保存 0644，目录保存 0755；
+不依赖 Gradle archive 默认的文件权限，也不在验证器里补 chmod 来掩盖错误的分发包。
 
 NativeWindow 必须在主线程调用，阻塞直到关闭；render 回调的 Canvas 为借用对象。
 当前提供单个事件循环、缩放、基本按键和 CPU/GPU 呈现。

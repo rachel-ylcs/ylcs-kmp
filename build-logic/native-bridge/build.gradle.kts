@@ -1,4 +1,5 @@
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 plugins {
     `kotlin-dsl`
@@ -75,6 +76,12 @@ publishing {
             name = "LocalVerification"
             url = uri(rootProject.layout.buildDirectory.dir("native-bridge-repository"))
         }
+    }
+}
+
+tasks.withType<PublishToMavenRepository>().configureEach {
+    doFirst {
+        check(repository.url.scheme == "file") { "Native Bridge remote Maven publishing is disabled; use the local verification repository" }
     }
 }
 
