@@ -96,7 +96,6 @@ class ScreenSettings : Screen() {
                     icon = Icons.Login,
                     hasDivider = false,
                     onClick = {
-                        pop()
                         navigate(::ScreenLogin)
                     }
                 )
