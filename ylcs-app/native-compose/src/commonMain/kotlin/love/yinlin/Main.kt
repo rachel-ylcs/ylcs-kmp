@@ -10,7 +10,7 @@ import org.jetbrains.skiko.window.NativeWindowOptions
 fun main(args: Array<String>) {
     NativeWindow(
         options = NativeWindowOptions(
-            title = "Rachel / Native Compose UI",
+            title = "Rachel / Native Foundation + Animation",
             width = 1000,
             height = 660,
             backend = if ("--software" in args) NativeWindowBackend.SOFTWARE else NativeWindowBackend.GPU,

@@ -1,10 +1,10 @@
-# Rachel Native desktop / Compose UI
+# Rachel Native desktop / Compose
 
-可选的桌面 Native 移植模块组，当前覆盖 Compose UI 的八个工件与 SDL ComposeScene 宿主，
+可选的桌面 Native 移植模块组，当前覆盖 Compose UI 的八个工件、Foundation/Animation 的五个运行时工件与 SDL ComposeScene 宿主，
 基于已有 Skiko Core + Skottie、静态 SDL 窗口宿主及桥插件。目标：mingwX64、linuxX64、macosArm64。
 默认 GPU：Windows Ganesh/D3D12，Linux Ganesh/Vulkan，macOS Ganesh/Metal。
-Graphite 按已确定的路线排除。Compose Runtime 复用官方 Native 工件；Foundation/Animation 为下一阶段。
-本阶段实现、审计、CI 与消费边界见 [COMPOSE_UI.md](docs/COMPOSE_UI.md)。
+Graphite 按已确定的路线排除。Compose Runtime 复用官方 Native 工件。
+UI 阶段见 [COMPOSE_UI.md](docs/COMPOSE_UI.md)，当前移植与构建边界见 [FOUNDATION_ANIMATION.md](docs/FOUNDATION_ANIMATION.md)。
 
 当前范围、已验收的平台及待完成项见 [STATUS.md](docs/STATUS.md)，实际检查见 [VALIDATION.md](docs/VALIDATION.md)。
 
@@ -53,15 +53,22 @@ strictly/reject 冲突、未支持的动态和范围请求明确失败。
 - 上游历史共享代码由脚本合并到 nativeMain/nativeTest，活动源集不使用 Native/JS 名称。
 - 当前仅有 macosArm64，Darwin 共享层统一合并到 macosMain/macosTest；三个平台层为 windows/linux/macos。
 - 两个库属于同一个 Skiko included build；正式 buildFile 指向 adaptation，继续复用上游 buildSrc。
-- Compose UI 使用一份 vendor/compose/workspace 稀疏 checkout 和单独的 compose-ui included build。
+- Compose UI、Foundation、Animation 共用一份 vendor/compose/workspace 稀疏 checkout 和 compose-ui included build。
 
 详见 [SOURCES.md](docs/SOURCES.md)。不要手改 vendor。
 
 ## 独立 APP 的使用方式
 
 ylcs-app/native-compose 只包含 commonMain 的场景与公共窗口 API 调用。
-build.gradle.kts 复用 Rachel nativeExecutable DSL，commonMain 声明 projects.ylcsModule.core、
-libs.skiko、libs.skiko.lottie 及 libs.compose.ui 与相关细分 UI 工件，安装 composeCompiler：
+build.gradle.kts 复用 Rachel nativeExecutable DSL，安装 composeCompiler，当前 commonMain 只需声明：
+
+```kotlin
+lib(libs.compose.foundation)
+```
+
+Foundation 的 API 依赖会带入 Animation、UI 与 Skiko，无需逐个列出 UI 子工件或调用 asProvider()。
+只使用 UI 原语时可声明 lib(libs.compose.ui)；animation-graphics 属于可选工件，使用其 API 时再声明。
+窗口和运行目录配置沿用：
 
 ```kotlin
 nativeApplication {
@@ -75,7 +82,8 @@ androidx.compose.ui.window.NativeWindow 提供 Composable 入口，基于 Skiko 
 混合 JVM/Android 的工程应将该窗口入口放在桌面 Native 源集，公共绘图/UI 仍保持跨平台；
 桥插件不改写其他平台来伪造这项新 API。
 
-预览展示点击计数、主题背景、文本/中文输入、剪贴板、滚轮、帧时钟和 Dialog；Escape 由弹层和 Compose 返回处理。
+预览展示 Foundation 布局、clickable、BasicTextField、SelectionContainer、LazyColumn，以及状态动画、AnimatedVisibility、animateContentSize 和 Dialog；Escape 由弹层和 Compose 返回处理。
+本轮仅构建，尚未运行该 Foundation 预览。
 
 ## 构建与运行
 

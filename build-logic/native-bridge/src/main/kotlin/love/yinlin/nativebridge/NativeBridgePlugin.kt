@@ -38,7 +38,7 @@ class NativeBridgePlugin : Plugin<Project> {
         for (artifact in compatibility.getProperty("compose.ui.modules").split(',')) {
             val ruleName = "compose-$artifact"
             bridge.redirect(ruleName) {
-                upstream.set("org.jetbrains.compose.ui:$artifact")
+                upstream.set(compatibility.getProperty("compose.$artifact.upstream", "org.jetbrains.compose.ui:$artifact"))
                 upstreamVersion.set(selectedVersion(project, ruleName, compatibility.getProperty("compose.upstream.version")))
                 targets.set(compatibility.getProperty("compose.$artifact.targets").split(',').toSet())
                 metadataTargets.set(compatibility.getProperty("compose.$artifact.metadata.targets").split(',').toSet())

@@ -14,7 +14,7 @@ Maven group 为 love.yinlin.native.compose.ui；KLIB unique_name 保持 org.jetb
 | ui | 复用 commonMain、skikoMain、nonJvmMain/nativeMain，补齐 Native 键盘、光标、剪贴板、URI、IME 和同步 actual |
 | SDL ComposeScene 宿主 | 真实 Layout/绘制/重组、帧时钟、鼠标与滚轮、键盘焦点、Dialog、生命周期和 ViewModelStore 清理 |
 
-不引入 Foundation/Animation 来隐藏 UI 的依赖缺口。业务预览使用 UI 原语；这些上层模块是下一阶段。
+UI 阶段先以 UI 原语独立完成构建与消费验证；后续 Foundation/Animation 已单独接入，最新预览和本轮构建范围见 [FOUNDATION_ANIMATION.md](FOUNDATION_ANIMATION.md)。
 官方 Runtime、Google annotation/collection、Lifecycle、SavedState 和 NavigationEvent 继续复用真实 Native 工件。
 Navigation3 UI 保留 JetBrains 坐标，当前没有纳入本轮移植。
 
@@ -22,7 +22,7 @@ Navigation3 UI 保留 JetBrains 坐标，当前没有纳入本轮移植。
 
 - adaptation/org.jetbrains.compose.ui_<artifact>/ 保存提交的构建脚本、自有实现与单元测试。
 - vendor/compose/workspace/ 为唯一锁定稀疏 checkout；不手工修改。
-- vendor/compose/workspace/native-desktop/ 为生成的八模块 Gradle included build。
+- vendor/compose/workspace/native-desktop/ 为生成的 Compose Gradle included build；当前已从八个 UI 模块扩展至十三模块。
 - scripts/compose_adapt.py 记录可重现的源码改动并检测漂移；compose-origins.json 记录派生来源。
 - 不编译 StubsMain；替代 actual 对应的原文件从准备工作区移除，让 Gradle 和 IDEA 看到同一份定义。
 - skikoMain 位于 commonMain 与 nativeMain 之间，保留 expect/actual fragment 边界。
@@ -51,7 +51,7 @@ Compose 使用物理像素，displayScale 与 pixelDensity 分开转换；IME co
 ## 预览与验收
 
 ylcs-app/native-compose 是唯一可视预览，安装 composeCompiler，保持 Rachel install/rachel/lib DSL 和 commonMain 官方依赖。
-当前展示点击计数、主题背景、焦点、中文输入、剪贴板、滚轮、帧时钟动画及 Dialog；不是 Foundation TextField 实现。
+本页记录的 UI 阶段预览使用 UI 原语；最新预览已换为 Foundation BasicTextField、选择容器、列表和 Animation，仍保留同一公共窗口入口。
 移植层不维护 samples，不在 APP 复制 SDL SDK、cinterop 或平台窗口代码。
 
 ```powershell

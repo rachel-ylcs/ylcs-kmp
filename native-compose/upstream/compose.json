@@ -88,6 +88,67 @@
                 "linuxMain": ["src/nativeMain/kotlin"],
                 "macosMain": ["src/nativeMain/kotlin", "src/darwinMain/kotlin", "src/macosMain/kotlin"]
             }
+        },
+        "foundation-layout": {
+            "alias": "native-compose-foundation-layout",
+            "family": "foundation",
+            "group": "love.yinlin.native.compose.foundation",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "skikoMain": ["src/skikoMain/kotlin"],
+                "nativeMain": ["src/nonJvmMain/kotlin"]
+            }
+        },
+        "animation-core": {
+            "alias": "native-compose-animation-core",
+            "family": "animation",
+            "group": "love.yinlin.native.compose.animation",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "nativeMain": ["src/nonJvmMain/kotlin"]
+            }
+        },
+        "animation": {
+            "alias": "native-compose-animation",
+            "family": "animation",
+            "group": "love.yinlin.native.compose.animation",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "nativeMain": ["src/nonAndroidMain/kotlin", "src/nonJvmMain/kotlin"]
+            }
+        },
+        "animation-graphics": {
+            "alias": "native-compose-animation-graphics",
+            "family": "animation",
+            "group": "love.yinlin.native.compose.animation",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"]
+            }
+        },
+        "foundation": {
+            "alias": "native-compose-foundation",
+            "family": "foundation",
+            "group": "love.yinlin.native.compose.foundation",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "skikoMain": ["src/skikoMain/kotlin"],
+                "nativeMain": ["src/nonJvmMain/kotlin", "src/nativeMain/kotlin"]
+            }
         }
     }
 }

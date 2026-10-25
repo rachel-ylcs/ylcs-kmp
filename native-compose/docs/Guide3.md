@@ -4,6 +4,8 @@
 
 工作区：D:\Rachel\ylcs\ylcs-kmp。
 
+后续进展已更新于本文第 14 节：主 UI 阶段完成后，用户已授权继续 Foundation/Animation；本轮只构建，不测试或运行 CI。第 1、13 节的暂停要求和 WIP 状态属于更早阶段，请以第 14 节、STATUS.md 与 VALIDATION.md 为当前接续依据。
+
 本文汇总本会话从最初 Skiko 讨论到 AndroidX 依赖整理的全部关键需求、决策、实现进度、故障经验和未完成事项，用于下一对话窗口接续。它是交接摘要，不是逐字聊天导出。历史验证、用户反馈、当前源码和待验证推断分别记录；未实际执行的检查不得写成通过。
 
 ## 1. 下一窗口先读什么、先做什么
@@ -670,4 +672,21 @@ Git 只读检查可使用：
 8. 公共 Maven 发布、完整业务实装、多窗口/无障碍/发行等仍是后续阶段。
 
 不要在接续时回到“先讨论目录/插件是否存在”的起点，也不要越过本次用户业务测试的暂停点。遇到交接文字与新源码不一致，优先核对当前源码并向用户清楚说明差异。
+
+## 14. 后续进展：UI 完成与 Foundation / Animation
+
+主 UI 后续已完成八模块 Windows 编译、库内 72 项测试、真实 Composable 预览与独立 Maven 消费；上一阶段详情见 COMPOSE_UI.md 与 VALIDATION.md 的历史记录。用户已自行开始三宿主 CI，本轮没有查询其远程结果。
+
+用户随后授权不等待 CI，先简化消费者依赖，再迁移全部 Foundation/Animation 运行时工件，并明确只需简单构建，不需要测试或 CI。
+
+- 已用只含 lib(libs.compose.ui) 的 APP 完成 Windows 编译，确认 UI 子工件与 Skiko 可传递获得；此前逐个列出依赖和 asProvider() 均无需保留。
+- 当前 APP 使用 Foundation/Animation，因此最后只声明 lib(libs.compose.foundation)。animation-graphics 与 Skottie 为可选独立依赖，用到时再加。
+- 已加入 foundation-layout、foundation、animation-core、animation、animation-graphics 五模块；三个 Native target 的配置、源码选择、桥插件和发布模板扩展到十三模块，官方 KLIB 身份保持不变。
+- 官方 macOS/desktop 的通用实现进入维护层，补齐文本编辑、选择菜单、语言、滚轮、SDL 剪贴板与 ReceiveContent 拖入；Animation 使用稳定 Native 线程身份。源码选择和适配详情见 FOUNDATION_ANIMATION.md。
+- 最新预览使用 BasicTextField、SelectionContainer、LazyColumn、clickable 与真实 Animation API，保留原公共 NativeWindow/Dialog 入口。
+- Windows 五模块 KLIB、共享元数据与最新 APP 链接已通过；最终日志 foundation-animation-final.log 的 EXE 临时占用失败，经 foundation-animation-final-link.log 重试链接成功。
+- IDEA MCP 已由用户重新打开；Gradle 构建可用，但新依赖仍需 Reload All Gradle Projects，尚未确认 IDE 导入无错误。
+- 本轮没有执行测试、程序运行、CI 或 Maven 发布，没有修改 workflow、ciModules 和上一阶段测试契约；未提交或推送。
+
+接下来由用户验证新增五模块及预览，特别是 Linux/macOS 编译、三平台 IME/菜单/滚动/动画、Maven 元数据与独立消费。基础层通过后再推进 Rachel Compose 与业务模块。保留本文原有的窗口/无障碍/拖出/正式发行等后续边界，不能从 Windows 构建推断全平台行为通过。
 

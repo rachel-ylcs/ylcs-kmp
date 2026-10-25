@@ -122,6 +122,37 @@ def ui_source_edits(workspace, native_root):
     return edits
 
 
+def foundation_source_edits(workspace, native_root):
+    base = "compose/foundation/foundation/src/"
+    adaptation = native_root / "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation"
+    shadows = {
+        "skikoMain/kotlin/androidx/compose/foundation/platform/Synchronization.skiko.kt": "platform/Synchronization.native.kt",
+        "nativeMain/kotlin/androidx/compose/foundation/text/KeyEventHelpers.native.kt": "text/KeyEventHelpers.native.kt",
+        "nativeMain/kotlin/androidx/compose/foundation/text/contextmenu/internal/ProvideDefaultPlatformTextContextMenuProviders.native.kt": "text/contextmenu/internal/PlatformDefaultTextContextMenuProviders.native.kt",
+        "nativeMain/kotlin/androidx/compose/foundation/text/selection/TextFieldSelectionManager.native.kt": "text/selection/TextFieldSelectionManager.native.kt",
+        "skikoMain/kotlin/androidx/compose/foundation/content/TransferableContent.skiko.kt": "content/TransferableContent.native.kt",
+        "skikoMain/kotlin/androidx/compose/foundation/content/MediaType.skiko.kt": "content/MediaType.native.kt",
+        "skikoMain/kotlin/androidx/compose/foundation/content/internal/ReceiveContentDragAndDropNode.skiko.kt": "content/internal/ReceiveContentDragAndDropNode.native.kt",
+    }
+    edits = {}
+    for source, replacement in shadows.items():
+        if not (adaptation / replacement).is_file():
+            raise ValueError(f"Foundation adaptation is missing: {replacement}")
+        edits[base + source] = None
+    replacements = {
+        "commonMain/kotlin/androidx/compose/foundation/lazy/staggeredgrid/LazyStaggeredGridCacheWindowLogic.kt":
+            ("override fun getNextStartItemIndexInLane(lane: Int, currentItemIndex: Int) =", "override fun getNextStartItemIndexInLane(lane: Int, currentItemIndex: Int): Int ="),
+        "commonMain/kotlin/androidx/compose/foundation/pager/PagerState.kt":
+            ("private fun tryRunPrefetch(result: PagerMeasureResult) =", "private fun tryRunPrefetch(result: PagerMeasureResult): Unit ="),
+        "skikoMain/kotlin/androidx/compose/foundation/text/ContextMenuStrings.skiko.kt":
+            ("private fun getTranslation(string: ContextMenuStrings, locale: Locale): String", "internal fun getTranslation(string: ContextMenuStrings, locale: Locale): String"),
+    }
+    for relative, [before, after] in replacements.items():
+        path = base + relative
+        edits[path] = replace_once((workspace / path).read_text(encoding="utf-8"), before, after)
+    return edits
+
+
 def source_edits(workspace, native_root, modules):
     edits = {}
     if "ui-text" in modules:
@@ -130,4 +161,6 @@ def source_edits(workspace, native_root, modules):
         edits.update(skiko_source_edits(workspace, native_root))
     if "ui" in modules:
         edits.update(ui_source_edits(workspace, native_root))
+    if "foundation" in modules:
+        edits.update(foundation_source_edits(workspace, native_root))
     return edits

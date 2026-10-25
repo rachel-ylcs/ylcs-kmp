@@ -16,6 +16,11 @@ VENDOR = ROOT / "vendor/compose"
 WORKSPACE = VENDOR / "workspace"
 BUILD = WORKSPACE / "native-desktop"
 TARGETS = {"mingw_x64", "linux_x64", "macos_arm64"}
+FAMILIES = {"ui", "foundation", "animation"}
+
+
+def source_path(name, module):
+    return f"compose/{module.get('family', 'ui')}/{name}"
 
 
 def digest(path):
@@ -33,10 +38,11 @@ def load_lock():
     if not lock.get("ciModules", lock["modules"]) or not set(lock.get("ciModules", lock["modules"])).issubset(lock["modules"]):
         raise ValueError("Compose CI stage references an unknown module")
     for name, module in lock["modules"].items():
-        if not re.fullmatch(r"ui(?:-[a-z]+(?:-[a-z]+)*)?", name):
+        family = module.get("family", "ui")
+        if family not in FAMILIES or not re.fullmatch(rf"{family}(?:-[a-z]+(?:-[a-z]+)*)?", name):
             raise ValueError(f"Invalid Compose module name: {name}")
         library = catalog["libraries"][module["alias"]]
-        if library["module"] != f"{lock['group']}:{name}" or library["version"] != {"ref": "cmp"}:
+        if library["module"] != f"{module.get('group', lock['group'])}:{name}" or library["version"] != {"ref": "cmp"}:
             raise ValueError(f"Compose Native coordinates changed for {name}; review the source lock")
         if not module["redirectTargets"] or not set(module["redirectTargets"]).issubset(TARGETS):
             raise ValueError(f"Invalid Compose redirect targets: {name}")
@@ -48,9 +54,9 @@ def load_lock():
                 raise ValueError(f"Unaudited source set: {name}/{source_set}")
             for directory in directories:
                 parts = PurePosixPath(directory).parts
-                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonAndroidExcludingWebMain", "nonJvmMain", "skikoMain", "jbMain", "nativeMain", "darwinMain", "macosMain"}:
+                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonAndroidExcludingWebMain", "nonJvmMain", "skikoMain", "jbMain", "nativeMain", "darwinMain", "macosMain", "appleMain"}:
                     raise ValueError(f"Unaudited upstream source path: {name}/{directory}")
-                if parts[1] == "darwinMain" and source_set != "macosMain":
+                if parts[1] in {"darwinMain", "appleMain"} and source_set != "macosMain":
                     raise ValueError(f"Foundation sources must belong to macosMain: {name}/{directory}")
     return lock
 
@@ -69,7 +75,7 @@ def git(*arguments, check=True):
 
 def checked_source(relative):
     parts = PurePosixPath(relative).parts
-    if len(parts) < 7 or parts[:2] != ("compose", "ui") or ".." in parts or not relative.endswith(".kt"):
+    if len(parts) < 7 or parts[0] != "compose" or parts[1] not in FAMILIES or ".." in parts or not relative.endswith(".kt"):
         raise ValueError(f"Invalid managed Compose source path: {relative}")
     path = WORKSPACE / relative
     if path.is_symlink() or not checked_path(path).is_relative_to(WORKSPACE.resolve()):
@@ -134,14 +140,14 @@ def checkout(lock, offline):
     if git("diff", "--quiet", check=False).returncode:
         raise ValueError("Compose checkout has local tracked edits; preserve them in adaptation before preparing sources")
     current = git("rev-parse", "--verify", "HEAD", check=False).stdout.strip()
-    selected = f"{lock['commit']}\n" + "\n".join(sorted(lock["modules"])) + "\n"
+    selected = f"{lock['commit']}\n" + "\n".join(sorted(source_path(name, module) for name, module in lock["modules"].items())) + "\n"
     marker = VENDOR / "checkout.txt"
     if current == lock["commit"] and marker.is_file() and marker.read_text(encoding="utf-8") == selected:
         return
     if offline:
         raise ValueError("Compose checkout does not match the current source selection; prepare it online first")
     git("sparse-checkout", "init", "--cone")
-    git("sparse-checkout", "set", *[f"compose/ui/{name}" for name in lock["modules"]])
+    git("sparse-checkout", "set", *[source_path(name, module) for name, module in lock["modules"].items()])
     if git("cat-file", "-e", f"{lock['commit']}^{{commit}}", check=False).returncode:
         print(f"Fetching Compose {lock['version']} at {lock['commit']}", flush=True)
         git("fetch", "--filter=blob:none", "--depth=1", "origin", lock["commit"])
@@ -170,7 +176,7 @@ def prepare(lock, offline):
     for name, module in lock["modules"].items():
         for directories in module["sourceSets"].values():
             for directory in directories:
-                source = WORKSPACE / f"compose/ui/{name}/{directory}"
+                source = WORKSPACE / source_path(name, module) / directory
                 if not source.is_dir() or not any(source.rglob("*.kt")):
                     raise ValueError(f"Selected Compose source directory is empty: {source}")
     templates = ROOT / "scripts/templates"
@@ -179,10 +185,11 @@ def prepare(lock, offline):
               templates / "compose-ui.settings.gradle.kts.template", templates / "compose-ui.build.gradle.kts.template"]
     inputs += [ROOT.parent / name for name in ["gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat"]]
     projects = []
-    for name in lock["modules"]:
+    for name, module in lock["modules"].items():
+        family = module.get("family", "ui")
         projects += [f'if ("{name}" in selectedModules) {{', f'    include(":{name}")', f'    project(":{name}").apply {{',
-                     f'        projectDir = rootDir.resolve("../compose/ui/{name}").canonicalFile',
-                     f'        buildFileName = projectDir.toPath().relativize(repositoryDirectory.resolve("native-compose/adaptation/org.jetbrains.compose.ui_{name}/build.gradle.kts").toPath()).toString()', "    }", "}"]
+                     f'        projectDir = rootDir.resolve("../{source_path(name, module)}").canonicalFile',
+                     f'        buildFileName = projectDir.toPath().relativize(repositoryDirectory.resolve("native-compose/adaptation/org.jetbrains.compose.{family}_{name}/build.gradle.kts").toPath()).toString()', "    }", "}"]
     settings = (templates / "compose-ui.settings.gradle.kts.template").read_text(encoding="utf-8").replace("__PROJECTS__", "\n".join(projects))
     build = (templates / "compose-ui.build.gradle.kts.template").read_text(encoding="utf-8").replace("__JAVA_VERSION__", str(profile["java"]))
     write(BUILD / "settings.gradle.kts", settings)

@@ -28,6 +28,146 @@
         "adaptation/org.jetbrains.compose.ui_ui-util/src/linuxMain/kotlin/androidx/compose/ui/util/Trace.linux.kt": {
             "source": "compose/ui/ui-util/src/macosMain/kotlin/androidx/compose/ui/util/Trace.macos.kt",
             "description": "Preserves the upstream desktop tracing contract: execute the block once without collecting profiling events."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/Clickable.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/Clickable.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/gestures/Scrollable.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/gestures/Scrollable.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/lazy/LazyList.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/lazy/LazyList.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/Overscroll.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/Overscroll.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/RequestFocusOnClick.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/RequestFocusOnClick.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/BasicTextField.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/BasicTextField.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/ContextMenu.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/ContextMenu.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/CoreTextField.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/CoreTextField.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/input/internal/selection/TextFieldMagnifierNode.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/input/internal/selection/TextFieldMagnifierNode.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/input/internal/TextFieldCoreModifier.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/input/internal/TextFieldCoreModifier.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/input/internal/TextFieldKeyEventHandler.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/input/internal/TextFieldKeyEventHandler.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/modifiers/SelectionController.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/modifiers/SelectionController.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/DefaultTextSelectionColors.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/selection/DefaultTextSelectionColors.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/SelectionGestures.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/selection/SelectionGestures.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/SelectionHandles.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/selection/SelectionHandles.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/TextFieldPointerModifier.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/TextFieldPointerModifier.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/TextFieldScroll.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/TextFieldScroll.macos.kt",
+            "description": "Preserves shared Skiko scrolling and the desktop no-overscroll policy."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/TouchMode.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/TouchMode.macos.kt",
+            "description": "Preserves the platform-neutral desktop policy and delegates layout, drawing, focus or selection to the shared Skiko implementation."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/SelectionManager.native.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/selection/SelectionManager.desktop.kt",
+            "description": "Preserves functional desktop context-menu actions and selection; clipboard availability uses the SDL clipboard instead of AWT."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/TextFieldSelectionManager.native.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/selection/TextFieldSelectionManager.desktop.kt",
+            "description": "Preserves functional desktop context-menu actions and selection; clipboard availability uses the SDL clipboard instead of AWT."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/input/internal/selection/TextFieldSelectionState.native.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/input/internal/selection/TextFieldSelectionState.desktop.kt",
+            "description": "Preserves functional desktop context-menu actions and selection; clipboard availability uses the SDL clipboard instead of AWT."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/contextmenu/modifier/TextContextMenuModifier.native.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/contextmenu/modifier/TextContextMenuModifier.desktop.kt",
+            "description": "Preserves functional desktop context-menu actions and selection; clipboard availability uses the SDL clipboard instead of AWT."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/contextmenu/internal/PlatformDefaultTextContextMenuProviders.native.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/contextmenu/internal/PlatformDefaultTextContextMenuProviders.desktop.kt",
+            "description": "Preserves functional desktop context-menu actions and selection; clipboard availability uses the SDL clipboard instead of AWT."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/internal/ClipboardUtils.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/internal/ClipboardUtils.macos.kt",
+            "description": "Uses the Native UI text clipboard entry contract and removes the direct AppKit pasteboard dependency."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/KeyMapping.native.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/KeyMapping.desktop.kt",
+            "description": "Preserves separate macOS, Windows and Linux shortcuts through Native operating-system detection."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/DesktopTextContextMenuItems.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/ContextMenu.desktop.kt",
+            "description": "Retains localized cut, copy, paste and select-all keys without Swing menu classes."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/platform/Synchronization.native.kt": {
+            "source": "compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/platform/Synchronization.skiko.kt",
+            "description": "Uses a Native atomicfu lock with PublishedApi visibility and an exactly-once contract, sharing the verified UI synchronization pattern."
+        },
+        "adaptation/org.jetbrains.compose.animation_animation-core/src/nativeMain/kotlin/androidx/compose/animation/core/ThreadIdentity.native.kt": {
+            "source": "compose/animation/animation-core/src/appleMain/kotlin/androidx/compose/animation/core/Expect.apple.kt",
+            "description": "Preserves stable thread identity for Transition reference comparisons using one Native thread-local token, without Apple framework dependencies."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/content/internal/ReceiveContentDragAndDropNode.native.kt": {
+            "source": "compose/foundation/foundation/src/androidMain/kotlin/androidx/compose/foundation/content/internal/ReceiveContentDragAndDropNode.android.kt",
+            "description": "Preserves receive-content lifecycle and consumption routing, replacing Android clip/permission data with owned SDL text and file-path entries."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/KeyEventHelpers.native.kt": {
+            "source": "compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/text/KeyEventHelpers.desktop.kt",
+            "description": "Preserves desktop key selection policy without Java key-event dependencies."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/TextFieldKeyInput.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/text/TextFieldKeyInput.macos.kt",
+            "description": "Committed input is supplied by SDL_TEXT_INPUT; keydown events only handle commands and never insert a second copy of IME or AltGr text."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/gestures/NativeScrollable.native.kt": {
+            "source": "compose/foundation/foundation/src/macosMain/kotlin/androidx/compose/foundation/gestures/MacosScrollable.macos.kt",
+            "description": "Uses owned SDL wheel deltas instead of NSEvent, with desktop logical scroll distances and fractional precise-scroll detection."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/content/MediaType.native.kt": {
+            "source": "compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/content/MediaType.kt",
+            "description": "Implements the common media-type contract with MIME representations and value equality."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/content/PlatformTransferableContent.native.kt": {
+            "source": "compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/content/TransferableContent.kt",
+            "description": "Exposes copied native drop file paths without retaining platform resources or opening dropped files."
+        },
+        "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/content/TransferableContent.native.kt": {
+            "source": "compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/TransferableContent.skiko.kt",
+            "description": "Replaces the upstream throwing/false receive-content placeholders with MIME-aware clipboard metadata and owned plain text."
         }
     }
 }

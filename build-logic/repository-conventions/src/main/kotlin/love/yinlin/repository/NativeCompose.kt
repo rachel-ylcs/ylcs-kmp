@@ -27,6 +27,8 @@ fun Settings.nativeCompose() {
             content {
                 includeGroup("love.yinlin.native.skiko")
                 includeGroup("love.yinlin.native.compose.ui")
+                includeGroup("love.yinlin.native.compose.foundation")
+                includeGroup("love.yinlin.native.compose.animation")
             }
         }
     }
@@ -116,13 +118,15 @@ private fun Settings.includeComposeUiSources(directory: File) {
     check(sourceDirectory.isDirectory) { "Prepared Compose working tree is missing" }
     val lock = JsonSlurper().parse(directory.resolve("upstream/compose.json")) as Map<*, *>
     val modules = lock["modules"] as Map<*, *>
-    val projects = modules.keys.associate { artifact ->
+    val projects = modules.entries.associate { (artifact, value) ->
+        val module = value as Map<*, *>
         val rule = "compose-$artifact"
         gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.version.$rule", state["version"] as String)
-        rule to ("${lock["group"]}:$artifact" to ":$artifact")
+        rule to ("${module["group"] ?: lock["group"]}:$artifact" to ":$artifact")
     }
-    val adaptations = modules.keys.associate { artifact ->
-        "compose-$artifact" to directory.resolve("adaptation/org.jetbrains.compose.ui_$artifact")
+    val adaptations = modules.entries.associate { (artifact, value) ->
+        val module = value as Map<*, *>
+        "compose-$artifact" to directory.resolve("adaptation/org.jetbrains.compose.${module["family"] ?: "ui"}_$artifact")
     }
     extensions.getByType<NativeBridgeSourcesExtension>().include(sourceDirectory, "compose-ui", projects, adaptations)
 }

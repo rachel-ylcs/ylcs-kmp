@@ -1,4 +1,26 @@
-# Compose UI 主工件与 SDL 宿主验证
+# Native Compose 验证记录
+
+## Foundation / Animation：本轮仅构建
+
+日期：2026-10-25（Asia/Shanghai）。Windows x64、JDK 25、Gradle 9.8.0、Kotlin 2.5.0-Beta2、CMP 1.13.0-beta01。
+按用户最新要求，本轮只做编译/链接及必要的源码检查，没有执行测试、程序运行或 CI，也没有 Maven 发布与独立消费验证。
+Gradle 经已重新启用的 IDEA MCP 终端执行；日志位于忽略的 native-compose/vendor/build/logs/。
+
+| 检查 | 实际结果与日志 |
+| --- | --- |
+| 单个 UI 依赖 | APP 仅 lib(libs.compose.ui)，Windows 编译通过，47s；ui-single-dependency.log |
+| 五模块 Windows KLIB | foundation-layout、foundation、animation-core、animation、animation-graphics 全部编译通过，33s；foundation-animation-second.log |
+| 共享元数据与预览 | 各依赖层的 common/skiko/native metadata 通过，使用单个 lib(libs.compose.foundation) 的新预览编译并链接通过，1m32s；foundation-animation-metadata-preview-second.log |
+| 最终代码复核 | foundation-animation-final.log 中五模块共享元数据与 Windows KLIB 均通过；animation-graphics 的 nativeMain 无源码，实际实现由 commonMain 编译。该轮 APP 链接因输出 EXE 被临时占用失败；随后仅重试链接成功，16s、89 tasks；foundation-animation-final-link.log |
+| 静态检查 | 根 TOML、Compose JSON、Python AST、十三模块坐标/源目录及来源映射检查，git diff --check |
+| IDEA | MCP 可调用并可启动 Gradle；新依赖尚需 Reload All Gradle Projects，文件检查仍有未解析引用，未标为 IDE 检查通过 |
+
+本轮修复了 Foundation skikoMain 对 Skiko 的直接依赖声明、Kotlin 2.5 两处表达式函数返回类型、Native 同步实现、文本菜单与 SDL 输入/剪贴板衔接。
+最后一次链接没有启动 EXE，也没有终止用户进程。仍有锁定上游弃用 API、内部可见性和 Gradle 弃用警告，不宣称零警告。
+Linux/macOS 宿主构建、三平台运行、输入法/菜单/滚动/动画行为、发布元数据和独立消费者留给用户后续验证。
+本轮没有修改 workflow、ciModules 或 UI 阶段的测试报告契约；下方历史测试不作为 Foundation/Animation 通过证据。
+
+## Compose UI 主工件与 SDL 宿主：上一阶段
 
 日期：2026-10-25（Asia/Shanghai）。Windows x64、JDK 25、Gradle 9.8.0、Kotlin 2.5.0-Beta2、CMP 1.13.0-beta01、Skiko 0.156.0、SDL 3.4.18。
 本轮用户明确授权继续移植与构建。Gradle 经 IDEA MCP 终端执行；以下是实际结果，日志位于忽略的 native-compose/vendor/build/logs/。

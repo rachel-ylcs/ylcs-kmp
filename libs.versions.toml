@@ -77,6 +77,7 @@ skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
 skiko-lottie = { module = "org.jetbrains.skiko:skiko-skottie", version.ref = "skiko" }
 
 # androidx
+androidx-graphics-shapes = { module = "androidx.graphics:graphics-shapes", version = "1.1.0" }
 androidx-annotation = { module = "androidx.annotation:annotation", version = "1.11.0" }
 androidx-collection = { module = "androidx.collection:collection", version = "1.7.0" }
 androidx-navigation-event = { module = "androidx.navigationevent:navigationevent-compose", version = "1.2.0" }
@@ -204,3 +205,8 @@ native-compose-ui-text = { module = "love.yinlin.native.compose.ui:ui-text", ver
 native-compose-ui-skiko = { module = "love.yinlin.native.compose.ui:ui-skiko", version.ref = "cmp" }
 native-compose-ui-backhandler = { module = "love.yinlin.native.compose.ui:ui-backhandler", version.ref = "cmp" }
 native-compose-ui = { module = "love.yinlin.native.compose.ui:ui", version.ref = "cmp" }
+native-compose-foundation = { module = "love.yinlin.native.compose.foundation:foundation", version.ref = "cmp" }
+native-compose-foundation-layout = { module = "love.yinlin.native.compose.foundation:foundation-layout", version.ref = "cmp" }
+native-compose-animation = { module = "love.yinlin.native.compose.animation:animation", version.ref = "cmp" }
+native-compose-animation-core = { module = "love.yinlin.native.compose.animation:animation-core", version.ref = "cmp" }
+native-compose-animation-graphics = { module = "love.yinlin.native.compose.animation:animation-graphics", version.ref = "cmp" }

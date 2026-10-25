@@ -43,6 +43,7 @@ val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     property("compose.ui.modules", composeModules.keys.joinToString(","))
     for ((artifact, value) in composeModules) {
         val module = value as Map<*, *>
+        property("compose.$artifact.upstream", "org.jetbrains.compose.${module["family"] ?: "ui"}:$artifact")
         property("compose.$artifact.module", catalog.findLibrary(module["alias"] as String).get().get().toString())
         property("compose.$artifact.targets", (module["redirectTargets"] as List<*>).joinToString(","))
         property("compose.$artifact.metadata.targets", (module["metadataTargets"] as List<*>).joinToString(","))

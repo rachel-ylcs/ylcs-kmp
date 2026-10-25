@@ -81,7 +81,7 @@ SDL CInterop 的定义、平台 adapters 和静态链接全部属于 Skiko Core�
 SDK 静态归档与系统 linkerOpts 进入发布的 SDL CInterop KLIB。
 消费方不配置 CInterop、不编译 SDL、不需要 SDL SDK 或平台窗口源码。
 
-APP 只在 commonMain 引用官方 Skiko/Skottie 坐标并调用公共 API。
+APP 在 commonMain 声明当前所需的官方 Compose 高层坐标，传递获得 Skiko；Skottie 仅在使用它时额外声明。
 桥插件做 target 重定向、ICU 收集和启动/打包，不再承担 SDL SDK 下载、链接或 DLL 收集。
 许可证保留在源码目录与 sources 工件中，不复制到程序暂存目录或 ZIP。
 Skiko 的 LICENSE/NOTICE、SDL 源码中的 LICENSE.txt 直接用于 sources 工件；
@@ -134,13 +134,13 @@ Runtime、Lifecycle、SavedState、Annotation、Collection 即使已有三个 Na
 移植库的版本目录别名统一放在根 TOML 底部，使用 native- 前缀和官方库名称：
 native-skiko、native-skiko-skottie、native-compose-ui-util / geometry / unit。
 对应 Kotlin accessor 为 libs.native.skiko、libs.native.skiko.skottie、libs.native.compose.ui.geometry 等；
-skiko 同时拥有子节点，需要 Provider 值时使用 libs.native.skiko.asProvider()。
+版本目录的父别名可能同时拥有子节点；普通 lib(...) 和 Gradle dependencies 声明可直接使用 accessor，不要求消费者调用 asProvider()。
 
 Compose 的库源码按 upstream/compose.json 显式选择；不执行上游 AndroidX 构建插件，不加载 Stubs 源集。
 没有平台差异的 Geometry 和 Unit 复用固定 checkout 的公共/非 JVM 实现，手写差异才进入 adaptation。
 库内测试保存在对应模块的 src/commonTest 或 src/nativeTest；预览只保存在 ylcs-app/native-compose。
 Skiko 已有 6 项回归从旧 samples 迁入 Core/Skottie，单独的 regression test run 保留上游测试边界。
-详细源码审计、共享元数据覆盖和当前 UI 流程见 [COMPOSE_UI.md](COMPOSE_UI.md)。
+UI 阶段源码审计与共享元数据覆盖见 [COMPOSE_UI.md](COMPOSE_UI.md)；Foundation/Animation 的源集、依赖与新增适配见 [FOUNDATION_ANIMATION.md](FOUNDATION_ANIMATION.md)。
 
 ## Skottie 为什么只有构建脚本
 

@@ -29,7 +29,9 @@ layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/root"
 
 subprojects {
     // KLIB module identities follow upstream; Maven publication coordinates remain independent.
-    group = "org.jetbrains.compose.ui"
+    val module = modules[name] as Map<*, *>
+    val upstreamGroup = "org.jetbrains.compose.${module["family"] ?: "ui"}"
+    group = upstreamGroup
     version = composeVersion
     layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/$name"))
 
@@ -49,7 +51,7 @@ subprojects {
                 // This target hook runs afterwards, before dependency coordinates are exported.
                 mavenPublication { artifactId = nativeArtifact }
                 compilations.getByName("main").compileTaskProvider.configure {
-                    compilerOptions.moduleName.set("org.jetbrains.compose.ui:${project.name}")
+                    compilerOptions.moduleName.set("$upstreamGroup:${project.name}")
                 }
             }
             sourceSets {
@@ -65,7 +67,7 @@ subprojects {
                     getByName("${target}Test").dependsOn(nativeTest)
                 }
                 if (selectedSources != null) {
-                    val adaptation = nativeDirectory.resolve("adaptation/org.jetbrains.compose.ui_${project.name}")
+                    val adaptation = nativeDirectory.resolve("adaptation/${upstreamGroup}_${project.name}")
                     configureEach {
                         val upstream = selectedSources[name] as? List<*> ?: emptyList<String>()
                         kotlin.setSrcDirs(upstream.map { project.file(it as String) })
@@ -85,7 +87,7 @@ subprojects {
                 }
             }
             publications.withType<MavenPublication>().configureEach {
-                groupId = sourceLock["group"] as String
+                groupId = (module["group"] ?: sourceLock["group"]) as String
                 pom {
                     name.set("Rachel Native ${project.name}")
                     description.set("Native desktop adaptation of Compose ${project.name}; modified by Rachel")
