@@ -20,17 +20,27 @@ native-compose/
         nativeInterop/cinterop/sdl.def
     org.jetbrains.skiko_skiko-skottie/
       build.gradle.kts
-    samples/skiko/              # 当前阶段：公共示例、Native 回归
+    org.jetbrains.compose.ui_ui-util/
+      src/windowsMain/kotlin/   # profiling-disabled trace actual
+      src/linuxMain/kotlin/
+      src/commonTest/kotlin/    # 库内回归及官方 Runtime 行为验证
+    org.jetbrains.compose.ui_ui-geometry/
+      src/commonTest/kotlin/
+    org.jetbrains.compose.ui_ui-unit/
+      src/commonTest/kotlin/
   vendor/
     skiko/workspace/            # 唯一、固定路径的 Native-only 工作源码
     skiko/*.zip                 # 锁定的上游/参考/共同基线归档，不常驻展开副本
     skiko/skia/                 # 校验过的 Skia 下载归档
     skiko/state.json            # 当前版本、输入指纹和维护源码路径清单
+    compose/workspace/          # 唯一、固定路径的 Compose 稀疏 Git checkout
+    compose/workspace/native-desktop/ # 脚本生成的 Native Gradle 入口
+    compose/state.json          # 输入、版本与固定构建路径
     sdl-source-*/               # 校验过的 SDL 源码
     sdl-static/<konan-target>/  # SDL 静态 SDK、系统链接依赖清单
     build/
       logs/
-      samples/
+      compose-ui/              # 库测试、本地 Maven 验证文件及独立消费者
       native-compose/          # 本地验证 Maven 仓库
       maven-consumer/
   scripts/
@@ -121,9 +131,16 @@ src/settings 是不依赖 KGP 的 Settings 实现。发布时 Settings marker �
 这些限制需要结合调用和 GC/FFI 语义评估。窗口、输入法、剪贴板和资源释放同样需要实际实现审计。
 Runtime、Lifecycle、SavedState、Annotation、Collection 即使已有三个 Native 发布变体，也要逐项完成以上检查。
 
-移植库的版本目录别名使用连字符：skiko-native、skiko-native-skottie，后续新增别名沿用同一形式。
-对应 Kotlin accessor 为 libs.skiko.native 和 libs.skiko.native.skottie；
-前者同时拥有子节点，需要 Provider 值时使用 libs.skiko.native.asProvider()。
+移植库的版本目录别名统一放在根 TOML 底部，使用 native- 前缀和官方库名称：
+native-skiko、native-skiko-skottie、native-compose-ui-util / geometry / unit。
+对应 Kotlin accessor 为 libs.native.skiko、libs.native.skiko.skottie、libs.native.compose.ui.geometry 等；
+skiko 同时拥有子节点，需要 Provider 值时使用 libs.native.skiko.asProvider()。
+
+Compose 的库源码按 upstream/compose.json 显式选择；不执行上游 AndroidX 构建插件，不加载 Stubs 源集。
+没有平台差异的 Geometry 和 Unit 复用固定 checkout 的公共/非 JVM 实现，手写差异才进入 adaptation。
+库内测试保存在对应模块的 src/commonTest 或 src/nativeTest；预览只保存在 ylcs-app/native-compose。
+Skiko 已有 6 项回归从旧 samples 迁入 Core/Skottie，单独的 regression test run 保留上游测试边界。
+详细源码审计、共享元数据覆盖和当前 UI 流程见 [COMPOSE_UI.md](COMPOSE_UI.md)。
 
 ## Skottie 为什么只有构建脚本
 
@@ -142,7 +159,7 @@ vendor/skiko/workspace/skiko/skiko-skottie/src/
   nativeMain/cpp/sksg/                         # InvalidationController bridge
 ```
 
-本项目的功能回归位于 adaptation/samples/skiko/src/nativeTest，涵盖实际时间轴像素变化及无效输入。
+本项目的功能回归位于 adaptation/org.jetbrains.skiko_skiko-skottie/src/nativeTest，涵盖实际时间轴像素变化及无效输入。
 如果后续发现平台实现缺口，手写修复再加入此 adaptation 模块的对应源集；现有上游代码不重复复制。
 
 Graphite 按确定的路线排除；AWT/JVM runtime 不迁移。

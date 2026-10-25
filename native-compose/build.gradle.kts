@@ -1,5 +1,4 @@
 import groovy.json.JsonSlurper
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins { idea }
@@ -17,7 +16,7 @@ check(libs.versions.sdl.get() == sdlLock["version"]) {
 }
 val skikoVersion = libs.versions.skiko.get()
 val portGroup = lock["group"] as String
-check(libs.skiko.native.asProvider().get().toString() == "$portGroup:skiko:$skikoVersion") {
+check(libs.native.skiko.asProvider().get().toString() == "$portGroup:skiko:$skikoVersion") {
     "Native Skiko coordinates changed in ../libs.versions.toml; review upstream/lock.json."
 }
 
@@ -40,12 +39,10 @@ if (sourceBuild != null && hostPublication != null) {
     }
 }
 
-subprojects {
-    layout.buildDirectory.set(nativeDirectory.dir("vendor/build/samples/$name"))
-    plugins.withId("org.jetbrains.kotlin.multiplatform") {
-        extensions.configure<KotlinMultiplatformExtension> {
-            compilerOptions.freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
-        }
+gradle.includedBuilds.find { it.name == "compose-ui" }?.let { source ->
+    tasks.register("publishComposeUiToVerificationRepository") {
+        group = "publishing"
+        dependsOn(source.task(":publishHostToVerificationRepository"))
     }
 }
 
@@ -57,4 +54,9 @@ tasks.register<Exec>("doctorNative") {
 tasks.register<Exec>("checkUpstreamUpdates") {
     group = "native setup"
     commandLine(providers.gradleProperty("python.command").getOrElse("python"), nativeDirectory.file("scripts/sync_upstream.py").asFile, "--check-updates")
+}
+
+tasks.register<Exec>("checkComposeUpdates") {
+    group = "native setup"
+    commandLine(providers.gradleProperty("python.command").getOrElse("python"), nativeDirectory.file("scripts/sync_compose.py").asFile, "--check-updates")
 }

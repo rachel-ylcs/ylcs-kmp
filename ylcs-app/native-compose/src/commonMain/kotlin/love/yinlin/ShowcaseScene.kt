@@ -1,5 +1,13 @@
 package love.yinlin
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.constrain
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.paragraph.FontCollection
@@ -53,8 +61,11 @@ internal class ShowcaseScene {
         canvas.clear(Background)
         canvas.save()
         try {
-            val scale = minOf(width / 1000f, height / 660f)
-            canvas.translate((width - 1000f * scale) / 2f, (height - 660f * scale) / 2f)
+            val viewport = Constraints(maxWidth = width, maxHeight = height).constrain(IntSize(width, height))
+            val designSize = with(Density(1f)) { Size(1000.dp.toPx(), 660.dp.toPx()) }
+            val scale = minOf(viewport.width / designSize.width, viewport.height / designSize.height)
+            val origin = Offset((viewport.width - designSize.width * scale) / 2f, (viewport.height - designSize.height * scale) / 2f)
+            trace("preview-transform") { canvas.translate(origin.x, origin.y) }
             canvas.scale(scale, scale)
             paint.color = Teal
             canvas.drawCircle(48f, 48f, 9f, paint)
@@ -84,7 +95,7 @@ internal class ShowcaseScene {
             canvas.drawImage(image, 650f, 420f)
             label(canvas, "WebP encode -> decode", 650f, 540f)
             label(canvas, "Resize the window  /  Space: pause  /  Esc: close", 36f, 615f)
-            label(canvas, "Current stage: Skiko rendering and window presentation", 36f, 640f)
+            label(canvas, "Current stage: Compose UI util / geometry / unit + Skiko", 36f, 640f)
         }
         finally { canvas.restore() }
     }

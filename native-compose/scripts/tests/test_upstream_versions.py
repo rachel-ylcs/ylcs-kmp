@@ -65,7 +65,7 @@ class UpstreamVersionsTest(unittest.TestCase):
             (native / "upstream").mkdir(parents=True)
             lock = {"group": "test.native", "versions": {"skiko": "0.156.0", "kotlin": "2.2.0"}}
             (native / "upstream/lock.json").write_text(json.dumps(lock))
-            (repository / "libs.versions.toml").write_text('[versions]\nskiko="0.156.0"\nkotlin="2.5.0-Beta2"\n[libraries]\nskiko-native={module="test.native:skiko",version.ref="skiko"}\n')
+            (repository / "libs.versions.toml").write_text('[versions]\nskiko="0.156.0"\nkotlin="2.5.0-Beta2"\n[libraries]\nnative-skiko={module="test.native:skiko",version.ref="skiko"}\n')
             with patch.object(sync_upstream, "ROOT", native):
                 selected = sync_upstream.load_lock()
             self.assertEqual(selected["versions"]["kotlin"], "2.5.0-Beta2")

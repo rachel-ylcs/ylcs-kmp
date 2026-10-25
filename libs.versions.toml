@@ -12,6 +12,7 @@ rachelMinimumCode = "370"
 kotlin = "2.5.0-Beta2"
 agp = "9.3.3"
 cmp = "1.13.0-beta01"
+cmp-internal = "1.12.0-alpha02"
 mavenPublish = "0.37.0"
 dokka = "2.3.0-Beta"
 
@@ -89,6 +90,11 @@ androidx-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runt
 # compose
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
+compose-ui-util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "cmp" }
+compose-ui-geometry = { module = "org.jetbrains.compose.ui:ui-geometry", version.ref = "cmp" }
+compose-ui-unit = { module = "org.jetbrains.compose.ui:ui-unit", version.ref = "cmp" }
+compose-annotation-internal = { module = "org.jetbrains.compose.annotation-internal:annotation", version.ref = "cmp-internal" }
+compose-collection-internal = { module = "org.jetbrains.compose.collection-internal:collection", version.ref = "cmp-internal" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
@@ -183,5 +189,8 @@ sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.16.1" }
 
 # ----- [Native Compose] -----
 
-skiko-native = { module = "love.yinlin.native.skiko:skiko", version.ref = "skiko" }
-skiko-native-skottie = { module = "love.yinlin.native.skiko:skiko-skottie", version.ref = "skiko" }
+native-skiko = { module = "love.yinlin.native.skiko:skiko", version.ref = "skiko" }
+native-skiko-skottie = { module = "love.yinlin.native.skiko:skiko-skottie", version.ref = "skiko" }
+native-compose-ui-util = { module = "love.yinlin.native.compose.ui:ui-util", version.ref = "cmp" }
+native-compose-ui-geometry = { module = "love.yinlin.native.compose.ui:ui-geometry", version.ref = "cmp" }
+native-compose-ui-unit = { module = "love.yinlin.native.compose.ui:ui-unit", version.ref = "cmp" }

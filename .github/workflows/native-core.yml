@@ -1,70 +1,59 @@
-name: Native Skiko Core and Skottie
+name: Native Compose UI
 
 on:
   workflow_dispatch:
-    inputs:
-      gpu-smoke:
-        description: 'Require D3D12 / Vulkan / Metal presentation too (needs a capable runner)'
-        type: boolean
-        default: false
   pull_request:
     paths:
       - 'native-compose/**'
-      - 'build-logic/native-bridge*/**'
+      - 'build-logic/native-bridge/**'
       - 'build-logic/repository-conventions/**'
       - 'build-logic/public-plugin/**'
-      - 'ylcs-app/native-compose/**'
       - 'build-logic/settings.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'build.gradle.kts'
+      - 'ylcs-app/native-compose/**'
       - 'libs.versions.toml'
+      - 'settings.gradle.kts'
       - 'gradle/wrapper/**'
       - '.github/workflows/native-core.yml'
   push:
     branches: [main]
     paths:
       - 'native-compose/**'
-      - 'build-logic/native-bridge*/**'
+      - 'build-logic/native-bridge/**'
       - 'build-logic/repository-conventions/**'
       - 'build-logic/public-plugin/**'
-      - 'ylcs-app/native-compose/**'
       - 'build-logic/settings.gradle.kts'
-      - 'settings.gradle.kts'
-      - 'build.gradle.kts'
+      - 'ylcs-app/native-compose/**'
       - 'libs.versions.toml'
+      - 'settings.gradle.kts'
       - 'gradle/wrapper/**'
       - '.github/workflows/native-core.yml'
 
 permissions:
   contents: read
 
-# Maven tasks below only produce local file repositories for verification.
-# upload-artifact stores CI evidence; this workflow never deploys to a public Maven repository.
-
+# This one Native workflow advances with the current porting stage.
+# Maven tasks write local verification files only; no public repository is configured.
 concurrency:
-  group: native-core-${{ github.workflow }}-${{ github.ref }}
+  group: native-compose-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Core + Skottie / ${{ matrix.target }}
+    name: UI Util + Geometry + Unit / ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         include:
           - runner: windows-2025
             target: mingw_x64
-            target-name: Windows
             test-task: windowsTest
           - runner: ubuntu-24.04
             target: linux_x64
-            target-name: Linux
             test-task: linuxTest
           - runner: macos-26
             target: macos_arm64
-            target-name: Macos
             test-task: macosTest
     defaults:
       run:
@@ -72,10 +61,7 @@ jobs:
     env:
       PYTHONUTF8: '1'
       NATIVE_TARGET: ${{ matrix.target }}
-      TARGET_NAME: ${{ matrix.target-name }}
       NATIVE_TEST_TASK: ${{ matrix.test-task }}
-      # This baseline validates Skia CPU rendering and SDL presentation, independently of a GPU.
-      SDL_RENDER_DRIVER: software
     steps:
       - uses: actions/checkout@v7
         with:
@@ -88,118 +74,55 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
-      - name: MSVC and Windows SDK
-        if: runner.os == 'Windows'
-        uses: TheMrMilchmann/setup-msvc-dev@v4
+      - name: Source and publication tool regressions
+        run: python -m unittest discover -s native-compose/scripts/tests -p 'test_compose_*.py' -v
+      - name: Prepare the one pinned Compose source checkout
+        run: python native-compose/scripts/sync_compose.py
+      - name: Bridge routing regressions and local plugin Maven files
+        run: |
+          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            :native-bridge:test :native-bridge:validatePlugins \
+            :native-bridge:publishAllPublicationsToLocalVerificationRepository
+      - name: Native UI library tests and host Maven files
+        run: |
+          bash ./gradlew -p native-compose/vendor/compose/workspace/native-desktop \
+            --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            ":ui-util:${NATIVE_TEST_TASK}" ":ui-geometry:${NATIVE_TEST_TASK}" ":ui-unit:${NATIVE_TEST_TASK}" \
+            publishHostToVerificationRepository
+      - name: Require real Native behavior and complete publications
+        run: |
+          python native-compose/scripts/verify_compose_ui.py --target "$NATIVE_TARGET" \
+            --tests native-compose/vendor/build/compose-ui
+          printf 'Compose UI %s: Util, Geometry, Unit and official Runtime library regressions passed.\n' \
+            "$NATIVE_TARGET" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
         with:
-          arch: x64
-          export-path-to-vs: VS_PATH
-      - name: Linux build and display dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake ninja-build pkg-config \
-            libfontconfig1-dev libfreetype6-dev fonts-dejavu-core libgl-dev libegl-dev \
-            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev \
-            libxss-dev libxtst-dev libwayland-dev libxkbcommon-dev libdbus-1-dev \
-            libudev-dev libasound2-dev libpulse-dev libibus-1.0-dev libvulkan-dev mesa-vulkan-drivers xvfb xauth
-      - name: Python publication tools
-        run: python -m unittest discover -s native-compose/scripts/tests -v
-      - name: Prepare locked sources and validate host tools
-        run: |
-          python native-compose/scripts/sync_upstream.py
-          python native-compose/scripts/prepare_sdl.py --source
-          python native-compose/scripts/doctor.py
-      - name: Bridge integration tests
-        run: |
-          bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            -Pnative.compose=true :build-logic:native-bridge:test \
-            :build-logic:native-bridge:validatePlugins
-      - name: Current Skiko regressions, independent app and local Maven verification files
-        run: |
-          display=()
-          if [[ "$RUNNER_OS" == Linux ]]; then
-            export SDL_VIDEODRIVER=x11
-            display=(xvfb-run --auto-servernum --server-args='-screen 0 1280x800x24')
-          fi
-          "${display[@]}" bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            -Pnative.compose=true -Pnative.smoke=true -Pnative.renderer=software \
-            ":native-compose:adaptation:samples:skiko:${NATIVE_TEST_TASK}" \
-            ":native-compose:adaptation:samples:skiko:run${TARGET_NAME}DebugExecutable" \
-            ":native-compose:adaptation:samples:skiko:package${TARGET_NAME}DebugExecutable" \
-            ":ylcs-app:native-compose:run${TARGET_NAME}ReleaseExecutable" \
-            ":ylcs-app:native-compose:package${TARGET_NAME}ReleaseExecutable" \
-            :native-compose:publishSkikoToVerificationRepository \
-            :build-logic:native-bridge:publishAllPublicationsToLocalVerificationRepository
-      - name: Require real Native test results and audit Maven artifacts
-        run: |
-          python - <<'PY'
-          import os
-          from pathlib import Path
-          import xml.etree.ElementTree as ET
-          reports = list(Path('native-compose/vendor/build/samples/skiko/test-results').glob('**/TEST-*.xml'))
-          assert reports, 'Native tests produced no JUnit reports'
-          suites = [ET.parse(path).getroot() for path in reports]
-          assert sum(int(suite.attrib['tests']) for suite in suites) == 6, 'Expected four Core and two Skottie integration tests'
-          assert any('SkikoCoreTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 4 for suite in suites)
-          assert any('SkikoSkottieTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 2 for suite in suites)
-          assert all(int(suite.attrib.get(key, 0)) == 0 for suite in suites for key in ['failures', 'errors', 'skipped'])
-          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
-              summary.write(f"Core + Skottie `{os.environ['NATIVE_TARGET']}`: 6 Native tests, offscreen rendering and SDL software resize passed.\n")
-          PY
-          python native-compose/scripts/verify_repository.py --target "$NATIVE_TARGET"
-      - name: Run relocated distribution ZIPs
-        run: |
-          display=()
-          if [[ "$RUNNER_OS" == Linux ]]; then
-            export SDL_VIDEODRIVER=x11
-            display=(xvfb-run --auto-servernum --server-args='-screen 0 1280x800x24')
-          fi
-          "${display[@]}" python native-compose/scripts/verify_distributions.py --target "$NATIVE_TARGET" --renderer software --include-showcase
-      - name: Require the selected Ganesh GPU backend and resize
-        if: github.event_name == 'workflow_dispatch' && inputs.gpu-smoke
-        run: |
-          display=()
-          if [[ "$RUNNER_OS" == Linux ]]; then
-            export SDL_VIDEODRIVER=x11
-            display=(xvfb-run --auto-servernum --server-args='-screen 0 1280x800x24')
-          fi
-          "${display[@]}" bash ./gradlew --no-daemon --configure-on-demand --max-workers=2 --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            -Pnative.compose=true -Pnative.smoke=true -Pnative.renderer=gpu \
-            ":native-compose:adaptation:samples:skiko:run${TARGET_NAME}DebugExecutable" \
-            ":ylcs-app:native-compose:run${TARGET_NAME}ReleaseExecutable"
-      - name: Upload host Maven verification files to Actions
-        uses: actions/upload-artifact@v7
-        with:
-          name: native-core-maven-${{ matrix.target }}
-          path: native-compose/vendor/build/native-compose/repository/
+          name: native-compose-ui-maven-${{ matrix.target }}
+          path: native-compose/vendor/build/compose-ui/repository/
           if-no-files-found: error
-      - name: Upload bridge Maven verification files to Actions
+      - name: Upload bridge Maven verification files
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v7
         with:
           name: native-bridge-maven
           path: build-logic/build/native-bridge-repository/
           if-no-files-found: error
-      - name: Samples and test evidence
+      - name: Library and bridge test evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: native-core-evidence-${{ matrix.target }}
+          name: native-compose-ui-evidence-${{ matrix.target }}
           path: |
-            native-compose/vendor/build/samples/*/distributions/*.zip
-            ylcs-app/native-compose/build/distributions/*.zip
-            native-compose/vendor/build/samples/skiko/test-results/
-            native-compose/vendor/build/samples/skiko/reports/tests/
+            native-compose/vendor/build/compose-ui/*/test-results/
+            native-compose/vendor/build/compose-ui/*/reports/tests/
             build-logic/native-bridge/build/test-results/
             build-logic/native-bridge/build/reports/tests/
           if-no-files-found: warn
 
   assemble:
-    name: Assemble three-target local Maven verification repository
+    name: Assemble the three-target local Maven verification repository
     needs: build
     runs-on: ubuntu-24.04
     steps:
@@ -209,23 +132,23 @@ jobs:
           python-version: '3.13'
       - uses: actions/download-artifact@v8
         with:
-          pattern: native-core-maven-*
+          pattern: native-compose-ui-maven-*
           path: host-publications
-      - name: Choose one root and require all three target publications
+      - name: Require all host artifacts and one canonical KMP root
         run: |
-          python native-compose/scripts/merge_repositories.py \
-            --input mingw_x64=host-publications/native-core-maven-mingw_x64 \
-            --input linux_x64=host-publications/native-core-maven-linux_x64 \
-            --input macos_arm64=host-publications/native-core-maven-macos_arm64 \
-            --output native-compose/vendor/build/assembled-repository
+          python native-compose/scripts/verify_compose_ui.py \
+            --input mingw_x64=host-publications/native-compose-ui-maven-mingw_x64 \
+            --input linux_x64=host-publications/native-compose-ui-maven-linux_x64 \
+            --input macos_arm64=host-publications/native-compose-ui-maven-macos_arm64 \
+            --output native-compose/vendor/build/compose-ui/assembled-repository
       - uses: actions/upload-artifact@v7
         with:
-          name: native-core-maven
-          path: native-compose/vendor/build/assembled-repository/
+          name: native-compose-ui-maven
+          path: native-compose/vendor/build/compose-ui/assembled-repository/
           if-no-files-found: error
 
   consume:
-    name: Maven consumer / ${{ matrix.target }}
+    name: UI Maven consumer / ${{ matrix.target }}
     needs: assemble
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
@@ -235,21 +158,22 @@ jobs:
         include:
           - runner: windows-2025
             target: mingw_x64
-            target-name: Windows
+            test-task: windowsTest
           - runner: ubuntu-24.04
             target: linux_x64
-            target-name: Linux
+            test-task: linuxTest
           - runner: macos-26
             target: macos_arm64
-            target-name: Macos
+            test-task: macosTest
     defaults:
       run:
         shell: bash
     env:
-      TARGET_NAME: ${{ matrix.target-name }}
-      SDL_RENDER_DRIVER: software
+      NATIVE_TEST_TASK: ${{ matrix.test-task }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          submodules: false
       - uses: actions/setup-java@v6
         with:
           distribution: oracle
@@ -257,37 +181,44 @@ jobs:
           cache: gradle
       - uses: actions/download-artifact@v8
         with:
-          name: native-core-maven
-          path: maven-core
+          name: native-compose-ui-maven
+          path: maven-ui
       - uses: actions/download-artifact@v8
         with:
           name: native-bridge-maven
           path: maven-plugins
-      - name: Linux runtime dependencies
-        if: runner.os == 'Linux'
+      - name: Test common official requests and explicit Native Maven requests
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libfontconfig1-dev libgl-dev fonts-dejavu-core xvfb xauth \
-            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev
-      - name: Compile, link and run using only Maven artifacts
-        run: |
+          test ! -e native-compose/vendor/compose/state.json
           test ! -e native-compose/vendor/skiko/state.json
           repositoryRoot="$PWD"
           if [[ "$RUNNER_OS" == Windows ]]; then
             repositoryRoot="$(pwd -W)"
           fi
-          display=()
-          if [[ "$RUNNER_OS" == Linux ]]; then
-            export SDL_VIDEODRIVER=x11
-            display=(xvfb-run --auto-servernum --server-args='-screen 0 1280x800x24')
-          fi
-          "${display[@]}" bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --max-workers=2 \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            "-Pnative.repository=$repositoryRoot/maven-core" "-Pnative.plugin.repository=$repositoryRoot/maven-plugins" \
-            -Pnative.legacyRequest=true -Pnative.window=true "run${TARGET_NAME}DebugExecutable"
-      - name: Consumer rendering evidence
+          for explicit in false true; do
+            bash ./gradlew -p native-compose/verification/compose-ui-consumer \
+              --no-daemon --max-workers=2 --stacktrace \
+              -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+              "-Pnative.repository=$repositoryRoot/maven-ui" "-Pnative.plugin.repository=$repositoryRoot/maven-plugins" \
+              "-Pnative.explicit=$explicit" "$NATIVE_TEST_TASK"
+          done
+          test ! -e native-compose/vendor/compose/state.json
+          test ! -e native-compose/vendor/skiko/state.json
+          python - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          reports = list(Path('native-compose/vendor/build/compose-ui/maven-consumer/test-results').glob('**/TEST-*.xml'))
+          assert reports, 'No independent Maven consumer test reports'
+          suites = [ET.parse(path).getroot() for path in reports]
+          assert any('ComposeUiPublicationTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 2 for suite in suites)
+          assert all(int(suite.attrib.get(key, 0)) == 0 for suite in suites for key in ['failures', 'errors', 'skipped'])
+          PY
+      - name: Independent Maven consumer test evidence
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: native-core-consumer-${{ matrix.target }}
-          path: native-compose/vendor/build/maven-consumer/nativeApplication/*/debugExecutable/*.png
-          if-no-files-found: error
+          name: native-compose-ui-consumer-${{ matrix.target }}
+          path: |
+            native-compose/vendor/build/compose-ui/maven-consumer/test-results/
+            native-compose/vendor/build/compose-ui/maven-consumer/reports/tests/
+          if-no-files-found: warn

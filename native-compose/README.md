@@ -1,9 +1,10 @@
-# Rachel Native desktop / Skiko
+# Rachel Native desktop / Compose UI
 
-可选的桌面 Native 移植模块组，当前阶段为 Skiko Core + Skottie、静态 SDL 窗口宿主、桥插件、
-阶段回归和独立 Rachel APP。目标：mingwX64、linuxX64、macosArm64。
+可选的桌面 Native 移植模块组，当前推进 Compose UI 的 ui-util、ui-geometry、ui-unit，
+基于已有 Skiko Core + Skottie、静态 SDL 窗口宿主及桥插件。目标：mingwX64、linuxX64、macosArm64。
 默认 GPU：Windows Ganesh/D3D12，Linux Ganesh/Vulkan，macOS Ganesh/Metal。
-Graphite 按已确定的路线排除；Compose runtime/UI 尚未移植。
+Graphite 按已确定的路线排除。Compose Runtime 复用官方 Native 工件，UI 其余模块尚待后续移植。
+本阶段实现、审计、CI 与消费边界见 [COMPOSE_UI.md](docs/COMPOSE_UI.md)。
 
 当前范围、已验收的平台及待完成项见 [STATUS.md](docs/STATUS.md)，实际检查见 [VALIDATION.md](docs/VALIDATION.md)。
 
@@ -47,11 +48,12 @@ native.compose=true
 strictly/reject 冲突、未支持的动态和范围请求明确失败。
 这项解析策略不构成所有旧版 API/ABI 自动兼容的承诺；普通模式使用所安装插件的兼容版本。
 
-- adaptation/：提交的 Kotlin/C++、CInterop 定义、构建配置和当前阶段样例。
+- adaptation/：按依赖坐标组织提交的 Kotlin/C++、CInterop 定义、构建配置和库内回归测试，不维护 samples。
 - vendor/：忽略的上游源码、准备后的 fork、静态 SDK、输出及 logs。
 - 上游历史共享代码由脚本合并到 nativeMain/nativeTest，活动源集不使用 Native/JS 名称。
 - 当前仅有 macosArm64，Darwin 共享层统一合并到 macosMain/macosTest；三个平台层为 windows/linux/macos。
 - 两个库属于同一个 Skiko included build；正式 buildFile 指向 adaptation，继续复用上游 buildSrc。
+- Compose UI 使用一份 vendor/compose/workspace 稀疏 checkout 和单独的 compose-ui included build。
 
 详见 [SOURCES.md](docs/SOURCES.md)。不要手改 vendor。
 
@@ -59,7 +61,7 @@ strictly/reject 冲突、未支持的动态和范围请求明确失败。
 
 ylcs-app/native-compose 只包含 commonMain 的场景与公共窗口 API 调用。
 build.gradle.kts 复用 Rachel nativeExecutable DSL，commonMain 声明 projects.ylcsModule.core、
-libs.skiko 和 libs.skiko.lottie：
+libs.skiko、libs.skiko.lottie 及本阶段 libs.compose.ui.util / geometry / unit：
 
 ```kotlin
 nativeApplication {
@@ -103,9 +105,11 @@ Skiko 的唯一工作源码位于 vendor/skiko/workspace，Gradle/IDE 始终引�
 .\gradlew.bat "-Pnative.compose=true" :ylcs-app:native-compose:runWindowsReleaseExecutable
 .\gradlew.bat "-Pnative.compose=true" :ylcs-app:native-compose:packageWindowsReleaseExecutable
 
-# 当前阶段回归与窗口
-.\gradlew.bat "-Pnative.compose=true" :native-compose:adaptation:samples:skiko:windowsTest
-.\gradlew.bat "-Pnative.compose=true" "-Pnative.smoke=true" :native-compose:adaptation:samples:skiko:runWindowsDebugExecutable
+# 当前 UI 库内回归
+.\gradlew.bat "-Pnative.compose=true" :compose-ui:ui-util:windowsTest :compose-ui:ui-geometry:windowsTest :compose-ui:ui-unit:windowsTest
+
+# 既有 Skiko 库内回归（当前 CI 阶段不执行）
+.\gradlew.bat "-Pnative.compose=true" :skiko:mingwX64RegressionTest :skiko:skiko-skottie:mingwX64RegressionTest
 ```
 
 Linux/macOS 在对应宿主将 Windows/windowsTest 替换为 Linux/linuxTest 或 Macos/macosTest，
@@ -114,7 +118,7 @@ Linux/macOS 在对应宿主将 Windows/windowsTest 替换为 Linux/linuxTest 或
 
 IDE 的 Native Compose 分组提供 nativeComposeShowcase（Debug）和 nativeComposeShowcaseRelease。
 应用打包输出在 ylcs-app/native-compose/build/distributions，
-阶段输出在 native-compose/vendor/build/samples/skiko；临时日志统一在 vendor/build/logs。
+UI 输出在 native-compose/vendor/build/compose-ui；临时日志统一在 vendor/build/logs。
 分发不再含 SDL 动态库，Windows 保留 icudtl.dat；插件不再复制许可证到程序暂存目录或 ZIP。
 来源与许可证仍保存在源码目录及 sources 工件中。详细边界见 [RUNTIME.md](docs/RUNTIME.md)。
 

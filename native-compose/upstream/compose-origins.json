@@ -1,0 +1,13 @@
+{
+    "schema": 1,
+    "files": {
+        "adaptation/org.jetbrains.compose.ui_ui-util/src/windowsMain/kotlin/androidx/compose/ui/util/Trace.windows.kt": {
+            "source": "compose/ui/ui-util/src/macosMain/kotlin/androidx/compose/ui/util/Trace.macos.kt",
+            "description": "Preserves the upstream desktop tracing contract: execute the block once without collecting profiling events."
+        },
+        "adaptation/org.jetbrains.compose.ui_ui-util/src/linuxMain/kotlin/androidx/compose/ui/util/Trace.linux.kt": {
+            "source": "compose/ui/ui-util/src/macosMain/kotlin/androidx/compose/ui/util/Trace.macos.kt",
+            "description": "Preserves the upstream desktop tracing contract: execute the block once without collecting profiling events."
+        }
+    }
+}

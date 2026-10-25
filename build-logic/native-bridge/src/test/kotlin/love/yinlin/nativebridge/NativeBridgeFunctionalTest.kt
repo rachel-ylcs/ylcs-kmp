@@ -5,6 +5,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.FileSystems
 import java.nio.file.attribute.PosixFilePermissions
+import java.util.Properties
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -25,8 +26,8 @@ class NativeBridgeFunctionalTest {
         .withPluginClasspath()
         .withArguments(*tasks, "--stacktrace", "--console=plain", "--gradle-user-home", System.getProperty("native.tests.gradleUserHome"))
 
-    private fun module(directory: File, group: String, version: String, dependencies: String = "") {
-        val module = directory.resolve("repo/${group.replace('.', '/')}/render/$version").apply { mkdirs() }
+    private fun module(directory: File, group: String, version: String, dependencies: String = "", artifact: String = "render") {
+        val module = directory.resolve("repo/${group.replace('.', '/')}/$artifact/$version").apply { mkdirs() }
         val variants = listOf("mingw_x64", "linux_x64", "macos_arm64", "jvm", "common").joinToString(",") { target ->
             val platform = if (target in setOf("jvm", "common")) target else "native"
             val nativeAttribute = if (platform == "native") ",\"org.jetbrains.kotlin.native.target\":\"$target\"" else ""
@@ -37,8 +38,8 @@ class NativeBridgeFunctionalTest {
             }
             """{"name":"$target","attributes":{"org.gradle.usage":"$usage","org.gradle.category":"library","org.jetbrains.kotlin.platform.type":"$platform"$nativeAttribute},"dependencies":[$dependencies]}"""
         }
-        module.resolve("render-$version.module").writeText("""{"formatVersion":"1.1","component":{"group":"$group","module":"render","version":"$version"},"variants":[$variants]}""")
-        module.resolve("render-$version.pom").writeText("""<project><modelVersion>4.0.0</modelVersion><groupId>$group</groupId><artifactId>render</artifactId><version>$version</version></project>""")
+        module.resolve("$artifact-$version.module").writeText("""{"formatVersion":"1.1","component":{"group":"$group","module":"$artifact","version":"$version"},"variants":[$variants]}""")
+        module.resolve("$artifact-$version.pom").writeText("""<project><modelVersion>4.0.0</modelVersion><groupId>$group</groupId><artifactId>$artifact</artifactId><version>$version</version></project>""")
     }
 
     private fun consumer(directory: File, targets: String, requestedVersion: String = "1.0", extra: String = "", includePort: Boolean = true) {
@@ -93,6 +94,56 @@ class NativeBridgeFunctionalTest {
         assertContains(output.lineSequence().first { it.startsWith("ROUTE mac =") }, "test.upstream:render:1.0")
         assertContains(output.lineSequence().first { it.startsWith("ROUTE desktop =") }, "test.upstream:render:1.0")
         assertContains(output, "APPLICATION_RUNTIMES=0")
+    }
+
+    @Test
+    fun builtInComposeRulesRedirectWindowsAndLinuxWhileMacAndJvmStayOfficial() {
+        val project = project()
+        val compatibility = Properties().apply {
+            checkNotNull(NativeBridgePlugin::class.java.classLoader.getResourceAsStream("rachel-native-bridge.properties")).use { load(it) }
+        }
+        val version = compatibility.getProperty("compose.upstream.version")
+        val artifacts = listOf("ui-util", "ui-geometry", "ui-unit")
+        for (artifact in artifacts) {
+            module(project, "org.jetbrains.compose.ui", version, artifact = artifact)
+            module(project, "love.yinlin.native.compose.ui", version, artifact = artifact)
+        }
+        val dependencies = artifacts.joinToString("\n") { "implementation(\"org.jetbrains.compose.ui:$it:$version\")" }
+        project.resolve("build.gradle.kts").writeText("""
+            plugins {
+                id("org.jetbrains.kotlin.multiplatform")
+                id("love.yinlin.native-bridge")
+            }
+            repositories {
+                maven { url = uri("repo"); metadataSources { gradleMetadata(); mavenPom() } }
+            }
+            kotlin {
+                mingwX64("windows")
+                linuxX64("linux")
+                macosArm64("macos")
+                jvm("desktop")
+                sourceSets.commonMain.dependencies {
+                    $dependencies
+                }
+            }
+            tasks.register("verifyComposeRouting") {
+                doLast {
+                    kotlin.targets.filter { it.name != "metadata" }.forEach { target ->
+                        val config = configurations.getByName(target.compilations.getByName("main").compileDependencyConfigurationName)
+                        val result = config.incoming.resolutionResult
+                        result.allDependencies.filterIsInstance<org.gradle.api.artifacts.result.UnresolvedDependencyResult>().forEach { throw it.failure }
+                        println("COMPOSE_ROUTE " + target.name + " = " + result.allComponents.joinToString { it.id.displayName })
+                    }
+                }
+            }
+        """.trimIndent())
+        val output = runner(project, "verifyComposeRouting").build().output
+        for (target in listOf("windows", "linux", "macos", "desktop")) {
+            val line = output.lineSequence().first { it.startsWith("COMPOSE_ROUTE $target =") }
+            val group = if (target in setOf("windows", "linux")) "love.yinlin.native.compose.ui" else "org.jetbrains.compose.ui"
+            for (artifact in artifacts) assertContains(line, "$group:$artifact:$version")
+            if (target in setOf("macos", "desktop")) assertFalse(line.contains("love.yinlin.native.compose.ui"))
+        }
     }
 
     @Test

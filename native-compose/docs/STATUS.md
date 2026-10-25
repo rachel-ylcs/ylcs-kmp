@@ -1,4 +1,20 @@
-# Skiko 当前状态与下一步
+# Native Compose 当前状态与下一步
+
+## 当前阶段：Compose UI 基础库
+
+已落地 ui-util、ui-geometry、ui-unit 的三目标源码构建、Windows/Linux 缺失 actual、
+按库/target 的桥接规则、14 项库内回归和独立 Maven 测试消费者。当前仅完成源码准备与静态检查，
+尚未执行本轮构建、测试或预览；不能将这些新增配置记为三平台验收通过。
+
+adaptation 不再维护 samples，既有 Skiko 回归已迁入对应适配库；唯一预览入口为 ylcs-app/native-compose。
+现有 native-core.yml 已切换到 UI 基础库阶段，不再运行 Skiko 编译/窗口/GPU 测试，也没有增加新的工作流。
+正式 Maven 发布仍关闭，CI 只生成 file: 验证仓库并上传 Actions 附件。
+
+下一步依次是 ui-graphics、ui-text、ui-skiko，再接 ui-backhandler、ui 和 SDL ComposeScene 宿主。
+目前 APP 只把 Compose 的几何/单位/工具 API 用于已有 Skiko 预览，尚未渲染 Composable UI。
+源码与依赖审计及任务命令见 [COMPOSE_UI.md](COMPOSE_UI.md)。
+
+## Skiko 基线与此前验收边界
 
 结论：**Core/Skottie 的主要实现已接入三个桌面 Native 目标，但最新 CI 三个平台均在 Kotlin 编译阶段失败，尚未完成移植验收。**
 源码审计尚未发现新增的 target actual 或 bridge 符号遗漏；当前编译修复、三目标 Maven 汇总消费
@@ -9,7 +25,7 @@
 对应提交 b0e2bd0f8d1a。三个宿主的 Python 工具测试及桥插件集成检查已通过，
 Core 均因 PaintFilterCanvas.shared.kt 的 @file:OptIn 直接引用内部注解 SymbolNameIsInternal 而编译失败。
 当前修复在生成脚本中移除该源码引用，保留原有按名称配置的 source-set 编译器 opt-in；
-Native 符号绑定、版本和三个 target 不变。版本目录及调用处同步使用 skiko-native / skiko-native-skottie。
+Native 符号绑定、版本和三个 target 不变。版本目录及调用处统一使用 native-skiko / native-skiko-skottie。
 按用户要求，本轮未执行准备、构建、测试或运行，修复等待下一轮 CI。
 
 下表明确区分当前阻塞与此前通过的记录；此前成功不能作为最新提交的验收结果。

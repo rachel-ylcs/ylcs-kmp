@@ -34,6 +34,16 @@ class NativeBridgePlugin : Plugin<Project> {
             targets.set(setOf("mingw_x64", "linux_x64", "macos_arm64"))
             module.set(compatibility.getProperty("skiko.skottie.module").substringBeforeLast(':') + ":" + upstreamVersion.get())
         }
+        for (artifact in compatibility.getProperty("compose.ui.modules").split(',')) {
+            val ruleName = "compose-$artifact"
+            bridge.redirect(ruleName) {
+                upstream.set("org.jetbrains.compose.ui:$artifact")
+                upstreamVersion.set(selectedVersion(project, ruleName, compatibility.getProperty("compose.upstream.version")))
+                targets.set(compatibility.getProperty("compose.$artifact.targets").split(',').toSet())
+                metadataTargets.set(compatibility.getProperty("compose.$artifact.metadata.targets").split(',').toSet())
+                module.set(compatibility.getProperty("compose.$artifact.module").substringBeforeLast(':') + ":" + upstreamVersion.get())
+            }
+        }
         val application = project.extensions.create("nativeApplication", NativeApplicationExtension::class.java)
         application.baseName.convention(project.name)
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
@@ -57,6 +67,9 @@ class NativeBridgePlugin : Plugin<Project> {
             doLast {
                 val nativeTargets = kotlin.targets.withType(KotlinNativeTarget::class.java)
                 project.logger.lifecycle("Native Bridge configured redirects for ${project.path} (no dependency resolution)")
+                for (rule in bridge.redirects.filter { it.metadataTargets.get() != it.targets.get() }) {
+                    project.logger.lifecycle("Shared metadata ${rule.name}: ${rule.metadataTargets.get().joinToString()}; concrete redirects: ${rule.targets.get().joinToString()}")
+                }
                 if (nativeTargets.isEmpty()) project.logger.lifecycle("No Native targets; no Native redirects apply.")
                 for (target in nativeTargets) {
                     val configuration = target.compilations.getByName("main").compileDependencyConfigurationName
@@ -75,7 +88,7 @@ class NativeBridgePlugin : Plugin<Project> {
                         if (!adaptation.isNullOrBlank()) project.logger.lifecycle("    adaptation: $adaptation")
                     }
                     val insight = if (project.path == ":") ":dependencyInsight" else "${project.path}:dependencyInsight"
-                    project.logger.lifecycle("  Actual graph: $insight --configuration $configuration --dependency org.jetbrains.skiko")
+                    project.logger.lifecycle("  Actual graph: $insight --configuration $configuration --dependency <group:artifact>")
                 }
             }
         }
@@ -105,13 +118,13 @@ class NativeBridgePlugin : Plugin<Project> {
                         rule.upstream.get() == "${requested.group}:${requested.module}" && when {
                             target != null -> target in rule.targets.get()
                             metadataTargets[configuration.name] != null ->
-                                metadataTargets.getValue(configuration.name).all { it in rule.targets.get() }
+                                metadataTargets.getValue(configuration.name).all { it in rule.metadataTargets.get() }
                             platform == KotlinPlatformType.common -> {
-                                // A common metadata graph may be replaced only if every participating
-                                // platform uses this port. Mixed JVM/Android/common graphs stay official.
+                                // Shared metadata may be replaced only when the replacement covers
+                                // every participant. Mixed JVM/Android/common graphs stay official.
                                 val participants = kotlin.targets.filter { it.platformType != KotlinPlatformType.common }
                                 participants.isNotEmpty() && participants.all {
-                                    it is KotlinNativeTarget && it.konanTarget.name in rule.targets.get()
+                                    it is KotlinNativeTarget && it.konanTarget.name in rule.metadataTargets.get()
                                 }
                             }
                             else -> false

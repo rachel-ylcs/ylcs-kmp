@@ -18,6 +18,9 @@ rachel {
                     projects.ylcsModule.core,
                     libs.skiko,
                     libs.skiko.lottie,
+                    libs.compose.ui.util,
+                    libs.compose.ui.geometry,
+                    libs.compose.ui.unit,
                 )
             }
         }

@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
@@ -29,10 +30,23 @@ dependencies {
 val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     destinationFile.set(layout.buildDirectory.file("generated/compatibility/rachel-native-bridge.properties"))
     property("skiko.upstream.version", libs.versions.skiko.get())
-    val nativeSkiko = libs.skiko.native.asProvider().get()
+    val nativeSkiko = libs.native.skiko.asProvider().get()
     property("skiko.port.module", "${nativeSkiko.module.group}:${nativeSkiko.module.name}:${nativeSkiko.versionConstraint.requiredVersion}")
-    property("skiko.skottie.module", libs.skiko.native.skottie.get().toString())
+    property("skiko.skottie.module", libs.native.skiko.skottie.get().toString())
     property("sdl.version", libs.versions.sdl.get())
+    val composeLock = rootProject.file("../native-compose/upstream/compose.json")
+    inputs.file(composeLock)
+    val compose = JsonSlurper().parse(composeLock) as Map<*, *>
+    val composeModules = compose["modules"] as Map<*, *>
+    val catalog = project.extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
+    property("compose.upstream.version", libs.versions.cmp.get())
+    property("compose.ui.modules", composeModules.keys.joinToString(","))
+    for ((artifact, value) in composeModules) {
+        val module = value as Map<*, *>
+        property("compose.$artifact.module", catalog.findLibrary(module["alias"] as String).get().get().toString())
+        property("compose.$artifact.targets", (module["redirectTargets"] as List<*>).joinToString(","))
+        property("compose.$artifact.metadata.targets", (module["metadataTargets"] as List<*>).joinToString(","))
+    }
 }
 tasks.processResources { from(writeCompatibility) }
 

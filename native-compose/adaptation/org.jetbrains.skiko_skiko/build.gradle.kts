@@ -56,6 +56,7 @@ tasks.withType<AbstractArchiveTask>().configureEach {
 // SDL belongs to the Native producer. Consumers receive its bindings, static
 // archive and portable system dependencies through this module's publication.
 val nativeComposeDirectory = adaptationDirectory.parentFile.parentFile
+apply(from = nativeComposeDirectory.resolve("scripts/templates/skiko-library-tests.gradle.kts"))
 val sdlLock = JsonSlurper().parse(nativeComposeDirectory.resolve("upstream/sdl.json")) as Map<*, *>
 val sdlVersion = sdlLock["version"] as String
 val sdlHost = HostManager.host.name

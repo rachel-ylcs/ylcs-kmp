@@ -23,3 +23,5 @@ extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectCo
     }
 }
 apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))
+
+apply(from = buildFile.parentFile.parentFile.parentFile.resolve("scripts/templates/skiko-library-tests.gradle.kts"))

@@ -1,4 +1,4 @@
-"""Extract and run the packaged Core samples from new directories containing spaces."""
+"""Extract and run the preview app packages from new directories containing spaces."""
 import argparse
 from pathlib import Path, PurePosixPath
 import shutil
@@ -81,15 +81,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", choices=list(HOST_TARGETS.values()), required=True)
     parser.add_argument("--renderer", choices=["gpu", "software"], default="software")
-    parser.add_argument("--include-showcase", action="store_true")
     args = parser.parse_args()
     if HOST_TARGETS[host_skia_key()] != args.target:
         parser.error("Run distributions on their matching host")
     work = ROOT / "vendor/build/distribution-verification"
     work.mkdir(parents=True, exist_ok=True)
-    samples = [("skiko", ROOT / "vendor/build/samples/skiko/distributions", "skiko", "debug")]
-    if args.include_showcase:
-        samples.append(("native-compose", ROOT.parent / "ylcs-app/native-compose/build/distributions", "native_compose", "release"))
+    distributions = ROOT.parent / "ylcs-app/native-compose/build/distributions"
+    samples = [("native-compose", distributions, "native_compose", build_type) for build_type in ["debug", "release"]]
     for sample, distributions, binary_name, build_type in samples:
         archives = list(distributions.glob(f"{sample}-*-{args.target}-{build_type}.zip"))
         # Gradle omits the version segment when project.version is unspecified.

@@ -1,0 +1,37 @@
+{
+    "schema": 1,
+    "repository": "JetBrains/compose-multiplatform-core",
+    "ref": "v1.13.0-beta01",
+    "commit": "bb05011eb10784ada1ec00494f1a710ba6ab6252",
+    "version": "1.13.0-beta01",
+    "group": "love.yinlin.native.compose.ui",
+    "modules": {
+        "ui-util": {
+            "alias": "native-compose-ui-util",
+            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "nativeMain": ["src/nonJvmMain/kotlin"],
+                "macosMain": ["src/macosMain/kotlin"]
+            }
+        },
+        "ui-geometry": {
+            "alias": "native-compose-ui-geometry",
+            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"]
+            }
+        },
+        "ui-unit": {
+            "alias": "native-compose-ui-unit",
+            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "nativeMain": ["src/nonAndroidMain/kotlin", "src/nonJvmMain/kotlin"]
+            }
+        }
+    }
+}
