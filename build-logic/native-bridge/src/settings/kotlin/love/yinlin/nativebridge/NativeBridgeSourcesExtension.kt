@@ -16,6 +16,13 @@ class NativeBridgeSourcesExtension(private val settings: Settings) {
 
     /** Adds maintained source locations for nativeBridgeReport without changing project selection. */
     fun include(directory: Any, buildName: String, projects: Map<String, Pair<String, String>>, adaptationDirectories: Map<String, File>) {
+        projects.forEach { (rule, source) ->
+            settings.gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.sourceInfo.$rule", mapOf(
+                "build" to buildName,
+                "project" to source.second,
+                "adaptation" to (adaptationDirectories[rule]?.resolve("build.gradle.kts")?.invariantSeparatorsPath ?: ""),
+            ))
+        }
         settings.includeBuild(directory) {
             name = buildName
             dependencySubstitution {
@@ -23,11 +30,6 @@ class NativeBridgeSourcesExtension(private val settings: Settings) {
                 projects.forEach { (rule, source) ->
                     val selector = substitutions.project(source.second)
                     settings.gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.source.$rule", selector)
-                    settings.gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.sourceInfo.$rule", mapOf(
-                        "build" to buildName,
-                        "project" to source.second,
-                        "adaptation" to (adaptationDirectories[rule]?.resolve("build.gradle.kts")?.invariantSeparatorsPath ?: ""),
-                    ))
                     substitutions.substitute(substitutions.module(source.first)).using(selector)
                 }
             }

@@ -29,6 +29,8 @@ def load_lock():
         raise ValueError("CMP version changed; review upstream/compose.json and pin its matching source commit. The main project does not need a downgrade.")
     if lock["repository"] != "JetBrains/compose-multiplatform-core" or not re.fullmatch(r"[a-f0-9]{40}", lock["commit"]):
         raise ValueError("Invalid Compose source identity")
+    if not lock.get("ciModules", lock["modules"]) or not set(lock.get("ciModules", lock["modules"])).issubset(lock["modules"]):
+        raise ValueError("Compose CI stage references an unknown module")
     for name, module in lock["modules"].items():
         if not re.fullmatch(r"ui-[a-z]+(?:-[a-z]+)*", name):
             raise ValueError(f"Invalid Compose module name: {name}")
@@ -45,7 +47,7 @@ def load_lock():
                 raise ValueError(f"Unaudited source set: {name}/{source_set}")
             for directory in directories:
                 parts = PurePosixPath(directory).parts
-                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonJvmMain", "nativeMain", "macosMain"}:
+                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonJvmMain", "skikoMain", "nativeMain", "macosMain"}:
                     raise ValueError(f"Unaudited upstream source path: {name}/{directory}")
     return lock
 
@@ -122,15 +124,15 @@ def prepare(lock, offline):
     templates = ROOT / "scripts/templates"
     inputs = [ROOT / "upstream/compose.json", ROOT / "upstream/compose-origins.json", Path(__file__),
               ROOT / "scripts/upstream_versions.py", ROOT / "scripts/sync_upstream.py",
-              templates / "compose-ui.settings.gradle.kts", templates / "compose-ui.build.gradle.kts"]
+              templates / "compose-ui.settings.gradle.kts.template", templates / "compose-ui.build.gradle.kts.template"]
     inputs += [ROOT.parent / name for name in ["gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat"]]
     projects = []
     for name in lock["modules"]:
-        projects += [f'include(":{name}")', f'project(":{name}").apply {{',
-                     f'    projectDir = rootDir.resolve("../compose/ui/{name}")',
-                     f'    buildFileName = projectDir.toPath().relativize(repositoryDirectory.resolve("native-compose/adaptation/org.jetbrains.compose.ui_{name}/build.gradle.kts").toPath()).toString()', "}"]
-    settings = (templates / "compose-ui.settings.gradle.kts").read_text(encoding="utf-8").replace("__PROJECTS__", "\n".join(projects))
-    build = (templates / "compose-ui.build.gradle.kts").read_text(encoding="utf-8").replace("__JAVA_VERSION__", str(profile["java"]))
+        projects += [f'if ("{name}" in selectedModules) {{', f'    include(":{name}")', f'    project(":{name}").apply {{',
+                     f'        projectDir = rootDir.resolve("../compose/ui/{name}").canonicalFile',
+                     f'        buildFileName = projectDir.toPath().relativize(repositoryDirectory.resolve("native-compose/adaptation/org.jetbrains.compose.ui_{name}/build.gradle.kts").toPath()).toString()', "    }", "}"]
+    settings = (templates / "compose-ui.settings.gradle.kts.template").read_text(encoding="utf-8").replace("__PROJECTS__", "\n".join(projects))
+    build = (templates / "compose-ui.build.gradle.kts.template").read_text(encoding="utf-8").replace("__JAVA_VERSION__", str(profile["java"]))
     write(BUILD / "settings.gradle.kts", settings)
     write(BUILD / "build.gradle.kts", build)
     properties = {"kotlin.mpp.applyDefaultHierarchyTemplate": "false", **profile["gradleProperties"]}

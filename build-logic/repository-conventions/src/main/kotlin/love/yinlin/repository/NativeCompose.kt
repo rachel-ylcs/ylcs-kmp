@@ -5,7 +5,6 @@ import love.yinlin.nativebridge.NativeBridgeSourcesExtension
 import org.gradle.api.initialization.Settings
 import org.gradle.api.logging.Logging
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.maven
 import java.io.File
 import java.security.MessageDigest
 

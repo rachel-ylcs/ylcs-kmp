@@ -13,6 +13,54 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class NativeBridgeFunctionalTest {
+    @Test
+    fun maintainedLibraryTestScriptConfiguresWithoutExecutingNativeCompilations() {
+        val root = project()
+        val native = root.resolve("native-compose")
+        native.resolve("upstream").mkdirs()
+        native.resolve("upstream/lock.json").writeText("""{"skia":"fixture"}""")
+        val library = native.resolve("adaptation/test.library").apply { mkdirs() }
+        library.resolve("settings.gradle.kts").writeText("rootProject.name = \"library-test-configuration\"\n")
+        library.resolve("gradle.properties").writeText("kotlin.native.ignoreDisabledTargets=true\n")
+        library.resolve("buildSrc").mkdirs()
+        library.resolve("buildSrc/build.gradle.kts").writeText("""
+            plugins { `java-library` }
+            repositories { mavenCentral() }
+            dependencies { implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${System.getProperty("native.tests.kotlinVersion")}") }
+        """.trimIndent())
+        val script = File(System.getProperty("native.tests.skikoLibraryScript")).invariantSeparatorsPath
+        library.resolve("build.gradle.kts").writeText("""
+            import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
+            import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+            import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
+            plugins { id("org.jetbrains.kotlin.multiplatform") }
+            repositories { mavenCentral() }
+            kotlin {
+                mingwX64()
+                linuxX64()
+                macosArm64()
+            }
+            tasks.register("unzipSkiaReleaseWindowsX64")
+            apply(from = "$script")
+            tasks.register("verifyNativeTestConfiguration") {
+                doLast {
+                    kotlin.targets.withType<KotlinNativeTargetWithHostTests>().forEach { target ->
+                        val run = target.testRuns.getByName("regression")
+                        check(run.executionSource.compilation.name == "regression")
+                        check(target.binaries.getTest("regression", NativeBuildType.DEBUG).compilation == target.compilations.getByName("regression"))
+                        check(tasks.getByName(target.name + "RegressionTest") is KotlinNativeTest)
+                        check(kotlin.sourceSets.getByName("nativeRegressionTest").dependsOn.contains(kotlin.sourceSets.getByName("commonRegression")))
+                        println("CONFIGURED_LIBRARY_TEST=" + target.name)
+                    }
+                }
+            }
+        """.trimIndent())
+        val output = runner(library, "verifyNativeTestConfiguration").build().output
+        for (target in listOf("mingwX64", "linuxX64", "macosArm64")) assertContains(output, "CONFIGURED_LIBRARY_TEST=$target")
+        assertFalse(output.contains("Missing 'dependsOn' in Source Sets"))
+        assertFalse(output.lineSequence().any { it.startsWith("> Task :compileKotlin") || it.startsWith("> Task :link") })
+    }
+
     private fun project(): File {
         val work = File(System.getProperty("native.tests.work")).apply { mkdirs() }
         return Files.createTempDirectory(work.toPath(), "bridge-").toFile().also {
@@ -331,7 +379,7 @@ class NativeBridgeFunctionalTest {
     @Test
     fun includedBuildRedirectUsesTheForeignProjectSelector() {
         val project = project()
-        consumer(project, "mingwX64(\"windows\")", includePort = false)
+        consumer(project, "mingwX64(\"windows\"); jvm(\"desktop\")", includePort = false)
         project.resolve("settings.gradle.kts").writeText("""
             plugins { id("love.yinlin.native-bridge.settings") }
             rootProject.name = "consumer"
@@ -344,7 +392,7 @@ class NativeBridgeFunctionalTest {
             import org.gradle.api.attributes.Attribute
             import org.gradle.api.attributes.Usage
             plugins { base }
-            group = "test.port"
+            group = "test.upstream"
             version = "1.0-native"
             configurations.create("nativeApi") {
                 isCanBeConsumed = true
@@ -358,7 +406,61 @@ class NativeBridgeFunctionalTest {
         """.trimIndent())
         val output = runner(project, "verifyRouting").build().output
         assertContains(output.lineSequence().first { it.startsWith("ROUTE windows =") }, "local-port")
+        val desktop = output.lineSequence().first { it.startsWith("ROUTE desktop =") }
+        assertContains(desktop, "test.upstream:render:1.0")
+        assertFalse(desktop.contains("local-port"))
         assertContains(output, "APPLICATION_RUNTIMES=0")
+    }
+
+    @Test
+    fun duplicateSourceBuildRegistrationKeepsIncludedConsumerRoutingLocal() {
+        val project = project()
+        consumer(project, "mingwX64(\"windows\"); jvm(\"desktop\")", includePort = false)
+        project.resolve("settings.gradle.kts").writeText("""
+            plugins { id("love.yinlin.native-bridge.settings") }
+            rootProject.name = "consumer"
+            gradle.extensions.extraProperties.set("love.yinlin.nativeCompose.maintainer", true)
+            nativeBridgeSources.include("render", file("port"), "test.port:render", "local-port")
+            includeBuild("ui") { name = "local-ui" }
+        """.trimIndent())
+        val port = project.resolve("port").apply { mkdirs() }
+        port.resolve("settings.gradle.kts").writeText("rootProject.name = \"render\"\n")
+        port.resolve("build.gradle.kts").writeText("""
+            import org.gradle.api.attributes.Attribute
+            import org.gradle.api.attributes.Usage
+            plugins { base }
+            group = "test.upstream"
+            version = "1.0-native"
+            configurations.create("nativeApi") {
+                isCanBeConsumed = true
+                isCanBeResolved = false
+                attributes {
+                    attribute(Usage.USAGE_ATTRIBUTE, objects.named("kotlin-api"))
+                    attribute(Attribute.of("org.jetbrains.kotlin.platform.type", String::class.java), "native")
+                    attribute(Attribute.of("org.jetbrains.kotlin.native.target", String::class.java), "mingw_x64")
+                }
+            }
+        """.trimIndent())
+        val ui = project.resolve("ui").apply { mkdirs() }
+        consumer(ui, "mingwX64(\"windows\"); jvm(\"desktop\")", includePort = false)
+        ui.resolve("gradle.properties").writeText(project.resolve("gradle.properties").readText())
+        ui.resolve("settings.gradle.kts").writeText("""
+            plugins { id("love.yinlin.native-bridge.settings") }
+            rootProject.name = "ui-consumer"
+            gradle.extensions.extraProperties.set("love.yinlin.nativeCompose.maintainer", true)
+            nativeBridgeSources.include("render", file("../port"), "test.port:render", "local-port")
+        """.trimIndent())
+        val output = runner(project, "verifyRouting", ":local-ui:verifyRouting", ":local-ui:nativeBridgeReport").build().output
+        val nativeRoutes = output.lineSequence().filter { it.startsWith("ROUTE windows =") }.toList()
+        assertEquals(2, nativeRoutes.size)
+        nativeRoutes.forEach { assertContains(it, "local-port") }
+        val jvmRoutes = output.lineSequence().filter { it.startsWith("ROUTE desktop =") }.toList()
+        assertEquals(2, jvmRoutes.size)
+        jvmRoutes.forEach {
+            assertContains(it, "test.upstream:render:1.0")
+            assertFalse(it.contains("local-port"))
+        }
+        assertContains(output, "included build local-port, project :")
     }
 
     @Test

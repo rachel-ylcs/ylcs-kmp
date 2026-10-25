@@ -14,6 +14,7 @@ plugins {
 val adaptationDirectory = buildFile.parentFile
 
 extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectContext ->
+    project.group = "org.jetbrains.skiko"
     extensions.configure<KotlinMultiplatformExtension> {
         if (supportNativeWindows) context.configureNativeTarget(OS.Windows, Arch.X64, mingwX64())
     }
@@ -56,7 +57,7 @@ tasks.withType<AbstractArchiveTask>().configureEach {
 // SDL belongs to the Native producer. Consumers receive its bindings, static
 // archive and portable system dependencies through this module's publication.
 val nativeComposeDirectory = adaptationDirectory.parentFile.parentFile
-apply(from = nativeComposeDirectory.resolve("scripts/templates/skiko-library-tests.gradle.kts"))
+apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/skiko-library-tests.gradle.kts"))
 val sdlLock = JsonSlurper().parse(nativeComposeDirectory.resolve("upstream/sdl.json")) as Map<*, *>
 val sdlVersion = sdlLock["version"] as String
 val sdlHost = HostManager.host.name
@@ -83,6 +84,10 @@ if (sdlHost == "mingw_x64") {
 }
 
 kotlin.targets.withType<KotlinNativeTarget>().configureEach {
+    // Published Native libraries retain the identity referenced by official precompiled KLIBs.
+    compilations.getByName("main").compileTaskProvider.configure {
+        compilerOptions.moduleName.set("org.jetbrains.skiko:skiko")
+    }
     val isHost = konanTarget == HostManager.host
     val sdlLibraryDirectory = if (sdlHost == "mingw_x64") layout.buildDirectory.dir("nativeBridges/strippedCoff/windows-x64").get().asFile else sdlSdk.resolve("lib")
     val output = layout.buildDirectory.file("cinterop/sdl-$name.def")

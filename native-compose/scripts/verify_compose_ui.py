@@ -36,7 +36,7 @@ def verify(repository, target, lock):
     version = lock["version"]
     group = repository / lock["group"].replace(".", "/")
     catalog = tomllib.loads((ROOT.parent / "libs.versions.toml").read_text(encoding="utf-8"))
-    for artifact in lock["modules"]:
+    for artifact in lock["ciModules"]:
         root = group / artifact / version
         native = group / f"{artifact}-{suffix}" / version
         metadata = json.loads((root / f"{artifact}-{version}.module").read_text(encoding="utf-8"))
@@ -53,6 +53,8 @@ def verify(repository, target, lock):
                 text = archive.read(name).decode("utf-8")
                 require(f"native_targets={target}" in text, f"Wrong KLIB target: {artifact}")
                 require(f"compiler_version={catalog['versions']['kotlin']}" in text, f"Wrong KLIB compiler: {artifact}")
+                identity = next(line.split("=", 1)[1] for line in text.splitlines() if line.startswith("unique_name=")).replace("\\:", ":")
+                require(identity == f"org.jetbrains.compose.ui:{artifact}", f"Native UI KLIB must retain the official identity: {identity}")
                 for line in text.splitlines():
                     if line.startswith(("linkerOpts=", "libraryPaths=")):
                         require(not re.search(r"[A-Za-z]:[\\/]|/(?:Users|home|workspace|tmp|private|Volumes)/", line), "Producer path leaked into KLIB")
@@ -65,7 +67,7 @@ def verify(repository, target, lock):
             dependencies = [d for v in target_metadata["variants"] for d in v.get("dependencies", [])]
             require(any(d.get("group") == lock["group"] and d.get("module") in {"ui-geometry", f"ui-geometry-{suffix}"}
                         and d.get("version", {}).get("requires") == version for d in dependencies), "UI Unit must expose its matching Geometry API dependency")
-    print(f"PASS: {len(lock['modules'])} Native UI Maven modules / {target} / {version}")
+    print(f"PASS: {len(lock['ciModules'])} Native UI Maven modules / {target} / {version}")
 
 
 def verify_tests(directory):
@@ -89,8 +91,8 @@ def merge(inputs, output, lock):
     require(set(inputs) == TARGETS, "All three host repositories are required")
     require(not output.exists(), "Assembly destination already exists; choose a fresh directory")
     group = Path(lock["group"].replace(".", "/"))
-    selected = [(inputs["macos_arm64"], artifact) for artifact in lock["modules"]]
-    selected += [(inputs[target], f"{artifact}-{SUFFIXES[target]}") for target in sorted(TARGETS) for artifact in lock["modules"]]
+    selected = [(inputs["macos_arm64"], artifact) for artifact in lock["ciModules"]]
+    selected += [(inputs[target], f"{artifact}-{SUFFIXES[target]}") for target in sorted(TARGETS) for artifact in lock["ciModules"]]
     for repository, artifact in selected:
         directory = repository / group / artifact
         require((directory / lock["version"]).is_dir(), f"Missing publication: {directory}")

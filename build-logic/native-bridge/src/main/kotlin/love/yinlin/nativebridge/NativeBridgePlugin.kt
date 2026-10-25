@@ -6,6 +6,7 @@ import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.component.ComponentSelector
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -75,9 +76,7 @@ class NativeBridgePlugin : Plugin<Project> {
                     val configuration = target.compilations.getByName("main").compileDependencyConfigurationName
                     project.logger.lifecycle("Target ${target.name} (${target.konanTarget.name}); configuration=$configuration")
                     for (rule in bridge.redirects.filter { target.konanTarget.name in it.targets.get() }) {
-                        val extras = project.gradle.extensions.extraProperties
-                        val sourceKey = "love.yinlin.nativeBridge.sourceInfo.${rule.name}"
-                        val source = if (extras.has(sourceKey)) extras.get(sourceKey) as Map<*, *> else null
+                        val source = sourceProperty(project, "sourceInfo", rule.name) as? Map<*, *>
                         val replacement = when {
                             source != null -> "included build ${source["build"]}, project ${source["project"]}"
                             rule.projectPath.isPresent -> "project ${rule.projectPath.get()}"
@@ -135,10 +134,7 @@ class NativeBridgePlugin : Plugin<Project> {
                     val rule = rules.single()
                     rule.validate()
                     NativeVersionSelection.validate(requested, rule.upstreamVersion.get(), rule.name)
-                    val localKey = "love.yinlin.nativeBridge.source.${rule.name}"
-                    val sourceSelector = project.gradle.extensions.extraProperties.let {
-                        if (it.has(localKey)) it.get(localKey) as ComponentSelector else null
-                    }
+                    val sourceSelector = sourceProperty(project, "source", rule.name) as? ComponentSelector
                     val maintainer = project.gradle.extensions.extraProperties.let {
                         it.has("love.yinlin.nativeCompose.maintainer") && it.get("love.yinlin.nativeCompose.maintainer") == true
                     }
@@ -151,6 +147,18 @@ class NativeBridgePlugin : Plugin<Project> {
                 }
             }
         }
+    }
+
+    private fun sourceProperty(project: Project, property: String, rule: String): Any? {
+        val key = "love.yinlin.nativeBridge.$property.$rule"
+        var build: Gradle? = project.gradle
+        // Gradle flattens duplicate included builds and may register their selectors in the parent only.
+        while (build != null) {
+            val extras = build.extensions.extraProperties
+            if (extras.has(key)) return extras.get(key)
+            build = build.parent
+        }
+        return null
     }
 
     private fun selectedVersion(project: Project, rule: String, fallback: String): String {

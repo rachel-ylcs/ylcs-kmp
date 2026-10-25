@@ -39,7 +39,7 @@ val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     val compose = JsonSlurper().parse(composeLock) as Map<*, *>
     val composeModules = compose["modules"] as Map<*, *>
     val catalog = project.extensions.getByType<org.gradle.api.artifacts.VersionCatalogsExtension>().named("libs")
-    property("compose.upstream.version", libs.versions.cmp.get())
+    property("compose.upstream.version", catalog.findVersion("cmp").get().requiredVersion)
     property("compose.ui.modules", composeModules.keys.joinToString(","))
     for ((artifact, value) in composeModules) {
         val module = value as Map<*, *>
@@ -120,5 +120,7 @@ tasks.test {
     useJUnit()
     systemProperty("native.tests.gradleUserHome", gradle.gradleUserHomeDir.absolutePath)
     systemProperty("native.tests.work", layout.buildDirectory.dir("functional-tests").get().asFile.absolutePath)
+    systemProperty("native.tests.skikoLibraryScript", layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts").asFile.absolutePath)
+    systemProperty("native.tests.kotlinVersion", libs.versions.kotlin.get())
     maxParallelForks = 1
 }

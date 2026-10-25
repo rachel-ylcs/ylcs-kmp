@@ -2,6 +2,8 @@ package love.yinlin
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color as UiColor
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -95,7 +97,7 @@ internal class ShowcaseScene {
             canvas.drawImage(image, 650f, 420f)
             label(canvas, "WebP encode -> decode", 650f, 540f)
             label(canvas, "Resize the window  /  Space: pause  /  Esc: close", 36f, 615f)
-            label(canvas, "Current stage: Compose UI util / geometry / unit + Skiko", 36f, 640f)
+            label(canvas, "Current stage: Compose Graphics data + Skiko rendering", 36f, 640f)
         }
         finally { canvas.restore() }
     }
@@ -126,7 +128,7 @@ internal class ShowcaseScene {
     private companion object {
         val Background = Color.makeRGB(237, 242, 241)
         val Ink = Color.makeRGB(29, 55, 57)
-        val Teal = Color.makeRGB(18, 126, 124)
+        val Teal = UiColor(18, 126, 124).toArgb()
         val Amber = Color.makeRGB(242, 173, 71)
         const val Svg = """<svg xmlns="http://www.w3.org/2000/svg" width="140" height="120" viewBox="0 0 140 120"><path d="M15 88 L70 12 L125 88 Z" fill="#127e7c"/><circle cx="70" cy="80" r="29" fill="#f2ad47"/><path d="M22 106 Q70 72 118 106" fill="none" stroke="#1d3739" stroke-width="6"/></svg>"""
         const val AnimationJson = """{"v":"5.7.4","fr":60,"ip":0,"op":120,"w":400,"h":120,"nm":"Rachel motion","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":1,"nm":"Moving tile","sr":1,"ks":{"o":{"a":0,"k":100},"r":{"a":1,"k":[{"t":0,"s":[0],"e":[180]},{"t":60,"s":[180],"e":[360]},{"t":120,"s":[360]}]},"p":{"a":1,"k":[{"t":0,"s":[50,60,0],"e":[350,60,0]},{"t":60,"s":[350,60,0],"e":[50,60,0]},{"t":120,"s":[50,60,0]}]},"a":{"a":0,"k":[25,25,0]},"s":{"a":0,"k":[100,100,100]}},"sw":50,"sh":50,"sc":"#127e7c","ip":0,"op":120,"st":0,"bm":0}]}"""

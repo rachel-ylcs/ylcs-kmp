@@ -88,7 +88,7 @@ jobs:
         run: |
           bash ./gradlew -p native-compose/vendor/compose/workspace/native-desktop \
             --no-daemon --max-workers=2 --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.ui.ci=true \
             ":ui-util:${NATIVE_TEST_TASK}" ":ui-geometry:${NATIVE_TEST_TASK}" ":ui-unit:${NATIVE_TEST_TASK}" \
             publishHostToVerificationRepository
       - name: Require real Native behavior and complete publications

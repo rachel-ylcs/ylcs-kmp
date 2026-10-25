@@ -4,6 +4,7 @@
 **/.fleet/
 **/.idea/
 **/.kotlin/
+**/.codex/
 
 # 临时文件
 .DS_Store

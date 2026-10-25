@@ -42,7 +42,7 @@ if (sourceBuild != null && hostPublication != null) {
 gradle.includedBuilds.find { it.name == "compose-ui" }?.let { source ->
     tasks.register("publishComposeUiToVerificationRepository") {
         group = "publishing"
-        dependsOn(source.task(":publishHostToVerificationRepository"))
+        dependsOn(source.task(":publishAllHostToVerificationRepository"))
     }
 }
 

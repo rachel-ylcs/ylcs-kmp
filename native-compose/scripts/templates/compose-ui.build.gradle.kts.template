@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
@@ -8,7 +9,8 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform) apply false
+    // Native Bridge Settings supplies KGP from the root build-logic version catalog.
+    id("org.jetbrains.kotlin.multiplatform") apply false
     alias(libs.plugins.composeCompiler) apply false
 }
 
@@ -16,6 +18,7 @@ val repositoryDirectory = rootDir.resolve("../../../../..").canonicalFile
 val nativeDirectory = repositoryDirectory.resolve("native-compose")
 val sourceLock = JsonSlurper().parse(nativeDirectory.resolve("upstream/compose.json")) as Map<*, *>
 val modules = sourceLock["modules"] as Map<*, *>
+val composeVersion = extensions.getByType<VersionCatalogsExtension>().named("libs").findVersion("cmp").get().requiredVersion
 val hostTarget = when (HostManager.host.name) {
     "mingw_x64" -> "windows"
     "linux_x64" -> "linux"
@@ -25,8 +28,9 @@ val hostTarget = when (HostManager.host.name) {
 layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/root"))
 
 subprojects {
-    group = sourceLock["group"] as String
-    version = libs.versions.cmp.get()
+    // KLIB module identities follow upstream; Maven publication coordinates remain independent.
+    group = "org.jetbrains.compose.ui"
+    version = composeVersion
     layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/$name"))
 
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
@@ -34,11 +38,16 @@ subprojects {
             jvmToolchain(__JAVA_VERSION__)
             compilerOptions {
                 freeCompilerArgs.addAll("-Xexpect-actual-classes", "-Xcollection-literals")
-                optIn.addAll("androidx.compose.ui.ExperimentalComposeUiApi", "androidx.compose.ui.unit.ExperimentalUnitApi")
+                optIn.add("androidx.compose.ui.ExperimentalComposeUiApi")
             }
             mingwX64("windows")
             linuxX64("linux")
             macosArm64("macos")
+            targets.withType<KotlinNativeTarget>().configureEach {
+                compilations.getByName("main").compileTaskProvider.configure {
+                    compilerOptions.moduleName.set("org.jetbrains.compose.ui:${project.name}")
+                }
+            }
             sourceSets {
                 commonTest.dependencies { implementation(kotlin("test")) }
                 val nativeMain = create("nativeMain") { dependsOn(commonMain.get()) }
@@ -71,6 +80,7 @@ subprojects {
                 }
             }
             publications.withType<MavenPublication>().configureEach {
+                groupId = sourceLock["group"] as String
                 val target = kotlin.targets.findByName(name) as? KotlinNativeTarget
                 artifactId = if (target == null) project.name else "${project.name}-${target.konanTarget.name.replace("_", "")}"
                 pom {
@@ -97,7 +107,7 @@ subprojects {
         }
         tasks.withType<Jar>().matching { it.name.endsWith("SourcesJar") || it.name == "sourcesJar" }.configureEach {
             from(rootDir.resolve("../LICENSE.txt")) { into("META-INF/licenses") }
-            from(nativeDirectory.resolve("upstream/compose.json"), nativeDirectory.resolve("upstream/compose-origins.json")) {
+            from(listOf(nativeDirectory.resolve("upstream/compose.json"), nativeDirectory.resolve("upstream/compose-origins.json"))) {
                 into("META-INF/provenance")
             }
         }
@@ -105,6 +115,14 @@ subprojects {
 }
 
 tasks.register("publishHostToVerificationRepository") {
+    group = "publishing"
+    for (module in sourceLock["ciModules"] as List<*>) {
+        dependsOn(":$module:publishKotlinMultiplatformPublicationToNativeVerificationRepository")
+        dependsOn(":$module:publish${hostTarget.replaceFirstChar(Char::uppercase)}PublicationToNativeVerificationRepository")
+    }
+}
+
+tasks.register("publishAllHostToVerificationRepository") {
     group = "publishing"
     for (module in modules.keys) {
         dependsOn(":$module:publishKotlinMultiplatformPublicationToNativeVerificationRepository")

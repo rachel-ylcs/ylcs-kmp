@@ -9,8 +9,10 @@ plugins {
 }
 
 parent!!.subprojects.forEach { p ->
-    if (p != project) p.plugins.withType<DokkaPlugin> {
-        dependencies.dokka(p)
+    if (p != project) {
+        p.plugins.withType<DokkaPlugin> {
+            dependencies.dokka(dependencies.project(mapOf("path" to p.path)))
+        }
     }
 }
 
