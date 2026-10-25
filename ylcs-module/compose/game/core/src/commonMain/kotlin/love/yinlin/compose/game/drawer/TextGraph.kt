@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 
@@ -18,11 +19,12 @@ class TextGraph internal constructor(
     fontWeight: FontWeight,
     fontStyle: FontStyle,
     letterSpacing: Float,
+    localeList: LocaleList,
     override val shadow: Shadow?,
     override val textDecoration: TextDecoration?,
     override val blendMode: BlendMode,
 ) : BasicTextGraph {
-    private val paragraph = BasicTextGraph.measureText(text, font, density, fontFamilyResolver, fontWeight, fontStyle, letterSpacing)
+    private val paragraph = BasicTextGraph.measureText(text, font, density, fontFamilyResolver, fontWeight, fontStyle, letterSpacing, localeList)
 
     override fun widthScale(height: Float): Long = BasicTextGraph.widthScale(paragraph, height)
     override fun width(height: Float): Float = BasicTextGraph.width(paragraph, height)

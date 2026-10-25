@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.roundToIntSize
 import androidx.compose.ui.util.unpackFloat1
@@ -19,8 +20,9 @@ import love.yinlin.compose.game.font.FontProvider
 class Drawer internal constructor(
     fontFamilyResolver: FontFamily.Resolver,
     fontProvider: FontProvider,
-    assetProvider: AssetProvider
-) : PrepareDrawer(fontFamilyResolver, fontProvider, assetProvider) {
+    assetProvider: AssetProvider,
+    localeList: LocaleList,
+) : PrepareDrawer(fontFamilyResolver, fontProvider, assetProvider, localeList) {
     @PublishedApi internal var rawScope: DrawScope? = null
 
     internal inline fun withRawScope(scope: DrawScope, block: Drawer.() -> Unit) {

@@ -9,6 +9,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -71,7 +72,8 @@ interface BasicTextGraph {
             fontFamilyResolver: FontFamily.Resolver,
             fontWeight: FontWeight,
             fontStyle: FontStyle,
-            letterSpacing: Float
+            letterSpacing: Float,
+            localeList: LocaleList,
         ): Paragraph {
             val intrinsics = ParagraphIntrinsics(
                 text = text,
@@ -87,7 +89,8 @@ interface BasicTextGraph {
                 density = density,
                 fontFamilyResolver = fontFamilyResolver,
                 placeholders = [],
-                softWrap = false
+                softWrap = false,
+                defaultLocaleList = localeList
             )
             return Paragraph(
                 paragraphIntrinsics = intrinsics,

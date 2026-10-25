@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.platform.LocalLocaleList
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
@@ -242,19 +243,23 @@ class ScenePlugin private constructor(
         }.pointerInput(Unit) { // 指针事件监听
             pointerInputLoop()
         }) {
+            // 字体解析器
             val fontFamilyResolver = LocalFontFamilyResolver.current
             // 字体转接器
             val fontProvider = remember { engine.pluginOrNull<FontPlugin>()?.fontProvider ?: FontProvider.Default }
             // 资源转接器
             val assetProvider = remember { engine.pluginOrNull<AssetPlugin>()?.assetProvider ?: AssetProvider.Default }
+            // 语言表
+            val localeList = LocalLocaleList.current
 
             layerEntities.fastForEach { layer ->
                 key(layer.id) {
-                    val drawer = remember {
+                    val drawer = remember(fontFamilyResolver, fontProvider, assetProvider, localeList) {
                         val initialDrawer = Drawer(
                             fontFamilyResolver = fontFamilyResolver,
                             fontProvider = fontProvider,
-                            assetProvider = assetProvider
+                            assetProvider = assetProvider,
+                            localeList = localeList
                         )
                         with(layer) { initialDrawer.preInitialDraw() }
                         initialDrawer

@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Density
 import love.yinlin.compose.game.asset.AssetProvider
@@ -17,7 +18,8 @@ import org.jetbrains.compose.resources.FontResource
 open class InitialDrawer internal constructor(
     protected val fontFamilyResolver: FontFamily.Resolver,
     protected val fontProvider: FontProvider,
-    val assetProvider: AssetProvider
+    val assetProvider: AssetProvider,
+    private val localeList: LocaleList,
 ) {
     companion object {
         private val DefaultDensity = Density(1f)
@@ -40,6 +42,7 @@ open class InitialDrawer internal constructor(
         fontWeight = fontWeight,
         fontStyle = fontStyle,
         letterSpacing = letterSpacing,
+        localeList = localeList,
         shadow = shadow,
         textDecoration = textDecoration,
         blendMode = blendMode,
@@ -62,6 +65,7 @@ open class InitialDrawer internal constructor(
         fontWeight = fontWeight,
         fontStyle = fontStyle,
         letterSpacing = letterSpacing,
+        localeList = localeList,
         shadow = shadow,
         textDecoration = textDecoration,
         blendMode = blendMode,
