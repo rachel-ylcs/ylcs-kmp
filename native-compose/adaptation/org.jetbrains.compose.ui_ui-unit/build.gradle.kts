@@ -10,7 +10,7 @@ kotlin {
             api(libs.androidx.annotation)
             api(project(":ui-geometry"))
             implementation(libs.androidx.collection)
-            implementation(libs.compose.runtime)
+            implementation(libs.compose.runtime.asProvider())
             implementation(project(":ui-util"))
         }
         getByName("nativeMain").dependencies {

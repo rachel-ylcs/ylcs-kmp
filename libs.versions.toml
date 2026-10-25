@@ -89,11 +89,13 @@ androidx-lifecycle = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runt
 
 # compose
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "cmp" }
+compose-runtime-saveable = { module = "org.jetbrains.compose.runtime:runtime-saveable", version.ref = "cmp" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "cmp" }
 compose-ui-util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "cmp" }
 compose-ui-geometry = { module = "org.jetbrains.compose.ui:ui-geometry", version.ref = "cmp" }
 compose-ui-unit = { module = "org.jetbrains.compose.ui:ui-unit", version.ref = "cmp" }
 compose-ui-graphics = { module = "org.jetbrains.compose.ui:ui-graphics", version.ref = "cmp" }
+compose-ui-text = { module = "org.jetbrains.compose.ui:ui-text", version.ref = "cmp" }
 compose-annotation-internal = { module = "org.jetbrains.compose.annotation-internal:annotation", version.ref = "cmp-internal" }
 compose-collection-internal = { module = "org.jetbrains.compose.collection-internal:collection", version.ref = "cmp-internal" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
@@ -196,3 +198,4 @@ native-compose-ui-util = { module = "love.yinlin.native.compose.ui:ui-util", ver
 native-compose-ui-geometry = { module = "love.yinlin.native.compose.ui:ui-geometry", version.ref = "cmp" }
 native-compose-ui-unit = { module = "love.yinlin.native.compose.ui:ui-unit", version.ref = "cmp" }
 native-compose-ui-graphics = { module = "love.yinlin.native.compose.ui:ui-graphics", version.ref = "cmp" }
+native-compose-ui-text = { module = "love.yinlin.native.compose.ui:ui-text", version.ref = "cmp" }

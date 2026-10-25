@@ -53,6 +53,7 @@ class NativeBridgePlugin : Plugin<Project> {
             configureRedirects(project, kotlin, bridge)
             project.afterEvaluate {
                 bridge.redirects.forEach(NativeDependencyRule::validate)
+                if (bridge.skikoTestRuntimeEnabled.get()) SkikoTestRuntime.configure(project, bridge)
                 if (application.enabled.get()) {
                     SkikoApplicationDependencies.configure(project, application, bridge)
                     configureApplication(project, kotlin, application)

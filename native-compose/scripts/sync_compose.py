@@ -9,6 +9,7 @@ import sys
 import tomllib
 from sync_upstream import preparation_lock
 from upstream_versions import main_profile, sync_wrappers
+from compose_adapt import source_edits
 
 ROOT = Path(__file__).resolve().parents[1]
 VENDOR = ROOT / "vendor/compose"
@@ -47,8 +48,10 @@ def load_lock():
                 raise ValueError(f"Unaudited source set: {name}/{source_set}")
             for directory in directories:
                 parts = PurePosixPath(directory).parts
-                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonJvmMain", "skikoMain", "nativeMain", "macosMain"}:
+                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonJvmMain", "skikoMain", "nativeMain", "darwinMain", "macosMain"}:
                     raise ValueError(f"Unaudited upstream source path: {name}/{directory}")
+                if parts[1] == "darwinMain" and source_set != "macosMain":
+                    raise ValueError(f"Foundation sources must belong to macosMain: {name}/{directory}")
     return lock
 
 
@@ -62,6 +65,51 @@ def checked_path(path):
 def git(*arguments, check=True):
     return subprocess.run(["git", "-c", f"safe.directory={WORKSPACE.resolve().as_posix()}", "-c", "core.fsmonitor=false",
                            "-C", str(WORKSPACE), *arguments], check=check, capture_output=True, text=True, timeout=300)
+
+
+def checked_source(relative):
+    parts = PurePosixPath(relative).parts
+    if len(parts) < 7 or parts[:2] != ("compose", "ui") or ".." in parts or not relative.endswith(".kt"):
+        raise ValueError(f"Invalid managed Compose source path: {relative}")
+    path = WORKSPACE / relative
+    if path.is_symlink() or not checked_path(path).is_relative_to(WORKSPACE.resolve()):
+        raise ValueError(f"Managed Compose source escapes its checkout: {relative}")
+    return path
+
+
+def restore_prepared_sources():
+    record = VENDOR / "source-edits.json"
+    if not record.is_file():
+        return
+    state = json.loads(record.read_text(encoding="utf-8"))
+    if state.get("schema") != 1 or state["commit"] != git("rev-parse", "HEAD").stdout.strip():
+        raise ValueError("Compose managed source identity changed; preserved without modification")
+    paths = []
+    for relative, hashes in state["files"].items():
+        path = checked_source(relative)
+        current = digest(path) if path.is_file() else None
+        if current not in {hashes["original"], hashes["prepared"]}:
+            raise ValueError(f"Compose checkout has local tracked edits in {relative}; preserved without modification")
+        paths.append(relative)
+    # Check every file first. Restore only recorded generated changes, never arbitrary edits.
+    if paths:
+        git("restore", "--source=HEAD", "--worktree", "--", *paths)
+
+
+def prepare_sources(lock):
+    edits = source_edits(WORKSPACE, ROOT, lock["modules"])
+    files = {}
+    for relative, text in edits.items():
+        path = checked_source(relative)
+        files[relative] = {"original": digest(path), "prepared": hashlib.sha256(text.encode("utf-8")).hexdigest() if text is not None else None}
+    # Record the plan first; an interrupted preparation can safely resume from either version.
+    write(VENDOR / "source-edits.json", json.dumps({"schema": 1, "commit": lock["commit"], "files": files}, indent=4) + "\n")
+    for relative, text in edits.items():
+        path = checked_source(relative)
+        if text is None:
+            path.unlink()
+        else:
+            write(path, text)
 
 
 def checkout(lock, offline):
@@ -80,7 +128,10 @@ def checkout(lock, offline):
     origin = git("remote", "get-url", "origin").stdout.strip()
     if origin != f"https://github.com/{lock['repository']}.git":
         raise ValueError("Compose checkout has an unexpected origin; preserved without modification")
-    if git("diff", "--quiet", check=False).returncode or git("diff", "--cached", "--quiet", check=False).returncode:
+    if git("diff", "--cached", "--quiet", check=False).returncode:
+        raise ValueError("Compose checkout has local tracked edits; preserve them in adaptation before preparing sources")
+    restore_prepared_sources()
+    if git("diff", "--quiet", check=False).returncode:
         raise ValueError("Compose checkout has local tracked edits; preserve them in adaptation before preparing sources")
     current = git("rev-parse", "--verify", "HEAD", check=False).stdout.strip()
     selected = f"{lock['commit']}\n" + "\n".join(sorted(lock["modules"])) + "\n"
@@ -112,6 +163,7 @@ def write(path, text):
 
 def prepare(lock, offline):
     checkout(lock, offline)
+    prepare_sources(lock)
     profile = main_profile(ROOT.parent)
     if not (WORKSPACE / "LICENSE.txt").is_file():
         raise ValueError("Pinned Compose checkout is missing its source license")
@@ -123,7 +175,7 @@ def prepare(lock, offline):
                     raise ValueError(f"Selected Compose source directory is empty: {source}")
     templates = ROOT / "scripts/templates"
     inputs = [ROOT / "upstream/compose.json", ROOT / "upstream/compose-origins.json", Path(__file__),
-              ROOT / "scripts/upstream_versions.py", ROOT / "scripts/sync_upstream.py",
+              ROOT / "scripts/upstream_versions.py", ROOT / "scripts/sync_upstream.py", ROOT / "scripts/compose_adapt.py",
               templates / "compose-ui.settings.gradle.kts.template", templates / "compose-ui.build.gradle.kts.template"]
     inputs += [ROOT.parent / name for name in ["gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat"]]
     projects = []

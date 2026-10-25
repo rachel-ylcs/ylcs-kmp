@@ -2,6 +2,9 @@ package love.yinlin.nativecompose.consumer
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,5 +33,13 @@ class ComposeUiPublicationTest {
         val values: List<Int> = [1, 2, 1, 3]
         val expected: List<Int> = [1, 2, 3]
         assertEquals(expected, values.fastDistinctBy { it })
+    }
+
+    @Test
+    fun publishedTextUsesTheNativeLocaleAndStaticIcuBridge() {
+        val locale = Locale("tr-TR")
+        assertEquals("tr", locale.language)
+        assertEquals("TR", locale.region)
+        assertEquals("İSTANBUL / STRASSE", AnnotatedString("istanbul / straße").toUpperCase(locale).text)
     }
 }

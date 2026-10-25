@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   build:
-    name: UI Util + Geometry + Unit / ${{ matrix.target }}
+    name: UI Text + Graphics / ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
@@ -49,12 +49,15 @@ jobs:
           - runner: windows-2025
             target: mingw_x64
             test-task: windowsTest
+            skiko-publication: MingwX64
           - runner: ubuntu-24.04
             target: linux_x64
             test-task: linuxTest
+            skiko-publication: LinuxX64
           - runner: macos-26
             target: macos_arm64
             test-task: macosTest
+            skiko-publication: MacosArm64
     defaults:
       run:
         shell: bash
@@ -62,6 +65,7 @@ jobs:
       PYTHONUTF8: '1'
       NATIVE_TARGET: ${{ matrix.target }}
       NATIVE_TEST_TASK: ${{ matrix.test-task }}
+      SKIKO_PUBLICATION: ${{ matrix.skiko-publication }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -74,28 +78,58 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
+      - name: Configure the Windows Native toolchain
+        if: runner.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+          export-path-to-vs: VS_PATH
+      - name: Linux Native build and link dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build pkg-config libfontconfig1-dev libfreetype6-dev \
+            libgl1-mesa-dev libegl1-mesa-dev libx11-dev libxcursor-dev libxrandr-dev \
+            libxinerama-dev libxi-dev libwayland-dev libxkbcommon-dev
       - name: Source and publication tool regressions
-        run: python -m unittest discover -s native-compose/scripts/tests -p 'test_compose_*.py' -v
-      - name: Prepare the one pinned Compose source checkout
-        run: python native-compose/scripts/sync_compose.py
+        run: python -m unittest discover -s native-compose/scripts/tests -p 'test_*.py' -v
+      - name: Prepare the pinned Skiko and Compose source checkouts
+        run: |
+          python native-compose/scripts/sync_upstream.py
+          python native-compose/scripts/sync_compose.py
       - name: Bridge routing regressions and local plugin Maven files
         run: |
           bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             :native-bridge:test :native-bridge:validatePlugins \
             :native-bridge:publishAllPublicationsToLocalVerificationRepository
+      - name: Publish the host Skiko foundation into local Maven files
+        run: |
+          bash ./gradlew -p native-compose/vendor/skiko/workspace/skiko \
+            --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            publishKotlinMultiplatformPublicationToBuildRepoRepository \
+            "publish${SKIKO_PUBLICATION}PublicationToBuildRepoRepository"
       - name: Native UI library tests and host Maven files
         run: |
           bash ./gradlew -p native-compose/vendor/compose/workspace/native-desktop \
             --no-daemon --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.ui.ci=true \
             ":ui-util:${NATIVE_TEST_TASK}" ":ui-geometry:${NATIVE_TEST_TASK}" ":ui-unit:${NATIVE_TEST_TASK}" \
+            ":ui-graphics:${NATIVE_TEST_TASK}" ":ui-text:${NATIVE_TEST_TASK}" \
             publishHostToVerificationRepository
+          python - <<'PY'
+          import shutil
+          from pathlib import Path
+          group = Path('love/yinlin/native/skiko')
+          shutil.copytree(Path('native-compose/vendor/skiko/workspace/skiko/build/repo') / group,
+                          Path('native-compose/vendor/build/compose-ui/repository') / group)
+          PY
       - name: Require real Native behavior and complete publications
         run: |
           python native-compose/scripts/verify_compose_ui.py --target "$NATIVE_TARGET" \
             --tests native-compose/vendor/build/compose-ui
-          printf 'Compose UI %s: Util, Geometry, Unit and official Runtime library regressions passed.\n' \
+          printf 'Compose UI %s: 31 regressions across Text, Graphics, Unit, Geometry, Util and Runtime passed.\n' \
             "$NATIVE_TARGET" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         with:
@@ -117,6 +151,10 @@ jobs:
           path: |
             native-compose/vendor/build/compose-ui/*/test-results/
             native-compose/vendor/build/compose-ui/*/reports/tests/
+            native-compose/vendor/build/compose-ui/repository/**/*.module
+            native-compose/vendor/build/compose-ui/repository/**/*.pom
+            native-compose/vendor/skiko/workspace/skiko/build/repo/**/*.module
+            native-compose/vendor/skiko/workspace/skiko/build/repo/**/*.pom
             build-logic/native-bridge/build/test-results/
             build-logic/native-bridge/build/reports/tests/
           if-no-files-found: warn
@@ -179,6 +217,18 @@ jobs:
           distribution: oracle
           java-version: '25'
           cache: gradle
+      - name: Linux Native link dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev libgl1-mesa-dev libegl1-mesa-dev \
+            libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libwayland-dev libxkbcommon-dev
+      - name: Configure the Windows Native linker environment
+        if: runner.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+          export-path-to-vs: VS_PATH
       - uses: actions/download-artifact@v8
         with:
           name: native-compose-ui-maven
@@ -200,7 +250,7 @@ jobs:
               --no-daemon --max-workers=2 --stacktrace \
               -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
               "-Pnative.repository=$repositoryRoot/maven-ui" "-Pnative.plugin.repository=$repositoryRoot/maven-plugins" \
-              "-Pnative.explicit=$explicit" "$NATIVE_TEST_TASK"
+              "-Pnative.explicit=$explicit" verifyNativeMavenClosure "$NATIVE_TEST_TASK"
           done
           test ! -e native-compose/vendor/compose/state.json
           test ! -e native-compose/vendor/skiko/state.json
@@ -210,7 +260,7 @@ jobs:
           reports = list(Path('native-compose/vendor/build/compose-ui/maven-consumer/test-results').glob('**/TEST-*.xml'))
           assert reports, 'No independent Maven consumer test reports'
           suites = [ET.parse(path).getroot() for path in reports]
-          assert any('ComposeUiPublicationTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 2 for suite in suites)
+          assert any('ComposeUiPublicationTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 3 for suite in suites)
           assert all(int(suite.attrib.get(key, 0)) == 0 for suite in suites for key in ['failures', 'errors', 'skipped'])
           PY
       - name: Independent Maven consumer test evidence

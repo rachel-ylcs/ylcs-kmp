@@ -5,7 +5,7 @@
     "commit": "bb05011eb10784ada1ec00494f1a710ba6ab6252",
     "version": "1.13.0-beta01",
     "group": "love.yinlin.native.compose.ui",
-    "ciModules": ["ui-util", "ui-geometry", "ui-unit"],
+    "ciModules": ["ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text"],
     "modules": {
         "ui-util": {
             "alias": "native-compose-ui-util",
@@ -42,6 +42,19 @@
             "sourceSets": {
                 "commonMain": ["src/commonMain/kotlin"],
                 "nativeMain": ["src/nonAndroidMain/kotlin", "src/skikoMain/kotlin", "src/nonJvmMain/kotlin"]
+            }
+        },
+        "ui-text": {
+            "alias": "native-compose-ui-text",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "nativeMain": ["src/nonAndroidMain/kotlin", "src/nonJvmMain/kotlin"],
+                "windowsMain": ["src/nativeMain/kotlin"],
+                "linuxMain": ["src/nativeMain/kotlin"],
+                "macosMain": ["src/nativeMain/kotlin", "src/darwinMain/kotlin", "src/macosMain/kotlin"]
             }
         }
     }

@@ -7,7 +7,7 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.compose.runtime)
+            implementation(libs.compose.runtime.asProvider())
             implementation(project(":ui-util"))
         }
     }

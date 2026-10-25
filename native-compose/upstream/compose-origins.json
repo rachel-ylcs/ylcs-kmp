@@ -1,6 +1,10 @@
 {
     "schema": 1,
     "files": {
+        "adaptation/org.jetbrains.compose.ui_ui-text/src/nativeMain/kotlin/androidx/compose/ui/text/platform/Synchronization.native.kt": {
+            "source": "compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/Synchronization.nonAndroid.kt",
+            "description": "Preserves the atomicfu lock with PublishedApi visibility and an explicit try/finally block that satisfies the exactly-once contract on Native."
+        },
         "adaptation/org.jetbrains.compose.ui_ui-util/src/windowsMain/kotlin/androidx/compose/ui/util/Trace.windows.kt": {
             "source": "compose/ui/ui-util/src/macosMain/kotlin/androidx/compose/ui/util/Trace.macos.kt",
             "description": "Preserves the upstream desktop tracing contract: execute the block once without collecting profiling events."

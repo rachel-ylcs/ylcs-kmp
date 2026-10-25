@@ -11,7 +11,10 @@ TARGETS = {"mingw_x64": "mingwx64", "linux_x64": "linuxx64", "macos_arm64": "mac
 ARTIFACTS = ["skiko", "skiko-skottie"]
 
 
-def merge(inputs, output, lock):
+def merge(inputs, output, lock, artifacts=None):
+    artifacts = ARTIFACTS if artifacts is None else artifacts
+    if not artifacts or not set(artifacts).issubset(ARTIFACTS):
+        raise ValueError("Unknown Native Skiko module selection")
     if set(inputs) != set(TARGETS):
         raise ValueError(f"Exactly these host publications are required: {', '.join(TARGETS)}")
     output = output.resolve()
@@ -22,8 +25,8 @@ def merge(inputs, output, lock):
     if output.exists() and any(output.iterdir()):
         raise ValueError(f"Refusing to mix publications with a non-empty repository: {output}")
     group = Path(*lock["group"].split("."))
-    modules = [(inputs["macos_arm64"], artifact) for artifact in ARTIFACTS]
-    modules += [(inputs[target], f"{artifact}-{suffix}") for artifact in ARTIFACTS for target, suffix in TARGETS.items()]
+    modules = [(inputs["macos_arm64"], artifact) for artifact in artifacts]
+    modules += [(inputs[target], f"{artifact}-{suffix}") for artifact in artifacts for target, suffix in TARGETS.items()]
     # Validate every input before copying anything. Do not let one host overwrite another's root.
     for repository, module in modules:
         directory = repository / group / module

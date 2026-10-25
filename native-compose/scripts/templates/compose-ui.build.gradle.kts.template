@@ -44,6 +44,10 @@ subprojects {
             linuxX64("linux")
             macosArm64("macos")
             targets.withType<KotlinNativeTarget>().configureEach {
+                val nativeArtifact = "${project.name}-${konanTarget.name.replace("_", "")}"
+                // KGP assigns its default artifactId after PublicationContainer callbacks.
+                // This target hook runs afterwards, before dependency coordinates are exported.
+                mavenPublication { artifactId = nativeArtifact }
                 compilations.getByName("main").compileTaskProvider.configure {
                     compilerOptions.moduleName.set("org.jetbrains.compose.ui:${project.name}")
                 }
@@ -71,7 +75,6 @@ subprojects {
     }
 
     plugins.withId("maven-publish") {
-        val kotlin = extensions.getByType<KotlinMultiplatformExtension>()
         extensions.configure<PublishingExtension> {
             repositories {
                 maven {
@@ -81,8 +84,6 @@ subprojects {
             }
             publications.withType<MavenPublication>().configureEach {
                 groupId = sourceLock["group"] as String
-                val target = kotlin.targets.findByName(name) as? KotlinNativeTarget
-                artifactId = if (target == null) project.name else "${project.name}-${target.konanTarget.name.replace("_", "")}"
                 pom {
                     name.set("Rachel Native ${project.name}")
                     description.set("Native desktop adaptation of Compose ${project.name}; modified by Rachel")
@@ -102,6 +103,11 @@ subprojects {
                 check(repository.url.scheme == "file") { "Native UI remote Maven publishing is disabled" }
                 check(publication.name in setOf("kotlinMultiplatform", hostTarget)) {
                     "Publish ${publication.name} on its matching Native host"
+                }
+                val target = project.extensions.getByType<KotlinMultiplatformExtension>().targets.findByName(publication.name) as? KotlinNativeTarget
+                val expected = if (target == null) project.name else "${project.name}-${target.konanTarget.name.replace("_", "")}"
+                check(publication.artifactId == expected) {
+                    "Native UI publication ${publication.name} must use $expected, got ${publication.artifactId}"
                 }
             }
         }

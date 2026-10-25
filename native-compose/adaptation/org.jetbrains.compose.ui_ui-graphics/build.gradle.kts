@@ -11,12 +11,12 @@ kotlin {
         commonMain.dependencies {
             api(libs.androidx.annotation)
             api(project(":ui-unit"))
-            implementation(libs.compose.runtime)
+            implementation(libs.compose.runtime.asProvider())
             implementation(project(":ui-util"))
             implementation(libs.androidx.collection)
         }
         getByName("nativeMain").dependencies {
-            api(libs.skiko)
+            api(libs.native.skiko.asProvider())
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.compose.collection.internal)
         }

@@ -17,11 +17,15 @@ kotlin {
                 implementation(libs.native.compose.ui.util)
                 implementation(libs.native.compose.ui.geometry)
                 implementation(libs.native.compose.ui.unit)
+                implementation(libs.native.compose.ui.graphics)
+                implementation(libs.native.compose.ui.text)
             }
             else {
                 implementation(libs.compose.ui.util)
                 implementation(libs.compose.ui.geometry)
                 implementation(libs.compose.ui.unit)
+                implementation(libs.compose.ui.graphics)
+                implementation(libs.compose.ui.text)
             }
         }
         commonTest.dependencies { implementation(kotlin("test")) }
@@ -30,6 +34,27 @@ kotlin {
         for (target in listOf("windows", "linux", "macos")) {
             getByName("${target}Main").dependsOn(nativeMain)
             getByName("${target}Test").dependsOn(nativeTest)
+        }
+    }
+}
+
+nativeBridge { skikoTests() }
+
+// Explicit Native coordinates must form a complete Maven graph without upstream port requests.
+tasks.register("verifyNativeMavenClosure") {
+    doLast {
+        if (explicit) {
+            val artifacts = setOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text")
+            kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().forEach { target ->
+                val result = configurations.getByName(target.compilations.getByName("main").compileDependencyConfigurationName).incoming.resolutionResult
+                result.allDependencies.filterIsInstance<org.gradle.api.artifacts.result.UnresolvedDependencyResult>().forEach { throw it.failure }
+                result.allDependencies.forEach { dependency ->
+                    val requested = dependency.requested as? org.gradle.api.artifacts.component.ModuleComponentSelector
+                    check(requested == null || requested.group != "org.jetbrains.skiko" && !(requested.group == "org.jetbrains.compose.ui" && requested.module in artifacts)) {
+                        "Native Maven publication still needs a redirect: ${dependency.requested}"
+                    }
+                }
+            }
         }
     }
 }

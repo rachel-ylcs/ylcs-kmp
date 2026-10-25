@@ -4,6 +4,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color as UiColor
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
@@ -37,7 +40,8 @@ internal class ShowcaseScene {
         ParagraphStyle().use { style ->
             style.textStyle = textStyle
             ParagraphBuilder(style, fonts).use { builder ->
-                builder.addText("Native text: café / Ελληνικά / אבג\nSkia shapes, ICU and bidirectional layout.")
+                val sample = AnnotatedString("istanbul / straße").toUpperCase(Locale("tr-TR"))
+                builder.addText("Compose Text: ${sample.text}\nNative text: café / Ελληνικά / אבג\nSkia shapes, ICU and bidirectional layout.")
                 builder.build()
             }
         }
@@ -97,7 +101,7 @@ internal class ShowcaseScene {
             canvas.drawImage(image, 650f, 420f)
             label(canvas, "WebP encode -> decode", 650f, 540f)
             label(canvas, "Resize the window  /  Space: pause  /  Esc: close", 36f, 615f)
-            label(canvas, "Current stage: Compose Graphics data + Skiko rendering", 36f, 640f)
+            label(canvas, "Current stage: Compose Text + native locale / Skiko rendering", 36f, 640f)
         }
         finally { canvas.restore() }
     }

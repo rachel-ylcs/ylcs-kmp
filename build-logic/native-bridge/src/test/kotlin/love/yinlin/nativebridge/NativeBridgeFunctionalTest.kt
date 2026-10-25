@@ -14,6 +14,62 @@ import kotlin.test.assertTrue
 
 class NativeBridgeFunctionalTest {
     @Test
+    fun nativeUiTemplateKeepsKonanCoordinatesAfterKgpCreatesPublications() {
+        val repository = project()
+        repository.resolve("libs.versions.toml").writeText(File(System.getProperty("native.tests.versionCatalog")).readText())
+        val native = repository.resolve("native-compose")
+        native.resolve("upstream").mkdirs()
+        native.resolve("upstream/compose.json").writeText("""
+            {"group":"test.native.ui","ciModules":["ui-util"],"modules":{"ui-util":{"sourceSets":{"commonMain":["src/commonMain/kotlin"]}}}}
+        """.trimIndent())
+        val build = native.resolve("vendor/compose/workspace/native-desktop").apply { mkdirs() }
+        build.resolve("gradle.properties").writeText("kotlin.stdlib.default.dependency=false\nkotlin.native.ignoreDisabledTargets=true\nkotlin.mpp.applyDefaultHierarchyTemplate=false\n")
+        build.resolve("settings.gradle.kts").writeText("""
+            pluginManagement {
+                repositories {
+                    mavenCentral()
+                    gradlePluginPortal()
+                }
+            }
+            dependencyResolutionManagement {
+                versionCatalogs { create("libs") { from(files("../../../../../libs.versions.toml")) } }
+            }
+            rootProject.name = "native-ui-publication-fixture"
+            include(":ui-util")
+        """.trimIndent())
+        build.resolve("ui-util").mkdirs()
+        build.resolve("ui-util/build.gradle.kts").writeText("""
+            plugins {
+                kotlin("multiplatform")
+                `maven-publish`
+            }
+        """.trimIndent())
+        val template = File(System.getProperty("native.tests.composeUiTemplate")).readText().replace("__JAVA_VERSION__", "25")
+        build.resolve("build.gradle.kts").writeText(template + "\n" + """
+            tasks.register("verifyNativePublicationCoordinates") {
+                doLast {
+                    val library = project(":ui-util")
+                    check(library.group == "org.jetbrains.compose.ui")
+                    val publications = library.extensions.getByType<PublishingExtension>().publications
+                    val expected = mapOf("kotlinMultiplatform" to "ui-util", "windows" to "ui-util-mingwx64", "linux" to "ui-util-linuxx64", "macos" to "ui-util-macosarm64")
+                    for ((name, artifact) in expected) {
+                        val publication = publications.getByName(name) as MavenPublication
+                        check(publication.groupId == "test.native.ui")
+                        check(publication.artifactId == artifact) { name + " still uses " + publication.artifactId }
+                        println("NATIVE_UI_PUBLICATION=" + artifact)
+                    }
+                    library.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>().forEach { target ->
+                        check(target.compilations.getByName("main").compileTaskProvider.get().compilerOptions.moduleName.get() == "org.jetbrains.compose.ui:ui-util")
+                    }
+                }
+            }
+        """.trimIndent())
+        val result = runner(build, "verifyNativePublicationCoordinates").build()
+        for (artifact in listOf("ui-util", "ui-util-mingwx64", "ui-util-linuxx64", "ui-util-macosarm64")) assertContains(result.output, "NATIVE_UI_PUBLICATION=$artifact")
+        assertTrue(result.tasks.none { it.path.contains("compileKotlin") || it.path.contains("linkDebug") || it.path.contains("linkRelease") })
+    }
+
+    @Test
     fun maintainedLibraryTestScriptConfiguresWithoutExecutingNativeCompilations() {
         val root = project()
         val native = root.resolve("native-compose")
@@ -197,11 +253,53 @@ class NativeBridgeFunctionalTest {
     @Test
     fun jvmOnlyNeverResolvesPortOrCreatesRuntimeConfiguration() {
         val project = project()
-        consumer(project, "jvm(\"desktop\")", includePort = false)
+        consumer(project, "jvm(\"desktop\")", includePort = false, extra = """
+            nativeBridge { skikoTests() }
+            tasks.named("verifyRouting") {
+                doLast { check(configurations.findByName("skikoNativeTestRuntime") == null) }
+            }
+        """.trimIndent())
         val output = runner(project, "verifyRouting").build().output
         assertContains(output, "test.upstream:render:1.0")
         assertFalse(output.contains("test.port:render:1.0-native"))
         assertContains(output, "APPLICATION_RUNTIMES=0")
+    }
+
+    @Test
+    fun skikoTestsStageOnlyHostDataAndKeepLibraryBinariesUntouched() {
+        val project = project()
+        val compatibility = Properties().apply {
+            checkNotNull(NativeBridgePlugin::class.java.classLoader.getResourceAsStream("rachel-native-bridge.properties")).use { load(it) }
+        }
+        val coordinate = compatibility.getProperty("skiko.port.module").split(':')
+        val artifact = coordinate[1] + "-mingwx64"
+        module(project, coordinate[0], coordinate[2], artifact = artifact)
+        val runtime = project.resolve("repo/${coordinate[0].replace('.', '/')}/$artifact/${coordinate[2]}")
+        runtime.resolve("$artifact-${coordinate[2]}-icudtl.dat").writeText("fixture ICU data")
+        project.resolve("fixture-test").mkdirs()
+        project.resolve("fixture-test/unused.exe").writeText("configuration fixture; never executed")
+        consumer(project, "mingwX64(\"windows\"); linuxX64(\"linux\"); macosArm64(\"macos\")", extra = """
+            nativeBridge { skikoTests() }
+            tasks.named<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest>("windowsTest") {
+                executable = file("fixture-test/unused.exe")
+            }
+            tasks.register("verifySkikoTestRuntime") {
+                if (System.getProperty("os.name").startsWith("Windows")) dependsOn("stageWindowsTestSkikoRuntime")
+                doLast {
+                    kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().forEach { target ->
+                        check(target.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Executable>().isEmpty())
+                    }
+                    if (System.getProperty("os.name").startsWith("Windows")) {
+                        check(file("fixture-test/icudtl.dat").readText() == "fixture ICU data")
+                    }
+                    else check(configurations.findByName("skikoNativeTestRuntime") == null)
+                    println("SKIKO_TEST_RUNTIME_VERIFIED")
+                }
+            }
+        """.trimIndent())
+        val output = runner(project, "verifySkikoTestRuntime").build().output
+        assertContains(output, "SKIKO_TEST_RUNTIME_VERIFIED")
+        assertFalse(output.lineSequence().any { it.startsWith("> Task :compileKotlin") || it.startsWith("> Task :link") })
     }
 
     @Test

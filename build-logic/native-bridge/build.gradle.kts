@@ -122,5 +122,7 @@ tasks.test {
     systemProperty("native.tests.work", layout.buildDirectory.dir("functional-tests").get().asFile.absolutePath)
     systemProperty("native.tests.skikoLibraryScript", layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts").asFile.absolutePath)
     systemProperty("native.tests.kotlinVersion", libs.versions.kotlin.get())
+    systemProperty("native.tests.composeUiTemplate", rootProject.file("../native-compose/scripts/templates/compose-ui.build.gradle.kts.template").absolutePath)
+    systemProperty("native.tests.versionCatalog", rootProject.file("../libs.versions.toml").absolutePath)
     maxParallelForks = 1
 }

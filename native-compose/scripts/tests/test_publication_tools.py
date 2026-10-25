@@ -75,6 +75,19 @@ class PublicationToolsTest(unittest.TestCase):
                 merge(inputs, work / "merged", {"group": "test.group", "versions": {"skiko": "1.0"}})
             self.assertFalse((work / "merged").exists())
 
+    def test_ui_can_assemble_only_its_required_core_without_a_skottie_publication(self):
+        with tempfile.TemporaryDirectory() as work:
+            work = Path(work)
+            inputs = {target: work / target for target in TARGETS}
+            for target, suffix in TARGETS.items():
+                for module in ["skiko", f"skiko-{suffix}"]:
+                    directory = inputs[target] / "test/group" / module / "1.0"
+                    directory.mkdir(parents=True)
+                    (directory / "artifact").write_text(target)
+            output = merge(inputs, work / "merged", {"group": "test.group", "versions": {"skiko": "1.0"}}, artifacts=["skiko"])
+            self.assertEqual((output / "test/group/skiko/1.0/artifact").read_text(), "macos_arm64")
+            self.assertFalse((output / "test/group/skiko-skottie").exists())
+
     def test_archive_cannot_write_outside_its_destination(self):
         with tempfile.TemporaryDirectory() as work:
             archive = Path(work) / "unsafe.zip"

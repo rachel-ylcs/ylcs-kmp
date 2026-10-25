@@ -36,11 +36,11 @@ else modules.keys.map { it as String }.toSet()
 
 __PROJECTS__
 
-// Root maintainer mode prepares Skiko first. A standalone UI baseline needs no Skiko checkout.
+// Both maintainer mode and the graphics/text CI stage prepare this same Skiko source build first.
 val skikoState = nativeDirectory.resolve("vendor/skiko/state.json")
 val requiresSkiko = selectedModules.any { (modules[it] as Map<*, *>)["requiresSkiko"] == true }
 if (requiresSkiko) {
-    check(skikoState.isFile) { "Prepare Skiko from the root native.compose=true build before building UI graphics; the CI baseline uses -Pnative.ui.ci=true" }
+    check(skikoState.isFile) { "Prepare Skiko with sync_upstream.py before building Native UI graphics/text" }
     val state = JsonSlurper().parse(skikoState) as Map<*, *>
     val catalogHash = MessageDigest.getInstance("SHA-256").digest(repositoryDirectory.resolve("libs.versions.toml").readBytes()).joinToString("") { "%02x".format(it) }
     check(state["catalogSha256"] == catalogHash) { "Skiko source state is stale; prepare it from the root maintainer build before building UI graphics" }

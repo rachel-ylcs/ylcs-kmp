@@ -22,6 +22,7 @@ rachel {
                     libs.compose.ui.geometry,
                     libs.compose.ui.unit,
                     libs.compose.ui.graphics,
+                    libs.compose.ui.text,
                 )
             }
         }

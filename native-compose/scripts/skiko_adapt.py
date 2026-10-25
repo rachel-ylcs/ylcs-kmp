@@ -291,6 +291,11 @@ CHECKSUMS
                     *buildType.clangFlags,''', '''                    *project.appleMacOsSdkFlags().toTypedArray(),
                     "-mmacosx-version-min=12.0",
                     *buildType.clangFlags,''')
+    text = replace_once(text, '''        compileTaskProvider.configure {
+            windowsRuntimeAliasesTask?.let { dependsOn(it) }''', '''        compileTaskProvider.configure {
+            // Free compiler argument paths alone do not track embedded archive contents.
+            inputs.files(allLibraries).withPropertyName("embeddedNativeArchives")
+            windowsRuntimeAliasesTask?.let { dependsOn(it) }''')
     native.write_text(text, encoding="utf-8", newline="\n")
 
     # Gradle 9 rejects an explicitly null ExecSpec working directory. The default

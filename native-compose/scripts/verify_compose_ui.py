@@ -9,9 +9,13 @@ import tomllib
 import xml.etree.ElementTree as ET
 import zipfile
 from sync_compose import ROOT, TARGETS, load_lock
+from merge_repositories import merge as merge_skiko
+from sync_upstream import load_lock as load_skiko_lock
+from verify_repository import verify_module as verify_skiko_module
 
 SUFFIXES = {"mingw_x64": "mingwx64", "linux_x64": "linuxx64", "macos_arm64": "macosarm64"}
-TESTS = {"UiUtilTest": 5, "NativeRuntimeTest": 2, "UiGeometryTest": 3, "UiUnitTest": 4}
+TESTS = {"UiUtilTest": 5, "NativeRuntimeTest": 2, "UiGeometryTest": 3, "UiUnitTest": 4,
+         "UiGraphicsTest": 6, "UiTextTest": 8, "NativeLocaleTest": 3}
 
 
 def require(condition, message):
@@ -36,6 +40,8 @@ def verify(repository, target, lock):
     version = lock["version"]
     group = repository / lock["group"].replace(".", "/")
     catalog = tomllib.loads((ROOT.parent / "libs.versions.toml").read_text(encoding="utf-8"))
+    if any(lock["modules"][name].get("requiresSkiko") for name in lock["ciModules"]):
+        verify_skiko_module(repository, target, load_skiko_lock(), "skiko")
     for artifact in lock["ciModules"]:
         root = group / artifact / version
         native = group / f"{artifact}-{suffix}" / version
@@ -63,10 +69,12 @@ def verify(repository, target, lock):
             require("META-INF/provenance/compose.json" in sources.namelist(), "Compose source identity is missing")
             require(not any("StubsMain/" in name for name in sources.namelist()), "Stub sources leaked into Native UI publication")
             require(any(name.endswith(".kt") for name in sources.namelist()), "Native UI sources are empty")
-        if artifact == "ui-unit":
-            dependencies = [d for v in target_metadata["variants"] for d in v.get("dependencies", [])]
-            require(any(d.get("group") == lock["group"] and d.get("module") in {"ui-geometry", f"ui-geometry-{suffix}"}
-                        and d.get("version", {}).get("requires") == version for d in dependencies), "UI Unit must expose its matching Geometry API dependency")
+        dependencies = [d for v in target_metadata["variants"] for d in v.get("dependencies", [])]
+        exports = {"ui-unit": ["ui-geometry"], "ui-graphics": ["ui-unit"], "ui-text": ["ui-graphics", "ui-unit"]}
+        for dependency in exports.get(artifact, []):
+            require(any(d.get("group") == lock["group"] and d.get("module") in {dependency, f"{dependency}-{suffix}"}
+                        and d.get("version", {}).get("requires") == version for d in dependencies), f"{artifact} must expose its matching Native {dependency} dependency")
+        require(not any(d.get("group") == "org.jetbrains.skiko" for d in dependencies), f"{artifact} must publish its Native Skiko dependency directly")
     print(f"PASS: {len(lock['ciModules'])} Native UI Maven modules / {target} / {version}")
 
 
@@ -97,6 +105,8 @@ def merge(inputs, output, lock):
         directory = repository / group / artifact
         require((directory / lock["version"]).is_dir(), f"Missing publication: {directory}")
         require(not any(path.is_symlink() for path in [directory, *directory.rglob("*")]), "Symlink in Native UI publication")
+    if any(lock["modules"][name].get("requiresSkiko") for name in lock["ciModules"]):
+        merge_skiko(inputs, output, load_skiko_lock(), artifacts=["skiko"])
     for repository, artifact in selected:
         shutil.copytree(repository / group / artifact, output / group / artifact)
     for target in sorted(TARGETS):
