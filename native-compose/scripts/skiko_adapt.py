@@ -82,10 +82,12 @@ def adapt_kotlin_sources(root: Path):
 
     # This is Native-only code now. Bind directly to the same Native symbol
     # annotation instead of suppressing optional-expectation errors inherited from JS.
+    # SymbolNameIsInternal is internal: the existing source-set compiler opt-in
+    # must remain a string, not an inaccessible @file:OptIn class reference.
     path = sources / "nativeMain/kotlin/org/jetbrains/skia/PaintFilterCanvas.shared.kt"
     text = replace_once(path.read_text(encoding="utf-8"),
                         '@file:Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE") // https://youtrack.jetbrains.com/issue/KT-50727\n\n',
-                        '@file:OptIn(kotlin.native.SymbolNameIsInternal::class)\n\n')
+                        "")
     for symbol in ["org_jetbrains_skia_PaintFilterCanvas__1nInit", "org_jetbrains_skia_PaintFilterCanvas__1nGetOnFilterPaint"]:
         text = replace_once(text, f'@ExternalSymbolName("{symbol}")', f'@kotlin.native.SymbolName("{symbol}")')
     path.write_text(text, encoding="utf-8", newline="\n")

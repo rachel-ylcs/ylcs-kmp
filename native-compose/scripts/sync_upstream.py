@@ -37,7 +37,7 @@ def load_lock():
     if catalog["versions"]["skiko"] != lock["upstreamVersions"]["skiko"]:
         raise ValueError(f"Main catalog selects Skiko {catalog['versions']['skiko']}; update its pinned source/Skia inputs in upstream/lock.json. The main project does not need a downgrade.")
     lock["versions"] = {key: catalog["versions"][key] for key in lock["versions"]}
-    native_skiko = catalog["libraries"]["skikoNative"]
+    native_skiko = catalog["libraries"]["skiko-native"]
     if native_skiko["version"]["ref"] != "skiko" or native_skiko["module"] != f"{lock['group']}:skiko":
         raise ValueError("Native Skiko coordinates changed in libs.versions.toml; review upstream/lock.json first.")
     return lock

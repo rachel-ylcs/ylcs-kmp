@@ -69,20 +69,26 @@ C++/CInterop 和最终链接仍由匹配宿主执行；该设置不证明跨宿�
 ## 三平台结果边界
 
 此前本地 Windows 的 C++/KLIB、原生测试、软件/D3D12 窗口、ZIP 和独立 Maven 消费通过。
-最新读取的 Native [run 40111028367](https://github.com/rachel-ylcs/ylcs-kmp/actions/runs/40111028367)
-对应提交 c5d1df6ebed9666bb9d2335499fbe72236e25bf6。三个宿主的编译、链接、6 项 Native 测试、
-软件窗口和 Maven 工件审计均通过；Windows job 成功，Linux/macOS 均在 ZIP 搬移步骤失败，
-导致三目标仓库汇总及独立消费 job 跳过。
+最新读取的 Native [run 40147244845](https://github.com/rachel-ylcs/ylcs-kmp/actions/runs/40147244845)
+对应提交 b0e2bd0f8d1a8644d3d0fa890c1e8c6666b64427。三个宿主的 23 项 Python 工具测试、
+桥插件集成测试和 validatePlugins 步骤成功；Core 的 Kotlin 编译全部失败，
+未到达本轮 Native 测试、应用运行和 ZIP 搬移，三目标仓库汇总及独立消费被跳过。
 
 | 平台 | 最新 CI 结果 | 当前修复 |
 | --- | --- | --- |
-| Windows | 整个构建 job 通过 | 本轮另修 Kotlin 警告和发布限制，待重新验证 |
-| Linux | ZIP 中 skiko.kexe 丢失执行位；编译、运行及工件审计已通过 | ZIP 显式设置程序 0755、数据 0644、目录 0755 |
-| macOS | ZIP 中 skiko.kexe 丢失执行位；编译、运行及工件审计已通过 | 使用相同的 ZIP 权限修复 |
+| Windows | compileKotlinMingwX64：内部注解不可访问 | 移除生成源码中的内部注解类引用，复用既有编译器 opt-in |
+| Linux | compileKotlinLinuxX64：同一错误 | 使用相同的源码生成修复 |
+| macOS | compileKotlinMacosArm64：同一错误 | 使用相同的源码生成修复 |
 
-原因是 Gradle 9 的可重现归档默认将普通文件保存为 0644，stage 的 0755 不会自动成为 ZIP 权限。
-修复放在生产 ZIP 的桥插件内；验证器保留执行权限断言，未通过补 chmod 绕过问题。
-现有桥插件功能用例增加 ZIP 中程序和数据的权限断言；本轮未执行该用例或其他构建/测试。
+共同错误位于生成的 PaintFilterCanvas.shared.kt 第 1 行：
+Cannot access 'annotation class SymbolNameIsInternal : Annotation': it is internal in file。
+前次修复引入了 @file:OptIn(kotlin.native.SymbolNameIsInternal::class)，但该注解在 Kotlin 2.5 中是 internal。
+当前只删除这处源码引用，保留同名字符串的 languageSettings.optIn 和原生 SymbolName 绑定，
+也不恢复 OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE 的未定义行为抑制。
+
+此前 run 40111028367 的 Windows 构建通过，Linux/macOS 因 ZIP 执行权限丢失失败。
+桥插件已显式设置程序 0755、数据 0644、目录 0755；新增的 ZIP 权限断言在最新 CI 的桥插件步骤通过。
+真实应用 ZIP 的搬移步骤仍需要在此次编译修复后完成，不能由插件用例通过推断已验收。
 
 当前修改尚未提交/推送，没有修改后的远程 CI 结果；本轮静态核对不能代替三个宿主重新验收。
 CI 默认软件窗口基线，手动 gpu-smoke 另行要求 D3D12/Vulkan/Metal 实际后端。

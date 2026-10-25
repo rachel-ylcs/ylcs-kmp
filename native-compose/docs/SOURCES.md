@@ -100,6 +100,31 @@ Skiko 位于框架依赖链底层，不为语法辅助函数反向依赖 Rachel 
 src/settings 是不依赖 KGP 的 Settings 实现。发布时 Settings marker 选择同一 GAV 的 settings classifier。
 规则及 adaptation 路径可由消费模块的 nativeBridgeReport 查看；实际依赖选择使用 dependencyInsight。
 
+## 依赖与目标的实际支持审计
+
+审计以根版本目录选定的版本为准，按“依赖坐标 + target”记录结果；上游宣称支持或发布了 KLIB
+只表示存在声明，不能直接标记为可复用。后续 Compose 和 AndroidX 依赖也采用相同规则：
+
+1. 检查发布的 Gradle Module Metadata 中该 target 的变体、实际 KLIB 和传递依赖闭包，
+   排除只发布 common metadata、只配置空 target 或依赖落到其他平台的情况。
+2. 对照锁定版本的实际构建脚本，追踪叶子源集到共享源集的依赖及所有生效的 expect/actual。
+   Compose fork 优先核对实际使用的 build-fork.gradle，不能把 AndroidX 原始脚本中的 Stubs 源集当成正式实现。
+3. 阅读平台实现及调用方，排查 TODO()、NotImplementedError、error("Not implemented")、
+   空函数、固定返回值、stub/mock，以及缺失的 CInterop/C++/系统服务。
+   没有平台源码不一定缺实现，共享实现也可能完整；存在空函数也不一定是缺陷，需按 API 语义判断。
+4. 分别记录“可复用”“有限支持”“缺失实现”“待运行验证”，写明影响的 API、源码位置和所需平台能力。
+   仅对缺失的库/target 增加适配与桥插件规则；未检查的目标保持待审计，不能计为已支持。
+5. 在对应宿主执行编译、链接和有实际行为断言的回归后，再更新运行结论。
+   用户要求只改源码时，保持运行状态未验证，不以编译配置或 TODO 数量代替验收。
+
+例如，Skiko 已记录 Native 空 reachabilityBarrier 和未实现的指针数组入口边界；
+这些限制需要结合调用和 GC/FFI 语义评估。窗口、输入法、剪贴板和资源释放同样需要实际实现审计。
+Runtime、Lifecycle、SavedState、Annotation、Collection 即使已有三个 Native 发布变体，也要逐项完成以上检查。
+
+移植库的版本目录别名使用连字符：skiko-native、skiko-native-skottie，后续新增别名沿用同一形式。
+对应 Kotlin accessor 为 libs.skiko.native 和 libs.skiko.native.skottie；
+前者同时拥有子节点，需要 Provider 值时使用 libs.skiko.native.asProvider()。
+
 ## Skottie 为什么只有构建脚本
 
 adaptation 只保存本项目维护的差异，不保存完整上游副本。

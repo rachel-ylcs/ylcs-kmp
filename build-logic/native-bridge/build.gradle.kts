@@ -29,9 +29,9 @@ dependencies {
 val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     destinationFile.set(layout.buildDirectory.file("generated/compatibility/rachel-native-bridge.properties"))
     property("skiko.upstream.version", libs.versions.skiko.get())
-    val nativeSkiko = libs.skikoNative.get()
+    val nativeSkiko = libs.skiko.native.asProvider().get()
     property("skiko.port.module", "${nativeSkiko.module.group}:${nativeSkiko.module.name}:${nativeSkiko.versionConstraint.requiredVersion}")
-    property("skiko.skottie.module", libs.skikoNativeSkottie.get().toString())
+    property("skiko.skottie.module", libs.skiko.native.skottie.get().toString())
     property("sdl.version", libs.versions.sdl.get())
 }
 tasks.processResources { from(writeCompatibility) }

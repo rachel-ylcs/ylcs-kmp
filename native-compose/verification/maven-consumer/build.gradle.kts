@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // Deliberately request only the extension: Core must arrive through its API metadata.
-            if (explicit) implementation(libs.skikoNativeSkottie)
+            if (explicit) implementation(libs.skiko.native.skottie)
             else implementation(libs.skiko.lottie)
             if (providers.gradleProperty("native.legacyRequest").getOrElse("false").toBoolean()) {
                 implementation("org.jetbrains.skiko:skiko:0.150.1")

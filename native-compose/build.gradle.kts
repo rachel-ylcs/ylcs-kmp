@@ -17,7 +17,7 @@ check(libs.versions.sdl.get() == sdlLock["version"]) {
 }
 val skikoVersion = libs.versions.skiko.get()
 val portGroup = lock["group"] as String
-check(libs.skikoNative.get().toString() == "$portGroup:skiko:$skikoVersion") {
+check(libs.skiko.native.asProvider().get().toString() == "$portGroup:skiko:$skikoVersion") {
     "Native Skiko coordinates changed in ../libs.versions.toml; review upstream/lock.json."
 }
 

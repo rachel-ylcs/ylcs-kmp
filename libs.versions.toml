@@ -74,8 +74,6 @@ jetbrains-annotation = { module = "org.jetbrains:annotations", version = "26.1.0
 
 # skiko
 skiko = { module = "org.jetbrains.skiko:skiko", version.ref = "skiko" }
-skikoNative = { module = "love.yinlin.native.skiko:skiko", version.ref = "skiko" }
-skikoNativeSkottie = { module = "love.yinlin.native.skiko:skiko-skottie", version.ref = "skiko" }
 skiko-lottie = { module = "org.jetbrains.skiko:skiko-skottie", version.ref = "skiko" }
 
 # androidx
@@ -182,3 +180,8 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 # service
 rethis = { module = "eu.vendeli:rethis", version = "0.4.4" }
 sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.16.1" }
+
+# ----- [Native Compose] -----
+
+skiko-native = { module = "love.yinlin.native.skiko:skiko", version.ref = "skiko" }
+skiko-native-skottie = { module = "love.yinlin.native.skiko:skiko-skottie", version.ref = "skiko" }
