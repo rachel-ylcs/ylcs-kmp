@@ -141,6 +141,10 @@ abstract class ScreenModel : ViewModel() {
     inline fun <reified A1, reified A2, reified A3, reified A4, reified A5> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, arg1, arg2, arg3, arg4, arg5, policy)
 
+    /** 原子替换当前页面，保留其下方的导航历史。 */
+    inline fun <reified S : ScreenModel> replaceCurrent(metaConstructor: () -> S): Unit =
+        activeManager().replaceCurrent(metaConstructor)
+
     // 执行所属导航栈的返回操作，保留最后一个页面
     fun pop(): Boolean = activeManager().pop()
 
