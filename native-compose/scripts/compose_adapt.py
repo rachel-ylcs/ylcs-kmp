@@ -23,9 +23,7 @@ def legacy_paragraph_bridges(text):
     return pattern.sub(adapt, text)
 
 
-def source_edits(workspace, native_root, modules):
-    if "ui-text" not in modules:
-        return {}
+def text_source_edits(workspace, native_root):
     base = "compose/ui/ui-text/src/"
     replacement = native_root / "adaptation/org.jetbrains.compose.ui_ui-text/src/nativeMain/kotlin/androidx/compose/ui/text/platform/Synchronization.native.kt"
     if not replacement.is_file():
@@ -52,4 +50,66 @@ def source_edits(workspace, native_root, modules):
         if text == original:
             raise ValueError(f"Compose upstream drift: no legacy paragraph bridges found in {path}")
         edits[path] = text
+    path = base + "nonAndroidMain/kotlin/androidx/compose/ui/text/font/FontFamilyResolver.nonAndroid.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    for signature in ["fun createFontFamilyResolver()", "fun createFontFamilyResolver(coroutineContext: CoroutineContext)"]:
+        text = replace_once(text, signature, "actual " + signature)
+    edits[path] = text
+    return edits
+
+
+def skiko_source_edits(workspace, native_root):
+    base = "compose/ui/ui-skiko/src/"
+    adaptation = native_root / "adaptation/org.jetbrains.compose.ui_ui-skiko/src"
+    for target in ["windows", "linux", "macos"]:
+        for suffix in [f"graphics/NativeImageAsset.{target}.kt", f"text/platform/NativeFont.{target}.kt"]:
+            if not (adaptation / f"{target}Main/kotlin/androidx/compose/ui" / suffix).is_file():
+                raise ValueError(f"Compose Skiko adaptation is missing: {target}/{suffix}")
+    edits = {base + "nativeMain/kotlin/androidx/compose/ui/graphics/NativeImageAsset.native.kt": None,
+             base + "nativeMain/kotlin/androidx/compose/ui/text/platform/NativeFont.native.kt": None}
+    path = base + "nonAndroidMain/kotlin/androidx/compose/ui/platform/ComposeUiSkikoRuntime.nonAndroid.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    for name in ["registerSkikoComposeImplementation", "clearSkikoComposeImplementation"]:
+        text = replace_once(text, f"fun {name}()", f"actual fun {name}()")
+    edits[path] = text
+    path = base + "nonAndroidMain/kotlin/androidx/compose/ui/graphics/SkiaBackedCanvas.nonAndroid.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    edits[path] = replace_once(text, "fun SkCanvas.asComposeCanvas(): Canvas", "actual fun SkCanvas.asComposeCanvas(): Canvas")
+    path = base + "nativeMain/kotlin/androidx/compose/ui/text/Cache.native.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    text = replace_once(text, "ref.value != null", "ref.get() != null")
+    edits[path] = replace_once(text, "            if (other == null) return false\n            other as Key<*>", "            if (other !is Key<*>) return false")
+    path = base + "nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoCharHelpers.nonAndroid.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    for operation in ["preceding", "following"]:
+        text = replace_once(text, f"    val iterator = BreakIterator.makeCharacterInstance()\n    iterator.setText(text)\n    return iterator.{operation}(index)",
+                            f"    return BreakIterator.makeCharacterInstance().use {{ iterator ->\n        iterator.setText(text)\n        iterator.{operation}(index)\n    }}")
+    text = text.replace("import org.jetbrains.skia.BreakIterator\n", "import org.jetbrains.skia.BreakIterator\nimport org.jetbrains.skia.impl.use\n")
+    edits[path] = text
+    path = base + "nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    edits[path] = replace_once(text, "    private var resolvedTypefaces: TypefaceDirtyTrackerLinkedList? = null",
+                               "    internal val boundaryLocale: String? get() = (style.localeList ?: defaultLocaleList).firstOrNull()?.toLanguageTag()\n\n    private var resolvedTypefaces: TypefaceDirtyTrackerLinkedList? = null")
+    path = base + "nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoParagraph.nonAndroid.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    text = replace_once(text, "        // TODO(https://youtrack.jetbrains.com/issue/CMP-1255)\n        return TextRange.Zero",
+                        "        return nativeRangeForRect(paragraph, text, paragraphIntrinsics.boundaryLocale, rect, granularity, inclusionStrategy)")
+    text = replace_once(text, '''        println("Compose Multiplatform doesn't support fillBoundingBoxes` yet. " +
+            "Follow https://youtrack.jetbrains.com/issue/CMP-720")
+        // TODO(https://youtrack.jetbrains.com/issue/CMP-720) implement fillBoundingBoxes''',
+                        "        nativeFillBoundingBoxes(this, paragraph, text, paragraphIntrinsics.boundaryLocale, range, array, arrayStart)")
+    edits[path] = text
+    path = base + "nonAndroidMain/kotlin/androidx/compose/ui/graphics/SkikoGraphics.nonAndroid.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    edits[path] = replace_once(text, "    // TODO: https://youtrack.jetbrains.com/issue/CMP-739\n    override fun colorMatrixFromFilter(filter: PlatformColorFilter): ColorMatrix = ColorMatrix()",
+                               "    override fun colorMatrixFromFilter(filter: PlatformColorFilter): ColorMatrix = colorMatrixFromSkiko(filter)")
+    return edits
+
+
+def source_edits(workspace, native_root, modules):
+    edits = {}
+    if "ui-text" in modules:
+        edits.update(text_source_edits(workspace, native_root))
+    if "ui-skiko" in modules:
+        edits.update(skiko_source_edits(workspace, native_root))
     return edits

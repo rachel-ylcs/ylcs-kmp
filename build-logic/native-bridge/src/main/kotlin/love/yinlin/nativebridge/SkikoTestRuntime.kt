@@ -34,6 +34,7 @@ internal object SkikoTestRuntime {
                 isCanBeResolved = true
                 isTransitive = false
             }
+            NativeRuntimeAttributes.configure(project, runtime, HostManager.host.name)
             project.dependencies.add(runtime.name, "${module[0]}:${module[1]}-mingwx64:${module[2]}:icudtl@dat")
             data.from(runtime)
         }

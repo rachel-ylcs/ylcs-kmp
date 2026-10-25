@@ -19,6 +19,7 @@ kotlin {
                 implementation(libs.native.compose.ui.unit)
                 implementation(libs.native.compose.ui.graphics)
                 implementation(libs.native.compose.ui.text)
+                implementation(libs.native.compose.ui.skiko)
             }
             else {
                 implementation(libs.compose.ui.util)
@@ -26,6 +27,7 @@ kotlin {
                 implementation(libs.compose.ui.unit)
                 implementation(libs.compose.ui.graphics)
                 implementation(libs.compose.ui.text)
+                implementation(libs.compose.ui.skiko)
             }
         }
         commonTest.dependencies { implementation(kotlin("test")) }
@@ -43,11 +45,17 @@ nativeBridge { skikoTests() }
 // Explicit Native coordinates must form a complete Maven graph without upstream port requests.
 tasks.register("verifyNativeMavenClosure") {
     doLast {
-        if (explicit) {
-            val artifacts = setOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text")
-            kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().forEach { target ->
-                val result = configurations.getByName(target.compilations.getByName("main").compileDependencyConfigurationName).incoming.resolutionResult
-                result.allDependencies.filterIsInstance<org.gradle.api.artifacts.result.UnresolvedDependencyResult>().forEach { throw it.failure }
+        val artifacts = setOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko")
+        kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().forEach { target ->
+            val result = configurations.getByName(target.compilations.getByName("main").compileDependencyConfigurationName).incoming.resolutionResult
+            result.allDependencies.filterIsInstance<org.gradle.api.artifacts.result.UnresolvedDependencyResult>().forEach { throw it.failure }
+            result.allComponents.forEach { component ->
+                val selected = component.id as? org.gradle.api.artifacts.component.ModuleComponentIdentifier
+                check(selected == null || selected.group != "org.jetbrains.compose.ui" || artifacts.none { selected.module == it || selected.module.startsWith("$it-") }) {
+                    "Native consumer mixed an upstream UI KLIB into the adapted backend graph: ${component.id}"
+                }
+            }
+            if (explicit) {
                 result.allDependencies.forEach { dependency ->
                     val requested = dependency.requested as? org.gradle.api.artifacts.component.ModuleComponentSelector
                     check(requested == null || requested.group != "org.jetbrains.skiko" && !(requested.group == "org.jetbrains.compose.ui" && requested.module in artifacts)) {

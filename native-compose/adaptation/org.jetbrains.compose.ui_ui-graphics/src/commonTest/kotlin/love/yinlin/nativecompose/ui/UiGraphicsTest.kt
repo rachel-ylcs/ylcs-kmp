@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.toArgb
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/** Pure Graphics behavior; raster/backend integration belongs to the following ui-skiko stage. */
+/** Pure Graphics behavior; raster and text backend integration is covered by UiSkikoTest. */
 class UiGraphicsTest {
     @Test
     fun colorsPreserveArgbAndComponents() {

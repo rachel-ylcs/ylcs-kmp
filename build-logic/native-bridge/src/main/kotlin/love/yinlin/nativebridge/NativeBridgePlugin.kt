@@ -188,6 +188,7 @@ class NativeBridgePlugin : Plugin<Project> {
                 }
                 val configuration = project.configurations.detachedConfiguration(project.dependencies.create(coordinate))
                 configuration.isTransitive = false
+                NativeRuntimeAttributes.configure(project, configuration, target.konanTarget.name)
                 configuration to filename
             }
             val runtimeConfiguration = project.configurations.create("${target.name}NativeApplicationRuntime") {
@@ -198,6 +199,7 @@ class NativeBridgePlugin : Plugin<Project> {
                     runtime.dependencies.get().forEach { coordinate -> add(project.dependencies.create(coordinate)) }
                 }
             }
+            NativeRuntimeAttributes.configure(project, runtimeConfiguration, target.konanTarget.name)
             target.binaries.withType(Executable::class.java).configureEach {
                 val binary = this
                 val suffix = target.name.replaceFirstChar(Char::uppercase) + binary.name.replaceFirstChar(Char::uppercase)

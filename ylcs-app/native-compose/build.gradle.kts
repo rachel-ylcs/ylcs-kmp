@@ -23,6 +23,7 @@ rachel {
                     libs.compose.ui.unit,
                     libs.compose.ui.graphics,
                     libs.compose.ui.text,
+                    libs.compose.ui.skiko,
                 )
             }
         }

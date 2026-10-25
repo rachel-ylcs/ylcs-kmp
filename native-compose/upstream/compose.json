@@ -5,11 +5,11 @@
     "commit": "bb05011eb10784ada1ec00494f1a710ba6ab6252",
     "version": "1.13.0-beta01",
     "group": "love.yinlin.native.compose.ui",
-    "ciModules": ["ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text"],
+    "ciModules": ["ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko"],
     "modules": {
         "ui-util": {
             "alias": "native-compose-ui-util",
-            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "sourceSets": {
                 "commonMain": ["src/commonMain/kotlin"],
@@ -19,7 +19,7 @@
         },
         "ui-geometry": {
             "alias": "native-compose-ui-geometry",
-            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "sourceSets": {
                 "commonMain": ["src/commonMain/kotlin"]
@@ -27,7 +27,7 @@
         },
         "ui-unit": {
             "alias": "native-compose-ui-unit",
-            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "sourceSets": {
                 "commonMain": ["src/commonMain/kotlin"],
@@ -37,17 +37,29 @@
         "ui-graphics": {
             "alias": "native-compose-ui-graphics",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "sourceSets": {
                 "commonMain": ["src/commonMain/kotlin"],
                 "nativeMain": ["src/nonAndroidMain/kotlin", "src/skikoMain/kotlin", "src/nonJvmMain/kotlin"]
             }
         },
+        "ui-skiko": {
+            "alias": "native-compose-ui-skiko",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "nativeMain": ["src/nonAndroidMain/kotlin"],
+                "windowsMain": ["src/nonAndroidExcludingWebMain/kotlin", "src/nonJvmMain/kotlin", "src/nativeMain/kotlin"],
+                "linuxMain": ["src/nonAndroidExcludingWebMain/kotlin", "src/nonJvmMain/kotlin", "src/nativeMain/kotlin"],
+                "macosMain": ["src/nonAndroidExcludingWebMain/kotlin", "src/nonJvmMain/kotlin", "src/nativeMain/kotlin"]
+            }
+        },
         "ui-text": {
             "alias": "native-compose-ui-text",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64"],
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "sourceSets": {
                 "commonMain": ["src/commonMain/kotlin"],

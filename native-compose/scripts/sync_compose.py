@@ -48,7 +48,7 @@ def load_lock():
                 raise ValueError(f"Unaudited source set: {name}/{source_set}")
             for directory in directories:
                 parts = PurePosixPath(directory).parts
-                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonJvmMain", "skikoMain", "nativeMain", "darwinMain", "macosMain"}:
+                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonAndroidExcludingWebMain", "nonJvmMain", "skikoMain", "nativeMain", "darwinMain", "macosMain"}:
                     raise ValueError(f"Unaudited upstream source path: {name}/{directory}")
                 if parts[1] == "darwinMain" and source_set != "macosMain":
                     raise ValueError(f"Foundation sources must belong to macosMain: {name}/{directory}")

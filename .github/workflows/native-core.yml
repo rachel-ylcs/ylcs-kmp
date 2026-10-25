@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   build:
-    name: UI Text + Graphics / ${{ matrix.target }}
+    name: UI Skiko backend / ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     strategy:
@@ -90,7 +90,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build pkg-config libfontconfig1-dev libfreetype6-dev \
             libgl1-mesa-dev libegl1-mesa-dev libx11-dev libxcursor-dev libxrandr-dev \
-            libxinerama-dev libxi-dev libwayland-dev libxkbcommon-dev
+            libxinerama-dev libxi-dev libxss-dev libxtst-dev libwayland-dev wayland-protocols libxkbcommon-dev
       - name: Source and publication tool regressions
         run: python -m unittest discover -s native-compose/scripts/tests -p 'test_*.py' -v
       - name: Prepare the pinned Skiko and Compose source checkouts
@@ -116,7 +116,7 @@ jobs:
             --no-daemon --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.ui.ci=true \
             ":ui-util:${NATIVE_TEST_TASK}" ":ui-geometry:${NATIVE_TEST_TASK}" ":ui-unit:${NATIVE_TEST_TASK}" \
-            ":ui-graphics:${NATIVE_TEST_TASK}" ":ui-text:${NATIVE_TEST_TASK}" \
+            ":ui-graphics:${NATIVE_TEST_TASK}" ":ui-text:${NATIVE_TEST_TASK}" ":ui-skiko:${NATIVE_TEST_TASK}" \
             publishHostToVerificationRepository
           python - <<'PY'
           import shutil
@@ -129,7 +129,7 @@ jobs:
         run: |
           python native-compose/scripts/verify_compose_ui.py --target "$NATIVE_TARGET" \
             --tests native-compose/vendor/build/compose-ui
-          printf 'Compose UI %s: 31 regressions across Text, Graphics, Unit, Geometry, Util and Runtime passed.\n' \
+          printf 'Compose UI %s: 46 regressions across the Skiko backend and its Text, Graphics, Unit, Geometry, Util and Runtime foundations passed.\n' \
             "$NATIVE_TARGET" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
         with:
@@ -222,7 +222,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libfontconfig1-dev libfreetype6-dev libgl1-mesa-dev libegl1-mesa-dev \
-            libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libwayland-dev libxkbcommon-dev
+            libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libxss-dev libxtst-dev libwayland-dev wayland-protocols libxkbcommon-dev
       - name: Configure the Windows Native linker environment
         if: runner.os == 'Windows'
         uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -260,7 +260,7 @@ jobs:
           reports = list(Path('native-compose/vendor/build/compose-ui/maven-consumer/test-results').glob('**/TEST-*.xml'))
           assert reports, 'No independent Maven consumer test reports'
           suites = [ET.parse(path).getroot() for path in reports]
-          assert any('ComposeUiPublicationTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 3 for suite in suites)
+          assert any('ComposeUiPublicationTest' in suite.attrib['name'] and int(suite.attrib['tests']) == 4 for suite in suites)
           assert all(int(suite.attrib.get(key, 0)) == 0 for suite in suites for key in ['failures', 'errors', 'skipped'])
           PY
       - name: Independent Maven consumer test evidence

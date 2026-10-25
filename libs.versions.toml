@@ -96,6 +96,7 @@ compose-ui-geometry = { module = "org.jetbrains.compose.ui:ui-geometry", version
 compose-ui-unit = { module = "org.jetbrains.compose.ui:ui-unit", version.ref = "cmp" }
 compose-ui-graphics = { module = "org.jetbrains.compose.ui:ui-graphics", version.ref = "cmp" }
 compose-ui-text = { module = "org.jetbrains.compose.ui:ui-text", version.ref = "cmp" }
+compose-ui-skiko = { module = "org.jetbrains.compose.ui:ui-skiko", version.ref = "cmp" }
 compose-annotation-internal = { module = "org.jetbrains.compose.annotation-internal:annotation", version.ref = "cmp-internal" }
 compose-collection-internal = { module = "org.jetbrains.compose.collection-internal:collection", version.ref = "cmp-internal" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
@@ -199,3 +200,4 @@ native-compose-ui-geometry = { module = "love.yinlin.native.compose.ui:ui-geomet
 native-compose-ui-unit = { module = "love.yinlin.native.compose.ui:ui-unit", version.ref = "cmp" }
 native-compose-ui-graphics = { module = "love.yinlin.native.compose.ui:ui-graphics", version.ref = "cmp" }
 native-compose-ui-text = { module = "love.yinlin.native.compose.ui:ui-text", version.ref = "cmp" }
+native-compose-ui-skiko = { module = "love.yinlin.native.compose.ui:ui-skiko", version.ref = "cmp" }

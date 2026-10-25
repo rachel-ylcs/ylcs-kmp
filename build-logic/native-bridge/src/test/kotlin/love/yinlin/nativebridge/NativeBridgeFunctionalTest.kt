@@ -22,7 +22,9 @@ class NativeBridgeFunctionalTest {
         native.resolve("upstream/compose.json").writeText("""
             {"group":"test.native.ui","ciModules":["ui-util"],"modules":{"ui-util":{"sourceSets":{"commonMain":["src/commonMain/kotlin"]}}}}
         """.trimIndent())
+        native.resolve("upstream/compose-origins.json").writeText("""{"files":{}}""")
         val build = native.resolve("vendor/compose/workspace/native-desktop").apply { mkdirs() }
+        build.parentFile.resolve("LICENSE.txt").writeText("fixture source license\n")
         build.resolve("gradle.properties").writeText("kotlin.stdlib.default.dependency=false\nkotlin.native.ignoreDisabledTargets=true\nkotlin.mpp.applyDefaultHierarchyTemplate=false\n")
         build.resolve("settings.gradle.kts").writeText("""
             pluginManagement {
@@ -38,6 +40,8 @@ class NativeBridgeFunctionalTest {
             include(":ui-util")
         """.trimIndent())
         build.resolve("ui-util").mkdirs()
+        build.resolve("ui-util/src/commonMain/kotlin").mkdirs()
+        build.resolve("ui-util/src/commonMain/kotlin/Source.kt").writeText("package fixture\nclass Source\n")
         build.resolve("ui-util/build.gradle.kts").writeText("""
             plugins {
                 kotlin("multiplatform")
@@ -47,6 +51,7 @@ class NativeBridgeFunctionalTest {
         val template = File(System.getProperty("native.tests.composeUiTemplate")).readText().replace("__JAVA_VERSION__", "25")
         build.resolve("build.gradle.kts").writeText(template + "\n" + """
             tasks.register("verifyNativePublicationCoordinates") {
+                dependsOn(":ui-util:" + hostTarget + "SourcesJar")
                 doLast {
                     val library = project(":ui-util")
                     check(library.group == "org.jetbrains.compose.ui")
@@ -61,11 +66,19 @@ class NativeBridgeFunctionalTest {
                     library.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>().forEach { target ->
                         check(target.compilations.getByName("main").compileTaskProvider.get().compilerOptions.moduleName.get() == "org.jetbrains.compose.ui:ui-util")
                     }
+                    val sources = library.tasks.getByName(hostTarget + "SourcesJar") as Jar
+                    java.util.zip.ZipFile(sources.archiveFile.get().asFile).use { archive ->
+                        check(archive.getEntry("META-INF/licenses/LICENSE.txt") != null)
+                        check(archive.getEntry("META-INF/provenance/compose.json") != null)
+                        check(archive.getEntry("META-INF/provenance/compose-origins.json") != null)
+                    }
+                    println("NATIVE_UI_SOURCE_NOTICES=VERIFIED")
                 }
             }
         """.trimIndent())
         val result = runner(build, "verifyNativePublicationCoordinates").build()
         for (artifact in listOf("ui-util", "ui-util-mingwx64", "ui-util-linuxx64", "ui-util-macosarm64")) assertContains(result.output, "NATIVE_UI_PUBLICATION=$artifact")
+        assertContains(result.output, "NATIVE_UI_SOURCE_NOTICES=VERIFIED")
         assertTrue(result.tasks.none { it.path.contains("compileKotlin") || it.path.contains("linkDebug") || it.path.contains("linkRelease") })
     }
 
@@ -121,7 +134,7 @@ class NativeBridgeFunctionalTest {
         val work = File(System.getProperty("native.tests.work")).apply { mkdirs() }
         return Files.createTempDirectory(work.toPath(), "bridge-").toFile().also {
             it.resolve("settings.gradle.kts").writeText("rootProject.name = \"consumer\"\n")
-            it.resolve("gradle.properties").writeText("kotlin.stdlib.default.dependency=false\nkotlin.native.ignoreDisabledTargets=true\n")
+            it.resolve("gradle.properties").writeText("kotlin.stdlib.default.dependency=false\nkotlin.native.ignoreDisabledTargets=true\nkotlin.mpp.applyDefaultHierarchyTemplate=false\n")
         }
     }
 
@@ -201,16 +214,24 @@ class NativeBridgeFunctionalTest {
     }
 
     @Test
-    fun builtInComposeRulesRedirectWindowsAndLinuxWhileMacAndJvmStayOfficial() {
+    fun builtInComposeRulesKeepTheNativeBackendGraphTogetherAndJvmOfficial() {
         val project = project()
         val compatibility = Properties().apply {
             checkNotNull(NativeBridgePlugin::class.java.classLoader.getResourceAsStream("rachel-native-bridge.properties")).use { load(it) }
         }
         val version = compatibility.getProperty("compose.upstream.version")
-        val artifacts = listOf("ui-util", "ui-geometry", "ui-unit")
+        val artifacts = listOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko")
         for (artifact in artifacts) {
             module(project, "org.jetbrains.compose.ui", version, artifact = artifact)
-            module(project, "love.yinlin.native.compose.ui", version, artifact = artifact)
+            val children = when (artifact) {
+                "ui-skiko" -> listOf("ui-graphics", "ui-text")
+                "ui-text" -> listOf("ui-graphics", "ui-unit", "ui-util")
+                "ui-graphics" -> listOf("ui-unit")
+                "ui-unit" -> listOf("ui-geometry")
+                else -> emptyList()
+            }
+            val dependencies = children.joinToString(",") { """{"group":"love.yinlin.native.compose.ui","module":"$it","version":{"requires":"$version"}}""" }
+            module(project, "love.yinlin.native.compose.ui", version, dependencies = dependencies, artifact = artifact)
         }
         val dependencies = artifacts.joinToString("\n") { "implementation(\"org.jetbrains.compose.ui:$it:$version\")" }
         project.resolve("build.gradle.kts").writeText("""
@@ -244,9 +265,10 @@ class NativeBridgeFunctionalTest {
         val output = runner(project, "verifyComposeRouting").build().output
         for (target in listOf("windows", "linux", "macos", "desktop")) {
             val line = output.lineSequence().first { it.startsWith("COMPOSE_ROUTE $target =") }
-            val group = if (target in setOf("windows", "linux")) "love.yinlin.native.compose.ui" else "org.jetbrains.compose.ui"
+            val group = if (target == "desktop") "org.jetbrains.compose.ui" else "love.yinlin.native.compose.ui"
             for (artifact in artifacts) assertContains(line, "$group:$artifact:$version")
-            if (target in setOf("macos", "desktop")) assertFalse(line.contains("love.yinlin.native.compose.ui"))
+            if (target == "desktop") assertFalse(line.contains("love.yinlin.native.compose.ui"))
+            else assertFalse(line.contains("org.jetbrains.compose.ui"))
         }
     }
 
@@ -619,6 +641,8 @@ class NativeBridgeFunctionalTest {
         val macos = System.getProperty("os.name") == "Mac OS X"
         val target = if (windows) "mingwX64" else if (macos) "macosArm64" else "linuxX64"
         val konan = if (windows) "mingw_x64" else if (macos) "macos_arm64" else "linux_x64"
+        module(project, "test.sidecar", "1.0", artifact = "icudata")
+        project.resolve("repo/test/sidecar/icudata/1.0/icudata-1.0-payload.dat").writeText("classified runtime fixture\n")
         project.resolve("gradle.properties").writeText("kotlin.native.ignoreDisabledTargets=true\n")
         project.resolve("runtime.txt").writeText("runtime fixture\n")
         project.resolve("build.gradle.kts").writeText("""
@@ -626,12 +650,18 @@ class NativeBridgeFunctionalTest {
                 id("org.jetbrains.kotlin.multiplatform")
                 id("love.yinlin.native-bridge")
             }
-            repositories { mavenCentral() }
+            repositories {
+                maven { url = uri("repo") }
+                mavenCentral()
+            }
             kotlin { $target("host") }
             nativeApplication {
                 enabled.set(true)
                 baseName.set("native-probe")
-                runtime("$konan") { files.from("runtime.txt") }
+                runtime("$konan") {
+                    files.from("runtime.txt")
+                    artifacts.put("test.sidecar:icudata:1.0:payload@dat", "payload.dat")
+                }
             }
         """.trimIndent())
         val source = project.resolve("src/commonMain/kotlin/Main.kt")
@@ -641,6 +671,7 @@ class NativeBridgeFunctionalTest {
         assertContains(output, "NATIVE_BRIDGE_EXECUTED")
         val stage = project.resolve("build/nativeApplication/host/debugExecutable")
         assertTrue(stage.resolve("runtime.txt").isFile)
+        assertEquals("classified runtime fixture\n", stage.resolve("payload.dat").readText())
         val exe = stage.resolve(if (windows) "native-probe.exe" else "native-probe.kexe")
         assertTrue(exe.isFile)
         if (!windows) assertTrue(exe.canExecute())
@@ -648,6 +679,7 @@ class NativeBridgeFunctionalTest {
         java.util.zip.ZipFile(archive).use { zip ->
             assertTrue(zip.getInputStream(zip.getEntry(exe.name)).readBytes().contentEquals(exe.readBytes()))
             assertTrue(zip.getInputStream(zip.getEntry("runtime.txt")).readBytes().contentEquals(stage.resolve("runtime.txt").readBytes()))
+            assertTrue(zip.getInputStream(zip.getEntry("payload.dat")).readBytes().contentEquals(stage.resolve("payload.dat").readBytes()))
         }
         FileSystems.newFileSystem(archive.toPath(), emptyMap<String, Any>()).use { zip ->
             assertEquals(PosixFilePermissions.fromString("rwxr-xr-x"), Files.getAttribute(zip.getPath("/${exe.name}"), "zip:permissions"))

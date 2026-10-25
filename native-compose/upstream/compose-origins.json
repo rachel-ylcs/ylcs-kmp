@@ -1,6 +1,14 @@
 {
     "schema": 1,
     "files": {
+        "adaptation/org.jetbrains.compose.ui_ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/platform/LoadNativeTypeface.kt": {
+            "source": "compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/platform/NativeFont.native.kt",
+            "description": "Reuses the Native font-loading contract with scoped Data and base-typeface ownership."
+        },
+        "adaptation/org.jetbrains.compose.ui_ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/graphics/CopySkikoPixelBytes.kt": {
+            "source": "compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/graphics/NativeImageAsset.native.kt",
+            "description": "Validates source and destination sizes, handles empty copies and avoids byte-count overflow before entering memcpy."
+        },
         "adaptation/org.jetbrains.compose.ui_ui-text/src/nativeMain/kotlin/androidx/compose/ui/text/platform/Synchronization.native.kt": {
             "source": "compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/Synchronization.nonAndroid.kt",
             "description": "Preserves the atomicfu lock with PublishedApi visibility and an explicit try/finally block that satisfies the exactly-once contract on Native."

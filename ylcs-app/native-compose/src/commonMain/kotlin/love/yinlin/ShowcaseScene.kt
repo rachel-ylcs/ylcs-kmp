@@ -1,30 +1,41 @@
+@file:OptIn(androidx.compose.ui.InternalComposeUiApi::class)
+
 package love.yinlin
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color as UiColor
+import androidx.compose.ui.graphics.asComposeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.registerSkikoComposeImplementation
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.text.TextStyle as UiTextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrain
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.trace
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.use
-import org.jetbrains.skia.paragraph.FontCollection
-import org.jetbrains.skia.paragraph.ParagraphBuilder
-import org.jetbrains.skia.paragraph.ParagraphStyle
-import org.jetbrains.skia.paragraph.TextStyle
 import org.jetbrains.skia.skottie.Animation
 import org.jetbrains.skia.svg.SVGDOM
 import kotlin.math.sin
 
 /** Owns the native drawing resources for one window; close before destroying its renderer. */
 internal class ShowcaseScene {
+    init {
+        registerSkikoComposeImplementation()
+    }
+
     private val face = checkNotNull(FontMgr.default.matchFamiliesStyle(
         ["Arial", "DejaVu Sans", "Liberation Sans", "Helvetica"], FontStyle.NORMAL))
     private val title = Font(face, 30f)
@@ -32,20 +43,16 @@ internal class ShowcaseScene {
     private val paint = Paint().apply { isAntiAlias = true }
     private val animation = Animation.makeFromString(AnimationJson)
     private val svg = Data.makeFromBytes(Svg.encodeToByteArray()).use { SVGDOM(it) }
-    private val fonts = FontCollection().apply { setDefaultFontManager(FontMgr.default) }
-    private val paragraph = TextStyle().use { textStyle ->
-        textStyle.fontFamilies = ["Arial", "DejaVu Sans", "Helvetica"]
-        textStyle.fontSize = 18f
-        textStyle.color = Ink
-        ParagraphStyle().use { style ->
-            style.textStyle = textStyle
-            ParagraphBuilder(style, fonts).use { builder ->
-                val sample = AnnotatedString("istanbul / straße").toUpperCase(Locale("tr-TR"))
-                builder.addText("Compose Text: ${sample.text}\nNative text: café / Ελληνικά / אבג\nSkia shapes, ICU and bidirectional layout.")
-                builder.build()
-            }
-        }
-    }
+    private val locale = Locale("tr-TR")
+    private val sample = AnnotatedString("istanbul / straße").toUpperCase(locale)
+    private val paragraph = Paragraph(
+        text = "Compose Paragraph: ${sample.text}\nNative text: café / Ελληνικά / אבג\nFont resolution, shaping and bidirectional layout.",
+        style = UiTextStyle(color = UiColor(Ink), fontSize = 18.sp, fontFamily = FontFamily.SansSerif, textDirection = TextDirection.Content),
+        constraints = Constraints(maxWidth = 510),
+        density = Density(1f),
+        fontFamilyResolver = createFontFamilyResolver(),
+        defaultLocaleList = LocaleList(locale)
+    )
     private val image = Surface.makeRasterN32Premul(160, 80).use { surface ->
         surface.canvas.clear(Teal)
         paint.color = Amber
@@ -75,8 +82,8 @@ internal class ShowcaseScene {
             canvas.scale(scale, scale)
             paint.color = Teal
             canvas.drawCircle(48f, 48f, 9f, paint)
-            label(canvas, "Rachel / Native graphics lab", 72f, 59f, title)
-            label(canvas, "Skiko Core + Skottie  |  SDL3  |  Kotlin/Native", 36f, 96f)
+            label(canvas, "Rachel / Native Compose backend", 72f, 59f, title)
+            label(canvas, "Compose UI Skiko  |  SDL3  |  Kotlin/Native", 36f, 96f)
 
             card(canvas, 36f, 126f, 448f, 216f, "01  Vector drawing + SVG")
             canvas.save()
@@ -93,15 +100,19 @@ internal class ShowcaseScene {
             animation.seek((seconds % 2f) / 2f).render(canvas, Rect.makeXYWH(530f, 176f, 404f, 120f))
             label(canvas, if (paused) "PAUSED  /  Space to resume" else "PLAYING  /  Space to pause", 530f, 318f)
 
-            card(canvas, 36f, 362f, 568f, 206f, "03  Fonts + paragraph shaping")
-            paragraph.layout(510f)
-            paragraph.paint(canvas, 60f, 426f)
+            card(canvas, 36f, 362f, 568f, 206f, "03  Compose Paragraph + Canvas")
+            canvas.save()
+            try {
+                canvas.translate(60f, 426f)
+                paragraph.paint(canvas.asComposeCanvas())
+            }
+            finally { canvas.restore() }
 
             card(canvas, 624f, 362f, 340f, 206f, "04  Image codec round trip")
             canvas.drawImage(image, 650f, 420f)
             label(canvas, "WebP encode -> decode", 650f, 540f)
             label(canvas, "Resize the window  /  Space: pause  /  Esc: close", 36f, 615f)
-            label(canvas, "Current stage: Compose Text + native locale / Skiko rendering", 36f, 640f)
+            label(canvas, "Current stage: Compose graphics/text backend / native raster and GPU rendering", 36f, 640f)
         }
         finally { canvas.restore() }
     }
@@ -119,8 +130,6 @@ internal class ShowcaseScene {
 
     fun close() {
         image.close()
-        paragraph.close()
-        fonts.close()
         svg.close()
         animation.close()
         paint.close()

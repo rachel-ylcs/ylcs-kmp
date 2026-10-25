@@ -7,7 +7,7 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skiko.RenderException
 
 /** An OpenGL function table assembled with a platform-provided proc resolver. */
-actual class GLAssembledInterface actual internal constructor(ptr: NativePointer) : RefCnt(ptr) {
+actual class GLAssembledInterface internal actual constructor(ptr: NativePointer) : RefCnt(ptr) {
     actual companion object {
         actual fun createFromNativePointers(ctxPtr: NativePointer, fPtr: NativePointer): GLAssembledInterface {
             if (fPtr == NullPointer) throw RenderException("Function pointer must not be null")

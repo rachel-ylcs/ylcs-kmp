@@ -1,0 +1,18 @@
+package love.yinlin.nativebridge
+
+import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.attributes.Attribute
+import org.gradle.api.attributes.Usage
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+
+/** Selects the host library variant when resolving classified Native runtime resources. */
+internal object NativeRuntimeAttributes {
+    fun configure(project: Project, configuration: Configuration, target: String) {
+        configuration.attributes {
+            attribute(KotlinPlatformType.attribute, KotlinPlatformType.native)
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "kotlin-api"))
+            attribute(Attribute.of("org.jetbrains.kotlin.native.target", String::class.java), target)
+        }
+    }
+}

@@ -1,9 +1,8 @@
 package org.jetbrains.skiko.window
 
-import org.jetbrains.skia.Canvas
-
 import kotlinx.cinterop.*
 import org.jetbrains.skiko.internal.sdl.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ColorType
 import org.jetbrains.skia.ImageInfo
