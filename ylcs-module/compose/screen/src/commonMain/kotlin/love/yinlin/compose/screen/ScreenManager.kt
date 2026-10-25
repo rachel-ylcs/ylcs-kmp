@@ -148,6 +148,15 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
     internal fun isActive(id: ScreenID): Boolean = backStack.any { it.id == id }
 
     @PublishedApi
+    internal fun replaceCurrentTo(type: String, args: ScreenArgs = ScreenArgs.Empty): Unit = execute {
+        NavigationCalculator.replaceCurrent(backStack, type, args)
+    }
+
+    /** 原子替换当前栈顶页面，保留其下方的导航历史。 */
+    inline fun <reified S : ScreenModel> replaceCurrent(metaConstructor: () -> S): Unit =
+        replaceCurrentTo(metaClassName<S>())
+
+    @PublishedApi
     internal fun navigateTo(type: String, args: ScreenArgs = ScreenArgs.Empty, policy: NavigationPolicy = NavigationPolicy.Default, isUnboundKey: Boolean = false): Unit = execute {
         NavigationCalculator.navigate(backStack, type, args, policy, isUnboundKey)
     }
