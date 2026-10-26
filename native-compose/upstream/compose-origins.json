@@ -199,17 +199,81 @@
             "source": "components/resources/library/src/macosMain/kotlin/org/jetbrains/compose/resources/ResourceEnvironment.macos.kt",
             "description": "Uses the host's SDL locale preferences and system theme cache with initialized SDL display scale; the common resource environment reads observable LocalLocale."
         },
-        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/MotionPathValuesHolder.kt": {
+        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/nativeMain/kotlin/androidx/compose/animation/graphics/vector/MotionPathValuesHolder.kt": {
             "source": "compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt",
             "description": "Completes the upstream 2D motion holder branch with axis projections, whole-path easing and duration-based specs compatible with repeats, reversal and sequential animators."
         },
-        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/MotionPath.kt": {
+        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/nativeMain/kotlin/androidx/compose/animation/graphics/vector/MotionPath.kt": {
             "source": "compose/ui/ui-graphics/src/commonMain/kotlin/androidx/compose/ui/graphics/PathMeasure.kt",
             "description": "Samples individual path contours into bounded immutable distance tables so active animations neither share mutable native measures nor join discontinuous contours."
         },
-        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/PathAnimatorFraction.kt": {
+        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/nativeMain/kotlin/androidx/compose/animation/graphics/vector/PathAnimatorFraction.kt": {
             "source": "compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt",
             "description": "Calculates clamped path morph progress in constant time, including zero duration, exact repeat endpoints and reverse repeats."
+        },
+        "adaptation/org.jetbrains.compose.material3_material3/src/nativeMain/kotlin/androidx/compose/material3/CalendarLocaleNumbers.native.kt": {
+            "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
+            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
+            "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
+            "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
+        },
+        "adaptation/org.jetbrains.compose.material3_material3/src/nativeMain/kotlin/androidx/compose/material3/internal/PlatformDateFormat.native.kt": {
+            "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
+            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
+            "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
+            "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
+        },
+        "adaptation/org.jetbrains.compose.material3_material3/src/macosMain/kotlin/androidx/compose/material3/CalendarLocaleTag.macos.kt": {
+            "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
+            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
+            "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
+            "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
+        },
+        "adaptation/org.jetbrains.compose.material3_material3/src/nativeMain/kotlin/androidx/compose/material3/CalendarLocaleTag.kt": {
+            "artifact": "org.jetbrains.compose.material3:material3-macosarm64:1.13.0-beta01:sources",
+            "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
+            "source": "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt",
+            "description": "Rachel desktop Native calendar binding: shared ICU date parsing/formatting and numeric localization; Cocoa CalendarLocale identity is retained on macOS."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skia/icu/DateTimeInfo.kt": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skia/icu/DateTimeUtils.kt": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skia/icu/DateTimeFormat.kt": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skia/icu/DateTimeUtils.native.kt": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skia/icu/DateTimeFormat.native.kt": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/cpp/icu/IcuFormatApi.h": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/cpp/icu/DateTimeFormat.cc": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
+        },
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeTest/kotlin/love/yinlin/nativecompose/offscreen/DateTimeFormatTest.kt": {
+            "repository": "unicode-org/icu",
+            "source": "icu4c/source/i18n/unicode/udat.h",
+            "description": "Original Rachel binding to the stable ICU C ABI already linked by Skia; bounded buffers, UTC/proleptic Gregorian calendars, strict parsing, managed date handles and bounded per-thread locale caches."
         }
     }
 }

@@ -9,6 +9,9 @@ internal fun parse(xml: String): Element = SimpleXmlParser(xml).parse()
 
 private class SimpleXmlParser(private val source: String) {
     private var index = if (source.startsWith('\uFEFF')) 1 else 0
+    private var nodes = 0
+    private var attributeCount = 0
+    private var namespaceCount = 0
 
     fun parse(): Element {
         if (source.length > 16 * 1024 * 1024) malformed("XML resource exceeds 16 MiB")
@@ -21,11 +24,13 @@ private class SimpleXmlParser(private val source: String) {
 
     private fun parseElement(parentNamespaces: Map<String, String>, depth: Int = 0): SimpleElement {
         if (depth >= 256) malformed("XML nesting exceeds 256 elements")
+        countNode()
         expect('<')
         if (peek('/') || peek('!') || peek('?')) malformed("Expected an element")
         val qualifiedName = readName()
         val rawAttributes = linkedMapOf<String, String>()
         while (true) {
+            val beforeWhitespace = index
             skipWhitespace()
             when {
                 consume("/>") -> {
@@ -34,7 +39,10 @@ private class SimpleXmlParser(private val source: String) {
                 }
                 consume(">") -> break
                 else -> {
+                    if (beforeWhitespace == index) malformed("Attributes must be separated by whitespace")
                     val name = readName()
+                    if (++attributeCount > 262144) malformed("XML contains too many attributes")
+                    if ((name == "xmlns" || name.startsWith("xmlns:")) && ++namespaceCount > 1024) malformed("XML contains too many namespace declarations")
                     skipWhitespace()
                     expect('=')
                     skipWhitespace()
@@ -57,7 +65,7 @@ private class SimpleXmlParser(private val source: String) {
             }
             when {
                 consume("<!--") -> skipUntil("-->")
-                consume("<![CDATA[") -> children += SimpleText(readUntil("]]>"))
+                consume("<![CDATA[") -> children += textNode(readUntil("]]>"))
                 consume("<?") -> skipUntil("?>")
                 peek('<') -> children += parseElement(namespaces, depth + 1)
                 index >= source.length -> malformed("Unclosed <$qualifiedName>")
@@ -65,7 +73,7 @@ private class SimpleXmlParser(private val source: String) {
                     val end = source.indexOf('<', index).takeIf { it >= 0 } ?: source.length
                     val text = source.substring(index, end)
                     index = end
-                    if (text.isNotEmpty()) children += SimpleText(decodeEntities(text))
+                    if (text.isNotEmpty()) children += textNode(decodeEntities(text))
                 }
             }
         }
@@ -75,7 +83,7 @@ private class SimpleXmlParser(private val source: String) {
     private fun namespaceMap(
         inherited: Map<String, String>,
         attributes: Map<String, String>,
-    ): Map<String, String> = buildMap {
+    ): Map<String, String> = if (attributes.keys.none { it == "xmlns" || it.startsWith("xmlns:") }) inherited else buildMap {
         putAll(inherited)
         attributes.forEach { [name, value] ->
             when {
@@ -99,6 +107,7 @@ private class SimpleXmlParser(private val source: String) {
 
     private fun readName(): String {
         val start = index
+        if (index >= source.length || !(source[index].isLetter() || source[index] == '_' || source[index] == ':')) malformed("Invalid XML name")
         while (index < source.length) {
             val c = source[index]
             if (!(c.isLetterOrDigit() || c == '_' || c == '-' || c == ':' || c == '.')) break
@@ -117,7 +126,17 @@ private class SimpleXmlParser(private val source: String) {
         if (index >= source.length) malformed("Unclosed attribute value")
         val value = source.substring(start, index)
         index++
+        if ('<' in value) malformed("Unescaped '<' in attribute value")
         return decodeEntities(value)
+    }
+
+    private fun countNode() {
+        if (++nodes > 65536) malformed("XML contains too many nodes")
+    }
+
+    private fun textNode(text: String): SimpleText {
+        countNode()
+        return SimpleText(text)
     }
 
     private fun decodeEntities(value: String): String = buildString {
@@ -223,8 +242,8 @@ private class SimpleElement(
         get() = namespaces[qualifiedName.substringBefore(':', "")].orEmpty()
 
     override val childNodes: NodeList = SimpleNodeList(children)
-    override val textContent: String? =
-        children.mapNotNull(Node::textContent).joinToString("").ifEmpty { null }
+    override val textContent: String?
+        get() = buildString { appendDescendantText(childNodes) }.ifEmpty { null }
 
     override fun lookupPrefix(namespaceURI: String): String =
         namespaces.entries.firstOrNull { it.value == namespaceURI }?.key.orEmpty()
@@ -242,5 +261,13 @@ private class SimpleElement(
             }
             ?.value
             .orEmpty()
+    }
+}
+
+private fun StringBuilder.appendDescendantText(nodes: NodeList) {
+    for (index in 0 ..< nodes.length) {
+        val node = nodes.item(index)
+        if (node is SimpleText) append(node.textContent)
+        else appendDescendantText(node.childNodes)
     }
 }

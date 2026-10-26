@@ -1,0 +1,13 @@
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/adaptive/layout/Pane.kt b/src/commonMain/kotlin/androidx/compose/material3/adaptive/layout/Pane.kt
+index 0651eba..a7de5ff 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/adaptive/layout/Pane.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/adaptive/layout/Pane.kt
+@@ -99,7 +99,7 @@ public fun <
+     val animatingBounds = paneMotion == PaneMotion.AnimateBounds
+     val motionProgress = { motionProgress }
+     val paneValue = scaffoldStateTransition.targetState[paneRole]
+-    val (paneModifier, contentModifier) = modifier.splitPaneAndContentModifiers()
++    val [paneModifier, contentModifier] = modifier.splitPaneAndContentModifiers()
+     scaffoldStateTransition.AnimatedVisibility(
+         visible = { value: ScaffoldValueT -> value[paneRole] != PaneAdaptedValue.Hidden },
+         modifier =

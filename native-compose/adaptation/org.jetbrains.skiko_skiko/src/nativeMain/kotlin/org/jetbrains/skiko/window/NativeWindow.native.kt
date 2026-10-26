@@ -4,12 +4,20 @@ import kotlinx.cinterop.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.sdl.*
 
-actual object NativeWindow {
+/**
+ * Desktop Native window host supplied by this Skiko port.
+ *
+ * Run on the main thread. This call owns the window/event loop and blocks until
+ * close or Escape; callbacks run on the same thread. The frame canvas is borrowed
+ * and must not be retained or closed. Callback failures propagate after native
+ * renderer/window resources are released. One event loop may run at a time.
+ */
+object NativeWindow {
     private var running = false
 
-    actual fun run(
-        options: NativeWindowOptions,
-        onKey: (NativeWindowKey) -> Unit,
+    fun run(
+        options: NativeWindowOptions = NativeWindowOptions(),
+        onKey: (NativeWindowKey) -> Unit = {},
         render: (canvas: Canvas, width: Int, height: Int, deltaSeconds: Float) -> Unit,
     ) {
         var scope: NativeWindowScope? = null
@@ -37,11 +45,11 @@ actual object NativeWindow {
         }
     }
 
-    actual fun open(
-        options: NativeWindowOptions,
-        onOpen: (NativeWindowScope) -> Unit,
-        onEvent: (NativeWindowEvent) -> Unit,
-        onClose: () -> Unit,
+    fun open(
+        options: NativeWindowOptions = NativeWindowOptions(),
+        onOpen: (NativeWindowScope) -> Unit = {},
+        onEvent: (NativeWindowEvent) -> Unit = {},
+        onClose: () -> Unit = {},
         render: (canvas: Canvas, width: Int, height: Int, nanoTime: Long) -> Unit,
     ) = memScoped {
         check(!running) { "A NativeWindow event loop is already running" }
@@ -54,7 +62,7 @@ actual object NativeWindow {
         finally { running = false }
     }
 
-    private fun runWindow(options: NativeWindowOptions, onOpen: (NativeWindowScope) -> Unit, onEvent: (NativeWindowEvent) -> Unit, onClose: () -> Unit, render: (Canvas, Int, Int, Long) -> Unit) = memScoped {
+    private fun runWindow(options: NativeWindowOptions = NativeWindowOptions(), onOpen: (NativeWindowScope) -> Unit, onEvent: (NativeWindowEvent) -> Unit, onClose: () -> Unit, render: (Canvas, Int, Int, Long) -> Unit) = memScoped {
         val software = options.backend == NativeWindowBackend.SOFTWARE
         val flags = SDL_WINDOW_RESIZABLE or SDL_WINDOW_HIGH_PIXEL_DENSITY or if (software) 0uL else gpuWindowFlags()
         val window = checkNotNull(RachelSDL_CreateWindow(options.title, options.width, options.height, flags)) {

@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.gradle.plugin.serialization)
     implementation(libs.gradle.plugin.mavenPublish)
     implementation(libs.gradle.plugin.dokka)
+    compileOnly(project(":native-bridge"))
 }
 
 kotlin {

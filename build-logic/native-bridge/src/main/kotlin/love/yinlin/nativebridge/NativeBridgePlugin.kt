@@ -60,12 +60,14 @@ class NativeBridgePlugin : Plugin<Project> {
                     require("macos_arm64" in rule.targets.get() && "macos_arm64" in rule.metadataTargets.get()) { "$name: macOS is an owned Native target; official artifact fallback is disabled" }
                     if (rule.module.isPresent) require(rule.module.get().substringBefore(':') != rule.upstream.get().substringBefore(':')) { "$name: an owned port cannot redirect back to the official Maven group" }
                 }
+                NativeMetadataAliases.configure(project, kotlin, bridge)
+                if (project.plugins.hasPlugin("org.jetbrains.compose")) ComposeResourceGeneration.configure(project, kotlin, bridge)
                 if (bridge.skikoTestRuntimeEnabled.get()) SkikoTestRuntime.configure(project, bridge)
                 if (application.enabled.get()) {
                     SkikoApplicationDependencies.configure(project, application, bridge)
                     configureApplication(project, kotlin, application)
                 }
-                else ComposeApplicationResources.configure(project, kotlin)
+                ComposeApplicationResources.configure(project, kotlin, application.enabled.get())
             }
         }
     }
@@ -180,9 +182,7 @@ class NativeBridgePlugin : Plugin<Project> {
     private fun configureApplication(project: Project, kotlin: KotlinMultiplatformExtension, application: NativeApplicationExtension) {
         kotlin.targets.withType(KotlinNativeTarget::class.java).configureEach {
             val target = this
-            require(target.konanTarget.name in setOf("mingw_x64", "linux_x64", "macos_arm64")) {
-                "Native application packaging supports mingw_x64, linux_x64 and macos_arm64; got ${target.konanTarget.name}"
-            }
+            if (target.konanTarget.name !in setOf("mingw_x64", "linux_x64", "macos_arm64")) return@configureEach
             if (target.binaries.withType(Executable::class.java).isEmpty()) {
                 target.binaries.executable {
                     entryPoint = application.entryPoint.get()
@@ -210,22 +210,40 @@ class NativeBridgePlugin : Plugin<Project> {
             NativeRuntimeAttributes.configure(project, runtimeConfiguration, target.konanTarget.name)
             target.binaries.withType(Executable::class.java).configureEach {
                 val binary = this
+                if (target.konanTarget.name == "mingw_x64" && (application.desktop.enabled || application.skikoWindowEnabled.get())) {
+                    // Keep Kotlin's main/CRT initialization while asking Windows to launch a GUI process.
+                    binary.linkerOpts("-Wl,--subsystem,windows", "-Wl,--entry,mainCRTStartup")
+                }
                 val suffix = target.name.replaceFirstChar(Char::uppercase) + binary.name.replaceFirstChar(Char::uppercase)
+                val desktop = application.desktop
+                if (desktop.enabled) desktop.validate()
+                val executableDirectory = NativeDesktopPackaging.executableDirectory(desktop, target.konanTarget.name)
+                val resourceDirectory = NativeDesktopPackaging.resourceDirectory(desktop, target.konanTarget.name)
+                val executablePath = listOf(executableDirectory, binary.outputFile.name).filter { it.isNotEmpty() }.joinToString("/")
                 val composeResources = ComposeApplicationResources.register(project, target, binary, suffix)
                 val stage = project.tasks.register("stage$suffix", Sync::class.java) {
                     group = "native application"
                     description = "Stage ${target.konanTarget.name} ${binary.name} with its runtime files"
                     dependsOn(binary.linkTaskProvider)
                     from(project.provider { binary.outputFile }) {
+                        into(executableDirectory)
                         filePermissions { unix("rwxr-xr-x") }
                     }
-                    from(runtimeConfiguration)
-                    from(runtime.files)
+                    from(runtimeConfiguration) { into(executableDirectory) }
+                    from(runtime.files) { into(executableDirectory) }
                     renamedArtifacts.forEach { (configuration, filename) ->
-                        from(configuration) { rename { filename } }
+                        from(configuration) {
+                            into(executableDirectory)
+                            rename { filename }
+                        }
                     }
-                    from(application.resources)
-                    if (composeResources != null) from(composeResources) { into("composeResources") }
+                    from(application.resources) { into(resourceDirectory) }
+                    if (composeResources != null) from(composeResources) { into(listOf(resourceDirectory, "composeResources").filter { it.isNotEmpty() }.joinToString("/")) }
+                    inputs.property("desktop.enabled", desktop.enabled)
+                    if (desktop.enabled) {
+                        inputs.properties(desktop.metadata().mapKeys { "desktop.${it.key}" })
+                        inputs.files(listOfNotNull(desktop.icon(target.konanTarget.name))).withPropertyName("desktopIcon")
+                    }
                     duplicatesStrategy = DuplicatesStrategy.FAIL
                     into(project.layout.buildDirectory.dir("nativeApplication/${target.name}/${binary.name}"))
                     doFirst {
@@ -233,23 +251,24 @@ class NativeBridgePlugin : Plugin<Project> {
                         val missing = runtime.files.files.filterNot { file -> file.exists() }
                         require(missing.isEmpty()) { "Missing native runtime files: ${missing.joinToString()}" }
                     }
+                    doLast { NativeDesktopPackaging.finish(destinationDir, destinationDir.resolve(executablePath), target.konanTarget.name, desktop) }
                 }
                 project.tasks.register("run$suffix", RunNativeApplication::class.java) {
                     group = "native application"
                     dependsOn(stage)
                     distribution.set(project.layout.dir(stage.map { task -> task.destinationDir }))
-                    executableName.set(project.provider { binary.outputFile.name })
+                    executableName.set(executablePath)
                     arguments.set(application.arguments)
                 }
                 project.tasks.register("package$suffix", Zip::class.java) {
                     group = "native application"
                     dependsOn(stage)
                     from(stage.map { task -> task.destinationDir }) {
-                        include { it.relativePath.pathString == binary.outputFile.name }
+                        include { it.relativePath.pathString == executablePath }
                         filePermissions { unix("rwxr-xr-x") }
                     }
                     from(stage.map { task -> task.destinationDir }) {
-                        exclude { it.relativePath.pathString == binary.outputFile.name }
+                        exclude { it.relativePath.pathString == executablePath }
                         filePermissions { unix("rw-r--r--") }
                     }
                     dirPermissions { unix("rwxr-xr-x") }
@@ -261,5 +280,6 @@ class NativeBridgePlugin : Plugin<Project> {
                 }
             }
         }
+        NativeComposeTasks.configure(project, kotlin)
     }
 }

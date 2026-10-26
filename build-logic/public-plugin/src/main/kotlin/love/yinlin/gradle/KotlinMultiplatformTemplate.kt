@@ -1,10 +1,13 @@
 package love.yinlin.gradle
 
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import love.yinlin.nativebridge.NativeApplicationExtension
+import love.yinlin.nativebridge.NativeDesktopDistribution
 import org.gradle.api.NamedDomainObjectContainer
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.dsl.AotMode
@@ -175,6 +178,17 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
     internal fun KotlinWebpackConfig.webpack() { webpackBlock(this) }
 
     // DesktopNative
+    private var composeDesktopPackageBlock: (NativeDesktopDistribution.() -> Unit)? = null
+
+    /** Configures the Native Compose application alongside the independent JVM desktopPackage. Requires the Native bridge plugin. */
+    fun composeDesktopPackage(block: NativeDesktopDistribution.() -> Unit) {
+        val previous = composeDesktopPackageBlock
+        composeDesktopPackageBlock = {
+            previous?.invoke(this)
+            block()
+        }
+    }
+
     var windowsTarget: Boolean = false
     var linuxTarget: Boolean = false
     var macosTarget: Boolean = false
@@ -217,6 +231,26 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         val exportResources = hasKMPResources
+
+        composeDesktopPackageBlock?.let { block ->
+            check(pluginManager.hasPlugin("love.yinlin.native-bridge")) { "composeDesktopPackage requires libs.plugins.nativeBridge in the module's plugins block" }
+            check(windowsTarget || linuxTarget || macosTarget) { "composeDesktopPackage requires windowsTarget, linuxTarget or macosTarget" }
+            val application = extensions.getByType<NativeApplicationExtension>()
+            application.skikoWindow()
+            application.desktop {
+                packageName = uniqueSafeName
+                displayName = uniqueName
+                packageVersion = defaults.desktop.packageVersion ?: defaults.publishing.version ?: version.toString()
+                vendor = defaults.organization
+                author = defaults.publishing.developerName.orEmpty()
+                copyright = defaults.copyright
+                bundleId = uniqueSafeModuleName.replace('_', '-')
+                block(this)
+            }
+            application.entryPoint.set(application.desktop.entryPoint)
+            application.baseName.set(application.desktop.packageName)
+            application.arguments.addAll(application.desktop.arguments)
+        }
 
         with(extension) {
             compilerOptions {

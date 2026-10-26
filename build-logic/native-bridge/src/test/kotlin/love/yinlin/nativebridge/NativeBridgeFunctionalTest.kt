@@ -2,6 +2,8 @@ package love.yinlin.nativebridge
 
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.file.Files
 import java.nio.file.FileSystems
 import java.nio.file.attribute.PosixFilePermissions
@@ -14,13 +16,47 @@ import kotlin.test.assertTrue
 
 class NativeBridgeFunctionalTest {
     @Test
+    fun explicitNativeResourcesGenerateAccessorsAndRespectAnExplicitOptOut() {
+        val composeVersion = System.getProperty("native.tests.composeVersion")
+        for (mode in listOf("auto", "never")) {
+            val directory = project()
+            directory.resolve("build.gradle.kts").writeText("""
+                plugins {
+                    id("org.jetbrains.kotlin.multiplatform")
+                    id("org.jetbrains.compose")
+                    id("org.jetbrains.kotlin.plugin.compose")
+                    id("love.yinlin.native-bridge")
+                }
+                repositories { mavenCentral() }
+                kotlin {
+                    mingwX64("windows")
+                    sourceSets.commonMain.dependencies {
+                        implementation("love.yinlin.native.compose.components:components-resources:$composeVersion")
+                    }
+                }
+                compose.resources {
+                    packageOfResClass = "fixture.resources"
+                    generateResClass = $mode
+                }
+            """.trimIndent())
+            val result = runner(directory, "generateComposeResClass").build()
+            val generated = directory.resolve("build/generated/compose/resourceGenerator/kotlin/commonResClass/fixture/resources/Res.kt")
+            if (mode == "auto") assertTrue(generated.isFile, result.output)
+            else {
+                assertContains(result.output, ":generateComposeResClass SKIPPED")
+                assertFalse(generated.exists())
+            }
+        }
+    }
+
+    @Test
     fun nativeUiTemplateKeepsKonanCoordinatesAfterKgpCreatesPublications() {
         val repository = project()
         repository.resolve("libs.versions.toml").writeText(File(System.getProperty("native.tests.versionCatalog")).readText())
         val native = repository.resolve("native-compose")
         native.resolve("upstream").mkdirs()
         native.resolve("upstream/compose.json").writeText("""
-            {"group":"test.native.ui","ciModules":["ui-util"],"modules":{"ui-util":{"sourceSets":{"commonMain":["src/commonMain/kotlin"]}}}}
+            {"group":"test.native.ui","modules":{"ui-util":{"sourceSets":{"commonMain":["src/commonMain/kotlin"]}}}}
         """.trimIndent())
         native.resolve("upstream/compose-origins.json").writeText("""{"files":{}}""")
         val build = native.resolve("vendor/compose/workspace/native-desktop").apply { mkdirs() }
@@ -159,9 +195,9 @@ class NativeBridgeFunctionalTest {
         module.resolve("$artifact-$version.pom").writeText("""<project><modelVersion>4.0.0</modelVersion><groupId>$group</groupId><artifactId>$artifact</artifactId><version>$version</version></project>""")
     }
 
-    private fun consumer(directory: File, targets: String, requestedVersion: String = "1.0", extra: String = "", includePort: Boolean = true) {
+    private fun consumer(directory: File, targets: String, requestedVersion: String = "1.0", extra: String = "", includePort: Boolean = true, selectedVersion: String = "1.0") {
         module(directory, "test.upstream", requestedVersion)
-        if (includePort) module(directory, "test.port", "1.0-native")
+        if (includePort) module(directory, "test.port", "$selectedVersion-native")
         directory.resolve("build.gradle.kts").writeText("""
             import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
             plugins {
@@ -179,9 +215,9 @@ class NativeBridgeFunctionalTest {
             nativeBridge {
                 redirect("render") {
                     upstream.set("test.upstream:render")
-                    upstreamVersion.set("1.0")
+                    upstreamVersion.set("$selectedVersion")
                     targets.set(setOf("mingw_x64"))
-                    module.set("test.port:render:1.0-native")
+                    module.set("test.port:render:$selectedVersion-native")
                 }
             }
             tasks.register("verifyRouting") {
@@ -199,6 +235,45 @@ class NativeBridgeFunctionalTest {
             }
             $extra
         """.trimIndent())
+    }
+
+    @Test
+    fun mixedPlatformMetadataUsesUpstreamRequestsButSelectsTheNativePort() {
+        for (mixed in listOf(false, true)) {
+            val project = project()
+            consumer(project, "mingwX64(\"windows\")" + if (mixed) "; jvm(\"desktop\")" else "", extra = """
+                nativeBridge {
+                    redirect("units") {
+                        upstream.set("test.upstream:units")
+                        upstreamVersion.set("1.0")
+                        targets.set(setOf("mingw_x64"))
+                        module.set("test.port:units:1.0")
+                    }
+                }
+                tasks.named("verifyRouting") {
+                    doLast {
+                        val graph = configurations.getByName("windowsCompileKlibraries").incoming.resolutionResult
+                        val request = graph.allDependencies.map { it.requested.displayName }.single { ":units:" in it }
+                        check(request == "${if (mixed) "test.upstream" else "test.port"}:units:1.0") { request }
+                        check(graph.allComponents.any { it.id.displayName == "test.port:units:1.0" })
+                        println("METADATA_NAMESPACE_VERIFIED")
+                    }
+                }
+            """.trimIndent())
+            module(project, "test.port", "1.0-native", dependencies = """{"group":"test.port","module":"units","version":{"requires":"1.0"}}""")
+            module(project, "test.port", "1.0-native", artifact = "render-mingwx64", dependencies = """{"group":"test.port","module":"units","version":{"requires":"1.0"}}""")
+            val rootMetadata = project.resolve("repo/test/port/render/1.0-native/render-1.0-native.module")
+            val metadata = groovy.json.JsonSlurper().parse(rootMetadata) as MutableMap<String, Any>
+            val variants = metadata["variants"] as List<MutableMap<String, Any>>
+            variants.single { it["name"] == "mingw_x64" }.apply {
+                remove("dependencies")
+                put("available-at", mapOf("url" to "../../render-mingwx64/1.0-native/render-mingwx64-1.0-native.module", "group" to "test.port", "module" to "render-mingwx64", "version" to "1.0-native"))
+            }
+            rootMetadata.writeText(groovy.json.JsonOutput.toJson(metadata))
+            module(project, "test.port", "1.0", artifact = "units")
+            module(project, "test.upstream", "1.0", artifact = "units")
+            assertContains(runner(project, "verifyRouting").build().output, "METADATA_NAMESPACE_VERIFIED")
+        }
     }
 
     @Test
@@ -351,6 +426,19 @@ class NativeBridgeFunctionalTest {
         consumer(project, "mingwX64(\"windows\")", "1.1")
         val output = runner(project, "verifyRouting").buildAndFail().output
         assertContains(output, "outside the tested version 1.0")
+    }
+
+    @Test
+    fun prereleaseAndStableReleasesRequireTheirMatchingPort() {
+        for (selected in listOf("1.13.0-beta01", "1.13.0")) {
+            val matching = project()
+            consumer(matching, "mingwX64(\"windows\")", requestedVersion = selected, selectedVersion = selected)
+            assertContains(runner(matching, "verifyRouting").build().output, "test.port:render:$selected-native")
+            val mismatch = project()
+            val requested = if (selected == "1.13.0") "1.13.0-beta01" else "1.13.0"
+            consumer(mismatch, "mingwX64(\"windows\")", requestedVersion = requested, selectedVersion = selected)
+            assertContains(runner(mismatch, "verifyRouting").buildAndFail().output, "outside the tested version $selected")
+        }
     }
 
     @Test
@@ -632,6 +720,153 @@ class NativeBridgeFunctionalTest {
         assertContains(route, "project ':local-port:extension'")
         assertFalse(route.contains("test.port:render:"))
         assertFalse(route.contains("test.port:extension:"))
+    }
+
+    @Test
+    fun multiplatformKeepsJvmPackagingOptionalAndIndependentFromNativePackaging() {
+        val rachelClasspath = System.getProperty("native.tests.rachelClasspath").split(File.pathSeparator).map(::File)
+        val metadata = Properties().apply { NativeBridgeFunctionalTest::class.java.getResourceAsStream("/plugin-under-test-metadata.properties")!!.use { load(it) } }
+        val bridgeClasspath = metadata.getProperty("implementation-classpath").split(File.pathSeparator).map(::File)
+        for (withBridge in listOf(false, true)) {
+            val project = project()
+            project.resolve("gradle.properties").writeText("kotlin.native.ignoreDisabledTargets=true\nkotlin.mpp.applyDefaultHierarchyTemplate=false\n")
+            project.resolve("build.gradle.kts").writeText("""
+                import love.yinlin.gradle.*
+                import org.jetbrains.compose.ComposeExtension
+                import org.jetbrains.compose.desktop.DesktopExtension
+                plugins {
+                    id("love.yinlin.rachel")
+                    id("org.jetbrains.kotlin.multiplatform")
+                    id("org.jetbrains.compose")
+                    id("org.jetbrains.kotlin.plugin.compose")
+                    ${if (withBridge) "id(\"love.yinlin.native-bridge\")" else ""}
+                }
+                repositories { mavenCentral() }
+                rachel {
+                    multiplatform {
+                        iosTarget = false
+                        webTarget = false
+                        windowsTarget = $withBridge
+                        linuxTarget = $withBridge
+                        macosTarget = $withBridge
+                        desktopPackage {
+                            mainClass = "fixture.DesktopKt"
+                            packageName = "JvmFixture"
+                            windows {}
+                            linux {}
+                            macos {}
+                        }
+                        ${if (withBridge) """
+                        composeDesktopPackage {
+                            entryPoint = "fixture.nativeMain"
+                            packageName = "NativeFixture"
+                            displayName = "Native Fixture"
+                            packageVersion = "2.3.4"
+                        }
+                        """ else ""}
+                    }
+                }
+                tasks.register("verifyDesktopConfiguration") {
+                    doLast {
+                        val desktop = project.extensions.getByType<ComposeExtension>().extensions.getByType<DesktopExtension>()
+                        check(desktop.application.mainClass == "fixture.DesktopKt")
+                        check(tasks.findByName("run") != null)
+                        ${if (withBridge) """
+                        val application = project.extensions.getByType<love.yinlin.nativebridge.NativeApplicationExtension>()
+                        check(application.entryPoint.get() == "fixture.nativeMain")
+                        check(application.baseName.get() == "NativeFixture")
+                        check(application.desktop.packageVersion == "2.3.4")
+                        check(listOf("composeRun", "composeReleaseRun", "composeDistribution").all { tasks.findByName(it) != null })
+                        """ else """
+                        check(tasks.findByName("composeRun") == null)
+                        check(project.extensions.findByName("nativeApplication") == null)
+                        """}
+                        println("DESKTOP_DSL_COEXISTENCE_VERIFIED")
+                    }
+                }
+            """.trimIndent())
+            val classpath = if (withBridge) rachelClasspath + bridgeClasspath else rachelClasspath
+            val result = runner(project, "verifyDesktopConfiguration").withPluginClasspath(classpath.distinct()).build()
+            assertContains(result.output, "DESKTOP_DSL_COEXISTENCE_VERIFIED")
+        }
+    }
+
+    @Test
+    fun hostComposeTasksRunBothBuildTypesAndPrepareAnUnpackedApplication() {
+        val project = project()
+        val windows = System.getProperty("os.name").startsWith("Windows")
+        val macos = System.getProperty("os.name") == "Mac OS X"
+        val target = if (windows) "mingwX64" else if (macos) "macosArm64" else "linuxX64"
+        project.resolve("gradle.properties").writeText("kotlin.native.ignoreDisabledTargets=true\n")
+        project.resolve("build.gradle.kts").writeText("""
+            plugins {
+                id("org.jetbrains.kotlin.multiplatform")
+                id("love.yinlin.native-bridge")
+            }
+            repositories { mavenCentral() }
+            kotlin {
+                $target("arbitraryHostName")
+                jvm("desktop")
+                iosArm64("ios")
+            }
+            nativeApplication {
+                enabled.set(true)
+                baseName.set("native-probe")
+                desktop {
+                    packageName = "NativeProbe"
+                    displayName = "Native Probe 中文"
+                    packageVersion = "1.2.3"
+                    vendor = "Fixture Vendor"
+                    author = "Fixture Author"
+                    copyright = "Copyright 2026 Fixture"
+                }
+            }
+            tasks.register("verifyPackagingScope") {
+                doLast {
+                    check(tasks.findByName("stageDesktopDebugExecutable") == null)
+                    check(tasks.findByName("stageIosDebugExecutable") == null)
+                    println("DESKTOP_NATIVE_PACKAGING_SCOPE_OK")
+                }
+            }
+        """.trimIndent())
+        val source = project.resolve(if (windows) "src/arbitraryHostNameMain/kotlin/Main.kt" else "src/commonMain/kotlin/Main.kt")
+        source.parentFile.mkdirs()
+        source.writeText(if (windows) """
+            import kotlinx.cinterop.ExperimentalForeignApi
+            import platform.windows.GetConsoleWindow
+
+            @OptIn(ExperimentalForeignApi::class)
+            fun main() {
+                check(GetConsoleWindow() == null) { "A graphical desktop application must not attach a console" }
+                println("COMPOSE_HOST_ALIAS_EXECUTED")
+            }
+        """.trimIndent() else "fun main() { println(\"COMPOSE_HOST_ALIAS_EXECUTED\") }\n")
+        val result = runner(project, "composeRun", "composeReleaseRun", "composeDistribution", "verifyPackagingScope").build()
+        assertContains(result.output, "DESKTOP_NATIVE_PACKAGING_SCOPE_OK")
+        assertEquals(2, result.output.lineSequence().count { it == "COMPOSE_HOST_ALIAS_EXECUTED" })
+        val distribution = project.resolve("build/nativeApplication/arbitraryHostName/releaseExecutable")
+        val executable = if (macos) distribution.resolve("NativeProbe.app/Contents/MacOS/native-probe.kexe") else distribution.resolve(if (windows) "native-probe.exe" else "native-probe.kexe")
+        assertTrue(executable.isFile)
+        assertTrue(distribution.walkTopDown().none { it.name == "application.json" })
+        assertFalse(distribution.resolve("application-icon.ico").exists())
+        assertFalse(distribution.resolve("application-icon.png").exists())
+        if (macos) assertContains(distribution.resolve("NativeProbe.app/Contents/Info.plist").readText(), "Fixture Author")
+        assertFalse(project.resolve("build/distributions").exists())
+        if (windows) {
+            for (buildType in listOf("debug", "release")) {
+                for (directory in listOf("bin", "nativeApplication")) {
+                    val executable = project.resolve("build/$directory/arbitraryHostName/${buildType}Executable/native-probe.exe")
+                    val pe = ByteBuffer.wrap(executable.readBytes()).order(ByteOrder.LITTLE_ENDIAN)
+                    val header = pe.getInt(0x3c)
+                    assertEquals(0x4550, pe.getInt(header), executable.path)
+                    assertEquals(2, pe.getShort(header + 24 + 68).toInt(), "Windows GUI subsystem: ${executable.path}")
+                }
+            }
+            val info = ProcessBuilder("powershell.exe", "-NoProfile", "-NonInteractive", "-Command", "(Get-Item -LiteralPath '" + distribution.resolve("native-probe.exe").absolutePath.replace("'", "''") + "').VersionInfo | Select-Object -ExpandProperty ProductName").redirectErrorStream(true).start()
+            val text = info.inputStream.readBytes().toString(Charsets.UTF_8)
+            assertEquals(0, info.waitFor())
+            assertContains(text, "Native Probe")
+        }
     }
 
     @Test

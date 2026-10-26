@@ -2,47 +2,23 @@ package love.yinlin.repository
 
 import groovy.json.JsonSlurper
 import love.yinlin.nativebridge.NativeBridgeSourcesExtension
+import love.yinlin.repository.nativecompose.NativeUpstreamSync
 import org.gradle.api.initialization.Settings
-import org.gradle.api.logging.Logging
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.security.MessageDigest
 
 /**
- * `native.compose` 只控制移植源码维护，默认关闭；不控制业务模块是否支持 Native。
- * 开启后重现锁定源码并关联真实 project，普通消费者由桥插件按 target 选择 Maven 工件。
+ * 本仓库始终重现锁定的移植源码并关联真实 project。
+ * 仓库外消费者只应用 Project 桥插件，按 target 选择已发布 Maven 工件。
  */
 @Suppress("UnstableApiUsage")
 fun Settings.nativeCompose() {
-    val value = providers.gradleProperty("native.compose").getOrElse(localProperties["native.compose"] ?: "false").trim().lowercase()
-    require(value in setOf("true", "false")) { "native.compose must be true or false" }
-    val enabled = value == "true"
-    gradle.extensions.extraProperties.set("love.yinlin.nativeCompose.maintainer", enabled)
-
-    // An explicit test/private repository is available to ordinary Maven consumers too.
-    providers.gradleProperty("native.repository").orNull?.let { repository ->
-        dependencyResolutionManagement.repositories.maven {
-            name = "NativeVerification"
-            setUrl(repository)
-            content {
-                includeGroup("love.yinlin.native.skiko")
-                includeGroup("love.yinlin.native.compose.ui")
-                includeGroup("love.yinlin.native.compose.foundation")
-                includeGroup("love.yinlin.native.compose.animation")
-                includeGroup("love.yinlin.native.compose.components")
-                includeGroup("love.yinlin.native.androidx.navigation3")
-            }
-        }
-    }
-    if (!enabled) return
-    require(!providers.gradleProperty("native.source").isPresent) {
-        "native.source has been removed. native.compose=true always uses source projects; use native.compose=false for Maven consumption."
-    }
+    gradle.extensions.extraProperties.set("love.yinlin.nativeCompose.maintainer", true)
 
     pluginManager.apply("love.yinlin.native-bridge.settings")
     extensions.getByType<RepositorySettings>().modules {
         module("native-compose")
-        module("ylcs-app") { module("native-compose") }
     }
 
     val directory = settingsDir.resolve("native-compose")
@@ -50,18 +26,7 @@ fun Settings.nativeCompose() {
 }
 
 private fun Settings.includeNativeComposeSources(directory: File) {
-    val preparation = providers.exec {
-        workingDir(settingsDir)
-        val arguments = mutableListOf(providers.gradleProperty("python.command").getOrElse("python"), directory.resolve("scripts/sync_upstream.py").absolutePath)
-        if (gradle.startParameter.isOffline) arguments.add("--offline")
-        commandLine(arguments)
-        isIgnoreExitValue = true
-    }
-    val output = preparation.standardOutput.asText.get().trim()
-    if (output.isNotEmpty()) Logging.getLogger("native-compose").lifecycle(output)
-    check(preparation.result.get().exitValue == 0) {
-        "Cannot prepare Native Compose source projects: ${preparation.standardError.asText.get().trim()}"
-    }
+    NativeUpstreamSync(directory).prepare(gradle.startParameter.isOffline)
     val stateFile = directory.resolve("vendor/skiko/state.json")
     check(stateFile.isFile) { "Source preparation did not produce vendor/skiko/state.json" }
 
@@ -71,7 +36,7 @@ private fun Settings.includeNativeComposeSources(directory: File) {
     for ((name, expected) in inputs) {
         val input = settingsDir.resolve(name as String).canonicalFile
         require(input.toPath().startsWith(repository)) { "Invalid prepared input path: $name" }
-        check(input.isFile && sha256(input) == expected) { "Prepared input changed: $name; re-run sync_upstream.py" }
+        check(input.isFile && sha256(input) == expected) { "Prepared input changed: $name; re-run prepareNativeSources" }
     }
     check(sha256(settingsDir.resolve("libs.versions.toml")) == state["catalogSha256"]) { "Prepared build does not use the root version catalog" }
     val versions = state["versions"] as Map<*, *>
@@ -95,16 +60,6 @@ private fun Settings.includeNativeComposeSources(directory: File) {
 }
 
 private fun Settings.includeComposeUiSources(directory: File) {
-    val preparation = providers.exec {
-        workingDir(settingsDir)
-        val arguments = mutableListOf(providers.gradleProperty("python.command").getOrElse("python"), directory.resolve("scripts/sync_compose.py").absolutePath)
-        if (gradle.startParameter.isOffline) arguments.add("--offline")
-        commandLine(arguments)
-        isIgnoreExitValue = true
-    }
-    val output = preparation.standardOutput.asText.get().trim()
-    if (output.isNotEmpty()) Logging.getLogger("native-compose").lifecycle(output)
-    check(preparation.result.get().exitValue == 0) { "Cannot prepare Native Compose UI sources: ${preparation.standardError.asText.get().trim()}" }
     val stateFile = directory.resolve("vendor/compose/state.json")
     check(stateFile.isFile) { "Source preparation did not produce vendor/compose/state.json" }
     val state = JsonSlurper().parse(stateFile) as Map<*, *>
@@ -112,7 +67,7 @@ private fun Settings.includeComposeUiSources(directory: File) {
     for ((name, expected) in state["inputs"] as Map<*, *>) {
         val input = settingsDir.resolve(name as String).canonicalFile
         require(input.toPath().startsWith(repository)) { "Invalid prepared Compose input path: $name" }
-        check(input.isFile && sha256(input) == expected) { "Prepared Compose input changed: $name; re-run sync_compose.py" }
+        check(input.isFile && sha256(input) == expected) { "Prepared Compose input changed: $name; re-run prepareNativeSources" }
     }
     check(sha256(settingsDir.resolve("libs.versions.toml")) == state["catalogSha256"]) { "Prepared Compose build does not use the root version catalog" }
     val sourceDirectory = directory.resolve(state["build"] as String).canonicalFile

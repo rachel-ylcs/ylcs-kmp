@@ -1,0 +1,51 @@
+name: Prepare Native Compose Sources
+description: Restore pinned Native sources and SDKs, then validate and prepare the local source builds.
+
+inputs:
+  tools:
+    description: Install Linux development packages needed to compile the desktop Native producers.
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Restore immutable upstream archives
+      uses: actions/cache@v5
+      with:
+        path: |
+          native-compose/vendor/skiko/*.zip
+          native-compose/vendor/skiko/skia/*.zip
+          native-compose/vendor/maven/*-sources.jar
+          native-compose/vendor/sdl-source-*.zip
+        key: native-archives-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/compose.json', 'native-compose/upstream/sdl.json') }}
+    - name: Restore prepared source workspaces
+      uses: actions/cache@v5
+      with:
+        path: native-compose/vendor/cache/prepared-sources.zip
+        key: native-sources-v4-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/**', 'native-compose/gradle/**', 'native-compose/adaptation/**', 'build-logic/repository-conventions/src/**', 'build-logic/repository-conventions/build.gradle.kts', 'build-logic/native-bridge/gradle/**', 'libs.versions.toml', 'gradle/wrapper/**', 'gradle.properties', 'settings.gradle.kts', 'gradlew', 'gradlew.bat') }}
+        restore-keys: |
+          native-sources-v4-${{ runner.os }}-${{ runner.arch }}-
+    - name: Restore the static SDL SDK and extracted Skia binaries
+      uses: actions/cache@v5
+      with:
+        path: |
+          native-compose/vendor/sdl-source-*
+          native-compose/vendor/sdl-static
+          native-compose/vendor/skiko/workspace/skiko/dependencies/skia
+        key: native-sdk-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/sdl.json', 'build-logic/native-bridge/gradle/sdl-sdk.gradle.kts', 'libs.versions.toml') }}
+    - name: Linux desktop Native toolchain dependencies
+      if: ${{ runner.os == 'Linux' && inputs.tools == 'true' }}
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build pkg-config libfontconfig1-dev libfreetype6-dev \
+          libgl1-mesa-dev libegl1-mesa-dev libx11-dev libxcursor-dev libxrandr-dev \
+          libxinerama-dev libxi-dev libxss-dev libxtst-dev libwayland-dev wayland-protocols libxkbcommon-dev
+    - name: Validate cached sources against locks and local adaptations
+      shell: bash
+      run: |
+        bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+          -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+          :repository-conventions:restoreNativeSourceCache \
+          :repository-conventions:prepareNativeSources \
+          :repository-conventions:createNativeSourceCache

@@ -1,0 +1,22 @@
+diff --git a/src/commonMain/kotlin/androidx/compose/material/ripple/CommonRipple.kt b/src/commonMain/kotlin/androidx/compose/material/ripple/CommonRipple.kt
+index cbd5847..a761488 100644
+--- a/src/commonMain/kotlin/androidx/compose/material/ripple/CommonRipple.kt
++++ b/src/commonMain/kotlin/androidx/compose/material/ripple/CommonRipple.kt
+@@ -131,7 +131,7 @@ private class CommonRippleIndicationInstance(
+ 
+     override fun addRipple(interaction: PressInteraction.Press, scope: CoroutineScope) {
+         // Finish existing ripples
+-        ripples.forEach { (_, ripple) -> ripple.finish() }
++        ripples.forEach { [_, ripple] -> ripple.finish() }
+         val origin = if (bounded) interaction.pressPosition else null
+         val rippleAnimation =
+             RippleAnimation(origin = origin, radius = targetRadius, bounded = bounded)
+@@ -150,7 +150,7 @@ private class CommonRippleIndicationInstance(
+     }
+ 
+     private fun DrawScope.drawRipples(color: Color) {
+-        ripples.forEach { (_, ripple) ->
++        ripples.forEach { [_, ripple] ->
+             with(ripple) {
+                 val alpha = rippleAlpha.value.pressedAlpha
+                 if (alpha != 0f) {

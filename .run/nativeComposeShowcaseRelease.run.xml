@@ -3,10 +3,9 @@
     <ExternalSystemSettings>
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-Pnative.compose=true" />
       <option name="taskNames">
         <list>
-          <option value=":ylcs-app:native-compose:runWindowsReleaseExecutable" />
+          <option value=":ylcs-app:native-compose:composeReleaseRun" />
         </list>
       </option>
     </ExternalSystemSettings>

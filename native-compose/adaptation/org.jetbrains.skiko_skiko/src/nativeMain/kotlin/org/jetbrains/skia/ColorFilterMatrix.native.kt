@@ -6,7 +6,8 @@ import org.jetbrains.skia.impl.Stats
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.reachabilityBarrier
 
-actual fun ColorFilter.colorMatrixOrNull(): ColorMatrix? {
+/** Returns this filter's 4 by 5 RGBA matrix, or null when the filter has no matrix representation. */
+fun ColorFilter.colorMatrixOrNull(): ColorMatrix? {
     Stats.onNativeCall()
     return try {
         interopScope {

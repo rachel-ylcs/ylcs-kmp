@@ -5,12 +5,11 @@ package org.jetbrains.skiko.window
 import org.jetbrains.skia.Canvas
 
 import kotlinx.cinterop.*
-import org.jetbrains.skiko.internal.sdl.*
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.*
 import platform.QuartzCore.CAMetalLayer
 
-internal actual fun gpuWindowFlags(): ULong = SDL_WINDOW_METAL
+internal actual fun gpuWindowFlags(): ULong = SdlMetalWindow.flags
 internal actual fun createGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit): WindowRenderer = MacosGpuRenderer(window, draw)
 
 internal class MacosGpuRenderer(private val window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer, MacosSkiaLayerComponent {
@@ -42,14 +41,14 @@ internal class MacosGpuRenderer(private val window: COpaquePointer, draw: (Canva
 
     override fun createMetalLayer(): CAMetalLayer {
         check(metalView == null)
-        val view = checkNotNull(RachelSDL_CreateMetalView(window)) { SDL_GetError()?.toKString() ?: "Cannot create SDL Metal view" }
+        val view = SdlMetalWindow.createView(window)
         metalView = view
-        val pointer = checkNotNull(RachelSDL_GetMetalLayer(view)) { "SDL did not expose a CAMetalLayer" }
+        val pointer = SdlMetalWindow.layer(view)
         return interpretObjCPointer(pointer.rawValue)
     }
 
     override fun deleteMetalLayer() {
-        metalView?.let { RachelSDL_DestroyMetalView(it) }
+        metalView?.let { SdlMetalWindow.destroyView(it) }
         metalView = null
     }
 
@@ -58,7 +57,7 @@ internal class MacosGpuRenderer(private val window: COpaquePointer, draw: (Canva
         return layer.render(force = true)
     }
 
-    override fun requestRender() = RachelSDL_RequestRender(window)
+    override fun requestRender() = SdlMetalWindow.requestRender(window)
     override fun close() = layer.detach()
     override fun createOpenGlContext(): NativePointer = error("This probe requires Metal")
     override fun makeOpenGlContextCurrent(context: NativePointer): Unit = error("This probe requires Metal")

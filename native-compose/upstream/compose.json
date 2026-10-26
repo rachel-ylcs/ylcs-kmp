@@ -5,13 +5,16 @@
     "commit": "bb05011eb10784ada1ec00494f1a710ba6ab6252",
     "version": "1.13.0-beta01",
     "group": "love.yinlin.native.compose.ui",
-    "ownedTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+    "ownedTargets": [
+        "mingw_x64",
+        "linux_x64",
+        "macos_arm64"
+    ],
     "resourceSource": {
         "repository": "JetBrains/compose-multiplatform",
         "ref": "v1.13.0-beta01",
         "commit": "926b833de872721337612d7ac4629636e9db4d1e"
     },
-    "ciModules": ["ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko", "ui-backhandler", "ui"],
     "modules": {
         "navigation3-ui": {
             "alias": "native-androidx-navigation3",
@@ -21,99 +24,231 @@
             "version": "1.2.0",
             "versionRef": "navigation3",
             "adaptation": "org.jetbrains.androidx.navigation3_navigation3-ui",
-            "sourceRepository": "navigation3",
+            "sourceRepository": "maven",
             "sourcePath": "navigation3-ui",
             "sourceArchive": {
                 "url": "https://repo.maven.apache.org/maven2/org/jetbrains/androidx/navigation3/navigation3-ui-macosarm64/1.2.0/navigation3-ui-macosarm64-1.2.0-sources.jar",
-                "sha256": "876d621c030cad1c529333a3c880fc57d74f0ebad0736ce3228b25f2bad8482c"
+                "sha256": "876d621c030cad1c529333a3c880fc57d74f0ebad0736ce3228b25f2bad8482c",
+                "licensePath": "META-INF/org/jetbrains/androidx/navigation3/navigation3-ui/LICENSE.txt"
             },
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ]
             }
         },
         "ui": {
             "alias": "native-compose-ui",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "skikoMain": ["src/skikoMain/kotlin"],
-                "nativeMain": ["src/nonJvmMain/kotlin", "src/nativeMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/skikoMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonJvmMain/kotlin",
+                    "src/nativeMain/kotlin"
+                ]
             }
         },
         "ui-backhandler": {
             "alias": "native-compose-ui-backhandler",
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "nativeMain": ["src/jbMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/jbMain/kotlin"
+                ]
             }
         },
         "ui-util": {
             "alias": "native-compose-ui-util",
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "nativeMain": ["src/nonJvmMain/kotlin"],
-                "macosMain": ["src/macosMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonJvmMain/kotlin"
+                ],
+                "macosMain": [
+                    "src/macosMain/kotlin"
+                ]
             }
         },
         "ui-geometry": {
             "alias": "native-compose-ui-geometry",
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ]
             }
         },
         "ui-unit": {
             "alias": "native-compose-ui-unit",
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "nativeMain": ["src/nonAndroidMain/kotlin", "src/nonJvmMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonAndroidMain/kotlin",
+                    "src/nonJvmMain/kotlin"
+                ]
             }
         },
         "ui-graphics": {
             "alias": "native-compose-ui-graphics",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "nativeMain": ["src/nonAndroidMain/kotlin", "src/skikoMain/kotlin", "src/nonJvmMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonAndroidMain/kotlin",
+                    "src/skikoMain/kotlin",
+                    "src/nonJvmMain/kotlin"
+                ]
             }
         },
         "ui-skiko": {
             "alias": "native-compose-ui-skiko",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "nativeMain": ["src/nonAndroidMain/kotlin"],
-                "windowsMain": ["src/nonAndroidExcludingWebMain/kotlin", "src/nonJvmMain/kotlin", "src/nativeMain/kotlin"],
-                "linuxMain": ["src/nonAndroidExcludingWebMain/kotlin", "src/nonJvmMain/kotlin", "src/nativeMain/kotlin"],
-                "macosMain": ["src/nonAndroidExcludingWebMain/kotlin", "src/nonJvmMain/kotlin", "src/nativeMain/kotlin"]
+                "nativeMain": [
+                    "src/nonAndroidMain/kotlin"
+                ],
+                "windowsMain": [
+                    "src/nonAndroidExcludingWebMain/kotlin",
+                    "src/nonJvmMain/kotlin",
+                    "src/nativeMain/kotlin"
+                ],
+                "linuxMain": [
+                    "src/nonAndroidExcludingWebMain/kotlin",
+                    "src/nonJvmMain/kotlin",
+                    "src/nativeMain/kotlin"
+                ],
+                "macosMain": [
+                    "src/nonAndroidExcludingWebMain/kotlin",
+                    "src/nonJvmMain/kotlin",
+                    "src/nativeMain/kotlin"
+                ]
             }
         },
         "ui-text": {
             "alias": "native-compose-ui-text",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "nativeMain": ["src/nonAndroidMain/kotlin", "src/nonJvmMain/kotlin"],
-                "windowsMain": ["src/nativeMain/kotlin"],
-                "linuxMain": ["src/nativeMain/kotlin"],
-                "macosMain": ["src/nativeMain/kotlin", "src/darwinMain/kotlin", "src/macosMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonAndroidMain/kotlin",
+                    "src/nonJvmMain/kotlin"
+                ],
+                "windowsMain": [
+                    "src/nativeMain/kotlin"
+                ],
+                "linuxMain": [
+                    "src/nativeMain/kotlin"
+                ],
+                "macosMain": [
+                    "src/nativeMain/kotlin",
+                    "src/darwinMain/kotlin",
+                    "src/macosMain/kotlin"
+                ]
             }
         },
         "foundation-layout": {
@@ -121,12 +256,26 @@
             "family": "foundation",
             "group": "love.yinlin.native.compose.foundation",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "skikoMain": ["src/skikoMain/kotlin"],
-                "nativeMain": ["src/nonJvmMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/skikoMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonJvmMain/kotlin"
+                ]
             }
         },
         "animation-core": {
@@ -134,11 +283,23 @@
             "family": "animation",
             "group": "love.yinlin.native.compose.animation",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "nativeMain": ["src/nonJvmMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonJvmMain/kotlin"
+                ]
             }
         },
         "animation": {
@@ -146,11 +307,24 @@
             "family": "animation",
             "group": "love.yinlin.native.compose.animation",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "nativeMain": ["src/nonAndroidMain/kotlin", "src/nonJvmMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonAndroidMain/kotlin",
+                    "src/nonJvmMain/kotlin"
+                ]
             }
         },
         "animation-graphics": {
@@ -158,10 +332,23 @@
             "family": "animation",
             "group": "love.yinlin.native.compose.animation",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ]
+            },
+            "adaptationSourceSets": {
+                "commonMain": "nativeMain"
             }
         },
         "components-resources": {
@@ -171,12 +358,27 @@
             "sourceRepository": "resources",
             "sourcePath": "components/resources/library",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "skikoMain": ["src/skikoMain/kotlin", "src/blockingMain/kotlin"],
-                "nativeMain": ["src/nativeMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/skikoMain/kotlin",
+                    "src/blockingMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nativeMain/kotlin"
+                ]
             }
         },
         "foundation": {
@@ -184,13 +386,345 @@
             "family": "foundation",
             "group": "love.yinlin.native.compose.foundation",
             "requiresSkiko": true,
-            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
-            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
             "sourceSets": {
-                "commonMain": ["src/commonMain/kotlin"],
-                "skikoMain": ["src/skikoMain/kotlin"],
-                "nativeMain": ["src/nonJvmMain/kotlin", "src/nativeMain/kotlin"]
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/skikoMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonJvmMain/kotlin",
+                    "src/nativeMain/kotlin"
+                ]
             }
+        },
+        "material3": {
+            "family": "material3",
+            "upstreamGroup": "org.jetbrains.compose.material3",
+            "group": "love.yinlin.native.compose.material3",
+            "adaptation": "org.jetbrains.compose.material3_material3",
+            "alias": "native-compose-material3",
+            "sourceRepository": "maven",
+            "sourcePath": "material3",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-macosarm64/1.13.0-beta01/material3-macosarm64-1.13.0-beta01-sources.jar",
+                "sha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/material3/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "macosMain": [
+                    "src/darwinMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nativeMain/kotlin",
+                    "src/nonJvmMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/skikoMain/kotlin"
+                ]
+            },
+            "excludeSources": [
+                "nonJvmMain/androidx/compose/material3/CalendarLocale.nonJvm.kt",
+                "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt"
+            ],
+            "sourceReplacements": {
+                "nonJvmMain/androidx/compose/material3/CalendarLocale.nonJvm.kt": "src/nativeMain/kotlin/androidx/compose/material3/CalendarLocaleNumbers.native.kt",
+                "darwinMain/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt": "src/nativeMain/kotlin/androidx/compose/material3/internal/PlatformDateFormat.native.kt"
+            }
+        },
+        "material3-ripple": {
+            "family": "material3",
+            "upstreamGroup": "org.jetbrains.compose.material3",
+            "group": "love.yinlin.native.compose.material3",
+            "adaptation": "org.jetbrains.compose.material3_material3-ripple",
+            "alias": "native-compose-material3-ripple",
+            "sourceRepository": "maven",
+            "sourcePath": "material3-ripple",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-ripple-macosarm64/1.13.0-beta01/material3-ripple-macosarm64-1.13.0-beta01-sources.jar",
+                "sha256": "c067bdeb43271642e864b6f2ae35ed5f27c350ad2df03cf7e06f89ee6cfd9cdb",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/material3-ripple/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/nonAndroidMain/kotlin"
+                ]
+            }
+        },
+        "material3-window-size-class": {
+            "family": "material3",
+            "upstreamGroup": "org.jetbrains.compose.material3",
+            "group": "love.yinlin.native.compose.material3",
+            "adaptation": "org.jetbrains.compose.material3_material3-window-size-class",
+            "alias": "native-compose-material3-windowSizeClass",
+            "sourceRepository": "maven",
+            "sourcePath": "material3-window-size-class",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-window-size-class-macosarm64/1.13.0-beta01/material3-window-size-class-macosarm64-1.13.0-beta01-sources.jar",
+                "sha256": "2df762d6098cd097e0d5c1d91de2ce81149b1867cd6d6c173eb16239f763daa7",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/material3-window-size-class/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nonJvmMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/skikoMain/kotlin"
+                ]
+            }
+        },
+        "material3-adaptive-navigation-suite": {
+            "family": "material3",
+            "upstreamGroup": "org.jetbrains.compose.material3",
+            "group": "love.yinlin.native.compose.material3",
+            "adaptation": "org.jetbrains.compose.material3_material3-adaptive-navigation-suite",
+            "alias": "native-compose-material3-adaptive-navigation-suite",
+            "sourceRepository": "maven",
+            "sourcePath": "material3-adaptive-navigation-suite",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/material3-adaptive-navigation-suite-macosarm64/1.13.0-beta01/material3-adaptive-navigation-suite-macosarm64-1.13.0-beta01-sources.jar",
+                "sha256": "647f494eb054966e13200640fca3c446a2dcf519641199a1f88b30ff8cf50844",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/material3-adaptive-navigation-suite/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ]
+            }
+        },
+        "material-ripple": {
+            "family": "material",
+            "upstreamGroup": "org.jetbrains.compose.material",
+            "group": "love.yinlin.native.compose.material",
+            "adaptation": "org.jetbrains.compose.material_material-ripple",
+            "alias": "native-compose-material-ripple",
+            "sourceRepository": "maven",
+            "sourcePath": "material-ripple",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material/material-ripple-macosarm64/1.13.0-beta01/material-ripple-macosarm64-1.13.0-beta01-sources.jar",
+                "sha256": "3e00d5744e39008081ca5ff415d29ce94b02fe11de1539164ce21adf8871c42c",
+                "licensePath": "META-INF/org/jetbrains/compose/material/material-ripple/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/nonAndroidMain/kotlin"
+                ]
+            }
+        },
+        "adaptive": {
+            "family": "adaptive",
+            "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
+            "group": "love.yinlin.native.compose.material3.adaptive",
+            "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive",
+            "alias": "native-compose-adaptive",
+            "sourceRepository": "maven",
+            "sourcePath": "adaptive",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-macosarm64/1.4.0-alpha01/adaptive-macosarm64-1.4.0-alpha01-sources.jar",
+                "sha256": "cf1e496e1070fe22fabe6d86b305f6468689cd67f8dcd3c774ed45c66c50aeba",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/nonAndroidMain/kotlin"
+                ]
+            },
+            "version": "1.4.0-alpha01",
+            "versionRef": "compose-adaptive"
+        },
+        "adaptive-layout": {
+            "family": "adaptive",
+            "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
+            "group": "love.yinlin.native.compose.material3.adaptive",
+            "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-layout",
+            "alias": "native-compose-adaptive-layout",
+            "sourceRepository": "maven",
+            "sourcePath": "adaptive-layout",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-layout-macosarm64/1.4.0-alpha01/adaptive-layout-macosarm64-1.4.0-alpha01-sources.jar",
+                "sha256": "f6747aa077e5f9b73f3c480692bc81d22a13968da2d8ab2a7410bdb7ef0089a7",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive-layout/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ],
+                "nativeMain": [
+                    "src/nativeMain/kotlin"
+                ],
+                "skikoMain": [
+                    "src/skikoMain/kotlin"
+                ]
+            },
+            "version": "1.4.0-alpha01",
+            "versionRef": "compose-adaptive"
+        },
+        "adaptive-navigation": {
+            "family": "adaptive",
+            "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
+            "group": "love.yinlin.native.compose.material3.adaptive",
+            "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-navigation",
+            "alias": "native-compose-adaptive-navigation",
+            "sourceRepository": "maven",
+            "sourcePath": "adaptive-navigation",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-navigation-macosarm64/1.4.0-alpha01/adaptive-navigation-macosarm64-1.4.0-alpha01-sources.jar",
+                "sha256": "699eeeed8e6c9125064096d18748dcd78b6761efe5d11bd9c47c7cf3339c1829",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive-navigation/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ]
+            },
+            "version": "1.4.0-alpha01",
+            "versionRef": "compose-adaptive"
+        },
+        "adaptive-navigation3": {
+            "family": "adaptive",
+            "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
+            "group": "love.yinlin.native.compose.material3.adaptive",
+            "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-navigation3",
+            "alias": "native-compose-adaptive-navigation3",
+            "sourceRepository": "maven",
+            "sourcePath": "adaptive-navigation3",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/material3/adaptive/adaptive-navigation3-macosarm64/1.4.0-alpha01/adaptive-navigation3-macosarm64-1.4.0-alpha01-sources.jar",
+                "sha256": "12392143160bde37748ceedc6f0702b6d8047b878835a690102df73c31dcacc2",
+                "licensePath": "META-INF/org/jetbrains/compose/material3/adaptive/adaptive-navigation3/LICENSE.txt"
+            },
+            "redirectTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "metadataTargets": [
+                "mingw_x64",
+                "linux_x64",
+                "macos_arm64"
+            ],
+            "requiresSkiko": true,
+            "sourceSets": {
+                "commonMain": [
+                    "src/commonMain/kotlin"
+                ]
+            },
+            "version": "1.4.0-alpha01",
+            "versionRef": "compose-adaptive"
         }
     }
 }

@@ -1,0 +1,924 @@
+diff --git a/compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt b/compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt
+index fe574939c76..e6e4cca5e6e 100644
+--- a/compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt
++++ b/compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt
+@@ -19,6 +19,7 @@ package androidx.compose.animation.graphics.vector
+ import androidx.collection.MutableScatterMap
+ import androidx.collection.mutableScatterMapOf
+ import androidx.compose.animation.animateColor
++import androidx.compose.animation.core.DurationBasedAnimationSpec
+ import androidx.compose.animation.core.Easing
+ import androidx.compose.animation.core.FiniteAnimationSpec
+ import androidx.compose.animation.core.KeyframesSpec
+@@ -42,7 +43,6 @@ import androidx.compose.ui.util.fastCoerceIn
+ import androidx.compose.ui.util.fastForEach
+ import androidx.compose.ui.util.fastMap
+ import androidx.compose.ui.util.fastMaxBy
+-import androidx.compose.ui.util.fastSumBy
+ import androidx.compose.ui.util.fastZip
+ import androidx.compose.ui.util.lerp
+ 
+@@ -118,9 +118,10 @@ internal class Timestamp<T>(
+             when (holder) {
+                 is PropertyValuesHolderFloat -> holder.asKeyframeSpec(durationMillis)
+                 is PropertyValuesHolderColor -> holder.asKeyframeSpec(durationMillis)
++                is MotionPathValuesHolder -> holder.asAnimationSpec(durationMillis)
+                 else -> throw RuntimeException("Unexpected value type: $holder")
+             }
+-                as KeyframesSpec<T>
++                as DurationBasedAnimationSpec<T>
+         return if (repeatCount == 0) {
+             spec
+         } else {
+@@ -129,7 +130,7 @@ internal class Timestamp<T>(
+                     if (repeatCount == RepeatCountInfinite) {
+                         Int.MAX_VALUE
+                     } else {
+-                        repeatCount + 1
++                        (repeatCount.toLong() + 1L).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+                     },
+                 animation = spec,
+                 repeatMode = repeatMode,
+@@ -176,15 +177,9 @@ private class FloatPropertyValues : PropertyValues<Float>() {
+             label = propertyName,
+             targetValueByState = { atEnd ->
+                 if (atEnd) {
+-                    (timestamps.last().holder as PropertyValuesHolderFloat)
+-                        .animatorKeyframes
+-                        .last()
+-                        .value
++                    timestamps.last().floatEndpoint(true)
+                 } else {
+-                    (timestamps.first().holder as PropertyValuesHolderFloat)
+-                        .animatorKeyframes
+-                        .first()
+-                        .value
++                    timestamps.first().floatEndpoint(false)
+                 }
+             },
+         )
+@@ -204,10 +199,10 @@ private class ColorPropertyValues : PropertyValues<Color>() {
+             label = propertyName,
+             targetValueByState = { atEnd ->
+                 if (atEnd) {
+-                    (timestamps.last().holder as PropertyValuesHolderColor)
+-                        .animatorKeyframes
+-                        .last()
+-                        .value
++                    timestamps.last().let { timestamp ->
++                        val frames = (timestamp.holder as PropertyValuesHolderColor).animatorKeyframes
++                        if (timestamp.endsAtStart) frames.first().value else frames.last().value
++                    }
+                 } else {
+                     (timestamps.first().holder as PropertyValuesHolderColor)
+                         .animatorKeyframes
+@@ -243,17 +238,7 @@ private class PathPropertyValues : PropertyValues<List<PathNode>>() {
+ 
+     private fun interpolate(timeMillis: Float): List<PathNode> {
+         val timestamp = timestamps.lastOrNull { it.timeMillis <= timeMillis } ?: timestamps.first()
+-        var fraction = (timeMillis - timestamp.timeMillis) / timestamp.durationMillis
+-        if (timestamp.repeatCount != 0) {
+-            var count = 0
+-            while (fraction > 1f) {
+-                fraction -= 1f
+-                count++
+-            }
+-            if (timestamp.repeatMode == RepeatMode.Reverse && count % 2 != 0) {
+-                fraction = 1f - fraction
+-            }
+-        }
++        val fraction = pathAnimatorFraction(timeMillis, timestamp)
+         return (timestamp.holder as PropertyValuesHolderPath).interpolate(fraction)
+     }
+ }
+@@ -266,12 +251,7 @@ internal data class ObjectAnimator(
+     val holders: List<PropertyValuesHolder<*>>,
+ ) : Animator() {
+ 
+-    override val totalDuration =
+-        if (repeatCount == RepeatCountInfinite) {
+-            Int.MAX_VALUE
+-        } else {
+-            startDelay + duration * (repeatCount + 1)
+-        }
++    override val totalDuration = animatorTotalDuration(duration, startDelay, repeatCount)
+ 
+     override fun collectPropertyValues(
+         propertyValuesMap: MutableScatterMap<String, PropertyValues<*>>,
+@@ -281,15 +261,20 @@ internal data class ObjectAnimator(
+         holders.fastForEach { holder ->
+             when (holder) {
+                 is PropertyValuesHolder2D -> {
+-                    // TODO(b/178978971): Implement path animation
++                    for (motion in holder.splitMotionPath()) {
++                        val values = propertyValuesMap[motion.propertyName] as FloatPropertyValues? ?: FloatPropertyValues()
++                        values.timestamps.add(Timestamp(saturatedAnimationTime(parentDelay, startDelay), duration, repeatCount, repeatMode, motion))
++                        propertyValuesMap[motion.propertyName] = values
++                    }
+                 }
++                is MotionPathValuesHolder -> error("Motion holders are collected through their 2D animator")
+                 is PropertyValuesHolderFloat -> {
+                     val values =
+                         propertyValuesMap[holder.propertyName] as FloatPropertyValues?
+                             ?: FloatPropertyValues()
+                     values.timestamps.add(
+                         Timestamp(
+-                            parentDelay + startDelay,
++                            saturatedAnimationTime(parentDelay, startDelay),
+                             duration,
+                             repeatCount,
+                             repeatMode,
+@@ -304,7 +289,7 @@ internal data class ObjectAnimator(
+                             ?: ColorPropertyValues()
+                     values.timestamps.add(
+                         Timestamp(
+-                            parentDelay + startDelay,
++                            saturatedAnimationTime(parentDelay, startDelay),
+                             duration,
+                             repeatCount,
+                             repeatMode,
+@@ -319,7 +304,7 @@ internal data class ObjectAnimator(
+                             ?: PathPropertyValues()
+                     values.timestamps.add(
+                         Timestamp(
+-                            parentDelay + startDelay,
++                            saturatedAnimationTime(parentDelay, startDelay),
+                             duration,
+                             repeatCount,
+                             repeatMode,
+@@ -342,7 +327,7 @@ internal data class AnimatorSet(val animators: List<Animator>, val ordering: Ord
+     override val totalDuration =
+         when (ordering) {
+             Ordering.Together -> animators.fastMaxBy { it.totalDuration }?.totalDuration ?: 0
+-            Ordering.Sequentially -> animators.fastSumBy { it.totalDuration }
++            Ordering.Sequentially -> animators.fold(0) { total, animator -> saturatedAnimationTime(total, animator.totalDuration) }
+         }
+ 
+     override fun collectPropertyValues(
+@@ -364,7 +349,7 @@ internal data class AnimatorSet(val animators: List<Animator>, val ordering: Ord
+                         overallDuration,
+                         accumulatedDelay,
+                     )
+-                    accumulatedDelay += animator.totalDuration
++                    accumulatedDelay = saturatedAnimationTime(accumulatedDelay, animator.totalDuration)
+                 }
+             }
+         }
+@@ -427,8 +412,12 @@ internal class PropertyValuesHolderPath(
+ ) : PropertyValuesHolder1D<List<PathNode>>(propertyName) {
+ 
+     fun interpolate(fraction: Float): List<PathNode> {
+-        val index =
+-            (animatorKeyframes.indexOfFirst { it.fraction >= fraction } - 1).coerceAtLeast(0)
++        require(animatorKeyframes.isNotEmpty()) { "Path animator needs at least one keyframe" }
++        if (fraction <= animatorKeyframes.first().fraction) return animatorKeyframes.first().value
++        if (fraction >= animatorKeyframes.last().fraction) return animatorKeyframes.last().value
++        val index = (animatorKeyframes.indexOfFirst { it.fraction >= fraction } - 1).coerceAtLeast(0)
++        val span = animatorKeyframes[index + 1].fraction - animatorKeyframes[index].fraction
++        if (span <= 0f) return animatorKeyframes[index + 1].value
+         val easing = animatorKeyframes[index + 1].interpolator
+         val innerFraction =
+             easing.transform(
+@@ -516,6 +505,7 @@ internal class StateVectorConfig : VectorConfig {
+ }
+ 
+ private fun lerp(start: List<PathNode>, stop: List<PathNode>, fraction: Float): List<PathNode> {
++    require(start.size == stop.size) { "start and stop paths have different node counts" }
+     return start.fastZip(stop) { a, b -> lerp(a, b, fraction) }
+ }
+ 
+@@ -658,6 +648,9 @@ private fun lerp(start: PathNode, stop: PathNode, fraction: Float): PathNode {
+                 lerp(start.arcStartY, stop.arcStartY, fraction),
+             )
+         }
+-        PathNode.Close -> PathNode.Close
++        PathNode.Close -> {
++            require(stop is PathNode.Close) { DifferentStartAndStopPathNodes }
++            PathNode.Close
++        }
+     }
+ }
+diff --git a/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/lazy/staggeredgrid/LazyStaggeredGridCacheWindowLogic.kt b/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/lazy/staggeredgrid/LazyStaggeredGridCacheWindowLogic.kt
+index 6ba2cedd347..e213e0ec97f 100644
+--- a/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/lazy/staggeredgrid/LazyStaggeredGridCacheWindowLogic.kt
++++ b/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/lazy/staggeredgrid/LazyStaggeredGridCacheWindowLogic.kt
+@@ -188,7 +188,7 @@ internal class LazyStaggeredGridCacheWindowScope(
+             return@with nextItemIndex
+         }
+ 
+-    override fun getNextStartItemIndexInLane(lane: Int, currentItemIndex: Int) =
++    override fun getNextStartItemIndexInLane(lane: Int, currentItemIndex: Int): Int =
+         with(laneInfo) {
+             if (currentItemIndex < layoutInfo.laneCount) return -1
+             val previousItemIndex = findPreviousItemIndex(currentItemIndex, lane)
+diff --git a/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/pager/PagerState.kt b/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/pager/PagerState.kt
+index 702c6f07452..674dff8cabb 100644
+--- a/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/pager/PagerState.kt
++++ b/compose/foundation/foundation/src/commonMain/kotlin/androidx/compose/foundation/pager/PagerState.kt
+@@ -783,7 +783,7 @@ internal constructor(
+         }
+     }
+ 
+-    private fun tryRunPrefetch(result: PagerMeasureResult) = Snapshot.withoutReadObservation {
++    private fun tryRunPrefetch(result: PagerMeasureResult): Unit = Snapshot.withoutReadObservation {
+         if (!prefetchingEnabled) return
+         if (result.beyondViewportPageCount >= pageCount) return
+         if (abs(previousPassDelta) <= 0.5f) return
+diff --git a/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/KeyEventHelpers.native.kt b/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/KeyEventHelpers.native.kt
+deleted file mode 100644
+index 35d893b8523..00000000000
+--- a/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/KeyEventHelpers.native.kt
++++ /dev/null
+@@ -1,23 +0,0 @@
+-/*
+- * Copyright 2021 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.foundation.text
+-
+-import androidx.compose.ui.input.key.KeyEvent
+-
+-internal actual fun KeyEvent.cancelsTextSelection(): Boolean = false
+-
+-internal actual fun showCharacterPalette(): Unit = TODO("implement native showCharacterPalette")
+diff --git a/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/contextmenu/internal/ProvideDefaultPlatformTextContextMenuProviders.native.kt b/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/contextmenu/internal/ProvideDefaultPlatformTextContextMenuProviders.native.kt
+deleted file mode 100644
+index 1ca98578603..00000000000
+--- a/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/contextmenu/internal/ProvideDefaultPlatformTextContextMenuProviders.native.kt
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/*
+- * Copyright 2025 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.foundation.text.contextmenu.internal
+-
+-import androidx.compose.runtime.Composable
+-import androidx.compose.ui.Modifier
+-
+-@Composable
+-internal actual fun ProvideDefaultPlatformTextContextMenuProviders(
+-    modifier: Modifier,
+-    content: @Composable () -> Unit
+-) {
+-    // TODO: https://youtrack.jetbrains.com/issue/CMP-7819
+-}
+\ No newline at end of file
+diff --git a/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/TextFieldSelectionManager.native.kt b/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/TextFieldSelectionManager.native.kt
+deleted file mode 100644
+index 59a753a07fc..00000000000
+--- a/compose/foundation/foundation/src/nativeMain/kotlin/androidx/compose/foundation/text/selection/TextFieldSelectionManager.native.kt
++++ /dev/null
+@@ -1,23 +0,0 @@
+-/*
+- * Copyright 2025 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.foundation.text.selection
+-
+-import androidx.compose.foundation.internal.hasText
+-
+-internal actual suspend fun TextFieldSelectionManager.hasAvailableTextToPaste(): Boolean {
+-    return clipboard?.getClipEntry()?.hasText() == true
+-}
+\ No newline at end of file
+diff --git a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/MediaType.skiko.kt b/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/MediaType.skiko.kt
+deleted file mode 100644
+index 0c6fd767aba..00000000000
+--- a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/MediaType.skiko.kt
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/*
+- * Copyright 2024 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.foundation.content
+-
+-import androidx.compose.foundation.ExperimentalFoundationApi
+-
+-// TODO https://youtrack.jetbrains.com/issue/COMPOSE-1263/Implement-Modifier.receiveContent
+-
+-@ExperimentalFoundationApi
+-actual class MediaType internal constructor() {
+-
+-    actual constructor(representation: String) : this()
+-
+-    actual val representation: String = ""
+-
+-    actual companion object {
+-        actual val Text: MediaType = MediaType()
+-
+-        actual val PlainText: MediaType = MediaType()
+-
+-        actual val HtmlText: MediaType = MediaType()
+-
+-        actual val Image: MediaType = MediaType()
+-
+-        actual val All: MediaType = MediaType()
+-    }
+-
+-    override fun toString(): String {
+-        return "MediaType(" +
+-            "representation='$representation')"
+-    }
+-}
+diff --git a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/TransferableContent.skiko.kt b/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/TransferableContent.skiko.kt
+deleted file mode 100644
+index 5b76ee2c6da..00000000000
+--- a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/TransferableContent.skiko.kt
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+- * Copyright 2024 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.foundation.content
+-
+-import androidx.compose.foundation.ExperimentalFoundationApi
+-import androidx.compose.ui.platform.ClipEntry
+-
+-// TODO https://youtrack.jetbrains.com/issue/COMPOSE-1263/Implement-Modifier.receiveContent
+-
+-@ExperimentalFoundationApi
+-actual class PlatformTransferableContent internal constructor()
+-
+-@ExperimentalFoundationApi
+-actual fun TransferableContent.hasMediaType(mediaType: MediaType): Boolean {
+-    return false
+-}
+-
+-internal actual fun ClipEntry.readPlainText(): String? = null
+\ No newline at end of file
+diff --git a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/internal/ReceiveContentDragAndDropNode.skiko.kt b/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/internal/ReceiveContentDragAndDropNode.skiko.kt
+deleted file mode 100644
+index a2ee50a4632..00000000000
+--- a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/internal/ReceiveContentDragAndDropNode.skiko.kt
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/*
+- * Copyright 2024 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.foundation.content.internal
+-
+-import androidx.compose.ui.draganddrop.DragAndDropEvent
+-import androidx.compose.ui.draganddrop.DragAndDropTargetModifierNode
+-
+-internal actual fun ReceiveContentDragAndDropNode(
+-    receiveContentConfiguration: ReceiveContentConfiguration,
+-    dragAndDropRequestPermission: (DragAndDropEvent) -> Unit
+-): DragAndDropTargetModifierNode {
+-    // TODO: https://youtrack.jetbrains.com/issue/CMP-1263
+-    throw NotImplementedError()
+-}
+diff --git a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/platform/Synchronization.skiko.kt b/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/platform/Synchronization.skiko.kt
+deleted file mode 100644
+index e2a109c7a18..00000000000
+--- a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/platform/Synchronization.skiko.kt
++++ /dev/null
+@@ -1,35 +0,0 @@
+-/*
+- * Copyright 2024 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-@file:JvmName("SynchronizationKt")
+-
+-package androidx.compose.foundation.platform
+-
+-import kotlin.contracts.ExperimentalContracts
+-import kotlin.contracts.InvocationKind
+-import kotlin.contracts.contract
+-import kotlin.jvm.JvmName
+-
+-internal actual class SynchronizedObject : kotlinx.atomicfu.locks.SynchronizedObject()
+-
+-@Suppress("NOTHING_TO_INLINE")
+-internal actual inline fun makeSynchronizedObject(ref: Any?) = SynchronizedObject()
+-
+-@Suppress("BanInlineOptIn")
+-@OptIn(ExperimentalContracts::class)
+-internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R {
+-    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+-    return kotlinx.atomicfu.locks.synchronized(lock, block)
+-}
+\ No newline at end of file
+diff --git a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/text/ContextMenuStrings.skiko.kt b/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/text/ContextMenuStrings.skiko.kt
+index e9a3d15f3c7..c42b12da99b 100644
+--- a/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/text/ContextMenuStrings.skiko.kt
++++ b/compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/text/ContextMenuStrings.skiko.kt
+@@ -40,7 +40,7 @@ internal actual value class ContextMenuStrings actual constructor(actual val val
+     }
+ }
+ 
+-private fun getTranslation(string: ContextMenuStrings, locale: Locale): String {
++internal fun getTranslation(string: ContextMenuStrings, locale: Locale): String {
+     val tag = localeTag(language = locale.language, region = locale.region)
+     val translation = translationByLocaleTag.getOrPut(tag) {
+         findTranslation(locale)
+diff --git a/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/graphics/NativeImageAsset.native.kt b/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/graphics/NativeImageAsset.native.kt
+deleted file mode 100644
+index bd216007cbe..00000000000
+--- a/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/graphics/NativeImageAsset.native.kt
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/*
+- * Copyright 2020 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.ui.graphics
+-
+-import kotlinx.cinterop.ExperimentalForeignApi
+-import kotlinx.cinterop.addressOf
+-import kotlinx.cinterop.usePinned
+-import platform.posix.memcpy
+-
+-@OptIn(ExperimentalForeignApi::class)
+-internal actual fun ByteArray.putBytesInto(array: IntArray, offset: Int, length: Int) {
+-    this.usePinned { bytes ->
+-        array.usePinned { ints ->
+-            // Assuming little endian.
+-            memcpy(ints.addressOf(offset), bytes.addressOf(0), (length * 4).toULong())
+-        }
+-    }
+-}
+diff --git a/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/Cache.native.kt b/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/Cache.native.kt
+index 7c43b1d1fbb..e0866a969c0 100644
+--- a/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/Cache.native.kt
++++ b/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/Cache.native.kt
+@@ -33,12 +33,11 @@ internal actual class WeakKeysCache<K : Any, V: Any> {
+         private val ref = WeakReference(key)
+         private val hash: Int = key.hashCode()
+ 
+-        val isAvailable get() = ref.value != null
++        val isAvailable get() = ref.get() != null
+ 
+         override fun equals(other: Any?): Boolean {
+             if (this === other) return true
+-            if (other == null) return false
+-            other as Key<*>
++            if (other !is Key<*>) return false
+             val a = ref.get()
+             val b = other.ref.get()
+             if (a == null || b == null) {
+diff --git a/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/platform/NativeFont.native.kt b/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/platform/NativeFont.native.kt
+deleted file mode 100644
+index 8bbf8f294f8..00000000000
+--- a/compose/ui/ui-skiko/src/nativeMain/kotlin/androidx/compose/ui/text/platform/NativeFont.native.kt
++++ /dev/null
+@@ -1,64 +0,0 @@
+-/*
+- * Copyright 2020 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.ui.text.platform
+-
+-import androidx.compose.ui.text.ExperimentalTextApi
+-import kotlin.native.Platform as NativePlatform
+-import org.jetbrains.skia.FontStyle as SkFontStyle
+-import org.jetbrains.skia.Typeface as SkTypeface
+-import androidx.compose.ui.text.font.Font
+-import androidx.compose.ui.text.font.FontStyle
+-import kotlin.experimental.ExperimentalNativeApi
+-import org.jetbrains.skia.Data
+-import org.jetbrains.skia.FontMgr
+-import org.jetbrains.skia.FontSlant
+-import org.jetbrains.skia.FontWeight
+-import org.jetbrains.skia.FontWidth
+-
+-@OptIn(ExperimentalTextApi::class)
+-internal actual fun loadTypeface(font: Font): SkTypeface {
+-    if (font !is PlatformFont) {
+-        throw IllegalArgumentException("Unsupported font type: $font")
+-    }
+-    @Suppress("REDUNDANT_ELSE_IN_WHEN")
+-    return when (font) {
+-        is LoadedFont -> FontMgr.default.makeFromData(Data.makeFromBytes(font.data))
+-            ?: error("loadTypeface makeFromData failed")
+-        is SystemFont -> FontMgr.default.legacyMakeTypeface(font.identity, font.skFontStyle)
+-            ?: error("loadTypeface legacyMakeTypeface failed")
+-        // TODO: compilation fails without `else` see https://youtrack.jetbrains.com/issue/KT-43875
+-        else -> throw IllegalArgumentException("Unsupported font type: $font")
+-    }.cloneWithVariationSettings(font.variationSettings)
+-}
+-
+-private val Font.skFontStyle: SkFontStyle
+-    get() = SkFontStyle(
+-        weight = FontWeight(weight.weight),
+-        width = FontWidth.NORMAL,
+-        slant = if (style == FontStyle.Italic) FontSlant.ITALIC else FontSlant.UPRIGHT
+-    )
+-
+-@OptIn(ExperimentalNativeApi::class)
+-internal actual fun currentPlatform(): Platform = when (NativePlatform.osFamily) {
+-    OsFamily.MACOSX -> Platform.MacOS
+-    OsFamily.IOS -> Platform.IOS
+-    OsFamily.LINUX -> Platform.Linux
+-    OsFamily.WINDOWS -> Platform.Windows
+-    OsFamily.TVOS -> Platform.TvOS
+-    OsFamily.WATCHOS -> Platform.WatchOS
+-    else -> Platform.Unknown
+-}
+diff --git a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/graphics/SkikoGraphics.nonAndroid.kt b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/graphics/SkikoGraphics.nonAndroid.kt
+index 11d9da456b0..67fd4faac9e 100644
+--- a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/graphics/SkikoGraphics.nonAndroid.kt
++++ b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/graphics/SkikoGraphics.nonAndroid.kt
+@@ -231,8 +231,7 @@ internal object SkikoGraphics : PlatformGraphics {
+     override fun createLightingColorFilter(multiply: Color, add: Color): PlatformColorFilter =
+         SkikoColorFilter(SkColorFilter.makeLighting(multiply.toArgb(), add.toArgb()))
+ 
+-    // TODO: https://youtrack.jetbrains.com/issue/CMP-739
+-    override fun colorMatrixFromFilter(filter: PlatformColorFilter): ColorMatrix = ColorMatrix()
++    override fun colorMatrixFromFilter(filter: PlatformColorFilter): ColorMatrix = colorMatrixFromSkiko(filter)
+ 
+     override fun createCornerPathEffect(radius: Float): PathEffect =
+         SkPathEffect.makeCorner(radius).asComposePathEffect()
+diff --git a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoCharHelpers.nonAndroid.kt b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoCharHelpers.nonAndroid.kt
+index dd891c77e07..97d1c73b382 100644
+--- a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoCharHelpers.nonAndroid.kt
++++ b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoCharHelpers.nonAndroid.kt
+@@ -19,17 +19,20 @@ package androidx.compose.ui.text
+ import kotlin.experimental.ExperimentalNativeApi
+ import kotlin.jvm.JvmInline
+ import org.jetbrains.skia.BreakIterator
++import org.jetbrains.skia.impl.use
+ 
+ internal fun findSkikoPrecedingBreak(text: String, index: Int): Int {
+-    val iterator = BreakIterator.makeCharacterInstance()
+-    iterator.setText(text)
+-    return iterator.preceding(index)
++    return BreakIterator.makeCharacterInstance().use { iterator ->
++        iterator.setText(text)
++        iterator.preceding(index)
++    }
+ }
+ 
+ internal fun findSkikoFollowingBreak(text: String, index: Int): Int {
+-    val iterator = BreakIterator.makeCharacterInstance()
+-    iterator.setText(text)
+-    return iterator.following(index)
++    return BreakIterator.makeCharacterInstance().use { iterator ->
++        iterator.setText(text)
++        iterator.following(index)
++    }
+ }
+ 
+ /**
+diff --git a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoParagraph.nonAndroid.kt b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoParagraph.nonAndroid.kt
+index dd1c704220c..4aabe8dcfdf 100644
+--- a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoParagraph.nonAndroid.kt
++++ b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/SkikoParagraph.nonAndroid.kt
+@@ -499,8 +499,7 @@ internal class SkikoParagraph(
+         granularity: TextGranularity,
+         inclusionStrategy: TextInclusionStrategy
+     ): TextRange {
+-        // TODO(https://youtrack.jetbrains.com/issue/CMP-1255)
+-        return TextRange.Zero
++        return nativeRangeForRect(paragraph, text, paragraphIntrinsics.boundaryLocale, rect, granularity, inclusionStrategy)
+     }
+ 
+     override fun getBoundingBox(offset: Int): Rect {
+@@ -516,9 +515,7 @@ internal class SkikoParagraph(
+         array: FloatArray,
+         arrayStart: Int
+     ) {
+-        println("Compose Multiplatform doesn't support fillBoundingBoxes` yet. " +
+-            "Follow https://youtrack.jetbrains.com/issue/CMP-720")
+-        // TODO(https://youtrack.jetbrains.com/issue/CMP-720) implement fillBoundingBoxes
++        nativeFillBoundingBoxes(this, paragraph, text, paragraphIntrinsics.boundaryLocale, range, array, arrayStart)
+     }
+ 
+     override fun getWordBoundary(offset: Int): TextRange {
+diff --git a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt
+index ef19734ea58..eec10361417 100644
+--- a/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt
++++ b/compose/ui/ui-skiko/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/SkikoParagraphIntrinsics.nonAndroid.kt
+@@ -47,6 +47,8 @@ internal class SkikoParagraphIntrinsics(
+     private val fontFamilyResolver: FontFamily.Resolver,
+     private val defaultLocaleList: LocaleList,
+ ) : ParagraphIntrinsics {
++    internal val boundaryLocale: String? get() = (style.localeList ?: defaultLocaleList).firstOrNull()?.toLanguageTag()
++
+     private var resolvedTypefaces: TypefaceDirtyTrackerLinkedList? = null
+ 
+     val textDirection =
+diff --git a/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt b/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt
+index 016d8c88ebe..0ce10badb0f 100644
+--- a/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt
++++ b/compose/ui/ui-text/src/commonMain/kotlin/androidx/compose/ui/text/AnnotatedString.kt
+@@ -144,12 +144,12 @@ internal constructor(
+                 if (spanStyles == null) {
+                     spanStyles = mutableListOf()
+                 }
+-                spanStyles!!.add(annotation as Range<SpanStyle>)
++                spanStyles.add(annotation as Range<SpanStyle>)
+             } else if (annotation.item is ParagraphStyle) {
+                 if (paragraphStyles == null) {
+                     paragraphStyles = mutableListOf()
+                 }
+-                paragraphStyles!!.add(annotation as Range<ParagraphStyle>)
++                paragraphStyles.add(annotation as Range<ParagraphStyle>)
+             }
+         }
+         spanStylesOrNull = spanStyles
+diff --git a/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/Paragraph.nonAndroid.kt b/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/Paragraph.nonAndroid.kt
+index 4c4c4733771..39942a0907f 100644
+--- a/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/Paragraph.nonAndroid.kt
++++ b/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/Paragraph.nonAndroid.kt
+@@ -165,6 +165,7 @@ actual fun Paragraph(
+             defaultLocaleList = LocaleList.current,
+         )
+ 
++@Suppress("DEPRECATION")
+ actual fun Paragraph(
+     text: String,
+     style: TextStyle,
+@@ -225,6 +226,7 @@ actual fun Paragraph(
+         "androidx.compose.ui.unit.Constraints",
+     ),
+ )
++@Suppress("DEPRECATION")
+ actual fun Paragraph(
+     text: String,
+     style: TextStyle,
+@@ -254,6 +256,7 @@ actual fun Paragraph(
+     "Paragraph that takes `ellipsis: Boolean` is deprecated, pass TextOverflow instead.",
+     level = DeprecationLevel.HIDDEN,
+ )
++@Suppress("DEPRECATION")
+ actual fun Paragraph(
+     text: String,
+     style: TextStyle,
+diff --git a/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/ParagraphIntrisics.nonAndroid.kt b/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/ParagraphIntrisics.nonAndroid.kt
+index 0f7cf3b5fee..38e5f3cef4d 100644
+--- a/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/ParagraphIntrisics.nonAndroid.kt
++++ b/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/ParagraphIntrisics.nonAndroid.kt
+@@ -35,6 +35,7 @@ import kotlin.jvm.JvmName
+             "fontFamilyResolver"
+     ),
+ )
++@Suppress("DEPRECATION")
+ actual fun ParagraphIntrinsics(
+     text: String,
+     style: TextStyle,
+@@ -55,6 +56,7 @@ actual fun ParagraphIntrinsics(
+             defaultLocaleList = LocaleList.current,
+         )
+ 
++@Suppress("DEPRECATION")
+ actual fun ParagraphIntrinsics(
+     text: String,
+     style: TextStyle,
+@@ -101,6 +103,7 @@ actual fun ParagraphIntrinsics(
+         "ParagraphIntrinsics(text, style, spanStyles, density, fontFamilyResolver, placeholders)"
+     ),
+ )
++@Suppress("DEPRECATION")
+ actual fun ParagraphIntrinsics(
+     text: String,
+     style: TextStyle,
+@@ -120,6 +123,7 @@ actual fun ParagraphIntrinsics(
+             defaultLocaleList = LocaleList.current,
+         )
+ 
++@Suppress("DEPRECATION")
+ actual fun ParagraphIntrinsics(
+     text: String,
+     style: TextStyle,
+diff --git a/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/Synchronization.nonAndroid.kt b/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/Synchronization.nonAndroid.kt
+deleted file mode 100644
+index 310c0c790e3..00000000000
+--- a/compose/ui/ui-text/src/nonAndroidMain/kotlin/androidx/compose/ui/text/platform/Synchronization.nonAndroid.kt
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/*
+- * Copyright 2024 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-@file:JvmName("SynchronizationKt")
+-
+-package androidx.compose.ui.text.platform
+-
+-import kotlin.contracts.ExperimentalContracts
+-import kotlin.contracts.InvocationKind
+-import kotlin.contracts.contract
+-import kotlin.jvm.JvmName
+-
+-internal actual class SynchronizedObject : kotlinx.atomicfu.locks.SynchronizedObject()
+-
+-@Suppress("NOTHING_TO_INLINE")
+-internal actual inline fun makeSynchronizedObject(ref: Any?) = SynchronizedObject()
+-
+-@PublishedApi
+-@Suppress("BanInlineOptIn")
+-@OptIn(ExperimentalContracts::class)
+-internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R {
+-    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+-    return kotlinx.atomicfu.locks.synchronized(lock, block)
+-}
+diff --git a/compose/ui/ui-text/src/nonJvmMain/kotlin/androidx/compose/ui/text/AnnotatedString.nonJvm.kt b/compose/ui/ui-text/src/nonJvmMain/kotlin/androidx/compose/ui/text/AnnotatedString.nonJvm.kt
+index ac20954648d..2eb7d2d0276 100644
+--- a/compose/ui/ui-text/src/nonJvmMain/kotlin/androidx/compose/ui/text/AnnotatedString.nonJvm.kt
++++ b/compose/ui/ui-text/src/nonJvmMain/kotlin/androidx/compose/ui/text/AnnotatedString.nonJvm.kt
+@@ -37,7 +37,9 @@ internal actual fun AnnotatedString.transform(
+     var resultStr = ""
+     val offsetMap = mutableMapOf(0 to 0)
+     transitions.sort()
+-    transitions.windowed(size = 2) { (start, end) ->
++    for (index in 0 ..< transitions.lastIndex) {
++        val start = transitions[index]
++        val end = transitions[index + 1]
+         resultStr += transform(text, start, end)
+         offsetMap.put(end, resultStr.length)
+     }
+diff --git a/compose/ui/ui/src/nonJvmMain/kotlin/androidx/compose/ui/Actuals.nonJvm.kt b/compose/ui/ui/src/nonJvmMain/kotlin/androidx/compose/ui/Actuals.nonJvm.kt
+index d79080dbde4..ad486a6cba6 100644
+--- a/compose/ui/ui/src/nonJvmMain/kotlin/androidx/compose/ui/Actuals.nonJvm.kt
++++ b/compose/ui/ui/src/nonJvmMain/kotlin/androidx/compose/ui/Actuals.nonJvm.kt
+@@ -19,7 +19,7 @@ package androidx.compose.ui
+ import androidx.compose.ui.node.ModifierNodeElement
+ import androidx.compose.ui.platform.InspectorInfo
+ import kotlin.coroutines.CoroutineContext
+-import kotlinx.coroutines.Dispatchers
++import androidx.compose.ui.platform.nativeUiDispatcher
+ 
+ internal actual fun classKeyForObject(a: Any): Any {
+     return a::class
+@@ -34,4 +34,4 @@ internal actual fun InspectorInfo.tryPopulateReflectively(
+ }
+ 
+ internal actual val PostDelayedDispatcher: CoroutineContext
+-    get() = Dispatchers.Main
++    get() = nativeUiDispatcher().context
+diff --git a/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/PlatformClipboard.skiko.kt b/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/PlatformClipboard.skiko.kt
+index 73186670636..f8fb25725b1 100644
+--- a/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/PlatformClipboard.skiko.kt
++++ b/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/PlatformClipboard.skiko.kt
+@@ -16,8 +16,6 @@
+ 
+ package androidx.compose.ui.platform
+ 
+-// TODO: https://youtrack.jetbrains.com/issue/CMP-1260
+-actual class ClipMetadata private constructor()
+ 
+ @Suppress("DEPRECATION")
+ internal expect fun createPlatformClipboardManager(): ClipboardManager
+diff --git a/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/Synchronization.skiko.kt b/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/Synchronization.skiko.kt
+deleted file mode 100644
+index d0e956c9373..00000000000
+--- a/compose/ui/ui/src/skikoMain/kotlin/androidx/compose/ui/platform/Synchronization.skiko.kt
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/*
+- * Copyright 2024 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-@file:JvmName("SynchronizationKt")
+-
+-package androidx.compose.ui.platform
+-
+-import kotlin.contracts.ExperimentalContracts
+-import kotlin.contracts.InvocationKind
+-import kotlin.contracts.contract
+-import kotlin.jvm.JvmName
+-
+-internal actual class SynchronizedObject : kotlinx.atomicfu.locks.SynchronizedObject()
+-
+-@Suppress("NOTHING_TO_INLINE")
+-internal actual inline fun makeSynchronizedObject(ref: Any?) = SynchronizedObject()
+-
+-@PublishedApi
+-@Suppress("BanInlineOptIn")
+-@OptIn(ExperimentalContracts::class)
+-internal actual inline fun <R> synchronized(lock: SynchronizedObject, block: () -> R): R {
+-    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+-    return kotlinx.atomicfu.locks.synchronized(lock, block)
+-}

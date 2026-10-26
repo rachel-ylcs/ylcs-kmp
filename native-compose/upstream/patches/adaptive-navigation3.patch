@@ -1,0 +1,13 @@
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/adaptive/navigation3/ThreePaneScaffoldScene.kt b/src/commonMain/kotlin/androidx/compose/material3/adaptive/navigation3/ThreePaneScaffoldScene.kt
+index 3045d53..4533cf2 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/adaptive/navigation3/ThreePaneScaffoldScene.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/adaptive/navigation3/ThreePaneScaffoldScene.kt
+@@ -484,7 +484,7 @@ internal class ThreePaneScaffoldScene<T : Any>(
+             allEntries == other.allEntries &&
+             previousEntries == other.previousEntries &&
+             scaffoldEntries == other.scaffoldEntries &&
+-            scaffoldEntryIndices == scaffoldEntryIndices &&
++            scaffoldEntryIndices == other.scaffoldEntryIndices &&
+             entriesAsNavItems == other.entriesAsNavItems
+     }
+ 

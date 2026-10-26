@@ -8,8 +8,13 @@ import org.jetbrains.skiko.window.NativeWindowOptions
 import org.jetbrains.skiko.window.NativeWindow as SkikoNativeWindow
 import kotlin.math.roundToInt
 
+/**
+ * Owns one SDL desktop window, composition and event loop on the main thread.
+ * The call blocks until the window closes, then disposes composition effects and host resources.
+ * [onCloseRequest] returns true to accept an OS close request. Escape is delivered to Compose.
+ */
 @ExperimentalComposeUiApi
-actual fun NativeWindow(options: NativeWindowOptions, onCloseRequest: () -> Boolean, content: @Composable () -> Unit) {
+fun NativeWindow(options: NativeWindowOptions = NativeWindowOptions(title = "Compose Native"), onCloseRequest: () -> Boolean = { true }, content: @Composable () -> Unit) {
     registerSkikoComposeImplementation()
     val host = NativeSceneHost(onCloseRequest)
     try {

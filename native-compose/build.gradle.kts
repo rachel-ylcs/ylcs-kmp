@@ -12,7 +12,7 @@ idea.module {
 val lock = JsonSlurper().parse(file("upstream/lock.json")) as Map<*, *>
 val sdlLock = JsonSlurper().parse(file("upstream/sdl.json")) as Map<*, *>
 check(libs.versions.sdl.get() == sdlLock["version"]) {
-    "SDL version changed in ../libs.versions.toml; review upstream/sdl.json and re-run prepare_sdl.py."
+    "SDL version changed in ../libs.versions.toml; review upstream/sdl.json and run prepareNativeSources."
 }
 val skikoVersion = libs.versions.skiko.get()
 val portGroup = lock["group"] as String
@@ -27,6 +27,29 @@ val hostPublication = when (HostManager.host.name) {
     "macos_arm64" -> "MacosArm64"
     else -> null
 }
+val hostTarget = when (HostManager.host.name) {
+    "mingw_x64" -> "windows"
+    "linux_x64" -> "linux"
+    "macos_arm64" -> "macos"
+    else -> null
+}
+val composeSource = gradle.includedBuilds.find { it.name == "compose-ui" }
+if (sourceBuild != null && composeSource != null && hostTarget != null) {
+    val composeLock = JsonSlurper().parse(file("upstream/compose.json")) as Map<*, *>
+    val modules = composeLock["modules"] as Map<*, *>
+    tasks.register("testHost") {
+        group = "verification"
+        description = "Run all maintained Native library regressions for this host"
+        val skikoTarget = when (hostTarget) {
+            "windows" -> "mingwX64"
+            "linux" -> "linuxX64"
+            else -> "macosArm64"
+        }
+        dependsOn(sourceBuild.task(":${skikoTarget}RegressionTest"))
+        dependsOn(sourceBuild.task(":skiko-skottie:${skikoTarget}RegressionTest"))
+        for (module in modules.keys) dependsOn(composeSource.task(":$module:${hostTarget}Test"))
+    }
+}
 if (sourceBuild != null && hostPublication != null) {
     tasks.register<Copy>("publishSkikoToVerificationRepository") {
         group = "publishing"
@@ -39,24 +62,39 @@ if (sourceBuild != null && hostPublication != null) {
     }
 }
 
-gradle.includedBuilds.find { it.name == "compose-ui" }?.let { source ->
+composeSource?.let { source ->
     tasks.register("publishComposeUiToVerificationRepository") {
         group = "publishing"
         dependsOn(source.task(":publishAllHostToVerificationRepository"))
     }
 }
 
-tasks.register<Exec>("doctorNative") {
-    group = "native setup"
-    commandLine(providers.gradleProperty("python.command").getOrElse("python"), nativeDirectory.file("scripts/doctor.py").asFile)
+tasks.register<Sync>("publishHost") {
+    group = "publishing"
+    description = "Publish all owned host KLIBs to one local verification repository"
+    dependsOn("publishSkikoToVerificationRepository", "publishComposeUiToVerificationRepository")
+    from(layout.buildDirectory.dir("repository"))
+    from(nativeDirectory.dir("vendor/build/compose-ui/repository")) {
+        val composeLock = JsonSlurper().parse(file("upstream/compose.json")) as Map<*, *>
+        val modules = composeLock["modules"] as Map<*, *>
+        val groups = modules.values.map { (it as Map<*, *>)["group"] ?: composeLock["group"] }.toSet()
+        include(groups.map { "${it.toString().replace('.', '/')}/**" })
+    }
+    into(nativeDirectory.dir("vendor/build/repository"))
+    duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 
-tasks.register<Exec>("checkUpstreamUpdates") {
-    group = "native setup"
-    commandLine(providers.gradleProperty("python.command").getOrElse("python"), nativeDirectory.file("scripts/sync_upstream.py").asFile, "--check-updates")
-}
-
-tasks.register<Exec>("checkComposeUpdates") {
-    group = "native setup"
-    commandLine(providers.gradleProperty("python.command").getOrElse("python"), nativeDirectory.file("scripts/sync_compose.py").asFile, "--check-updates")
+val repositoryBuildLogic = gradle.includedBuilds.single { it.projectDir.canonicalFile == nativeDirectory.dir("../build-logic").asFile.canonicalFile }
+for ((name, target) in mapOf(
+    "prepareSources" to ":repository-conventions:prepareNativeSources",
+    "checkUpstreamUpdates" to ":repository-conventions:checkNativeUpstreamUpdates",
+    "checkSources" to ":native-bridge:checkNativeSources",
+    "verifyHost" to ":native-bridge:verifyNativeHost",
+    "verifyDistributions" to ":native-bridge:verifyNativeDistributions",
+    "assembleVerificationRepository" to ":native-bridge:assembleNativeRepository",
+)) {
+    tasks.register(name) {
+        group = if (name in setOf("prepareSources", "checkUpstreamUpdates")) "native setup" else "verification"
+        dependsOn(repositoryBuildLogic.task(target))
+    }
 }

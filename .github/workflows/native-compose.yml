@@ -1,0 +1,155 @@
+name: Native Compose
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'native-compose/**'
+      - 'build-logic/native-bridge/**'
+      - 'build-logic/repository-conventions/**'
+      - 'build-logic/public-plugin/**'
+      - 'build-logic/settings.gradle.kts'
+      - 'ylcs-app/native-compose/**'
+      - 'libs.versions.toml'
+      - 'settings.gradle.kts'
+      - 'gradle/wrapper/**'
+      - '.github/workflows/native-compose.yml'
+      - '.github/actions/setup-native/**'
+  push:
+    branches: [main]
+    paths:
+      - 'native-compose/**'
+      - 'build-logic/native-bridge/**'
+      - 'build-logic/repository-conventions/**'
+      - 'build-logic/public-plugin/**'
+      - 'build-logic/settings.gradle.kts'
+      - 'ylcs-app/native-compose/**'
+      - 'libs.versions.toml'
+      - 'settings.gradle.kts'
+      - 'gradle/wrapper/**'
+      - '.github/workflows/native-compose.yml'
+      - '.github/actions/setup-native/**'
+
+permissions:
+  contents: read
+
+# All owned libraries, bridge and application directories are verified from repository sources.
+# Maven tasks write local verification files only; no public repository is configured.
+concurrency:
+  group: native-compose-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Native libraries and SDL host / ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: mingw_x64
+            binary-target: Windows
+          - runner: ubuntu-24.04
+            target: linux_x64
+            binary-target: Linux
+          - runner: macos-26
+            target: macos_arm64
+            binary-target: Macos
+    defaults:
+      run:
+        shell: bash
+    env:
+      NATIVE_TARGET: ${{ matrix.target }}
+      NATIVE_BINARY_TARGET: ${{ matrix.binary-target }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: oracle
+          java-version: '25'
+          cache: gradle
+      - name: Configure the Windows Native toolchain
+        if: runner.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+          export-path-to-vs: VS_PATH
+      - name: Restore and prepare pinned Native sources and SDKs
+        uses: ./.github/actions/setup-native
+        with:
+          tools: 'true'
+      - name: Source preparation, bridge routing and desktop packaging regressions
+        run: |
+          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            :repository-conventions:test :native-bridge:test :native-bridge:validatePlugins :public-plugin:validatePlugins
+      - name: Test and publish all owned host libraries
+        run: |
+          bash ./gradlew --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            :native-compose:testHost :native-compose:publishHost
+      - name: Require real Native behavior and complete publications
+        run: |
+          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+            :native-bridge:verifyNativeHost
+      - name: Prepare and relocate Debug and Release application directories
+        env:
+          SDL_VIDEODRIVER: dummy
+        run: |
+          bash ./gradlew --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            -Pnative.renderer=software -Pnative.smoke=true \
+            ":ylcs-app:native-compose:stage${NATIVE_BINARY_TARGET}DebugExecutable" \
+            :ylcs-app:native-compose:composeDistribution
+          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+            :native-bridge:verifyNativeDistributions
+      - uses: actions/upload-artifact@v7
+        with:
+          name: native-compose-maven-${{ matrix.target }}
+          path: native-compose/vendor/build/repository/
+          if-no-files-found: error
+      - name: Library and bridge test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-compose-evidence-${{ matrix.target }}
+          path: |
+            native-compose/vendor/build/compose-ui/*/test-results/
+            native-compose/vendor/build/compose-ui/*/reports/tests/
+            native-compose/vendor/build/repository/**/*.module
+            native-compose/vendor/build/repository/**/*.pom
+            native-compose/vendor/skiko/workspace/skiko/build/test-results/
+            native-compose/vendor/skiko/workspace/skiko/skiko-skottie/build/test-results/
+            build-logic/native-bridge/build/test-results/
+            build-logic/native-bridge/build/reports/tests/
+            build-logic/repository-conventions/build/test-results/
+          if-no-files-found: warn
+
+  assemble:
+    name: Assemble the three-target local Maven verification repository
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: oracle
+          java-version: '25'
+          cache: gradle
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: native-compose-maven-*
+          path: host-publications
+      - name: Require all host artifacts and one canonical KMP root
+        run: |
+          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+            :native-bridge:assembleNativeRepository
+      - uses: actions/upload-artifact@v7
+        with:
+          name: native-compose-maven
+          path: native-compose/vendor/build/assembled-repository/
+          if-no-files-found: error

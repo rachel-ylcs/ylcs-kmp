@@ -9,6 +9,21 @@ version = libs.versions.rachel.get()
 dependencies {
     implementation(project(path = ":public-plugin", configuration = "bootstrapElements"))
     implementation(project(path = ":native-bridge", configuration = "settingsElements"))
+    testImplementation(kotlin("test-junit"))
+}
+
+val nativeSourcesDirectory = rootProject.layout.projectDirectory.dir("../native-compose")
+for ((taskName, command) in mapOf("prepareNativeSources" to "prepare", "checkNativeUpstreamUpdates" to "updates", "restoreNativeSourceCache" to "cache-restore", "createNativeSourceCache" to "cache-create")) {
+    tasks.register<JavaExec>(taskName) {
+        group = "native setup"
+        description = "${command.replace('-', ' ')} the locked Native Compose sources"
+        classpath = sourceSets.main.get().runtimeClasspath
+        mainClass.set("love.yinlin.repository.nativecompose.NativeSourcesMain")
+        args(command, nativeSourcesDirectory.asFile.absolutePath)
+        if (command == "prepare" && gradle.startParameter.isOffline) args("offline")
+        if (command == "prepare") mustRunAfter("restoreNativeSourceCache")
+        if (command == "cache-create") mustRunAfter("prepareNativeSources")
+    }
 }
 
 kotlin {

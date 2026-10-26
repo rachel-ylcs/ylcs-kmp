@@ -25,8 +25,14 @@ apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))
 // Configure source roots after upstream has registered every platform task.
 extensions.configure<KotlinMultiplatformExtension> {
     sourceSets.configureEach {
-        val directory = adaptationDirectory.resolve("src/$name/kotlin")
-        if (directory.isDirectory) kotlin.srcDir(directory)
+        // Cocoa forward declarations belong to the macOS platform fragment.
+        // macosArm64 is the only supported macOS target; use its leaf as the source root.
+        if (name == "macosMain") kotlin.setSrcDirs(emptyList<String>())
+        else {
+            val directory = adaptationDirectory.resolve("src/${if (name == "macosArm64Main") "macosMain" else name}/kotlin")
+            if (name == "macosArm64Main") kotlin.srcDir(project.file("src/macosMain/kotlin"))
+            if (directory.isDirectory) kotlin.srcDir(directory)
+        }
     }
 }
 
@@ -36,7 +42,7 @@ tasks.withType<CompileSkikoCppTask>().configureEach {
         name.contains("Linux") -> "linuxMain"
         else -> "macosMain"
     }
-    for (sourceSet in listOf("commonMain", "nativeMain", platformSourceSet)) {
+    for (sourceSet in listOf("nativeMain", platformSourceSet)) {
         val directory = adaptationDirectory.resolve("src/$sourceSet/cpp")
         if (directory.isDirectory) {
             sourceRoots.add(layout.dir(provider { directory }))
@@ -63,18 +69,8 @@ val sdlVersion = sdlLock["version"] as String
 val sdlHost = HostManager.host.name
 val sdlSdk = nativeComposeDirectory.resolve("vendor/sdl-static/$sdlHost")
 val sdlArchive = if (sdlHost == "mingw_x64") "SDL3-static.lib" else "libSDL3.a"
-val prepareSdl = tasks.register<Exec>("prepareSdlStatic") {
-    group = "native setup"
-    inputs.files(nativeComposeDirectory.resolve("scripts/prepare_sdl.py"), nativeComposeDirectory.resolve("upstream/sdl.json"))
-    outputs.files(sdlSdk.resolve("rachel-sdl.json"), sdlSdk.resolve("lib/$sdlArchive"))
-    commandLine(providers.gradleProperty("python.command").getOrElse("python"), nativeComposeDirectory.resolve("scripts/prepare_sdl.py"), "--build")
-    if (sdlHost == "linux_x64") {
-        dependsOn("downloadKotlinNativeDistribution")
-        val nativeLocation = layout.buildDirectory.file("konan.txt")
-        inputs.file(nativeLocation)
-        args("--konan-home-file", nativeLocation.get().asFile)
-    }
-}
+apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts"))
+val prepareSdl = tasks.named("prepareSdlStatic")
 
 if (sdlHost == "mingw_x64") {
     tasks.named<StripCoffDirectivesTask>("stripCoffDirectivesWindowsX64") {
@@ -91,7 +87,7 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
     val isHost = konanTarget == HostManager.host
     val sdlLibraryDirectory = if (sdlHost == "mingw_x64") layout.buildDirectory.dir("nativeBridges/strippedCoff/windows-x64").get().asFile else sdlSdk.resolve("lib")
     val output = layout.buildDirectory.file("cinterop/sdl-$name.def")
-    val definition = adaptationDirectory.resolve("src/nativeInterop/cinterop/sdl.def")
+    val definition = adaptationDirectory.resolve("src/nativeMain/cinterop/sdl.def")
     val writeDefinition = tasks.register("writeSdlDef${name.replaceFirstChar(Char::uppercase)}") {
         dependsOn(prepareSdl)
         inputs.file(definition)
@@ -123,7 +119,7 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
 tasks.withType<AbstractArchiveTask>().configureEach {
     if (name == "sourcesJar" || name.endsWith("SourcesJar")) {
         dependsOn(prepareSdl)
-        from(adaptationDirectory.resolve("src/nativeInterop")) { into("nativeInterop") }
+        from(adaptationDirectory.resolve("src/nativeMain/cinterop")) { into("nativeInterop/cinterop") }
         from(nativeComposeDirectory.resolve("vendor/sdl-source-$sdlVersion/LICENSE.txt")) {
             into("META-INF/licenses")
             rename { "SDL.txt" }

@@ -1,5 +1,7 @@
 [versions]
 
+compose-adaptive = "1.4.0-alpha01"
+
 # ----- [Rachel] -----
 
 rachel = "3.7.1"
@@ -214,3 +216,24 @@ native-compose-animation = { module = "love.yinlin.native.compose.animation:anim
 native-compose-animation-core = { module = "love.yinlin.native.compose.animation:animation-core", version.ref = "cmp" }
 native-compose-animation-graphics = { module = "love.yinlin.native.compose.animation:animation-graphics", version.ref = "cmp" }
 native-compose-resources = { module = "love.yinlin.native.compose.components:components-resources", version.ref = "cmp" }
+
+# Material3 and Adaptive
+androidx-window-core = { module = "org.jetbrains.androidx.window:window-core", version = "1.5.1" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }
+native-compose-material3 = { module = "love.yinlin.native.compose.material3:material3", version.ref = "cmp" }
+compose-material3-ripple = { module = "org.jetbrains.compose.material3:material3-ripple", version.ref = "cmp" }
+native-compose-material3-ripple = { module = "love.yinlin.native.compose.material3:material3-ripple", version.ref = "cmp" }
+compose-material3-windowSizeClass = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "cmp" }
+native-compose-material3-windowSizeClass = { module = "love.yinlin.native.compose.material3:material3-window-size-class", version.ref = "cmp" }
+compose-material3-adaptive-navigation-suite = { module = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite", version.ref = "cmp" }
+native-compose-material3-adaptive-navigation-suite = { module = "love.yinlin.native.compose.material3:material3-adaptive-navigation-suite", version.ref = "cmp" }
+compose-material-ripple = { module = "org.jetbrains.compose.material:material-ripple", version.ref = "cmp" }
+native-compose-material-ripple = { module = "love.yinlin.native.compose.material:material-ripple", version.ref = "cmp" }
+compose-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "compose-adaptive" }
+native-compose-adaptive = { module = "love.yinlin.native.compose.material3.adaptive:adaptive", version.ref = "compose-adaptive" }
+compose-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "compose-adaptive" }
+native-compose-adaptive-layout = { module = "love.yinlin.native.compose.material3.adaptive:adaptive-layout", version.ref = "compose-adaptive" }
+compose-adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "compose-adaptive" }
+native-compose-adaptive-navigation = { module = "love.yinlin.native.compose.material3.adaptive:adaptive-navigation", version.ref = "compose-adaptive" }
+compose-adaptive-navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose-adaptive" }
+native-compose-adaptive-navigation3 = { module = "love.yinlin.native.compose.material3.adaptive:adaptive-navigation3", version.ref = "compose-adaptive" }

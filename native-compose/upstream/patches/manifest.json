@@ -1,0 +1,68 @@
+{
+    "schema": 1,
+    "skiko": {
+        "file": "skiko.patch",
+        "sha256": "5444f667ce88788edfc41b6e7afb193d86560f203afce5779c860ec0cd7ab15b",
+        "sources": {
+            "skiko-upstream": {
+                "repository": "JetBrains/skiko",
+                "ref": "v0.156.0",
+                "commit": "71d1a686fe49bac19ef1767b9bded4800a5a67c5",
+                "sha256": "7e1589bc4b46d5c0752774165257b3727171c330e658fb2d9b6f5f51b2b9048a"
+            },
+            "skiko-reference": {
+                "repository": "brahmkshatriya/skiko-native",
+                "ref": "master",
+                "commit": "85a7cf78045555f885fa774ac6007c6258d2bfb7",
+                "sha256": "9d56d23fa900258dfa6fb40d94d52acf9f8c463e3167d49b5493d95afd87ba12"
+            },
+            "skiko-merge-base": {
+                "repository": "JetBrains/skiko",
+                "ref": "c4b1940eaa73abfcbaa3f3f5d5972ab0ac7b9810",
+                "commit": "c4b1940eaa73abfcbaa3f3f5d5972ab0ac7b9810",
+                "sha256": "a0ba13f7cafdeeb75c788f649eb742f680f360582762497dc8614c88075e4b4c"
+            }
+        },
+        "skia": "m156-24300fbbcb",
+        "skiaAssets": {
+            "windows-Release-x64": "a51a1d52c706129b7c695a3e9ade630758d392a053faac9ae88420ecaea40dbf",
+            "linux-Release-x64": "39c68325dd756c9ecd56d6a9c1fdec0fa03ab9d8dc72e9fa4f23bd1e8a29f551",
+            "macos-Release-arm64": "e1caf783f4d1412759632c6727d7ac3b91670bb5cfb66e45f81de968d27e65ed"
+        },
+        "version": "0.156.0"
+    },
+    "compose": {
+        "file": "compose.patch",
+        "sha256": "57352783644f64656d8f1650c8ab2914e45c1dc3ab8c11139f3dad9408f2d03d",
+        "commit": "bb05011eb10784ada1ec00494f1a710ba6ab6252",
+        "version": "1.13.0-beta01"
+    },
+    "resources": {
+        "file": "resources.patch",
+        "sha256": "3a9381861c16b280d31bfa24d84fea04203080c86a6dc6b7b673d6c0320888c1",
+        "commit": "926b833de872721337612d7ac4629636e9db4d1e",
+        "version": "1.13.0-beta01"
+    },
+    "maven": {
+        "material3": {
+            "file": "material3.patch",
+            "sha256": "26c109842326430498088f78eb88dc3e56da8b848ae9d9d227fbdf474e458c93",
+            "sourceSha256": "368a101dbd036fef583ce3b1563576110b1467e89dc2c3322c0e520a98739d05"
+        },
+        "material-ripple": {
+            "file": "material-ripple.patch",
+            "sha256": "d9f2a5ff5620bde9ae429049569c030d9c7461c7ba7735ad5632366281c219b7",
+            "sourceSha256": "3e00d5744e39008081ca5ff415d29ce94b02fe11de1539164ce21adf8871c42c"
+        },
+        "adaptive-layout": {
+            "file": "adaptive-layout.patch",
+            "sha256": "3c597d20705187358dc020ac17bdf8f78a8d93881e21eafd7c38be534415216d",
+            "sourceSha256": "f6747aa077e5f9b73f3c480692bc81d22a13968da2d8ab2a7410bdb7ef0089a7"
+        },
+        "adaptive-navigation3": {
+            "file": "adaptive-navigation3.patch",
+            "sha256": "c5c7b8f98830047d684810e6aa5ae2f150d94a72461ec87393c2b5213c7b680c",
+            "sourceSha256": "12392143160bde37748ceedc6f0702b6d8047b878835a690102df73c31dcacc2"
+        }
+    }
+}

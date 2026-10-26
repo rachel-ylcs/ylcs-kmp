@@ -5,6 +5,8 @@ plugins {
     `maven-publish`
 }
 
+nativeBridge { skikoTests() }
+
 kotlin {
     sourceSets {
         commonMain.dependencies {

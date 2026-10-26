@@ -1,6 +1,7 @@
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import org.jetbrains.skia.*
@@ -15,7 +16,7 @@ import platform.darwin.NSObject
  * SkiaLayer implementation for macOS.
  * Supports [GraphicsApi.METAL] and [GraphicsApi.OPENGL].
  */
-@OptIn(BetaInteropApi::class)
+@OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 actual open class SkiaLayer {
     private var macosComponent: MacosSkiaLayerComponent? = null
     private var macosRenderer: MacosNativeRenderer? = null

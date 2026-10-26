@@ -8,7 +8,7 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        maven { url = uri(providers.gradleProperty("native.repository").getOrElse("../../vendor/build/compose-ui/assembled-repository")) }
+        maven { url = uri(providers.gradleProperty("native.repository").getOrElse("../../vendor/build/repository")) }
         mavenCentral()
         google()
     }

@@ -1,0 +1,443 @@
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/AppBarDsl.kt b/src/commonMain/kotlin/androidx/compose/material3/AppBarDsl.kt
+index 181cb57..3e55628 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/AppBarDsl.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/AppBarDsl.kt
+@@ -305,7 +305,7 @@ internal class OverflowMeasurePolicy(
+         constraints: Constraints,
+     ): MeasureResult {
+         val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+-        val (contentMeasurables, overflowMeasurables) = measurables
++        val [contentMeasurables, overflowMeasurables] = measurables
+ 
+         overflowState.totalItemCount = contentMeasurables.size
+ 
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/ButtonGroup.kt b/src/commonMain/kotlin/androidx/compose/material3/ButtonGroup.kt
+index 024acbc..7d2bc82 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/ButtonGroup.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/ButtonGroup.kt
+@@ -561,7 +561,7 @@ private class ButtonGroupMeasurePolicy(
+         measurables: List<List<Measurable>>,
+         constraints: Constraints,
+     ): MeasureResult {
+-        val (contentMeasurables, overflowMeasurables) = measurables
++        val [contentMeasurables, overflowMeasurables] = measurables
+         overflowState.totalItemCount = contentMeasurables.size
+         val arrangementSpacingInt = horizontalArrangement.spacing.roundToPx()
+         val arrangementSpacingPx = arrangementSpacingInt.toLong()
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/DatePicker.kt b/src/commonMain/kotlin/androidx/compose/material3/DatePicker.kt
+index 269ea88..e7e5509 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/DatePicker.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/DatePicker.kt
+@@ -1596,11 +1596,11 @@ private fun DatePickerContent(
+     val coroutineScope = rememberCoroutineScope()
+     var yearPickerVisible by rememberSaveable { mutableStateOf(false) }
+     val focusManager = LocalFocusManager.current
+-    val (
++    val [
+         nextButtonFocusRequester,
+         yearSelectionButtonFocusRequester,
+         currentYearFocusRequester,
+-        dividerFocusRequester) =
++        dividerFocusRequester] =
+         remember { FocusRequester.createRefs() }
+     val totalMonths = remember(yearRange) { numberOfMonthsInRange(yearRange) }
+     Column {
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/DateRangePicker.kt b/src/commonMain/kotlin/androidx/compose/material3/DateRangePicker.kt
+index cdbafb0..fd230f3 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/DateRangePicker.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/DateRangePicker.kt
+@@ -135,7 +135,7 @@ public fun DateRangePicker(
+                 createCalendarModel(state.locale)
+             }
+         }
+-    val (topTargetFocusRequester, bottomTargetFocusRequester) =
++    val [topTargetFocusRequester, bottomTargetFocusRequester] =
+         remember { FocusRequester.createRefs() }
+     DateEntryContainer(
+         modifier = modifier,
+@@ -1052,8 +1052,8 @@ internal fun ContentDrawScope.drawRangeBackground(
+     val horizontalSpaceBetweenItems =
+         (this.size.width - DaysInWeek * itemContainerWidth) / DaysInWeek
+ 
+-    val (x1, y1) = selectedRangeInfo.gridStartCoordinates
+-    val (x2, y2) = selectedRangeInfo.gridEndCoordinates
++    val [x1, y1] = selectedRangeInfo.gridStartCoordinates
++    val [x2, y2] = selectedRangeInfo.gridEndCoordinates
+     // The endX and startX are offset to include only half the item's width when dealing with first
+     // and last items in the selection in order to keep the selection edges rounded.
+     var startX =
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/ListItem.kt b/src/commonMain/kotlin/androidx/compose/material3/ListItem.kt
+index 48d314c..f13ff8d 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/ListItem.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/ListItem.kt
+@@ -894,12 +894,12 @@ private class ListItemMeasurePolicy : MultiContentMeasurePolicy {
+         measurables: List<List<Measurable>>,
+         constraints: Constraints,
+     ): MeasureResult {
+-        val (
++        val [
+             headlineMeasurable,
+             overlineMeasurable,
+             supportingMeasurable,
+             leadingMeasurable,
+-            trailingMeasurable) =
++            trailingMeasurable] =
+             measurables
+         var currentTotalWidth = 0
+ 
+@@ -1056,12 +1056,12 @@ private class ListItemMeasurePolicy : MultiContentMeasurePolicy {
+         height: Int,
+         intrinsicMeasure: IntrinsicMeasurable.(height: Int) -> Int,
+     ): Int {
+-        val (
++        val [
+             headlineMeasurable,
+             overlineMeasurable,
+             supportingMeasurable,
+             leadingMeasurable,
+-            trailingMeasurable) =
++            trailingMeasurable] =
+             measurables
+         return calculateWidth(
+             leadingWidth = leadingMeasurable.firstOrNull()?.intrinsicMeasure(height) ?: 0,
+@@ -1079,12 +1079,12 @@ private class ListItemMeasurePolicy : MultiContentMeasurePolicy {
+         width: Int,
+         intrinsicMeasure: IntrinsicMeasurable.(width: Int) -> Int,
+     ): Int {
+-        val (
++        val [
+             headlineMeasurable,
+             overlineMeasurable,
+             supportingMeasurable,
+             leadingMeasurable,
+-            trailingMeasurable) =
++            trailingMeasurable] =
+             measurables
+ 
+         var remainingWidth =
+@@ -1691,13 +1691,13 @@ private class InteractiveListItemMeasurePolicy(
+         measurables: List<List<Measurable>>,
+         constraints: Constraints,
+     ): MeasureResult {
+-        val (
++        val [
+             leadingMeasurable,
+             trailingMeasurable,
+             overlineMeasurable,
+             supportingMeasurable,
+             contentMeasurable,
+-        ) = measurables
++        ] = measurables
+ 
+         val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+         var constraintOffsetX = 0
+@@ -1806,13 +1806,13 @@ private class InteractiveListItemMeasurePolicy(
+         height: Int,
+         intrinsicMeasure: IntrinsicMeasurable.(height: Int) -> Int,
+     ): Int {
+-        val (
++        val [
+             leadingMeasurable,
+             trailingMeasurable,
+             overlineMeasurable,
+             supportingMeasurable,
+             contentMeasurable,
+-        ) = measurables
++        ] = measurables
+ 
+         return calculateWidth(
+             leadingWidth = leadingMeasurable.firstOrNull()?.intrinsicMeasure(height) ?: 0,
+@@ -1829,13 +1829,13 @@ private class InteractiveListItemMeasurePolicy(
+         width: Int,
+         intrinsicMeasure: IntrinsicMeasurable.(width: Int) -> Int,
+     ): Int {
+-        val (
++        val [
+             leadingMeasurable,
+             trailingMeasurable,
+             overlineMeasurable,
+             supportingMeasurable,
+             contentMeasurable,
+-        ) = measurables
++        ] = measurables
+ 
+         var remainingWidth = width
+ 
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/SearchBar.kt b/src/commonMain/kotlin/androidx/compose/material3/SearchBar.kt
+index 7100d22..a9e06cf 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/SearchBar.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/SearchBar.kt
+@@ -565,7 +565,7 @@ private fun AppBarWithSearchImpl(
+     val isContainerTransparent =
+         remember(appBarContainerColor) { appBarContainerColor == Color.Transparent }
+ 
+-    val (targetAppBarContainerColor, targetSearchBarContainerColor) =
++    val [targetAppBarContainerColor, targetSearchBarContainerColor] =
+         remember(
+                 appBarContainerColor,
+                 scrolledAppBarContainerColor,
+@@ -3732,7 +3732,7 @@ private fun DockedSearchBarLayoutImpl(
+         val minHeight = DockedExpandedTableMinHeight.coerceAtMost(maxHeight)
+ 
+         Layout(contents = listOf(inputField, content)) { measurables, baseConstraints ->
+-            val (inputFieldMeasurables, contentMeasurables) = measurables
++            val [inputFieldMeasurables, contentMeasurables] = measurables
+             val constraintMaxHeight =
+                 lerp(
+                     state.collapsedBounds.height,
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/SegmentedButton.kt b/src/commonMain/kotlin/androidx/compose/material3/SegmentedButton.kt
+index 7b7382e..566d314 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/SegmentedButton.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/SegmentedButton.kt
+@@ -415,7 +415,7 @@ internal class SegmentedButtonContentMeasurePolicy(
+         measurables: List<List<Measurable>>,
+         constraints: Constraints,
+     ): MeasureResult {
+-        val (iconMeasurables, contentMeasurables) = measurables
++        val [iconMeasurables, contentMeasurables] = measurables
+         val iconPlaceables = iconMeasurables.fastMap { it.measure(constraints) }
+         val iconWidth = iconPlaceables.fastMaxBy { it.width }?.width ?: 0
+         val contentPlaceables = contentMeasurables.fastMap { it.measure(constraints) }
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/Slider.kt b/src/commonMain/kotlin/androidx/compose/material3/Slider.kt
+index b540559..8bb7286 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/Slider.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/Slider.kt
+@@ -1905,7 +1905,7 @@ public object SliderDefaults {
+                     it > sliderPositions.activeRange.endInclusive ||
+                         it < sliderPositions.activeRange.start
+                 }
+-                .forEach { (outsideFraction, list) ->
++                .forEach { [outsideFraction, list] ->
+                     drawPoints(
+                         list.fastMap { Offset(lerp(sliderStart, sliderEnd, it).x, center.y) },
+                         PointMode.Points,
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/SnackbarHost.kt b/src/commonMain/kotlin/androidx/compose/material3/SnackbarHost.kt
+index 3503ced..8bf901a 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/SnackbarHost.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/SnackbarHost.kt
+@@ -379,7 +379,7 @@ private fun FadeInFadeOutWithScale(
+     }
+     Box(modifier) {
+         state.scope = currentRecomposeScope
+-        state.items.fastForEach { (item, opacity) -> key(item) { opacity { content(item!!) } } }
++        state.items.fastForEach { [item, opacity] -> key(item) { opacity { content(item!!) } } }
+     }
+ }
+ 
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/TabRow.kt b/src/commonMain/kotlin/androidx/compose/material3/TabRow.kt
+index c84cf81..8c11f59 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/TabRow.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/TabRow.kt
+@@ -439,7 +439,7 @@ private fun TabRowImpl(
+         Layout(
+             modifier = Modifier.fillMaxWidth(),
+             contents = listOf(tabs, divider, { scope.indicator() }),
+-        ) { (tabMeasurables, dividerMeasurables, indicatorMeasurables), constraints ->
++        ) { [tabMeasurables, dividerMeasurables, indicatorMeasurables], constraints ->
+             val tabRowWidth = constraints.maxWidth
+             val tabCount = tabMeasurables.size
+             var tabWidth = 0
+@@ -575,7 +575,7 @@ private fun ScrollableTabRowImpl(
+                         .horizontalScroll(scrollState)
+                         .selectableGroup()
+                         .clipToBounds(),
+-            ) { (tabMeasurables, indicatorMeasurables), constraints ->
++            ) { [tabMeasurables, indicatorMeasurables], constraints ->
+                 val padding = edgePadding.roundToPx()
+                 val tabCount = tabMeasurables.size
+                 val layoutHeight =
+diff --git a/src/commonMain/kotlin/androidx/compose/material3/internal/DraggableAnchors.kt b/src/commonMain/kotlin/androidx/compose/material3/internal/DraggableAnchors.kt
+index ff3989c..a0c2ad4 100644
+--- a/src/commonMain/kotlin/androidx/compose/material3/internal/DraggableAnchors.kt
++++ b/src/commonMain/kotlin/androidx/compose/material3/internal/DraggableAnchors.kt
+@@ -139,7 +139,7 @@ private class DraggableAnchorsNode<T>(
+         // update the anchors in the main pass.
+         if (!isLookingAhead || !didInitializeAnchors) {
+             val size = IntSize(placeable.width, placeable.height)
+-            val (newAnchors, suggestedTarget) = anchors(size, constraints)
++            val [newAnchors, suggestedTarget] = anchors(size, constraints)
+             state.updateAnchors(newAnchors, suggestedTarget)
+             didInitializeAnchors = true
+         }
+diff --git a/src/darwinMain/kotlin/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt b/src/darwinMain/kotlin/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt
+deleted file mode 100644
+index e48b1d2..0000000
+--- a/src/darwinMain/kotlin/androidx/compose/material3/internal/PlatformDateFormat.darwin.kt
++++ /dev/null
+@@ -1,146 +0,0 @@
+-/*
+- * Copyright 2024 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-@file:OptIn(ExperimentalTime::class)
+-
+-package androidx.compose.material3.internal
+-
+-import androidx.compose.material3.CalendarLocale
+-import kotlin.time.ExperimentalTime
+-import kotlin.time.Instant
+-import kotlinx.datetime.TimeZone
+-import kotlinx.datetime.toNSTimeZone
+-import platform.Foundation.NSCalendar
+-import platform.Foundation.NSDate
+-import platform.Foundation.NSDateFormatter
+-import platform.Foundation.NSDateFormatterShortStyle
+-import platform.Foundation.dateWithTimeIntervalSince1970
+-import platform.Foundation.localeIdentifier
+-import platform.Foundation.timeIntervalSince1970
+-
+-internal actual class PlatformDateFormat actual constructor(private val locale: CalendarLocale) {
+-
+-    private val baseDateFormatter by lazy {
+-        createBaseFormatter()
+-    }
+-
+-    private val shortDateFormatter by lazy {
+-        NSDateFormatter().apply {
+-            setLocale(this@PlatformDateFormat.locale)
+-            setDateStyle(NSDateFormatterShortStyle)
+-        }
+-    }
+-
+-    actual val firstDayOfWeek: Int
+-        get() = firstDayOfWeek()
+-
+-    actual fun formatWithPattern(
+-        utcTimeMillis: Long,
+-        pattern: String,
+-        cache: MutableMap<String, Any>
+-    ): String {
+-        val nsDate = NSDate.dateWithTimeIntervalSince1970(utcTimeMillis / 1000.0)
+-
+-        return getCachedDateFormatterForPattern(pattern = pattern, useLocale = true, cache = cache).stringFromDate(nsDate)
+-    }
+-
+-    actual fun formatWithSkeleton(
+-        utcTimeMillis: Long,
+-        skeleton: String,
+-        cache: MutableMap<String, Any>
+-    ): String {
+-        val nsDate = NSDate.dateWithTimeIntervalSince1970(utcTimeMillis / 1000.0)
+-
+-        return getCachedDateFormatterForSkeleton(skeleton = skeleton, cache = cache).stringFromDate(nsDate)
+-    }
+-
+-    actual fun parse(
+-        date: String,
+-        pattern: String,
+-        locale: CalendarLocale,
+-        cache: MutableMap<String, Any>
+-    ): CalendarDate? {
+-        // TODO https://youtrack.jetbrains.com/issue/CMP-7146/Properly-use-locale-in-CalendarModel.parse-implementations
+-        val nsDate = getCachedDateFormatterForPattern(pattern = pattern, useLocale = false, cache = cache).dateFromString(date) ?: return null
+-
+-        return Instant
+-            .fromEpochMilliseconds((nsDate.timeIntervalSince1970 * 1000).toLong())
+-            .toCalendarDate(TimeZone.UTC)
+-    }
+-
+-    actual fun getDateInputFormat(): DateInputFormat {
+-        val pattern = shortDateFormatter.dateFormat
+-
+-        return datePatternAsInputFormat(pattern)
+-    }
+-
+-    @Suppress("UNCHECKED_CAST")
+-    actual val weekdayNames: List<Pair<String, String>> get() {
+-        val formatter = baseDateFormatter
+-
+-        val fromSundayToSaturday = formatter.standaloneWeekdaySymbols
+-            .zip(formatter.veryShortStandaloneWeekdaySymbols) as List<Pair<String, String>>
+-
+-        return fromSundayToSaturday.drop(1) + fromSundayToSaturday.first()
+-    }
+-
+-    private fun firstDayOfWeek(): Int {
+-        return (NSCalendar.currentCalendar.firstWeekday.toInt() - 1).takeIf { it > 0 } ?: 7
+-    }
+-
+-    // See http://www.unicode.org/reports/tr35/tr35-31/tr35-dates.html#Date_Format_Patterns
+-    //
+-    // 'j' template requests the preferred hour format for the locale.
+-    // 'a' is a pattern for AM\PM symbol. Presence of this symbol means that locale has 12h format.
+-    actual fun is24HourFormat(): Boolean {
+-        return NSDateFormatter
+-            .dateFormatFromTemplate("j", 0UL, locale)
+-            ?.contains('a') == false
+-    }
+-
+-    private fun getCachedDateFormatterForSkeleton(
+-        skeleton: String,
+-        cache: MutableMap<String, Any>
+-    ): NSDateFormatter {
+-        return cache.getOrPut("S:$skeleton${this@PlatformDateFormat.locale.localeIdentifier}") {
+-            createBaseFormatter().apply {
+-                setLocalizedDateFormatFromTemplate(skeleton)
+-            }
+-        } as NSDateFormatter
+-    }
+-
+-    private fun getCachedDateFormatterForPattern(
+-        pattern: String,
+-        useLocale: Boolean,
+-        cache: MutableMap<String, Any>
+-    ): NSDateFormatter {
+-        val localeKey = if (useLocale) this@PlatformDateFormat.locale.localeIdentifier else "NO_LOC"
+-        return cache.getOrPut("P:$pattern:$localeKey") {
+-            createBaseFormatter(useLocale).apply {
+-                setDateFormat(pattern)
+-            }
+-        } as NSDateFormatter
+-    }
+-
+-    private fun createBaseFormatter(useLocale: Boolean = true): NSDateFormatter {
+-        return NSDateFormatter().apply {
+-            setTimeZone(TimeZone.UTC.toNSTimeZone())
+-            if (useLocale) {
+-                setLocale(this@PlatformDateFormat.locale)
+-            }
+-        }
+-    }
+-}
+diff --git a/src/nonJvmMain/kotlin/androidx/compose/material3/CalendarLocale.nonJvm.kt b/src/nonJvmMain/kotlin/androidx/compose/material3/CalendarLocale.nonJvm.kt
+deleted file mode 100644
+index 48147da..0000000
+--- a/src/nonJvmMain/kotlin/androidx/compose/material3/CalendarLocale.nonJvm.kt
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/*
+- * Copyright 2023 The Android Open Source Project
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package androidx.compose.material3
+-
+-internal actual fun Int.toLocalString(
+-    minDigits: Int,
+-    maxDigits: Int,
+-    isGroupingUsed: Boolean,
+-    locale: CalendarLocale?,
+-): String = toString().padStart(minDigits, '0')
