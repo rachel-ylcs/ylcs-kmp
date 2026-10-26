@@ -218,7 +218,7 @@ native-compose-animation-graphics = { module = "love.yinlin.native.compose.anima
 native-compose-resources = { module = "love.yinlin.native.compose.components:components-resources", version.ref = "cmp" }
 
 # Material3 and Adaptive
-androidx-window-core = { module = "org.jetbrains.androidx.window:window-core", version = "1.5.1" }
+androidx-window-core = { module = "androidx.window:window-core", version = "1.5.1" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }
 native-compose-material3 = { module = "love.yinlin.native.compose.material3:material3", version.ref = "cmp" }
 compose-material3-ripple = { module = "org.jetbrains.compose.material3:material3-ripple", version.ref = "cmp" }
