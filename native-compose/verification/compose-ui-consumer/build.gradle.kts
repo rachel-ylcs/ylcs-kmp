@@ -21,6 +21,7 @@ kotlin {
         commonMain.dependencies {
             if (explicit) {
                 implementation(libs.native.compose.foundation.asProvider())
+                implementation(libs.native.compose.adaptive.navigation)
                 implementation(libs.native.compose.resources)
                 implementation(libs.native.compose.animation.graphics)
                 implementation(libs.native.androidx.navigation3)
@@ -28,6 +29,7 @@ kotlin {
             }
             else {
                 implementation(libs.compose.foundation)
+                implementation(libs.compose.adaptive.navigation)
                 implementation(libs.compose.resources)
                 implementation("org.jetbrains.compose.animation:animation-graphics:${libs.versions.cmp.get()}")
                 implementation(libs.androidx.navigation3.asProvider())
