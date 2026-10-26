@@ -50,14 +50,22 @@ class NativeBridgePlugin : Plugin<Project> {
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             val kotlin = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
             configureReport(project, kotlin, bridge)
+            NativePortDependencyAudit.configure(project, kotlin, bridge) { sourceProperty(project, "source", it) as? ComponentSelector }
             configureRedirects(project, kotlin, bridge)
             project.afterEvaluate {
                 bridge.redirects.forEach(NativeDependencyRule::validate)
+                val ownedRules = compatibility.getProperty("compose.ui.modules").split(',').map { "compose-$it" } + listOf("skiko-core", "skiko-skottie")
+                for (name in ownedRules) {
+                    val rule = bridge.redirects.getByName(name)
+                    require("macos_arm64" in rule.targets.get() && "macos_arm64" in rule.metadataTargets.get()) { "$name: macOS is an owned Native target; official artifact fallback is disabled" }
+                    if (rule.module.isPresent) require(rule.module.get().substringBefore(':') != rule.upstream.get().substringBefore(':')) { "$name: an owned port cannot redirect back to the official Maven group" }
+                }
                 if (bridge.skikoTestRuntimeEnabled.get()) SkikoTestRuntime.configure(project, bridge)
                 if (application.enabled.get()) {
                     SkikoApplicationDependencies.configure(project, application, bridge)
                     configureApplication(project, kotlin, application)
                 }
+                else ComposeApplicationResources.configure(project, kotlin)
             }
         }
     }
@@ -115,7 +123,7 @@ class NativeBridgePlugin : Plugin<Project> {
                     val target = configuration.attributes.getAttribute(targetAttribute)
                     val platform = configuration.attributes.getAttribute(KotlinPlatformType.attribute)
                     val rules = bridge.redirects.filter { rule ->
-                        rule.upstream.get() == "${requested.group}:${requested.module}" && when {
+                        rule.matchesUpstream(requested.group, requested.module, target) && when {
                             target != null -> target in rule.targets.get()
                             metadataTargets[configuration.name] != null ->
                                 metadataTargets.getValue(configuration.name).all { it in rule.metadataTargets.get() }
@@ -203,6 +211,7 @@ class NativeBridgePlugin : Plugin<Project> {
             target.binaries.withType(Executable::class.java).configureEach {
                 val binary = this
                 val suffix = target.name.replaceFirstChar(Char::uppercase) + binary.name.replaceFirstChar(Char::uppercase)
+                val composeResources = ComposeApplicationResources.register(project, target, binary, suffix)
                 val stage = project.tasks.register("stage$suffix", Sync::class.java) {
                     group = "native application"
                     description = "Stage ${target.konanTarget.name} ${binary.name} with its runtime files"
@@ -216,6 +225,7 @@ class NativeBridgePlugin : Plugin<Project> {
                         from(configuration) { rename { filename } }
                     }
                     from(application.resources)
+                    if (composeResources != null) from(composeResources) { into("composeResources") }
                     duplicatesStrategy = DuplicatesStrategy.FAIL
                     into(project.layout.buildDirectory.dir("nativeApplication/${target.name}/${binary.name}"))
                     doFirst {

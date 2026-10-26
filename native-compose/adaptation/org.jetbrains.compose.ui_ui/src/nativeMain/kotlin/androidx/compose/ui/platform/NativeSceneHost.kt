@@ -3,6 +3,10 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.LocalSystemTheme
+import androidx.compose.ui.asComposeSystemTheme
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.geometry.Offset
@@ -12,6 +16,7 @@ import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.scene.CanvasLayersComposeScene
 import androidx.compose.ui.scene.ComposeScene
 import androidx.compose.ui.scene.SingleComposeSceneRenderingScope
+import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toDpSize
@@ -22,6 +27,7 @@ import androidx.navigationevent.DirectNavigationEventInput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.jetbrains.skia.Canvas
+import org.jetbrains.skiko.window.NativeDesktop
 import org.jetbrains.skiko.window.NativeWindowCursor
 import org.jetbrains.skiko.window.NativeWindowEvent
 import org.jetbrains.skiko.window.NativeWindowScope
@@ -39,6 +45,8 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
     private val recomposer: FrameRecomposer
     private val scene: ComposeScene
     private val drops = mutableListOf<NativeWindowEvent.Drop>()
+    private val systemTheme = mutableStateOf(NativeDesktop.systemTheme().asComposeSystemTheme())
+    private val locales = mutableStateOf(LocaleList.current)
     private var closed = false
     @Volatile
     private var window: NativeWindowScope? = null
@@ -46,6 +54,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
     private val platform = object : PlatformContext.Empty() {
         override val architectureComponentsOwner: PlatformArchitectureComponentsOwner get() = owner
         override val windowInfo: WindowInfo get() = info
+        override val localeList: LocaleList get() = locales.value
         override val taskDispatchers: TaskDispatchers = object : TaskDispatchers {
             override val Default = Dispatchers.Default
             override val IO = Dispatchers.IO
@@ -88,6 +97,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         this.window = window
         dispatcher.wake = window::invalidate
         textInput.attach(window)
+        refreshEnvironment()
         info.isWindowFocused = true
         updateGeometry(window.pixelWidth, window.pixelHeight)
         owner.setLifecycleState(Lifecycle.State.RESUMED)
@@ -96,7 +106,9 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
 
     fun setContent(content: @Composable () -> Unit) {
         check(!closed)
-        scene.setContent(content = content)
+        scene.setContent {
+            CompositionLocalProvider(LocalSystemTheme provides systemTheme.value, content = content)
+        }
     }
 
     fun render(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
@@ -116,8 +128,10 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         dispatcher.runCurrent()
         when (event) {
             NativeWindowEvent.CloseRequested -> if (onCloseRequest()) window?.close()
+            NativeWindowEvent.EnvironmentChanged -> refreshEnvironment()
             is NativeWindowEvent.Focus -> {
                 info.isWindowFocused = event.focused
+                if (event.focused) refreshEnvironment()
                 if (!event.focused) {
                     scene.cancelPointerInput()
                     info.keyboardModifiers = PointerKeyboardModifiers()
@@ -192,6 +206,12 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
 
     private fun invalidate() {
         window?.invalidate()
+    }
+
+    private fun refreshEnvironment() {
+        systemTheme.value = NativeDesktop.systemTheme().asComposeSystemTheme()
+        val preferred = NativeDesktop.preferredLocales()
+        locales.value = if (preferred.isEmpty()) LocaleList.current else LocaleList(preferred.joinToString(","))
     }
 
     private fun updateGeometry(width: Int, height: Int) {

@@ -210,3 +210,4 @@ native-compose-foundation-layout = { module = "love.yinlin.native.compose.founda
 native-compose-animation = { module = "love.yinlin.native.compose.animation:animation", version.ref = "cmp" }
 native-compose-animation-core = { module = "love.yinlin.native.compose.animation:animation-core", version.ref = "cmp" }
 native-compose-animation-graphics = { module = "love.yinlin.native.compose.animation:animation-graphics", version.ref = "cmp" }
+native-compose-resources = { module = "love.yinlin.native.compose.components:components-resources", version.ref = "cmp" }

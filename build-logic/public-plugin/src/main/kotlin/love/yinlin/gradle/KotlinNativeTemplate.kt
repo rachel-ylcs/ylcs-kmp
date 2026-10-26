@@ -2,6 +2,9 @@ package love.yinlin.gradle
 
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.findByType
+import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -62,6 +65,13 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
             KotlinNativeSourceSetsScope(this@build, extension, sourceSets).source()
 
             action()
+        }
+
+        if (hasKMPResources) {
+            extensions.findByType<ComposeExtension>()?.extensions?.findByType<ResourcesExtension>()?.apply {
+                publicResClass = true
+                packageOfResClass = "$uniqueSafeModuleName.resources"
+            }
         }
 
         configureActions()

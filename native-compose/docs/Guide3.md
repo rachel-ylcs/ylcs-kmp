@@ -4,7 +4,7 @@
 
 工作区：D:\Rachel\ylcs\ylcs-kmp。
 
-后续进展已更新于本文第 14 节：主 UI 阶段完成后，用户已授权继续 Foundation/Animation；本轮只构建，不测试或运行 CI。第 1、13 节的暂停要求和 WIP 状态属于更早阶段，请以第 14 节、STATUS.md 与 VALIDATION.md 为当前接续依据。
+后续进展已更新于本文第 14 至 16 节：主 UI、Foundation/Animation 与 Resources 之后，用户明确本目录全部已移植工件在 macOS 也由本项目接管，并要求核验实现。第 1、13 节的暂停要求和 WIP 状态属于更早阶段，请以第 16 节、STATUS.md 与 VALIDATION.md 为当前接续依据。
 
 本文汇总本会话从最初 Skiko 讨论到 AndroidX 依赖整理的全部关键需求、决策、实现进度、故障经验和未完成事项，用于下一对话窗口接续。它是交接摘要，不是逐字聊天导出。历史验证、用户反馈、当前源码和待验证推断分别记录；未实际执行的检查不得写成通过。
 
@@ -689,4 +689,30 @@ Git 只读检查可使用：
 - 本轮没有执行测试、程序运行、CI 或 Maven 发布，没有修改 workflow、ciModules 和上一阶段测试契约；未提交或推送。
 
 接下来由用户验证新增五模块及预览，特别是 Linux/macOS 编译、三平台 IME/菜单/滚动/动画、Maven 元数据与独立消费。基础层通过后再推进 Rachel Compose 与业务模块。保留本文原有的窗口/无障碍/拖出/正式发行等后续边界，不能从 Windows 构建推断全平台行为通过。
+
+## 15. 后续进展：Resources
+
+2026-10-26，用户报告上一阶段 CI 已通过，要求核查并移植 compose:resources，包括 composeResources 的识别、复制及运行时读取。
+
+- 官方运行时位于另一个仓库 JetBrains/compose-multiplatform 的 components/resources/library，已锁定 CMP 对应提交。Windows/Linux 没有官方变体，macOS 可执行 reader 仍依赖源码路径回退。
+- 已加入第十四个模块 components-resources，保留 org.jetbrains.compose.resources API 与官方 KLIB 身份；Native Maven group 为 love.yinlin.native.compose.components。
+- 运行时复用 common/Skiko/blocking/native 实现，补齐跨平台文件读取、URI、系统环境、同步与 VectorDrawable DOM。SDL 外部 ABI 仅进入叶子 fragment，保持共享元数据可编译。
+- 识别目录、生成 Res、转换 .cvr、资源变体发布及传递解析继续由官方 Compose/KGP 插件完成，Native 桥把解析结果同步到 EXE 旁，再进入 stage/run/package。
+- Native DSL 的 Res 包名与导出约定已与 multiplatform DSL 对齐。APP 使用正常 libs.compose.foundation、libs.compose.resources 和 composeMultiplatform 插件，没有 Provider 或 SDL 构建配置。
+- 预览新增“资源”页；本机已构建 Windows KLIB、共享元数据与资源 APP/ZIP，并核对六个资源在二进制、暂存目录和 ZIP 中一致。
+- 本轮未执行程序、测试、CI、Maven 发布或独立消费，没有修改 workflow/ciModules，未提交或推送。上一阶段 CI 是用户报告，未在本轮独立查询远程日志。
+
+实现和构建命令见 COMPOSE_RESOURCES.md，最终日志与验证边界见 VALIDATION.md。下一步由用户验收 Linux/macOS、资源读取与图片/字体等行为、搬移运行及跨模块 Maven 资源消费，再推进 Rachel 上层模块。
+
+## 16. macOS 所有移植工件接管与核验
+
+用户确认范围为 native-compose 下全部已移植工件，即十四个 Compose 工件与 Skiko/Skottie，共十六个；Runtime、Lifecycle 等尚未移植的基础依赖继续按原方案复用。
+这些工件此前已有 macosArm64 重定向，本轮将其固化为 ownedTargets/桥插件约束，补齐显式 *-macosarm64 请求的重定向，并新增实际解析图核验任务 verifyNativePortDependencies。
+
+源码核验发现官方 macOS 拖放数据、剪贴板 metadata、复制快捷键及宿主生命周期等未完成路径；活动源集已使用本项目共享 Native/SDL 实现替代。
+官方和锁定社区 Skiko 的 isShowing 都仍固定 true，本轮已修正自有 macOS 实现，并让 pixelGeometry 读取宿主提供值。源码与兼容边界见 MACOS_AUDIT.md。
+
+Windows 上临时向 macosMain 加入十六个主坐标和十六个 Native 叶子坐标，实际解析全部指向自有源码项目；正常 Windows/Linux APP 图各核对十四个实际端口依赖。Windows 编译通过。
+没有把解析图通过记作 macOS 编译/运行通过。共享 Native reachabilityBarrier、指针数组转换、二维路径动画、完整动态主题刷新及原有无障碍/互操作等限制仍保留并明确记录。
+本轮未运行测试、APP、CI 或 Maven 发布，没有修改 workflow/ciModules，未提交或推送。
 

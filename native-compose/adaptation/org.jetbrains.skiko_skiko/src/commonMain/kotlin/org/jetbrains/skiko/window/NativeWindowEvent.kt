@@ -4,6 +4,8 @@ package org.jetbrains.skiko.window
 sealed interface NativeWindowEvent {
     data object CloseRequested : NativeWindowEvent
     data class Focus(val focused: Boolean) : NativeWindowEvent
+    /** System theme, locale preferences or display scale changed; refresh host environment state. */
+    data object EnvironmentChanged : NativeWindowEvent
     data class Key(val scanCode: Int, val codePoint: Int, val down: Boolean, val repeat: Boolean, val modifiers: Int) : NativeWindowEvent
     data class Pointer(val kind: Kind, val x: Float, val y: Float, val buttons: Int, val button: Int = 0, val scrollX: Float = 0f, val scrollY: Float = 0f, val modifiers: Int = 0) : NativeWindowEvent {
         enum class Kind { MOVE, PRESS, RELEASE, SCROLL, ENTER, EXIT }

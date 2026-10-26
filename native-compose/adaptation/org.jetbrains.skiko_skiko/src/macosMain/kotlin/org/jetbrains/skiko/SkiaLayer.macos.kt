@@ -23,7 +23,11 @@ actual open class SkiaLayer {
     private var macosRenderWaitsForVsync = true
 
     fun isShowing(): Boolean {
-        return true
+        macosComponent?.let { return it.isShowing }
+        if (!this::nsView.isInitialized) return false
+        val window = nsView.window ?: return false
+        // MetalRedrawer handles occlusion throttling separately; a covered window is still showing.
+        return window.visible && !window.miniaturized && !nsView.hiddenOrHasHiddenAncestor
     }
 
     /**
@@ -35,7 +39,7 @@ actual open class SkiaLayer {
     actual var renderApi: GraphicsApi = GraphicsApi.METAL
         set(value) {
             if (value != GraphicsApi.METAL && value != GraphicsApi.OPENGL) {
-                throw IllegalArgumentException("$field is not supported in macOS")
+                throw IllegalArgumentException("$value is not supported in macOS")
             }
             if (macosComponent != null && value != field) {
                 throw IllegalStateException("The macOS native renderer cannot be changed after attach")
@@ -51,7 +55,7 @@ actual open class SkiaLayer {
     else 1.0f
 
     /**
-     * Fullscreen is not supported
+     * Fullscreen follows the attached Native host. An NSView-only attachment does not own its window.
      */
     actual var fullscreen: Boolean
         get() = macosComponent?.fullscreen ?: false
@@ -279,7 +283,7 @@ actual open class SkiaLayer {
         }
     }
 
-    actual val pixelGeometry: PixelGeometry get() = PixelGeometry.UNKNOWN
+    actual val pixelGeometry: PixelGeometry get() = macosComponent?.pixelGeometry ?: PixelGeometry.UNKNOWN
 
     private fun createDrawScope() = LayerDrawScope(
         pixelGeometry = pixelGeometry,

@@ -21,6 +21,7 @@ internal class MacosGpuRenderer(private val window: COpaquePointer, draw: (Canva
     override val drawableWidth: Int get() = geometry.width
     override val drawableHeight: Int get() = geometry.height
     override val contentScale: Float get() = geometry.scale
+    override val isShowing: Boolean get() = geometry.isShowing
     override var fullscreen: Boolean
         get() = geometry.fullscreen
         set(value) { geometry.fullscreen = value }

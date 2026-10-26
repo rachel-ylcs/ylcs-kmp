@@ -14,6 +14,8 @@ internal class SdlWindowEvents(private val window: COpaquePointer, private val s
         when (event.type) {
             SDL_EVENT_QUIT, SDL_EVENT_WINDOW_CLOSE_REQUESTED -> send(NativeWindowEvent.CloseRequested)
             SDL_EVENT_WINDOW_FOCUS_GAINED -> send(NativeWindowEvent.Focus(true))
+            SDL_EVENT_SYSTEM_THEME_CHANGED, SDL_EVENT_LOCALE_CHANGED, SDL_EVENT_WINDOW_DISPLAY_CHANGED,
+            SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED, SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED -> send(NativeWindowEvent.EnvironmentChanged)
             SDL_EVENT_WINDOW_FOCUS_LOST -> {
                 buttons = 0
                 send(NativeWindowEvent.Focus(false))

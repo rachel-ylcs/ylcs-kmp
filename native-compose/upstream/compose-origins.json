@@ -168,6 +168,42 @@
         "adaptation/org.jetbrains.compose.foundation_foundation/src/nativeMain/kotlin/androidx/compose/foundation/content/TransferableContent.native.kt": {
             "source": "compose/foundation/foundation/src/skikoMain/kotlin/androidx/compose/foundation/content/TransferableContent.skiko.kt",
             "description": "Replaces the upstream throwing/false receive-content placeholders with MIME-aware clipboard metadata and owned plain text."
+        },
+        "adaptation/org.jetbrains.compose.components_components-resources/src/nativeMain/kotlin/org/jetbrains/compose/resources/vector/xmldom/DomXmlParser.native.kt": {
+            "repository": "brahmkshatriya/compose-native",
+            "commit": "660fda7cbad94ba05870aee4f7be9b8e5e224972",
+            "source": "compose/components/components-resources/src/desktopNativeMain/kotlin/org/jetbrains/compose/resources/vector/xmldom/DomXmlParser.desktopNative.kt",
+            "description": "Portable VectorDrawable XML DOM derived from the community Native implementation; bounds nesting, rejects DTD, preserves supplementary Unicode references and unprefixed attribute namespaces."
+        },
+        "adaptation/org.jetbrains.compose.components_components-resources/src/nativeMain/kotlin/org/jetbrains/compose/resources/ResourceLock.native.kt": {
+            "repository": "JetBrains/compose-multiplatform",
+            "commit": "926b833de872721337612d7ac4629636e9db4d1e",
+            "source": "components/resources/library/src/nativeMain/kotlin/org/jetbrains/compose/resources/ResourceLock.native.kt",
+            "description": "Replaces the deprecated atomic spin-lock actual with the same atomicfu synchronization primitive used by Native UI."
+        },
+        "adaptation/org.jetbrains.compose.components_components-resources/src/nativeMain/kotlin/org/jetbrains/compose/resources/ResourceReader.native.kt": {
+            "repository": "JetBrains/compose-multiplatform",
+            "commit": "926b833de872721337612d7ac4629636e9db4d1e",
+            "source": "components/resources/library/src/macosMain/kotlin/org/jetbrains/compose/resources/ResourceReader.macos.kt",
+            "description": "Implements the shared ResourceReader contract against an executable-relative deployed tree, with MIME-independent owned bytes, bounded range reads, path validation and percent-encoded file URIs."
+        },
+        "adaptation/org.jetbrains.compose.components_components-resources/src/nativeMain/kotlin/org/jetbrains/compose/resources/ResourceEnvironment.native.kt": {
+            "repository": "JetBrains/compose-multiplatform",
+            "commit": "926b833de872721337612d7ac4629636e9db4d1e",
+            "source": "components/resources/library/src/macosMain/kotlin/org/jetbrains/compose/resources/ResourceEnvironment.macos.kt",
+            "description": "Uses the host's SDL locale preferences and system theme cache with initialized SDL display scale; the common resource environment reads observable LocalLocale."
+        },
+        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/MotionPathValuesHolder.kt": {
+            "source": "compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt",
+            "description": "Completes the upstream 2D motion holder branch with axis projections, whole-path easing and duration-based specs compatible with repeats, reversal and sequential animators."
+        },
+        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/MotionPath.kt": {
+            "source": "compose/ui/ui-graphics/src/commonMain/kotlin/androidx/compose/ui/graphics/PathMeasure.kt",
+            "description": "Samples individual path contours into bounded immutable distance tables so active animations neither share mutable native measures nor join discontinuous contours."
+        },
+        "adaptation/org.jetbrains.compose.animation_animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/PathAnimatorFraction.kt": {
+            "source": "compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt",
+            "description": "Calculates clamped path morph progress in constant time, including zero duration, exact repeat endpoints and reverse repeats."
         }
     }
 }

@@ -31,4 +31,18 @@ abstract class NativeDependencyRule @Inject constructor(private val ruleName: St
         require(module.isPresent.xor(projectPath.isPresent)) { "$name: choose module OR projectPath" }
         if (module.isPresent) require(module.get().split(':').size == 3) { "$name: module must be group:artifact:version" }
     }
+
+    /** Native leaf coordinates must follow the same route as the ordinary KMP root request. */
+    internal fun matchesUpstream(group: String, artifact: String, target: String?): Boolean {
+        val coordinate = upstream.get().split(':')
+        if (coordinate[0] != group) return false
+        if (coordinate[1] == artifact) return true
+        val suffix = when (target) {
+            "mingw_x64" -> "mingwx64"
+            "linux_x64" -> "linuxx64"
+            "macos_arm64" -> "macosarm64"
+            else -> return false
+        }
+        return artifact == "${coordinate[1]}-$suffix"
+    }
 }

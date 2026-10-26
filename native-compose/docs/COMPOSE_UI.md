@@ -22,7 +22,7 @@ Navigation3 UI 保留 JetBrains 坐标，当前没有纳入本轮移植。
 
 - adaptation/org.jetbrains.compose.ui_<artifact>/ 保存提交的构建脚本、自有实现与单元测试。
 - vendor/compose/workspace/ 为唯一锁定稀疏 checkout；不手工修改。
-- vendor/compose/workspace/native-desktop/ 为生成的 Compose Gradle included build；当前已从八个 UI 模块扩展至十三模块。
+- vendor/compose/workspace/native-desktop/ 为生成的 Compose Gradle included build；当前已从八个 UI 模块扩展至十四模块，包含 Foundation/Animation 与 Resources。
 - scripts/compose_adapt.py 记录可重现的源码改动并检测漂移；compose-origins.json 记录派生来源。
 - 不编译 StubsMain；替代 actual 对应的原文件从准备工作区移除，让 Gradle 和 IDEA 看到同一份定义。
 - skikoMain 位于 commonMain 与 nativeMain 之间，保留 expect/actual fragment 边界。

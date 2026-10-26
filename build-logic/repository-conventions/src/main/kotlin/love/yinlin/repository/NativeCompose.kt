@@ -29,6 +29,7 @@ fun Settings.nativeCompose() {
                 includeGroup("love.yinlin.native.compose.ui")
                 includeGroup("love.yinlin.native.compose.foundation")
                 includeGroup("love.yinlin.native.compose.animation")
+                includeGroup("love.yinlin.native.compose.components")
             }
         }
     }

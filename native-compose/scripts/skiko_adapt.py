@@ -98,6 +98,37 @@ def adapt_kotlin_sources(root: Path):
         text = replace_once(text, f"getPtr({name}) as InteropPointer", f"getPtr({name})")
     path.write_text(text, encoding="utf-8", newline="\n")
 
+    adapt_readonly_iterators(sources)
+
+
+def adapt_readonly_iterators(sources: Path):
+    """Keep immutable native cursors source-compatible without advertising mutable storage."""
+    common = sources / "commonMain/kotlin/org/jetbrains/skia"
+    names = ["shaper/TrivialBidiRunIterator", "shaper/TrivialScriptRunIterator", "shaper/TrivialLanguageRunIterator",
+             "shaper/TrivialFontRunIterator", "shaper/HbIcuScriptRunIterator", "shaper/IcuBidiRunIterator",
+             "shaper/FontMgrRunIterator", "PathSegmentIterator"]
+    for name in names:
+        path = common / f"{name}.kt"
+        text = replace_once(path.read_text(encoding="utf-8"), '        TODO("Not yet implemented")',
+                            '        throw UnsupportedOperationException("Native run and path iterators are read-only")')
+        if name.startswith("shaper/Trivial"):
+            text = replace_once(text, "        _atEnd = true", "        if (_atEnd) throw NoSuchElementException()\n        _atEnd = true")
+        elif name.startswith("shaper/"):
+            text = replace_once(text, "            _nConsume(_ptr)", "            if (!hasNext()) throw NoSuchElementException()\n            _nConsume(_ptr)")
+        path.write_text(text, encoding="utf-8", newline="\n")
+
+    # C++ consumes the borrowed UTF-8 buffer and dereferences it when converting run indices.
+    # Always retain it; the ownership flag controls closing, not reachability or the pointer value.
+    for name in ["ManagedRunIterator", "TextBlobBuilderRunHandler"]:
+        path = common / f"shaper/{name}.kt"
+        text = replace_once(path.read_text(encoding="utf-8"), "    internal val _text: ManagedString?",
+                            "    private val ownsText = manageText\n    internal val _text: ManagedString?")
+        text = replace_once(text, "        _text?.close()", "        if (ownsText) _text?.close()")
+        text = replace_once(text, "        _text = if (manageText) text else null", "        _text = text")
+        if name == "TextBlobBuilderRunHandler":
+            text = replace_once(text, "        // TODO [pavel.sergeev] what `manageText` == false is actually mean?\n", "")
+        path.write_text(text, encoding="utf-8", newline="\n")
+
 
 def prepare_notices(root: Path, lock, own_root: Path):
     """Keep source publication notices derived from the audited inputs."""

@@ -141,6 +141,10 @@ Compose 的库源码按 upstream/compose.json 显式选择；不执行上游 And
 库内测试保存在对应模块的 src/commonTest 或 src/nativeTest；预览只保存在 ylcs-app/native-compose。
 Skiko 已有 6 项回归从旧 samples 迁入 Core/Skottie，单独的 regression test run 保留上游测试边界。
 UI 阶段源码审计与共享元数据覆盖见 [COMPOSE_UI.md](COMPOSE_UI.md)；Foundation/Animation 的源集、依赖与新增适配见 [FOUNDATION_ANIMATION.md](FOUNDATION_ANIMATION.md)。
+Resources 使用单独固定的 JetBrains/compose-multiplatform 稀疏 checkout，位于 vendor/resources/workspace；
+sync_compose_resources.py 由同一准备锁管理并保护本地修改，仍将该模块加入现有 included build。
+已移植工件在 macOS 同样编译自有工件；ownedTargets 防止源码清单漏掉 macOS，verifyNativePortDependencies 检查实际 selected component。包名和 KLIB 身份仍保留官方名称，不表示消费官方二进制。
+生成访问器与资源变体继续使用官方 Gradle 插件，Native 运行时及部署边界见 [COMPOSE_RESOURCES.md](COMPOSE_RESOURCES.md)。
 
 ## Skottie 为什么只有构建脚本
 

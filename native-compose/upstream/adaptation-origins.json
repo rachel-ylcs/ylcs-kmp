@@ -43,6 +43,7 @@
         "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skiko/RenderDelegateFailure.kt": "skiko/src/windowsMain/kotlin/org/jetbrains/skiko/SkiaLayer.windows.kt",
         "adaptation/org.jetbrains.skiko_skiko/src/windowsMain/kotlin/org/jetbrains/skiko/Direct3DRenderTargetSize.kt": "skiko/src/windowsMain/kotlin/org/jetbrains/skiko/WindowsDirect3DRenderer.kt",
         "adaptation/org.jetbrains.skiko_skiko/src/windowsMain/kotlin/org/jetbrains/skiko/Direct3DCompositionScale.kt": "skiko/src/windowsMain/kotlin/org/jetbrains/skiko/WindowsDirect3DRenderer.kt",
-        "adaptation/org.jetbrains.skiko_skiko/src/windowsMain/kotlin/org/jetbrains/skiko/WglDevice.kt": "skiko/src/windowsMain/kotlin/org/jetbrains/skiko/WindowsOpenGLRenderer.kt"
+        "adaptation/org.jetbrains.skiko_skiko/src/windowsMain/kotlin/org/jetbrains/skiko/WglDevice.kt": "skiko/src/windowsMain/kotlin/org/jetbrains/skiko/WindowsOpenGLRenderer.kt",
+        "adaptation/org.jetbrains.skiko_skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.native.kt": "skiko/src/nativeMain/kotlin/org/jetbrains/skia/impl/Native.native.kt"
     }
 }

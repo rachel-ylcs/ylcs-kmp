@@ -10,17 +10,24 @@ import tomllib
 from sync_upstream import preparation_lock
 from upstream_versions import main_profile, sync_wrappers
 from compose_adapt import source_edits
+from sync_compose_resources import prepare_resource_sources, RESOURCE_WORKSPACE
 
 ROOT = Path(__file__).resolve().parents[1]
 VENDOR = ROOT / "vendor/compose"
 WORKSPACE = VENDOR / "workspace"
 BUILD = WORKSPACE / "native-desktop"
 TARGETS = {"mingw_x64", "linux_x64", "macos_arm64"}
-FAMILIES = {"ui", "foundation", "animation"}
+FAMILIES = {"ui", "foundation", "animation", "components"}
 
 
 def source_path(name, module):
+    if module.get("sourceRepository") == "resources":
+        return module["sourcePath"]
     return f"compose/{module.get('family', 'ui')}/{name}"
+
+
+def source_workspace(module):
+    return RESOURCE_WORKSPACE if module.get("sourceRepository") == "resources" else WORKSPACE
 
 
 def digest(path):
@@ -37,8 +44,16 @@ def load_lock():
         raise ValueError("Invalid Compose source identity")
     if not lock.get("ciModules", lock["modules"]) or not set(lock.get("ciModules", lock["modules"])).issubset(lock["modules"]):
         raise ValueError("Compose CI stage references an unknown module")
+    owned_targets = set(lock.get("ownedTargets", []))
+    if not owned_targets.issubset(TARGETS):
+        raise ValueError("Unknown owned Compose target")
+    if "ownedTargets" in lock and "macos_arm64" not in owned_targets:
+        raise ValueError("macOS must remain an owned Compose target")
     for name, module in lock["modules"].items():
         family = module.get("family", "ui")
+        if module.get("sourceRepository") is not None:
+            if name != "components-resources" or module["sourceRepository"] != "resources" or module.get("sourcePath") != "components/resources/library":
+                raise ValueError(f"Unaudited Compose source repository: {name}")
         if family not in FAMILIES or not re.fullmatch(rf"{family}(?:-[a-z]+(?:-[a-z]+)*)?", name):
             raise ValueError(f"Invalid Compose module name: {name}")
         library = catalog["libraries"][module["alias"]]
@@ -47,6 +62,10 @@ def load_lock():
         if not module["redirectTargets"] or not set(module["redirectTargets"]).issubset(TARGETS):
             raise ValueError(f"Invalid Compose redirect targets: {name}")
         metadata_targets = set(module.get("metadataTargets", module["redirectTargets"]))
+        if not owned_targets.issubset(module["redirectTargets"]) or not owned_targets.issubset(metadata_targets):
+            raise ValueError(f"Owned Compose targets must use our artifacts and metadata: {name}")
+        if owned_targets and not library["module"].startswith("love.yinlin.native."):
+            raise ValueError(f"Owned Compose artifact must use Native publication coordinates: {name}")
         if not set(module["redirectTargets"]).issubset(metadata_targets) or not metadata_targets.issubset(TARGETS):
             raise ValueError(f"Invalid Compose metadata coverage: {name}")
         for source_set, directories in module["sourceSets"].items():
@@ -54,7 +73,7 @@ def load_lock():
                 raise ValueError(f"Unaudited source set: {name}/{source_set}")
             for directory in directories:
                 parts = PurePosixPath(directory).parts
-                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonAndroidExcludingWebMain", "nonJvmMain", "skikoMain", "jbMain", "nativeMain", "darwinMain", "macosMain", "appleMain"}:
+                if len(parts) != 3 or parts[0] != "src" or parts[2] != "kotlin" or parts[1] not in {"commonMain", "nonAndroidMain", "nonAndroidExcludingWebMain", "nonJvmMain", "skikoMain", "jbMain", "nativeMain", "darwinMain", "macosMain", "appleMain", "blockingMain"}:
                     raise ValueError(f"Unaudited upstream source path: {name}/{directory}")
                 if parts[1] in {"darwinMain", "appleMain"} and source_set != "macosMain":
                     raise ValueError(f"Foundation sources must belong to macosMain: {name}/{directory}")
@@ -140,14 +159,15 @@ def checkout(lock, offline):
     if git("diff", "--quiet", check=False).returncode:
         raise ValueError("Compose checkout has local tracked edits; preserve them in adaptation before preparing sources")
     current = git("rev-parse", "--verify", "HEAD", check=False).stdout.strip()
-    selected = f"{lock['commit']}\n" + "\n".join(sorted(source_path(name, module) for name, module in lock["modules"].items())) + "\n"
+    selected_sources = [source_path(name, module) for name, module in lock["modules"].items() if not module.get("sourceRepository")]
+    selected = f"{lock['commit']}\n" + "\n".join(sorted(selected_sources)) + "\n"
     marker = VENDOR / "checkout.txt"
     if current == lock["commit"] and marker.is_file() and marker.read_text(encoding="utf-8") == selected:
         return
     if offline:
         raise ValueError("Compose checkout does not match the current source selection; prepare it online first")
     git("sparse-checkout", "init", "--cone")
-    git("sparse-checkout", "set", *[source_path(name, module) for name, module in lock["modules"].items()])
+    git("sparse-checkout", "set", *selected_sources)
     if git("cat-file", "-e", f"{lock['commit']}^{{commit}}", check=False).returncode:
         print(f"Fetching Compose {lock['version']} at {lock['commit']}", flush=True)
         git("fetch", "--filter=blob:none", "--depth=1", "origin", lock["commit"])
@@ -170,25 +190,29 @@ def write(path, text):
 def prepare(lock, offline):
     checkout(lock, offline)
     prepare_sources(lock)
+    if "components-resources" in lock["modules"]:
+        prepare_resource_sources(lock["resourceSource"], lock["version"], offline)
     profile = main_profile(ROOT.parent)
     if not (WORKSPACE / "LICENSE.txt").is_file():
         raise ValueError("Pinned Compose checkout is missing its source license")
     for name, module in lock["modules"].items():
         for directories in module["sourceSets"].values():
             for directory in directories:
-                source = WORKSPACE / source_path(name, module) / directory
+                source = source_workspace(module) / source_path(name, module) / directory
                 if not source.is_dir() or not any(source.rglob("*.kt")):
                     raise ValueError(f"Selected Compose source directory is empty: {source}")
     templates = ROOT / "scripts/templates"
     inputs = [ROOT / "upstream/compose.json", ROOT / "upstream/compose-origins.json", Path(__file__),
               ROOT / "scripts/upstream_versions.py", ROOT / "scripts/sync_upstream.py", ROOT / "scripts/compose_adapt.py",
+              ROOT / "scripts/sync_compose_resources.py",
               templates / "compose-ui.settings.gradle.kts.template", templates / "compose-ui.build.gradle.kts.template"]
     inputs += [ROOT.parent / name for name in ["gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat"]]
     projects = []
     for name, module in lock["modules"].items():
         family = module.get("family", "ui")
+        project_path = (source_workspace(module) / source_path(name, module)).relative_to(ROOT.parent).as_posix()
         projects += [f'if ("{name}" in selectedModules) {{', f'    include(":{name}")', f'    project(":{name}").apply {{',
-                     f'        projectDir = rootDir.resolve("../{source_path(name, module)}").canonicalFile',
+                     f'        projectDir = repositoryDirectory.resolve("{project_path}").canonicalFile',
                      f'        buildFileName = projectDir.toPath().relativize(repositoryDirectory.resolve("native-compose/adaptation/org.jetbrains.compose.{family}_{name}/build.gradle.kts").toPath()).toString()', "    }", "}"]
     settings = (templates / "compose-ui.settings.gradle.kts.template").read_text(encoding="utf-8").replace("__PROJECTS__", "\n".join(projects))
     build = (templates / "compose-ui.build.gradle.kts.template").read_text(encoding="utf-8").replace("__JAVA_VERSION__", str(profile["java"]))

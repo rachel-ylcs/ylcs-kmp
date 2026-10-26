@@ -98,7 +98,7 @@ subprojects {
                             url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                         }
                     }
-                    scm { url.set("https://github.com/JetBrains/compose-multiplatform-core") }
+                    scm { url.set(if (module["sourceRepository"] == "resources") "https://github.com/JetBrains/compose-multiplatform" else "https://github.com/JetBrains/compose-multiplatform-core") }
                 }
             }
         }
@@ -116,7 +116,9 @@ subprojects {
             }
         }
         tasks.withType<Jar>().matching { it.name.endsWith("SourcesJar") || it.name == "sourcesJar" }.configureEach {
-            from(rootDir.resolve("../LICENSE.txt")) { into("META-INF/licenses") }
+            val sourceLicense = if (module["sourceRepository"] == "resources") nativeDirectory.resolve("vendor/resources/workspace/LICENSE.txt")
+            else rootDir.resolve("../LICENSE.txt")
+            from(sourceLicense) { into("META-INF/licenses") }
             from(listOf(nativeDirectory.resolve("upstream/compose.json"), nativeDirectory.resolve("upstream/compose-origins.json"))) {
                 into("META-INF/provenance")
             }

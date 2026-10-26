@@ -5,6 +5,12 @@
     "commit": "bb05011eb10784ada1ec00494f1a710ba6ab6252",
     "version": "1.13.0-beta01",
     "group": "love.yinlin.native.compose.ui",
+    "ownedTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+    "resourceSource": {
+        "repository": "JetBrains/compose-multiplatform",
+        "ref": "v1.13.0-beta01",
+        "commit": "926b833de872721337612d7ac4629636e9db4d1e"
+    },
     "ciModules": ["ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko", "ui-backhandler", "ui"],
     "modules": {
         "ui": {
@@ -135,6 +141,21 @@
             "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
             "sourceSets": {
                 "commonMain": ["src/commonMain/kotlin"]
+            }
+        },
+        "components-resources": {
+            "alias": "native-compose-resources",
+            "family": "components",
+            "group": "love.yinlin.native.compose.components",
+            "sourceRepository": "resources",
+            "sourcePath": "components/resources/library",
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"],
+                "skikoMain": ["src/skikoMain/kotlin", "src/blockingMain/kotlin"],
+                "nativeMain": ["src/nativeMain/kotlin"]
             }
         },
         "foundation": {

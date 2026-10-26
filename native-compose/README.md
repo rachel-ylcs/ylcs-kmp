@@ -1,10 +1,12 @@
 # Rachel Native desktop / Compose
 
-可选的桌面 Native 移植模块组，当前覆盖 Compose UI 的八个工件、Foundation/Animation 的五个运行时工件与 SDL ComposeScene 宿主，
+可选的桌面 Native 移植模块组，当前覆盖 Compose UI 的八个工件、Foundation/Animation 的五个运行时工件、Resources 与 SDL ComposeScene 宿主，
 基于已有 Skiko Core + Skottie、静态 SDL 窗口宿主及桥插件。目标：mingwX64、linuxX64、macosArm64。
 默认 GPU：Windows Ganesh/D3D12，Linux Ganesh/Vulkan，macOS Ganesh/Metal。
 Graphite 按已确定的路线排除。Compose Runtime 复用官方 Native 工件。
 UI 阶段见 [COMPOSE_UI.md](docs/COMPOSE_UI.md)，当前移植与构建边界见 [FOUNDATION_ANIMATION.md](docs/FOUNDATION_ANIMATION.md)。
+资源运行时、生成和部署见 [COMPOSE_RESOURCES.md](docs/COMPOSE_RESOURCES.md)。
+全部十六个已移植工件在 macOS 也由本项目维护和重定向，覆盖官方主坐标及显式 macosarm64 坐标；核验与保留边界见 [MACOS_AUDIT.md](docs/MACOS_AUDIT.md)。
 
 当前范围、已验收的平台及待完成项见 [STATUS.md](docs/STATUS.md)，实际检查见 [VALIDATION.md](docs/VALIDATION.md)。
 
@@ -54,6 +56,7 @@ strictly/reject 冲突、未支持的动态和范围请求明确失败。
 - 当前仅有 macosArm64，Darwin 共享层统一合并到 macosMain/macosTest；三个平台层为 windows/linux/macos。
 - 两个库属于同一个 Skiko included build；正式 buildFile 指向 adaptation，继续复用上游 buildSrc。
 - Compose UI、Foundation、Animation 共用一份 vendor/compose/workspace 稀疏 checkout 和 compose-ui included build。
+- Resources 来自另一个官方仓库，保存在 vendor/resources/workspace，仍加入同一 included build。
 
 详见 [SOURCES.md](docs/SOURCES.md)。不要手改 vendor。
 
@@ -63,10 +66,11 @@ ylcs-app/native-compose 只包含 commonMain 的场景与公共窗口 API 调用
 build.gradle.kts 复用 Rachel nativeExecutable DSL，安装 composeCompiler，当前 commonMain 只需声明：
 
 ```kotlin
-lib(libs.compose.foundation)
+lib(libs.compose.foundation, libs.compose.resources)
 ```
 
 Foundation 的 API 依赖会带入 Animation、UI 与 Skiko，无需逐个列出 UI 子工件或调用 asProvider()。
+Resources 额外声明自身运行时并应用 composeMultiplatform 插件，沿用官方 Res 生成与资源变体；Native 桥自动同步和打包 composeResources。
 只使用 UI 原语时可声明 lib(libs.compose.ui)；animation-graphics 属于可选工件，使用其 API 时再声明。
 窗口和运行目录配置沿用：
 
@@ -83,7 +87,7 @@ androidx.compose.ui.window.NativeWindow 提供 Composable 入口，基于 Skiko 
 桥插件不改写其他平台来伪造这项新 API。
 
 预览展示 Foundation 布局、clickable、BasicTextField、SelectionContainer、LazyColumn，以及状态动画、AnimatedVisibility、animateContentSize 和 Dialog；Escape 由弹层和 Compose 返回处理。
-本轮仅构建，尚未运行该 Foundation 预览。
+“资源”页展示字符串、数组、复数、PNG/SVG/XML 矢量和原始文件。本轮仅构建和检查资源产物，尚未运行资源预览。
 
 ## 构建与运行
 
@@ -153,6 +157,8 @@ Settings 实现位于同一模块的 src/settings，生成轻量的 settings cla
 ```powershell
 .\gradlew.bat "-Pnative.compose=true" :ylcs-app:native-compose:nativeBridgeReport
 ```
+
+核对实际 Native compile 依赖图是否选中自有源码/Maven 工件，可执行 verifyNativePortDependencies；该任务不编译或运行目标程序。
 
 | 上游坐标 | Native targets | 维护源码 / included project |
 | --- | --- | --- |

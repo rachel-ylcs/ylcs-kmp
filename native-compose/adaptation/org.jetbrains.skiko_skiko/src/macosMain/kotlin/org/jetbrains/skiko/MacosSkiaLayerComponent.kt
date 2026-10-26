@@ -13,6 +13,8 @@ interface MacosSkiaLayerComponent {
     val drawableWidth: Int
     val drawableHeight: Int
     val contentScale: Float
+    /** Custom hosts may refine this drawable-size fallback with their native visibility state. */
+    val isShowing: Boolean get() = drawableWidth > 0 && drawableHeight > 0
     val pixelGeometry: PixelGeometry get() = PixelGeometry.UNKNOWN
     var fullscreen: Boolean
 

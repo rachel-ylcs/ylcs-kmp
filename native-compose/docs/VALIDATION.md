@@ -1,5 +1,51 @@
 # Native Compose 验证记录
 
+## macOS 所有权与实现核验：本轮
+
+日期：2026-10-26。用户确认接管范围为本目录的十六个已移植工件，不扩大到尚未移植的 Runtime/AndroidX 基础依赖。
+源码审阅结论与已确认的上游 TODO、桌面策略和保留限制见 MACOS_AUDIT.md。
+
+| 检查 | 实际结果 |
+| --- | --- |
+| 接管约束 | 十四个 Compose 模块 ownedTargets 覆盖 Windows/Linux/macOS，自有坐标及共享 metadata 必须覆盖；桥插件拒绝内置规则漏掉 macOS 或回指官方 Maven group |
+| macOS 解析 | 外部 init 脚本向 macosMain 临时加入十六个官方主坐标及十六个显式 macosarm64 坐标，verifyNativePortDependencies 确认全部选中登记的源码项目，32 请求均可解析 |
+| Windows/Linux 正常图 | 各核对十四个 APP 实际依赖项目；未直接使用的 animation-graphics/Skottie 只在上述 macOS 审计图额外声明 |
+| Windows 编译 | macos-owned-ports.log：BUILD SUCCESSFUL in 2m15s，101 tasks；包含 APP compileKotlinWindows、Skiko SDL CInterop 和依赖 KLIB 编译 |
+| 最终解析复核 | macos-owned-ports-final.log：BUILD SUCCESSFUL in 7s，十六个 macOS 端口及 Windows/Linux 普通闭包再次通过 |
+| 源码实际修复 | macOS isShowing 从 true 改为宿主/窗口状态，pixelGeometry 读取宿主值；补齐显式 Native 叶子请求的重定向 |
+
+macOS 依赖解析不构建其 KLIB，不需要在 Windows 伪装 macOS SDK；本轮没有执行 macOS 编译/链接/运行。
+没有执行测试、APP、CI、Maven 发布或独立消费；没有修改 workflow、ciModules。官方/社区锁定源码中仍存在的共享 Native GC/指针数组等限制已明确保留，未宣布全 API 验收通过。
+
+## Compose Resources：本轮构建与资源产物检查
+
+日期：2026-10-26（Asia/Shanghai）。Windows x64、JDK 25、Gradle 9.8.0、Kotlin 2.5.0-Beta2、CMP 1.13.0-beta01。
+用户已报告上一阶段 CI 通过；本轮未重新查询其远程日志，继续 Resources。沿用只构建的边界，没有执行程序、测试或 CI，没有 Maven 发布/独立消费。
+
+| 检查 | 实际结果与证据 |
+| --- | --- |
+| 官方发布与源码 | Maven .module 确认有 macosArm64、没有 mingwX64/linuxX64；官方 tag 解引用到 926b833de872721337612d7ac4629636e9db4d1e，运行时和 Gradle 插件源码分别审查 |
+| 运行时编译 | common/skiko/native metadata、Windows KLIB 通过；SDL CInterop backend 在叶子 fragment 编译，官方模块身份保留 |
+| 资源生成 | 官方插件生成 public Res、数组/字符串/复数/Drawable 访问器及 Windows collector；值资源转换为 .cvr，模块包名与 Rachel KMP 约定一致 |
+| APP 与部署 | 编译、链接、官方资源解析/组装、复制到 binary 目录、stage 和 Debug ZIP 通过；resources-app-second.log、resources-package-final.log |
+| 最终构建 | resources-final-check.log：BUILD SUCCESSFUL in 1m49s，281 tasks；包含共享元数据、windowsSourcesJar 和 packageWindowsDebugExecutable |
+| 资源产物 | 六个文件在 binary 目录、stage 和 ZIP 中逐字节一致；包括 PNG、SVG、XML 矢量、中文/空格文件名和两种语言 .cvr，ZIP 只有当前模块命名空间 |
+| KLIB 与 sources | manifest 确认 unique_name=org.jetbrains.compose.components:components-resources、mingw_x64、Kotlin 2.5.0-Beta2；sources 包含官方许可、两个来源清单、可移植 DOM 与叶子 SDL backend，不含被替换的 Apple DOM |
+| 静态检查 | 根 TOML/Compose JSON、十四模块坐标、Python AST、维护源码格式、git diff --check |
+
+实际执行的最终任务：
+
+```powershell
+.\gradlew.bat "-Pnative.compose=true" :compose-ui:components-resources:compileNativeMainKotlinMetadata :compose-ui:components-resources:windowsSourcesJar :ylcs-app:native-compose:packageWindowsDebugExecutable
+```
+
+构建通过 IDEA MCP 终端执行；日志位于忽略的 native-compose/vendor/build/logs。产物核查记录在外部工作目录 resources-audit/artifact-check.json，不作为项目构建输入。
+本轮先发现共享 metadata 无法直接导入目标 CInterop，已将 SDL ABI 移入叶子 fragment；Native DSL 原先也未设置 KMP 资源包名约定，已补齐。
+仍有锁定上游弃用 API/内部可见性、Gradle 弃用等警告，不宣称零警告。
+
+程序、资源解码/字体/限定符/URI 的实际行为、不同工作目录或搬移后启动、资源删除后的运行、多模块 Maven 资源发布/消费、Linux/macOS 均未验证。
+没有更改 workflow、ciModules 或既有 UI 测试报告契约；下方历史测试不作为本轮 Resources 验收证据。
+
 ## Foundation / Animation：本轮仅构建
 
 日期：2026-10-25（Asia/Shanghai）。Windows x64、JDK 25、Gradle 9.8.0、Kotlin 2.5.0-Beta2、CMP 1.13.0-beta01。

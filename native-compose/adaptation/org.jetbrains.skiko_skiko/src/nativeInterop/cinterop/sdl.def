@@ -50,6 +50,10 @@ static inline void RachelSDL_WakeEventLoop(Uint32 type) {
 static inline bool RachelSDL_IsFullscreen(void *window) {
     return (SDL_GetWindowFlags((SDL_Window *)window) & SDL_WINDOW_FULLSCREEN) != 0;
 }
+static inline bool RachelSDL_IsWindowShowing(void *window) {
+    const SDL_WindowFlags flags = SDL_GetWindowFlags((SDL_Window *)window);
+    return (flags & (SDL_WINDOW_HIDDEN | SDL_WINDOW_MINIMIZED)) == 0;
+}
 static inline bool RachelSDL_SetFullscreen(void *window, bool fullscreen) {
     return SDL_SetWindowFullscreen((SDL_Window *)window, fullscreen);
 }

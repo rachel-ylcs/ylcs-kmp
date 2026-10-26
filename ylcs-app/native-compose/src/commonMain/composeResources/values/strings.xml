@@ -1,0 +1,12 @@
+<resources>
+    <string name="resources_title">Native Compose Resources</string>
+    <string-array name="resource_features">
+        <item>Strings and plurals</item>
+        <item>Images and vectors</item>
+        <item>Files beside the executable</item>
+    </string-array>
+    <plurals name="resource_count">
+        <item quantity="one">%1$d resource selected</item>
+        <item quantity="other">%1$d resources selected</item>
+    </plurals>
+</resources>

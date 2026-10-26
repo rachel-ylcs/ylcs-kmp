@@ -59,6 +59,7 @@ internal fun ShowcaseScene() {
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Action("组件", tab == 0) { tab = 0 }
             Action("列表", tab == 1) { tab = 1 }
+            Action("资源", tab == 2) { tab = 2 }
             Action(if (dark) "浅色背景" else "深色背景") { dark = !dark }
         }
 
@@ -92,7 +93,7 @@ internal fun ShowcaseScene() {
                 Action("打开弹层") { dialog = true }
             }
         }
-        else {
+        else if (tab == 1) {
             Panel {
                 Label("03 / LazyColumn 与稳定条目", Teal)
                 Label("列表在固定高度内独立滚动，外层页面保持自己的滚动状态。", size = 13)
@@ -108,6 +109,9 @@ internal fun ShowcaseScene() {
                     }
                 }
             }
+        }
+        else {
+            Panel { ResourcesPreview(count) }
         }
     }
     if (dialog) {

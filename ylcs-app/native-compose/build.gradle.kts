@@ -3,6 +3,7 @@ plugins {
         libs.plugins.rachel,
         libs.plugins.kotlinMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.composeMultiplatform,
         libs.plugins.nativeBridge
     )
 }
@@ -15,7 +16,7 @@ rachel {
 
         sources {
             commonMain {
-                lib(libs.compose.foundation)
+                lib(libs.compose.foundation, libs.compose.resources)
             }
         }
 

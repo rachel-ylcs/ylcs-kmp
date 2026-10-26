@@ -153,6 +153,62 @@ def foundation_source_edits(workspace, native_root):
     return edits
 
 
+def animation_graphics_source_edits(workspace, native_root):
+    path = "compose/animation/animation-graphics/src/commonMain/kotlin/androidx/compose/animation/graphics/vector/Animator.kt"
+    text = (workspace / path).read_text(encoding="utf-8")
+    text = replace_once(text, "import androidx.compose.animation.core.Easing", "import androidx.compose.animation.core.DurationBasedAnimationSpec\nimport androidx.compose.animation.core.Easing")
+    text = replace_once(text, "                is PropertyValuesHolderColor -> holder.asKeyframeSpec(durationMillis)",
+                        "                is PropertyValuesHolderColor -> holder.asKeyframeSpec(durationMillis)\n                is MotionPathValuesHolder -> holder.asAnimationSpec(durationMillis)")
+    text = replace_once(text, "                as KeyframesSpec<T>", "                as DurationBasedAnimationSpec<T>")
+    for collection, endpoint in [("last", "true"), ("first", "false")]:
+        text = replace_once(text, f"(timestamps.{collection}().holder as PropertyValuesHolderFloat)\n                        .animatorKeyframes\n                        .{collection}()\n                        .value",
+                            f"timestamps.{collection}().floatEndpoint({endpoint})")
+    text = replace_once(text, """(timestamps.last().holder as PropertyValuesHolderColor)
+                        .animatorKeyframes
+                        .last()
+                        .value""", """timestamps.last().let { timestamp ->
+                        val frames = (timestamp.holder as PropertyValuesHolderColor).animatorKeyframes
+                        if (timestamp.endsAtStart) frames.first().value else frames.last().value
+                    }""")
+    text = replace_once(text, """                is PropertyValuesHolder2D -> {
+                    // TODO(b/178978971): Implement path animation
+                }""", """                is PropertyValuesHolder2D -> {
+                    for (motion in holder.splitMotionPath()) {
+                        val values = propertyValuesMap[motion.propertyName] as FloatPropertyValues? ?: FloatPropertyValues()
+                        values.timestamps.add(Timestamp(parentDelay + startDelay, duration, repeatCount, repeatMode, motion))
+                        propertyValuesMap[motion.propertyName] = values
+                    }
+                }
+                is MotionPathValuesHolder -> error("Motion holders are collected through their 2D animator")""")
+    text = replace_once(text, """        var fraction = (timeMillis - timestamp.timeMillis) / timestamp.durationMillis
+        if (timestamp.repeatCount != 0) {
+            var count = 0
+            while (fraction > 1f) {
+                fraction -= 1f
+                count++
+            }
+            if (timestamp.repeatMode == RepeatMode.Reverse && count % 2 != 0) {
+                fraction = 1f - fraction
+            }
+        }""", "        val fraction = pathAnimatorFraction(timeMillis, timestamp)")
+    text = replace_once(text, """        val index =
+            (animatorKeyframes.indexOfFirst { it.fraction >= fraction } - 1).coerceAtLeast(0)
+        val easing = animatorKeyframes[index + 1].interpolator""", """        require(animatorKeyframes.isNotEmpty()) { "Path animator needs at least one keyframe" }
+        if (fraction <= animatorKeyframes.first().fraction) return animatorKeyframes.first().value
+        if (fraction >= animatorKeyframes.last().fraction) return animatorKeyframes.last().value
+        val index = (animatorKeyframes.indexOfFirst { it.fraction >= fraction } - 1).coerceAtLeast(0)
+        val span = animatorKeyframes[index + 1].fraction - animatorKeyframes[index].fraction
+        if (span <= 0f) return animatorKeyframes[index + 1].value
+        val easing = animatorKeyframes[index + 1].interpolator""")
+    text = replace_once(text, """    return start.fastZip(stop) { a, b -> lerp(a, b, fraction) }""", """    require(start.size == stop.size) { "start and stop paths have different node counts" }
+    return start.fastZip(stop) { a, b -> lerp(a, b, fraction) }""")
+    text = replace_once(text, "        PathNode.Close -> PathNode.Close", """        PathNode.Close -> {
+            require(stop is PathNode.Close) { DifferentStartAndStopPathNodes }
+            PathNode.Close
+        }""")
+    return {path: text}
+
+
 def source_edits(workspace, native_root, modules):
     edits = {}
     if "ui-text" in modules:
@@ -163,4 +219,6 @@ def source_edits(workspace, native_root, modules):
         edits.update(ui_source_edits(workspace, native_root))
     if "foundation" in modules:
         edits.update(foundation_source_edits(workspace, native_root))
+    if "animation-graphics" in modules:
+        edits.update(animation_graphics_source_edits(workspace, native_root))
     return edits
