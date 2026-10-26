@@ -23,12 +23,21 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastDistinctBy
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.compose.ui.util.trace
+import androidx.window.core.layout.WindowSizeClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /** Runs with only Maven artifacts and the published bridge plugin, without vendor sources. */
 class ComposeUiPublicationTest {
+    @Test
+    fun adaptiveNavigationPublishesTheWindowCoreNativeDependency() {
+        // WindowSizeClass is exported through adaptive-navigation -> adaptive-layout -> adaptive.
+        val window = WindowSizeClass(900, 620)
+        assertTrue(window.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND))
+        assertTrue(window.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND))
+    }
+
     @Test
     fun geometryAndUnitsLinkAcrossThePublishedModules() {
         val rect = Rect(0f, 0f, 80f, 60f).translate(Offset(10f, 20f))
