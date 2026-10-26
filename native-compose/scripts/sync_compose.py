@@ -11,22 +11,25 @@ from sync_upstream import preparation_lock
 from upstream_versions import main_profile, sync_wrappers
 from compose_adapt import source_edits
 from sync_compose_resources import prepare_resource_sources, RESOURCE_WORKSPACE
+from sync_navigation3 import prepare_navigation3, WORKSPACE as NAVIGATION_WORKSPACE
 
 ROOT = Path(__file__).resolve().parents[1]
 VENDOR = ROOT / "vendor/compose"
 WORKSPACE = VENDOR / "workspace"
 BUILD = WORKSPACE / "native-desktop"
 TARGETS = {"mingw_x64", "linux_x64", "macos_arm64"}
-FAMILIES = {"ui", "foundation", "animation", "components"}
+FAMILIES = {"ui", "foundation", "animation", "components", "navigation3"}
 
 
 def source_path(name, module):
-    if module.get("sourceRepository") == "resources":
+    if module.get("sourceRepository") in {"resources", "navigation3"}:
         return module["sourcePath"]
     return f"compose/{module.get('family', 'ui')}/{name}"
 
 
 def source_workspace(module):
+    if module.get("sourceRepository") == "navigation3":
+        return NAVIGATION_WORKSPACE
     return RESOURCE_WORKSPACE if module.get("sourceRepository") == "resources" else WORKSPACE
 
 
@@ -52,12 +55,20 @@ def load_lock():
     for name, module in lock["modules"].items():
         family = module.get("family", "ui")
         if module.get("sourceRepository") is not None:
-            if name != "components-resources" or module["sourceRepository"] != "resources" or module.get("sourcePath") != "components/resources/library":
+            resource = name == "components-resources" and module["sourceRepository"] == "resources" and module.get("sourcePath") == "components/resources/library"
+            navigation = name == "navigation3-ui" and module["sourceRepository"] == "navigation3" and module.get("sourcePath") == "navigation3-ui" and module.get("upstreamGroup") == "org.jetbrains.androidx.navigation3"
+            if not resource and not navigation:
                 raise ValueError(f"Unaudited Compose source repository: {name}")
         if family not in FAMILIES or not re.fullmatch(rf"{family}(?:-[a-z]+(?:-[a-z]+)*)?", name):
             raise ValueError(f"Invalid Compose module name: {name}")
         library = catalog["libraries"][module["alias"]]
-        if library["module"] != f"{module.get('group', lock['group'])}:{name}" or library["version"] != {"ref": "cmp"}:
+        version_ref = module.get("versionRef", "cmp")
+        if module.get("version", lock["version"]) != catalog["versions"][version_ref]:
+            raise ValueError(f"Pinned source version changed for {name}; review its release sources first")
+        adaptation = module.get("adaptation", f"org.jetbrains.compose.{family}_{name}")
+        if not re.fullmatch(r"[a-z0-9.]+_[a-z0-9-]+", adaptation):
+            raise ValueError(f"Invalid adaptation directory: {name}")
+        if library["module"] != f"{module.get('group', lock['group'])}:{name}" or library["version"] != {"ref": version_ref}:
             raise ValueError(f"Compose Native coordinates changed for {name}; review the source lock")
         if not module["redirectTargets"] or not set(module["redirectTargets"]).issubset(TARGETS):
             raise ValueError(f"Invalid Compose redirect targets: {name}")
@@ -192,6 +203,8 @@ def prepare(lock, offline):
     prepare_sources(lock)
     if "components-resources" in lock["modules"]:
         prepare_resource_sources(lock["resourceSource"], lock["version"], offline)
+    if "navigation3-ui" in lock["modules"]:
+        prepare_navigation3(lock["modules"]["navigation3-ui"], offline)
     profile = main_profile(ROOT.parent)
     if not (WORKSPACE / "LICENSE.txt").is_file():
         raise ValueError("Pinned Compose checkout is missing its source license")
@@ -205,15 +218,17 @@ def prepare(lock, offline):
     inputs = [ROOT / "upstream/compose.json", ROOT / "upstream/compose-origins.json", Path(__file__),
               ROOT / "scripts/upstream_versions.py", ROOT / "scripts/sync_upstream.py", ROOT / "scripts/compose_adapt.py",
               ROOT / "scripts/sync_compose_resources.py",
+              ROOT / "scripts/sync_navigation3.py",
               templates / "compose-ui.settings.gradle.kts.template", templates / "compose-ui.build.gradle.kts.template"]
     inputs += [ROOT.parent / name for name in ["gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat"]]
     projects = []
     for name, module in lock["modules"].items():
         family = module.get("family", "ui")
+        adaptation = module.get("adaptation", f"org.jetbrains.compose.{family}_{name}")
         project_path = (source_workspace(module) / source_path(name, module)).relative_to(ROOT.parent).as_posix()
         projects += [f'if ("{name}" in selectedModules) {{', f'    include(":{name}")', f'    project(":{name}").apply {{',
                      f'        projectDir = repositoryDirectory.resolve("{project_path}").canonicalFile',
-                     f'        buildFileName = projectDir.toPath().relativize(repositoryDirectory.resolve("native-compose/adaptation/org.jetbrains.compose.{family}_{name}/build.gradle.kts").toPath()).toString()', "    }", "}"]
+                     f'        buildFileName = projectDir.toPath().relativize(repositoryDirectory.resolve("native-compose/adaptation/{adaptation}/build.gradle.kts").toPath()).toString()', "    }", "}"]
     settings = (templates / "compose-ui.settings.gradle.kts.template").read_text(encoding="utf-8").replace("__PROJECTS__", "\n".join(projects))
     build = (templates / "compose-ui.build.gradle.kts.template").read_text(encoding="utf-8").replace("__JAVA_VERSION__", str(profile["java"]))
     write(BUILD / "settings.gradle.kts", settings)
@@ -227,9 +242,11 @@ def prepare(lock, offline):
     hashes = {path.relative_to(ROOT.parent).as_posix(): digest(path) for path in inputs}
     state = {"schema": 1, "build": "vendor/compose/workspace/native-desktop", "commit": lock["commit"],
              "inputs": hashes, "catalogSha256": profile["catalogSha256"], "version": lock["version"],
-             "modules": list(lock["modules"]), "java": profile["java"]}
+             "modules": list(lock["modules"]), "java": profile["java"],
+             "moduleVersions": {name: module.get("version", lock["version"]) for name, module in lock["modules"].items()}}
     write(VENDOR / "state.json", json.dumps(state, indent=4) + "\n")
-    print(f"Prepared Compose UI {lock['version']}: {', '.join(lock['modules'])} -> {state['build']}", flush=True)
+    labels = [f"{name} ({module['version']})" if "version" in module else name for name, module in lock["modules"].items()]
+    print(f"Prepared Compose UI {lock['version']}: {', '.join(labels)} -> {state['build']}", flush=True)
 
 
 def main():

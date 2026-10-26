@@ -60,6 +60,7 @@ internal fun ShowcaseScene() {
             Action("组件", tab == 0) { tab = 0 }
             Action("列表", tab == 1) { tab = 1 }
             Action("资源", tab == 2) { tab = 2 }
+            Action("导航", tab == 3) { tab = 3 }
             Action(if (dark) "浅色背景" else "深色背景") { dark = !dark }
         }
 
@@ -110,9 +111,10 @@ internal fun ShowcaseScene() {
                 }
             }
         }
-        else {
+        else if (tab == 2) {
             Panel { ResourcesPreview(count) }
         }
+        else NavigationPreview()
     }
     if (dialog) {
         Dialog(onDismissRequest = { dialog = false }) {

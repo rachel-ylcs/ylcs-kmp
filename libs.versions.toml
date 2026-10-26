@@ -20,6 +20,7 @@ dokka = "2.3.0-Beta"
 skiko = "0.156.0"
 sdl = "3.4.18"
 lifecycle = "2.11.0"
+navigation3 = "1.2.0"
 coroutines = "1.11.0"
 ktor = "3.6.0"
 mmkv = "2.4.3"
@@ -81,7 +82,8 @@ androidx-graphics-shapes = { module = "androidx.graphics:graphics-shapes", versi
 androidx-annotation = { module = "androidx.annotation:annotation", version = "1.11.0" }
 androidx-collection = { module = "androidx.collection:collection", version = "1.7.0" }
 androidx-navigation-event = { module = "androidx.navigationevent:navigationevent-compose", version = "1.2.0" }
-androidx-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version = "1.2.0" }
+androidx-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 androidx-savedstate = { module = "androidx.savedstate:savedstate", version = "1.5.0" }
 androidx-savedstate-compose = { module = "androidx.savedstate:savedstate-compose", version = "1.5.0" }
@@ -197,6 +199,7 @@ sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.16.1" }
 
 native-skiko = { module = "love.yinlin.native.skiko:skiko", version.ref = "skiko" }
 native-skiko-skottie = { module = "love.yinlin.native.skiko:skiko-skottie", version.ref = "skiko" }
+native-androidx-navigation3 = { module = "love.yinlin.native.androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 native-compose-ui-util = { module = "love.yinlin.native.compose.ui:ui-util", version.ref = "cmp" }
 native-compose-ui-geometry = { module = "love.yinlin.native.compose.ui:ui-geometry", version.ref = "cmp" }
 native-compose-ui-unit = { module = "love.yinlin.native.compose.ui:ui-unit", version.ref = "cmp" }

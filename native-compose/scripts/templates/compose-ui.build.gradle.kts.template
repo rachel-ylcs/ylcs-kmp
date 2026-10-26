@@ -30,9 +30,9 @@ layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/root"
 subprojects {
     // KLIB module identities follow upstream; Maven publication coordinates remain independent.
     val module = modules[name] as Map<*, *>
-    val upstreamGroup = "org.jetbrains.compose.${module["family"] ?: "ui"}"
+    val upstreamGroup = (module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}") as String
     group = upstreamGroup
-    version = composeVersion
+    version = module["version"] ?: composeVersion
     layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/$name"))
 
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
@@ -67,7 +67,7 @@ subprojects {
                     getByName("${target}Test").dependsOn(nativeTest)
                 }
                 if (selectedSources != null) {
-                    val adaptation = nativeDirectory.resolve("adaptation/${upstreamGroup}_${project.name}")
+                    val adaptation = nativeDirectory.resolve("adaptation/${module["adaptation"] ?: "${upstreamGroup}_${project.name}"}")
                     configureEach {
                         val upstream = selectedSources[name] as? List<*> ?: emptyList<String>()
                         kotlin.setSrcDirs(upstream.map { project.file(it as String) })
@@ -116,7 +116,8 @@ subprojects {
             }
         }
         tasks.withType<Jar>().matching { it.name.endsWith("SourcesJar") || it.name == "sourcesJar" }.configureEach {
-            val sourceLicense = if (module["sourceRepository"] == "resources") nativeDirectory.resolve("vendor/resources/workspace/LICENSE.txt")
+            val sourceLicense = if (module["sourceRepository"] == "navigation3") project.file("LICENSE.txt")
+            else if (module["sourceRepository"] == "resources") nativeDirectory.resolve("vendor/resources/workspace/LICENSE.txt")
             else rootDir.resolve("../LICENSE.txt")
             from(sourceLicense) { into("META-INF/licenses") }
             from(listOf(nativeDirectory.resolve("upstream/compose.json"), nativeDirectory.resolve("upstream/compose-origins.json"))) {

@@ -1,6 +1,12 @@
 {
     "schema": 1,
     "files": {
+        "adaptation/org.jetbrains.androidx.navigation3_navigation3-ui/src/nativeMain/kotlin/androidx/navigation3/ui/NavDisplay.native.kt": {
+            "artifact": "org.jetbrains.androidx.navigation3:navigation3-ui-macosarm64:1.2.0:sources",
+            "sha256": "876d621c030cad1c529333a3c880fc57d74f0ebad0736ce3228b25f2bad8482c",
+            "source": "macosMain/androidx/navigation3/ui/NavDisplay.macos.kt",
+            "description": "Preserves the three desktop default transition actuals for all owned Native targets; the official macOS and JVM desktop defaults intentionally use no transition, while NavDisplay supports caller-provided animations."
+        },
         "adaptation/org.jetbrains.compose.ui_ui/src/nativeMain/kotlin/androidx/compose/ui/input/key/Key.native.kt": {
             "source": "compose/ui/ui/src/commonMain/kotlin/androidx/compose/ui/input/key/Key.kt",
             "description": "Implements the complete common key contract with SDL USB scan codes, keypad navigation variants and distinct unsupported-key identities."

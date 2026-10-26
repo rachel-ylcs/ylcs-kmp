@@ -16,7 +16,7 @@ rachel {
 
         sources {
             commonMain {
-                lib(libs.compose.foundation, libs.compose.resources)
+                lib(libs.compose.foundation, libs.compose.resources, libs.androidx.navigation3, libs.androidx.navigation3.viewmodel)
             }
         }
 

@@ -4,9 +4,9 @@
 
 ## 本阶段范围与结论
 
-范围按根版本目录 `libs.versions.toml` 中 Rachel 框架及业务所需的 Compose 依赖及其传递依赖闭包确定。包括 Runtime、UI、Foundation、Animation、Resources 和底层 Skiko/Skottie；不加入项目未使用的 Material、Material3，也不扩展 Navigation、Lifecycle 等其他 AndroidX 库的移植。
+范围按根版本目录 `libs.versions.toml` 中 Rachel 框架及业务所需的 Compose、导航依赖及其传递依赖闭包确定。包括 Runtime、UI、Foundation、Animation、Resources、Navigation3 和底层 Skiko/Skottie；不加入项目未使用的 Material、Material3。其他 AndroidX 及共享数据/网络库先核验官方 Native 支持，只移植实际缺失的工件。
 
-这一范围的 Compose 库移植与发布接线已补齐，Windows 构建及独立 Maven 消费构建通过。Linux/macOS 的完整编译、链接、运行及本轮 CI 尚待用户执行，不能由本机结果推断三平台验收通过。
+这一范围的 Compose 与 Navigation3 库移植及发布接线已补齐，Windows 构建及独立 Maven 消费构建通过。用户已提交前一阶段 CI，本轮未等待或查询其结果。Linux/macOS 的完整编译、链接、运行及本轮新增 Navigation3 的 CI 尚待用户执行，不能由本机结果推断三平台验收通过。
 
 | 依赖范围 | 当前处理 |
 | --- | --- |
@@ -15,13 +15,38 @@
 | Foundation | 自有 `foundation-layout`、`foundation`。 |
 | Animation | 自有 `animation-core`、`animation`、`animation-graphics`。 |
 | Resources | 自有 `components-resources` 运行时；复用官方 Compose Gradle 插件识别、生成和聚合资源，由 Native 桥部署资源目录。 |
+| Navigation3 | 自有 `navigation3-ui:1.2.0`；官方 `androidx.navigation3:navigation3-runtime:1.2.0` 与 `androidx.lifecycle:lifecycle-viewmodel-navigation3:2.11.0` 已有三个桌面 Native 实现，继续复用。 |
 | Skiko | 自有 Core、Skottie，静态 Skia/SDL 路线保持不变。 |
 
-十四个 Compose 工件和两个 Skiko 工件均接管三个桌面 Native 目标，包括 macOS。显式请求官方平台叶子坐标时也会重定向，不再回落到官方的同名移植工件。未移植、已有真实 Native 支持的官方 Runtime 工件不属于这十六个接管工件。
+十四个 Compose 工件、Navigation3 UI 和两个 Skiko 工件，共十七个工件，均接管三个桌面 Native 目标，包括 macOS。显式请求官方平台叶子坐标时也会重定向，不再回落到官方的同名移植工件。未移植、已有真实 Native 支持的官方 Runtime 工件不属于这十七个接管工件。
 
 普通消费者继续使用版本目录中的公开依赖，如 `implementation(libs.compose.ui)`、`implementation(libs.compose.foundation)`、`implementation(libs.compose.resources)`。UI 子工件和 Skiko 从依赖图引入，无需消费者逐个声明，也无需手写 `Provider` 或 `.asProvider()`。
 
-## 本轮补齐
+## 本轮 Navigation3
+
+- 确认官方 `org.jetbrains.androidx.navigation3:navigation3-ui:1.2.0` 缺少 Windows/Linux Native 变体，接管为 `love.yinlin.native.androidx.navigation3:navigation3-ui:1.2.0`。版本目录新增独立 `navigation3` 版本项及 Runtime/私有工件别名；现有公开别名与版本保持兼容。
+- 以官方 Maven 的 macOS `1.2.0` source JAR 为发布源码基线，SHA-256 锁定为 `876d621c030cad1c529333a3c880fc57d74f0ebad0736ce3228b25f2bad8482c`。公共源码由 `sync_navigation3.py` 在 vendor 重现；三个 Native 默认转场 actual 维护在 adaptation，保留上游许可证及来源记录。源码准备会检查哈希、路径和非托管修改，支持离线重现。
+- 已检查官方 macOS 与 JVM 桌面的三个默认转场：均有意返回 `EnterTransition.None`/`ExitTransition.None`，并非抛错占位。自有 Native 实现保留这个默认行为，`NavDisplay` 仍支持调用方提供普通、返回及预测返回转场。
+- 源码准备、KLIB 身份、本地发布、桥插件与维护模式映射支持工件独立版本及上游 group；Navigation3 保持 `1.2.0`，其余 Compose 工件保持 `1.13.0-beta01`，不把旧源码重标为 CMP 版本。
+- Navigation3 发布元数据直接依赖同一移植构建的自有 UI/Animation 工件，Native 根坐标与显式平台叶子坐标均可重定向。已核对原始 KLIB 模块身份及完整 Maven 依赖坐标。
+- Native 专用预览新增“导航”页，包含 `NavDisplay`、每条目 ViewModel 装饰器、可保存输入状态、前进/返回及转场。只构建，没有运行或验收这些交互。没有修改 `ylcs-module`、业务 APP、页面生命周期或路由设计。
+
+后续迁移模块仍使用 `libs.androidx.navigation3` 和 `libs.androidx.navigation3.viewmodel`；在需要移植依赖的模块手动安装现有 Native Bridge 插件并声明 Native target。`native.compose` 继续只控制源码维护模式，不自动迁移业务模块。
+
+| 本轮验证 | 结果 |
+| --- | --- |
+| Navigation3 Windows KLIB、公共/Native metadata、本地 file Maven 发布 | 通过，初次构建 `2m 37s`；没有公开发布。 |
+| 最新 Native 预览 Windows 编译、链接、资源暂存和 ZIP 打包 | 通过，最终构建 `1m 18s`。 |
+| 三目标依赖解析 | 通过；每个目标十七个自有工件，覆盖五十一个显式叶子坐标，同时加入二十四个官方运行时根依赖及 WinHttp/CIO/Darwin HTTP 引擎。只解析图，未进行 Linux/macOS 编译。 |
+| 普通声明的独立 Maven 消费构建 | 通过，`1m 22s`；实际编译链接 NavDisplay、ViewModel 装饰器、Resources，并纳入当前共享 kotlinx/Ktor 依赖及 WinHttp。未使用 Compose/Skiko/Navigation3 的源码替换，构建插件来自本地 build-logic。 |
+| 修正发布坐标后的独立私有工件消费 | 通过，`9s`；使用新 file Maven 路径检查 Navigation3 可达的八十三个 Maven 组件，确认无源码项目或仍需重定向的自有上游请求。相同 KLIB 的编译/链接任务复用缓存。 |
+| 发布及源码检查 | 根 GMM 含三个 Native 变体，根/Windows 版本均为 `1.2.0`，KLIB 身份、依赖坐标、Native actual 与许可证正确；离线源码准备及差异检查通过。 |
+
+已核验 Navigation3 Runtime、Lifecycle/ViewModel/SavedState、NavigationEvent、Collection、Graphics Shapes 等当前 AndroidX 依赖的桌面 Native 支持。共享 kotlinx 日期、IO、协程、序列化及 Ktor 客户端/插件也有三个目标变体，本轮不增加这些库的自有 fork。平台专用依赖仍须在业务迁移时按目标放置，例如现有 kotlinx-html 只用于 JS 站点，JVM/Android 专用依赖不转入 Native。
+
+本轮日志：`vendor/build/logs/navigation3-initial.log`、`navigation3-published-closure.log`、`navigation3-final.log`、`navigation3-maven-consumer.log`、`navigation3-maven-closure.log`。未执行测试、程序或 CI，未修改 workflow、`ciModules`、提交或推送。
+
+## Compose 基础层已补齐
 
 - Skiko 的 `reachabilityBarrier` 改为实际的托管引用使用：线程局部原子引用在 FFI 调用后接收对象并立即清空，避免空实现及长期持有图形资源。
 - Native 指针数组保留作用域内已知的元素数量，支持有明确长度的外部缓冲区回读；未知外部缓冲区必须提供数量，不猜测内存长度。数组解码异常也释放原生数组，作用域释放后清空 pin 和长度记录。
@@ -41,7 +66,7 @@
 
 现有预览仍是 `ylcs-app/native-compose`，直接声明 Foundation 与 Resources，包含图片、SVG、VectorDrawable、字符串/数组/复数及 Unicode 文件名资源。
 
-## 本轮实际验证
+## 前一阶段 Compose 验证记录
 
 按用户要求未执行测试、APP 运行或 CI，也未扩展 workflow、测试报告契约或 `ciModules`。以下均是构建、依赖解析及产物静态检查。
 
@@ -64,7 +89,7 @@
 
 ## 后续边界
 
-当前没有需要再新增的版本目录内 Compose 库工件。接下来由用户进行本轮三平台 CI、运行验收及 GC/回调寿命等压力验证，然后进入 Rachel 模块和业务模块的 Native 接入。
+截至本轮，当前版本目录内已知缺失的 Compose/Navigation3 桌面 Native 工件已补齐。接下来由用户进行本轮三平台 CI、运行验收及 GC/回调寿命等压力验证，然后自行进入 Rachel 模块和业务模块的 Native 接入。
 
 本阶段完成的是 Compose 依赖层，未声称 JVM/AWT/Swing 专用业务源码可直接在 Native 上运行。仓库现有桌面 Window/Tray、SwingPanel 等平台封装仍需在对应业务迁移时提供 Native actual；多窗口宿主、OS 无障碍桥、嵌入本机控件及拖出系统等专项宿主能力也没有在本轮扩展。Compose 的共享布局、绘制、动画、文本与资源实现不因此缺少另一个待补的库工件。
 

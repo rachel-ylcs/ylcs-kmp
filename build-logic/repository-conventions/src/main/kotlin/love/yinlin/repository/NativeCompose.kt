@@ -30,6 +30,7 @@ fun Settings.nativeCompose() {
                 includeGroup("love.yinlin.native.compose.foundation")
                 includeGroup("love.yinlin.native.compose.animation")
                 includeGroup("love.yinlin.native.compose.components")
+                includeGroup("love.yinlin.native.androidx.navigation3")
             }
         }
     }
@@ -122,12 +123,13 @@ private fun Settings.includeComposeUiSources(directory: File) {
     val projects = modules.entries.associate { (artifact, value) ->
         val module = value as Map<*, *>
         val rule = "compose-$artifact"
-        gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.version.$rule", state["version"] as String)
+        val moduleVersions = state["moduleVersions"] as? Map<*, *>
+        gradle.extensions.extraProperties.set("love.yinlin.nativeBridge.version.$rule", (moduleVersions?.get(artifact) ?: state["version"]) as String)
         rule to ("${module["group"] ?: lock["group"]}:$artifact" to ":$artifact")
     }
     val adaptations = modules.entries.associate { (artifact, value) ->
         val module = value as Map<*, *>
-        "compose-$artifact" to directory.resolve("adaptation/org.jetbrains.compose.${module["family"] ?: "ui"}_$artifact")
+        "compose-$artifact" to directory.resolve("adaptation/${module["adaptation"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}_$artifact"}")
     }
     extensions.getByType<NativeBridgeSourcesExtension>().include(sourceDirectory, "compose-ui", projects, adaptations)
 }

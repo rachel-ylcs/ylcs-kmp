@@ -13,6 +13,27 @@
     },
     "ciModules": ["ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko", "ui-backhandler", "ui"],
     "modules": {
+        "navigation3-ui": {
+            "alias": "native-androidx-navigation3",
+            "family": "navigation3",
+            "group": "love.yinlin.native.androidx.navigation3",
+            "upstreamGroup": "org.jetbrains.androidx.navigation3",
+            "version": "1.2.0",
+            "versionRef": "navigation3",
+            "adaptation": "org.jetbrains.androidx.navigation3_navigation3-ui",
+            "sourceRepository": "navigation3",
+            "sourcePath": "navigation3-ui",
+            "sourceArchive": {
+                "url": "https://repo.maven.apache.org/maven2/org/jetbrains/androidx/navigation3/navigation3-ui-macosarm64/1.2.0/navigation3-ui-macosarm64-1.2.0-sources.jar",
+                "sha256": "876d621c030cad1c529333a3c880fc57d74f0ebad0736ce3228b25f2bad8482c"
+            },
+            "requiresSkiko": true,
+            "redirectTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "metadataTargets": ["mingw_x64", "linux_x64", "macos_arm64"],
+            "sourceSets": {
+                "commonMain": ["src/commonMain/kotlin"]
+            }
+        },
         "ui": {
             "alias": "native-compose-ui",
             "requiresSkiko": true,
