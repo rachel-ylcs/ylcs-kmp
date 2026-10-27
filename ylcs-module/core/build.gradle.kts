@@ -23,6 +23,8 @@ rachel {
                     libs.kotlinx.atomicfu,
                     ExportLib,
                     libs.androidx.annotation,
+                    libs.androidx.collection,
+
                     libs.kotlinx.coroutines,
                     libs.kotlinx.io,
                     libs.kotlinx.datetime,
@@ -41,19 +43,9 @@ rachel {
 
             nativeMain(clientMain)
 
-            jvmMain(clientMain) {
-                lib(
-                    ExportLib,
-                    libs.androidx.collection,
-                )
-            }
+            jvmMain(clientMain)
 
-            appleMain(nativeMain) {
-                lib(
-                    ExportLib,
-                    libs.androidx.collection,
-                )
-            }
+            appleMain(nativeMain)
 
             androidMain(jvmMain) {
                 lib(
@@ -74,10 +66,15 @@ rachel {
                 )
             }
 
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(appleMain)
+
             webMain(commonMain) {
                 lib(
                     ExportLib,
-                    libs.androidx.collection,
                     libs.kotlinx.broswer
                 )
             }
@@ -85,22 +82,6 @@ rachel {
             jsMain(webMain)
 
             wasmJsMain(webMain)
-
-            windowsMain(nativeMain) {
-                lib(
-                    ExportLib,
-                    libs.androidx.collection,
-                )
-            }
-
-            linuxMain(nativeMain) {
-                lib(
-                    ExportLib,
-                    libs.androidx.collection,
-                )
-            }
-
-            macosMain(appleMain)
         }
     }
 }

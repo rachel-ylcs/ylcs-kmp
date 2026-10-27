@@ -23,8 +23,9 @@ rachel {
         sources {
             commonMain {
                 lib(
-                    libs.androidx.navigation3,
+                    libs.androidx.navigation3.runtime,
                     libs.androidx.navigation3.viewmodel,
+                    libs.androidx.navigation3,
                     ExportLib,
                     projects.ylcsModule.compose.ui,
                 )

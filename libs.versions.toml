@@ -31,7 +31,7 @@ mmkv = "2.4.3"
 # ----- [Android] -----
 
 androidx-activity = "1.13.0"
-media3 = "1.12.0-alpha01"
+media3 = "1.12.0-alpha02"
 
 
 
@@ -88,12 +88,12 @@ androidx-window-core = { module = "androidx.window:window-core", version = "1.5.
 androidx-navigation-event = { module = "androidx.navigationevent:navigationevent-compose", version = "1.2.0" }
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3 = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+androidx-navigation3-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 androidx-savedstate = { module = "androidx.savedstate:savedstate", version.ref = "savedstate" }
 androidx-savedstate-compose = { module = "androidx.savedstate:savedstate-compose", version.ref = "savedstate" }
 androidx-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 androidx-viewmodel-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
-androidx-navigation3-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 
 # compose
 compose-runtime-retain = { module = "androidx.compose.runtime:runtime-retain", version = "1.12.1" }
@@ -206,7 +206,7 @@ ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 # service
 rethis = { module = "eu.vendeli:rethis", version = "0.4.4" }
-sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.16.1" }
+sqlx4k = { module = "io.github.smyrgeorge:sqlx4k-mysql", version = "1.17.0" }
 
 # ----- [Native Compose] -----
 
