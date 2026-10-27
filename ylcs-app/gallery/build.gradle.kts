@@ -9,12 +9,14 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
     )
 }
 
 rachel {
     multiplatform {
         iosTarget = false
+        nativeDesktopTarget = true
 
         sources {
             commonMain {
@@ -35,11 +37,22 @@ rachel {
 
             desktopMain(commonMain)
 
+            nativeMain(commonMain)
+            windowsMain(nativeMain)
+            linuxMain(nativeMain)
+            macosMain(nativeMain)
+
             wasmJsMain(commonMain)
         }
 
         desktopPackage {
             windows { }
+        }
+
+        composeDesktopPackage {
+            entryPoint = "main"
+            packageName = "RachelGallery"
+            displayName = "Rachel UI Gallery"
         }
 
         webpack {
@@ -53,8 +66,8 @@ rachel {
 
         actions {
             tasks.register("galleryRun") {
-                description = "运行Debug桌面版Gallery"
-                dependsOn(tasks.named("run"))
+                description = "运行Debug原生桌面版Gallery"
+                dependsOn(tasks.named("composeRun"))
             }
 
             tasks.register("galleryPublish") {
