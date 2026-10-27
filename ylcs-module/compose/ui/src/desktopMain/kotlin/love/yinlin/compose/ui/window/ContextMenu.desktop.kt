@@ -2,32 +2,22 @@ package love.yinlin.compose.ui.window
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuDataProvider
-import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.ContextMenuItem as AwtItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-
-@Stable
-class ContextMenuScope {
-    private val menus: MutableList<ContextMenuItem> = []
-
-    fun item(text: String, onClick: () -> Unit) {
-        menus += ContextMenuItem(text, onClick)
-    }
-
-    internal fun build(): List<ContextMenuItem> = menus
-}
 
 @Composable
-fun ContextMenu(
+actual fun ContextMenu(
     menus: ContextMenuScope.() -> Unit,
-    enabled: Boolean = true,
+    enabled: Boolean,
     content: @Composable () -> Unit
 ) {
     ContextMenuArea(
         items = {
             val scope = ContextMenuScope()
             scope.menus()
-            scope.build()
+            scope.build { item ->
+                AwtItem(item.label, item.enabled, item.onClick)
+            }
         },
         enabled = enabled,
         content = content
@@ -35,16 +25,18 @@ fun ContextMenu(
 }
 
 @Composable
-fun ContextMenuProvider(
+actual fun ContextMenuProvider(
     menus: ContextMenuScope.() -> Unit,
-    enabled: Boolean = true,
+    enabled: Boolean,
     content: @Composable () -> Unit
 ) {
     ContextMenuDataProvider(
         items = {
             val scope = ContextMenuScope()
             if (enabled) scope.menus()
-            scope.build()
+            scope.build { item ->
+                AwtItem(item.label, item.enabled, item.onClick)
+            }
         },
         content = content
     )

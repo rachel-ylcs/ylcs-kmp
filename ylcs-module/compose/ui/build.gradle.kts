@@ -31,15 +31,17 @@ rachel {
                 )
             }
 
-            iosMain(commonMain)
+            pcMain(commonMain)
 
-            iosMainList(iosMain)
+            desktopMain(pcMain)
 
-            webMain(commonMain)
+            nativeMain(pcMain)
 
-            jsMain(webMain)
+            windowsMain(nativeMain)
 
-            wasmJsMain(webMain)
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
         }
     }
 }

@@ -72,9 +72,15 @@ class KotlinMultiplatformSourceSetsScope(
     val macosTest: KotlinSourceSet by lazy { set.getByName("macosTest") }
 
     val skikoMain: KotlinSourceSet by lazy { set.maybeCreate("skikoMain") }
+    val skikoTest: KotlinSourceSet by lazy { set.maybeCreate("skikoTest") }
     val jvmMain: KotlinSourceSet by lazy { set.maybeCreate("jvmMain") }
+    val jvmTest: KotlinSourceSet by lazy { set.maybeCreate("jvmTest") }
     val clientMain: KotlinSourceSet by lazy { set.maybeCreate("clientMain") }
+    val clientTest: KotlinSourceSet by lazy { set.maybeCreate("clientTest") }
     val posixMain: KotlinSourceSet by lazy { set.maybeCreate("posixMain") }
+    val posixTest: KotlinSourceSet by lazy { set.maybeCreate("posixTest") }
+    val pcMain: KotlinSourceSet by lazy { set.maybeCreate("pcMain") }
+    val pcTest: KotlinSourceSet by lazy { set.maybeCreate("pcTest") }
 }
 
 // swift 依赖包结构

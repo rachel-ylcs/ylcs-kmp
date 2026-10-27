@@ -15,6 +15,7 @@ class KotlinJsSourceSetsScope(
     val commonMain: KotlinSourceSet by lazy { with(extension) { set.commonMain.get() } }
     val commonTest: KotlinSourceSet by lazy { with(extension) { set.commonTest.get() } }
     val jsMain: KotlinSourceSet by lazy { with(extension) { set.jsMain.get() } }
+    val jsTest: KotlinSourceSet by lazy { with(extension) { set.jsTest.get() } }
 }
 
 open class KotlinJsTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
