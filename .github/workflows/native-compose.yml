@@ -164,18 +164,6 @@ jobs:
         with:
           cache-provider: basic
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-      - name: Configure macOS Native compilation
-        if: runner.os == 'macOS'
-        run: |
-          # Applies to included builds and standalone Maven consumers as well.
-          # Keep dependency caches; avoid rebuilding per-file project caches on cold CI workers.
-          gradle_user_home="${GRADLE_USER_HOME:-$HOME/.gradle}"
-          mkdir -p "$gradle_user_home"
-          cat >> "$gradle_user_home/gradle.properties" <<'EOF'
-
-          kotlin.incremental.native=false
-          kotlin.native.parallelThreads=1
-          EOF
       - name: Configure the Windows Native toolchain
         if: runner.os == 'Windows'
         uses: TheMrMilchmann/setup-msvc-dev@v4

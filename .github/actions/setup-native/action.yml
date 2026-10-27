@@ -9,6 +9,22 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Configure macOS CI compilation
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: |
+        # User-home properties override the local-development defaults in every build.
+        # Cold CI workers should not rebuild per-file project caches for each test binary.
+        gradle_user_home="${GRADLE_USER_HOME:-$HOME/.gradle}"
+        mkdir -p "$gradle_user_home"
+        cat >> "$gradle_user_home/gradle.properties" <<'EOF'
+
+        kotlin.incremental.native=false
+        kotlin.native.parallelThreads=1
+        org.gradle.workers.max=1
+        org.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED
+        kotlin.compiler.execution.strategy=in-process
+        EOF
     - name: Resolve Native cache inputs
       id: inputs
       shell: bash

@@ -14,8 +14,11 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.HasKotlinDependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 // 在 ExportLib 后面的库将会被导出给其他模块可见
@@ -173,6 +176,15 @@ internal inline fun <reified T : KotlinBaseExtension> Project.configureTemplate(
 
     with(t) {
         extensions.configure<T> { build(this) }
+
+        if (providers.environmentVariable("GITHUB_ACTIONS").orNull == "true" && providers.environmentVariable("RUNNER_OS").orNull == "macOS") {
+            extensions.findByType<KotlinMultiplatformExtension>()?.targets?.withType<KotlinNativeTarget>()?.configureEach {
+                if (konanTarget.family.isAppleFamily) {
+                    // CI tests keep Debug behavior but do not need Apple's DWARF debug map.
+                    binaries.withType<TestExecutable>().configureEach { linkerOpts("-S") }
+                }
+            }
+        }
 
         val publication = buildDefaults.publishing
         extensions.findByType<DokkaExtension>()?.apply {

@@ -47,7 +47,7 @@ Skia SDK 的 ICU 数据只包含文本排版所需的部分资源。完整日期
 
 [native-compose.yml](../.github/workflows/native-compose.yml) 是独立的移植维护工作流，适配源码、上游锁及补丁、桥插件、同步器和相关构建配置变化时运行，普通 `ylcs-module` 或示例源码变化不触发它。仅修改版本目录时，先比较 Native 构建实际使用的版本、库和插件；框架自身版本号及无关业务依赖变化不会启动三个宿主的重型验证。维护流程保留移植回归测试、本地发布、独立 Maven 消费和三宿主工件汇总。
 
-GitHub Actions 中的 macOS 验证程序使用链接器 `-S` 省去调试映射，测试断言和编译优化模式保持原有配置。维护工作流在 macOS 使用一个 Gradle worker、一个 Native 后端线程，并设置 `kotlin.incremental.native=false`，避免为每个测试程序重复创建项目依赖的按文件增量缓存，以及当前 Kotlin 版本的缓存构建错误；Gradle build cache 和 Native 外部依赖缓存继续启用。这些配置同时作用于 included build 和独立 Maven 消费验证，本地构建保留原有增量编译及调试配置。工作流保存宿主库阶段的完整日志、Gradle 耗时报告及 Kotlin 编译报告。
+GitHub Actions 的 macOS Gradle 作业通过共享 `setup-native` 动作设置 `kotlin.incremental.native=false`、一个 Gradle worker、一个 Native 后端线程及 3 GiB Gradle 堆，Kotlin 编译在 Gradle 进程内执行。这些用户级属性覆盖仓库的本地开发配置，同时作用于框架 Build/Test、发布、included build 和独立 Maven 消费验证，避免冷构建重复建立按文件项目缓存及多个编译进程争用 runner 内存；Gradle build cache 和 Native 外部依赖缓存继续启用。框架 Apple Native 单元测试及移植验证程序使用链接器 `-S` 省去调试映射，测试断言和编译优化模式保持原有配置。本地构建保留原有增量编译及调试配置。维护工作流保存宿主库阶段的完整日志、Gradle 耗时报告及 Kotlin 编译报告。
 
 源码缓存任务为 `:repository-conventions:restoreNativeSourceCache`、`:repository-conventions:createNativeSourceCache`，缓存身份由 `:repository-conventions:writeNativeCiInputs` 计算；快照排除 SDK、原始归档和编译输出。静态 SDK 缓存按宿主镜像、Kotlin 版本及 SDK 输入区分。
 
