@@ -131,16 +131,19 @@ jobs:
             target: mingw_x64
             binary-target: Windows
             gradle-target: windows
+            workers: 2
             timeout-minutes: 90
           - runner: ubuntu-24.04
             target: linux_x64
             binary-target: Linux
             gradle-target: linux
+            workers: 2
             timeout-minutes: 90
           - runner: macos-26
             target: macos_arm64
             binary-target: Macos
             gradle-target: macos
+            workers: 1
             timeout-minutes: 120
     defaults:
       run:
@@ -161,6 +164,18 @@ jobs:
         with:
           cache-provider: basic
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - name: Configure macOS Native compilation
+        if: runner.os == 'macOS'
+        run: |
+          # Applies to included builds and standalone Maven consumers as well.
+          # Keep dependency caches; avoid rebuilding per-file project caches on cold CI workers.
+          gradle_user_home="${GRADLE_USER_HOME:-$HOME/.gradle}"
+          mkdir -p "$gradle_user_home"
+          cat >> "$gradle_user_home/gradle.properties" <<'EOF'
+
+          kotlin.incremental.native=false
+          kotlin.native.parallelThreads=1
+          EOF
       - name: Configure the Windows Native toolchain
         if: runner.os == 'Windows'
         uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -173,40 +188,42 @@ jobs:
           tools: 'true'
       - name: Source preparation, bridge routing and desktop packaging regressions
         run: |
-          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             :repository-conventions:test :native-bridge:test :public-plugin:test :native-bridge:validatePlugins :public-plugin:validatePlugins
       - name: Test and publish all owned host libraries
         run: |
-          bash ./gradlew --no-daemon --build-cache --profile --max-workers=2 --stacktrace \
+          mkdir -p build/native-ci
+          bash ./gradlew --no-daemon --build-cache --profile --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            :native-compose:testHost :native-compose:publishHost
+            -Pkotlin.build.report.output=file \
+            :native-compose:testHost :native-compose:publishHost 2>&1 | tee build/native-ci/host-libraries.log
       - name: Require real Native behavior and complete publications
         run: |
-          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             :native-bridge:verifyNativeHost
       - name: Consume the published KLIBs without source substitutions
         run: |
-          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             :native-bridge:publishAllPublicationsToLocalVerificationRepository
-          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
-          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.explicit=true \
             "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
-          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             "run${NATIVE_BINARY_TARGET}DebugExecutable"
       - name: Publish a framework library and consume its JVM and Native variants
         run: |
-          bash ./gradlew -p native-compose/verification/framework-producer --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/framework-producer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process publishHost
-          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             desktopTest verifyFrameworkResolution
-          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pframework.native=true \
             "${NATIVE_GRADLE_TARGET}Test" verifyFrameworkResolution
       - uses: actions/upload-artifact@v7
@@ -222,6 +239,8 @@ jobs:
           /usr/bin/xcodebuild -version
           /usr/bin/xcrun --log --find ld
           /usr/bin/xcrun --sdk macosx --show-sdk-path
+          /usr/sbin/sysctl hw.memsize vm.swapusage
+          /usr/bin/memory_pressure -Q
           df -h
       - name: Library and bridge test evidence
         if: always()
@@ -240,8 +259,12 @@ jobs:
             build-logic/native-bridge/build/test-results/
             build-logic/native-bridge/build/reports/tests/
             build-logic/repository-conventions/build/test-results/
+            build/native-ci/
             build/reports/profile/
+            native-compose/vendor/build/compose-ui/*/reports/kotlin-build/
             native-compose/vendor/build/compose-ui/root/reports/profile/
+            native-compose/vendor/skiko/workspace/skiko/build/reports/kotlin-build/
+            native-compose/vendor/skiko/workspace/skiko/skiko-skottie/build/reports/kotlin-build/
             native-compose/vendor/skiko/workspace/skiko/build/reports/profile/
           if-no-files-found: warn
 
