@@ -13,6 +13,8 @@ import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
 internal typealias SourceObject = Map<String, Any?>
@@ -67,37 +69,46 @@ internal fun writeSource(root: File, file: File, bytes: ByteArray) {
 internal fun File.resolveSibling(name: String): File = parentFile.resolve(name)
 
 internal fun sourceCommand(directory: File, arguments: List<String>, allowedExitCodes: Set<Int> = setOf(0)): String {
-    val process = ProcessBuilder(arguments).directory(directory).redirectErrorStream(true).start()
+    val process = ProcessBuilder(arguments).directory(directory).start()
     val bytes = ByteArrayOutputStream()
-    var readFailure: Throwable? = null
-    val reader = thread(name = "native-source-output", isDaemon = true) {
-        try {
-            process.inputStream.use { stream ->
-                val buffer = ByteArray(8192)
-                while (true) {
-                    val count = stream.read(buffer)
-                    if (count < 0) break
-                    check(bytes.size() + count <= 8 * 1024 * 1024) { "Source command output exceeds its size limit" }
-                    bytes.write(buffer, 0, count)
+    val diagnostics = ByteArrayOutputStream()
+    val total = AtomicInteger()
+    val readFailure = AtomicReference<Throwable?>()
+    // Git metadata is read from stdout; warnings and tracing must not become part of a URL or hash.
+    val readers = listOf(process.inputStream to bytes, process.errorStream to diagnostics).mapIndexed { index, (input, output) ->
+        thread(name = "native-source-output-$index", isDaemon = true) {
+            try {
+                input.use { stream ->
+                    val buffer = ByteArray(8192)
+                    while (true) {
+                        val count = stream.read(buffer)
+                        if (count < 0) break
+                        check(total.addAndGet(count) <= 8 * 1024 * 1024) { "Source command output exceeds its size limit" }
+                        output.write(buffer, 0, count)
+                    }
                 }
+            } catch (error: Throwable) {
+                readFailure.compareAndSet(null, error)
+                process.destroyForcibly()
             }
-        } catch (error: Throwable) { readFailure = error }
+        }
     }
     if (!process.waitFor(5, TimeUnit.MINUTES)) {
         process.destroyForcibly()
-        reader.join(5000)
+        readers.forEach { it.join(5000) }
         error("Native source command timed out: ${arguments.first()}")
     }
-    reader.join(5000)
-    check(!reader.isAlive) { "Source command output did not close" }
-    readFailure?.let { throw it }
+    readers.forEach { it.join(5000) }
+    check(readers.none { it.isAlive }) { "Source command output did not close" }
+    readFailure.get()?.let { throw it }
     val output = bytes.toString(Charsets.UTF_8)
-    check(process.exitValue() in allowedExitCodes) { "Native source command failed (${process.exitValue()}): ${arguments.joinToString(" ")}\n$output" }
+    check(process.exitValue() in allowedExitCodes) { "Native source command failed (${process.exitValue()}): ${arguments.joinToString(" ")}\n$output\n${diagnostics.toString(Charsets.UTF_8)}" }
     return output
 }
 
 internal fun sourceGit(directory: File, vararg arguments: String): String = sourceCommand(directory,
-    listOf("git", "-c", "safe.directory=${directory.canonicalFile.invariantSeparatorsPath}", "-c", "core.fsmonitor=false", "-c", "core.longpaths=true", "-c", "core.autocrlf=false", "-C", directory.absolutePath) + arguments)
+    listOf("git", "-c", "safe.directory=${directory.canonicalFile.invariantSeparatorsPath}", "-c", "core.fsmonitor=false", "-c", "core.autocrlf=false") +
+        (if (File.separatorChar == '\\') listOf("-c", "core.longpaths=true") else emptyList()) + listOf("-C", directory.absolutePath) + arguments)
 
 internal fun downloadSource(url: String, destination: File, expectedHash: String, offline: Boolean, maximum: Long) {
     check(Regex("[a-f0-9]{64}").matches(expectedHash)) { "Missing immutable source hash" }

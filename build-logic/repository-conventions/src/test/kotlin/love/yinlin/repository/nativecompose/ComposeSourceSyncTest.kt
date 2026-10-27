@@ -44,6 +44,28 @@ class ComposeSourceSyncTest {
             sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true)
             assertEquals(timestamp, source.lastModified())
             assertEquals("prepared\n", source.readText())
+            val origin = "https://github.com/JetBrains/compose-multiplatform-core.git"
+            sourceGit(workspace, "config", "url.https://mirror.invalid/.insteadOf", "https://github.com/")
+            assertEquals("https://mirror.invalid/JetBrains/compose-multiplatform-core.git", sourceGit(workspace, "remote", "get-url", "origin").trim())
+            sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true)
+            assertEquals(timestamp, source.lastModified())
+            val restored = owner.resolve("restored-workspace")
+            assertTrue(workspace.copyRecursively(restored))
+            val restoredSource = restored.resolve("src/A.kt")
+            assertTrue(restoredSource.setLastModified(1234567890000L))
+            val restoredTimestamp = restoredSource.lastModified()
+            sync.prepareGit(restored, record, marker, identity, listOf("src"), specification, true)
+            assertEquals("prepared\n", restoredSource.readText())
+            assertEquals(restoredTimestamp, restoredSource.lastModified())
+            sourceGit(workspace, "config", "remote.origin.url", "https://unexpected.invalid/repository.git")
+            val wrongOrigin = assertFailsWith<IllegalStateException> { sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true) }
+            assertTrue(wrongOrigin.message.orEmpty().contains("Unexpected Compose origin"))
+            assertEquals(timestamp, source.lastModified())
+            sourceGit(workspace, "config", "remote.origin.url", origin)
+            sourceGit(workspace, "config", "--add", "remote.origin.url", "https://unexpected.invalid/another.git")
+            assertFailsWith<IllegalStateException> { sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true) }
+            assertEquals(timestamp, source.lastModified())
+            sourceGit(workspace, "config", "--replace-all", "remote.origin.url", origin)
             other.writeText("local edit\n")
             assertFailsWith<IllegalStateException> { sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true) }
             assertEquals("local edit\n", other.readText())

@@ -84,7 +84,7 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
             sourceGit(directory, "config", "remote.origin.promisor", "true")
             sourceGit(directory, "config", "remote.origin.partialclonefilter", "blob:none")
         }
-        check(sourceGit(directory, "remote", "get-url", "origin").trim() == url) { "Unexpected Compose origin; checkout preserved" }
+        check(sourceGit(directory, "config", "--local", "--get-all", "remote.origin.url").trim() == url) { "Unexpected Compose origin; checkout preserved" }
         check(sourceGit(directory, "diff", "--cached", "--name-only").isBlank()) { "Staged Compose edits preserved" }
         val current = if (fresh) null else sourceGit(directory, "rev-parse", "HEAD").trim()
         val selected = commit + "\n" + paths.sorted().joinToString("\n", postfix = "\n")
