@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.Family
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.nativeBridge)
@@ -11,6 +15,11 @@ kotlin {
     mingwX64("windows")
     linuxX64("linux")
     macosArm64("macos")
+    targets.withType<KotlinNativeTarget>().configureEach {
+        if (konanTarget.family == Family.OSX && providers.environmentVariable("GITHUB_ACTIONS").orNull == "true") {
+            binaries.withType<Executable>().configureEach { linkerOpts("-S") }
+        }
+    }
     sourceSets {
         commonMain.dependencies {
             // Deliberately request only the extension: Core must arrive through its API metadata.

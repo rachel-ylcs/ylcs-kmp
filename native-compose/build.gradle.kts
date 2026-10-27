@@ -90,7 +90,6 @@ for ((name, target) in mapOf(
     "checkUpstreamUpdates" to ":repository-conventions:checkNativeUpstreamUpdates",
     "checkSources" to ":native-bridge:checkNativeSources",
     "verifyHost" to ":native-bridge:verifyNativeHost",
-    "verifyDistributions" to ":native-bridge:verifyNativeDistributions",
     "assembleVerificationRepository" to ":native-bridge:assembleNativeRepository",
 )) {
     tasks.register(name) {

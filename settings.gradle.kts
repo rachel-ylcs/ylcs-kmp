@@ -171,7 +171,6 @@ repository {
         /* -----------------  应用模块  ----------------- */
 
         module("ylcs-app") {
-            module("native-compose")
             module("app") {
                 module("global", "portal")
                 module("viewer")

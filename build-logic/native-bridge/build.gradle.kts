@@ -47,7 +47,7 @@ dependencies {
     add(verificationSource.implementationConfigurationName, kotlin("stdlib"))
 }
 
-for ((taskName, command) in mapOf("checkNativeSources" to "sources", "verifyNativeHost" to "host", "verifyNativeDistributions" to "distributions", "assembleNativeRepository" to "assemble")) {
+for ((taskName, command) in mapOf("checkNativeSources" to "sources", "verifyNativeHost" to "host", "assembleNativeRepository" to "assemble")) {
     tasks.register<JavaExec>(taskName) {
         group = "verification"
         description = "Verify Native Compose $command using maintained Kotlin checks"
@@ -155,6 +155,8 @@ tasks.test {
     systemProperty("native.tests.gradleUserHome", gradle.gradleUserHomeDir.absolutePath)
     systemProperty("native.tests.work", layout.buildDirectory.dir("functional-tests").get().asFile.absolutePath)
     systemProperty("native.tests.skikoLibraryScript", layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts").asFile.absolutePath)
+    inputs.file(layout.projectDirectory.file("gradle/skiko-library-tests.gradle.kts"))
+    inputs.file(rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template"))
     systemProperty("native.tests.kotlinVersion", libs.versions.kotlin.get())
     systemProperty("native.tests.composeVersion", libs.versions.cmp.get())
     systemProperty("native.tests.composeUiTemplate", rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template").absolutePath)

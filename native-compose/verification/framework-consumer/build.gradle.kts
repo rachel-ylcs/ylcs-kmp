@@ -1,6 +1,8 @@
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.result.UnresolvedDependencyResult
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
+import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.HostManager
 
 buildscript {
@@ -36,6 +38,11 @@ kotlin {
         }
     }
     else jvm("desktop")
+    targets.withType<KotlinNativeTarget>().configureEach {
+        if (konanTarget.family == Family.OSX && providers.environmentVariable("GITHUB_ACTIONS").orNull == "true") {
+            binaries.withType<TestExecutable>().configureEach { linkerOpts("-S") }
+        }
+    }
     sourceSets {
         commonMain.dependencies { implementation("love.yinlin.verification:framework:1.0") }
         commonTest.dependencies {

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="nativeComposeShowcase" type="GradleRunConfiguration" factoryName="Gradle" folderName="Native Compose">
+  <configuration default="false" name="publishToMavenLocal" type="GradleRunConfiguration" factoryName="Gradle" folderName="Maven">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -10,10 +10,10 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":ylcs-app:native-compose:composeRun" />
+          <option value=":publishToMavenLocal" />
         </list>
       </option>
-      <option name="vmOptions" />
+      <option name="vmOptions" value="" />
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>

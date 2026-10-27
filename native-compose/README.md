@@ -18,6 +18,8 @@
 - `vendor`：忽略的上游源码、归档、SDK 和构建输出，由 Kotlin 同步器管理。维护差异放入适配源码或补丁，不直接修改生成源码。
 - `verification`：独立 Maven 发布/消费工程，验证脱离源码复合构建后的使用方式。
 
+未修改的 macOS 实现直接从锁定的上游源码目录加入 `macosMain`，与适配源码一起编译成 Rachel 工件。例如 `ui-util` 使用上游 `macosMain`，`ui-text` 使用上游 `nativeMain`、`darwinMain` 和 `macosMain`。适配目录没有同名文件，不代表使用官方 macOS 二进制工件。
+
 源码同步位于 `build-logic/repository-conventions`，SDL 构建及验证工具位于 `build-logic/native-bridge`。维护流程使用 Gradle/Kotlin，不依赖 Python。
 
 ## 维护端使用
@@ -45,7 +47,9 @@ Skia SDK 的 ICU 数据只包含文本排版所需的部分资源。完整日期
 
 [native-compose.yml](../.github/workflows/native-compose.yml) 是独立的移植维护工作流，适配源码、上游锁及补丁、桥插件、同步器和相关构建配置变化时运行，普通 `ylcs-module` 或示例源码变化不触发它。仅修改版本目录时，先比较 Native 构建实际使用的版本、库和插件；框架自身版本号及无关业务依赖变化不会启动三个宿主的重型验证。维护流程保留移植回归测试、本地发布、独立 Maven 消费和三宿主工件汇总。
 
-在 GitHub Actions 手动运行 `Native Compose Maintenance` 并开启 `distributions`，才会额外构建、搬移并启动示例的 Debug/Release 分发目录；自动维护验证不执行这一阶段。源码缓存任务为 `:repository-conventions:restoreNativeSourceCache`、`:repository-conventions:createNativeSourceCache`，缓存身份由 `:repository-conventions:writeNativeCiInputs` 计算；快照排除 SDK、原始归档和编译输出。静态 SDK 缓存按宿主镜像、Kotlin 版本及 SDK 输入区分。
+GitHub Actions 中的 macOS 验证程序使用链接器 `-S` 省去调试映射，避免逐个合并 Skia/Kotlin 的大型 DWARF 符号；测试断言、编译优化模式和 Native 编译缓存保持原有配置。本地构建保留完整调试信息。维护工作流显式开启 Gradle build cache，并保存宿主库阶段的 Gradle 耗时报告。
+
+源码缓存任务为 `:repository-conventions:restoreNativeSourceCache`、`:repository-conventions:createNativeSourceCache`，缓存身份由 `:repository-conventions:writeNativeCiInputs` 计算；快照排除 SDK、原始归档和编译输出。静态 SDK 缓存按宿主镜像、Kotlin 版本及 SDK 输入区分。
 
 升级维护流程：
 
@@ -95,13 +99,6 @@ composeDesktopPackage {
 
 该配置与 JVM 的 `desktopPackage {}` 独立，同一模块可同时配置。`composeRun` 运行宿主 Debug，`composeReleaseRun` 运行 Release，`composeDistribution` 输出 `build/nativeApplication/<target>/releaseExecutable` 普通目录，包含 Compose 资源和平台运行数据。Windows 图标/版本信息嵌入 EXE；macOS 使用 `.app`、Info.plist 和 ICNS。自定义 `composePublish` 可消费此目录进行复制或 ZIP 打包。
 
-显式验证已生成应用目录的搬移与启动：
-
-```text
-./gradlew :ylcs-app:native-compose:composeDistribution
-./gradlew :native-compose:verifyDistributions
-```
-
-`verifyDistributions` 需要已有 Debug 和 Release 分发目录，并会运行其中的程序。CI 在验证前准备这两个目录。
+`NativeWindow` 在创建场景前自动调用 `registerSkikoComposeImplementation()`，注册 Skiko 图形和文本后端。若自行管理底层 Compose 场景，或在窗口创建前使用 `Path()`、`ImageBitmap()`、文本排版等后端 API，需要在首次使用前完成注册。
 
 框架库沿用自身 Maven group/GAV，发布 KMP root 及启用的 Native target publication。JVM、Android 等用户按普通方式依赖；Native 用户应用匹配版本的桥插件。公开 Compose 类型按模块 API 导出规则声明，保持消费者可见的依赖完整。

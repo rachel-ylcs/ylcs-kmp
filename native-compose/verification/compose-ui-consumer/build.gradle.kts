@@ -1,5 +1,7 @@
 import groovy.json.JsonSlurper
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
+import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.HostManager
 
 plugins {
@@ -17,6 +19,11 @@ kotlin {
     mingwX64("windows")
     linuxX64("linux")
     macosArm64("macos")
+    targets.withType<KotlinNativeTarget>().configureEach {
+        if (konanTarget.family == Family.OSX && providers.environmentVariable("GITHUB_ACTIONS").orNull == "true") {
+            binaries.withType<TestExecutable>().configureEach { linkerOpts("-S") }
+        }
+    }
     sourceSets {
         commonMain.dependencies {
             if (explicit) {

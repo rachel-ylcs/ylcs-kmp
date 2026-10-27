@@ -2,11 +2,6 @@ name: Native Compose Maintenance
 
 on:
   workflow_dispatch:
-    inputs:
-      distributions:
-        description: Also build, relocate and run Debug and Release application directories.
-        type: boolean
-        default: false
   pull_request:
     paths:
       - 'native-compose/adaptation/**'
@@ -117,7 +112,7 @@ jobs:
             git show "${BASE_REFERENCE}:libs.versions.toml" > build/native-ci/base.versions.toml
             arguments+=("-Pnative.ci.baseCatalog=$PWD/build/native-ci/base.versions.toml")
           fi
-          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --console=plain \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --console=plain \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             "${arguments[@]}" :repository-conventions:writeNativeCiInputs
           cat build-logic/repository-conventions/build/native-ci/inputs.properties >> "$GITHUB_OUTPUT"
@@ -178,54 +173,42 @@ jobs:
           tools: 'true'
       - name: Source preparation, bridge routing and desktop packaging regressions
         run: |
-          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             :repository-conventions:test :native-bridge:test :native-bridge:validatePlugins :public-plugin:validatePlugins
       - name: Test and publish all owned host libraries
         run: |
-          bash ./gradlew --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew --no-daemon --build-cache --profile --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             :native-compose:testHost :native-compose:publishHost
       - name: Require real Native behavior and complete publications
         run: |
-          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
             :native-bridge:verifyNativeHost
       - name: Consume the published KLIBs without source substitutions
         run: |
-          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             :native-bridge:publishAllPublicationsToLocalVerificationRepository
-          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
-          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.explicit=true \
             "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
-          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             "run${NATIVE_BINARY_TARGET}DebugExecutable"
       - name: Publish a framework library and consume its JVM and Native variants
         run: |
-          bash ./gradlew -p native-compose/verification/framework-producer --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/framework-producer --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process publishHost
-          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             desktopTest verifyFrameworkResolution
-          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pframework.native=true \
             "${NATIVE_GRADLE_TARGET}Test" verifyFrameworkResolution
-      - name: Prepare and relocate Debug and Release application directories
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.distributions }}
-        env:
-          SDL_VIDEODRIVER: dummy
-        run: |
-          bash ./gradlew --no-daemon --max-workers=2 --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            -Pnative.renderer=software -Pnative.smoke=true \
-            ":ylcs-app:native-compose:stage${NATIVE_BINARY_TARGET}DebugExecutable" \
-            :ylcs-app:native-compose:composeDistribution
-          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
-            :native-bridge:verifyNativeDistributions
       - uses: actions/upload-artifact@v7
         with:
           name: native-compose-maven-${{ matrix.target }}
@@ -257,6 +240,9 @@ jobs:
             build-logic/native-bridge/build/test-results/
             build-logic/native-bridge/build/reports/tests/
             build-logic/repository-conventions/build/test-results/
+            build/reports/profile/
+            native-compose/vendor/build/compose-ui/root/reports/profile/
+            native-compose/vendor/skiko/workspace/skiko/build/reports/profile/
           if-no-files-found: warn
 
   assemble:
@@ -279,7 +265,7 @@ jobs:
           path: host-publications
       - name: Require all host artifacts and one canonical KMP root
         run: |
-          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
             :native-bridge:assembleNativeRepository
       - uses: actions/upload-artifact@v7
         with:

@@ -13,7 +13,6 @@ object NativeVerification {
         when (arguments[0]) {
             "sources" -> verifier.checkSources()
             "host" -> verifier.verifyHost(directory.resolve("vendor/build/repository"), System.getenv("NATIVE_TARGET") ?: hostTarget())
-            "distributions" -> NativeDistributionVerification(directory).verify(System.getenv("NATIVE_TARGET") ?: hostTarget())
             "assemble" -> {
                 val inputs = directory.parentFile.resolve(System.getenv("NATIVE_REPOSITORIES_DIR") ?: "host-publications")
                 verifier.assemble(targetSuffixes.keys.associateWith { inputs.resolve("native-compose-maven-$it") }, directory.resolve("vendor/build/assembled-repository"))

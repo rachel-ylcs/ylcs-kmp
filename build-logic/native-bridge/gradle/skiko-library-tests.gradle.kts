@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithHostTests
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
+import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.HostManager
 
 // Maintained library regressions remain separate from upstream's larger test suites.
@@ -23,6 +24,8 @@ kotlinExtension.targets.withType<KotlinNativeTargetWithHostTests>().configureEac
     }
     binaries.test("regression", listOf(NativeBuildType.DEBUG)) { compilation = regressions }
     val binary = binaries.getTest("regression", NativeBuildType.DEBUG)
+    // Preserve the debug compiler mode and assertions; omit only CI's Apple debug map.
+    if (konanTarget.family == Family.OSX && providers.environmentVariable("GITHUB_ACTIONS").orNull == "true") binary.linkerOpts("-S")
     testRuns.create("regression") {
         setExecutionSourceFrom(binary)
         if (HostManager.host == target.konanTarget) {

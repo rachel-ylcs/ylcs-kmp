@@ -84,6 +84,10 @@ class NativeBridgeFunctionalTest {
                 kotlin("multiplatform")
                 `maven-publish`
             }
+            kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {
+                binaries.executable()
+                binaries.sharedLib()
+            }
         """.trimIndent())
         val template = File(System.getProperty("native.tests.composeUiTemplate")).readText().replace("__JAVA_VERSION__", "25")
         build.resolve("build.gradle.kts").writeText(template + "\n" + """
@@ -92,6 +96,15 @@ class NativeBridgeFunctionalTest {
                 doLast {
                     val library = project(":ui-util")
                     check(library.group == "org.jetbrains.compose.ui")
+                    val ci = providers.environmentVariable("GITHUB_ACTIONS").orNull == "true"
+                    library.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>().forEach { target ->
+                        target.binaries.forEach { binary ->
+                            check(("-S" in binary.linkerOpts) == (ci && target.name == "macos" && binary is TestExecutable))
+                            check(binary.debuggable == binary.buildType.debuggable)
+                            check(binary.optimized == binary.buildType.optimized)
+                        }
+                    }
+                    println("NATIVE_UI_CI_COMPILER_MODES=" + ci)
                     val publications = library.extensions.getByType<PublishingExtension>().publications
                     val expected = mapOf("kotlinMultiplatform" to "ui-util", "windows" to "ui-util-mingwx64", "linux" to "ui-util-linuxx64", "macos" to "ui-util-macosarm64")
                     for ((name, artifact) in expected) {
@@ -113,10 +126,14 @@ class NativeBridgeFunctionalTest {
                 }
             }
         """.trimIndent())
-        val result = runner(build, "verifyNativePublicationCoordinates").build()
-        for (artifact in listOf("ui-util", "ui-util-mingwx64", "ui-util-linuxx64", "ui-util-macosarm64")) assertContains(result.output, "NATIVE_UI_PUBLICATION=$artifact")
-        assertContains(result.output, "NATIVE_UI_SOURCE_NOTICES=VERIFIED")
-        assertTrue(result.tasks.none { it.path.contains("compileKotlin") || it.path.contains("linkDebug") || it.path.contains("linkRelease") })
+        for (ci in listOf(false, true)) {
+            val environment = System.getenv().toMutableMap().apply { put("GITHUB_ACTIONS", ci.toString()) }
+            val result = runner(build, "verifyNativePublicationCoordinates").withEnvironment(environment).build()
+            for (artifact in listOf("ui-util", "ui-util-mingwx64", "ui-util-linuxx64", "ui-util-macosarm64")) assertContains(result.output, "NATIVE_UI_PUBLICATION=$artifact")
+            assertContains(result.output, "NATIVE_UI_SOURCE_NOTICES=VERIFIED")
+            assertContains(result.output, "NATIVE_UI_CI_COMPILER_MODES=$ci")
+            assertTrue(result.tasks.none { it.path.contains("compileKotlin") || it.path.contains("linkDebug") || it.path.contains("linkRelease") })
+        }
     }
 
     @Test
@@ -152,6 +169,11 @@ class NativeBridgeFunctionalTest {
                 doLast {
                     kotlin.targets.withType<KotlinNativeTargetWithHostTests>().forEach { target ->
                         val run = target.testRuns.getByName("regression")
+                        val binary = target.binaries.getTest("regression", NativeBuildType.DEBUG)
+                        val ci = providers.environmentVariable("GITHUB_ACTIONS").orNull == "true"
+                        check(("-S" in binary.linkerOpts) == (ci && target.name == "macosArm64"))
+                        check(binary.debuggable == binary.buildType.debuggable)
+                        check(binary.optimized == binary.buildType.optimized)
                         check(run.executionSource.compilation.name == "regression")
                         check(target.binaries.getTest("regression", NativeBuildType.DEBUG).compilation == target.compilations.getByName("regression"))
                         check(tasks.getByName(target.name + "RegressionTest") is KotlinNativeTest)
@@ -161,10 +183,13 @@ class NativeBridgeFunctionalTest {
                 }
             }
         """.trimIndent())
-        val output = runner(library, "verifyNativeTestConfiguration").build().output
-        for (target in listOf("mingwX64", "linuxX64", "macosArm64")) assertContains(output, "CONFIGURED_LIBRARY_TEST=$target")
-        assertFalse(output.contains("Missing 'dependsOn' in Source Sets"))
-        assertFalse(output.lineSequence().any { it.startsWith("> Task :compileKotlin") || it.startsWith("> Task :link") })
+        for (ci in listOf(false, true)) {
+            val environment = System.getenv().toMutableMap().apply { put("GITHUB_ACTIONS", ci.toString()) }
+            val output = runner(library, "verifyNativeTestConfiguration").withEnvironment(environment).build().output
+            for (target in listOf("mingwX64", "linuxX64", "macosArm64")) assertContains(output, "CONFIGURED_LIBRARY_TEST=$target")
+            assertFalse(output.contains("Missing 'dependsOn' in Source Sets"))
+            assertFalse(output.lineSequence().any { it.startsWith("> Task :compileKotlin") || it.startsWith("> Task :link") })
+        }
     }
 
     private fun project(): File {
