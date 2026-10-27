@@ -175,7 +175,7 @@ jobs:
         run: |
           bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=2 --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            :repository-conventions:test :native-bridge:test :native-bridge:validatePlugins :public-plugin:validatePlugins
+            :repository-conventions:test :native-bridge:test :public-plugin:test :native-bridge:validatePlugins :public-plugin:validatePlugins
       - name: Test and publish all owned host libraries
         run: |
           bash ./gradlew --no-daemon --build-cache --profile --max-workers=2 --stacktrace \

@@ -772,9 +772,7 @@ class NativeBridgeFunctionalTest {
                     multiplatform {
                         iosTarget = false
                         webTarget = false
-                        windowsTarget = $withBridge
-                        linuxTarget = $withBridge
-                        macosTarget = $withBridge
+                        nativeDesktopTarget = $withBridge
                         desktopPackage {
                             mainClass = "fixture.DesktopKt"
                             packageName = "JvmFixture"

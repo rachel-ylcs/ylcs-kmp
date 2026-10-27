@@ -16,9 +16,7 @@ plugins {
 
 rachel {
     multiplatform {
-        windowsTarget = true
-        linuxTarget = true
-        macosTarget = true
+        nativeDesktopTarget = true
 
         sources {
             commonMain {

@@ -194,9 +194,19 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
         }
     }
 
-    var windowsTarget: Boolean = false
-    var linuxTarget: Boolean = false
-    var macosTarget: Boolean = false
+    var nativeDesktopTarget: Boolean = false
+    private var windowsTargetOverride: Boolean? = null
+    private var linuxTargetOverride: Boolean? = null
+    private var macosTargetOverride: Boolean? = null
+    var windowsTarget: Boolean
+        get() = windowsTargetOverride ?: nativeDesktopTarget
+        set(value) { windowsTargetOverride = value }
+    var linuxTarget: Boolean
+        get() = linuxTargetOverride ?: nativeDesktopTarget
+        set(value) { linuxTargetOverride = value }
+    var macosTarget: Boolean
+        get() = macosTargetOverride ?: nativeDesktopTarget
+        set(value) { macosTargetOverride = value }
     private var windowsBlock: KotlinNativeTarget.() -> Unit = {}
     fun windows(block: KotlinNativeTarget.() -> Unit) {
         val previous = windowsBlock
@@ -239,7 +249,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
 
         composeDesktopPackageBlock?.let { block ->
             check(pluginManager.hasPlugin("love.yinlin.native-bridge")) { "composeDesktopPackage requires libs.plugins.nativeBridge in the module's plugins block" }
-            check(windowsTarget || linuxTarget || macosTarget) { "composeDesktopPackage requires windowsTarget, linuxTarget or macosTarget" }
+            check(windowsTarget || linuxTarget || macosTarget) { "composeDesktopPackage requires an enabled desktop Native target (nativeDesktopTarget, windowsTarget, linuxTarget or macosTarget)" }
             val application = extensions.getByType<NativeApplicationExtension>()
             application.skikoWindow()
             application.desktop {

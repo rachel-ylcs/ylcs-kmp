@@ -10,9 +10,7 @@ plugins {
 
 rachel {
     nativeLibrary {
-        windowsTarget = true
-        linuxTarget = true
-        macosTarget = true
+        nativeDesktopTarget = true
 
         sources {
             nativeMain(commonMain) {

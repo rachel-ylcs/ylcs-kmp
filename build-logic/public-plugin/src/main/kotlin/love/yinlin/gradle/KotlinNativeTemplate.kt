@@ -37,9 +37,19 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
     }
     internal fun KotlinNativeSourceSetsScope.source() { sourceBlock(this) }
 
-    var windowsTarget: Boolean = false
-    var linuxTarget: Boolean = false
-    var macosTarget: Boolean = false
+    var nativeDesktopTarget: Boolean = false
+    private var windowsTargetOverride: Boolean? = null
+    private var linuxTargetOverride: Boolean? = null
+    private var macosTargetOverride: Boolean? = null
+    var windowsTarget: Boolean
+        get() = windowsTargetOverride ?: nativeDesktopTarget
+        set(value) { windowsTargetOverride = value }
+    var linuxTarget: Boolean
+        get() = linuxTargetOverride ?: nativeDesktopTarget
+        set(value) { linuxTargetOverride = value }
+    var macosTarget: Boolean
+        get() = macosTargetOverride ?: nativeDesktopTarget
+        set(value) { macosTargetOverride = value }
     open fun KotlinNativeTarget.baseNative() { }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {

@@ -12,6 +12,10 @@ sourceSets.main {
     compileClasspath += bootstrap.output
     runtimeClasspath += bootstrap.output
 }
+sourceSets.test {
+    compileClasspath += bootstrap.output
+    runtimeClasspath += bootstrap.output
+}
 
 dependencies {
     add(bootstrap.compileOnlyConfigurationName, gradleApi())
@@ -24,6 +28,7 @@ dependencies {
     implementation(libs.gradle.plugin.mavenPublish)
     implementation(libs.gradle.plugin.dokka)
     compileOnly(project(":native-bridge"))
+    testImplementation(kotlin("test-junit"))
 }
 
 kotlin {

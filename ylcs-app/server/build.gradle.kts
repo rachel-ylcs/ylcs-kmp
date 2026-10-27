@@ -11,9 +11,7 @@ plugins {
 
 rachel {
     nativeExecutable {
-        windowsTarget = true
-        linuxTarget = true
-        macosTarget = true
+        nativeDesktopTarget = true
 
         commandArgs = listOf("--cd=${C.root.work.server.asFile}")
 
