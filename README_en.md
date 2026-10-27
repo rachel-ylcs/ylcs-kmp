@@ -29,11 +29,23 @@
 
 Covering cross-platform entry, shared UI, dependent service startup, client and server interaction engines, free screen navigation, platform native components, custom themes, responsive layout, MDI configuration consistency, page loading, server routing, and other fields.
 
-It supports `Android`, `iOS`, `Windows`, `Linux`, `macOS`, `Web(Wasm)` and other client and server platforms.
+|Target|  VM  |  Native  |  Native Compose  |
+|:---:|:---:|:---:|:---:|
+|  Android  |✅|➖|➖|
+|  iOS  |➖|✅|➖|
+|  Windows  |✅|✅|✅|
+|  Linux  |✅|✅|✅|
+|  macOS  |✅|✅|✅|
+|  Web  |✅|✅|✅|
+|Server|✅|✅|➖|
+
+- **VM**: `JVM` or `JavaScript`
+- **Native**: `Kotlin Native` or `Web Assembly`
+- **Native Compose**: **The bridge plugin makes native compose desktop possible!**
 
 ## Feature
 
-- **Cross platform**: Based on `KMP` / `CMP`, it supports six platform clients and servers, with multi terminal consistency.
+- **Cross-platform**: Based on `KMP` / `CMP`, it supports all platform clients and servers, with multi terminal consistency.
 - **Native performance**: Generate platform native binary files without bridging or additional libraries.
 - **Single language**: Mastering `kotlin` language is sufficient to complete most task requirements and development.
 - **Quick**: You can start building your own cross platform application in just three minutes.

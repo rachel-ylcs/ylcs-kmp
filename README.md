@@ -29,11 +29,23 @@
 
 涵盖跨平台入口、共享UI、依赖服务启动、客户端和服务端交互引擎、自由屏幕导航、平台原生组件、自定义主题、响应式布局、MDI配置一致性、分页加载、服务端路由等领域。
 
-支持`Android`，`iOS`, `Windows`, `Linux`, `macOS`, `Web(Wasm)`等客户端, `Server`服务端。
+|Target|  VM  |  Native  |  Native Compose  |
+|:---:|:---:|:---:|:---:|
+|  Android  |✅|➖|➖|
+|  iOS  |➖|✅|➖|
+|  Windows  |✅|✅|✅|
+|  Linux  |✅|✅|✅|
+|  macOS  |✅|✅|✅|
+|  Web  |✅|✅|✅|
+|Server|✅|✅|➖|
+
+- **VM**: `JVM` or `JavaScript`
+- **Native**: `Kotlin Native` or `Web Assembly`
+- **Native Compose**: **The bridge plugin makes native compose desktop possible!**
 
 ## 特性
 
-- **跨平台**：基于`KMP` / `CMP`，支持六个平台客户端与服务端，具有多端一致性。
+- **跨平台**：基于`KMP` / `CMP`，支持全平台客户端与服务端，具有多端一致性。
 - **原生性能**：生成平台原生二进制文件，无桥接或附加库。
 - **单一语言**：仅需掌握`kotlin`语言即可完成大多数任务需求与开发。
 - **快速**：三分钟便能上手构建自己的跨平台应用程序。
