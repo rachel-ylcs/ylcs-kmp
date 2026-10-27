@@ -14,6 +14,9 @@ import java.nio.ByteOrder
 internal object NativeWindowsResources {
     fun write(executable: File, desktop: NativeDesktopDistribution, icon: File?) {
         require(System.getProperty("os.name").startsWith("Windows"))
+        // EndUpdateResourceW can drop the COFF table while retaining its old symbol count.
+        // Kotlin/Native uses its string table to find DWARF sections when printing exceptions.
+        val symbols = NativeWindowsCoffSymbols.read(executable)
         Arena.ofConfined().use { arena ->
             val linker = Linker.nativeLinker()
             val kernel = SymbolLookup.libraryLookup("Kernel32.dll", arena)
@@ -45,6 +48,7 @@ internal object NativeWindowsResources {
                 if (active) end.invokeWithArguments(handle, 1)
             }
         }
+        symbols?.restore(executable)
     }
 
     internal fun iconResources(bytes: ByteArray): List<Triple<Int, Int, ByteArray>> {
