@@ -10,6 +10,8 @@ on:
       - 'build-logic/public-plugin/**'
       - 'build-logic/settings.gradle.kts'
       - 'ylcs-app/native-compose/**'
+      - 'ylcs-module/compose/**'
+      - '.github/actions/setup-build/action.yml'
       - 'libs.versions.toml'
       - 'settings.gradle.kts'
       - '.gitattributes'
@@ -25,6 +27,8 @@ on:
       - 'build-logic/public-plugin/**'
       - 'build-logic/settings.gradle.kts'
       - 'ylcs-app/native-compose/**'
+      - 'ylcs-module/compose/**'
+      - '.github/actions/setup-build/action.yml'
       - 'libs.versions.toml'
       - 'settings.gradle.kts'
       - '.gitattributes'
@@ -42,8 +46,99 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+  scope:
+    name: Select Native Compose validation scope
+    runs-on: ubuntu-24.04
+    outputs:
+      core_changed: ${{ steps.diff.outputs.core_changed }}
+      core_only: ${{ steps.diff.outputs.core_only }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Inspect PR file changes
+        id: diff
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          core_changed=false
+          core_only=true
+          if [[ "$GITHUB_EVENT_NAME" != "pull_request" ]]; then
+            echo "core_changed=false" >> "$GITHUB_OUTPUT"
+            echo "core_only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > "$RUNNER_TEMP/native-compose-changes.txt"
+          while IFS= read -r changed; do
+            case "$changed" in
+              ylcs-module/compose/core/*) core_changed=true ;;
+              .github/workflows/native-compose.yml|.github/actions/setup-build/action.yml) ;;
+              *) core_only=false ;;
+            esac
+          done < "$RUNNER_TEMP/native-compose-changes.txt"
+          if [[ "$core_changed" == false ]]; then core_only=false; fi
+          echo "core_changed=$core_changed" >> "$GITHUB_OUTPUT"
+          echo "core_only=$core_only" >> "$GITHUB_OUTPUT"
+
+  compile-compose-core:
+    name: Compose core Native compilation / ${{ matrix.target }}
+    needs: scope
+    if: ${{ needs.scope.outputs.core_changed == 'true' }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: windows
+          - runner: ubuntu-24.04
+            target: linux
+          - runner: macos-26
+            target: macos
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: oracle
+          java-version: '25'
+          cache: gradle
+      - name: Configure Windows MSVC
+        if: runner.os == 'Windows'
+        uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+          export-path-to-vs: VS_PATH
+      - name: Prepare pinned Native Compose sources and toolchain
+        uses: ./.github/actions/setup-native
+        with:
+          tools: 'true'
+      - name: Compile compose:core only
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          case "$TARGET" in
+            windows) task=compileKotlinWindows ;;
+            linux) task=compileKotlinLinux ;;
+            macos) task=compileKotlinMacos ;;
+            *) exit 1 ;;
+          esac
+          bash ./gradlew --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            ":ylcs-module:compose:core:$task"
+
   build:
     name: Native libraries and SDL host / ${{ matrix.target }}
+    needs: scope
+    if: ${{ needs.scope.outputs.core_only != 'true' }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 90
     strategy:
