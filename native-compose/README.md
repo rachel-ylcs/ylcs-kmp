@@ -33,7 +33,7 @@
 ./gradlew :native-compose:verifyHost
 ```
 
-`prepareNativeSources` 获取锁定归档和稀疏 Git checkout、应用补丁并生成 included builds，不执行 CMake、库编译或应用运行。离线模式要求所需归档、Git 对象及源码选择已存在。同步保留构建输出和未变化文件的时间戳，遇到本地修改、未知文件或上游漂移时保留现场并失败。
+`prepareNativeSources` 获取锁定归档和稀疏 Git checkout、应用补丁并生成 included builds，不执行 CMake、库编译或应用运行。输入和受管理源码一致时直接复用，不重复解压 Maven 源码或还原、应用 Git 补丁，也不重写 Wrapper。离线模式要求所需归档、Git 对象及源码选择已存在。同步保留构建输出和未变化文件的时间戳，遇到本地修改、未知文件或上游漂移时保留现场并失败。
 
 Material3、Adaptive、Navigation3 使用官方 macOS sources JAR 中的真实共享实现；缺失 actual 由适配源码提供。日期和数字本地化共用 Skia ICU，macOS 的 `CalendarLocale` 保留 `NSLocale` 类型身份。
 
@@ -41,7 +41,11 @@ Skia SDK 的 ICU 数据只包含文本排版所需的部分资源。完整日期
 
 `testHost` 执行当前宿主库测试；`publishHost` 输出到 `native-compose/vendor/build/repository`；`verifyHost` 校验 Maven 文件、校验和、目标、KLIB 身份、静态库、许可、依赖闭包及维护测试报告。缺失、失败或跳过的测试不能作为通过结果。
 
-唯一 Native 验证工作流为 [native-compose.yml](../.github/workflows/native-compose.yml)。三个宿主分别构建、测试、本地发布，再由 Kotlin 汇总一份 macOS KMP root 和三个 target publication。源码缓存任务为 `:repository-conventions:restoreNativeSourceCache`、`:repository-conventions:createNativeSourceCache`；快照排除构建输出，恢复后仍校验来源和输入。静态 SDK 使用单独缓存。
+日常 Build/Test 通过共享的 `setup-build`、`setup-native` 动作恢复上游归档、准备好的源码、Kotlin/Native 工具链和 Gradle 编译缓存，不运行移植库的维护测试或本地发布。桌面 Native 作业另外恢复宿主 SDL/Skia SDK；修改 `skikoMain`、`skikoTest` 也会触发三个桌面 Native 平台的框架测试。源码快照仅使用精确缓存键，命中后恢复并由 Settings 检查、复用；未命中时自动准备并创建快照。
+
+[native-compose.yml](../.github/workflows/native-compose.yml) 是独立的移植维护工作流，适配源码、上游锁及补丁、桥插件、同步器和相关构建配置变化时运行，普通 `ylcs-module` 或示例源码变化不触发它。仅修改版本目录时，先比较 Native 构建实际使用的版本、库和插件；框架自身版本号及无关业务依赖变化不会启动三个宿主的重型验证。维护流程保留移植回归测试、本地发布、独立 Maven 消费和三宿主工件汇总。
+
+在 GitHub Actions 手动运行 `Native Compose Maintenance` 并开启 `distributions`，才会额外构建、搬移并启动示例的 Debug/Release 分发目录；自动维护验证不执行这一阶段。源码缓存任务为 `:repository-conventions:restoreNativeSourceCache`、`:repository-conventions:createNativeSourceCache`，缓存身份由 `:repository-conventions:writeNativeCiInputs` 计算；快照排除 SDK、原始归档和编译输出。静态 SDK 缓存按宿主镜像、Kotlin 版本及 SDK 输入区分。
 
 升级维护流程：
 

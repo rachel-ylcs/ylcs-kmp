@@ -58,7 +58,7 @@ internal class SourcePatches(private val nativeDirectory: File) {
                 val prepared = staging.resolve(relative).takeIf { it.isFile }?.sourceHash()
                 mapOf("original" to original, "prepared" to prepared)
             }
-            writeSource(nativeDirectory.resolve("vendor"), record, sourceBytes(mapOf("schema" to 3, "commit" to commit, "files" to hashes)))
+            writeSource(nativeDirectory.resolve("vendor"), record, sourceBytes(mapOf("schema" to 4, "commit" to commit, "patchSha256" to specification["sha256"], "files" to hashes)))
             apply(workspace, specification)
         } finally {
             checkedSourcePath(nativeDirectory.resolve("vendor"), staging)

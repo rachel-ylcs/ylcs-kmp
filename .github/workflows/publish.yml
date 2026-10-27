@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Setup Build Environment
         id: check
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
           android: 'true'

@@ -6,7 +6,7 @@ on:
 jobs:
   package-android:
     name: Package Android
-    uses: $/.github/workflows/gradle-build.yml
+    uses: ./.github/workflows/gradle-build.yml
     with:
       runner: ubuntu-latest
       task: ylcs-app:android-app:androidPublish

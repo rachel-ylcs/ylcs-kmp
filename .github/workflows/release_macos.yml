@@ -6,7 +6,7 @@ on:
 jobs:
   package-macos:
     name: Package macOS
-    uses: $/.github/workflows/gradle-build.yml
+    uses: ./.github/workflows/gradle-build.yml
     with:
       runner: macos-26
       task: ylcs-app:desktop-app:desktopPublish

@@ -18,7 +18,7 @@ rachel {
 
         sources {
             commonMain {
-                lib(libs.compose.foundation, libs.compose.resources, libs.androidx.navigation3, libs.androidx.navigation3.viewmodel)
+                lib(projects.ylcsModule.compose.core, libs.compose.resources, libs.androidx.navigation3, libs.androidx.navigation3.viewmodel)
             }
             nativeMain(commonMain)
             windowsMain(nativeMain)

@@ -9,7 +9,11 @@ class NativeSourceCache(directory: File) {
     private val nativeDirectory = directory.canonicalFile
     private val vendor = nativeDirectory.resolve("vendor")
     private val archive = vendor.resolve("cache/prepared-sources.zip")
-    private val roots = listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states", "icu")
+    private val sdlVersion = nativeDirectory.resolve("upstream/sdl.json").takeIf { it.isFile }?.sourceJson()?.get("version") as? String
+    private val roots = listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states", "icu/workspace") + listOfNotNull(sdlVersion?.let {
+        check(Regex("[0-9]+\\.[0-9]+\\.[0-9]+").matches(it)) { "Invalid cached SDL source version" }
+        "sdl-source-$it"
+    })
     private val markers = setOf("skiko/state.json", "compose/state.json", "compose/source-edits.json", "compose/checkout.txt", "resources/source-edits.json", "resources/checkout.txt")
     private val excluded = setOf("build", ".gradle", ".kotlin", "dependencies", "node_modules", "local.properties", ".prepare.lock", "__pycache__")
 

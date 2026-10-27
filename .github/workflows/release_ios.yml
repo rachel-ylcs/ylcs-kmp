@@ -9,12 +9,12 @@ jobs:
     runs-on: macos-26
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
 
       - name: Build
         id: package
-        uses: $/.github/actions/package-ios
+        uses: ./.github/actions/package-ios
         with:
           ipa-name: "[iOS]银临茶舍${{ github.ref_name }}.ipa"

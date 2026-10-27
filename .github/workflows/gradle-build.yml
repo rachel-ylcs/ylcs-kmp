@@ -31,6 +31,10 @@ on:
         description: Run the Gradle task with Xvfb and software rendering on Linux.
         type: boolean
         default: false
+      native-tools:
+        description: Install tools required by a desktop Native target.
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -42,13 +46,14 @@ jobs:
         shell: ${{ startsWith(inputs.runner, 'windows-') && 'pwsh' || 'bash' }}
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: ${{ inputs.submodules }}
           android: ${{ inputs.android }}
           msvc: ${{ inputs.msvc }}
           gtk: ${{ inputs.gtk }}
           virtual-display: ${{ inputs.virtual-display }}
+          native-tools: ${{ inputs.native-tools }}
 
       - name: Build
         if: ${{ runner.os != 'Linux' || !inputs.virtual-display }}

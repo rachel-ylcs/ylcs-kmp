@@ -39,12 +39,13 @@ jobs:
         shell: ${{ startsWith(inputs.runner, 'windows-') && 'pwsh' || 'bash' }}
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
           android: ${{ inputs.android }}
           msvc: ${{ inputs.msvc }}
           gtk: ${{ inputs.gtk }}
+          native-tools: ${{ inputs.task == 'windowsTest' || inputs.task == 'linuxTest' || inputs.task == 'macosTest' }}
 
       - name: Setup Python
         uses: actions/setup-python@v7

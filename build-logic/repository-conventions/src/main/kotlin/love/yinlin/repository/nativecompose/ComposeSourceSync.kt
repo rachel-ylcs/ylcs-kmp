@@ -68,7 +68,7 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
         else -> vendor.resolve("compose/workspace")
     }
 
-    private fun prepareGit(directory: File, record: File, marker: File, identity: SourceObject, paths: List<String>, patch: SourceObject, offline: Boolean) {
+    internal fun prepareGit(directory: File, record: File, marker: File, identity: SourceObject, paths: List<String>, patch: SourceObject, offline: Boolean) {
         val repository = identity["repository"] as String
         val commit = identity["commit"] as String
         check(repository in setOf("JetBrains/compose-multiplatform-core", "JetBrains/compose-multiplatform") && Regex("[a-f0-9]{40}").matches(commit)) { "Unaudited Compose source identity" }
@@ -86,24 +86,33 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
         }
         check(sourceGit(directory, "remote", "get-url", "origin").trim() == url) { "Unexpected Compose origin; checkout preserved" }
         check(sourceGit(directory, "diff", "--cached", "--name-only").isBlank()) { "Staged Compose edits preserved" }
+        val current = if (fresh) null else sourceGit(directory, "rev-parse", "HEAD").trim()
+        val selected = commit + "\n" + paths.sorted().joinToString("\n", postfix = "\n")
         if (record.isFile) {
             val previous = record.sourceJson()
-            check(previous["commit"] == sourceGit(directory, "rev-parse", "HEAD").trim()) { "Managed Compose commit changed; source edits preserved" }
+            check(previous["commit"] == current) { "Managed Compose commit changed; source edits preserved" }
             val files = previous["files"].sourceObject()
+            var prepared = true
             for ((relative, hashes) in files) {
                 sourceRelativePath(relative)
                 val target = checkedSourcePath(vendor, directory.resolve(relative))
                 val actual = target.takeIf { it.isFile }?.sourceHash()
                 val values = if (hashes is Map<*, *>) setOf(hashes["original"], hashes["prepared"]) else setOf(hashes, null)
                 check(actual in values) { "Local Compose source edit preserved: $relative" }
+                if (hashes !is Map<*, *> || actual != hashes["prepared"]) prepared = false
             }
+            val changed = sourceGit(directory, "diff", "--name-only", "-z").split('\u0000').filter { it.isNotEmpty() }.toSet()
+            check((changed - files.keys).isEmpty()) { "Local tracked Compose edits preserved: ${changed - files.keys}" }
+            val untracked = sourceGit(directory, "ls-files", "--others", "--exclude-standard", "-z").split('\u0000').filter {
+                it.isNotEmpty() && "/src/" in "/$it" && it.substringAfterLast('.') in setOf("kt", "cc", "cpp", "h", "hh", "def")
+            }.toSet()
+            check((untracked - files.keys).isEmpty()) { "Local untracked Compose sources preserved: ${untracked - files.keys}" }
+            if (prepared && current == commit && marker.isFile && marker.readText() == selected && previous["patchSha256"] == patch["sha256"] && files.keys == sync.patches.paths(patch)) return
             val tracked = files.filterValues { hashes -> hashes !is Map<*, *> || hashes["original"] != null }.keys
             for (relative in files.keys - tracked) checkedSourcePath(vendor, directory.resolve(relative)).delete()
             if (tracked.isNotEmpty()) sourceGit(directory, "restore", "--source=HEAD", "--worktree", "--", *tracked.toTypedArray())
         }
         check(sourceGit(directory, "diff", "--name-only").isBlank()) { "Local tracked Compose edits preserved" }
-        val selected = commit + "\n" + paths.sorted().joinToString("\n", postfix = "\n")
-        val current = if (fresh) null else sourceGit(directory, "rev-parse", "HEAD").trim()
         val existingSelection = if (!fresh && current == commit && !marker.isFile) sourceGit(directory, "sparse-checkout", "list").lineSequence().filter { it.isNotBlank() }.toSet() else emptySet()
         if (current == commit && !marker.isFile && existingSelection == paths.toSet()) writeSource(vendor, marker, selected.toByteArray())
         if (current != commit || !marker.isFile || marker.readText() != selected) {
@@ -126,6 +135,17 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
         val expected = "https://repo.maven.apache.org/maven2/${group.replace('.', '/')}/$name-macosarm64/$version/$name-macosarm64-$version-sources.jar"
         check(source["url"] == expected && Regex("\\d+\\.\\d+\\.\\d+(?:-[A-Za-z0-9.]+)?").matches(version)) { "Unaudited Maven source identity: $name" }
         val archive = vendor.resolve("maven/$name-$version-sources.jar")
+        val patch = sync.patches.manifest["maven"].sourceObject()[name]?.sourceObject()
+        if (patch != null) {
+            check(patch["sourceSha256"] == source["sha256"]) { "Maven patch identity changed: $name" }
+            sync.patches.file(patch)
+        }
+        val replacements = (module["sourceReplacements"] as? Map<*, *>) ?: emptyMap<String, String>()
+        for (relative in replacements.values) check(nativeDirectory.resolve("adaptation/${adaptation(name, module)}/${sourceRelativePath(relative as String)}").isFile) { "Missing maintained replacement: $relative" }
+        val destination = vendor.resolve("maven/workspace/$name")
+        val record = vendor.resolve("maven/states/$name.json")
+        val identity = mapOf("schema" to 4, "url" to expected, "sha256" to source["sha256"], "fingerprint" to bytesHash(sourceBytes(mapOf("module" to module, "patch" to patch, "inputs" to sync.inputHashes()))))
+        if (sync.workspace.reusable(destination, record, identity)) return
         downloadSource(expected, archive, source["sha256"] as String, offline, 32L * 1024 * 1024)
         val selected = module["sourceSets"].sourceObject().values.flatMap { it as List<*> }.map { (it as String).split('/')[1] }.toSet()
         sync.stage(".maven-source-") { staging ->
@@ -137,22 +157,16 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
                     else -> null
                 }
             }
-            val patch = sync.patches.manifest["maven"].sourceObject()[name]?.sourceObject()
             if (patch != null) {
-                check(patch["sourceSha256"] == source["sha256"]) { "Maven patch identity changed: $name" }
                 sync.patches.apply(staging, patch)
             }
             val exclusions = (module["excludeSources"] as? List<*>)?.map { it as String }?.toSet() ?: emptySet()
-            val replacements = (module["sourceReplacements"] as? Map<*, *>) ?: emptyMap<String, String>()
             check(exclusions == replacements.keys) { "Missing maintained source replacement provenance: $name" }
-            for (relative in replacements.values) check(nativeDirectory.resolve("adaptation/${adaptation(name, module)}/${sourceRelativePath(relative as String)}").isFile) { "Missing maintained replacement: $relative" }
             for (relative in exclusions) check(!staging.resolve("src/${relative.substringBefore('/')}/kotlin/${relative.substringAfter('/')}").exists()) { "Upstream actual shadow remains: $relative" }
             check(staging.resolve("LICENSE.txt").isFile && staging.walkTopDown().any { it.extension == "kt" }) { "Missing Maven source/license: $name" }
-            val destination = vendor.resolve("maven/workspace/$name")
-            val record = vendor.resolve("maven/states/$name.json")
             // Earlier source records are validated before migration to per-file hashes.
             migrateMavenRecord(name, destination, record)
-            sync.workspace.synchronize(staging, destination, record, mapOf("schema" to 3, "url" to expected, "sha256" to source["sha256"]))
+            sync.workspace.synchronize(staging, destination, record, identity)
         }
     }
 

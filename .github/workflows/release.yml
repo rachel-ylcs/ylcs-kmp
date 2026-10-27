@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
           android: 'true'
@@ -30,13 +30,13 @@ jobs:
     runs-on: macos-26
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
 
       - name: Build
         id: package
-        uses: $/.github/actions/package-ios
+        uses: ./.github/actions/package-ios
         with:
           ipa-name: "ylcs-ios.ipa"
 
@@ -51,7 +51,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
           msvc: 'true'
@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
           gtk: 'true'
@@ -93,7 +93,7 @@ jobs:
     runs-on: macos-26
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
 
@@ -111,7 +111,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
 
@@ -135,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
 
@@ -154,7 +154,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
           msvc: 'true'
@@ -173,7 +173,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Build Environment
-        uses: $/.github/actions/setup-build
+        uses: ./.github/actions/setup-build
         with:
           submodules: recursive
 

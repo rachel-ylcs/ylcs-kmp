@@ -7,7 +7,7 @@ jobs:
   package-linux:
     name: Package Linux
     # 用太新的 Ubuntu 会导致 native 库链接的 glibc 版本过高，导致无法在较旧的 Linux 上运行
-    uses: $/.github/workflows/gradle-build.yml
+    uses: ./.github/workflows/gradle-build.yml
     with:
       runner: ubuntu-22.04
       task: ylcs-app:desktop-app:desktopPublish

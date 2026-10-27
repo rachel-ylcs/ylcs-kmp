@@ -15,6 +15,14 @@ dependencies {
 }
 
 val nativeSourcesDirectory = rootProject.layout.projectDirectory.dir("../native-compose")
+tasks.register<JavaExec>("writeNativeCiInputs") {
+    group = "native setup"
+    description = "Resolve the Native cache identity and relevant catalog changes without preparing upstream sources"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("love.yinlin.repository.nativecompose.NativeCiInputs")
+    args(rootProject.projectDir.parentFile.absolutePath, layout.buildDirectory.file("native-ci/inputs.properties").get().asFile.absolutePath, providers.gradleProperty("native.ci.baseCatalog").getOrElse(""))
+}
+
 for ((taskName, command) in mapOf("prepareNativeSources" to "prepare", "checkNativeUpstreamUpdates" to "updates", "restoreNativeSourceCache" to "cache-restore", "createNativeSourceCache" to "cache-create")) {
     tasks.register<JavaExec>(taskName) {
         group = "native setup"

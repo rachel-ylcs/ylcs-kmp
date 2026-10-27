@@ -6,7 +6,7 @@ on:
 jobs:
   package-web:
     name: Package Web
-    uses: $/.github/workflows/gradle-build.yml
+    uses: ./.github/workflows/gradle-build.yml
     with:
       runner: ubuntu-latest
       task: ylcs-app:web-app:webPublish

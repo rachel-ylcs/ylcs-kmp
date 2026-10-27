@@ -16,7 +16,15 @@ class NativeSourceCacheTest {
         val work = Files.createTempDirectory("native-source-cache").toFile()
         try {
             val native = work.resolve("native-compose").apply { mkdirs() }
+            native.resolve("upstream/sdl.json").apply {
+                parentFile.mkdirs()
+                writeText("""{"version":"3.4.18"}""")
+            }
             val vendor = native.resolve("vendor")
+            vendor.resolve("sdl-source-3.4.18/include/SDL3/SDL.h").apply {
+                parentFile.mkdirs()
+                writeText("SDL source header")
+            }
             for (root in listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states", "icu/workspace")) vendor.resolve(root).mkdirs()
             vendor.resolve("icu/workspace/icudtl.dat").writeText("locale data")
             vendor.resolve("compose/workspace/src/A.kt").apply {
@@ -42,14 +50,17 @@ class NativeSourceCacheTest {
                 val names = zip.entries().asSequence().map { it.name }.toSet()
                 assertTrue("compose/workspace/src/A.kt" in names && "compose/workspace/.git/HEAD" in names)
                 assertTrue("icu/workspace/icudtl.dat" in names)
+                assertTrue("sdl-source-3.4.18/include/SDL3/SDL.h" in names)
                 assertFalse(names.any { "/build/" in it || "/dependencies/" in it })
             }
             assertTrue(vendor.resolve("compose/workspace").deleteRecursively())
             assertTrue(vendor.resolve("icu").deleteRecursively())
+            assertTrue(vendor.resolve("sdl-source-3.4.18").deleteRecursively())
             cache.restore()
             assertEquals("source", vendor.resolve("compose/workspace/src/A.kt").readText())
             assertEquals("locked commit", vendor.resolve("compose/workspace/.git/HEAD").readText())
             assertEquals("locale data", vendor.resolve("icu/workspace/icudtl.dat").readText())
+            assertEquals("SDL source header", vendor.resolve("sdl-source-3.4.18/include/SDL3/SDL.h").readText())
         } finally { assertTrue(work.deleteRecursively()) }
     }
 

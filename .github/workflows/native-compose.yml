@@ -1,17 +1,28 @@
-name: Native Compose
+name: Native Compose Maintenance
 
 on:
   workflow_dispatch:
+    inputs:
+      distributions:
+        description: Also build, relocate and run Debug and Release application directories.
+        type: boolean
+        default: false
   pull_request:
     paths:
-      - 'native-compose/**'
+      - 'native-compose/adaptation/**'
+      - 'native-compose/upstream/**'
+      - 'native-compose/gradle/**'
+      - 'native-compose/verification/**'
+      - 'native-compose/build.gradle.kts'
       - 'build-logic/native-bridge/**'
       - 'build-logic/repository-conventions/**'
       - 'build-logic/public-plugin/**'
       - 'build-logic/settings.gradle.kts'
-      - 'ylcs-app/native-compose/**'
       - 'libs.versions.toml'
       - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
       - '.gitattributes'
       - 'gradle/wrapper/**'
       - '.github/workflows/native-compose.yml'
@@ -19,14 +30,20 @@ on:
   push:
     branches: [main]
     paths:
-      - 'native-compose/**'
+      - 'native-compose/adaptation/**'
+      - 'native-compose/upstream/**'
+      - 'native-compose/gradle/**'
+      - 'native-compose/verification/**'
+      - 'native-compose/build.gradle.kts'
       - 'build-logic/native-bridge/**'
       - 'build-logic/repository-conventions/**'
       - 'build-logic/public-plugin/**'
       - 'build-logic/settings.gradle.kts'
-      - 'ylcs-app/native-compose/**'
       - 'libs.versions.toml'
       - 'settings.gradle.kts'
+      - 'gradle.properties'
+      - 'gradlew'
+      - 'gradlew.bat'
       - '.gitattributes'
       - 'gradle/wrapper/**'
       - '.github/workflows/native-compose.yml'
@@ -34,18 +51,83 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
-# All owned libraries, bridge and application directories are verified from repository sources.
+# Module changes use Build/Test; this workflow verifies the maintained Native stack.
 # Maven tasks write local verification files only; no public repository is configured.
 concurrency:
   group: native-compose-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect Native Maintenance Inputs
+    runs-on: ubuntu-latest
+    outputs:
+      native: ${{ steps.direct.outputs.changed || steps.catalog.outputs.catalog-changed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            native:
+              - 'native-compose/adaptation/**'
+              - 'native-compose/upstream/**'
+              - 'native-compose/gradle/**'
+              - 'native-compose/verification/**'
+              - 'native-compose/build.gradle.kts'
+              - 'build-logic/native-bridge/**'
+              - 'build-logic/repository-conventions/**'
+              - 'build-logic/public-plugin/**'
+              - 'build-logic/settings.gradle.kts'
+              - 'settings.gradle.kts'
+              - 'gradle.properties'
+              - 'gradlew'
+              - 'gradlew.bat'
+              - '.gitattributes'
+              - 'gradle/wrapper/**'
+              - '.github/workflows/native-compose.yml'
+              - '.github/actions/setup-native/**'
+      - name: Require maintenance verification for source or tooling changes
+        id: direct
+        if: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.native == 'true' }}
+        run: echo 'changed=true' >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@v6
+        if: ${{ steps.direct.outputs.changed != 'true' }}
+        with:
+          distribution: oracle
+          java-version: '25'
+      - uses: gradle/actions/setup-gradle@v6
+        if: ${{ steps.direct.outputs.changed != 'true' }}
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - name: Compare Native dependencies in a catalog-only change
+        id: catalog
+        if: ${{ steps.direct.outputs.changed != 'true' }}
+        env:
+          BASE_REFERENCE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          mkdir -p build/native-ci
+          arguments=()
+          if [[ "$BASE_REFERENCE" =~ ^[0-9a-f]{40}$ ]] && git cat-file -e "${BASE_REFERENCE}:libs.versions.toml"; then
+            git show "${BASE_REFERENCE}:libs.versions.toml" > build/native-ci/base.versions.toml
+            arguments+=("-Pnative.ci.baseCatalog=$PWD/build/native-ci/base.versions.toml")
+          fi
+          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --console=plain \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            "${arguments[@]}" :repository-conventions:writeNativeCiInputs
+          cat build-logic/repository-conventions/build/native-ci/inputs.properties >> "$GITHUB_OUTPUT"
+
   build:
     name: Native libraries and SDL host / ${{ matrix.target }}
+    needs: changes
+    if: ${{ needs.changes.outputs.native == 'true' }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
+    timeout-minutes: ${{ matrix.timeout-minutes }}
     strategy:
       fail-fast: false
       matrix:
@@ -54,14 +136,17 @@ jobs:
             target: mingw_x64
             binary-target: Windows
             gradle-target: windows
+            timeout-minutes: 90
           - runner: ubuntu-24.04
             target: linux_x64
             binary-target: Linux
             gradle-target: linux
+            timeout-minutes: 90
           - runner: macos-26
             target: macos_arm64
             binary-target: Macos
             gradle-target: macos
+            timeout-minutes: 120
     defaults:
       run:
         shell: bash
@@ -77,7 +162,10 @@ jobs:
         with:
           distribution: oracle
           java-version: '25'
-          cache: gradle
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - name: Configure the Windows Native toolchain
         if: runner.os == 'Windows'
         uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -127,6 +215,7 @@ jobs:
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pframework.native=true \
             "${NATIVE_GRADLE_TARGET}Test" verifyFrameworkResolution
       - name: Prepare and relocate Debug and Release application directories
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.distributions }}
         env:
           SDL_VIDEODRIVER: dummy
         run: |
@@ -142,6 +231,15 @@ jobs:
           name: native-compose-maven-${{ matrix.target }}
           path: native-compose/vendor/build/repository/
           if-no-files-found: error
+      - name: Diagnose a macOS toolchain failure
+        if: failure() && runner.os == 'macOS'
+        timeout-minutes: 2
+        run: |
+          /usr/bin/xcode-select --print-path
+          /usr/bin/xcodebuild -version
+          /usr/bin/xcrun --log --find ld
+          /usr/bin/xcrun --sdk macosx --show-sdk-path
+          df -h
       - name: Library and bridge test evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -171,7 +269,10 @@ jobs:
         with:
           distribution: oracle
           java-version: '25'
-          cache: gradle
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - uses: actions/download-artifact@v8
         with:
           pattern: native-compose-maven-*

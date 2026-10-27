@@ -1,5 +1,5 @@
-name: Prepare Native Compose Sources
-description: Restore pinned Native sources and SDKs, then validate and prepare the local source builds.
+name: Cache Native Compose Dependencies
+description: Reuse prepared upstream sources, Native toolchains and host SDKs without running maintenance verification.
 
 inputs:
   tools:
@@ -9,6 +9,24 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Resolve Native cache inputs
+      id: inputs
+      shell: bash
+      run: |
+        bash ./gradlew -p build-logic --no-daemon --max-workers=2 --console=plain \
+          -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+          :repository-conventions:writeNativeCiInputs
+        cat build-logic/repository-conventions/build/native-ci/inputs.properties >> "$GITHUB_OUTPUT"
+        printf 'image-version=%s-%s\n' "${ImageOS:-$RUNNER_OS}" "${ImageVersion:-unknown}" >> "$GITHUB_OUTPUT"
+    - name: Restore Kotlin Native distributions and dependencies
+      uses: actions/cache@v5
+      with:
+        path: |
+          ~/.konan/dependencies
+          ~/.konan/kotlin-native-*
+        key: native-konan-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.kotlin-version }}-${{ inputs.tools }}
+        restore-keys: |
+          native-konan-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.kotlin-version }}-
     - name: Restore immutable upstream archives
       uses: actions/cache@v5
       with:
@@ -17,22 +35,22 @@ runs:
           native-compose/vendor/skiko/skia/*.zip
           native-compose/vendor/maven/*-sources.jar
           native-compose/vendor/sdl-source-*.zip
-        key: native-archives-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/compose.json', 'native-compose/upstream/sdl.json') }}
+          native-compose/vendor/icu/icu-data.zip
+        key: native-archives-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/compose.json', 'native-compose/upstream/sdl.json', 'native-compose/upstream/icu.json') }}
     - name: Restore prepared source workspaces
+      id: sources
       uses: actions/cache@v5
       with:
         path: native-compose/vendor/cache/prepared-sources.zip
-        key: native-sources-v4-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/**', 'native-compose/gradle/**', 'native-compose/adaptation/**', 'build-logic/repository-conventions/src/**', 'build-logic/repository-conventions/build.gradle.kts', 'build-logic/native-bridge/gradle/**', 'libs.versions.toml', 'gradle/wrapper/**', 'gradle.properties', 'settings.gradle.kts', '.gitattributes', 'gradlew', 'gradlew.bat') }}
-        restore-keys: |
-          native-sources-v4-${{ runner.os }}-${{ runner.arch }}-
+        key: native-sources-v6-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.native-inputs }}-${{ hashFiles('native-compose/upstream/**', 'native-compose/gradle/**', 'native-compose/adaptation/**', 'build-logic/repository-conventions/src/main/**', 'build-logic/repository-conventions/build.gradle.kts', 'build-logic/native-bridge/gradle/**', 'gradle/wrapper/**', 'gradle.properties', 'settings.gradle.kts', '.gitattributes', 'gradlew', 'gradlew.bat') }}
     - name: Restore the static SDL SDK and extracted Skia binaries
+      if: ${{ inputs.tools == 'true' }}
       uses: actions/cache@v5
       with:
         path: |
-          native-compose/vendor/sdl-source-*
           native-compose/vendor/sdl-static
           native-compose/vendor/skiko/workspace/skiko/dependencies/skia
-        key: native-sdk-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/sdl.json', 'build-logic/native-bridge/gradle/sdl-sdk.gradle.kts', 'libs.versions.toml') }}
+        key: native-sdk-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.image-version }}-${{ steps.inputs.outputs.kotlin-version }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/sdl.json', 'build-logic/native-bridge/gradle/sdl-sdk.gradle.kts') }}
     - name: Linux desktop Native toolchain dependencies
       if: ${{ runner.os == 'Linux' && inputs.tools == 'true' }}
       shell: bash
@@ -41,11 +59,33 @@ runs:
         sudo apt-get install -y cmake ninja-build pkg-config libfontconfig1-dev libfreetype6-dev \
           libgl1-mesa-dev libegl1-mesa-dev libx11-dev libxcursor-dev libxrandr-dev \
           libxinerama-dev libxi-dev libxss-dev libxtst-dev libwayland-dev wayland-protocols libxkbcommon-dev
-    - name: Validate cached sources against locks and local adaptations
+    - name: Configure the macOS Native toolchain
+      if: ${{ runner.os == 'macOS' && inputs.tools == 'true' }}
+      shell: bash
+      run: |
+        developer_dir="$(cd /Applications/Xcode.app/Contents/Developer && pwd -P)"
+        export DEVELOPER_DIR="$developer_dir"
+        printf 'DEVELOPER_DIR=%s\n' "$developer_dir" >> "$GITHUB_ENV"
+        sudo env DEVELOPER_DIR="$developer_dir" /usr/bin/xcodebuild -runFirstLaunch
+        /usr/bin/xcrun --kill-cache
+        /usr/bin/xcodebuild -version
+        /usr/bin/xcrun --find clang
+        /usr/bin/xcrun --find ld
+        sdk_root="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)"
+        printf 'SDKROOT=%s\n' "$sdk_root" >> "$GITHUB_ENV"
+        printf 'macOS SDK: %s\n' "$sdk_root"
+    - name: Restore the prepared source snapshot
+      if: ${{ steps.sources.outputs.cache-hit == 'true' }}
       shell: bash
       run: |
         bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
           -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-          :repository-conventions:restoreNativeSourceCache \
+          :repository-conventions:restoreNativeSourceCache
+    - name: Prepare a missing source snapshot
+      if: ${{ steps.sources.outputs.cache-hit != 'true' }}
+      shell: bash
+      run: |
+        bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+          -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
           :repository-conventions:prepareNativeSources \
           :repository-conventions:createNativeSourceCache

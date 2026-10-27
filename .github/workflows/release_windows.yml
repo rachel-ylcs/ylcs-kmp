@@ -6,7 +6,7 @@ on:
 jobs:
   package-windows:
     name: Package Windows
-    uses: $/.github/workflows/gradle-build.yml
+    uses: ./.github/workflows/gradle-build.yml
     with:
       runner: windows-latest
       task: ylcs-app:desktop-app:desktopPublish

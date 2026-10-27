@@ -23,13 +23,16 @@ inputs:
   virtual-display:
     description: Install Xvfb and Xauthority tools on Linux.
     default: 'false'
+  native-tools:
+    description: Install desktop Native development tools and restore compiled SDL and Skia SDKs.
+    default: 'false'
 
 runs:
   using: composite
   steps:
     - name: Checkout Code
       if: ${{ inputs.checkout == 'true' }}
-      uses: $/.github/actions/checkout
+      uses: ./.github/actions/checkout
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
         submodules: ${{ inputs.submodules }}
@@ -56,10 +59,12 @@ runs:
       with:
         distribution: oracle
         java-version: '25'
-        cache: gradle
-        cache-dependency-path: |
-          ./*.gradle*
-          ./**/gradle-wrapper.properties
+
+    - name: Cache Gradle Dependencies and Build Outputs
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        cache-provider: basic
+        cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
     - name: Setup Android SDK
       if: ${{ inputs.android == 'true' }}
@@ -73,3 +78,8 @@ runs:
       with:
         arch: x64
         export-path-to-vs: VS_PATH
+
+    - name: Restore Native Compose Dependencies
+      uses: ./.github/actions/setup-native
+      with:
+        tools: ${{ inputs.native-tools }}

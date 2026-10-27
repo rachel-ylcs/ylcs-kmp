@@ -39,6 +39,8 @@ class NativeUpstreamSync(directory: File) {
         files.addAll(repository.resolve("build-logic/repository-conventions/src/main/kotlin/love/yinlin/repository/nativecompose").walkTopDown().filter { it.extension == "kt" })
         files.add(repository.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts"))
         files.add(repository.resolve(".gitattributes"))
+        files.add(repository.resolve("settings.gradle.kts"))
+        files.add(repository.resolve("gradle.properties"))
         files.addAll(listOf("gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat").map { repository.resolve(it) })
         return files.distinct().sortedBy { it.invariantSeparatorsPath }.associate { it.relativeTo(repository).invariantSeparatorsPath to it.sourceHash() }
     }
@@ -68,12 +70,12 @@ class NativeUpstreamSync(directory: File) {
         val owner = vendor.resolve("icu")
         workspace.locked(owner) {
             val archive = owner.resolve("icu-data.zip")
-            downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 64L * 1024 * 1024)
             val build = owner.resolve("workspace")
             val marker = build.resolve(".rachel-prepared.json")
             val fingerprint = bytesHash(sourceBytes(mapOf("lock" to lock, "inputs" to inputHashes())))
             val previous = if (marker.isFile) marker.sourceJson() else emptyMap()
-            if (previous["fingerprint"] != fingerprint) stage(".icu-data-") { staging ->
+            if (previous["fingerprint"] != fingerprint || !build.resolve("icudtl.dat").isFile || !build.resolve("icu-LICENSE.txt").isFile) stage(".icu-data-") { staging ->
+                downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 64L * 1024 * 1024)
                 SourceArchive.extract(archive, staging, false)
                 val input = staging.resolve(sourceRelativePath(data["file"] as String))
                 check(input.sourceHash() == data["sha256"] && staging.resolve("LICENSE").sourceHash() == lock["licenseSha256"]) { "ICU data/license checksum mismatch" }
@@ -95,14 +97,14 @@ class NativeUpstreamSync(directory: File) {
             val commit = upstream["commit"] as String
             check(Regex("[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+").matches(repositoryName) && Regex("[a-f0-9]{40}").matches(commit)) { "Invalid Skiko source identity" }
             val archive = owner.resolve("skiko-upstream.zip")
-            downloadSource("https://codeload.github.com/$repositoryName/zip/$commit", archive, upstream["sha256"] as String, offline, 128L * 1024 * 1024)
             val inputs = inputHashes()
             val inventory = nativeDirectory.resolve("adaptation").listFiles().orEmpty().filter { it.name.startsWith("org.jetbrains.skiko_") }.flatMap { module -> module.resolve("src").walkTopDown().filter { it.isFile }.map { it.relativeTo(nativeDirectory).invariantSeparatorsPath }.toList() }.sorted()
-            val fingerprint = bytesHash(sourceBytes(mapOf("inputs" to inputs, "catalog" to catalog.file.sourceHash(), "inventory" to inventory)))
+            val fingerprint = bytesHash(sourceBytes(mapOf("inputs" to inputs, "catalog" to NativeCiInputs(repository).identity(catalog), "inventory" to inventory)))
             val build = owner.resolve("workspace")
             val marker = build.resolve(".rachel-prepared.json")
             val previous = if (marker.isFile) marker.sourceJson() else emptyMap()
-            if (previous["fingerprint"] != fingerprint) stage(".skiko-source-") { staging ->
+            if (previous["fingerprint"] != fingerprint || !workspace.reusable(build, marker, mapOf("fingerprint" to fingerprint))) stage(".skiko-source-") { staging ->
+                downloadSource("https://codeload.github.com/$repositoryName/zip/$commit", archive, upstream["sha256"] as String, offline, 128L * 1024 * 1024)
                 SourceArchive.extract(archive, staging, true)
                 patches.apply(staging, patches.manifest["skiko"].sourceObject())
                 catalog.alignUpstreamCatalog(staging.resolve("dependencies.toml"))
@@ -110,19 +112,18 @@ class NativeUpstreamSync(directory: File) {
                 catalog.copyWrappers(staging)
                 prepareNotices(staging)
                 removeShadows(staging)
-                workspace.synchronize(staging, build, marker, mapOf("schema" to 3, "fingerprint" to fingerprint, "sources" to skiko["sources"]))
+                workspace.synchronize(staging, build, marker, mapOf("schema" to 3, "fingerprint" to fingerprint, "sources" to skiko["sources"]), setOf("skiko/dependencies/skia"))
             }
             val key = skiaHostKey()
             val filename = "Skia-${skiko["skia"]}-$key.zip"
             val expected = skiko["skiaAssets"].sourceObject().getValue(key) as String
             val cached = owner.resolve("skia/$expected.zip")
-            if (!cached.isFile) {
-                val existing = build.resolve("skiko/dependencies/skia/${skiko["skia"]}/$filename")
-                if (existing.isFile && existing.sourceHash() == expected) existing.copyTo(cached.apply { parentFile.mkdirs() })
-            }
-            downloadSource("https://github.com/JetBrains/skia/releases/download/${skiko["skia"]}/$filename", cached, expected, offline, 1024L * 1024 * 1024)
             val target = build.resolve("skiko/dependencies/skia/${skiko["skia"]}/$filename")
-            if (!target.isFile || target.sourceHash() != expected) cached.copyTo(checkedSourcePath(vendor, target).apply { parentFile.mkdirs() }, overwrite = true)
+            if (!target.isFile || target.sourceHash() != expected) {
+                downloadSource("https://github.com/JetBrains/skia/releases/download/${skiko["skia"]}/$filename", cached, expected, offline, 1024L * 1024 * 1024)
+                cached.copyTo(checkedSourcePath(vendor, target).apply { parentFile.mkdirs() }, overwrite = true)
+            }
+            else if (!cached.isFile) target.copyTo(cached.apply { parentFile.mkdirs() })
             writeSource(vendor, owner.resolve("state.json"), sourceBytes(mapOf("schema" to 3, "build" to "vendor/skiko/workspace/skiko", "fingerprint" to fingerprint,
                 "inputs" to inputs, "sourceInventory" to inventory, "catalogSha256" to catalog.file.sourceHash(), "java" to catalog.java,
                 "versions" to skiko["versions"].sourceObject().mapValues { (name, value) -> catalog.versions[name] ?: value })))
@@ -180,10 +181,10 @@ class NativeUpstreamSync(directory: File) {
         check(version == catalog.versions["sdl"]) { "SDL catalog/source lock mismatch" }
         val source = lock["source"].sourceObject()
         val archive = vendor.resolve("sdl-source-$version.zip")
-        downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 128L * 1024 * 1024)
         val destination = vendor.resolve("sdl-source-$version")
         val marker = destination.resolve(".rachel-source-sha256")
         if (!marker.isFile || marker.readText() != source["sha256"]) stage(".sdl-source-") { staging ->
+            downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 128L * 1024 * 1024)
             SourceArchive.extract(archive, staging, true)
             staging.resolve(".rachel-source-sha256").writeText(source["sha256"] as String)
             check(!destination.exists()) { "Unrecognized SDL source directory preserved: $destination" }
