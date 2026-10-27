@@ -12,6 +12,47 @@ import kotlin.test.assertTrue
 
 class NativeSourceCacheTest {
     @Test
+    fun snapshotRestoresDetachedGitRepositoriesWithEmptyRefDirectories() {
+        val work = Files.createTempDirectory("native-source-cache-detached").toFile()
+        try {
+            sourceGit(work, "init", "-q")
+            sourceGit(work, "remote", "add", "origin", "https://example.invalid/outer.git")
+            val native = work.resolve("native-compose").apply { mkdirs() }
+            val vendor = native.resolve("vendor")
+            for (root in listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states", "icu/workspace")) vendor.resolve(root).mkdirs()
+            val commits = linkedMapOf<String, String>()
+            for (repository in listOf("compose", "resources")) {
+                val workspace = vendor.resolve("$repository/workspace")
+                workspace.resolve("A.kt").writeText("source\n")
+                sourceGit(workspace, "-c", "init.defaultBranch=fixture", "init", "-q")
+                sourceGit(workspace, "remote", "add", "origin", "https://example.invalid/$repository.git")
+                sourceGit(workspace, "add", ".")
+                sourceGit(workspace, "-c", "user.name=Native Source Fixture", "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
+                commits[repository] = sourceGit(workspace, "rev-parse", "HEAD").trim()
+                sourceGit(workspace, "checkout", "--detach")
+                sourceGit(workspace, "branch", "-D", "fixture")
+                assertFalse(workspace.resolve(".git/refs").walkTopDown().any { it.isFile })
+            }
+            val cache = NativeSourceCache(native)
+            cache.create()
+            for (repository in commits.keys) assertTrue(vendor.resolve("$repository/workspace").renameTo(work.resolve("original-$repository")))
+            cache.restore()
+            for ((repository, commit) in commits) {
+                val workspace = vendor.resolve("$repository/workspace")
+                // Match CI, where actions/checkout also trusts the enclosing repository.
+                assertEquals("https://example.invalid/$repository.git", sourceGit(workspace, "-c", "safe.directory=${work.canonicalFile.invariantSeparatorsPath}", "config", "--local", "--get-all", "remote.origin.url").trim())
+                assertEquals(commit, sourceGit(workspace, "rev-parse", "HEAD").trim())
+                assertTrue(workspace.resolve(".git/refs").isDirectory)
+                assertTrue(workspace.resolve(".git/objects").isDirectory)
+                assertEquals("source\n", workspace.resolve("A.kt").readText())
+            }
+        } finally {
+            for (file in work.walkTopDown().filter { it.isFile }) assertTrue(file.setWritable(true))
+            assertTrue(work.deleteRecursively())
+        }
+    }
+
+    @Test
     fun snapshotExcludesCompilerOutputsAndRestoresGitAndKotlinSources() {
         val work = Files.createTempDirectory("native-source-cache").toFile()
         try {

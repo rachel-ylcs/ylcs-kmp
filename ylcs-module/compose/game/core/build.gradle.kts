@@ -5,6 +5,7 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
         libs.plugins.androidLibrary,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
@@ -13,6 +14,10 @@ plugins {
 
 rachel {
     multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
+
         sources {
             commonMain {
                 lib(
@@ -26,6 +31,12 @@ rachel {
             iosMainList(skikoMain)
 
             desktopMain(skikoMain)
+
+            windowsMain(skikoMain)
+
+            linuxMain(skikoMain)
+
+            macosMain(skikoMain)
 
             webMain(skikoMain)
 

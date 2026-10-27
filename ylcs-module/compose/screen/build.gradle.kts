@@ -7,6 +7,7 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
         libs.plugins.androidLibrary,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
@@ -15,13 +16,16 @@ plugins {
 
 rachel {
     multiplatform {
+        windowsTarget = true
+        linuxTarget = true
+        macosTarget = true
+
         sources {
             commonMain {
                 lib(
                     libs.androidx.navigation3,
                     libs.androidx.navigation3.viewmodel,
                     ExportLib,
-                    libs.kotlinx.json,
                     projects.ylcsModule.compose.ui,
                 )
             }

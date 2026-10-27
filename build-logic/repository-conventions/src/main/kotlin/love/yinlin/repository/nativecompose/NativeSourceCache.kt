@@ -66,6 +66,15 @@ class NativeSourceCache(directory: File) {
                 destination.parentFile.mkdirs()
                 Files.copy(staging.resolve(relative).toPath(), destination.toPath(), StandardCopyOption.COPY_ATTRIBUTES)
             }
+            // Detached checkouts can have no refs. File-only ZIP snapshots omit these directories,
+            // making Git ignore the restored checkout and discover the enclosing Rachel repository.
+            for (root in listOf("compose/workspace", "resources/workspace")) {
+                if (!vendor.resolve("$root/.git/HEAD").isFile) continue
+                for (name in listOf("objects", "refs")) {
+                    val directory = checkedSourcePath(vendor, vendor.resolve("$root/.git/$name"))
+                    check(directory.isDirectory || directory.mkdirs()) { "Cannot restore Git directory: $directory" }
+                }
+            }
             println("Restored ${files.size} prepared source inputs; synchronization will validate them against the locks")
         } finally {
             checkedSourcePath(vendor, staging)
