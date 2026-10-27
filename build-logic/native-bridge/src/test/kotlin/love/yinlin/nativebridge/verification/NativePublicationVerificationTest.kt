@@ -1,6 +1,5 @@
 package love.yinlin.nativebridge.verification
 
-import groovy.json.JsonOutput
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.Test

@@ -1,11 +1,10 @@
-@file:Suppress("DEPRECATION")
-
 package org.jetbrains.compose.resources
 
 import androidx.compose.ui.text.intl.Locale
 import org.jetbrains.skiko.SystemTheme
 import org.jetbrains.skiko.window.NativeDesktop
 
+@Suppress("DEPRECATION")
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = NativeDesktop.preferredLocales().firstOrNull()?.let(::Locale) ?: Locale.current
     return ResourceEnvironment(

@@ -8,22 +8,7 @@ import org.gradle.kotlin.dsl.getByType
 import java.io.File
 import java.security.MessageDigest
 
-/**
- * 本仓库始终重现锁定的移植源码并关联真实 project。
- * 仓库外消费者只应用 Project 桥插件，按 target 选择已发布 Maven 工件。
- */
-@Suppress("UnstableApiUsage")
-fun Settings.nativeCompose() {
-    gradle.extensions.extraProperties.set("love.yinlin.nativeCompose.maintainer", true)
-
-    pluginManager.apply("love.yinlin.native-bridge.settings")
-    extensions.getByType<RepositorySettings>().modules {
-        module("native-compose")
-    }
-
-    val directory = settingsDir.resolve("native-compose")
-    includeNativeComposeSources(directory)
-}
+private fun sha256(file: File): String = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
 
 private fun Settings.includeNativeComposeSources(directory: File) {
     NativeUpstreamSync(directory).prepare(gradle.startParameter.isOffline)
@@ -89,4 +74,15 @@ private fun Settings.includeComposeUiSources(directory: File) {
     extensions.getByType<NativeBridgeSourcesExtension>().include(sourceDirectory, "compose-ui", projects, adaptations)
 }
 
-private fun sha256(file: File): String = MessageDigest.getInstance("SHA-256").digest(file.readBytes()).joinToString("") { "%02x".format(it) }
+@Suppress("unused")
+fun Settings.nativeComposeMaintainer() {
+    gradle.extensions.extraProperties.set("love.yinlin.nativeCompose.maintainer", true)
+
+    pluginManager.apply("love.yinlin.native-bridge.settings")
+    extensions.getByType<RepositorySettings>().modules {
+        module("native-compose")
+    }
+
+    val directory = settingsDir.resolve("native-compose")
+    includeNativeComposeSources(directory)
+}

@@ -29,7 +29,7 @@ class NativeInputTest {
             service.onTextInput("中文")
             assertEquals("中文", request.currentValue.text)
             assertNull(request.currentValue.composition)
-            assertEquals<List<Int>>([2, 4, 18, 20], window.inputArea)
+            assertEquals([2, 4, 18, 20], window.inputArea)
         }
         finally { session.cancelAndJoin() }
         service.onTextInput("ignored")
@@ -81,9 +81,9 @@ class NativeInputTest {
 
     @Test
     fun keypadNavigationDependsOnNumLock() {
-        assertEquals(Key.NumPad1, nativeKey(NativeWindowEvent.Key(89, 0, true, false, 0x1000)))
-        assertEquals(Key.NumPadMoveEnd, nativeKey(NativeWindowEvent.Key(89, 0, true, false, 0)))
-        assertEquals(Key.A, nativeKey(NativeWindowEvent.Key(4, 97, true, false, 0)))
+        assertEquals(Key.NumPad1, nativeKey(NativeWindowEvent.Key(89, 0, down = true, repeat = false, modifiers = 0x1000)))
+        assertEquals(Key.NumPadMoveEnd, nativeKey(NativeWindowEvent.Key(89, 0, down = true, repeat = false, modifiers = 0)))
+        assertEquals(Key.A, nativeKey(NativeWindowEvent.Key(4, 97, down = true, repeat = false, modifiers = 0)))
     }
 
     @Test
@@ -136,11 +136,11 @@ class NativeInputTest {
         val service = NativeTextInputService()
         service.attach(window)
         service.notifyFocusedRect(Rect(3f, 5f, 16f, 18f))
-        assertEquals<List<Int>>([1, 2, 7, 7], window.inputArea)
+        assertEquals([1, 2, 7, 7], window.inputArea)
         service.notifyFocusedRect(Rect(Float.NaN, 0f, 1f, 1f))
-        assertEquals<List<Int>>([1, 2, 7, 7], window.inputArea)
+        assertEquals([1, 2, 7, 7], window.inputArea)
         service.notifyFocusedRect(Rect(1.8f, 1.8f, 2.2f, 2.2f))
-        assertEquals<List<Int>>([0, 0, 2, 2], window.inputArea)
+        assertEquals([0, 0, 2, 2], window.inputArea)
     }
 
     @Test

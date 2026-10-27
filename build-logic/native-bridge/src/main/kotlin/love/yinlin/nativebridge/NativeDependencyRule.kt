@@ -5,18 +5,15 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import javax.inject.Inject
 
-/** One upstream module/version mapped only for the listed Konan target identifiers. */
 abstract class NativeDependencyRule @Inject constructor(private val ruleName: String) : Named {
     override fun getName(): String = ruleName
 
     abstract val upstream: Property<String>
     abstract val upstreamVersion: Property<String>
     abstract val targets: SetProperty<String>
-    /** Targets supplied by the replacement's shared metadata; concrete target routing still uses [targets]. */
     abstract val metadataTargets: SetProperty<String>
     abstract val module: Property<String>
 
-    /** Same-build project alternative. Its Maven coordinates must be configured by its producer. */
     abstract val projectPath: Property<String>
 
     init {
@@ -32,7 +29,6 @@ abstract class NativeDependencyRule @Inject constructor(private val ruleName: St
         if (module.isPresent) require(module.get().split(':').size == 3) { "$name: module must be group:artifact:version" }
     }
 
-    /** Native leaf coordinates must follow the same route as the ordinary KMP root request. */
     internal fun matchesUpstream(group: String, artifact: String, target: String?): Boolean {
         val coordinate = upstream.get().split(':')
         if (coordinate[0] != group) return false

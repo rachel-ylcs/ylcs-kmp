@@ -18,20 +18,16 @@ package androidx.compose.foundation.text
 
 import androidx.compose.foundation.DesktopPlatform
 
-internal actual val platformDefaultKeyMapping: KeyMapping
-    get() = keyMappingOverride ?: _platformDefaultKeyMapping
+internal actual val platformDefaultKeyMapping: KeyMapping get() = keyMappingOverride ?: _platformDefaultKeyMapping
 
 /**
  * Used for testing purposes only
  */
 internal var keyMappingOverride: KeyMapping? = null
-private val _platformDefaultKeyMapping: KeyMapping =
-    createPlatformDefaultKeyMapping(DesktopPlatform.Current)
+private val _platformDefaultKeyMapping: KeyMapping = createPlatformDefaultKeyMapping(DesktopPlatform.Current)
 
-internal fun createPlatformDefaultKeyMapping(platform: DesktopPlatform): KeyMapping {
-    return when (platform) {
-        DesktopPlatform.MacOS -> createMacOsDefaultKeyMapping()
-        DesktopPlatform.Windows -> createWindowsDefaultKeyMapping()
-        else -> DefaultSkikoKeyMapping
-    }
+internal fun createPlatformDefaultKeyMapping(platform: DesktopPlatform): KeyMapping = when (platform) {
+    DesktopPlatform.MacOS -> createMacOsDefaultKeyMapping()
+    DesktopPlatform.Windows -> createWindowsDefaultKeyMapping()
+    else -> DefaultSkikoKeyMapping
 }

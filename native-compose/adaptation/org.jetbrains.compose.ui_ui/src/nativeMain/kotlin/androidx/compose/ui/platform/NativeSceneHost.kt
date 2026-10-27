@@ -190,8 +190,8 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
     private fun drop() {
         if (drops.isEmpty()) return
         val data = DragAndDropTransferData(drops.filterNot { it.isFile }.joinToString("\n") { it.text }.ifEmpty { null }, drops.filter { it.isFile }.map { it.text })
-        val last = drops.last()
-        val event = DragAndDropEvent(data, Offset(last.x, last.y))
+        (val x, val y) = drops.last()
+        val event = DragAndDropEvent(data, Offset(x, y))
         drops.clear()
         val target = scene.rootDragAndDropNode
         if (!target.acceptDragAndDropTransfer(event)) return

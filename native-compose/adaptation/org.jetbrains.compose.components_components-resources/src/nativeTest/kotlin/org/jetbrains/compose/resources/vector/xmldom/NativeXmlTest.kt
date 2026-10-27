@@ -31,6 +31,6 @@ class NativeXmlTest {
     fun aggregatesTextWithoutKeepingAWholeCopyAtEveryAncestor() {
         val text = "abc😀".repeat(32768)
         val root = parse("<r>".repeat(64) + text + "<![CDATA[<tail>]]>" + "</r>".repeat(64))
-        assertEquals(text + "<tail>", root.textContent)
+        assertEquals("$text<tail>", root.textContent)
     }
 }

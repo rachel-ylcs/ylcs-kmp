@@ -11,7 +11,6 @@ import java.lang.foreign.ValueLayout
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-/** Updates only the staged PE image, using Windows' resource APIs through JDK 25. */
 internal object NativeWindowsResources {
     fun write(executable: File, desktop: NativeDesktopDistribution, icon: File?) {
         require(System.getProperty("os.name").startsWith("Windows"))

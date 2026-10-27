@@ -1,5 +1,3 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, org.jetbrains.skiko.InternalSkikoApi::class)
-
 package org.jetbrains.skia.icu
 
 import org.jetbrains.skia.ExternalSymbolName

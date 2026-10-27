@@ -2,7 +2,6 @@ package love.yinlin.repository.nativecompose
 
 import java.io.File
 
-/** Native CI ignores application versions and dependencies that the maintained builds do not use. */
 internal class NativeCiInputs(private val repository: File) {
     private val accessors: Set<String> = listOf("native-compose/adaptation", "native-compose/gradle", "native-compose/verification", "build-logic/native-bridge", "build-logic/public-plugin/build.gradle.kts").flatMap { relative ->
         repository.resolve(relative).walkTopDown().onEnter { it.name !in setOf("build", "vendor", ".gradle", ".kotlin") }.filter {

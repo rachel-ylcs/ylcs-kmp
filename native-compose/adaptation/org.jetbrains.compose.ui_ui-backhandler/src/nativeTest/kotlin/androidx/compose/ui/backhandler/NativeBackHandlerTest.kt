@@ -1,6 +1,3 @@
-@file:Suppress("DEPRECATION")
-@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
-
 package androidx.compose.ui.backhandler
 
 import androidx.compose.runtime.Composition
@@ -28,6 +25,7 @@ class NativeBackHandlerTest {
         try {
             composition.setContent {
                 CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides owner) {
+                    @Suppress("DEPRECATION")
                     BackHandler { backs++ }
                 }
             }
@@ -57,6 +55,7 @@ class NativeBackHandlerTest {
         try {
             composition.setContent {
                 CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides owner) {
+                    @Suppress("DEPRECATION")
                     BackHandler(enabled = false) { error("Disabled handler ran") }
                 }
             }

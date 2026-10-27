@@ -6,7 +6,6 @@ import java.nio.channels.OverlappingFileLockException
 import java.nio.channels.FileLock
 import java.nio.file.StandardOpenOption
 
-/** Owns only generated files recorded by the source preparer, preserving arbitrary local edits. */
 internal class SourceWorkspace(private val vendor: File) {
     fun reusable(destination: File, record: File, identity: SourceObject): Boolean {
         checkedSourcePath(vendor, destination)
@@ -50,7 +49,7 @@ internal class SourceWorkspace(private val vendor: File) {
         checkedSourcePath(vendor, destination)
         checkedSourcePath(vendor, record)
         preservedDirectories.forEach { sourceRelativePath(it) }
-        val files = staging.walkTopDown().filter { it.isFile }.associate { it.relativeTo(staging).invariantSeparatorsPath to it }
+        val files = staging.walkTopDown().filter { it.isFile }.associateBy { it.relativeTo(staging).invariantSeparatorsPath }
         check(files.keys.none { relative -> preservedDirectories.any { relative == it || relative.startsWith("$it/") } }) { "Prepared sources overlap an independently managed SDK: $destination" }
         val hashes = files.mapValues { it.value.sourceHash() }
         val previous = if (record.isFile) record.sourceJson() else emptyMap()
@@ -66,20 +65,29 @@ internal class SourceWorkspace(private val vendor: File) {
         }
         val oldFiles = known?.keys ?: legacy?.map { it as String }?.toSet() ?: emptySet()
         val currentSources = sourceFiles(destination)
-        check((currentSources - oldFiles - files.keys).isEmpty()) { "Unrecognized source files preserved in $destination: ${currentSources - oldFiles - files.keys}" }
+        check(buildSet {
+            addAll(currentSources)
+            removeAll(oldFiles)
+            removeAll(files.keys)
+        }.isEmpty()) { "Unrecognized source files preserved in $destination: ${
+            buildSet {
+                addAll(currentSources)
+                removeAll(oldFiles)
+                removeAll(files.keys)
+            }
+        }" }
         for (relative in oldFiles) {
             sourceRelativePath(relative)
             val file = checkedSourcePath(vendor, destination.resolve(relative))
             val current = if (file.isFile) file.sourceHash() else null
-            val expected = known?.get(relative)
-            val allowed = when (expected) {
+            val allowed = when (val expected = known?.get(relative)) {
                 is List<*> -> expected.toSet()
                 is String -> setOf(expected)
                 else -> setOf(hashes[relative])
             }
             check(current == null || current in allowed) { "Local source edit preserved: $file" }
         }
-        for ((relative, source) in files) {
+        for ((relative, _) in files) {
             val target = checkedSourcePath(vendor, destination.resolve(relative))
             check(relative in oldFiles || !target.exists() || (target.isFile && target.sourceHash() == hashes.getValue(relative))) { "Unrecognized generated source preserved: $target" }
         }
@@ -87,7 +95,7 @@ internal class SourceWorkspace(private val vendor: File) {
         val pending = linkedMapOf<String, Any?>()
         for (relative in oldFiles + hashes.keys) {
             val old = known?.get(relative)
-            val values = if (old is List<*>) old else listOfNotNull(old)
+            val values = old as? List<*> ?: listOfNotNull(old)
             pending[relative] = (values + listOfNotNull(hashes[relative])).distinct()
         }
         writeSource(vendor, record, sourceBytes(identity + ("files" to (oldFiles + hashes.keys).sorted()) + ("fileHashes" to pending)))

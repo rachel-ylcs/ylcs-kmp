@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-
 package androidx.compose.foundation.content
 
 import androidx.compose.runtime.Stable

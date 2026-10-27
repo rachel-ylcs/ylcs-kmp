@@ -20,8 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalAccessorScope
 
 @Composable
-internal actual fun rememberPlatformOverscrollEffect(): OverscrollEffect? =
-    null
+internal actual fun rememberPlatformOverscrollEffect(): OverscrollEffect? = null
 
-internal actual fun CompositionLocalAccessorScope.defaultOverscrollFactory(): OverscrollFactory? =
-    null
+internal actual fun CompositionLocalAccessorScope.defaultOverscrollFactory(): OverscrollFactory? = null

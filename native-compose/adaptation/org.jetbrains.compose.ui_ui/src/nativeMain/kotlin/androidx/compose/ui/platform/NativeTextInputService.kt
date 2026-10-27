@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Rect
@@ -11,6 +9,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 /** Bridges both Compose text-input contracts to the SDL host's IME session. */
+@Suppress("DEPRECATION")
 internal class NativeTextInputService : PlatformTextInputService {
     private var window: NativeWindowScope? = null
     private var request: PlatformTextInputMethodRequest? = null

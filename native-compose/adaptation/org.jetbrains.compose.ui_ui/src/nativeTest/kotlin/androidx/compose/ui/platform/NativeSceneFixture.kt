@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.ui.InternalComposeUiApi::class)
-
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable

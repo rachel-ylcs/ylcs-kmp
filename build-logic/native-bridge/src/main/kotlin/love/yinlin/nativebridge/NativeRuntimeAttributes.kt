@@ -6,7 +6,6 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
-/** Selects the host library variant when resolving classified Native runtime resources. */
 internal object NativeRuntimeAttributes {
     val artifactSuffixes = mapOf("mingw_x64" to "mingwx64", "linux_x64" to "linuxx64", "macos_arm64" to "macosarm64")
 

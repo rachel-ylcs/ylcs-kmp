@@ -3,7 +3,6 @@ package love.yinlin.repository.nativecompose
 import java.io.File
 import java.nio.file.Files
 
-/** Reviewable unified patches are tied to their exact upstream identities and SHA-256. */
 internal class SourcePatches(private val nativeDirectory: File) {
     val manifest = nativeDirectory.resolve("upstream/patches/manifest.json").sourceJson()
 

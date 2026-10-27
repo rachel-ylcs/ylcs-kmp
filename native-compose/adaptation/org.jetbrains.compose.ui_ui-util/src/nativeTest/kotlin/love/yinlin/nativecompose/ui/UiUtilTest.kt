@@ -60,7 +60,7 @@ class UiUtilTest {
     @Test
     fun tracingPreservesTheOriginalException() {
         val failure = IllegalStateException("trace fixture")
-        var caught: Throwable? = null
+        var caught: Throwable?
         try { trace("native-ui") { throw failure } }
         catch (error: Throwable) { caught = error }
         assertSame(failure, caught)

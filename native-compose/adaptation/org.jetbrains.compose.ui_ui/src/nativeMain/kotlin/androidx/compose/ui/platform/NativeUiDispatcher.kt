@@ -1,4 +1,4 @@
-@file:OptIn(kotlinx.coroutines.InternalCoroutinesApi::class)
+@file:OptIn(InternalCoroutinesApi::class)
 
 package androidx.compose.ui.platform
 
@@ -10,6 +10,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.concurrent.Volatile
 import kotlin.native.concurrent.ThreadLocal
+import kotlin.time.Duration.Companion.milliseconds
 
 /** A host-thread queue; background timers only enqueue resumptions and never execute UI work. */
 internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable {
@@ -49,7 +50,7 @@ internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable 
 
     override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
         val timer = timers.launch {
-            kotlinx.coroutines.delay(timeMillis)
+            delay(timeMillis.milliseconds)
             continuation.resume(Unit)
         }
         continuation.invokeOnCancellation { timer.cancel() }
@@ -57,7 +58,7 @@ internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable 
 
     override fun invokeOnTimeout(timeMillis: Long, block: Runnable, context: CoroutineContext): DisposableHandle {
         val timer = timers.launch {
-            kotlinx.coroutines.delay(timeMillis)
+            delay(timeMillis.milliseconds)
             dispatch(context, block)
         }
         return DisposableHandle { timer.cancel() }

@@ -2,7 +2,6 @@ package love.yinlin.repository.nativecompose
 
 import java.io.File
 
-/** Gradle JavaExec entry; ordinary repository imports call NativeUpstreamSync directly. */
 object NativeSourcesMain {
     @JvmStatic
     fun main(arguments: Array<String>) {

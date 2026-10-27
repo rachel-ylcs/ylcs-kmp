@@ -16,5 +16,4 @@
 
 package androidx.compose.foundation.text.selection
 
-internal actual val FirstLongPressSelectionAdjustment: SelectionAdjustment
-    get() = SelectionAdjustment.Word
+internal actual val FirstLongPressSelectionAdjustment: SelectionAdjustment get() = SelectionAdjustment.Word

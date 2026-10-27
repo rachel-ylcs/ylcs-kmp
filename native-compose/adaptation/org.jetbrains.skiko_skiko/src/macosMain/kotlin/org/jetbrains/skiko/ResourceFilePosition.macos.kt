@@ -1,9 +1,6 @@
-@file:OptIn(ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.COpaquePointer
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.reinterpret
 import platform.posix.FILE
 import platform.posix.fseek

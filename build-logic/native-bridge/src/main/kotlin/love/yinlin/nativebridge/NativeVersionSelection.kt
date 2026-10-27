@@ -4,7 +4,6 @@ import org.gradle.api.GradleException
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import java.math.BigInteger
 
-/** Checks a request against the selected port, without mistaking an older edge for a downgrade. */
 internal object NativeVersionSelection {
     fun validate(request: ModuleComponentSelector, selected: String, rule: String) {
         val constraint = request.versionConstraint

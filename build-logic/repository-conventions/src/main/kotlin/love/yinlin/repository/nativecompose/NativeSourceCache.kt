@@ -4,7 +4,6 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
-/** Snapshots only prepared source inputs; SDKs and compiler outputs have separate CI caches. */
 class NativeSourceCache(directory: File) {
     private val nativeDirectory = directory.canonicalFile
     private val vendor = nativeDirectory.resolve("vendor")

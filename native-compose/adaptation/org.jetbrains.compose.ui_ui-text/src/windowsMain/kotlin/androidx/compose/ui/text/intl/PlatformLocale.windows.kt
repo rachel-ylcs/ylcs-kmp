@@ -1,7 +1,8 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package androidx.compose.ui.text.intl
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.UShortVar
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped

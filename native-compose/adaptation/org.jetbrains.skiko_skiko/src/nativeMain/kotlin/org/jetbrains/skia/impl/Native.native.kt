@@ -1,4 +1,4 @@
-@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+@file:OptIn(ExperimentalAtomicApi::class)
 
 package org.jetbrains.skia.impl
 
@@ -9,6 +9,7 @@ import org.jetbrains.skiko.internal.fastForEach
 import kotlin.native.internal.NativePtr
 import kotlin.native.concurrent.ThreadLocal
 import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 actual abstract class Native actual constructor(ptr: NativePointer) {
     internal actual var _ptr: NativePointer
@@ -227,7 +228,7 @@ actual class InteropScope actual constructor() {
         try {
             val size = decoder.getArraySize(this)
             require(size >= 0) { "Native array returned a negative size" }
-            return Array<T>(size) { decoder.getArrayElement(this, it) }
+            return Array(size) { decoder.getArrayElement(this, it) }
         }
         finally { decoder.disposeArray(this) }
     }

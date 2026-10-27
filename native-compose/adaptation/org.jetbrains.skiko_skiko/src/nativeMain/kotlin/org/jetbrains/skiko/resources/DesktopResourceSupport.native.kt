@@ -1,5 +1,3 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class, org.jetbrains.skiko.InternalSkikoApi::class)
-
 package org.jetbrains.skiko.resources
 
 import kotlinx.cinterop.addressOf
@@ -7,8 +5,8 @@ import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import org.jetbrains.skiko.internal.sdl.*
 
-@org.jetbrains.skiko.InternalSkikoApi
 /** SDL resource services without exposing target-specific CInterop types to dependent libraries. */
+@org.jetbrains.skiko.InternalSkikoApi
 object DesktopResourceSupport {
     fun baseDirectory(): String = checkNotNull(SDL_GetBasePath()?.toKString()) { "Cannot locate the Native application's resource directory" }
 

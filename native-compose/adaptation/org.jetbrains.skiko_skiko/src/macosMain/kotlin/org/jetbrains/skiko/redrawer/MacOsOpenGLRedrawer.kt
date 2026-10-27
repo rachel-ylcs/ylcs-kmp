@@ -1,20 +1,11 @@
-@file:OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko.redrawer
 
 import kotlinx.cinterop.*
 import org.jetbrains.skia.*
 import org.jetbrains.skiko.*
-import platform.CoreFoundation.CFTimeInterval
-import platform.CoreGraphics.CGRectMake
-import platform.CoreVideo.CVTimeStamp
 import platform.OpenGL.GL_DRAW_FRAMEBUFFER_BINDING
 import platform.OpenGL.glGetIntegerv
-import platform.OpenGLCommon.CGLContextObj
-import platform.OpenGLCommon.CGLPixelFormatObj
-import platform.OpenGLCommon.CGLSetCurrentContext
 import platform.OpenGLCommon.GLenum
-import platform.QuartzCore.CAOpenGLLayer
 import platform.QuartzCore.*
 
 /**

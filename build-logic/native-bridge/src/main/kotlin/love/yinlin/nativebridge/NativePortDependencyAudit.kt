@@ -11,7 +11,6 @@ import org.gradle.api.artifacts.result.UnresolvedDependencyResult
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
-/** Checks selected components without building or downloading their target KLIB artifacts. */
 internal object NativePortDependencyAudit {
     fun configure(project: Project, kotlin: KotlinMultiplatformExtension, bridge: NativeBridgeExtension, source: (String) -> ComponentSelector?) {
         project.tasks.register("verifyNativePortDependencies") {

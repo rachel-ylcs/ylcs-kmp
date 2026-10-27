@@ -3,6 +3,7 @@ package androidx.compose.ui.platform
 import kotlinx.coroutines.*
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class NativeDispatcherTest {
     @Test
@@ -31,10 +32,10 @@ class NativeDispatcherTest {
         var resumed = false
         try {
             val work = launch(dispatcher, start = CoroutineStart.UNDISPATCHED) {
-                delay(10)
+                delay(10.milliseconds)
                 resumed = true
             }
-            withTimeout(10_000) { queued.await() }
+            withTimeout(10_000.milliseconds) { queued.await() }
             assertFalse(resumed)
             dispatcher.runCurrent()
             assertTrue(resumed)

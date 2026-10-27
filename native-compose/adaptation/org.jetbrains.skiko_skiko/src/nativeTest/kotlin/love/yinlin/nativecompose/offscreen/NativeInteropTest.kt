@@ -1,7 +1,8 @@
-@file:OptIn(org.jetbrains.skiko.InternalSkikoApi::class, kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 
 package love.yinlin.nativecompose.offscreen
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import org.jetbrains.skia.ManagedString
 import org.jetbrains.skia.impl.*
 import org.jetbrains.skia.shaper.IcuBidiRunIterator

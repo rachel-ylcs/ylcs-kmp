@@ -13,7 +13,7 @@ class NativeMotionPathTest {
 
     @Test
     fun appliesEasingToTheWholePathAndKeepsAxesAligned() {
-        val holder = PropertyValuesHolder2D("translateX", "translateY", [PathNode.MoveTo(0f, 0f), PathNode.LineTo(100f, 0f), PathNode.LineTo(100f, 100f)], Easing { it * it })
+        val holder = PropertyValuesHolder2D("translateX", "translateY", [PathNode.MoveTo(0f, 0f), PathNode.LineTo(100f, 0f), PathNode.LineTo(100f, 100f)]) { it * it }
         val axes = holder.splitMotionPath()
         val x = axes[0].asAnimationSpec(1000).vectorize(Float.VectorConverter)
         val y = axes[1].asAnimationSpec(1000).vectorize(Float.VectorConverter)

@@ -1,4 +1,4 @@
-@file:OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
+@file:OptIn(BetaInteropApi::class)
 
 package org.jetbrains.skiko.redrawer
 

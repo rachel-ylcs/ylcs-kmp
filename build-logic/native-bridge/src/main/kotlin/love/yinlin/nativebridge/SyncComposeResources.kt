@@ -13,7 +13,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import javax.inject.Inject
 
-/** Syncs even after the final source file is removed, clearing obsolete deployed resources. */
 @DisableCachingByDefault(because = "Synchronizes files into a local native executable directory")
 abstract class SyncComposeResources : DefaultTask() {
     @get:InputFiles

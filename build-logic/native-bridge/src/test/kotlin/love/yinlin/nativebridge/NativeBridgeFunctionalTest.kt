@@ -239,6 +239,7 @@ class NativeBridgeFunctionalTest {
     }
 
     @Test
+    @Suppress("UNCHECKED_CAST")
     fun mixedPlatformMetadataUsesUpstreamRequestsButSelectsTheNativePort() {
         for (mixed in listOf(false, true)) {
             val project = project()

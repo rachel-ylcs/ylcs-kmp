@@ -8,7 +8,6 @@ import java.net.http.HttpResponse
 import java.nio.file.Files
 import java.time.Duration
 
-/** Repository-only source preparation. It does not run Gradle, CMake, compilers or tests. */
 class NativeUpstreamSync(directory: File) {
     internal val nativeDirectory = directory.canonicalFile
     internal val repository = nativeDirectory.parentFile
@@ -194,6 +193,17 @@ class NativeUpstreamSync(directory: File) {
         println("Prepared SDL $version sources")
     }
 
+    private fun nativeHostTarget(): String {
+        val os = System.getProperty("os.name").lowercase()
+        val arch = System.getProperty("os.arch").lowercase()
+        return when {
+            os.startsWith("windows") && arch in setOf("amd64", "x86_64") -> "mingw_x64"
+            os.startsWith("linux") && arch in setOf("amd64", "x86_64") -> "linux_x64"
+            os.startsWith("mac") && arch in setOf("arm64", "aarch64") -> "macos_arm64"
+            else -> error("Unsupported desktop Native host: $os/$arch")
+        }
+    }
+
     private fun skiaHostKey(): String = when (nativeHostTarget()) {
         "mingw_x64" -> "windows-Release-x64"
         "linux_x64" -> "linux-Release-x64"
@@ -218,16 +228,5 @@ class NativeUpstreamSync(directory: File) {
             val latest = Regex("<latest>([^<]+)</latest>").find(xml.toString(Charsets.UTF_8))?.groupValues?.get(1)
             println("${module["upstreamGroup"]}:$name: locked=${module["version"] ?: compose["version"]} latest=$latest")
         }
-    }
-}
-
-internal fun nativeHostTarget(): String {
-    val os = System.getProperty("os.name").lowercase()
-    val arch = System.getProperty("os.arch").lowercase()
-    return when {
-        os.startsWith("windows") && arch in setOf("amd64", "x86_64") -> "mingw_x64"
-        os.startsWith("linux") && arch in setOf("amd64", "x86_64") -> "linux_x64"
-        os.startsWith("mac") && arch in setOf("arm64", "aarch64") -> "macos_arm64"
-        else -> error("Unsupported desktop Native host: $os/$arch")
     }
 }

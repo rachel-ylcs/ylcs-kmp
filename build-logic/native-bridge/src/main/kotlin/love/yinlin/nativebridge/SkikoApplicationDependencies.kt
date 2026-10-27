@@ -3,7 +3,6 @@ package love.yinlin.nativebridge
 import org.gradle.api.Project
 import java.io.File
 
-/** Application data only: SDL bindings, platform adapters and static linkage belong to Skiko. */
 internal object SkikoApplicationDependencies {
     fun configure(project: Project, application: NativeApplicationExtension, bridge: NativeBridgeExtension) {
         val extras = project.gradle.extensions.extraProperties

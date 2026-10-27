@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 
 /** Owned clipboard text and file paths; no platform clipboard handle is retained. */
 @Stable
-actual class ClipEntry private constructor(val plainText: String, val filePaths: List<String>, private val hasPlainText: Boolean) {
+actual class ClipEntry private constructor(val plainText: String, val filePaths: List<String>, hasPlainText: Boolean) {
     actual val clipMetadata: ClipMetadata = ClipMetadata(when {
         hasPlainText && filePaths.isNotEmpty() -> ["text/plain", "text/uri-list"]
         hasPlainText -> ["text/plain"]

@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.content.internal
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.content.TransferableContent
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
@@ -24,7 +23,7 @@ import androidx.compose.ui.draganddrop.DragAndDropTargetModifierNode
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.foundation.content.PlatformTransferableContent
 
-@OptIn(ExperimentalFoundationApi::class)
+@Suppress("FunctionName")
 internal actual fun ReceiveContentDragAndDropNode(
     receiveContentConfiguration: ReceiveContentConfiguration,
     dragAndDropRequestPermission: (DragAndDropEvent) -> Unit,
@@ -34,37 +33,35 @@ internal actual fun ReceiveContentDragAndDropNode(
             // accept any dragging item. The actual decider will be the onReceive callback.
             true
         },
-        target =
-            object : DragAndDropTarget {
-                override fun onStarted(event: DragAndDropEvent) {
-                    receiveContentConfiguration.receiveContentListener.onDragStart()
-                }
+        target = object : DragAndDropTarget {
+            override fun onStarted(event: DragAndDropEvent) {
+                receiveContentConfiguration.receiveContentListener.onDragStart()
+            }
 
-                override fun onEnded(event: DragAndDropEvent) {
-                    receiveContentConfiguration.receiveContentListener.onDragEnd()
-                }
+            override fun onEnded(event: DragAndDropEvent) {
+                receiveContentConfiguration.receiveContentListener.onDragEnd()
+            }
 
-                override fun onEntered(event: DragAndDropEvent) {
-                    receiveContentConfiguration.receiveContentListener.onDragEnter()
-                }
+            override fun onEntered(event: DragAndDropEvent) {
+                receiveContentConfiguration.receiveContentListener.onDragEnter()
+            }
 
-                override fun onExited(event: DragAndDropEvent) {
-                    receiveContentConfiguration.receiveContentListener.onDragExit()
-                }
+            override fun onExited(event: DragAndDropEvent) {
+                receiveContentConfiguration.receiveContentListener.onDragExit()
+            }
 
-                override fun onDrop(event: DragAndDropEvent): Boolean {
-                    dragAndDropRequestPermission(event)
+            override fun onDrop(event: DragAndDropEvent): Boolean {
+                dragAndDropRequestPermission(event)
 
-                    val original = event.toTransferableContent()
-                    val remaining =
-                        receiveContentConfiguration.receiveContentListener.onReceive(original)
-                    return original != remaining
-                }
-            },
+                val original = event.toTransferableContent()
+                val remaining =
+                    receiveContentConfiguration.receiveContentListener.onReceive(original)
+                return original != remaining
+            }
+        },
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 internal fun DragAndDropEvent.toTransferableContent(): TransferableContent {
     val data = transferData
     val clip = if (data.files.isEmpty()) ClipEntry.withPlainText(data.text ?: "") else ClipEntry.withFiles(data.files, data.text)

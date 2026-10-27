@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
-
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.*
@@ -92,7 +90,7 @@ class NativeSceneTest {
             }
             fixture.render()
             requester.requestFocus()
-            fixture.host.onEvent(NativeWindowEvent.Key(4, 97, true, false, 0x0040))
+            fixture.host.onEvent(NativeWindowEvent.Key(4, 97, down = true, repeat = false, modifiers = 0x0040))
             assertEquals(Key.A, key)
             assertTrue(control)
         }
@@ -180,8 +178,8 @@ class NativeSceneTest {
             }
             fixture.render()
             fixture.render()
-            fixture.host.onEvent(NativeWindowEvent.Key(41, 27, true, false, 0))
-            fixture.host.onEvent(NativeWindowEvent.Key(41, 27, false, false, 0))
+            fixture.host.onEvent(NativeWindowEvent.Key(41, 27, down = true, repeat = false, modifiers = 0))
+            fixture.host.onEvent(NativeWindowEvent.Key(41, 27, down = false, repeat = false, modifiers = 0))
             assertEquals(1, dismissed)
             assertEquals(0, fixture.window.closes)
         }

@@ -106,9 +106,12 @@ internal fun sourceCommand(directory: File, arguments: List<String>, allowedExit
     return output
 }
 
-internal fun sourceGit(directory: File, vararg arguments: String): String = sourceCommand(directory,
-    listOf("git", "-c", "safe.directory=${directory.canonicalFile.invariantSeparatorsPath}", "-c", "core.fsmonitor=false", "-c", "core.autocrlf=false") +
-        (if (File.separatorChar == '\\') listOf("-c", "core.longpaths=true") else emptyList()) + listOf("-C", directory.absolutePath) + arguments)
+internal fun sourceGit(directory: File, vararg arguments: String): String = sourceCommand(directory, buildList {
+    addAll(listOf("git", "-c", "safe.directory=${directory.canonicalFile.invariantSeparatorsPath}", "-c", "core.fsmonitor=false", "-c", "core.autocrlf=false"))
+    addAll(if (File.separatorChar == '\\') listOf("-c", "core.longpaths=true") else emptyList())
+    addAll(listOf("-C", directory.absolutePath))
+    addAll(arguments)
+})
 
 internal fun downloadSource(url: String, destination: File, expectedHash: String, offline: Boolean, maximum: Long) {
     check(Regex("[a-f0-9]{64}").matches(expectedHash)) { "Missing immutable source hash" }

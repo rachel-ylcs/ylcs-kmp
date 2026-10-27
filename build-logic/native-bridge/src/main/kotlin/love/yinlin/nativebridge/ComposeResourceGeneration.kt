@@ -5,7 +5,6 @@ import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-/** Extends Compose's direct-dependency detection to the owned Resources coordinate. */
 internal object ComposeResourceGeneration {
     fun configure(project: Project, kotlin: KotlinMultiplatformExtension, bridge: NativeBridgeExtension) {
         val compose = project.extensions.findByName("compose") as? ExtensionAware ?: return

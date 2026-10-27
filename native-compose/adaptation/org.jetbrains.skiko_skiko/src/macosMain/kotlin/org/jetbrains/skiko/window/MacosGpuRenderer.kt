@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko.window
 
-import org.jetbrains.skia.Canvas
-
 import kotlinx.cinterop.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.*
 import platform.QuartzCore.CAMetalLayer

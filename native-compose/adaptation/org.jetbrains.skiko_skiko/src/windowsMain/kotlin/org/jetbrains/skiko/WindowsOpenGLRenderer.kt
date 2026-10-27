@@ -79,8 +79,8 @@ internal class WindowsOpenGLRenderer(
             releaseResources(contextLost = true, propagateFailure = false, context = createdContext, glInterface = createdInterface)
             throw failure as? RenderException ?: RenderException("Could not initialize the WGL renderer", failure)
         }
-        openGlInterface = checkNotNull(createdInterface)
-        directContext = checkNotNull(createdContext)
+        openGlInterface = createdInterface
+        directContext = createdContext
     }
 
     override fun render(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit) {

@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractExecutable
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
-/** Deploys the official Compose plugin's resolved tree, including resources from dependent modules. */
 internal object ComposeApplicationResources {
     fun configure(project: Project, kotlin: KotlinMultiplatformExtension, applicationConfigured: Boolean) {
         kotlin.targets.withType(KotlinNativeTarget::class.java).configureEach {

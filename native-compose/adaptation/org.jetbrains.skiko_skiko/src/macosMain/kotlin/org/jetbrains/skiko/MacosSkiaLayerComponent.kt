@@ -1,8 +1,5 @@
-@file:OptIn(ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.impl.NativePointer
 import platform.QuartzCore.CAMetalLayer

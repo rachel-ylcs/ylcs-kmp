@@ -1,6 +1,5 @@
 package org.jetbrains.skia.icu
 
-import org.jetbrains.skia.impl.InteropPointer
 import org.jetbrains.skia.impl.Managed
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.interopScope

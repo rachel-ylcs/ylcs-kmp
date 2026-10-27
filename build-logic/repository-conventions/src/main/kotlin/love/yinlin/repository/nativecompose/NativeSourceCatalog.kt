@@ -2,7 +2,6 @@ package love.yinlin.repository.nativecompose
 
 import java.io.File
 
-/** Reads the repository's one-line version catalog entries used by source-build profiles. */
 internal class NativeSourceCatalog(private val repository: File, val file: File = repository.resolve("libs.versions.toml")) {
     private val text = file.readText()
     private val sections = Regex("(?m)^\\[([^]]+)]\\s*$").findAll(text).toList()

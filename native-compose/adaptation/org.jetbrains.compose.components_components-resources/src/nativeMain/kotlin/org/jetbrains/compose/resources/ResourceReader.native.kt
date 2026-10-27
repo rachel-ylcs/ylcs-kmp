@@ -7,7 +7,6 @@ private val WindowsDeviceNames: Set<String> = ["CON", "PRN", "AUX", "NUL", "CONI
 
 internal actual fun getPlatformResourceReader(): ResourceReader = DesktopResourceReader
 
-/** Reads the deployed resource tree relative to the application, independently of the working directory. */
 private object DesktopResourceReader : ResourceReader {
     private val baseDirectory: String by lazy {
         resourceBaseDirectory().replace('\\', '/').trimEnd('/')
@@ -23,6 +22,7 @@ private object DesktopResourceReader : ResourceReader {
     override fun getUri(path: String): String {
         val absolutePath = resolve(path)
         if (!resourceFileExists(absolutePath)) throw MissingResourceException(path)
+
         val encoded = buildString {
             for (byte in absolutePath.encodeToByteArray()) {
                 val value = byte.toInt() and 0xFF
@@ -34,6 +34,7 @@ private object DesktopResourceReader : ResourceReader {
                 }
             }
         }
+
         return when {
             encoded.startsWith("//") -> "file:$encoded"
             encoded.startsWith('/') -> "file://$encoded"
@@ -47,16 +48,17 @@ private object DesktopResourceReader : ResourceReader {
     }
 }
 
-/** Checks lexical resource paths, including Win32 names normalized outside the intended tree. */
 internal fun validateDesktopResourcePath(path: String, windows: Boolean) {
     require(path.isNotEmpty() && '\u0000' !in path && '\\' !in path && ':' !in path && !path.startsWith('/')) { "Resource path must be relative to the application" }
+
     for (segment in path.split('/')) {
         require(segment.isNotEmpty() && segment != "." && segment != "..") { "Resource path contains an invalid segment" }
+
         if (windows) {
             require(segment.last() != ' ' && segment.last() != '.' && segment.none { it < ' ' || it in "<>\"|?*" }) { "Resource path contains a Windows-normalized segment" }
+
             val name = segment.substringBefore('.').trimEnd(' ').uppercase()
-            val device = name in WindowsDeviceNames ||
-                (name.startsWith("COM") || name.startsWith("LPT")) && name.length == 4 && name.last() in "123456789¹²³"
+            val device = name in WindowsDeviceNames || (name.startsWith("COM") || name.startsWith("LPT")) && name.length == 4 && name.last() in "123456789¹²³"
             require(!device) { "Resource path refers to a Windows device" }
         }
     }

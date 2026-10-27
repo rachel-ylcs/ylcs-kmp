@@ -2,13 +2,11 @@ package love.yinlin.nativebridge
 
 import org.gradle.api.Project
 import org.gradle.api.Action
-import org.gradle.api.artifacts.ComponentMetadataDetails
 import org.gradle.api.attributes.Attribute
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
-/** Keeps Kotlin's transitive source-set visibility aligned across official and ported components. */
 internal object NativeMetadataAliases {
     fun configure(project: Project, kotlin: KotlinMultiplatformExtension, bridge: NativeBridgeExtension) {
         val participants = kotlin.targets.filter { it.platformType != KotlinPlatformType.common }
@@ -29,7 +27,7 @@ internal object NativeMetadataAliases {
                 }
             }
         }
-        project.dependencies.components.all(Action<ComponentMetadataDetails> {
+        project.dependencies.components.all(Action {
             val component = this
             val identifier = "${component.id.group}:${component.id.name}"
             if (identifier !in aliases) return@Action

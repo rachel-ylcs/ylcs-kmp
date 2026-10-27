@@ -1,5 +1,3 @@
-@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
-
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.geometry.Offset

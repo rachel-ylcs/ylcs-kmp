@@ -29,9 +29,11 @@ private class SimpleXmlParser(private val source: String) {
         if (peek('/') || peek('!') || peek('?')) malformed("Expected an element")
         val qualifiedName = readName()
         val rawAttributes = linkedMapOf<String, String>()
+
         while (true) {
             val beforeWhitespace = index
             skipWhitespace()
+
             when {
                 consume("/>") -> {
                     val namespaces = namespaceMap(parentNamespaces, rawAttributes)
@@ -118,11 +120,12 @@ private class SimpleXmlParser(private val source: String) {
     }
 
     private fun readQuotedValue(): String {
-        if (index >= source.length || source[index] != '\'' && source[index] != '"')
-            malformed("Expected quoted value")
+        if (index >= source.length || source[index] != '\'' && source[index] != '"') malformed("Expected quoted value")
         val quote = source[index++]
         val start = index
+
         while (index < source.length && source[index] != quote) index++
+
         if (index >= source.length) malformed("Unclosed attribute value")
         val value = source.substring(start, index)
         index++
@@ -151,6 +154,7 @@ private class SimpleXmlParser(private val source: String) {
             if (end < 0) malformed("Unclosed entity")
             val entity = value.substring(position, end)
             position = end + 1
+
             when (entity) {
                 "amp" -> append('&')
                 "lt" -> append('<')
@@ -163,6 +167,7 @@ private class SimpleXmlParser(private val source: String) {
                         entity.startsWith('#') -> entity.substring(1).toIntOrNull()
                         else -> null
                     } ?: malformed("Unsupported entity &$entity;")
+
                     if (codePoint != 9 && codePoint != 10 && codePoint != 13 && codePoint !in 0x20 .. 0xD7FF && codePoint !in 0xE000 .. 0xFFFD && codePoint !in 0x10000 .. 0x10FFFF) malformed("Invalid XML character reference")
                     if (codePoint <= 0xFFFF) append(codePoint.toChar())
                     else {
@@ -216,7 +221,7 @@ private class SimpleNodeList(private val nodes: List<Node>) : NodeList {
         get() = nodes.size
 }
 
-private class SimpleText(private val value: String) : Node {
+private class SimpleText(value: String) : Node {
     override val textContent: String = value
     override val nodeName: String = "#text"
     override val localName: String = nodeName

@@ -63,8 +63,8 @@ internal class LinuxOpenGLRenderer(
             releaseRendererResource(null) { component.deleteOpenGlContext(openGlContext) }
             throw failure as? RenderException ?: RenderException("Could not initialize the OpenGL renderer", failure)
         }
-        openGlInterface = checkNotNull(createdInterface)
-        directContext = checkNotNull(createdContext)
+        openGlInterface = createdInterface
+        directContext = createdContext
     }
 
     override fun render(width: Int, height: Int, waitForVsync: Boolean, block: (Canvas) -> Unit) {

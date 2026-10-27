@@ -8,7 +8,6 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import javax.inject.Inject
 
-/** Opt-in application packaging; the bridge alone never creates executables or downloads runtimes. */
 abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFactory) {
     abstract val enabled: Property<Boolean>
     abstract val entryPoint: Property<String>
@@ -29,7 +28,6 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
         arguments.convention(emptyList())
     }
 
-    /** Uses the Konan identifier, e.g. mingw_x64, even when the Gradle target is called windows. */
     fun runtime(target: String, configure: Action<NativeRuntime>) {
         configure.execute(runtimes.maybeCreate(target))
     }
@@ -39,10 +37,8 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
         configure.execute(desktop)
     }
 
-    /** Stage Skiko's target-specific runtime data; source mode uses the local producer task. */
     fun skikoRuntime() { skikoRuntimeEnabled.set(true) }
 
-    /** Configure runtime data and launch arguments for Skiko's self-contained Native window host. */
     fun skikoWindow() {
         enabled.set(true)
         skikoRuntime()

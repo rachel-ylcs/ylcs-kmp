@@ -2,7 +2,6 @@ package love.yinlin.nativebridge
 
 import java.io.File
 
-/** Metadata for the unpacked application; platform icons use ICO, PNG and ICNS respectively. */
 class NativeDesktopDistribution {
     internal var enabled = false
     var entryPoint: String = "main"

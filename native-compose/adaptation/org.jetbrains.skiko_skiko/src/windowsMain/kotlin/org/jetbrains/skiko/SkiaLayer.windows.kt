@@ -517,15 +517,15 @@ actual open class SkiaLayer(
 
     private fun leaveFullscreen(hwnd: HWND) {
         val style = savedWindowStyle ?: return
-        val rect = savedWindowRect ?: return
+        (val left, val top, val right, val bottom) = savedWindowRect ?: return
         SetWindowLongPtrW(hwnd, GWL_STYLE, style)
         SetWindowPos(
             hwnd,
             null,
-            rect.left,
-            rect.top,
-            rect.right - rect.left,
-            rect.bottom - rect.top,
+            left,
+            top,
+            right - left,
+            bottom - top,
             (SWP_NOOWNERZORDER or SWP_NOACTIVATE or SWP_FRAMECHANGED or SWP_SHOWWINDOW).convert(),
         )
         ShowWindow(hwnd, SW_RESTORE)
@@ -551,7 +551,7 @@ actual val currentSystemTheme: SystemTheme get() {
                 RRF_RT_REG_DWORD.convert(),
                 null,
                 valuePinned.addressOf(0),
-                sizePinned.addressOf(0).reinterpret<UIntVar>(),
+                sizePinned.addressOf(0).reinterpret(),
             )
         }
     }

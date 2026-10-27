@@ -182,7 +182,7 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
         for ((relative, expected) in hashes) {
             val file = checkedSourcePath(vendor, destination.resolve(relative))
             val actual = file.takeIf { it.isFile }?.sourceHash()
-            val allowed = if (expected is List<*>) expected else listOf(expected)
+            val allowed = expected as? List<*> ?: listOf(expected)
             check(actual == null || actual in allowed) { "Local Maven source edit preserved: $file" }
         }
         writeSource(vendor, record, sourceBytes(previous + ("files" to hashes.keys.sorted()) + ("fileHashes" to hashes)))

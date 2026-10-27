@@ -1,6 +1,5 @@
 package love.yinlin.repository.nativecompose
 
-import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.file.Files

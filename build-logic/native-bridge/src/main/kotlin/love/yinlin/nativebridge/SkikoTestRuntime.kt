@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 
-/** Native tests need the same ICU data as an application; SDL and Skia remain statically linked. */
 internal object SkikoTestRuntime {
     fun configure(project: Project, bridge: NativeBridgeExtension) {
         val suffix = NativeRuntimeAttributes.artifactSuffixes[HostManager.host.name] ?: return

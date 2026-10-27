@@ -8,5 +8,4 @@
 *.css linguist-language=JavaScript
 *.html linguist-language=JavaScript
 
-# Patch hashes and git apply use the exact, platform-independent LF bytes.
 native-compose/upstream/patches/*.patch text eol=lf

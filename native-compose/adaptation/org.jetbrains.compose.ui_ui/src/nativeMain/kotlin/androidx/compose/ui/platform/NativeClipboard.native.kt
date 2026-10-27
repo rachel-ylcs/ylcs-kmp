@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.platform
 
 import org.jetbrains.skiko.window.NativeDesktop
