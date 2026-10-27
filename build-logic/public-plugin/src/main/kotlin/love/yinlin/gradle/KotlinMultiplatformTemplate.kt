@@ -186,7 +186,6 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
     // DesktopNative
     private var composeDesktopPackageBlock: (NativeDesktopDistribution.() -> Unit)? = null
 
-    /** Configures the Native Compose application alongside the independent JVM desktopPackage. Requires the Native bridge plugin. */
     fun composeDesktopPackage(block: NativeDesktopDistribution.() -> Unit) {
         val previous = composeDesktopPackageBlock
         composeDesktopPackageBlock = {
