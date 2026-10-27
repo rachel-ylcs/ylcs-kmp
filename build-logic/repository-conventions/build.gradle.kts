@@ -7,6 +7,8 @@ group = "love.yinlin"
 version = libs.versions.rachel.get()
 
 dependencies {
+    implementation(kotlin("stdlib"))
+    implementation(localGroovy())
     implementation(project(path = ":public-plugin", configuration = "bootstrapElements"))
     implementation(project(path = ":native-bridge", configuration = "settingsElements"))
     testImplementation(kotlin("test-junit"))
@@ -28,6 +30,13 @@ for ((taskName, command) in mapOf("prepareNativeSources" to "prepare", "checkNat
 
 kotlin {
     jvmToolchain(25)
+}
+
+tasks.test {
+    inputs.files(sourceSets.main.get().runtimeClasspath)
+    inputs.file(rootProject.projectDir.parentFile.resolve(".gitattributes"))
+    systemProperty("native.sources.repositoryRoot", rootProject.projectDir.parentFile.absolutePath)
+    doFirst { systemProperty("native.sources.runtimeClasspath", sourceSets.main.get().runtimeClasspath.asPath) }
 }
 
 val versionResources = layout.buildDirectory.dir("generated/versionResources")

@@ -22,7 +22,7 @@ runs:
       uses: actions/cache@v5
       with:
         path: native-compose/vendor/cache/prepared-sources.zip
-        key: native-sources-v4-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/**', 'native-compose/gradle/**', 'native-compose/adaptation/**', 'build-logic/repository-conventions/src/**', 'build-logic/repository-conventions/build.gradle.kts', 'build-logic/native-bridge/gradle/**', 'libs.versions.toml', 'gradle/wrapper/**', 'gradle.properties', 'settings.gradle.kts', 'gradlew', 'gradlew.bat') }}
+        key: native-sources-v4-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('native-compose/upstream/**', 'native-compose/gradle/**', 'native-compose/adaptation/**', 'build-logic/repository-conventions/src/**', 'build-logic/repository-conventions/build.gradle.kts', 'build-logic/native-bridge/gradle/**', 'libs.versions.toml', 'gradle/wrapper/**', 'gradle.properties', 'settings.gradle.kts', '.gitattributes', 'gradlew', 'gradlew.bat') }}
         restore-keys: |
           native-sources-v4-${{ runner.os }}-${{ runner.arch }}-
     - name: Restore the static SDL SDK and extracted Skia binaries

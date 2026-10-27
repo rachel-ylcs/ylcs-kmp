@@ -596,10 +596,3 @@ extern "C" void skiko_windows_d3d_close(KNativePointer handle,
 }
 
 #endif
-
-#if defined(SK_BUILD_FOR_WIN)
-// Skia's /MT archives register C++ static destructors through atexit. Kotlin/Native
-// starts with MinGW's CRT, whose on-exit table is incompatible with that registration.
-// These are process-lifetime caches, so their destructors do not need to run on exit.
-extern "C" int __wrap_atexit(void (*)(void)) { return 0; }
-#endif

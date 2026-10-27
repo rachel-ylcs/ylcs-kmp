@@ -85,6 +85,21 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
         compilerOptions.moduleName.set("org.jetbrains.skiko:skiko")
     }
     val isHost = konanTarget == HostManager.host
+    if (isHost) {
+        val targetPublication = name
+        publishing.publications.withType<MavenPublication>().configureEach {
+            if (name == targetPublication) {
+                artifact(nativeComposeDirectory.resolve("vendor/icu/workspace/icudtl.dat")) {
+                    classifier = "icudtl"
+                    extension = "dat"
+                }
+                artifact(nativeComposeDirectory.resolve("vendor/icu/workspace/icu-LICENSE.txt")) {
+                    classifier = "icu-license"
+                    extension = "txt"
+                }
+            }
+        }
+    }
     val sdlLibraryDirectory = if (sdlHost == "mingw_x64") layout.buildDirectory.dir("nativeBridges/strippedCoff/windows-x64").get().asFile else sdlSdk.resolve("lib")
     val output = layout.buildDirectory.file("cinterop/sdl-$name.def")
     val definition = adaptationDirectory.resolve("src/nativeMain/cinterop/sdl.def")
@@ -124,5 +139,10 @@ tasks.withType<AbstractArchiveTask>().configureEach {
             into("META-INF/licenses")
             rename { "SDL.txt" }
         }
+        from(nativeComposeDirectory.resolve("vendor/icu/workspace/icu-LICENSE.txt")) {
+            into("META-INF/licenses")
+            rename { "ICU.txt" }
+        }
+        from(nativeComposeDirectory.resolve("upstream/icu.json")) { into("META-INF/provenance") }
     }
 }

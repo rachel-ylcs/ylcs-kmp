@@ -21,6 +21,7 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
         val versions = catalogVersions()
         check(compose["version"] == versions["cmp"] && skiko["versions"].jsonObject()["skiko"] == versions["skiko"]) { "Review the source locks for the selected CMP/Skiko release" }
         check(nativeDirectory.resolve("upstream/sdl.json").readJson()["version"] == versions["sdl"]) { "SDL catalog/lock mismatch" }
+        check(nativeDirectory.resolve("upstream/icu.json").readJson()["skia"] == skiko["skia"]) { "Review the ICU locale data for the selected Skia SDK" }
         for ((artifact, value) in modules) {
             val module = value.jsonObject()
             check((module["redirectTargets"] as List<*>).toSet() == targetSuffixes.keys && (module["metadataTargets"] as List<*>).toSet() == targetSuffixes.keys) { "Missing owned Native target: $artifact" }
@@ -56,6 +57,20 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
         }
     }
 
+    internal fun verifyPublication(metadata: JsonObject, directory: File, group: String, artifact: String, version: String) {
+        val component = metadata["component"].jsonObject()
+        check(component["group"] == group && component["version"] == version) { "Wrong coordinates: $artifact" }
+        verifyFiles(metadata, directory)
+        // KMP leaf metadata identifies its root component; the POM still uses the leaf GAV.
+        val pom = directory.resolve("$artifact-$version.pom")
+        check(pom.isFile) { "Missing POM: $pom" }
+        val project = pom.safeXml().documentElement
+        check(project.nodeName == "project") { "Invalid POM: $pom" }
+        val coordinates = (0 ..< project.childNodes.length).map { project.childNodes.item(it) }
+            .filter { it.nodeName in setOf("groupId", "artifactId", "version") }.associate { it.nodeName to it.textContent.trim() }
+        check(coordinates == mapOf("groupId" to group, "artifactId" to artifact, "version" to version)) { "Wrong POM coordinates: $pom" }
+    }
+
     private fun identity(artifact: String): Triple<String, String, String> {
         if (artifact in setOf("skiko", "skiko-skottie")) return Triple(skiko["group"] as String, skiko["versions"].jsonObject()["skiko"] as String, "org.jetbrains.skiko")
         val module = modules.getValue(artifact).jsonObject()
@@ -75,11 +90,7 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
             val rootMetadata = root.resolve("$artifact-$version.module").readJson()
             val targetMetadata = native.resolve("$artifact-$suffix-$version.module").readJson()
             for ((metadata, directory) in listOf(rootMetadata to root, targetMetadata to native)) {
-                val component = metadata["component"].jsonObject()
-                check(component["group"] == group && component["version"] == version) { "Wrong coordinates: $artifact" }
-                verifyFiles(metadata, directory)
-                val pom = directory.resolve("${component["module"]}-$version.pom")
-                check(pom.isFile && pom.safeXml().documentElement.nodeName == "project") { "Missing or invalid POM: $pom" }
+                verifyPublication(metadata, directory, group, if (directory == root) artifact else "$artifact-$suffix", version)
                 for (variant in metadata.objects("variants")) {
                     for (dependency in variant.objects("dependencies")) {
                         val name = targetSuffixes.values.fold(dependency["module"] as String) { value, platform -> value.removeSuffix("-$platform") }
@@ -123,7 +134,11 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
             check(main.isFile) { "Main KLIB is missing: $main" }
             if (artifact == "skiko") {
                 check(sdl) { "Core KLIB must embed static SDL" }
-                if (target == "mingw_x64") check(native.resolve("$artifact-$suffix-$version-icudtl.dat").let { it.isFile && it.length() > 0 }) { "Windows ICU data is missing" }
+                val icu = native.resolve("$artifact-$suffix-$version-icudtl.dat")
+                val expectedIcu = nativeDirectory.resolve("upstream/icu.json").readJson()["data"].jsonObject()["sha256"]
+                check(icu.isFile && icu.digest("SHA-256") == expectedIcu) { "Complete ICU locale data is missing or has the wrong version: $icu" }
+                val license = native.resolve("$artifact-$suffix-$version-icu-license.txt")
+                check(license.isFile && license.digest("SHA-256") == nativeDirectory.resolve("upstream/icu.json").readJson()["licenseSha256"]) { "ICU data license is missing: $license" }
                 if (target == "linux_x64") for (system in listOf("fontconfig", "GL", "dl")) check(exportedOptions.any { "-l$system" in it }) { "Linux $system link dependency is missing" }
             }
             if (artifact == "skiko-skottie") {
@@ -145,7 +160,7 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
             if (artifact in setOf("skiko", "skiko-skottie")) {
                 check("META-INF/licenses/Apache-2.0.txt" in names && "META-INF/licenses/THIRD_PARTY_NOTICES.md" in names) { "Skiko license/provenance is missing: $file" }
                 check(names.any { it.startsWith("native-sources/") && (it.endsWith(".cc") || it.endsWith(".cpp")) }) { "C++ sources are missing: $file" }
-                if (artifact == "skiko") check("META-INF/licenses/SDL.txt" in names) { "SDL license is missing" }
+                if (artifact == "skiko") check("META-INF/licenses/SDL.txt" in names && "META-INF/licenses/ICU.txt" in names) { "SDL/ICU license is missing" }
             } else check("META-INF/licenses/LICENSE.txt" in names && "META-INF/provenance/compose.json" in names) { "Compose license/provenance is missing: $file" }
         }
     }

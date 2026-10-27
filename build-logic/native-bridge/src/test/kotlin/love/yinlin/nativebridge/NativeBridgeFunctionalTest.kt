@@ -1,6 +1,7 @@
 package love.yinlin.nativebridge
 
 import org.gradle.testkit.runner.GradleRunner
+import org.jetbrains.kotlin.konan.target.HostManager
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -370,7 +371,9 @@ class NativeBridgeFunctionalTest {
             checkNotNull(NativeBridgePlugin::class.java.classLoader.getResourceAsStream("rachel-native-bridge.properties")).use { load(it) }
         }
         val coordinate = compatibility.getProperty("skiko.port.module").split(':')
-        val artifact = coordinate[1] + "-mingwx64"
+        val host = HostManager.host.name
+        val target = mapOf("mingw_x64" to "windows", "linux_x64" to "linux", "macos_arm64" to "macos").getValue(host)
+        val artifact = coordinate[1] + "-" + NativeRuntimeAttributes.artifactSuffixes.getValue(host)
         module(project, coordinate[0], coordinate[2], artifact = artifact)
         val runtime = project.resolve("repo/${coordinate[0].replace('.', '/')}/$artifact/${coordinate[2]}")
         runtime.resolve("$artifact-${coordinate[2]}-icudtl.dat").writeText("fixture ICU data")
@@ -378,19 +381,16 @@ class NativeBridgeFunctionalTest {
         project.resolve("fixture-test/unused.exe").writeText("configuration fixture; never executed")
         consumer(project, "mingwX64(\"windows\"); linuxX64(\"linux\"); macosArm64(\"macos\")", extra = """
             nativeBridge { skikoTests() }
-            tasks.named<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest>("windowsTest") {
+            tasks.named<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest>("${target}Test") {
                 executable = file("fixture-test/unused.exe")
             }
             tasks.register("verifySkikoTestRuntime") {
-                if (System.getProperty("os.name").startsWith("Windows")) dependsOn("stageWindowsTestSkikoRuntime")
+                dependsOn("stage${target.replaceFirstChar(Char::uppercase)}TestSkikoRuntime")
                 doLast {
                     kotlin.targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().forEach { target ->
                         check(target.binaries.withType<org.jetbrains.kotlin.gradle.plugin.mpp.Executable>().isEmpty())
                     }
-                    if (System.getProperty("os.name").startsWith("Windows")) {
-                        check(file("fixture-test/icudtl.dat").readText() == "fixture ICU data")
-                    }
-                    else check(configurations.findByName("skikoNativeTestRuntime") == null)
+                    check(file("fixture-test/icudtl.dat").readText() == "fixture ICU data")
                     println("SKIKO_TEST_RUNTIME_VERIFIED")
                 }
             }

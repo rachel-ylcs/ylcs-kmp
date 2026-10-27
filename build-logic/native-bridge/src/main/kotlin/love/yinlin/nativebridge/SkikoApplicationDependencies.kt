@@ -1,6 +1,5 @@
 package love.yinlin.nativebridge
 
-import groovy.json.JsonSlurper
 import org.gradle.api.Project
 import java.io.File
 
@@ -19,19 +18,16 @@ internal object SkikoApplicationDependencies {
 
     private fun configureSkiko(project: Project, application: NativeApplicationExtension, bridge: NativeBridgeExtension, nativeRoot: File?) {
         if (nativeRoot != null) {
-            val state = JsonSlurper().parse(nativeRoot.resolve("vendor/skiko/state.json")) as Map<*, *>
-            val lock = JsonSlurper().parse(nativeRoot.resolve("upstream/lock.json")) as Map<*, *>
-            val skia = lock["skia"] as String
-            val build = nativeRoot.resolve(state["build"] as String)
-            application.runtime("mingw_x64") {
-                files.from(build.resolve("dependencies/skia/$skia/Skia-$skia-windows-Release-x64/out/Release-windows-x64/icudtl.dat"))
-                files.builtBy(project.gradle.includedBuild("skiko").task(":unzipSkiaReleaseWindowsX64"))
+            for (target in NativeRuntimeAttributes.artifactSuffixes.keys) application.runtime(target) {
+                files.from(nativeRoot.resolve("vendor/icu/workspace/icudtl.dat"))
+                files.from(nativeRoot.resolve("vendor/icu/workspace/icu-LICENSE.txt"))
             }
         }
         else {
             val module = bridge.redirects.getByName("skiko-core").module.get().split(':')
-            application.runtime("mingw_x64") {
-                artifacts.put("${module[0]}:${module[1]}-mingwx64:${module[2]}:icudtl@dat", "icudtl.dat")
+            for ((target, suffix) in NativeRuntimeAttributes.artifactSuffixes) application.runtime(target) {
+                artifacts.put("${module[0]}:${module[1]}-$suffix:${module[2]}:icudtl@dat", "icudtl.dat")
+                artifacts.put("${module[0]}:${module[1]}-$suffix:${module[2]}:icu-license@txt", "icu-LICENSE.txt")
             }
         }
     }

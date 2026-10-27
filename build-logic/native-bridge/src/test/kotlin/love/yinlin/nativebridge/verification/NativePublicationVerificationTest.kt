@@ -37,6 +37,21 @@ class NativePublicationVerificationTest {
     }
 
     @Test
+    fun leafPomUsesItsOwnCoordinatesWhenMetadataIdentifiesTheRootComponent() {
+        val work = Files.createTempDirectory("native-publication-leaf").toFile()
+        try {
+            val verifier = fixture(work)
+            val directory = work.resolve("skiko-mingwx64/0.156.0").apply { mkdirs() }
+            val metadata = mapOf("component" to mapOf("group" to "test.native", "module" to "skiko", "version" to "0.156.0", "url" to "../../skiko/0.156.0/skiko-0.156.0.module"))
+            val pom = directory.resolve("skiko-mingwx64-0.156.0.pom")
+            pom.writeText("""<project><groupId>test.native</groupId><artifactId>skiko-mingwx64</artifactId><version>0.156.0</version></project>""")
+            verifier.verifyPublication(metadata, directory, "test.native", "skiko-mingwx64", "0.156.0")
+            pom.writeText("""<project><groupId>test.native</groupId><artifactId>skiko</artifactId><version>0.156.0</version></project>""")
+            assertFailsWith<IllegalStateException> { verifier.verifyPublication(metadata, directory, "test.native", "skiko-mingwx64", "0.156.0") }
+        } finally { assertTrue(work.deleteRecursively()) }
+    }
+
+    @Test
     fun missingSkippedAndDuplicateRegressionReportsCannotPass() {
         val work = Files.createTempDirectory("native-publication-reports").toFile()
         try {

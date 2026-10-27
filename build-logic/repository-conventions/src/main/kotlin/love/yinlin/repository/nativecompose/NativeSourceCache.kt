@@ -9,7 +9,7 @@ class NativeSourceCache(directory: File) {
     private val nativeDirectory = directory.canonicalFile
     private val vendor = nativeDirectory.resolve("vendor")
     private val archive = vendor.resolve("cache/prepared-sources.zip")
-    private val roots = listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states")
+    private val roots = listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states", "icu")
     private val markers = setOf("skiko/state.json", "compose/state.json", "compose/source-edits.json", "compose/checkout.txt", "resources/source-edits.json", "resources/checkout.txt")
     private val excluded = setOf("build", ".gradle", ".kotlin", "dependencies", "node_modules", "local.properties", ".prepare.lock", "__pycache__")
 

@@ -38,6 +38,7 @@ class NativeUpstreamSync(directory: File) {
         files.addAll(nativeDirectory.resolve("gradle/templates").walkTopDown().filter { it.isFile })
         files.addAll(repository.resolve("build-logic/repository-conventions/src/main/kotlin/love/yinlin/repository/nativecompose").walkTopDown().filter { it.extension == "kt" })
         files.add(repository.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts"))
+        files.add(repository.resolve(".gitattributes"))
         files.addAll(listOf("gradle/wrapper/gradle-wrapper.properties", "gradle/wrapper/gradle-wrapper.jar", "gradlew", "gradlew.bat").map { repository.resolve(it) })
         return files.distinct().sortedBy { it.invariantSeparatorsPath }.associate { it.relativeTo(repository).invariantSeparatorsPath to it.sourceHash() }
     }
@@ -55,7 +56,35 @@ class NativeUpstreamSync(directory: File) {
     fun prepare(offline: Boolean = false) {
         prepareSkiko(offline)
         prepareSdl(offline)
+        prepareIcu(offline)
         ComposeSourceSync(this).prepare(offline)
+    }
+
+    private fun prepareIcu(offline: Boolean) {
+        val lock = nativeDirectory.resolve("upstream/icu.json").sourceJson()
+        check(lock["skia"] == skiko["skia"]) { "Review the ICU data version when changing the Skia SDK" }
+        val source = lock["source"].sourceObject()
+        val data = lock["data"].sourceObject()
+        val owner = vendor.resolve("icu")
+        workspace.locked(owner) {
+            val archive = owner.resolve("icu-data.zip")
+            downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 64L * 1024 * 1024)
+            val build = owner.resolve("workspace")
+            val marker = build.resolve(".rachel-prepared.json")
+            val fingerprint = bytesHash(sourceBytes(mapOf("lock" to lock, "inputs" to inputHashes())))
+            val previous = if (marker.isFile) marker.sourceJson() else emptyMap()
+            if (previous["fingerprint"] != fingerprint) stage(".icu-data-") { staging ->
+                SourceArchive.extract(archive, staging, false)
+                val input = staging.resolve(sourceRelativePath(data["file"] as String))
+                check(input.sourceHash() == data["sha256"] && staging.resolve("LICENSE").sourceHash() == lock["licenseSha256"]) { "ICU data/license checksum mismatch" }
+                Files.move(input.toPath(), staging.resolve("icudtl.dat").toPath())
+                Files.move(staging.resolve("LICENSE").toPath(), staging.resolve("icu-LICENSE.txt").toPath())
+                workspace.synchronize(staging, build, marker, mapOf("schema" to 3, "fingerprint" to fingerprint, "version" to lock["version"]))
+            }
+            check(build.resolve("icudtl.dat").sourceHash() == data["sha256"]) { "Prepared ICU data differs from its lock" }
+            check(build.resolve("icu-LICENSE.txt").sourceHash() == lock["licenseSha256"]) { "Prepared ICU license differs from its lock" }
+            println("Prepared complete ICU ${lock["version"]} locale data")
+        }
     }
 
     private fun prepareSkiko(offline: Boolean) {

@@ -1,13 +1,8 @@
-import groovy.json.JsonSlurper
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.nativeBridge)
 }
 
-val lock = JsonSlurper().parse(file("../../upstream/lock.json")) as Map<*, *>
-val portGroup = lock["group"] as String
-val skikoVersion = libs.versions.skiko.get()
 val explicit = providers.gradleProperty("native.explicit").getOrElse("false").toBoolean()
 layout.buildDirectory.set(layout.projectDirectory.dir("../../vendor/build/maven-consumer"))
 
@@ -34,10 +29,8 @@ kotlin {
 
 nativeApplication {
     enabled.set(true)
+    skikoRuntime()
     baseName.set("maven-skiko-consumer")
     entryPoint.set("love.yinlin.nativecompose.consumer.main")
     if (providers.gradleProperty("native.window").getOrElse("false").toBoolean()) arguments.add("--window")
-    runtime("mingw_x64") {
-        artifacts.put("$portGroup:skiko-mingwx64:$skikoVersion:icudtl@dat", "icudtl.dat")
-    }
 }

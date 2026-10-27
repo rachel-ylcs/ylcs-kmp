@@ -17,7 +17,8 @@ class NativeSourceCacheTest {
         try {
             val native = work.resolve("native-compose").apply { mkdirs() }
             val vendor = native.resolve("vendor")
-            for (root in listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states")) vendor.resolve(root).mkdirs()
+            for (root in listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states", "icu/workspace")) vendor.resolve(root).mkdirs()
+            vendor.resolve("icu/workspace/icudtl.dat").writeText("locale data")
             vendor.resolve("compose/workspace/src/A.kt").apply {
                 parentFile.mkdirs()
                 writeText("source")
@@ -40,12 +41,15 @@ class NativeSourceCacheTest {
             ZipFile(archive).use { zip ->
                 val names = zip.entries().asSequence().map { it.name }.toSet()
                 assertTrue("compose/workspace/src/A.kt" in names && "compose/workspace/.git/HEAD" in names)
+                assertTrue("icu/workspace/icudtl.dat" in names)
                 assertFalse(names.any { "/build/" in it || "/dependencies/" in it })
             }
             assertTrue(vendor.resolve("compose/workspace").deleteRecursively())
+            assertTrue(vendor.resolve("icu").deleteRecursively())
             cache.restore()
             assertEquals("source", vendor.resolve("compose/workspace/src/A.kt").readText())
             assertEquals("locked commit", vendor.resolve("compose/workspace/.git/HEAD").readText())
+            assertEquals("locale data", vendor.resolve("icu/workspace/icudtl.dat").readText())
         } finally { assertTrue(work.deleteRecursively()) }
     }
 

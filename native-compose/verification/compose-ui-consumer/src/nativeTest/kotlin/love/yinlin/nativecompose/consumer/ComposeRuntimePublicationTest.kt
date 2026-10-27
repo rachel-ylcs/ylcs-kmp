@@ -1,4 +1,4 @@
-@file:OptIn(androidx.compose.ui.InternalComposeUiApi::class)
+@file:OptIn(androidx.compose.ui.InternalComposeUiApi::class, androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package love.yinlin.nativecompose.consumer
 
@@ -10,6 +10,10 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.platform.registerSkikoComposeImplementation
@@ -26,10 +30,30 @@ import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.skottie.Animation
 import kotlin.test.*
 
-/** Foundation, Navigation3, Resources and Skottie run through the published dependency graph. */
+/** Foundation, Material3, Navigation3, Resources and Skottie use the published dependency graph. */
 class ComposeRuntimePublicationTest {
     @BeforeTest
     fun installGraphicsBackend() { registerSkikoComposeImplementation() }
+
+    @Test
+    fun materialDatePickerRendersAndUpdatesItsSelectionFromMaven() = runBlocking {
+        var state: DatePickerState? = null
+        PublishedSceneFixture(coroutineContext).use { scene ->
+            scene.content {
+                MaterialTheme {
+                    val picker = rememberDatePickerState(initialSelectedDateMillis = 0L)
+                    SideEffect { state = picker }
+                    DatePicker(picker)
+                }
+            }
+            scene.settle()
+            val picker = assertNotNull(state)
+            assertEquals(0L, picker.selectedDateMillis)
+            picker.selectedDateMillis = 86_400_000L
+            scene.settle()
+            assertEquals(86_400_000L, picker.selectedDateMillis)
+        }
+    }
 
     @Test
     fun navigationEntriesRetainTextAndIsolateAndClearViewModels() = runBlocking {

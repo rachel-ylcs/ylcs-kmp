@@ -12,6 +12,7 @@ on:
       - 'ylcs-app/native-compose/**'
       - 'libs.versions.toml'
       - 'settings.gradle.kts'
+      - '.gitattributes'
       - 'gradle/wrapper/**'
       - '.github/workflows/native-compose.yml'
       - '.github/actions/setup-native/**'
@@ -26,6 +27,7 @@ on:
       - 'ylcs-app/native-compose/**'
       - 'libs.versions.toml'
       - 'settings.gradle.kts'
+      - '.gitattributes'
       - 'gradle/wrapper/**'
       - '.github/workflows/native-compose.yml'
       - '.github/actions/setup-native/**'
@@ -51,18 +53,22 @@ jobs:
           - runner: windows-2025
             target: mingw_x64
             binary-target: Windows
+            gradle-target: windows
           - runner: ubuntu-24.04
             target: linux_x64
             binary-target: Linux
+            gradle-target: linux
           - runner: macos-26
             target: macos_arm64
             binary-target: Macos
+            gradle-target: macos
     defaults:
       run:
         shell: bash
     env:
       NATIVE_TARGET: ${{ matrix.target }}
       NATIVE_BINARY_TARGET: ${{ matrix.binary-target }}
+      NATIVE_GRADLE_TARGET: ${{ matrix.gradle-target }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -96,6 +102,30 @@ jobs:
         run: |
           bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
             :native-bridge:verifyNativeHost
+      - name: Consume the published KLIBs without source substitutions
+        run: |
+          bash ./gradlew -p build-logic --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            :native-bridge:publishAllPublicationsToLocalVerificationRepository
+          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
+          bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.explicit=true \
+            "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
+          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            "run${NATIVE_BINARY_TARGET}DebugExecutable"
+      - name: Publish a framework library and consume its JVM and Native variants
+        run: |
+          bash ./gradlew -p native-compose/verification/framework-producer --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process publishHost
+          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            desktopTest verifyFrameworkResolution
+          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --max-workers=2 --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pframework.native=true \
+            "${NATIVE_GRADLE_TARGET}Test" verifyFrameworkResolution
       - name: Prepare and relocate Debug and Release application directories
         env:
           SDL_VIDEODRIVER: dummy
@@ -120,6 +150,8 @@ jobs:
           path: |
             native-compose/vendor/build/compose-ui/*/test-results/
             native-compose/vendor/build/compose-ui/*/reports/tests/
+            native-compose/vendor/build/framework-consumer-*/test-results/
+            native-compose/vendor/build/framework-consumer-*/reports/tests/
             native-compose/vendor/build/repository/**/*.module
             native-compose/vendor/build/repository/**/*.pom
             native-compose/vendor/skiko/workspace/skiko/build/test-results/

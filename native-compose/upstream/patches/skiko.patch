@@ -990,10 +990,9 @@ index 4c02102..f8c9ee4 100644
              }
          )
 diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt b/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
-index 729da81..c68e597 100644
 --- a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
 +++ b/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfiguration.kt
-@@ -8,6 +8,7 @@ import OS
+@@ -8,6 +8,7 @@
  import SkiaBuildType
  import SkikoModuleKind
  import SkikoProjectContext
@@ -1001,7 +1000,7 @@ index 729da81..c68e597 100644
  import WriteCInteropDefFile
  import compilerForTarget
  import dsl.TargetEnv
-@@ -20,10 +21,15 @@ import org.gradle.api.Project
+@@ -20,10 +21,15 @@
  import org.gradle.api.artifacts.Configuration
  import org.gradle.api.attributes.Attribute
  import org.gradle.api.attributes.Usage
@@ -1017,17 +1016,17 @@ index 729da81..c68e597 100644
  import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
  import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-@@ -46,6 +52,9 @@ private val nativeSymbolSourcesUikitSimAttribute =
+@@ -45,6 +51,9 @@
+     Attribute.of("org.jetbrains.skiko.nativeSymbolSources.uikitSim", String::class.java)
  
  private const val NATIVE_SYMBOL_SOURCES_USAGE = "skiko-native-symbol-sources"
- 
++
 +private val arm64ToolchainRoot: String
 +    get() = System.getenv("SKIKO_ARM64_TOOLCHAIN") ?: "/opt/arm-gnu-toolchain"
-+
+
  fun String.withSuffix(isUikitSim: Boolean = false) =
      this + if (isUikitSim) "Sim" else ""
- 
-@@ -189,6 +198,7 @@ fun SkikoProjectContext.compileNativeBridgesTask(
+@@ -189,6 +198,7 @@
                  compiler.set(project.appleToolchainExecutableOrDefault("clang++", compiler.get()))
                  flags.set(listOf(
                      *project.appleMacOsSdkFlags().toTypedArray(),
@@ -1035,7 +1034,7 @@ index 729da81..c68e597 100644
                      *buildType.clangFlags,
                      *skiaPreprocessorFlags(OS.MacOS, buildType),
                      when(arch) {
-@@ -215,22 +225,53 @@ fun SkikoProjectContext.compileNativeBridgesTask(
+@@ -215,22 +225,53 @@
                  )
                  // Add sysroot for ARM64 cross-compilation
                  if (arch == Arch.Arm64 && hostArch != Arch.Arm64) {
@@ -1094,7 +1093,7 @@ index 729da81..c68e597 100644
              includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
          }
          includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
-@@ -270,11 +311,14 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -270,11 +311,14 @@
      target: KotlinNativeTarget,
      coreNativeSymbolSourcesFor: ((OS, Arch, Boolean) -> Configuration)? = null
  ) = with(this.project) {
@@ -1111,7 +1110,7 @@ index 729da81..c68e597 100644
      val isUikitSim = target.isUikitSimulator()
  
      val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
-@@ -283,7 +327,10 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -283,7 +327,10 @@
      val unpackedSkia = unzipper.get()
      val skiaDir = unpackedSkia.absolutePath
  
@@ -1123,7 +1122,7 @@ index 729da81..c68e597 100644
      val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
  
      // For iOS/tvOS we patch every library so that public Skia symbols are
-@@ -293,24 +340,92 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -293,24 +340,78 @@
      // unsupported shapes fall back to a "_skiko" suffix.
      val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
      val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
@@ -1131,20 +1130,6 @@ index 729da81..c68e597 100644
 +        layout.buildDirectory.dir("nativeBridges/strippedCoff/$targetString").get().asFile
  
      val skiaBinDir = "$skiaDir/out/${buildType.id}-$targetString"
-+    if (os == OS.Windows && kind == SkikoModuleKind.CORE) {
-+        val icuData = file("$skiaBinDir/icudtl.dat")
-+        extensions.configure<PublishingExtension> {
-+            publications.withType<MavenPublication>().configureEach {
-+                if (name == target.name) {
-+                    artifact(icuData) {
-+                        classifier = "icudtl"
-+                        extension = "dat"
-+                        builtBy(unzipper)
-+                    }
-+                }
-+            }
-+        }
-+    }
      val resolvedBinaryInputs = resolveBinaryInputs(os, arch, TargetEnv.NATIVE, skiaBinDir)
      val mergedArchive = layout.buildDirectory.file("mergedSkiaArchives/$targetString/libskia_static.a")
 -    val mergeArchivesTask = project.tasks.register<MergeStaticArchivesTask>("mergeSkiaArchives$targetString") {
@@ -1204,10 +1189,11 @@ index 729da81..c68e597 100644
 +            }
      } else {
 -        nativeArchives + bridgesLibraryPath
+-    }
 +        windowsRuntimeAliasesTask = null
 +        windowsRuntimeArchives = emptyList()
 +        windowsStaticMsvcRuntimes = emptyList()
-     }
++    }
 +    val platformLibraries =
 +        when {
 +            requiresSymbolPatching ->
@@ -1228,7 +1214,7 @@ index 729da81..c68e597 100644
  
      val hiddenSymbolsFile = layout.buildDirectory.file(
          "nativeHiddenSymbols/$targetString/${if (os.isLinux) "symbols.map" else "symbols.txt"}"
-@@ -322,24 +437,26 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -322,24 +423,26 @@
      } else {
          nativeArchives
      }
@@ -1268,7 +1254,7 @@ index 729da81..c68e597 100644
          }
          OS.IOS -> {
              // list of linker options to be included into klib, which are needed for skiko consumers
-@@ -364,16 +481,34 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -364,16 +467,34 @@
                  "-L/usr/lib64",
                  "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
              )
@@ -1280,10 +1266,11 @@ index 729da81..c68e597 100644
                  // ARM GNU toolchain sysroot paths
 -                options.add(0, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/lib64")
 -                options.add(1, "-L/opt/arm-gnu-toolchain/aarch64-none-linux-gnu/libc/usr/lib64")
+-            }
+-            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
 +                options.add(0, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/lib64")
 +                options.add(1, "-L$arm64ToolchainRoot/aarch64-none-linux-gnu/libc/usr/lib64")
-             }
--            options.add("--version-script=${hiddenSymbolsFile.get().asFile.absolutePath}")
++            }
 +            configureCinterop(cinteropName, os, arch, target, targetString, options)
 +            mutableListOfLinkerOptions(options)
 +        }
@@ -1307,7 +1294,7 @@ index 729da81..c68e597 100644
              mutableListOfLinkerOptions(options)
          }
          else -> mutableListOf()
-@@ -390,7 +525,9 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -390,7 +511,9 @@
  
      // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
      target.binaries.all {
@@ -1318,7 +1305,7 @@ index 729da81..c68e597 100644
      }
  
  
-@@ -414,13 +551,17 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -414,13 +537,17 @@
          }
          inputs.files(objectFiles)
          val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
@@ -1337,10 +1324,11 @@ index 729da81..c68e597 100644
              OS.MacOS, OS.IOS, OS.TVOS -> {
                  executable = "libtool"
                  argumentProviders.add { listOf("-static", "-o", staticLib) }
-@@ -432,6 +573,24 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -431,6 +558,24 @@
+         file(outDir).mkdirs()
          outputs.dir(outDir)
      }
- 
++
 +    val stripCoffDirectivesTask =
 +        if (os == OS.Windows) {
 +            project.registerSkikoTask<StripCoffDirectivesTask>(
@@ -1358,11 +1346,10 @@ index 729da81..c68e597 100644
 +        } else {
 +            null
 +        }
-+
+
      // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
      val compilationDependency = if (requiresSymbolPatching) {
-         val patchActionName = "patchSkikoSymbols".withSuffix(isUikitSim = isUikitSim)
-@@ -444,7 +603,7 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -444,7 +589,7 @@
          }
          project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
              dependsOn(unzipper)
@@ -1371,16 +1358,17 @@ index 729da81..c68e597 100644
              dependsOn(linkTask)
              if (coreSymbolSources != null) {
                  dependsOn(coreSymbolSources)
-@@ -458,19 +617,24 @@ fun SkikoProjectContext.configureNativeTarget(
+@@ -458,19 +603,24 @@
                  configureNativeSymbolSourcesElements(os, arch, isUikitSim, nativeArchives + bridgesLibraryPath, patchTask)
              }
          }
 -    } else {
 -        linkTask
 -    }
-+    } else stripCoffDirectivesTask ?: linkTask
- 
+-
 -    hideSkiaSymbols.configure {
++    } else stripCoffDirectivesTask ?: linkTask
++
 +    hideSkiaSymbols?.configure {
          dependsOn(unzipper)
 -        dependsOn(mergeArchivesTask)
@@ -16308,3 +16296,23 @@ index 0000000..92a6ea3
 +private const val RESOURCES_PATH = "src/commonTest/resources"
 +
 +actual fun resourcePath(resourceId: String): String = "$RESOURCES_PATH/$resourceId"
+diff --git a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt b/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
+deleted file mode 100644
+index 7f37323..0000000
+--- a/skiko/src/nativeMain/kotlin/org/jetbrains/skiko/OpenGLLibrary.native.kt
++++ /dev/null
+@@ -1,13 +0,0 @@
+-package org.jetbrains.skiko
+-
+-internal actual fun loadOpenGLLibrary() {
+-    when (hostOs) {
+-        // It is deprecated. See https://developer.apple.com/documentation/opengles
+-        OS.Ios -> throw RenderException("OpenGL on iOS isn't supported")
+-        // Do nothing as we don't know for sure which OS supports OpenGL.
+-        // If there is support, we assume that it is already linked.
+-        // If there is no support, there will be a native crash
+-        // (to throw a RenderException we need to investigate case by case)
+-        else -> Unit
+-    }
+-}
+\ No newline at end of file

@@ -5,7 +5,7 @@ import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skia.impl.interopScope
 import org.jetbrains.skia.impl.withStringResult
 
-/** Uses Skia's already bundled ICU and locale data; no process-global locale is modified. */
+/** Uses Skia's static ICU and the complete packaged locale data; no default locale is modified. */
 object DateTimeUtils {
     fun localeInfo(languageTag: String): DateTimeInfo {
         validateLocale(languageTag)
@@ -51,6 +51,7 @@ object DateTimeUtils {
 
     internal fun validateLocale(languageTag: String) {
         require(languageTag.length <= 256 && languageTag.none { it == '\u0000' || it == '\r' || it == '\n' }) { "Invalid date locale" }
+        IcuData.ensureLoaded()
     }
 }
 

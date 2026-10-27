@@ -1,0 +1,14 @@
+{
+    "schema": 1,
+    "version": "78.2",
+    "skia": "m156-24300fbbcb",
+    "source": {
+        "url": "https://github.com/unicode-org/icu/releases/download/release-78.2/icu4c-78.2-data-bin-l.zip",
+        "sha256": "6fc51a8818242bfd83207ab89551166ac2fb4bf502d01e41cddc8cb6a0ba4cda"
+    },
+    "data": {
+        "file": "icudt78l.dat",
+        "sha256": "a3d49eacd189624769dc77457c6aa1789a89219fb217a6d87d5b076c269aaf1f"
+    },
+    "licenseSha256": "e55522d81edc687a341a4411e0776e54ca654e90147f354a90458aaced4116af"
+}

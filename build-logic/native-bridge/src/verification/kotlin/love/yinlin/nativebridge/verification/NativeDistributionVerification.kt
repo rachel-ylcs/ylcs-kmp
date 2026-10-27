@@ -83,6 +83,11 @@ internal class NativeDistributionVerification(private val nativeDirectory: File)
             check("sdl3" !in libraries.lowercase()) { "Executable still depends on dynamic SDL: $libraries" }
             check(target == "mingw_x64" || Files.isExecutable(executable.toPath())) { "Executable permissions were lost: $executable" }
             check(files.any { "composeResources" in it.invariantSeparatorsPath }) { "Compose resources are missing: $source" }
+            val data = files.singleOrNull { it.name == "icudtl.dat" }
+            val expected = nativeDirectory.resolve("upstream/icu.json").readJson()["data"].jsonObject()["sha256"]
+            check(data != null && data.digest("SHA-256") == expected) { "Complete ICU locale data is missing: $source" }
+            val license = files.singleOrNull { it.name == "icu-LICENSE.txt" }
+            check(license != null && license.digest("SHA-256") == nativeDirectory.resolve("upstream/icu.json").readJson()["licenseSha256"]) { "ICU data license is missing: $source" }
             output(listOf(executable.path, "--smoke", "--software"), destination, smoke = true)
             println("PASS: relocated Native Compose $target/$kind: $destination")
         }

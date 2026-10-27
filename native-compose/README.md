@@ -6,7 +6,7 @@
 
 共 26 个工件：Skiko Core/Skottie、UI 八工件、Foundation 两工件、Animation 三工件、Resources、Navigation3 UI、Material3 主族四工件、Material Ripple、Adaptive 四工件。Runtime 等已具备三个目标支持的依赖使用官方工件。
 
-基线由根 [libs.versions.toml](../libs.versions.toml) 和 [upstream](upstream) 锁定：CMP/Material3 `1.13.0-beta01`、Adaptive `1.4.0-alpha01`、Navigation3 `1.2.0`、Skiko `0.156.0`、SDL `3.4.18`。桥插件使用 Rachel 发布版本，移植库使用对应的上游版本。
+基线由根 [libs.versions.toml](../libs.versions.toml) 和 [upstream](upstream) 锁定：CMP/Material3 `1.13.0-beta01`、Adaptive `1.4.0-alpha01`、Navigation3 `1.2.0`、Skiko `0.156.0`、SDL `3.4.18`、ICU 数据 `78.2`。桥插件使用 Rachel 发布版本，移植库使用对应的上游版本。
 
 ## 目标与源码边界
 
@@ -37,13 +37,15 @@
 
 Material3、Adaptive、Navigation3 使用官方 macOS sources JAR 中的真实共享实现；缺失 actual 由适配源码提供。日期和数字本地化共用 Skia ICU，macOS 的 `CalendarLocale` 保留 `NSLocale` 类型身份。
 
+Skia SDK 的 ICU 数据只包含文本排版所需的部分资源。完整日期和数字本地化数据由 `upstream/icu.json` 锁定，随三个目标的 Skiko publication 以 `icudtl@dat` 发布。桥插件将 `icudtl.dat` 和 `icu-LICENSE.txt` 复制到应用目录；库测试使用 `nativeBridge { skikoTests() }` 准备同一数据。Linux/macOS 首次使用日期服务时注册只读内存映射，Windows 使用 Skia 的数据加载器。
+
 `testHost` 执行当前宿主库测试；`publishHost` 输出到 `native-compose/vendor/build/repository`；`verifyHost` 校验 Maven 文件、校验和、目标、KLIB 身份、静态库、许可、依赖闭包及维护测试报告。缺失、失败或跳过的测试不能作为通过结果。
 
 唯一 Native 验证工作流为 [native-compose.yml](../.github/workflows/native-compose.yml)。三个宿主分别构建、测试、本地发布，再由 Kotlin 汇总一份 macOS KMP root 和三个 target publication。源码缓存任务为 `:repository-conventions:restoreNativeSourceCache`、`:repository-conventions:createNativeSourceCache`；快照排除构建输出，恢复后仍校验来源和输入。静态 SDK 使用单独缓存。
 
 升级维护流程：
 
-1. 确定 CMP、Skiko 及独立版本库的目标版本，核对官方 tag/commit、Maven source archive、Skia 资产和社区参考变化，更新根版本目录及锁定项。
+1. 确定 CMP、Skiko 及独立版本库的目标版本，核对官方 tag/commit、Maven source archive、Skia 资产、SDK 的 ICU 版本和社区参考变化，更新根版本目录及锁定项。
 2. 在临时目录取得对应原始源码，审核和重做 `upstream/patches`。先执行 `git apply --check`，保留真实功能、平台实现和许可证。更新补丁清单的 SHA-256、提交、版本及参考身份，不能只修改版本标签。
 3. 核查适配实现、源集、依赖导出、KLIB 身份、资源所有权及测试；Kotlin 位置解构等兼容性修改保留为受版本约束的补丁。
 4. 准备源码并验证对应宿主和独立 Maven 消费，刷新 IDEA Gradle 模型。
