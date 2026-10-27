@@ -38,7 +38,7 @@ jobs:
       macos: ${{ steps.filter.outputs.macos }}
     steps:
       - name: Checkout Code
-        uses: ./.github/actions/checkout
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -193,7 +193,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: ./.github/actions/checkout
+        uses: actions/checkout@v7
 
       - name: Setup Python
         uses: actions/setup-python@v7

@@ -38,10 +38,14 @@ jobs:
       run:
         shell: ${{ startsWith(inputs.runner, 'windows-') && 'pwsh' || 'bash' }}
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
-          submodules: recursive
           android: ${{ inputs.android }}
           msvc: ${{ inputs.msvc }}
           gtk: ${{ inputs.gtk }}

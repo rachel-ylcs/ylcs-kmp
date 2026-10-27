@@ -10,10 +10,14 @@ jobs:
     name: Package Android
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
-          submodules: recursive
           android: 'true'
 
       - name: Build
@@ -29,10 +33,13 @@ jobs:
     name: Package iOS
     runs-on: macos-26
     steps:
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
 
       - name: Build
         id: package
@@ -50,10 +57,14 @@ jobs:
     name: Package Windows
     runs-on: windows-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
-          submodules: recursive
           msvc: 'true'
 
       - name: Build
@@ -70,10 +81,14 @@ jobs:
     # 用太新的 Ubuntu 会导致 native 库链接的 glibc 版本过高，导致无法在较旧的 Linux 上运行
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
-          submodules: recursive
           gtk: 'true'
           virtual-display: 'true'
 
@@ -92,10 +107,13 @@ jobs:
     name: Package macOS
     runs-on: macos-26
     steps:
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:desktop-app:desktopArtifact
@@ -110,10 +128,13 @@ jobs:
     name: Package Web
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:web-app:webArtifact
@@ -134,10 +155,13 @@ jobs:
     name: Package Server
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:server:serverPublish
@@ -153,10 +177,14 @@ jobs:
     name: Package Mod Manager
     runs-on: windows-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
         with:
-          submodules: recursive
           msvc: 'true'
 
       - name: Build
@@ -172,10 +200,13 @@ jobs:
     name: Package Landpage
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
 
       - name: Build
         run: ./gradlew ylcs-app:landpage:landpagePublish

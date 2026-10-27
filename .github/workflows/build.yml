@@ -18,6 +18,10 @@ on:
       - 'ylcs-docs/**'
       - 'design/**'
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   changes:
     name: Detect Changes
@@ -34,10 +38,9 @@ jobs:
       modernScreen: ${{ steps.filter.outputs.modernScreen }}
     steps:
       - name: Checkout Code
-        uses: ./.github/actions/checkout
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          submodules: recursive
 
       - name: Detect File Changes
         uses: dorny/paths-filter@v4

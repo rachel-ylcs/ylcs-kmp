@@ -8,10 +8,13 @@ jobs:
     name: Package iOS
     runs-on: macos-26
     steps:
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - name: Checkout Code
+        uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
 
       - name: Build
         id: package

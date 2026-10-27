@@ -10,6 +10,9 @@ jobs:
     name: Package Server
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build
 
