@@ -3,15 +3,16 @@ package love.yinlin.compose.ui.text
 import androidx.compose.foundation.text.BasicSecureTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import love.yinlin.annotation.NativeComposeSAM
 import love.yinlin.compose.Colors
 import love.yinlin.compose.LocalColor
 import love.yinlin.compose.LocalColorVariant
@@ -71,8 +72,15 @@ fun PasswordInput(
             onTextLayout = null,
             interactionSource = state.interactionSource,
             cursorBrush = remember(contentColor) { SolidColor(contentColor) },
-            decorator = { innerContent ->
-                DecorationBox(state, hint, alignment, enabled, colorProvider, leading, trailing, innerContent)
+            decorator = remember(state, hint, alignment, enabled, colorProvider, leading, trailing) {
+                @NativeComposeSAM
+                @Suppress("ObjectLiteralToLambda")
+                object : TextFieldDecorator {
+                    @Composable
+                    override fun Decoration(innerTextField: @Composable () -> Unit) {
+                        DecorationBox(state, hint, alignment, enabled, colorProvider, leading, trailing, innerTextField)
+                    }
+                }
             },
             textObfuscationMode = state.maskStatus,
             textObfuscationCharacter = state.mask.character,
