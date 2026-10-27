@@ -597,6 +597,50 @@ class NativeBridgeFunctionalTest {
         assertContains(output.lineSequence().first { it.startsWith("COMMON_ROOT =") }, "test.upstream:render:1.0")
     }
 
+    @Test
+    fun sharedNativeSourceSetIdeMetadataUsesOnlyFullyCoveredPorts() {
+        val project = project()
+        consumer(project, """
+            mingwX64("windows")
+            linuxX64("linux")
+            macosArm64("macos")
+            iosArm64("ios")
+            jvm("desktop")
+            sourceSets {
+                val skikoMain = create("skikoMain") { dependsOn(commonMain.get()) }
+                val nativeMain = create("nativeMain") { dependsOn(skikoMain) }
+                val desktopNativeMain = create("desktopNativeMain") { dependsOn(nativeMain) }
+                getByName("windowsMain").dependsOn(desktopNativeMain)
+                getByName("linuxMain").dependsOn(desktopNativeMain)
+                getByName("macosMain").dependsOn(desktopNativeMain)
+                getByName("iosMain").dependsOn(skikoMain)
+                getByName("desktopMain").dependsOn(skikoMain)
+            }
+        """.trimIndent(), extra = """
+            nativeBridge.redirects.getByName("render") {
+                targets.set(setOf("mingw_x64", "linux_x64", "macos_arm64"))
+            }
+            tasks.register("verifySourceSetMetadata") {
+                doLast {
+                    for (name in listOf("commonMain", "skikoMain", "nativeMain", "desktopNativeMain", "iosMain")) {
+                        val result = configurations.getByName(name + "ResolvableDependenciesMetadata").incoming.resolutionResult
+                        result.allDependencies.filterIsInstance<org.gradle.api.artifacts.result.UnresolvedDependencyResult>().forEach { throw it.failure }
+                        println("SOURCE_METADATA " + name + " = " + result.allComponents.joinToString { it.id.displayName })
+                    }
+                }
+            }
+        """.trimIndent())
+        val output = runner(project, "verifySourceSetMetadata").build().output
+        for (name in listOf("nativeMain", "desktopNativeMain")) {
+            assertContains(output.lineSequence().first { it.startsWith("SOURCE_METADATA $name =") }, "test.port:render:1.0-native")
+        }
+        for (name in listOf("commonMain", "skikoMain", "iosMain")) {
+            val line = output.lineSequence().first { it.startsWith("SOURCE_METADATA $name =") }
+            assertContains(line, "test.upstream:render:1.0")
+            assertFalse(line.contains("test.port:render:1.0-native"))
+        }
+    }
+
     private val commonMetadataProbe = """
         tasks.register("verifyCommonRoot") {
             doLast {

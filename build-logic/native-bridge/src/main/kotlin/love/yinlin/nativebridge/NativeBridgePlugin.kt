@@ -11,6 +11,7 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinSharedNativeCompilation
@@ -107,6 +108,11 @@ class NativeBridgePlugin : Plugin<Project> {
     private fun configureRedirects(project: Project, kotlin: KotlinMultiplatformExtension, bridge: NativeBridgeExtension) {
         val targetAttribute = Attribute.of("org.jetbrains.kotlin.native.target", String::class.java)
         val metadataTargets = mutableMapOf<String, Set<String>>()
+        val metadataSourceSets = mutableMapOf<String, KotlinSourceSet>()
+        kotlin.sourceSets.configureEach {
+            // IDE metadata resolution has a separate configuration from Native compilation.
+            metadataSourceSets["${name}ResolvableDependenciesMetadata"] = this
+        }
         kotlin.targets.configureEach {
             compilations.configureEach {
                 val compilation = this
@@ -129,6 +135,15 @@ class NativeBridgePlugin : Plugin<Project> {
                             target != null -> target in rule.targets.get()
                             metadataTargets[configuration.name] != null ->
                                 metadataTargets.getValue(configuration.name).all { it in rule.metadataTargets.get() }
+                            metadataSourceSets[configuration.name] != null -> {
+                                val sourceSet = metadataSourceSets.getValue(configuration.name)
+                                val participants = kotlin.targets.filter { target ->
+                                    target.platformType != KotlinPlatformType.common && target.compilations.any { sourceSet in it.allKotlinSourceSets }
+                                }
+                                participants.isNotEmpty() && participants.all {
+                                    it is KotlinNativeTarget && it.konanTarget.name in rule.metadataTargets.get()
+                                }
+                            }
                             platform == KotlinPlatformType.common -> {
                                 // Shared metadata may be replaced only when the replacement covers
                                 // every participant. Mixed JVM/Android/common graphs stay official.
