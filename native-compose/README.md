@@ -39,6 +39,8 @@ SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主�
 
 `prepareNativeSources` 获取锁定归档和稀疏 Git checkout、应用补丁并生成 included builds，不执行 CMake、库编译或应用运行。输入和受管理源码一致时直接复用，不重复解压 Maven 源码或还原、应用 Git 补丁，也不重写 Wrapper。离线模式要求所需归档、Git 对象及源码选择已存在。同步保留构建输出和未变化文件的时间戳，遇到本地修改、未知文件或上游漂移时保留现场并失败。
 
+同步仅为 `vendor` 上游 Kotlin 文件和脚本合并文件级 `kotlin.Suppress("warnings")`，保留原有抑制项、版权声明和编译错误。`adaptation` 源码继续输出警告，未设置模块级 `suppressWarnings`。没有源码归属的编译器、链接器及 Gradle 警告继续保留。该策略参与同步记录和缓存身份，已有 vendor 会在源码准备时自动迁移。
+
 Material3、Adaptive、Navigation3 使用官方 macOS sources JAR 中的真实共享实现；缺失 actual 由适配源码提供。日期和数字本地化共用 Skia ICU，macOS 的 `CalendarLocale` 保留 `NSLocale` 类型身份。
 
 应用默认分发 JetBrains Skia SDK 自带的约 3.72 MiB 裁剪版 ICU 数据，包含中英文文本边界规则、中日文词典及 Unicode 规范化等基础数据。`upstream/icu.json` 锁定源 SDK 和数据哈希；三个桌面目标共用同一份小端数据，以 `icudtl-text@dat` 随 Skiko publication 发布，桥插件在分发目录中将其命名为 `icudtl.dat`。应用分发目录不额外复制 ICU 许可证，适配源码也不单独维护许可证副本；上游归档及 Maven 许可来源保持原有管理方式。

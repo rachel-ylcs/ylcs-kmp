@@ -38,12 +38,12 @@ class ComposeSourceSyncTest {
             val marker = owner.resolve("checkout.txt").apply { writeText("$commit\nsrc\n") }
             val record = owner.resolve("source-edits.json")
             sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true)
-            assertEquals("prepared\n", source.readText())
+            assertEquals(SourceWarnings.kotlin("prepared\n"), source.readText())
             assertTrue(source.setLastModified(1234567890000L))
             val timestamp = source.lastModified()
             sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true)
             assertEquals(timestamp, source.lastModified())
-            assertEquals("prepared\n", source.readText())
+            assertEquals(SourceWarnings.kotlin("prepared\n"), source.readText())
             val origin = "https://github.com/JetBrains/compose-multiplatform-core.git"
             sourceGit(workspace, "config", "url.https://mirror.invalid/.insteadOf", "https://github.com/")
             assertEquals("https://mirror.invalid/JetBrains/compose-multiplatform-core.git", sourceGit(workspace, "remote", "get-url", "origin").trim())
@@ -55,7 +55,7 @@ class ComposeSourceSyncTest {
             assertTrue(restoredSource.setLastModified(1234567890000L))
             val restoredTimestamp = restoredSource.lastModified()
             sync.prepareGit(restored, record, marker, identity, listOf("src"), specification, true)
-            assertEquals("prepared\n", restoredSource.readText())
+            assertEquals(SourceWarnings.kotlin("prepared\n"), restoredSource.readText())
             assertEquals(restoredTimestamp, restoredSource.lastModified())
             sourceGit(workspace, "config", "remote.origin.url", "https://unexpected.invalid/repository.git")
             val wrongOrigin = assertFailsWith<IllegalStateException> { sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true) }
@@ -70,7 +70,7 @@ class ComposeSourceSyncTest {
             assertFailsWith<IllegalStateException> { sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true) }
             assertEquals("local edit\n", other.readText())
             assertEquals(timestamp, source.lastModified())
-            other.writeText("unchanged\n")
+            other.writeText(SourceWarnings.kotlin("unchanged\n"))
             workspace.resolve("src/Extra.kt").writeText("local source\n")
             assertFailsWith<IllegalStateException> { sync.prepareGit(workspace, record, marker, identity, listOf("src"), specification, true) }
             assertEquals("local source\n", workspace.resolve("src/Extra.kt").readText())

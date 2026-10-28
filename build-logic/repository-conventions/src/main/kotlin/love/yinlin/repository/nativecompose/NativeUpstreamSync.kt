@@ -123,6 +123,7 @@ class NativeUpstreamSync(directory: File) {
                 catalog.copyWrappers(staging)
                 prepareNotices(staging)
                 removeShadows(staging)
+                SourceWarnings.prepare(vendor, staging)
                 workspace.synchronize(staging, build, marker, mapOf("schema" to 3, "fingerprint" to fingerprint, "sources" to skiko["sources"]), setOf("skiko/dependencies/skia"))
             }
             val key = skiaHostKey()

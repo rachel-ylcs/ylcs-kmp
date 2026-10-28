@@ -1,6 +1,7 @@
 package love.yinlin.repository.nativecompose
 
 import java.io.File
+import java.nio.file.Files
 
 internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
     private val nativeDirectory = sync.nativeDirectory
@@ -107,10 +108,20 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
                 it.isNotEmpty() && "/src/" in "/$it" && it.substringAfterLast('.') in setOf("kt", "cc", "cpp", "h", "hh", "def")
             }.toSet()
             check((untracked - files.keys).isEmpty()) { "Local untracked Compose sources preserved: ${untracked - files.keys}" }
-            if (prepared && current == commit && marker.isFile && marker.readText() == selected && previous["patchSha256"] == patch["sha256"] && files.keys == sync.patches.paths(patch)) return
+            val expectedPaths = sync.patches.paths(patch) + SourceWarnings.trackedPaths(directory)
+            if (prepared && current == commit && marker.isFile && marker.readText() == selected && previous["patchSha256"] == patch["sha256"] &&
+                previous["warningPolicy"] == SourceWarnings.policy && files.keys == expectedPaths) return
             val tracked = files.filterValues { hashes -> hashes !is Map<*, *> || hashes["original"] != null }.keys
             for (relative in files.keys - tracked) checkedSourcePath(vendor, directory.resolve(relative)).delete()
-            if (tracked.isNotEmpty()) sourceGit(directory, "restore", "--source=HEAD", "--worktree", "--", *tracked.toTypedArray())
+            if (tracked.isNotEmpty()) {
+                // A policy migration can include thousands of files, exceeding Windows' argv limit.
+                val pathspec = Files.createTempFile(vendor.toPath(), ".restore-paths-", ".txt").toFile()
+                try {
+                    pathspec.writeBytes(tracked.joinToString("\u0000", postfix = "\u0000").toByteArray())
+                    sourceGit(directory, "--literal-pathspecs", "restore", "--source=HEAD", "--worktree", "--pathspec-from-file=${pathspec.absolutePath}", "--pathspec-file-nul")
+                }
+                finally { check(pathspec.delete()) }
+            }
         }
         check(sourceGit(directory, "diff", "--name-only").isBlank()) { "Local tracked Compose edits preserved" }
         val existingSelection = if (!fresh && current == commit && !marker.isFile) sourceGit(directory, "sparse-checkout", "list").lineSequence().filter { it.isNotBlank() }.toSet() else emptySet()
@@ -164,6 +175,7 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
             check(exclusions == replacements.keys) { "Missing maintained source replacement provenance: $name" }
             for (relative in exclusions) check(!staging.resolve("src/${relative.substringBefore('/')}/kotlin/${relative.substringAfter('/')}").exists()) { "Upstream actual shadow remains: $relative" }
             check(staging.resolve("LICENSE.txt").isFile && staging.walkTopDown().any { it.extension == "kt" }) { "Missing Maven source/license: $name" }
+            SourceWarnings.prepare(vendor, staging)
             // Earlier source records are validated before migration to per-file hashes.
             migrateMavenRecord(name, destination, record)
             sync.workspace.synchronize(staging, destination, record, identity)
