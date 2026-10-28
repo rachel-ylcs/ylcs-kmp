@@ -1,17 +1,16 @@
-@file:Suppress("DEPRECATION", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-@file:OptIn(ExperimentalStdlibApi::class, kotlin.experimental.ExperimentalNativeApi::class)
-
+@file:Suppress("DEPRECATION", "INVISIBLE_MEMBER")
+@file:OptIn(ExperimentalStdlibApi::class, ExperimentalNativeApi::class)
 package androidx.compose.ui.platform
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.experimental.ExperimentalNativeApi
 import kotlin.native.EagerInitialization
 import kotlin.native.OsFamily
 import kotlin.native.Platform
 
-/** Keeps scopes created before a window opens bound to the current Native UI event loop. */
 internal class NativeMainDispatcher : MainCoroutineDispatcher() {
     private val lock = SynchronizedObject()
     private var host: NativeUiDispatcher? = null
@@ -36,7 +35,6 @@ internal class NativeMainDispatcher : MainCoroutineDispatcher() {
         if (dispatcher != null) dispatcher.dispatch(context, block)
         else {
             context[Job]?.cancel(CancellationException("Native Compose UI event loop is closed"))
-            // Resume cancelled continuations so their cleanup can finish after the UI loop stops.
             Dispatchers.Default.dispatch(context, block)
         }
     }
@@ -47,7 +45,6 @@ internal class NativeMainDispatcher : MainCoroutineDispatcher() {
             check(host == null) { "Dispatchers.Main already has a Native Compose UI host" }
             host = dispatcher
             started = true
-            // Claim happens before the window installs its wake callback; preserve startup FIFO order.
             while (true) {
                 val [context, block] = pending.removeFirstOrNull() ?: break
                 dispatcher.dispatch(context, block)
@@ -67,6 +64,11 @@ internal class NativeMainDispatcher : MainCoroutineDispatcher() {
 // Darwin already provides a system Main dispatcher and must retain it.
 @EagerInitialization
 internal val nativeMainDispatcher: NativeMainDispatcher? = when (Platform.osFamily) {
-    OsFamily.WINDOWS, OsFamily.LINUX -> NativeMainDispatcher().also { Dispatchers.injectMain(it) }
+    OsFamily.WINDOWS, OsFamily.LINUX -> {
+        val dispatcher = NativeMainDispatcher()
+        @Suppress("INVISIBLE_REFERENCE")
+        Dispatchers.injectMain(dispatcher)
+        dispatcher
+    }
     else -> null
 }

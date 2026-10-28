@@ -12,7 +12,6 @@ import kotlin.concurrent.Volatile
 import kotlin.native.concurrent.ThreadLocal
 import kotlin.time.Duration.Companion.milliseconds
 
-/** A host-thread queue; background timers only enqueue resumptions and never execute UI work. */
 internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable {
     private val ownerThread = getCurrentThreadId()
     private val lock = SynchronizedObject()
