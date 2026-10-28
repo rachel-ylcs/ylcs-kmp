@@ -28,6 +28,7 @@ import org.jetbrains.skia.impl.use
 
 internal fun loadNativeTypeface(font: Font): Typeface {
     require(font is PlatformFont) { "Unsupported font type: $font" }
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     val typeface = when (font) {
         is LoadedFont -> Data.makeFromBytes(font.data).use { FontMgr.default.makeFromData(it) }
         is SystemFont -> FontMgr.default.legacyMakeTypeface(font.identity, FontStyle(

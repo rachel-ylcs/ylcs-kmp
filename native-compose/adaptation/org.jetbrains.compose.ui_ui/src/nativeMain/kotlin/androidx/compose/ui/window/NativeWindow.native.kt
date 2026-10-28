@@ -13,8 +13,13 @@ import kotlin.math.roundToInt
  * The call blocks until the window closes, then disposes composition effects and host resources.
  * [onCloseRequest] returns true to accept an OS close request. Escape is delivered to Compose.
  */
+@Suppress("FunctionName")
 @ExperimentalComposeUiApi
-fun NativeWindow(options: NativeWindowOptions = NativeWindowOptions(title = "Compose Native"), onCloseRequest: () -> Boolean = { true }, content: @Composable () -> Unit) {
+fun NativeWindow(
+    options: NativeWindowOptions = NativeWindowOptions(title = "Compose Native"),
+    onCloseRequest: () -> Boolean = { true },
+    content: @Composable () -> Unit
+) {
     registerSkikoComposeImplementation()
     val host = NativeSceneHost(onCloseRequest)
     try {
