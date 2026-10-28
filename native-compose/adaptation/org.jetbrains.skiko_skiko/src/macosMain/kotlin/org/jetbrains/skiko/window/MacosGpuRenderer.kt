@@ -7,9 +7,9 @@ import org.jetbrains.skiko.*
 import platform.QuartzCore.CAMetalLayer
 
 internal actual fun gpuWindowFlags(): ULong = SdlMetalWindow.flags
-internal actual fun createGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit): WindowRenderer = MacosGpuRenderer(window, draw)
+internal actual fun createGpuRenderer(window: COpaquePointer, transparent: Boolean, draw: (Canvas, Int, Int) -> Unit): WindowRenderer = MacosGpuRenderer(window, transparent, draw)
 
-internal class MacosGpuRenderer(private val window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer, MacosSkiaLayerComponent {
+internal class MacosGpuRenderer(private val window: COpaquePointer, private val transparent: Boolean, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer, MacosSkiaLayerComponent {
     private val geometry = SdlWindowGeometry(window)
     private var metalView: COpaquePointer? = null
     private val layer = SkiaLayer()
@@ -41,7 +41,7 @@ internal class MacosGpuRenderer(private val window: COpaquePointer, draw: (Canva
         val view = SdlMetalWindow.createView(window)
         metalView = view
         val pointer = SdlMetalWindow.layer(view)
-        return interpretObjCPointer(pointer.rawValue)
+        return interpretObjCPointer<CAMetalLayer>(pointer.rawValue).apply { opaque = !transparent }
     }
 
     override fun deleteMetalLayer() {

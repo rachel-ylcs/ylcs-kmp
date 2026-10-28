@@ -30,6 +30,8 @@ SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主�
 
 需要 JDK 25、根 Gradle Wrapper、Git。Windows 需要 MSVC/Windows SDK；Linux 需要桌面开发包；macOS arm64 需要 Xcode。IDEA 的 Gradle JVM 使用 JDK 25。Gradle Settings 自动准备和登记本地移植源码。
 
+桥插件为本地源码消费单独生成项目结构元数据：保留发布坐标，并为实际选中的源码项目补充其 Gradle group/name 身份，兼容 Kotlin 在同一 build 和跨 included build 时使用的不同匹配方式。该文件仅替换 KGP 的 `kotlinProjectStructureMetadata` secondary variant；Maven publication 和 metadata JAR 继续使用原始发布元数据。通过 `ExportLib`／`api` 传递的依赖可沿模块链导入共享 Native 源码，不需要消费模块重复声明 Compose 子工件。
+
 ```text
 ./gradlew -p build-logic :repository-conventions:prepareNativeSources
 ./gradlew -p build-logic --offline :repository-conventions:prepareNativeSources
@@ -89,7 +91,15 @@ rachel {
 
 按需使用 `libs.compose.ui`、`libs.compose.foundation`、`libs.compose.material3`、`libs.compose.material3.windowSizeClass`、`libs.compose.material3.adaptive.navigation.suite`、`libs.compose.adaptive.layout`、`libs.compose.adaptive.navigation`、`libs.compose.adaptive.navigation3`。Material3 的基础 UI、Foundation 和 Ripple 随依赖图引入。Resources 同时应用官方 Compose Multiplatform 插件，沿用 `src/commonMain/composeResources` 和生成的 `Res`。
 
-桌面入口位于 Native 源集，调用 `androidx.compose.ui.window.NativeWindow`。应用安装桥插件后，可在 `rachel.multiplatform` 配置：
+桌面入口位于 Native 源集，调用 `androidx.compose.ui.window.NativeWindow`。
+
+`NativeWindowOptions` 支持创建时的 `transparent` 和 `undecorated`，默认均为 `false`。透明模式贯通 SDL 窗口与 Windows D3D12、Linux Vulkan、macOS Metal 的 alpha 缓冲；Linux 需要支持透明合成的窗口管理器和 Vulkan surface。`NativeWindowScope` 提供图标、最小尺寸、窗口装饰及标题栏命中区域接口；图标像素由 SDL 复制，拖动回调在窗口关闭前解绑。
+
+Rachel 的 `compose:app` Native `PlatformApplication` 默认采用透明、无系统标题栏窗口，支持与 JVM 类似的 `title`、`icon: DrawableResource?`、`initSize`、`minSize`、`roundedCorner` 和 `TopBar(controller, onExit)`。`controller.icon`、`controller.undecorated` 和 `controller.roundedCorner` 可在运行时更新；`transparent` 必须在创建窗口前配置。自定义标题栏默认交给系统拖动，交互控件区域用 `Modifier.windowDragArea(controller, draggable = false)` 排除，边缘保持系统缩放；切回系统装饰后隐藏 Compose 标题栏。位图、XML Vector 和 SVG 图标共用 Painter 栅格化，macOS 设置应用 Dock 图标；Wayland 不支持图标协议时保留系统图标，不中断应用。窗口实际透明还需要 Compose 内容使用透明背景。
+
+Native 托盘沿用 SDL 3.4.18 的图标接口，通过 `controller.tray.visible` 显示或隐藏，`painter` 默认为窗口图标，`tooltip` 默认为窗口标题。`isActive` 表示图标是否已创建，`isAvailable` 记录最近一次创建结果（尚未尝试时为 null）。桌面未提供托盘服务时跳过创建，Linux 需要可用的 GTK/AppIndicator 和桌面托盘服务。显隐与提示文字等状态由窗口生命周期内的 Main 协程观察，窗口隐藏或最小化时仍可更新；关闭窗口时取消观察并释放托盘。当前只开放图标、提示文字及显隐，点击、菜单和通知待后续接入，不添加图标点击的 SDL 扩展补丁。
+
+应用安装桥插件后，可在 `rachel.multiplatform` 配置打包信息：
 
 ```kotlin
 composeDesktopPackage {

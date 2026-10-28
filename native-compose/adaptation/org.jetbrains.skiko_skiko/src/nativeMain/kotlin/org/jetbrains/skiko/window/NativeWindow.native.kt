@@ -56,57 +56,45 @@ object NativeWindow {
 
     private fun runWindow(options: NativeWindowOptions = NativeWindowOptions(), onOpen: (NativeWindowScope) -> Unit, onEvent: (NativeWindowEvent) -> Unit, onClose: () -> Unit, render: (Canvas, Int, Int, Long) -> Unit) = memScoped {
         val software = options.backend == NativeWindowBackend.SOFTWARE
-        val flags = SDL_WINDOW_RESIZABLE or SDL_WINDOW_HIGH_PIXEL_DENSITY or if (software) 0uL else gpuWindowFlags()
+        var flags = SDL_WINDOW_RESIZABLE or SDL_WINDOW_HIGH_PIXEL_DENSITY
+        if (!software) flags = flags or gpuWindowFlags()
+        if (options.transparent) flags = flags or SDL_WINDOW_TRANSPARENT
+        if (options.undecorated) flags = flags or SDL_WINDOW_BORDERLESS
         val window = checkNotNull(RachelSDL_CreateWindow(options.title, options.width, options.height, flags)) {
             SDL_GetError()?.toKString() ?: "SDL_CreateWindow failed"
         }
         try {
             var nanoTime = 0L
             val draw: (Canvas, Int, Int) -> Unit = { canvas, width, height -> render(canvas, width, height, nanoTime) }
-            val renderer = if (software) RasterWindowRenderer(window, draw) else createGpuRenderer(window, draw)
+            val renderer = if (software) RasterWindowRenderer(window, draw) else createGpuRenderer(window, options.transparent, draw)
             try {
                 val wakeEventType = SDL_RegisterEvents(1)
                 check(wakeEventType != UInt.MAX_VALUE) { "Unable to register the Native window wake event" }
                 val scope = SdlWindowScope(window, wakeEventType)
                 try {
                     onOpen(scope)
-                    val events = SdlWindowEvents(window, onEvent)
+                    val events = SdlWindowEvents(window, wakeEventType, onEvent)
                     println("Renderer: ${renderer.description}; statically linked SDL3")
                     val event = alloc<SDL_Event>()
                     val width = alloc<IntVar>()
                     val height = alloc<IntVar>()
-                    val started = SDL_GetTicks()
                     var dirty = true
-                    var frames = 0
-                    var initialWidth = 0
-                    var initialHeight = 0
                     while (!scope.shouldClose) {
-                        check(!options.smoke || SDL_GetTicks() - started < 10000uL) { "NativeWindow smoke test timed out" }
-                        if (SDL_WaitEventTimeout(event.ptr, if (dirty || options.continuous) 0 else 250)) {
+                        if (SDL_WaitEventTimeout(event.ptr, if (dirty) 0 else 250)) {
                             do {
                                 events.dispatch(event)
                                 dirty = true
                             } while (SDL_PollEvent(event.ptr))
                         }
-                        scope.rethrowDropFailure()
-                        if (scope.shouldClose || (!dirty && !options.continuous)) continue
+                        scope.rethrowCallbackFailure()
+                        if (scope.shouldClose || !dirty) continue
                         check(RachelSDL_GetWindowSizeInPixels(window, width.ptr, height.ptr))
                         check(width.value in 0 .. 16384 && height.value in 0 .. 16384 && width.value.toLong() * height.value <= 67108864)
                         val frameStarted = SDL_GetTicks()
                         nanoTime = SDL_GetTicksNS().toLong()
-                        if (width.value > 0 && height.value > 0 && renderer.render(width.value, height.value)) {
-                            frames++
-                            dirty = false
-                            if (options.smoke && frames == 1) {
-                                initialWidth = width.value
-                                initialHeight = height.value
-                                check(RachelSDL_SetWindowSize(window, (options.width + 160).coerceAtMost(16384), (options.height + 60).coerceAtMost(16384)))
-                            }
-                            else if (options.smoke && frames >= (if (options.continuous) 12 else 2) && (width.value != initialWidth || height.value != initialHeight)) {
-                                println("PASS: ${renderer.description}; static SDL; resize ${initialWidth}x$initialHeight -> ${width.value}x${height.value}; $frames frames")
-                                scope.close()
-                            }
-                        }
+
+                        dirty = false
+                        if (width.value > 0 && height.value > 0) renderer.render(width.value, height.value)
                         val elapsed = SDL_GetTicks() - frameStarted
                         if (elapsed < 16uL) SDL_Delay((16uL - elapsed).toUInt())
                     }

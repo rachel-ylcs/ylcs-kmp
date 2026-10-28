@@ -14,8 +14,9 @@ expect abstract class PlatformApplication<out A : PlatformApplication<A>>(
     /**
      * 返回桌面
      *
-     * Desktop -> 最小化
+     * JVM / Native Desktop -> 最小化
      * Android -> 返回桌面
+     * iOS、Web -> 暂不执行操作
      */
     fun backHome()
 

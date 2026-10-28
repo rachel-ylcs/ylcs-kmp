@@ -108,6 +108,7 @@ compose-ui-text = { module = "org.jetbrains.compose.ui:ui-text", version.ref = "
 compose-ui-skiko = { module = "org.jetbrains.compose.ui:ui-skiko", version.ref = "cmp" }
 compose-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "cmp" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "cmp" }
+compose-foundation-layout = { module = "org.jetbrains.compose.foundation:foundation-layout", version.ref = "cmp" }
 compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "cmp" }
 compose-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "cmp" }
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "cmp" }

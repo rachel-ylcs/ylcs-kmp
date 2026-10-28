@@ -16,11 +16,13 @@ internal class RasterWindowRenderer(window: COpaquePointer, private val draw: (C
 
     override fun render(width: Int, height: Int): Boolean {
         Surface.makeRaster(ImageInfo(width, height, ColorType.RGBA_8888, ColorAlphaType.PREMUL)).use { surface ->
+            surface.canvas.clear(org.jetbrains.skia.Color.TRANSPARENT)
             draw(surface.canvas, width, height)
             Pixmap().use { pixels ->
                 check(surface.peekPixels(pixels))
                 val texture = checkNotNull(RachelSDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TextureAccess.SDL_TEXTUREACCESS_STREAMING, width, height))
                 try {
+                    check(SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE))
                     check(SDL_UpdateTexture(texture, null, interpretCPointer<ByteVar>(pixels.addr), pixels.rowBytes))
                     check(RachelSDL_RenderClear(renderer))
                     check(RachelSDL_RenderTexture(renderer, texture, null, null))

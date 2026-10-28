@@ -35,6 +35,107 @@ static inline bool RachelSDL_GetWindowSizeInPixels(void *window, int *width, int
 static inline bool RachelSDL_SetWindowSize(void *window, int width, int height) {
     return SDL_SetWindowSize((SDL_Window *)window, width, height);
 }
+static inline bool RachelSDL_GetWindowSize(void *window, int *width, int *height) {
+    return SDL_GetWindowSize((SDL_Window *)window, width, height);
+}
+static inline const char *RachelSDL_GetWindowTitle(void *window) {
+    return SDL_GetWindowTitle((SDL_Window *)window);
+}
+static inline SDL_WindowFlags RachelSDL_GetWindowFlags(void *window) {
+    return SDL_GetWindowFlags((SDL_Window *)window);
+}
+static inline bool RachelSDL_SetWindowTitle(void *window, const char *title) {
+    return SDL_SetWindowTitle((SDL_Window *)window, title);
+}
+static inline bool RachelSDL_SetWindowMinimumSize(void *window, int width, int height) {
+    return SDL_SetWindowMinimumSize((SDL_Window *)window, width, height);
+}
+static inline bool RachelSDL_SetWindowUndecorated(void *window, bool undecorated) {
+    return SDL_SetWindowBordered((SDL_Window *)window, !undecorated);
+}
+// SDL copies the pixels before returning. Neither the borrowed array nor the surface is retained.
+static inline bool RachelSDL_SetWindowIcon(void *window, int width, int height, void *pixels) {
+    SDL_Surface *surface = SDL_CreateSurfaceFrom(width, height, SDL_PIXELFORMAT_ARGB8888, pixels, width * 4);
+    if (!surface) return false;
+    const bool success = SDL_SetWindowIcon((SDL_Window *)window, surface);
+    SDL_DestroySurface(surface);
+    return success;
+}
+static inline void *RachelSDL_CreateTray(const char *tooltip) {
+    return SDL_CreateTray(NULL, tooltip);
+}
+static inline void RachelSDL_DestroyTray(void *tray) {
+    SDL_DestroyTray((SDL_Tray *)tray);
+}
+static inline bool RachelSDL_SetTrayIcon(void *tray, int width, int height, void *pixels) {
+    SDL_Surface *surface = SDL_CreateSurfaceFrom(width, height, SDL_PIXELFORMAT_ARGB8888, pixels, width * 4);
+    if (!surface) return false;
+    SDL_SetTrayIcon((SDL_Tray *)tray, surface);
+    SDL_DestroySurface(surface);
+    return true;
+}
+static inline void RachelSDL_SetTrayTooltip(void *tray, const char *tooltip) {
+    SDL_SetTrayTooltip((SDL_Tray *)tray, tooltip);
+}
+typedef bool (*RachelSDL_DragAreaCallback)(void *userdata, float x, float y);
+typedef struct RachelSDL_WindowHitTest {
+    RachelSDL_DragAreaCallback callback;
+    void *userdata;
+} RachelSDL_WindowHitTest;
+
+static SDL_HitTestResult SDLCALL RachelSDL_HitTestWindow(SDL_Window *window, const SDL_Point *point, void *userdata) {
+    const SDL_WindowFlags flags = SDL_GetWindowFlags(window);
+    if (!(flags & SDL_WINDOW_BORDERLESS)) return SDL_HITTEST_NORMAL;
+    float density = SDL_GetWindowPixelDensity(window);
+    if (!(density > 0)) density = 1;
+    if ((flags & SDL_WINDOW_RESIZABLE) && !(flags & (SDL_WINDOW_MAXIMIZED | SDL_WINDOW_FULLSCREEN))) {
+        int width = 0, height = 0;
+        SDL_GetWindowSize(window, &width, &height);
+        float scale = SDL_GetWindowDisplayScale(window);
+        if (!(scale > 0)) scale = density;
+        const float edge = 6 * scale / density;
+        const bool left = point->x >= 0 && point->x < edge;
+        const bool right = point->x < width && point->x >= width - edge;
+        const bool top = point->y >= 0 && point->y < edge;
+        const bool bottom = point->y < height && point->y >= height - edge;
+        if (top) return left ? SDL_HITTEST_RESIZE_TOPLEFT : right ? SDL_HITTEST_RESIZE_TOPRIGHT : SDL_HITTEST_RESIZE_TOP;
+        if (bottom) return left ? SDL_HITTEST_RESIZE_BOTTOMLEFT : right ? SDL_HITTEST_RESIZE_BOTTOMRIGHT : SDL_HITTEST_RESIZE_BOTTOM;
+        if (left) return SDL_HITTEST_RESIZE_LEFT;
+        if (right) return SDL_HITTEST_RESIZE_RIGHT;
+    }
+    const RachelSDL_WindowHitTest *test = (const RachelSDL_WindowHitTest *)userdata;
+    return test->callback(test->userdata, point->x * density, point->y * density) ? SDL_HITTEST_DRAGGABLE : SDL_HITTEST_NORMAL;
+}
+static inline void *RachelSDL_CreateWindowHitTest(void *window, RachelSDL_DragAreaCallback callback, void *userdata) {
+    RachelSDL_WindowHitTest *test = (RachelSDL_WindowHitTest *)SDL_malloc(sizeof(RachelSDL_WindowHitTest));
+    if (!test) return NULL;
+    test->callback = callback;
+    test->userdata = userdata;
+    if (!SDL_SetWindowHitTest((SDL_Window *)window, RachelSDL_HitTestWindow, test)) {
+        SDL_free(test);
+        return NULL;
+    }
+    return test;
+}
+static inline void RachelSDL_DestroyWindowHitTest(void *window, void *test) {
+    SDL_SetWindowHitTest((SDL_Window *)window, NULL, NULL);
+    SDL_free(test);
+}
+static inline bool RachelSDL_SetWindowVisible(void *window, bool visible) {
+    return visible ? SDL_ShowWindow((SDL_Window *)window) : SDL_HideWindow((SDL_Window *)window);
+}
+static inline bool RachelSDL_SetWindowAlwaysOnTop(void *window, bool alwaysOnTop) {
+    return SDL_SetWindowAlwaysOnTop((SDL_Window *)window, alwaysOnTop);
+}
+static inline bool RachelSDL_MinimizeWindow(void *window) {
+    return SDL_MinimizeWindow((SDL_Window *)window);
+}
+static inline bool RachelSDL_MaximizeWindow(void *window) {
+    return SDL_MaximizeWindow((SDL_Window *)window);
+}
+static inline bool RachelSDL_RestoreWindow(void *window) {
+    return SDL_RestoreWindow((SDL_Window *)window);
+}
 static inline float RachelSDL_GetWindowDisplayScale(void *window) {
     return SDL_GetWindowDisplayScale((SDL_Window *)window);
 }
@@ -114,7 +215,7 @@ static inline SDL_Texture *RachelSDL_CreateTexture(void *renderer, SDL_PixelForm
     return SDL_CreateTexture((SDL_Renderer *)renderer, format, access, width, height);
 }
 static inline bool RachelSDL_RenderClear(void *renderer) {
-    return SDL_RenderClear((SDL_Renderer *)renderer);
+    return SDL_SetRenderDrawColor((SDL_Renderer *)renderer, 0, 0, 0, 0) && SDL_RenderClear((SDL_Renderer *)renderer);
 }
 static inline bool RachelSDL_RenderTexture(void *renderer, SDL_Texture *texture, const SDL_FRect *source, const SDL_FRect *destination) {
     return SDL_RenderTexture((SDL_Renderer *)renderer, texture, source, destination);

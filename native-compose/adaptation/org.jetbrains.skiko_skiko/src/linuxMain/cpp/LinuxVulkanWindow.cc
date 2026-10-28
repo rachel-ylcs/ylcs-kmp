@@ -92,6 +92,7 @@ namespace {
         int requestedWidth = 0, requestedHeight = 0;
         int preferredBuffers = 0;
         bool vsync = true;
+        bool transparent = false;
         bool dirty = true;
         bool lost = false;
         char deviceName[VK_MAX_PHYSICAL_DEVICE_NAME_SIZE] = {};
@@ -113,7 +114,8 @@ namespace {
 
         bool init(const char* const* instanceExtensions, int extensionCount,
             SurfaceFactory createSurface, void* userData, int priority, int buffers,
-            int64_t cacheLimit) {
+            int64_t cacheLimit, bool transparency) {
+            transparent = transparency;
             if (!createSurface || !instanceExtensions || extensionCount < 1 || extensionCount > 64)
                 return fail("Invalid Vulkan surface factory or instance extensions");
             void* loader = vulkanLoader();
@@ -332,7 +334,15 @@ namespace {
             if (!(caps.supportedUsageFlags & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))
                 return fail("Vulkan surface cannot be a color attachment");
             VkCompositeAlphaFlagBitsKHR alpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-            if (!(caps.supportedCompositeAlpha & alpha)) {
+            if (transparent) {
+                if (caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR)
+                    alpha = VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR;
+                else if (caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR)
+                    alpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
+                else
+                    return fail("Vulkan window system does not support premultiplied transparent buffers");
+            }
+            else if (!(caps.supportedCompositeAlpha & alpha)) {
                 alpha = VkCompositeAlphaFlagBitsKHR(caps.supportedCompositeAlpha & (~caps.supportedCompositeAlpha + 1));
             }
             VkSwapchainCreateInfoKHR info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
@@ -453,7 +463,7 @@ namespace {
             if (!frame)
                 return fail("Could not snapshot the Vulkan scene for presentation");
             auto* canvas = surfaces[imageIndex]->getCanvas();
-            canvas->clear(SK_ColorBLACK);
+            canvas->clear(transparent ? SK_ColorTRANSPARENT : SK_ColorBLACK);
             canvas->drawImage(frame, 0, 0);
             auto semaphore = GrBackendSemaphores::MakeVk(presentSemaphores[imageIndex]);
             GrFlushInfo flushInfo;
@@ -486,7 +496,7 @@ namespace {
 } // namespace
 
 SKIKO_EXPORT KNativePointer RachelVulkanWindow_Create(KNativePointer names, KInt count,
-    KNativePointer factory, KNativePointer userData, KInt priority, KInt buffers, KLong cacheLimit) {
+    KNativePointer factory, KNativePointer userData, KInt priority, KInt buffers, KLong cacheLimit, KBoolean transparent) {
     lastError[0] = '\0';
     auto window = std::unique_ptr<VulkanWindow>(new (std::nothrow) VulkanWindow());
     if (!window) {
@@ -494,7 +504,7 @@ SKIKO_EXPORT KNativePointer RachelVulkanWindow_Create(KNativePointer names, KInt
         return nullptr;
     }
     if (!window->init(static_cast<const char* const*>(names), count,
-            reinterpret_cast<SurfaceFactory>(factory), userData, priority, buffers, cacheLimit))
+            reinterpret_cast<SurfaceFactory>(factory), userData, priority, buffers, cacheLimit, transparent))
         return nullptr;
     return window.release();
 }

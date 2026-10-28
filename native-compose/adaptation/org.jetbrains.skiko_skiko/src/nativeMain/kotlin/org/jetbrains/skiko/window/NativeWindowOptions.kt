@@ -1,13 +1,12 @@
 package org.jetbrains.skiko.window
 
-/** Logical window size; the render callback receives drawable pixels, including display scaling. */
 class NativeWindowOptions(
     val title: String = "Skiko Native",
     val width: Int = 800,
     val height: Int = 480,
     val backend: NativeWindowBackend = NativeWindowBackend.GPU,
-    val continuous: Boolean = false,
-    val smoke: Boolean = false,
+    val transparent: Boolean = false,
+    val undecorated: Boolean = false,
 ) {
     init {
         require(title.length <= 1024 && '\u0000' !in title)

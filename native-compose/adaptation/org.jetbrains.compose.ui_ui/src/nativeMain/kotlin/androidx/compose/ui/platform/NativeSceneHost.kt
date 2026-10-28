@@ -130,9 +130,11 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
 
     fun onEvent(event: NativeWindowEvent) {
         if (closed) return
-        window?.let { updateGeometry(it.pixelWidth, it.pixelHeight) }
         dispatcher.runCurrent()
+        if (event == NativeWindowEvent.Wake) return
+        window?.let { updateGeometry(it.pixelWidth, it.pixelHeight) }
         when (event) {
+            NativeWindowEvent.Wake, is NativeWindowEvent.WindowStateChanged -> Unit
             NativeWindowEvent.CloseRequested -> if (onCloseRequest()) window?.close()
             NativeWindowEvent.EnvironmentChanged -> refreshEnvironment()
             is NativeWindowEvent.Focus -> {

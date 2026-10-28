@@ -29,6 +29,8 @@
 
 Covering cross-platform entry, shared UI, dependent service startup, client and server interaction engines, free screen navigation, platform native components, custom themes, responsive layout, MDI configuration consistency, page loading, server routing, and other fields.
 
+### We Support Native Compose Desktop Application !!!
+
 |Target|  VM  |  Native  |  Native Compose  |
 |:---:|:---:|:---:|:---:|
 |  Android  |✅|➖|➖|

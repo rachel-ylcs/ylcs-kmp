@@ -41,6 +41,7 @@ rachel {
                     libs.compose.ui.skiko,
                     libs.compose.ui.backhandler,
                     libs.compose.foundation,
+                    libs.compose.foundation.layout,
 
                     projects.ylcsModule.foundation.context,
                 )

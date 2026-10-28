@@ -4,7 +4,7 @@ import kotlinx.cinterop.*
 import org.jetbrains.skiko.internal.sdl.*
 import org.jetbrains.skiko.internal.sdl.SDL_MouseWheelDirection.SDL_MOUSEWHEEL_FLIPPED
 
-internal class SdlWindowEvents(private val window: COpaquePointer, private val send: (NativeWindowEvent) -> Unit) {
+internal class SdlWindowEvents(private val window: COpaquePointer, private val wakeEventType: UInt, private val send: (NativeWindowEvent) -> Unit) {
     private var x = 0f
     private var y = 0f
     private var buttons = 0
@@ -12,7 +12,11 @@ internal class SdlWindowEvents(private val window: COpaquePointer, private val s
     fun dispatch(event: SDL_Event) {
         val scale = RachelSDL_GetWindowPixelDensity(window).takeIf { it.isFinite() && it > 0f } ?: 1f
         when (event.type) {
+            wakeEventType -> send(NativeWindowEvent.Wake)
             SDL_EVENT_QUIT, SDL_EVENT_WINDOW_CLOSE_REQUESTED -> send(NativeWindowEvent.CloseRequested)
+            SDL_EVENT_WINDOW_RESIZED, SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Size))
+            SDL_EVENT_WINDOW_MINIMIZED, SDL_EVENT_WINDOW_MAXIMIZED, SDL_EVENT_WINDOW_RESTORED -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Placement))
+            SDL_EVENT_WINDOW_SHOWN, SDL_EVENT_WINDOW_HIDDEN -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Visibility))
             SDL_EVENT_WINDOW_FOCUS_GAINED -> send(NativeWindowEvent.Focus(true))
             SDL_EVENT_SYSTEM_THEME_CHANGED, SDL_EVENT_LOCALE_CHANGED, SDL_EVENT_WINDOW_DISPLAY_CHANGED,
             SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED, SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED -> send(NativeWindowEvent.EnvironmentChanged)

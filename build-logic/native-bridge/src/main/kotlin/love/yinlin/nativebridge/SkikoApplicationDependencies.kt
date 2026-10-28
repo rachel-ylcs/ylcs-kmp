@@ -9,7 +9,6 @@ internal object SkikoApplicationDependencies {
         val nativeRoot = if (extras.has("love.yinlin.nativeCompose.root")) extras.get("love.yinlin.nativeCompose.root") as File else null
         if (application.skikoRuntimeEnabled.get()) configureSkiko(project, application, bridge, nativeRoot)
         if (!application.skikoWindowEnabled.get()) return
-        if (project.providers.gradleProperty("native.smoke").getOrElse("false").toBoolean()) application.arguments.add("--smoke")
         val renderer = project.providers.gradleProperty("native.renderer").getOrElse("gpu")
         require(renderer in setOf("gpu", "software")) { "native.renderer must be gpu or software" }
         if (renderer == "software") application.arguments.add("--software")

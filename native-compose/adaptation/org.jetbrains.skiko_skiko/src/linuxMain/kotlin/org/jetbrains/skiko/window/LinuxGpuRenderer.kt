@@ -1,18 +1,17 @@
 @file:OptIn(ExperimentalForeignApi::class)
 package org.jetbrains.skiko.window
 
-import org.jetbrains.skia.Canvas
-
 import kotlinx.cinterop.*
 import org.jetbrains.skiko.internal.sdl.*
+import org.jetbrains.skia.Canvas
 import org.jetbrains.skia.impl.Native.Companion.NullPointer
 import org.jetbrains.skia.impl.NativePointer
 import org.jetbrains.skiko.*
 
 internal actual fun gpuWindowFlags(): ULong = SDL_WINDOW_VULKAN
-internal actual fun createGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit): WindowRenderer = LinuxGpuRenderer(window, draw)
+internal actual fun createGpuRenderer(window: COpaquePointer, transparent: Boolean, draw: (Canvas, Int, Int) -> Unit): WindowRenderer = LinuxGpuRenderer(window, transparent, draw)
 
-internal class LinuxGpuRenderer(private val window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer, LinuxSkiaLayerComponent {
+internal class LinuxGpuRenderer(private val window: COpaquePointer, override val transparency: Boolean, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer, LinuxSkiaLayerComponent {
     private val geometry = SdlWindowGeometry(window)
     private val layer = SkiaLayer(SkiaLayerProperties(renderApi = GraphicsApi.VULKAN))
     override val windowHandle: Any get() = window
@@ -41,7 +40,7 @@ internal class LinuxGpuRenderer(private val window: COpaquePointer, draw: (Canva
         val names = checkNotNull(SDL_Vulkan_GetInstanceExtensions(count.ptr)) { SDL_GetError()?.toKString() ?: "No Vulkan extensions" }
         check(count.value in 1u .. 64u)
         val extensions = List(count.value.toInt()) { index -> checkNotNull(names[index]).toKString() }
-        LinuxVulkanWindow(extensions, checkNotNull(RachelSDL_VulkanSurfaceFactory()).rawValue, window.rawValue, properties)
+        LinuxVulkanWindow(extensions, checkNotNull(RachelSDL_VulkanSurfaceFactory()).rawValue, window.rawValue, properties, transparent = transparency)
     }
 
     override fun render(width: Int, height: Int): Boolean {
@@ -53,7 +52,6 @@ internal class LinuxGpuRenderer(private val window: COpaquePointer, draw: (Canva
     override fun requestRender() = RachelSDL_RequestRender(window)
     override fun close() = layer.detach()
 
-    // This SDL window was created for Vulkan; fallback is deliberately an error in this probe.
     override val openGlResolverContext: NativePointer get() = NullPointer
     override val openGlResolver: NativePointer get() = NullPointer
     override fun createOpenGlContext(): NativePointer = error("This probe requires Vulkan")

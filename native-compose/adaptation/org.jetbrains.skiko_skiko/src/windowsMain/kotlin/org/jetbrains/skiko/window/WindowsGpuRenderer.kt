@@ -12,10 +12,10 @@ import org.jetbrains.skiko.SkiaLayerProperties
 import org.jetbrains.skiko.SkikoRenderDelegate
 
 internal actual fun gpuWindowFlags(): ULong = 0uL
-internal actual fun createGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit): WindowRenderer = WindowsGpuRenderer(window, draw)
+internal actual fun createGpuRenderer(window: COpaquePointer, transparent: Boolean, draw: (Canvas, Int, Int) -> Unit): WindowRenderer = WindowsGpuRenderer(window, transparent, draw)
 
-internal class WindowsGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer {
-    private val layer = SkiaLayer(SkiaLayerProperties(renderApi = GraphicsApi.DIRECT3D))
+internal class WindowsGpuRenderer(window: COpaquePointer, transparent: Boolean, draw: (Canvas, Int, Int) -> Unit) : WindowRenderer {
+    private val layer = SkiaLayer(SkiaLayerProperties(renderApi = GraphicsApi.DIRECT3D)).apply { transparency = transparent }
     override val description: String get() = layer.rendererDescription
 
     init {
@@ -24,6 +24,7 @@ internal class WindowsGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, In
             layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ -> draw(canvas, width, height) }
             layer.attachTo(hwnd.rawValue.toLong())
             check(layer.renderApi == GraphicsApi.DIRECT3D) { "D3D12 initialization fell back to ${layer.renderApi}" }
+            check(!transparent || layer.diagnostics.hasTransparentWindowBuffer) { "D3D12 could not create a transparent window buffer" }
         }
         catch (failure: Throwable) {
             layer.detach()

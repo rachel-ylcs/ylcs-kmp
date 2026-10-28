@@ -3,6 +3,7 @@
 *.cpp linguist-language=C++
 *.c linguist-language=C++
 *.h linguist-language=C++
+*.def linguist-language=C++
 *.S linguist-language=Assembly
 *.js linguist-language=JavaScript
 *.css linguist-language=JavaScript

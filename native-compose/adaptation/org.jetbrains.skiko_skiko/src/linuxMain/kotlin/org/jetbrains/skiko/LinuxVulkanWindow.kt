@@ -1,5 +1,4 @@
 @file:OptIn(ExperimentalForeignApi::class)
-
 package org.jetbrains.skiko
 
 import kotlinx.cinterop.*
@@ -23,6 +22,7 @@ class LinuxVulkanWindow(
     surfaceFactory: NativePointer,
     userData: NativePointer,
     properties: SkiaLayerProperties = SkiaLayerProperties(),
+    transparent: Boolean = false,
 ) {
     private var pointer = memScoped {
         require(instanceExtensions.size in 1 .. 64)
@@ -32,7 +32,7 @@ class LinuxVulkanWindow(
         instanceExtensions.forEachIndexed { index, name -> names[index] = name.cstr.getPointer(this) }
         create(names.rawValue, instanceExtensions.size, surfaceFactory, userData,
             properties.adapterPriority.ordinal, properties.frameBuffering.numberOfBuffers() ?: 0,
-            properties.gpuResourceCacheLimit).also {
+            properties.gpuResourceCacheLimit, transparent).also {
             if (it == NullPointer) throw RenderException(vulkanError())
         }
     }
@@ -68,7 +68,7 @@ class LinuxVulkanWindow(
 private fun vulkanError(): String = interpretCPointer<ByteVar>(lastError())?.toKString() ?: "Vulkan window operation failed"
 
 @ExternalSymbolName("RachelVulkanWindow_Create")
-private external fun create(names: NativePointer, count: Int, factory: NativePointer, userData: NativePointer, priority: Int, buffers: Int, cacheLimit: Long): NativePointer
+private external fun create(names: NativePointer, count: Int, factory: NativePointer, userData: NativePointer, priority: Int, buffers: Int, cacheLimit: Long, transparent: Boolean): NativePointer
 @ExternalSymbolName("RachelVulkanWindow_Destroy")
 private external fun destroy(pointer: NativePointer)
 @ExternalSymbolName("RachelVulkanWindow_Acquire")

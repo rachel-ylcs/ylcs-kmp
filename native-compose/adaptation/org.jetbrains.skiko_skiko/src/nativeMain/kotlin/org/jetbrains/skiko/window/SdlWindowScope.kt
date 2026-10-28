@@ -12,11 +12,10 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
     private val active = AtomicBoolean(true)
     private val closing = AtomicBoolean(false)
     private val cursors = mutableMapOf<NativeWindowCursor, COpaquePointer>()
-    private var dropFailure: Throwable? = null
-    private val dropTarget = SdlWindowDropTarget(window) { failure ->
-        if (dropFailure == null) dropFailure = failure
-        close()
-    }
+    private val trays = mutableSetOf<SdlNativeTray>()
+    private var callbackFailure: Throwable? = null
+    private var hitTest: SdlWindowHitTest? = null
+    private val dropTarget = SdlWindowDropTarget(window, ::onCallbackFailure)
     val shouldClose: Boolean get() = closing.load()
 
     override val displayScale: Float get() {
@@ -41,6 +40,23 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
         val height = alloc<IntVar>()
         check(RachelSDL_GetWindowSizeInPixels(window, null, height.ptr)) { SDL_GetError()?.toKString() ?: "Unable to read window height" }
         height.value
+    }
+
+    override val state: NativeWindowState get() = memScoped {
+        checkHostThread()
+        val width = alloc<IntVar>()
+        val height = alloc<IntVar>()
+        check(RachelSDL_GetWindowSize(window, width.ptr, height.ptr)) { SDL_GetError()?.toKString() ?: "Unable to read window size" }
+        val flags = RachelSDL_GetWindowFlags(window)
+        NativeWindowState(
+            title = RachelSDL_GetWindowTitle(window)?.toKString().orEmpty(),
+            width = width.value,
+            height = height.value,
+            minimized = flags and SDL_WINDOW_MINIMIZED != 0uL,
+            maximized = flags and SDL_WINDOW_MAXIMIZED != 0uL,
+            visible = flags and SDL_WINDOW_HIDDEN == 0uL,
+            alwaysOnTop = flags and SDL_WINDOW_ALWAYS_ON_TOP != 0uL,
+        )
     }
 
     override fun invalidate() {
@@ -77,13 +93,88 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
         check(RachelSDL_SetWindowSize(window, width, height)) { SDL_GetError()?.toKString() ?: "Unable to resize window" }
     }
 
+    override fun setTitle(title: String) {
+        checkHostThread()
+        require(title.length <= 1024 && '\u0000' !in title) { "Invalid Native window title" }
+        check(RachelSDL_SetWindowTitle(window, title)) { SDL_GetError()?.toKString() ?: "Unable to set window title" }
+    }
+
+    override fun setMinimumSize(width: Int, height: Int) {
+        checkHostThread()
+        require(width in 1 .. 16384 && height in 1 .. 16384 && width.toLong() * height <= 67108864)
+        check(RachelSDL_SetWindowMinimumSize(window, width, height)) { SDL_GetError()?.toKString() ?: "Unable to set minimum window size" }
+    }
+
+    override fun setUndecorated(undecorated: Boolean) {
+        checkHostThread()
+        check(RachelSDL_SetWindowUndecorated(window, undecorated)) { SDL_GetError()?.toKString() ?: "Unable to change window decorations" }
+    }
+
+    override fun setIcon(width: Int, height: Int, pixels: IntArray): Boolean {
+        checkHostThread()
+        require(width in 1 .. 1024 && height in 1 .. 1024 && pixels.size == width * height)
+        return pixels.usePinned { RachelSDL_SetWindowIcon(window, width, height, it.addressOf(0)) }
+    }
+
+    override fun createTray(tooltip: String): NativeTray? {
+        checkHostThread()
+        return SdlNativeTray.create(tooltip) { trays.remove(it) }?.also { trays.add(it) }
+    }
+
+    override fun setDragArea(hitTest: ((Float, Float) -> Boolean)?) {
+        checkHostThread()
+        val current = this.hitTest
+        if (hitTest == null) {
+            current?.dispose()
+            this.hitTest = null
+        }
+        else if (current != null) current.hitTest = hitTest
+        else this.hitTest = SdlWindowHitTest(window, hitTest, ::onCallbackFailure)
+    }
+
+    override fun setVisible(visible: Boolean) {
+        checkHostThread()
+        check(RachelSDL_SetWindowVisible(window, visible)) { SDL_GetError()?.toKString() ?: "Unable to change window visibility" }
+    }
+
+    override fun setAlwaysOnTop(alwaysOnTop: Boolean) {
+        checkHostThread()
+        check(RachelSDL_SetWindowAlwaysOnTop(window, alwaysOnTop)) { SDL_GetError()?.toKString() ?: "Unable to change window topmost state" }
+    }
+
+    override fun setMinimized(minimized: Boolean) {
+        checkHostThread()
+        val flags = RachelSDL_GetWindowFlags(window)
+        if (minimized) {
+            if (flags and SDL_WINDOW_MINIMIZED == 0uL) check(RachelSDL_MinimizeWindow(window)) { SDL_GetError()?.toKString() ?: "Unable to minimize window" }
+        }
+        else if (flags and SDL_WINDOW_MINIMIZED != 0uL) {
+            check(RachelSDL_RestoreWindow(window)) { SDL_GetError()?.toKString() ?: "Unable to restore window" }
+            if (flags and SDL_WINDOW_MAXIMIZED != 0uL) check(RachelSDL_MaximizeWindow(window)) { SDL_GetError()?.toKString() ?: "Unable to restore maximized window" }
+        }
+    }
+
+    override fun setMaximized(maximized: Boolean) {
+        checkHostThread()
+        val flags = RachelSDL_GetWindowFlags(window)
+        if (maximized) {
+            if (flags and SDL_WINDOW_MAXIMIZED == 0uL || flags and SDL_WINDOW_MINIMIZED != 0uL) check(RachelSDL_MaximizeWindow(window)) { SDL_GetError()?.toKString() ?: "Unable to maximize window" }
+        }
+        else if (flags and SDL_WINDOW_MAXIMIZED != 0uL) check(RachelSDL_RestoreWindow(window)) { SDL_GetError()?.toKString() ?: "Unable to restore window" }
+    }
+
     override fun setDropTarget(target: NativeWindowDropTarget?) {
         checkHostThread()
         dropTarget.target = target
     }
 
-    fun rethrowDropFailure() {
-        dropFailure?.let { throw it }
+    private fun onCallbackFailure(failure: Throwable) {
+        if (callbackFailure == null) callbackFailure = failure
+        close()
+    }
+
+    fun rethrowCallbackFailure() {
+        callbackFailure?.let { throw it }
     }
 
     override fun startTextInput() {
@@ -104,6 +195,9 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
 
     fun dispose() {
         active.store(false)
+        trays.toList().forEach { it.close() }
+        hitTest?.dispose()
+        hitTest = null
         dropTarget.dispose()
         cursors.values.forEach(::RachelSDL_DestroyCursor)
         cursors.clear()

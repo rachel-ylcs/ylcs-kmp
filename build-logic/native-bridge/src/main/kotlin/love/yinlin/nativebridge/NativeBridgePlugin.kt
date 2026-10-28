@@ -67,6 +67,7 @@ class NativeBridgePlugin : Plugin<Project> {
                     if (rule.module.isPresent) require(rule.module.get().substringBefore(':') != rule.upstream.get().substringBefore(':')) { "$name: an owned port cannot redirect back to the official Maven group" }
                 }
                 NativeMetadataAliases.configure(project, kotlin, bridge)
+                NativeSourceMetadata.configure(project, kotlin, bridge) { sourceProperty(project, "source", it) is ComponentSelector }
                 if (project.plugins.hasPlugin("org.jetbrains.compose")) ComposeResourceGeneration.configure(project, kotlin, bridge)
                 if (bridge.skikoTestRuntimeEnabled.get()) SkikoTestRuntime.configure(project, bridge)
                 if (application.enabled.get()) {

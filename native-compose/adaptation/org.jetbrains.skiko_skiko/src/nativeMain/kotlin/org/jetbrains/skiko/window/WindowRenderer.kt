@@ -11,4 +11,4 @@ internal interface WindowRenderer {
 }
 
 internal expect fun gpuWindowFlags(): ULong
-internal expect fun createGpuRenderer(window: COpaquePointer, draw: (Canvas, Int, Int) -> Unit): WindowRenderer
+internal expect fun createGpuRenderer(window: COpaquePointer, transparent: Boolean, draw: (Canvas, Int, Int) -> Unit): WindowRenderer

@@ -22,6 +22,7 @@ kotlin {
     }
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.kotlinx.coroutines)
             // Deliberately request only the extension: Core must arrive through its API metadata.
             if (explicit) implementation(libs.native.skiko.skottie)
             else implementation(libs.skiko.lottie)
