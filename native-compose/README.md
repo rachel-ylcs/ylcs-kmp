@@ -22,6 +22,8 @@
 
 源码同步位于 `build-logic/repository-conventions`，SDL 构建及验证工具位于 `build-logic/native-bridge`。维护流程使用 Gradle/Kotlin，不依赖 Python。
 
+SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主构建配置：保留窗口、输入、剪贴板、拖放、托盘、原生对话框和 Skiko 所需的图形上下文接入，以及 SDL 软件渲染回退；关闭音频、摄像头、手柄、触觉、HIDAPI、传感器、电源查询、独立 SDL GPU 和 SDL 自身不使用的硬件 renderer。Compose 的 D3D12/Metal/OpenGL GPU 渲染继续由 Skia/Skiko 提供。源码同步会对 SDL 的动态 API 总开关应用可重复、带上游格式检查的调整，让静态链接可以裁剪未引用 API；该 SDK 不支持通过 `SDL3_DYNAMIC_API` 替换运行时实现。配置和同步逻辑均参与源码/SDK 缓存身份，修改后会自动重建。
+
 ## 维护端使用
 
 需要 JDK 25、根 Gradle Wrapper、Git。Windows 需要 MSVC/Windows SDK；Linux 需要桌面开发包；macOS arm64 需要 Xcode。IDEA 的 Gradle JVM 使用 JDK 25。Gradle Settings 自动准备和登记本地移植源码。

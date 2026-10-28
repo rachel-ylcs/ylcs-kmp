@@ -3,5 +3,32 @@
   "source": {
     "url": "https://github.com/libsdl-org/SDL/releases/download/release-3.4.18/SDL3-3.4.18.zip",
     "sha256": "9cd42377704398796071b8597cd7e21da254a43bad98c4199739647adc13fa6f"
+  },
+  "build": {
+    "dynamicApi": false,
+    "cmake": {
+      "SDL_VIDEO": true,
+      "SDL_RENDER": true,
+      "SDL_DIALOG": true,
+      "SDL_TRAY": true,
+      "SDL_OPENGL": true,
+      "SDL_OPENGLES": true,
+      "SDL_VULKAN": true,
+      "SDL_AUDIO": false,
+      "SDL_CAMERA": false,
+      "SDL_JOYSTICK": false,
+      "SDL_HAPTIC": false,
+      "SDL_HIDAPI": false,
+      "SDL_POWER": false,
+      "SDL_SENSOR": false,
+      "SDL_GPU": false,
+      "SDL_XINPUT": false,
+      "SDL_RENDER_D3D": false,
+      "SDL_RENDER_D3D11": false,
+      "SDL_RENDER_D3D12": false,
+      "SDL_RENDER_METAL": false,
+      "SDL_RENDER_GPU": false,
+      "SDL_RENDER_VULKAN": false
+    }
   }
 }

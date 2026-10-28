@@ -94,6 +94,9 @@ fun sdkLinkOptions(text: String): List<String> {
 val sdkNativeDirectory = rootProject.projectDir.resolve("../../../../..").canonicalFile.resolve("native-compose")
 val sdkLockFile = sdkNativeDirectory.resolve("upstream/sdl.json")
 val sdkLock = JsonSlurper().parse(sdkLockFile) as Map<*, *>
+val sdkBuildProfile = sdkLock["build"] as Map<*, *>
+val sdkCmakeProfile = sdkBuildProfile["cmake"] as Map<*, *>
+check(sdkBuildProfile["dynamicApi"] == false && sdkCmakeProfile.all { (name, value) -> name is String && Regex("SDL_[A-Z0-9_]+").matches(name) && value is Boolean }) { "Invalid SDL window SDK profile" }
 val sdkVersion = sdkLock["version"] as String
 val sdkHost = HostManager.host.name
 check(sdkHost in setOf("mingw_x64", "linux_x64", "macos_arm64")) { "Unsupported static SDL host: $sdkHost" }
@@ -106,7 +109,7 @@ val sdkNativeLocation = layout.buildDirectory.file("konan.txt")
 tasks.register("prepareSdlStatic") {
     group = "native setup"
     description = "Build the pinned SDL source as a static SDK for the Kotlin/Native host"
-    inputs.files(sdkLockFile, sdkScript, sdkSource.resolve(".rachel-source-sha256"))
+    inputs.files(sdkLockFile, sdkScript, sdkSource.resolve(".rachel-source-sha256"), sdkSource.resolve("src/dynapi/SDL_dynapi.h"))
     inputs.property("host", sdkHost)
     outputs.files(sdkPrefix.resolve("rachel-sdl.json"), sdkPrefix.resolve("lib/$sdkArchiveName"))
     if (sdkHost == "linux_x64") {
@@ -115,11 +118,14 @@ tasks.register("prepareSdlStatic") {
     }
     doLast {
         check(sdkSource.resolve("include/SDL3/SDL.h").isFile) { "Run :repository-conventions:prepareNativeSources to prepare the SDL source" }
+        val dynamicApiHeader = sdkSource.resolve("src/dynapi/SDL_dynapi.h")
+        check(dynamicApiHeader.readText().contains("#define SDL_DYNAMIC_API 0 /* Rachel:")) { "Prepare the direct-call SDL source profile before building its SDK" }
         val work = sdkNativeDirectory.resolve("vendor/build/sdl-static")
         val environment = if (sdkHost == "mingw_x64") project.sdkWindowsEnvironment(System.getenv(), work) else System.getenv()
         val source = sdkLock["source"] as Map<*, *>
         val profile = mutableMapOf<String, Any>("version" to sdkVersion, "target" to sdkHost, "archive" to sdkArchiveName,
-            "linkage" to "static", "buildType" to "Release", "sourceSha256" to source["sha256"]!!, "scriptSha256" to sdkDigest(sdkScript))
+            "linkage" to "static", "buildType" to "Release", "sourceSha256" to source["sha256"]!!, "scriptSha256" to sdkDigest(sdkScript),
+            "dynamicApiHeaderSha256" to sdkDigest(dynamicApiHeader), "profile" to sdkBuildProfile)
         val nativeOptions = if (sdkHost == "linux_x64") {
             val (options, identities) = project.sdkLinuxOptions(File(sdkNativeLocation.get().asFile.readText().trim()), environment, work.resolve("bootstrap"))
             profile["nativeToolchain"] = identities
@@ -132,6 +138,7 @@ tasks.register("prepareSdlStatic") {
         val build = work.resolve(if (sdkHost == "linux_x64") "linux_x64-konan" else sdkHost)
         val options = mutableListOf("-DCMAKE_INSTALL_PREFIX=$sdkPrefix", "-DCMAKE_INSTALL_LIBDIR=lib", "-DCMAKE_BUILD_TYPE=Release", "-DSDL_SHARED=OFF", "-DSDL_STATIC=ON",
             "-DCMAKE_POSITION_INDEPENDENT_CODE=ON", "-DSDL_TEST_LIBRARY=OFF", "-DSDL_TESTS=OFF", "-DSDL_EXAMPLES=OFF")
+        options.addAll(sdkCmakeProfile.map { (name, value) -> "-D$name=${if (value == true) "ON" else "OFF"}" })
         options.addAll(nativeOptions)
         if (sdkHost == "mingw_x64") options.addAll(listOf("-G", "Ninja", "-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded"))
         else if (sdkHost == "macos_arm64") options.addAll(listOf("-DCMAKE_OSX_ARCHITECTURES=arm64", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0"))
