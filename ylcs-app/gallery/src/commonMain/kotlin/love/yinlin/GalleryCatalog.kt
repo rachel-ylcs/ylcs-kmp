@@ -100,6 +100,11 @@ internal data class PageItem(
                 ComponentItem("ReorderingColumn", "少量条目在容器边界内拖动，回落中可继续拖动；记录每次提交的索引和最终顺序。", "歌词引擎 优先级 边界 onSettle"),
                 ComponentItem("ReorderingRow", "在内容边界内拖动，可切换不同宽度及 RTL，回落中可连续拖动；在外部接入横向滚动。", "Row horizontalScroll 边界 onSettle"),
             ]),
+            PageItem("drag-drop", Icons.DragHandle, "拖放", "Drag & Drop", "从系统文件管理器或其他应用拖入内容，比较文件、文本与混合接收。", DragDropPage, PageGroup.Interaction, [
+                ComponentItem("文件拖放", "一次拖入一个或多个文件，查看收到的文件路径；接收区域只接受文件。", "dragDrop DragFlag.File DropResult.File Windows Linux macOS Native Desktop Web"),
+                ComponentItem("文本拖放", "从其他应用拖入选中的文本，查看内容与字符数；接收区域只接受文本。", "DragFlag.Text DropResult.Text"),
+                ComponentItem("混合接收与开关", "实时开关拖放及文件、文本过滤，检查修改参数后的接收行为和回调次数。", "enabled flag DragFlag or rememberUpdatedState"),
+            ]),
             PageItem("navigation", Icons.Anchor, "导航", "Tabs & Breadcrumbs", "切换当前内容，或者沿着路径回到更上层的位置。", NavigationPage, PageGroup.Interaction, [
                 ComponentItem("TabBar", "切换五个标签，其中一个带图标，另一个处于禁用状态。"),
                 ComponentItem("Breadcrumb", "点击任一上层路径截断导航，重置后可以再次体验完整路径。"),

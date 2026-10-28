@@ -15,7 +15,6 @@ import love.yinlin.data.MimeType
 import love.yinlin.extension.asArray
 import love.yinlin.extension.cast
 import love.yinlin.fs.File
-import org.w3c.dom.get
 import org.w3c.files.get
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsString
@@ -28,24 +27,25 @@ actual fun Modifier.dragDrop(
     onDrop: (DropResult) -> Unit
 ): Modifier = this.composed {
     if (enabled) {
+        val currentFlag by rememberUpdatedState(flag)
         val onDropFunc by rememberUpdatedState(onDrop)
+
         val target = remember {
             object : DragAndDropTarget {
                 override fun onDrop(event: DragAndDropEvent): Boolean {
                     val transferData = event.transferData?.domDataTransferOrNull
                     if (transferData != null) {
                         val types = transferData.types.asArray { s: JsString -> s.cast.lowercase() }
-                        if (MimeType.TEXT in types) {
-                            val items = transferData.items
-                            items[0]?.getAsString { onDrop(DropResult.Text(it)) }
-                            return true
-                        }
-                        else if ("files" in types) {
+                        if ("files" in types && (currentFlag and DragFlag.File == DragFlag.File)) {
                             val files = transferData.files
                             val len = files.length
                             val paths: MutableList<File> = []
                             for (i in 0 ..< len) paths += File(files[i]?.name ?: "")
                             onDropFunc(DropResult.File(paths))
+                            return true
+                        }
+                        else if (MimeType.TEXT in types && (currentFlag and DragFlag.Text == DragFlag.Text)) {
+                            onDropFunc(DropResult.Text(transferData.getData(MimeType.TEXT)))
                             return true
                         }
                         return false
@@ -61,10 +61,11 @@ actual fun Modifier.dragDrop(
                 types?.let {
                     val acceptText = MimeType.TEXT in types
                     val acceptFile = "files" in types
-                    (acceptText && (flag and DragFlag.Text == DragFlag.Text)) || (acceptFile && (flag and DragFlag.File == DragFlag.File))
+                    (acceptText && (currentFlag and DragFlag.Text == DragFlag.Text)) || (acceptFile && (currentFlag and DragFlag.File == DragFlag.File))
                 } ?: false
             },
             target = target
         )
-    } else this
+    }
+    else this
 }

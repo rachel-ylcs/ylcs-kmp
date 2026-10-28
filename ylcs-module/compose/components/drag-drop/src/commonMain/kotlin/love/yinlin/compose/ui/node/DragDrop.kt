@@ -3,28 +3,11 @@ package love.yinlin.compose.ui.node
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 
-@Stable
-class DragFlag private constructor(val value: Int) {
-    infix fun and(other: DragFlag): DragFlag = DragFlag(value and other.value)
-    infix fun or(other: DragFlag): DragFlag = DragFlag(value or other.value)
-
-    override fun equals(other: Any?): Boolean = (other as? DragFlag)?.value == value
-    override fun hashCode(): Int = value
-
-    companion object {
-        val File = DragFlag(1)
-        val Text = DragFlag(2)
-    }
-}
-
-@Stable
-sealed interface DropResult {
-    @Stable
-    data class File(val path: List<love.yinlin.fs.File>) : DropResult
-    @Stable
-    data class Text(val text: String) : DropResult
-}
-
+/**
+ * 接收拖入此区域的文件或文本，通过 [DragFlag.or] 组合允许的数据类型。
+ * 同一份数据同时包含文件和文本且两者都允许时，优先返回文件；文件不会被自动读取。
+ * [enabled] 为 false 时不接收拖放；Android 和 iOS 保持原 Modifier。
+ */
 @Stable
 expect fun Modifier.dragDrop(
     enabled: Boolean,

@@ -22,18 +22,19 @@ actual fun Modifier.dragDrop(
     onDrop: (DropResult) -> Unit
 ): Modifier = this.composed {
     if (enabled) {
+        val currentFlag by rememberUpdatedState(flag)
         val onDropFunc by rememberUpdatedState(onDrop)
 
         val target = remember {
             object : DragAndDropTarget {
                 override fun onDrop(event: DragAndDropEvent): Boolean {
                     val transferable = event.awtTransferable
-                    if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    if ((currentFlag and DragFlag.File == DragFlag.File) && transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                         val list = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>
                         onDropFunc(DropResult.File(list.map { File((it as java.io.File).absolutePath) }))
                         return true
                     }
-                    else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    else if ((currentFlag and DragFlag.Text == DragFlag.Text) && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                         val text = transferable.getTransferData(DataFlavor.stringFlavor) as String
                         onDropFunc(DropResult.Text(text))
                         return true
@@ -48,9 +49,10 @@ actual fun Modifier.dragDrop(
                 val transferable = event.awtTransferable
                 val acceptText = transferable.isDataFlavorSupported(DataFlavor.stringFlavor)
                 val acceptFile = transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
-                (acceptText && (flag and DragFlag.Text == DragFlag.Text)) || (acceptFile && (flag and DragFlag.File == DragFlag.File))
+                (acceptText && (currentFlag and DragFlag.Text == DragFlag.Text)) || (acceptFile && (currentFlag and DragFlag.File == DragFlag.File))
             },
             target = target
         )
-    } else this
+    }
+    else this
 }
