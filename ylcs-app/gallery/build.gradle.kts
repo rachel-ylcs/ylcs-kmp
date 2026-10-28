@@ -39,8 +39,11 @@ rachel {
             desktopMain(commonMain)
 
             nativeMain(commonMain)
+
             windowsMain(nativeMain)
+
             linuxMain(nativeMain)
+
             macosMain(nativeMain)
 
             wasmJsMain(commonMain)

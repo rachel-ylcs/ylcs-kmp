@@ -9,12 +9,14 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
     )
 }
 
 rachel {
     multiplatform {
         iosTarget = false
+        nativeDesktopTarget = true
 
         sources {
             commonMain {
@@ -23,11 +25,25 @@ rachel {
 
             desktopMain(commonMain)
 
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
+
             wasmJsMain(commonMain)
         }
 
         desktopPackage {
             windows { }
+        }
+
+        composeDesktopPackage {
+            entryPoint = "main"
+            packageName = "RachelModernScreen"
+            displayName = "Rachel Modern Screen"
         }
 
         webpack {
@@ -41,8 +57,8 @@ rachel {
 
         actions {
             tasks.register("modernScreenRun") {
-                description = "运行Debug桌面版ModernScreen"
-                dependsOn(tasks.named("run"))
+                description = "运行Debug原生桌面版ModernScreen"
+                dependsOn(tasks.named("composeRun"))
             }
 
             tasks.register("modernScreenPublish") {
