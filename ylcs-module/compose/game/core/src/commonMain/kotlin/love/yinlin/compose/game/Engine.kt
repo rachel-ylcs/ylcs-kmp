@@ -22,10 +22,10 @@ import love.yinlin.compose.game.plugin.Plugin
 import love.yinlin.compose.game.plugin.PluginFactory
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
+import love.yinlin.coroutines.emptyContext
 import love.yinlin.reflect.metaClassName
 import love.yinlin.reflect.metaRawClassName
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 @OptIn(CompatibleRachelApi::class)
 @Stable
@@ -71,8 +71,7 @@ class Engine(
 
     private val scope = CoroutineScope(SupervisorJob() + cpuContext)
 
-    fun launchCoroutine(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job =
-        scope.launch(context = context, block = block)
+    fun launchCoroutine(context: CoroutineContext = emptyContext, block: suspend CoroutineScope.() -> Unit): Job = scope.launch(context = context, block = block)
 
     /**
      * 初始化

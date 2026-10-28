@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import kotlinx.coroutines.CoroutineScope
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.coroutines.Coroutines
 
 @Stable
 abstract class BasicPlatformViewState<V : Any, P : Any> : PlatformViewStateOwner {
@@ -27,21 +28,21 @@ abstract class BasicPlatformViewState<V : Any, P : Any> : PlatformViewStateOwner
     protected open fun releaseResources() {}
 
     protected fun onView(view: V, action: (V) -> Unit) {
-        platformViewOnUi {
+        Coroutines.dispatchUI {
             val binding = activeBinding
             if (!releaseRequested && binding != null && binding.active && binding.view === view) action(view)
         }
     }
 
     protected fun withView(action: (V) -> Unit) {
-        platformViewOnUi {
+        Coroutines.dispatchUI {
             val binding = activeBinding
             if (!releaseRequested && binding != null && binding.active) action(binding.requireView())
         }
     }
 
     protected fun launch(view: V, block: suspend CoroutineScope.() -> Unit) {
-        platformViewOnUi {
+        Coroutines.dispatchUI {
             val binding = activeBinding
             if (!releaseRequested && binding != null && binding.active && binding.view === view) binding.launch(block)
         }
@@ -50,7 +51,7 @@ abstract class BasicPlatformViewState<V : Any, P : Any> : PlatformViewStateOwner
     protected fun cleanup(vararg actions: () -> Unit) = platformViewCleanup(*actions)
 
     final override fun release() {
-        platformViewOnUi {
+        Coroutines.dispatchUI {
             releaseRequested = true
             active = false
             platformViewCleanup(*bindings.map { binding -> { binding.cancelTasks() } }.toTypedArray(), ::finishRelease)

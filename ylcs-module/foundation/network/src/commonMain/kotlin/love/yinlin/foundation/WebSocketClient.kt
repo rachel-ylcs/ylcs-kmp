@@ -10,7 +10,6 @@ import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import io.ktor.websocket.send
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.consumeAsFlow
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.catchingError
@@ -49,7 +48,7 @@ class WebSocketClient internal constructor(@PublishedApi internal val delegate: 
                 }
             }?.then { connection.onError(it) }
         }) {
-            Coroutines.with(NonCancellable) {
+            Coroutines.wait {
                 cleaning({
                     connection.onDisconnect()
                 }) {

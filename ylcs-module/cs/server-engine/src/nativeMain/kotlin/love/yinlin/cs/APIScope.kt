@@ -20,7 +20,6 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.JsonArray
@@ -870,7 +869,7 @@ abstract class APIScope(val engine: ServerEngine) {
                     }
                 }?.then { manager.onError(it) }
             }) {
-                Coroutines.with(NonCancellable) {
+                Coroutines.wait {
                     cleaning({
                         manager.onClose()
                     }) {

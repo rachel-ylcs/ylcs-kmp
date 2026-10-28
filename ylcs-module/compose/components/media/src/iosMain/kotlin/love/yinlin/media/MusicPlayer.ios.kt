@@ -9,6 +9,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.mainImmediateContext
 import love.yinlin.extension.catchingError
 import love.yinlin.foundation.PlatformContext
 import platform.Foundation.*
@@ -88,7 +89,7 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
     }
 
     private fun onTrackEnded(generation: Long) {
-        scope.launch(Dispatchers.Main.immediate) {
+        scope.launch(mainImmediateContext) {
             val current = player ?: return@launch
             if (lifetime.isClosed || current.generation != generation || !current.wantsPlay) return@launch
             catchingError {
@@ -148,7 +149,7 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
     }
 
     private fun runRemote(action: suspend () -> Unit) {
-        scope.launch(Dispatchers.Main.immediate) {
+        scope.launch(mainImmediateContext) {
             if (lifetime.isClosed || !isInit) return@launch
             catchingError {
                 action()
@@ -192,7 +193,7 @@ class IOSMusicPlayer(fetcher: MediaMetadataFetcher) : CommonMusicPlayer(fetcher)
             }
         } else {
             val task = NSURLSession.sharedSession.dataTaskWithURL(url) { data, response, failure ->
-                scope.launch(Dispatchers.Main.immediate) {
+                scope.launch(mainImmediateContext) {
                     if (lifetime.isClosed || currentId != id || coverVersion != expectedVersion) return@launch
                     coverTask = null
                     val status = (response as? NSHTTPURLResponse)?.statusCode ?: 0L

@@ -1,9 +1,9 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.mainImmediateContext
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 
@@ -38,7 +38,7 @@ internal class IOSAudioPlayer(context: PlatformContext, onEndListener: () -> Uni
     }
 
     private fun command(block: IOSAVPlayer.() -> Unit) {
-        scope.launch(Dispatchers.Main.immediate) {
+        scope.launch(mainImmediateContext) {
             if (!lifetime.isClosed) player?.block()
         }
     }

@@ -3,6 +3,7 @@
 package love.yinlin.media
 
 import kotlinx.coroutines.*
+import love.yinlin.coroutines.mainImmediateContext
 import love.yinlin.extension.catchingError
 import platform.AVFoundation.*
 import platform.AVFAudio.*
@@ -57,7 +58,7 @@ internal class IOSAVPlayer(
     }
 
     private fun post(block: () -> Unit) {
-        lifetime.scope.launch(Dispatchers.Main.immediate) {
+        lifetime.scope.launch(mainImmediateContext) {
             if (!disposed && !lifetime.isClosed) block()
         }
     }

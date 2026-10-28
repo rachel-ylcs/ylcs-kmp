@@ -1,6 +1,5 @@
 package love.yinlin.compose.cache
 
-import kotlinx.coroutines.NonCancellable
 import kotlinx.io.Sink
 import kotlinx.io.Source
 import kotlinx.io.buffered
@@ -170,7 +169,7 @@ class FileDiskStorage(
                     target
                 }
             }) {
-                Coroutines.with(NonCancellable) {
+                Coroutines.wait {
                     temporary.delete()
                 }
             }

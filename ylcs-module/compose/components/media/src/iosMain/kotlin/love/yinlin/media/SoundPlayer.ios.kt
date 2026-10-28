@@ -5,6 +5,7 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.mainImmediateContext
 import love.yinlin.extension.catching
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.toNSData
@@ -65,7 +66,7 @@ actual class SoundPlayer {
     }
 
     private fun post(block: () -> Unit) {
-        scope.launch(Dispatchers.Main.immediate) {
+        scope.launch(mainImmediateContext) {
             if (!lifetime.isClosed) block()
         }
     }
@@ -115,7 +116,7 @@ actual class SoundPlayer {
         disposePlayers()
         sources = newSources
         delegate = Delegate { player ->
-            scope.launch(Dispatchers.Main.immediate) {
+            scope.launch(mainImmediateContext) {
                 if (!lifetime.isClosed && player in players && !player.isPlaying()) {
                     finish(player)
                 }
@@ -141,7 +142,7 @@ actual class SoundPlayer {
     }
 
     actual fun play(index: Int) {
-        scope.launch(Dispatchers.Main.immediate) {
+        scope.launch(mainImmediateContext) {
             if (lifetime.isClosed) return@launch
             val player = players.getOrNull(index) ?: return@launch
             // 同一索引重播，不同索引可以同时播放。

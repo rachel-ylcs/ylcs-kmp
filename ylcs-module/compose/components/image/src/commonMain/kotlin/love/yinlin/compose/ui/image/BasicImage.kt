@@ -66,6 +66,7 @@ import love.yinlin.compose.platform.inspector
 import love.yinlin.compose.window.rememberOffScreenWindowState
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.cpuContext
+import love.yinlin.coroutines.waitContext
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.cleaning
 import kotlin.math.abs
@@ -433,7 +434,7 @@ private fun rememberAnimatedImageFrame(result: ImageResult, state: ImageState): 
                     deadline = maxOf(deadline, now) + animation.durations[next] * 1000000L
                 }
             }) {
-                Coroutines.with(NonCancellable + cpuContext) { decoder?.close() }
+                Coroutines.with(waitContext, cpuContext) { decoder?.close() }
             }
         }
 
@@ -497,7 +498,7 @@ private fun Modifier.imageZoomGestures(state: ImageState, interactionSource: Mut
                         interactionSource.emit(press)
                         released = tryAwaitRelease()
                     }) {
-                        Coroutines.with(NonCancellable) {
+                        Coroutines.wait {
                             interactionSource.emit(if (released) PressInteraction.Release(press) else PressInteraction.Cancel(press))
                         }
                     }

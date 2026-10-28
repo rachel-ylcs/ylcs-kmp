@@ -16,7 +16,6 @@ import love.yinlin.compose.image.cache.ImageMemoryCache
 import love.yinlin.compose.image.data.*
 import love.yinlin.compose.image.decoder.ImageDecodeException
 import love.yinlin.compose.image.decoder.decodePlatformImageFile
-import love.yinlin.compose.image.decoder.openImageDecoder
 import love.yinlin.compose.image.decoder.platformAnimation
 import love.yinlin.compose.image.input.*
 import love.yinlin.concurrent.Lock
@@ -318,7 +317,7 @@ internal class ImageLoader(
             memory.clear()
         }
 
-        Coroutines.with(NonCancellable) {
+        Coroutines.wait {
             disk?.clear()
         }
     }

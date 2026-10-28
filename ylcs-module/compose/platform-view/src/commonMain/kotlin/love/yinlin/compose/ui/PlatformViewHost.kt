@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.Dispatchers
-import kotlin.coroutines.EmptyCoroutineContext
 
 internal fun platformViewCleanup(vararg actions: () -> Unit) {
     var failure: Throwable? = null
@@ -20,12 +18,6 @@ internal fun platformViewCleanup(vararg actions: () -> Unit) {
         }
     }
     failure?.let { throw it }
-}
-
-internal fun platformViewOnUi(action: () -> Unit) {
-    val dispatcher = Dispatchers.Main.immediate
-    if (dispatcher.isDispatchNeeded(EmptyCoroutineContext)) dispatcher.dispatch(EmptyCoroutineContext) { action() }
-    else action()
 }
 
 @Composable

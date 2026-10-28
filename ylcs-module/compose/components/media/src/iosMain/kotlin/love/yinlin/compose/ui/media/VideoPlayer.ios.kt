@@ -5,7 +5,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -13,6 +12,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.compose.ui.PlatformViewEnvironment
 import love.yinlin.compose.ui.PlatformViewHost
 import love.yinlin.compose.ui.PlatformViewState
+import love.yinlin.coroutines.mainImmediateContext
 import love.yinlin.extension.catchingError
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.IOSAVPlayer
@@ -124,7 +124,7 @@ private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
     }
 
     private fun command(block: () -> Unit) {
-        scope.launch(Dispatchers.Main.immediate) {
+        scope.launch(mainImmediateContext) {
             if (lifetime.isClosed) return@launch
             catchingError(block)?.let { failure ->
                 player?.pause()

@@ -1,6 +1,7 @@
 package love.yinlin.compose.ui
 
 import kotlinx.coroutines.*
+import love.yinlin.coroutines.mainImmediateContext
 
 internal class PlatformViewBinding<V : Any, P : Any>(private val state: BasicPlatformViewState<V, P>, parameters: P) {
     var view: V? = null
@@ -67,7 +68,7 @@ internal class PlatformViewBinding<V : Any, P : Any>(private val state: BasicPla
     }
 
     fun launch(block: suspend CoroutineScope.() -> Unit) {
-        val scope = tasks ?: CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate).also { tasks = it }
+        val scope = tasks ?: CoroutineScope(SupervisorJob() + mainImmediateContext).also { tasks = it }
         scope.launch(block = block)
     }
 

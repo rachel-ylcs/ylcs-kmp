@@ -11,9 +11,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import love.yinlin.annotation.LooseTyped
+import love.yinlin.coroutines.emptyContext
 import love.yinlin.extension.cleaning
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 @Stable
 abstract class ScreenModel : ViewModel() {
@@ -89,7 +89,7 @@ abstract class ScreenModel : ViewModel() {
     /**
      * 启动协程
      */
-    fun launch(context: CoroutineContext = EmptyCoroutineContext, block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(context = context, block = block)
+    fun launch(context: CoroutineContext = emptyContext, block: suspend CoroutineScope.() -> Unit): Job = viewModelScope.launch(context = context, block = block)
 
     /**
      * 普通变量监听
