@@ -1,10 +1,10 @@
 @file:Suppress("DEPRECATION")
-
 package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.LocalSystemTheme
 import androidx.compose.ui.asComposeSystemTheme
 import androidx.compose.ui.draganddrop.DragAndDropEvent
@@ -30,10 +30,10 @@ import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.window.NativeDesktop
 import org.jetbrains.skiko.window.NativeWindowCursor
 import org.jetbrains.skiko.window.NativeWindowEvent
+import org.jetbrains.skiko.window.NativeWindowDropTarget
 import org.jetbrains.skiko.window.NativeWindowScope
 import kotlin.concurrent.Volatile
 
-/** Owns one composition, scheduler and architecture owner; all scene calls stay on the host thread. */
 internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { true }) : AutoCloseable {
     private val dispatcher = nativeUiDispatcher().claim()
     private val owner: DefaultArchitectureComponentsOwner
@@ -45,11 +45,15 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
     private val recomposer: FrameRecomposer
     private val scene: ComposeScene
     private val drops = mutableListOf<NativeWindowEvent.Drop>()
+    private var dropPreviewType = 0
+    private var dropPreviewEvent: DragAndDropEvent? = null
+    @Volatile private var dropValidationChanged = false
+    private val dropObserver = SnapshotStateObserver { callback -> callback() }
+    private val onDropValidationChanged: (NativeSceneHost) -> Unit = { it.dropValidationChanged = true }
     private val systemTheme = mutableStateOf(NativeDesktop.systemTheme().asComposeSystemTheme())
     private val locales = mutableStateOf(LocaleList.current)
     private var closed = false
-    @Volatile
-    private var window: NativeWindowScope? = null
+    @Volatile private var window: NativeWindowScope? = null
 
     private val platform = object : PlatformContext.Empty() {
         override val architectureComponentsOwner: PlatformArchitectureComponentsOwner get() = owner
@@ -101,6 +105,8 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         info.isWindowFocused = true
         updateGeometry(window.pixelWidth, window.pixelHeight)
         owner.setLifecycleState(Lifecycle.State.RESUMED)
+        dropObserver.start()
+        window.setDropTarget { types, x, y -> queryDrop(types, x, y) }
         invalidate()
     }
 
@@ -188,6 +194,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
     }
 
     private fun drop() {
+        endDropPreview()
         if (drops.isEmpty()) return
         val data = DragAndDropTransferData(drops.filterNot { it.isFile }.joinToString("\n") { it.text }.ifEmpty { null }, drops.filter { it.isFile }.map { it.text })
         (val x, val y) = drops.last()
@@ -202,6 +209,59 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
             val _ = target.onDrop(event)
         }
         finally { target.onEnded(event) }
+    }
+
+    private fun queryDrop(types: Int, x: Float, y: Float): Int {
+        if (closed) return 0
+        if (types == 0) {
+            endDropPreview()
+            return 0
+        }
+        val attached = window ?: return 0
+        updateGeometry(attached.pixelWidth, attached.pixelHeight)
+        dispatcher.runCurrent()
+        scene.measureAndLayout()
+        val position = Offset(x, y)
+        if (!x.isFinite() || !y.isFinite() || x < 0 || y < 0 || x >= attached.pixelWidth || y >= attached.pixelHeight) {
+            endDropPreview()
+            return 0
+        }
+        val target = scene.rootDragAndDropNode
+        if (!dropValidationChanged && dropPreviewType != 0 && types and dropPreviewType != 0) {
+            val event = DragAndDropEvent(dropPreviewEvent!!.transferData, position)
+            dropPreviewEvent = event
+            target.onMoved(event)
+            if (target.hasEligibleDropTarget) return dropPreviewType
+        }
+        endDropPreview()
+        for (kind in NativeWindowDropTarget.File .. NativeWindowDropTarget.Text) {
+            if (types and kind == 0) continue
+            val data = DragAndDropTransferData(hasFiles = kind == NativeWindowDropTarget.File, hasText = kind == NativeWindowDropTarget.Text)
+            val event = DragAndDropEvent(data, position)
+            var accepted = false
+            dropObserver.observeReads(this, onDropValidationChanged) { accepted = target.acceptDragAndDropTransfer(event) }
+            if (!accepted) continue
+            dropPreviewType = kind
+            dropPreviewEvent = event
+            target.onStarted(event)
+            target.onEntered(event)
+            target.onMoved(event)
+            if (target.hasEligibleDropTarget) return kind
+            endDropPreview()
+        }
+        return 0
+    }
+
+    private fun endDropPreview() {
+        val event = dropPreviewEvent
+        dropPreviewEvent = null
+        dropPreviewType = 0
+        dropValidationChanged = false
+        dropObserver.clear(this)
+        if (event != null) {
+            try { scene.rootDragAndDropNode.onExited(event) }
+            finally { scene.rootDragAndDropNode.onEnded(event) }
+        }
     }
 
     private fun invalidate() {
@@ -226,7 +286,8 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         if (closed) return
         closed = true
         var failure: Throwable? = null
-        val cleanup: List<() -> Unit> = [scene::close, recomposer::close, dispatcher::runCurrent, textInput::close,
+        val cleanup: List<() -> Unit> = [{ window?.setDropTarget(null) }, ::endDropPreview, dropObserver::stop, dropObserver::clear,
+            scene::close, recomposer::close, dispatcher::runCurrent, textInput::close,
             { owner.setLifecycleState(Lifecycle.State.DESTROYED) }, owner.viewModelStore::clear, owner.navigationEventDispatcher::dispose, dispatcher::close]
         for (action in cleanup) {
             try { action() }

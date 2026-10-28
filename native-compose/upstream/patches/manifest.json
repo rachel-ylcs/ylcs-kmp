@@ -64,5 +64,10 @@
             "sha256": "c5c7b8f98830047d684810e6aa5ae2f150d94a72461ec87393c2b5213c7b680c",
             "sourceSha256": "12392143160bde37748ceedc6f0702b6d8047b878835a690102df73c31dcacc2"
         }
+    },
+    "sdl": {
+        "file": "sdl.patch",
+        "sha256": "edbb5d8dc5f0929c639f2588face2084fc23b1757b0557ebd86687670fe377d3",
+        "sourceSha256": "9cd42377704398796071b8597cd7e21da254a43bad98c4199739647adc13fa6f"
     }
 }

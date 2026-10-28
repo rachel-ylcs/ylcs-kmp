@@ -1,9 +1,9 @@
 package androidx.compose.ui.platform
 
 import org.jetbrains.skiko.window.NativeWindowCursor
+import org.jetbrains.skiko.window.NativeWindowDropTarget
 import org.jetbrains.skiko.window.NativeWindowScope
 
-/** Headless host controls: scene tests use real Compose/Skia without creating an SDL window. */
 internal class TestNativeWindowScope(override val displayScale: Float = 1f, override val pixelDensity: Float = 1f) : NativeWindowScope {
     override val pixelWidth = 96
     override val pixelHeight = 64
@@ -16,6 +16,7 @@ internal class TestNativeWindowScope(override val displayScale: Float = 1f, over
     override fun close() { closes++ }
     override fun setSize(width: Int, height: Int) = Unit
     override fun setCursor(cursor: NativeWindowCursor) = Unit
+    override fun setDropTarget(target: NativeWindowDropTarget?) = Unit
     override fun startTextInput() { inputStarts++ }
     override fun stopTextInput() { inputStops++ }
     override fun setTextInputArea(x: Int, y: Int, width: Int, height: Int) { inputArea = [x, y, width, height] }

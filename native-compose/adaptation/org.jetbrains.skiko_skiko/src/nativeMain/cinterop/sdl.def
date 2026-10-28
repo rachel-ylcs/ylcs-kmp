@@ -1,4 +1,4 @@
-headers = SDL3/SDL.h SDL3/SDL_vulkan.h SDL3/SDL_metal.h
+headers = SDL3/SDL.h SDL3/SDL_vulkan.h SDL3/SDL_metal.h SDL3/SDL_racheldrop.h
 headerFilter = SDL3/**
 package = org.jetbrains.skiko.internal.sdl
 ---

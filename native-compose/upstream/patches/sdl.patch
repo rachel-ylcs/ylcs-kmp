@@ -1,0 +1,506 @@
+diff --git a/include/SDL3/SDL_racheldrop.h b/include/SDL3/SDL_racheldrop.h
+new file mode 100644
+--- /dev/null
++++ b/include/SDL3/SDL_racheldrop.h
+@@ -0,0 +1,58 @@
++/* Rachel extension: synchronous, per-window drop negotiation. Not an upstream SDL API. */
++#ifndef SDL_racheldrop_h_
++#define SDL_racheldrop_h_
++#include "SDL_video.h"
++#include "SDL_properties.h"
++
++#define RACHEL_SDL_DROP_FILE 1u
++#define RACHEL_SDL_DROP_TEXT 2u
++typedef Uint32 (SDLCALL *RachelSDL_DropCallback)(void *userdata, Uint32 types, float x, float y);
++
++static inline bool RachelSDL_SetDropCallback(void *window, RachelSDL_DropCallback callback, void *userdata)
++{
++    SDL_PropertiesID props = SDL_GetWindowProperties((SDL_Window *)window);
++    if (!callback) {
++        SDL_ClearProperty(props, "rachel.drop.callback");
++        SDL_ClearProperty(props, "rachel.drop.userdata");
++        return true;
++    }
++    return SDL_SetPointerProperty(props, "rachel.drop.userdata", userdata) &&
++        SDL_SetPointerProperty(props, "rachel.drop.callback", (void *)callback);
++}
++
++static inline Uint32 RachelSDL_QueryDrop(SDL_Window *window, Uint32 types, float x, float y)
++{
++    if (!window) return 0;
++    SDL_PropertiesID props = SDL_GetWindowProperties(window);
++    RachelSDL_DropCallback callback = (RachelSDL_DropCallback)SDL_GetPointerProperty(props, "rachel.drop.callback", NULL);
++    Uint32 accepted = callback ? callback(SDL_GetPointerProperty(props, "rachel.drop.userdata", NULL), types, x, y) & types : 0;
++    SDL_SetNumberProperty(props, "rachel.drop.types", types);
++    SDL_SetNumberProperty(props, "rachel.drop.accepted", accepted);
++    SDL_SetFloatProperty(props, "rachel.drop.x", x);
++    SDL_SetFloatProperty(props, "rachel.drop.y", y);
++    return accepted;
++}
++
++static inline Uint32 RachelSDL_DropTypes(SDL_Window *window)
++{
++    return (Uint32)SDL_GetNumberProperty(SDL_GetWindowProperties(window), "rachel.drop.types", 0);
++}
++
++static inline Uint32 RachelSDL_AcceptedDrop(SDL_Window *window)
++{
++    return (Uint32)SDL_GetNumberProperty(SDL_GetWindowProperties(window), "rachel.drop.accepted", 0);
++}
++
++static inline Uint32 RachelSDL_RecheckDrop(SDL_Window *window)
++{
++    SDL_PropertiesID props = SDL_GetWindowProperties(window);
++    return RachelSDL_QueryDrop(window, RachelSDL_DropTypes(window),
++        SDL_GetFloatProperty(props, "rachel.drop.x", 0), SDL_GetFloatProperty(props, "rachel.drop.y", 0));
++}
++
++static inline void RachelSDL_EndDrop(SDL_Window *window)
++{
++    if (!window) return;
++    RachelSDL_QueryDrop(window, 0, 0, 0);
++}
++#endif
+diff --git a/src/events/SDL_dropevents.c b/src/events/SDL_dropevents.c
+--- a/src/events/SDL_dropevents.c
++++ b/src/events/SDL_dropevents.c
+@@ -111,5 +111,6 @@
+ 
+ bool SDL_SendDropComplete(SDL_Window *window)
+ {
++    RachelSDL_EndDrop(window);
+     return SDL_SendDrop(window, SDL_EVENT_DROP_COMPLETE, NULL, NULL, 0, 0);
+ }
+diff --git a/src/events/SDL_dropevents_c.h b/src/events/SDL_dropevents_c.h
+--- a/src/events/SDL_dropevents_c.h
++++ b/src/events/SDL_dropevents_c.h
+@@ -23,6 +23,8 @@
+ #ifndef SDL_dropevents_c_h_
+ #define SDL_dropevents_c_h_
+ 
++#include <SDL3/SDL_racheldrop.h>
++
+ extern bool SDL_SendDropFile(SDL_Window *window, const char *source, const char *file);
+ extern bool SDL_SendDropPosition(SDL_Window *window, float x, float y);
+ extern bool SDL_SendDropText(SDL_Window *window, const char *text);
+diff --git a/src/video/cocoa/SDL_cocoawindow.m b/src/video/cocoa/SDL_cocoawindow.m
+--- a/src/video/cocoa/SDL_cocoawindow.m
++++ b/src/video/cocoa/SDL_cocoawindow.m
+@@ -163,13 +163,7 @@
+ 
+ - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
+ {
+-    if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) == NSDragOperationGeneric) {
+-        return NSDragOperationGeneric;
+-    } else if (([sender draggingSourceOperationMask] & NSDragOperationCopy) == NSDragOperationCopy) {
+-        return NSDragOperationCopy;
+-    }
+-
+-    return NSDragOperationNone; // no idea what to do with this, reject it.
++    return [self draggingUpdated:sender];
+ }
+ 
+ - (void)draggingExited:(id<NSDraggingInfo>)sender
+@@ -180,29 +174,29 @@
+ 
+ - (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender
+ {
+-    if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) == NSDragOperationGeneric) {
+-        SDL_Window *sdlwindow = [self findSDLWindow];
+-        NSPoint point = [sender draggingLocation];
+-        float x, y;
+-        x = point.x;
+-        y = (sdlwindow->h - point.y);
+-        SDL_SendDropPosition(sdlwindow, x, y);
+-        return NSDragOperationGeneric;
+-    } else if (([sender draggingSourceOperationMask] & NSDragOperationCopy) == NSDragOperationCopy) {
+-        SDL_Window *sdlwindow = [self findSDLWindow];
+-        NSPoint point = [sender draggingLocation];
+-        float x, y;
+-        x = point.x;
+-        y = (sdlwindow->h - point.y);
+-        SDL_SendDropPosition(sdlwindow, x, y);
+-        return NSDragOperationCopy;
+-    }
+-
+-    return NSDragOperationNone; // no idea what to do with this, reject it.
++    SDL_Window *window = [self findSDLWindow];
++    if (!window) return NSDragOperationNone;
++    NSPasteboard *pasteboard = [sender draggingPasteboard];
++    Uint32 types = 0;
++    if ([pasteboard availableTypeFromArray:@[NSFilenamesPboardType]]) types |= RACHEL_SDL_DROP_FILE;
++    if ([pasteboard availableTypeFromArray:@[NSPasteboardTypeString]]) types |= RACHEL_SDL_DROP_TEXT;
++    NSPoint point = [sender draggingLocation];
++    float x = point.x, y = window->h - point.y;
++    SDL_SendDropPosition(window, x, y);
++    Uint32 accepted = RachelSDL_QueryDrop(window, types, x, y);
++    if (!accepted) return NSDragOperationNone;
++    NSDragOperation mask = [sender draggingSourceOperationMask];
++    if (mask & NSDragOperationCopy) return NSDragOperationCopy;
++    if (mask & NSDragOperationGeneric) return NSDragOperationGeneric;
++    return NSDragOperationNone;
+ }
+ 
+ - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
+ {
++    if ([self draggingUpdated:sender] == NSDragOperationNone) {
++        SDL_SendDropComplete([self findSDLWindow]);
++        return NO;
++    }
+     SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                  ". [SDL] In performDragOperation, draggingSourceOperationMask %lx, "
+                  "expected Generic %lx, others Copy %lx, Link %lx, Private %lx, Move %lx, Delete %lx\n",
+@@ -223,7 +217,8 @@
+     }
+     @autoreleasepool {
+         NSPasteboard *pasteboard = [sender draggingPasteboard];
+-        NSString *desiredType = [pasteboard availableTypeFromArray:@[ NSFilenamesPboardType, NSPasteboardTypeString ]];
++        Uint32 accepted = RachelSDL_AcceptedDrop([self findSDLWindow]);
++        NSString *desiredType = [pasteboard availableTypeFromArray:accepted == RACHEL_SDL_DROP_FILE ? @[NSFilenamesPboardType] : @[NSPasteboardTypeString]];
+         SDL_Window *sdlwindow = [self findSDLWindow];
+         NSData *pboardData;
+         id pboardPlist;
+diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_waylandevents.c
+--- a/src/video/wayland/SDL_waylandevents.c
++++ b/src/video/wayland/SDL_waylandevents.c
+@@ -2755,12 +2755,41 @@
+     }
+ }
+ 
++/* Rachel: negotiate without reading the offered data before the user drops it. */
++static void Wayland_RachelDropTarget(SDL_WaylandDataDevice *device, float x, float y)
++{
++    const char *file = NULL, *text = NULL;
++#ifdef SDL_USE_LIBDBUS
++    if (Wayland_data_offer_has_mime(device->drag_offer, FILE_PORTAL_MIME)) file = FILE_PORTAL_MIME;
++#endif
++    if (Wayland_data_offer_has_mime(device->drag_offer, FILE_MIME)) file = FILE_MIME;
++    size_t count = 0;
++    const char *const *mimes = Wayland_GetTextMimeTypes(SDL_GetVideoDevice(), &count);
++    for (size_t i = 0; i < count; ++i) {
++        if (Wayland_data_offer_has_mime(device->drag_offer, mimes[i])) {
++            text = mimes[i];
++            break;
++        }
++    }
++    Uint32 types = (file ? RACHEL_SDL_DROP_FILE : 0) | (text ? RACHEL_SDL_DROP_TEXT : 0);
++    Uint32 accepted = RachelSDL_QueryDrop(device->dnd_window, types, x, y);
++    device->has_mime_file = accepted == RACHEL_SDL_DROP_FILE;
++    device->has_mime_text = accepted == RACHEL_SDL_DROP_TEXT;
++    device->mime_type = device->has_mime_file ? file : device->has_mime_text ? text : NULL;
++    wl_data_offer_accept(device->drag_offer->offer, device->drag_serial, device->mime_type);
++    if (wl_data_offer_get_version(device->drag_offer->offer) >= WL_DATA_OFFER_SET_ACTIONS_SINCE_VERSION) {
++        uint32_t action = accepted ? WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY : WL_DATA_DEVICE_MANAGER_DND_ACTION_NONE;
++        wl_data_offer_set_actions(device->drag_offer->offer, action, action);
++    }
++}
++
+ static void data_device_handle_enter(void *data, struct wl_data_device *wl_data_device,
+                                      uint32_t serial, struct wl_surface *surface,
+                                      wl_fixed_t x, wl_fixed_t y, struct wl_data_offer *id)
+ {
+     SDL_WaylandDataDevice *data_device = data;
+     SDL_WindowData *window = surface ? Wayland_GetWindowDataForOwnedSurface(surface) : NULL;
++    data_device->dnd_window = NULL;
+     data_device->has_mime_file = false;
+     data_device->has_mime_text = false;
+ 
+@@ -2777,13 +2806,11 @@
+         if (Wayland_data_offer_has_mime(data_device->drag_offer, FILE_PORTAL_MIME)) {
+             data_device->has_mime_file = true;
+             data_device->mime_type = FILE_PORTAL_MIME;
+-            wl_data_offer_accept(id, serial, FILE_PORTAL_MIME);
+         }
+ #endif
+         if (Wayland_data_offer_has_mime(data_device->drag_offer, FILE_MIME)) {
+             data_device->has_mime_file = true;
+             data_device->mime_type = FILE_MIME;
+-            wl_data_offer_accept(id, serial, FILE_MIME);
+         }
+ 
+         size_t mime_count = 0;
+@@ -2792,22 +2819,17 @@
+             if (Wayland_data_offer_has_mime(data_device->drag_offer, text_mime_types[i])) {
+                 data_device->has_mime_text = true;
+                 data_device->mime_type = text_mime_types[i];
+-                wl_data_offer_accept(id, serial, text_mime_types[i]);
+                 break;
+             }
+         }
+ 
+         if (data_device->has_mime_file || data_device->has_mime_text) {
+-            // SDL only supports "copy" style drag and drop
+-            if (wl_data_offer_get_version(data_device->drag_offer->offer) >= WL_DATA_OFFER_SET_ACTIONS_SINCE_VERSION) {
+-                wl_data_offer_set_actions(data_device->drag_offer->offer, WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY, WL_DATA_DEVICE_MANAGER_DND_ACTION_COPY);
+-            }
+-
+             // Set the destination window and send the initial position.
+             data_device->dnd_window = window->sdlwindow;
+             const float dx = (float)(wl_fixed_to_double(x) * data_device->dnd_window->internal->pointer_scale.x);
+             const float dy = (float)(wl_fixed_to_double(y) * data_device->dnd_window->internal->pointer_scale.y);
+             SDL_SendDropPosition(data_device->dnd_window, dx, dy);
++            Wayland_RachelDropTarget(data_device, dx, dy);
+             SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                          ". In wl_data_device_listener . data_device_handle_enter on data_offer 0x%08x at %d x %d into window %d for serial %d",
+                          WAYLAND_wl_proxy_get_id((struct wl_proxy *)id),
+@@ -2864,6 +2886,7 @@
+                      ". In wl_data_device_listener . data_device_handle_leave on data_offer 0x%08x for serial %d",
+                      -1, -1);
+     }
++    data_device->dnd_window = NULL;
+     data_device->has_mime_file = false;
+     data_device->has_mime_text = false;
+ }
+@@ -2873,7 +2896,7 @@
+ {
+     SDL_WaylandDataDevice *data_device = data;
+ 
+-    if (data_device->drag_offer && data_device->dnd_window && (data_device->has_mime_file || data_device->has_mime_text)) {
++    if (data_device->drag_offer && data_device->dnd_window) {
+         const float dx = (float)(wl_fixed_to_double(x) * data_device->dnd_window->internal->pointer_scale.x);
+         const float dy = (float)(wl_fixed_to_double(y) * data_device->dnd_window->internal->pointer_scale.y);
+ 
+@@ -2882,6 +2905,7 @@
+          *      hammer the DBus interface hundreds or even thousands of times per second.
+          */
+         SDL_SendDropPosition(data_device->dnd_window, dx, dy);
++        Wayland_RachelDropTarget(data_device, dx, dy);
+         SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                      ". In wl_data_device_listener . data_device_handle_motion on data_offer 0x%08x at %d x %d in window %d serial %d",
+                      WAYLAND_wl_proxy_get_id((struct wl_proxy *)data_device->drag_offer->offer),
+@@ -2897,6 +2921,10 @@
+ static void data_device_handle_drop(void *data, struct wl_data_device *wl_data_device)
+ {
+     SDL_WaylandDataDevice *data_device = data;
++    if (data_device->drag_offer && data_device->dnd_window) {
++        SDL_PropertiesID props = SDL_GetWindowProperties(data_device->dnd_window);
++        Wayland_RachelDropTarget(data_device, SDL_GetFloatProperty(props, "rachel.drop.x", 0), SDL_GetFloatProperty(props, "rachel.drop.y", 0));
++    }
+ 
+     if (data_device->drag_offer && data_device->dnd_window && (data_device->has_mime_file || data_device->has_mime_text)) {
+         SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+@@ -2907,7 +2935,7 @@
+         size_t length;
+         bool drop_handled = false;
+ #ifdef SDL_USE_LIBDBUS
+-        if (Wayland_data_offer_has_mime(data_device->drag_offer, FILE_PORTAL_MIME)) {
++        if (data_device->has_mime_file && Wayland_data_offer_has_mime(data_device->drag_offer, FILE_PORTAL_MIME)) {
+             void *buffer = Wayland_data_offer_receive(data_device->drag_offer, FILE_PORTAL_MIME, &length, false);
+             if (buffer) {
+                 SDL_DBusContext *dbus = SDL_DBus_GetContext();
+diff --git a/src/video/windows/SDL_windowswindow.c b/src/video/windows/SDL_windowswindow.c
+--- a/src/video/windows/SDL_windowswindow.c
++++ b/src/video/windows/SDL_windowswindow.c
+@@ -1764,22 +1764,35 @@
+     return E_NOINTERFACE;
+ }
+ 
++/* Rachel: negotiate the format and hit target before advertising COPY to OLE. */
++static Uint32 WIN_RachelDropTypes(SDLDropTarget *target, IDataObject *data)
++{
++    const CLIPFORMAT formats[] = {CF_HDROP, (CLIPFORMAT)target->format_file,
++        CF_UNICODETEXT, CF_TEXT, (CLIPFORMAT)target->format_text};
++    Uint32 types = 0;
++    for (int i = 0; i < 5; ++i) {
++        FORMATETC format = {formats[i], NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
++        if (data->lpVtbl->QueryGetData(data, &format) == S_OK) {
++            types |= i < 2 ? RACHEL_SDL_DROP_FILE : RACHEL_SDL_DROP_TEXT;
++        }
++    }
++    return types;
++}
++
++static DWORD WIN_RachelDropEffect(SDLDropTarget *target, DWORD effects, POINTL pt, Uint32 types)
++{
++    POINT point = {pt.x, pt.y};
++    if (!ScreenToClient(target->hwnd, &point)) return DROPEFFECT_NONE;
++    SDL_SendDropPosition(target->window, point.x, point.y);
++    Uint32 accepted = RachelSDL_QueryDrop(target->window, types, (float)point.x, (float)point.y);
++    return accepted && (effects & DROPEFFECT_COPY) ? DROPEFFECT_COPY : DROPEFFECT_NONE;
++}
++
+ static STDMETHODIMP SDLDropTarget_DragEnter(SDLDropTarget *target,
+                                             IDataObject *pDataObject, DWORD grfKeyState,
+                                             POINTL pt, DWORD *pdwEffect)
+ {
+-    SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                 ". In DragEnter at %ld, %ld", pt.x, pt.y);
+-    *pdwEffect = DROPEFFECT_COPY;
+-    POINT pnt = { pt.x, pt.y };
+-    if (ScreenToClient(target->hwnd, &pnt)) {
+-        SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                     ". In DragEnter at %ld, %ld => window %u at %ld, %ld", pt.x, pt.y, target->window->id, pnt.x, pnt.y);
+-        SDL_SendDropPosition(target->window, pnt.x, pnt.y);
+-    } else {
+-        SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                     ". In DragEnter at %ld, %ld => nil, nil", pt.x, pt.y);
+-    }
++    *pdwEffect = WIN_RachelDropEffect(target, *pdwEffect, pt, WIN_RachelDropTypes(target, pDataObject));
+     return S_OK;
+ }
+ 
+@@ -1787,18 +1800,7 @@
+                                            DWORD grfKeyState,
+                                            POINTL pt, DWORD *pdwEffect)
+ {
+-    SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                 ". In DragOver at %ld, %ld", pt.x, pt.y);
+-    *pdwEffect = DROPEFFECT_COPY;
+-    POINT pnt = { pt.x, pt.y };
+-    if (ScreenToClient(target->hwnd, &pnt)) {
+-        SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                     ". In DragOver at %ld, %ld => window %u at %ld, %ld", pt.x, pt.y, target->window->id, pnt.x, pnt.y);
+-        SDL_SendDropPosition(target->window, pnt.x, pnt.y);
+-    } else {
+-        SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                     ". In DragOver at %ld, %ld => nil, nil", pt.x, pt.y);
+-    }
++    *pdwEffect = WIN_RachelDropEffect(target, *pdwEffect, pt, RachelSDL_DropTypes(target->window));
+     return S_OK;
+ }
+ 
+@@ -1814,15 +1816,11 @@
+                                        IDataObject *pDataObject, DWORD grfKeyState,
+                                        POINTL pt, DWORD *pdwEffect)
+ {
+-    *pdwEffect = DROPEFFECT_COPY;
+-    POINT pnt = { pt.x, pt.y };
+-    if (ScreenToClient(target->hwnd, &pnt)) {
+-        SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                     ". In Drop at %ld, %ld => window %u at %ld, %ld", pt.x, pt.y, target->window->id, pnt.x, pnt.y);
+-        SDL_SendDropPosition(target->window, pnt.x, pnt.y);
+-    } else {
+-        SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+-                     ". In Drop at %ld, %ld => nil, nil", pt.x, pt.y);
++    *pdwEffect = WIN_RachelDropEffect(target, *pdwEffect, pt, WIN_RachelDropTypes(target, pDataObject));
++    const Uint32 accepted = RachelSDL_AcceptedDrop(target->window);
++    if (*pdwEffect == DROPEFFECT_NONE) {
++        SDL_SendDropComplete(target->window);
++        return S_OK;
+     }
+ 
+     {
+@@ -1855,7 +1853,7 @@
+         fetc.lindex = -1;
+         fetc.tymed = TYMED_HGLOBAL;
+         const char *format_mime = "text/uri-list";
+-        if (SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
++        if ((accepted & RACHEL_SDL_DROP_FILE) && SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
+             SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                          ". In Drop File for QueryGetData, format %08x '%s', success",
+                          fetc.cfFormat, format_mime);
+@@ -1903,7 +1901,7 @@
+         fetc.lindex = -1;
+         fetc.tymed = TYMED_HGLOBAL;
+         const char *format_mime = "text/plain;charset=utf-8";
+-        if (SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
++        if ((accepted & RACHEL_SDL_DROP_TEXT) && SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
+             SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                          ". In Drop Text for QueryGetData, format %08x '%s', success",
+                          fetc.cfFormat, format_mime);
+@@ -1949,7 +1947,7 @@
+         fetc.lindex = -1;
+         fetc.tymed = TYMED_HGLOBAL;
+         const char *format_mime = "CF_UNICODETEXT";
+-        if (SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
++        if ((accepted & RACHEL_SDL_DROP_TEXT) && SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
+             SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                          ". In Drop Text for QueryGetData, format %08x '%s', success",
+                          fetc.cfFormat, format_mime);
+@@ -2003,7 +2001,7 @@
+         fetc.lindex = -1;
+         fetc.tymed = TYMED_HGLOBAL;
+         const char *format_mime = "CF_TEXT";
+-        if (SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
++        if ((accepted & RACHEL_SDL_DROP_TEXT) && SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
+             SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                          ". In Drop Text for QueryGetData, format %08x '%s', success",
+                          fetc.cfFormat, format_mime);
+@@ -2049,7 +2047,7 @@
+         fetc.lindex = -1;
+         fetc.tymed = TYMED_HGLOBAL;
+         const char *format_mime = "CF_HDROP";
+-        if (SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
++        if ((accepted & RACHEL_SDL_DROP_FILE) && SUCCEEDED(pDataObject->lpVtbl->QueryGetData(pDataObject, &fetc))) {
+             SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
+                          ". In Drop File for QueryGetData, format %08x '%s', success",
+                          fetc.cfFormat, format_mime);
+diff --git a/src/video/x11/SDL_x11events.c b/src/video/x11/SDL_x11events.c
+--- a/src/video/x11/SDL_x11events.c
++++ b/src/video/x11/SDL_x11events.c
+@@ -170,6 +170,34 @@
+         atom[count++] = a2;
+     }
+     return X11_PickTarget(disp, atom, count);
++}
++
++/* Rachel: retain both advertised formats so hit testing can choose the matching one. */
++static void X11_RachelDropTargets(SDL_Window *window, Display *display, Atom *atoms, int count)
++{
++    Atom file = None, text = None;
++    for (int i = 0; i < count; ++i) {
++        if (atoms[i] == None) continue;
++        char *name = X11_XGetAtomName(display, atoms[i]);
++        if (!name) continue;
++        if (SDL_strcmp(name, "text/uri-list") == 0) file = atoms[i];
++        else if (SDL_strcmp(name, "text/plain;charset=utf-8") == 0 || SDL_strcmp(name, "UTF8_STRING") == 0) text = atoms[i];
++        else if (text == None && (SDL_strcmp(name, "text/plain") == 0 || SDL_strcmp(name, "TEXT") == 0)) text = atoms[i];
++        X11_XFree(name);
++    }
++    SDL_PropertiesID props = SDL_GetWindowProperties(window);
++    SDL_SetNumberProperty(props, "rachel.drop.x11.file", (Sint64)file);
++    SDL_SetNumberProperty(props, "rachel.drop.x11.text", (Sint64)text);
++}
++
++static Atom X11_RachelDropTarget(SDL_Window *window, float x, float y)
++{
++    SDL_PropertiesID props = SDL_GetWindowProperties(window);
++    Atom file = (Atom)SDL_GetNumberProperty(props, "rachel.drop.x11.file", None);
++    Atom text = (Atom)SDL_GetNumberProperty(props, "rachel.drop.x11.text", None);
++    Uint32 types = (file != None ? RACHEL_SDL_DROP_FILE : 0) | (text != None ? RACHEL_SDL_DROP_TEXT : 0);
++    Uint32 accepted = RachelSDL_QueryDrop(window, types, x, y);
++    return accepted == RACHEL_SDL_DROP_FILE ? file : accepted == RACHEL_SDL_DROP_TEXT ? text : None;
+ }
+ 
+ struct KeyRepeatCheckData
+@@ -1754,10 +1782,13 @@
+                 X11_ReadProperty(&p, display, data->xdnd_source, videodata->atoms.XdndTypeList);
+                 // pick one
+                 data->xdnd_req = X11_PickTarget(display, (Atom *)p.data, p.count);
++                X11_RachelDropTargets(data->window, display, (Atom *)p.data, p.count);
+                 X11_XFree(p.data);
+             } else {
+                 // pick from list of three
+                 data->xdnd_req = X11_PickTargetFromAtoms(display, xevent->xclient.data.l[2], xevent->xclient.data.l[3], xevent->xclient.data.l[4]);
++                Atom offers[] = {xevent->xclient.data.l[2], xevent->xclient.data.l[3], xevent->xclient.data.l[4]};
++                X11_RachelDropTargets(data->window, display, offers, 3);
+             }
+         } else if (xevent->xclient.message_type == videodata->atoms.XdndLeave) {
+ #ifdef DEBUG_XEVENTS
+@@ -1784,6 +1815,7 @@
+                                           root_x, root_y, &window_x, &window_y, &ChildReturn);
+ 
+                 SDL_SendDropPosition(data->window, (float)window_x, (float)window_y);
++                data->xdnd_req = X11_RachelDropTarget(data->window, (float)window_x, (float)window_y);
+             }
+ 
+             // reply with status
+@@ -1794,14 +1826,16 @@
+             m.message_type = videodata->atoms.XdndStatus;
+             m.format = 32;
+             m.data.l[0] = data->xwindow;
+-            m.data.l[1] = (data->xdnd_req != None);
++            m.data.l[1] = (data->xdnd_req != None) | 2; // Rachel: request every position update, including rejected regions.
+             m.data.l[2] = 0; // specify an empty rectangle
+             m.data.l[3] = 0;
+-            m.data.l[4] = videodata->atoms.XdndActionCopy; // we only accept copying anyway
++            m.data.l[4] = data->xdnd_req != None ? videodata->atoms.XdndActionCopy : None;
+ 
+             X11_XSendEvent(display, xevent->xclient.data.l[0], False, NoEventMask, (XEvent *)&m);
+             X11_XFlush(display);
+         } else if (xevent->xclient.message_type == videodata->atoms.XdndDrop) {
++            SDL_PropertiesID props = SDL_GetWindowProperties(data->window);
++            data->xdnd_req = X11_RachelDropTarget(data->window, SDL_GetFloatProperty(props, "rachel.drop.x", 0), SDL_GetFloatProperty(props, "rachel.drop.y", 0));
+             if (data->xdnd_req == None) {
+                 // say again - not interested!
+                 SDL_zero(m);

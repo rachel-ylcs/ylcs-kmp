@@ -1,4 +1,4 @@
-@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
+@file:OptIn(ExperimentalAtomicApi::class)
 
 package org.jetbrains.skiko.window
 
@@ -6,11 +6,17 @@ import kotlinx.cinterop.*
 import org.jetbrains.skiko.internal.sdl.*
 import org.jetbrains.skiko.internal.sdl.SDL_SystemCursor.*
 import kotlin.concurrent.atomics.AtomicBoolean
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 internal class SdlWindowScope(private val window: COpaquePointer, private val wakeEventType: UInt) : NativeWindowScope {
     private val active = AtomicBoolean(true)
     private val closing = AtomicBoolean(false)
     private val cursors = mutableMapOf<NativeWindowCursor, COpaquePointer>()
+    private var dropFailure: Throwable? = null
+    private val dropTarget = SdlWindowDropTarget(window) { failure ->
+        if (dropFailure == null) dropFailure = failure
+        close()
+    }
     val shouldClose: Boolean get() = closing.load()
 
     override val displayScale: Float get() {
@@ -71,6 +77,15 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
         check(RachelSDL_SetWindowSize(window, width, height)) { SDL_GetError()?.toKString() ?: "Unable to resize window" }
     }
 
+    override fun setDropTarget(target: NativeWindowDropTarget?) {
+        checkHostThread()
+        dropTarget.target = target
+    }
+
+    fun rethrowDropFailure() {
+        dropFailure?.let { throw it }
+    }
+
     override fun startTextInput() {
         checkHostThread()
         check(RachelSDL_StartTextInput(window)) { SDL_GetError()?.toKString() ?: "Unable to start text input" }
@@ -89,7 +104,7 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
 
     fun dispose() {
         active.store(false)
-        // SDL_DestroyCursor restores the default when the destroyed cursor is active.
+        dropTarget.dispose()
         cursors.values.forEach(::RachelSDL_DestroyCursor)
         cursors.clear()
     }

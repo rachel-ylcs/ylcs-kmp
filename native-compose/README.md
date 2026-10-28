@@ -24,6 +24,8 @@
 
 SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主构建配置：保留窗口、输入、剪贴板、拖放、托盘、原生对话框和 Skiko 所需的图形上下文接入，以及 SDL 软件渲染回退；关闭音频、摄像头、手柄、触觉、HIDAPI、传感器、电源查询、独立 SDL GPU 和 SDL 自身不使用的硬件 renderer。Compose 的 D3D12/Metal/OpenGL GPU 渲染继续由 Skia/Skiko 提供。源码同步会对 SDL 的动态 API 总开关应用可重复、带上游格式检查的调整，让静态链接可以裁剪未引用 API；该 SDK 不支持通过 `SDL3_DYNAMIC_API` 替换运行时实现。配置和同步逻辑均参与源码/SDK 缓存身份，修改后会自动重建。
 
+桌面 Native 拖放使用 [SDL 补丁](upstream/patches/sdl.patch) 提供逐窗口的同步协商：Windows OLE、macOS Cocoa、Linux X11／Wayland 在悬停时将格式与位置交给 Compose 命中检查，匹配后才返回允许复制。未设置接收目标、禁用、类型不匹配或移出组件时返回禁止；实际文件和文本在松手后交付。补丁由同步器校验、应用并记录 SHA-256，参与 SDL SDK 缓存身份；更新 SDL 时须一并审核。
+
 ## 维护端使用
 
 需要 JDK 25、根 Gradle Wrapper、Git。Windows 需要 MSVC/Windows SDK；Linux 需要桌面开发包；macOS arm64 需要 Xcode。IDEA 的 Gradle JVM 使用 JDK 25。Gradle Settings 自动准备和登记本地移植源码。

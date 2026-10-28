@@ -4,14 +4,6 @@ import kotlinx.cinterop.*
 import org.jetbrains.skia.Canvas
 import org.jetbrains.skiko.internal.sdl.*
 
-/**
- * Desktop Native window host supplied by this Skiko port.
- *
- * Run on the main thread. This call owns the window/event loop and blocks until
- * close or Escape; callbacks run on the same thread. The frame canvas is borrowed
- * and must not be retained or closed. Callback failures propagate after native
- * renderer/window resources are released. One event loop may run at a time.
- */
 object NativeWindow {
     private var running = false
 
@@ -96,6 +88,7 @@ object NativeWindow {
                                 dirty = true
                             } while (SDL_PollEvent(event.ptr))
                         }
+                        scope.rethrowDropFailure()
                         if (scope.shouldClose || (!dirty && !options.continuous)) continue
                         check(RachelSDL_GetWindowSizeInPixels(window, width.ptr, height.ptr))
                         check(width.value in 0 .. 16384 && height.value in 0 .. 16384 && width.value.toLong() * height.value <= 67108864)

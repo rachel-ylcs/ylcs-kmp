@@ -66,7 +66,7 @@ runs:
         path: |
           native-compose/vendor/sdl-static
           native-compose/vendor/skiko/workspace/skiko/dependencies/skia
-        key: native-sdk-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.image-version }}-${{ steps.inputs.outputs.kotlin-version }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/sdl.json', 'build-logic/native-bridge/gradle/sdl-sdk.gradle.kts') }}
+        key: native-sdk-v3-${{ runner.os }}-${{ runner.arch }}-${{ steps.inputs.outputs.image-version }}-${{ steps.inputs.outputs.kotlin-version }}-${{ hashFiles('native-compose/upstream/lock.json', 'native-compose/upstream/sdl.json', 'native-compose/upstream/patches/sdl.patch', 'build-logic/native-bridge/gradle/sdl-sdk.gradle.kts') }}
     - name: Linux desktop Native toolchain dependencies
       if: ${{ runner.os == 'Linux' && inputs.tools == 'true' }}
       shell: bash

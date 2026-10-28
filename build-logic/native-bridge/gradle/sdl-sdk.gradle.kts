@@ -104,12 +104,13 @@ val sdkSource = sdkNativeDirectory.resolve("vendor/sdl-source-$sdkVersion")
 val sdkPrefix = sdkNativeDirectory.resolve("vendor/sdl-static/$sdkHost")
 val sdkArchiveName = if (sdkHost == "mingw_x64") "SDL3-static.lib" else "libSDL3.a"
 val sdkScript = sdkNativeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts")
+val sdkDropPatch = sdkSource.resolve(".rachel-drop-patch.json")
 val sdkNativeLocation = layout.buildDirectory.file("konan.txt")
 
 tasks.register("prepareSdlStatic") {
     group = "native setup"
     description = "Build the pinned SDL source as a static SDK for the Kotlin/Native host"
-    inputs.files(sdkLockFile, sdkScript, sdkSource.resolve(".rachel-source-sha256"), sdkSource.resolve("src/dynapi/SDL_dynapi.h"))
+    inputs.files(sdkLockFile, sdkScript, sdkSource.resolve(".rachel-source-sha256"), sdkSource.resolve("src/dynapi/SDL_dynapi.h"), sdkDropPatch)
     inputs.property("host", sdkHost)
     outputs.files(sdkPrefix.resolve("rachel-sdl.json"), sdkPrefix.resolve("lib/$sdkArchiveName"))
     if (sdkHost == "linux_x64") {
@@ -123,9 +124,10 @@ tasks.register("prepareSdlStatic") {
         val work = sdkNativeDirectory.resolve("vendor/build/sdl-static")
         val environment = if (sdkHost == "mingw_x64") project.sdkWindowsEnvironment(System.getenv(), work) else System.getenv()
         val source = sdkLock["source"] as Map<*, *>
+        val dropPatchSha256 = (JsonSlurper().parse(sdkDropPatch) as Map<*, *>)["patchSha256"] as String
         val profile = mutableMapOf<String, Any>("version" to sdkVersion, "target" to sdkHost, "archive" to sdkArchiveName,
             "linkage" to "static", "buildType" to "Release", "sourceSha256" to source["sha256"]!!, "scriptSha256" to sdkDigest(sdkScript),
-            "dynamicApiHeaderSha256" to sdkDigest(dynamicApiHeader), "profile" to sdkBuildProfile)
+            "dynamicApiHeaderSha256" to sdkDigest(dynamicApiHeader), "dropPatchSha256" to dropPatchSha256, "profile" to sdkBuildProfile)
         val nativeOptions = if (sdkHost == "linux_x64") {
             val (options, identities) = project.sdkLinuxOptions(File(sdkNativeLocation.get().asFile.readText().trim()), environment, work.resolve("bootstrap"))
             profile["nativeToolchain"] = identities

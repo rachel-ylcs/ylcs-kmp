@@ -205,6 +205,7 @@ class NativeUpstreamSync(directory: File) {
         check(destination.resolve("include/SDL3/SDL.h").isFile && destination.resolve("LICENSE.txt").isFile) { "SDL headers/license are missing" }
         check(lock["build"].sourceObject()["dynamicApi"] == false) { "The static Compose SDL profile requires direct API calls" }
         NativeSdlSource.disableDynamicApi(destination)
+        NativeSdlSource.prepareDropNegotiation(nativeDirectory, destination, archive, source["sha256"] as String)
         println("Prepared SDL $version sources")
     }
 

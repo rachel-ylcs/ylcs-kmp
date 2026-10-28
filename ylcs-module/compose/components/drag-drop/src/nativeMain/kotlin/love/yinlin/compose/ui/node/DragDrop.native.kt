@@ -42,7 +42,7 @@ actual fun Modifier.dragDrop(
         this.dragAndDropTarget(
             shouldStartDragAndDrop = { event ->
                 val data = event.transferData
-                (data.files.isNotEmpty() && (currentFlag and DragFlag.File == DragFlag.File)) || (data.text != null && (currentFlag and DragFlag.Text == DragFlag.Text))
+                (data.hasFiles && (currentFlag and DragFlag.File == DragFlag.File)) || (data.hasText && (currentFlag and DragFlag.Text == DragFlag.Text))
             },
             target = target
         )
