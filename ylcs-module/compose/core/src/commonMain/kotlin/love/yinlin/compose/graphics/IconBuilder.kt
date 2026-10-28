@@ -16,7 +16,7 @@ import love.yinlin.extension.lazyName
 @Stable
 class IconBuilder @PublishedApi internal constructor(private val builder: ImageVector.Builder) {
     companion object {
-        val BaseColor = SolidColor(Color.Black)
+        val BaseColor by lazy { SolidColor(Color.Black) }
     }
 
     private val nodes = ArrayList<PathNode>(32)

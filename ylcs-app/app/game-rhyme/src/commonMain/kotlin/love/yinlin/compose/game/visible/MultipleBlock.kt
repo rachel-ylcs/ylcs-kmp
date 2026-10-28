@@ -79,23 +79,23 @@ class MultipleBlock(
         private const val INNER_MAIN_ALPHA = 0.8f
         private val InnerProgressTipColor = Colors.White
 
-        private val DefaultPath = Path([TopCenter, CenterRight, BottomCenter, CenterLeft])
-        private val InnerPath2 = [
+        private val DefaultPath by lazy { Path([TopCenter, CenterRight, BottomCenter, CenterLeft]) }
+        private val InnerPath2 by lazy { [
             Path([TopCenter, CenterLeft, CenterRight]),
             Path([BottomCenter, CenterLeft, CenterRight])
-        ]
-        private val InnerPath3 = [
+        ] }
+        private val InnerPath3 by lazy { [
             Path([CenterLeft, InnerTopLeft, InnerBottomLeft]),
             Path([TopCenter, InnerTopLeft, InnerBottomLeft, BottomCenter, InnerBottomRight, InnerTopRight]),
             Path([CenterRight, InnerTopRight, InnerBottomRight])
-        ]
-        private val InnerPath4 = [
+        ] }
+        private val InnerPath4 by lazy { [
             Path([TopCenter, DefaultCenter, CenterLeft]),
             Path([TopCenter, DefaultCenter, CenterRight]),
             Path([BottomCenter, DefaultCenter, CenterRight]),
             Path([BottomCenter, DefaultCenter, CenterLeft])
-        ]
-        private val InnerPaths = [[], [], InnerPath2, InnerPath3, InnerPath4]
+        ] }
+        private val InnerPaths by lazy { [[], [], InnerPath2, InnerPath3, InnerPath4] }
 
         fun buildTime(difficulty: RhymeDifficulty, start: Long, end: Long, extraPrepareRatio: Float): Time {
             val rawPrepare = PrepareDurationMap[difficulty]!!
