@@ -7,6 +7,7 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
         libs.plugins.androidLibrary,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
@@ -15,12 +16,18 @@ plugins {
 
 rachel {
     multiplatform {
+        nativeDesktopTarget = true
+
         sources {
             commonMain {
                 lib(
                     ExportLib,
                     projects.ylcsModule.compose.core,
                 )
+            }
+
+            commonTest {
+                lib(libs.test, libs.kotlinx.coroutines.test)
             }
 
             androidMain(commonMain) {

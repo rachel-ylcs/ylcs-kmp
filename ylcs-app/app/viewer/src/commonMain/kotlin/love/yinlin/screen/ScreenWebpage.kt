@@ -22,6 +22,10 @@ class ScreenWebpage(url: String) : Screen() {
 
     override val title: String by derivedStateOf { state.title }
 
+    override fun uninitialize() {
+        state.release()
+    }
+
     override fun onBack() {
         if (state.canGoBack) state.goBack()
         else pop()

@@ -28,6 +28,10 @@ class ScreenActivityLink : Screen() {
 
     override val title: String = "链接提取"
 
+    override fun uninitialize() {
+        webPageState.release()
+    }
+
     @Composable
     override fun Content() {
         Platform.use(

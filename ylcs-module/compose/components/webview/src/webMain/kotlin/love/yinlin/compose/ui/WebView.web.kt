@@ -12,5 +12,5 @@ actual fun WebView(
 ) {
     NavigationBack(enabled = state.canGoBack) { state.goBack() }
 
-    state.HostView(modifier)
+    PlatformViewHost(state, WebViewParameters(config), modifier)
 }

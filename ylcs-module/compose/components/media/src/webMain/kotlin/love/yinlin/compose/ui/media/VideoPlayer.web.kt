@@ -1,76 +1,170 @@
 package love.yinlin.compose.ui.media
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import kotlinx.browser.document
 import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compatible.ThrowableCompatible
-import love.yinlin.compose.ui.PlatformView
-import love.yinlin.data.MimeType
+import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.ui.PlatformViewEnvironment
+import love.yinlin.compose.ui.PlatformViewHost
+import love.yinlin.compose.ui.PlatformViewState
 import love.yinlin.extension.createElement
 import love.yinlin.extension.raw
-import love.yinlin.extension.then
 import love.yinlin.foundation.PlatformContext
-import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLVideoElement
 import kotlin.js.ExperimentalWasmJsInterop
 
 @Stable
+private data class WebVideoParameters(
+    val source: String? = null,
+    val loadVersion: Long = 0L,
+    val playing: Boolean = false,
+    val commandVersion: Long = 0L,
+    val seekPosition: Long = 0L,
+    val seekVersion: Long = 0L,
+)
+
+@Stable
 @OptIn(ExperimentalWasmJsInterop::class, CompatibleRachelApi::class)
 private class WebVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
-    val view = object : PlatformView<HTMLVideoElement>() {
-        override fun build(): HTMLVideoElement = createElement {
-            autoplay = true
+    private var request by mutableRefStateOf(WebVideoParameters())
+    private var resumePosition = 0L
+    private var released = false
+    private val viewState = object : PlatformViewState<HTMLVideoElement, WebVideoParameters>() {
+        private var latestView: HTMLVideoElement? = null
+        private val pendingSeek = mutableMapOf<HTMLVideoElement, Long>()
+
+        override fun factory(environment: PlatformViewEnvironment): HTMLVideoElement = createElement {
+            autoplay = false
             controls = true
             loop = true
             muted = false
-            appendChild(createElement<HTMLSourceElement> {
-                type = MimeType.MP4
-            })
-            onplay = { this@WebVideoController.isPlaying = true }
-            onpause = { this@WebVideoController.isPlaying = false }
-            ondurationchange = { this@WebVideoController.duration = (duration * 1000).toLong() }
-            ontimeupdate = { this@WebVideoController.position = (currentTime * 1000).toLong() }
-            onerror = { message, _, _, _, error ->
-                this@WebVideoController.error = ThrowableCompatible(error).build() ?: Throwable(message?.toString() ?: "error")
+        }
+
+        override fun attach(view: HTMLVideoElement) {
+            latestView = view
+            view.onplay = {
+                onView(view) {
+                    isPlaying = !it.paused
+                    if (!it.paused && !request.playing) request = request.copy(playing = true)
+                }
+            }
+            view.onpause = {
+                onView(view) {
+                    isPlaying = !it.paused
+                    if (it.paused && request.playing) request = request.copy(playing = false)
+                }
+            }
+            view.ondurationchange = { onView(view) { duration = (it.duration.takeIf(Double::isFinite) ?: 0.0).times(1000).toLong() } }
+            view.ontimeupdate = {
+                onView(view) {
+                    position = (it.currentTime * 1000).toLong()
+                    resumePosition = position
+                }
+            }
+            view.onloadedmetadata = {
+                onView(view) { pendingSeek.remove(it)?.let { target -> it.currentTime = target / 1000.0 } }
+            }
+            view.onerror = { message, _, _, _, failure ->
+                onView(view) { error = ThrowableCompatible(failure).build() ?: Throwable(message?.toString() ?: "error") }
                 false.raw
             }
+        }
+
+        override fun synchronize(view: HTMLVideoElement, previous: WebVideoParameters?, next: WebVideoParameters) {
+            val changedSource = previous == null || previous.loadVersion != next.loadVersion
+            if (changedSource) {
+                pendingSeek.remove(view)
+                if (next.source == null) view.removeAttribute("src")
+                else view.src = next.source
+                view.load()
+            }
+            if (next.source != null && (changedSource || previous.seekVersion != next.seekVersion)) {
+                val target = if (previous == null) resumePosition else next.seekPosition
+                if (view.readyState > 0) view.currentTime = target / 1000.0
+                else pendingSeek[view] = target
+            }
+            if (changedSource || previous.commandVersion != next.commandVersion) {
+                if (next.source != null && next.playing) {
+                    val _ = view.play().catch { failure ->
+                        onView(view) {
+                            if (request.playing && parameters.loadVersion == next.loadVersion && parameters.commandVersion == next.commandVersion) {
+                                error = ThrowableCompatible(failure).build() ?: Throwable("Video playback was rejected")
+                            }
+                        }
+                        null
+                    }
+                }
+                else view.pause()
+            }
+        }
+
+        override fun detach(view: HTMLVideoElement) {
+            if (latestView === view) {
+                latestView = null
+                resumePosition = (view.currentTime * 1000).toLong()
+            }
+            pendingSeek.remove(view)
+            cleanup({
+                view.onplay = null
+                view.onpause = null
+                view.ondurationchange = null
+                view.ontimeupdate = null
+                view.onloadedmetadata = null
+                view.onerror = null
+            }, view::pause, { view.removeAttribute("src") }, view::load)
+        }
+
+        override fun releaseResources() {
+            latestView = null
+            pendingSeek.clear()
         }
     }
 
     override fun releaseController() {
-        view.host?.then { document.removeChild(it) }
+        if (released) return
+        released = true
+        viewState.release()
+        url = null
+        isPlaying = false
     }
 
     override fun load(path: String) {
-        view.host {
-            (it.firstElementChild as? HTMLSourceElement)?.src = path
-        }
+        if (released) return
+        url = path
+        error = null
+        position = 0L
+        duration = 0L
+        resumePosition = 0L
+        request = request.copy(source = path, loadVersion = request.loadVersion + 1L, playing = true, seekPosition = 0L)
     }
 
     override fun play() {
-        view.host?.play()
+        if (!released) request = request.copy(playing = true, commandVersion = request.commandVersion + 1L)
     }
 
     override fun pause() {
-        view.host?.pause()
+        if (!released) request = request.copy(playing = false, commandVersion = request.commandVersion + 1L)
     }
 
     override fun stop() {
-        view.host {
-            it.pause()
-            (it.firstElementChild as? HTMLSourceElement)?.src = ""
-        }
+        if (released) return
+        url = null
+        position = 0L
+        resumePosition = 0L
+        request = request.copy(source = null, loadVersion = request.loadVersion + 1L, playing = false, seekPosition = 0L)
     }
 
     override fun seek(position: Long) {
-        view.host?.currentTime = position / 1000.0
+        if (released) return
+        val target = position.coerceAtLeast(0L)
+        resumePosition = target
+        request = request.copy(seekPosition = target, seekVersion = request.seekVersion + 1L)
     }
 
     @Composable
     override fun SurfaceContent(modifier: Modifier) {
-        view.HostView(modifier = modifier)
+        PlatformViewHost(viewState, request, modifier)
     }
 }
 

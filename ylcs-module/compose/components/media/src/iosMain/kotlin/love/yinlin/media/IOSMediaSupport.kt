@@ -7,6 +7,7 @@ import love.yinlin.concurrent.atomic
 import love.yinlin.coroutines.mainContext
 import platform.CoreMedia.*
 import platform.Foundation.*
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * 每个播放器拥有自己的生命周期和 scope。关闭请求从任意线程立即生效；
@@ -20,9 +21,10 @@ internal class IOSPlayerLifetime {
     fun close(cleanup: () -> Unit) {
         if (!closing.compareAndSet(expect = false, update = true)) return
         scope.cancel()
-        scope.launch(Dispatchers.Main.immediate) {
-            cleanup()
-        }
+
+        val dispatcher = Dispatchers.Main.immediate
+        if (dispatcher.isDispatchNeeded(EmptyCoroutineContext)) dispatcher.dispatch(EmptyCoroutineContext) { cleanup() }
+        else cleanup()
     }
 }
 

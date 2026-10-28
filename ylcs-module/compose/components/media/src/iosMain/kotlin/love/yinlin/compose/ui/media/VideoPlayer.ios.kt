@@ -3,17 +3,16 @@ package love.yinlin.compose.ui.media
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import love.yinlin.compose.ui.PlatformView
-import love.yinlin.compose.ui.Releasable
-import love.yinlin.compose.ui.Updatable
-import love.yinlin.compose.ui.rememberPlatformView
-import love.yinlin.coroutines.Coroutines
+import love.yinlin.compose.ui.PlatformViewEnvironment
+import love.yinlin.compose.ui.PlatformViewHost
+import love.yinlin.compose.ui.PlatformViewState
 import love.yinlin.extension.catchingError
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.IOSAVPlayer
@@ -37,8 +36,13 @@ private class VideoView : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
 }
 
 @Stable
-private class VideoViewWrapper(private val getSurfacePlayer: () -> AVPlayer?) : PlatformView<VideoView>(), Updatable<VideoView>, Releasable<VideoView> {
-    override fun build(): VideoView {
+private data class VideoViewParameters(val player: AVPlayer?)
+
+@Stable
+private class VideoViewState : PlatformViewState<VideoView, VideoViewParameters>() {
+    override val properties = UIKitInteropProperties(interactionMode = null)
+
+    override fun factory(environment: PlatformViewEnvironment): VideoView {
         val videoView = VideoView()
         videoView.backgroundColor = UIColor.blackColor
         videoView.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect
@@ -46,17 +50,18 @@ private class VideoViewWrapper(private val getSurfacePlayer: () -> AVPlayer?) : 
         return videoView
     }
 
-    override fun update(view: VideoView) {
-        view.videoLayer.player = getSurfacePlayer()
+    override fun synchronize(view: VideoView, previous: VideoViewParameters?, next: VideoViewParameters) {
+        if (previous?.player !== next.player) view.videoLayer.player = next.player
     }
 
-    override fun release(view: VideoView) {
+    override fun detach(view: VideoView) {
         view.videoLayer.player = null
     }
 }
 
 @Stable
 private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
+    private val viewState = VideoViewState()
     private val lifetime = IOSPlayerLifetime()
     private val scope = lifetime.scope
     private var player: IOSAVPlayer? = null
@@ -143,6 +148,7 @@ private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
     override fun seek(position: Long) = command { player?.seek(position) }
 
     override fun releaseController() {
+        viewState.release()
         lifetime.close {
             progressJob?.cancel()
             progressJob = null
@@ -159,8 +165,7 @@ private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
 
     @Composable
     override fun SurfaceContent(modifier: Modifier) {
-        val wrapper = rememberPlatformView { VideoViewWrapper { surfacePlayer } }
-        wrapper.HostView(modifier)
+        PlatformViewHost(viewState, VideoViewParameters(surfacePlayer), modifier)
     }
 }
 
