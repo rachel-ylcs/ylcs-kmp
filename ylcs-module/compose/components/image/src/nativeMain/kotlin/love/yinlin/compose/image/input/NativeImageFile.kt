@@ -18,11 +18,11 @@ internal class NativeImageFile private constructor(private val stream: CPointer<
 
             return cleaning({
                 if (fseek(stream, 0, SEEK_END) != 0) throw IOException("Cannot seek image file")
-                val length = ftell(stream)
-                require(length in 1 .. maxBytes) { "Image file is empty or exceeds the byte budget" }
+                val length = ftell(stream).toLong()
+                require(length in 1L .. maxBytes.toLong()) { "Image file is empty or exceeds the byte budget" }
                 if (fseek(stream, 0, SEEK_SET) != 0) throw IOException("Cannot rewind image file")
 
-                NativeImageFile(stream, length).also { transferred = true }
+                NativeImageFile(stream, length.toInt()).also { transferred = true }
             }) { if (!transferred) fclose(stream) }
         }
     }
@@ -37,7 +37,7 @@ internal class NativeImageFile private constructor(private val stream: CPointer<
 
     fun rewind(): Boolean = fseek(stream, 0, SEEK_SET) == 0
 
-    fun hasSameSize(): Boolean = fseek(stream, 0, SEEK_END) == 0 && ftell(stream) == size
+    fun hasSameSize(): Boolean = fseek(stream, 0, SEEK_END) == 0 && ftell(stream).toLong() == size.toLong()
 
     override fun close() {
         fclose(stream)
