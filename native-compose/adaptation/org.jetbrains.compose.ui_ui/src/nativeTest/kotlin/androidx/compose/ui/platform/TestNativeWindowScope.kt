@@ -1,6 +1,7 @@
 package androidx.compose.ui.platform
 
 import org.jetbrains.skiko.window.NativeWindowCursor
+import org.jetbrains.skiko.window.NativeWindowBounds
 import org.jetbrains.skiko.window.NativeWindowDropTarget
 import org.jetbrains.skiko.window.NativeWindowScope
 import org.jetbrains.skiko.window.NativeWindowState
@@ -10,6 +11,10 @@ internal class TestNativeWindowScope(override val displayScale: Float = 1f, over
     override val pixelWidth = 96
     override val pixelHeight = 64
     override val state get() = NativeWindowState("", pixelWidth, pixelHeight)
+    override val displayBounds get() = NativeWindowBounds(0, 0, pixelWidth, pixelHeight)
+    override val windowHandle: Long? get() = null
+    override val displayHandle: Long? get() = null
+    override val isPositionSupported = true
     var invalidations = 0
     var closes = 0
     var inputStarts = 0
@@ -18,6 +23,7 @@ internal class TestNativeWindowScope(override val displayScale: Float = 1f, over
     override fun invalidate() { invalidations++ }
     override fun close() { closes++ }
     override fun setSize(width: Int, height: Int) = Unit
+    override fun setPosition(x: Int, y: Int): Boolean = true
     override fun setTitle(title: String) = Unit
     override fun setMinimumSize(width: Int, height: Int) = Unit
     override fun setUndecorated(undecorated: Boolean) = Unit
@@ -28,6 +34,7 @@ internal class TestNativeWindowScope(override val displayScale: Float = 1f, over
     override fun setAlwaysOnTop(alwaysOnTop: Boolean) = Unit
     override fun setMinimized(minimized: Boolean) = Unit
     override fun setMaximized(maximized: Boolean) = Unit
+    override fun setFullscreen(fullscreen: Boolean) = Unit
     override fun setCursor(cursor: NativeWindowCursor) = Unit
     override fun setDropTarget(target: NativeWindowDropTarget?) = Unit
     override fun startTextInput() { inputStarts++ }

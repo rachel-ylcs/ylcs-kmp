@@ -8,4 +8,7 @@ data class NativeWindowState(
     val maximized: Boolean = false,
     val visible: Boolean = true,
     val alwaysOnTop: Boolean = false,
+    val x: Int = 0,
+    val y: Int = 0,
+    val fullscreen: Boolean = false,
 )

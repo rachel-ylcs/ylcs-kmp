@@ -38,6 +38,20 @@ static inline bool RachelSDL_SetWindowSize(void *window, int width, int height) 
 static inline bool RachelSDL_GetWindowSize(void *window, int *width, int *height) {
     return SDL_GetWindowSize((SDL_Window *)window, width, height);
 }
+static inline bool RachelSDL_GetWindowPosition(void *window, int *x, int *y) {
+    return SDL_GetWindowPosition((SDL_Window *)window, x, y);
+}
+static inline bool RachelSDL_SetWindowPosition(void *window, int x, int y) {
+    return SDL_SetWindowPosition((SDL_Window *)window, x, y);
+}
+static inline bool RachelSDL_GetWindowDisplayBounds(void *window, SDL_Rect *bounds) {
+    SDL_DisplayID display = SDL_GetDisplayForWindow((SDL_Window *)window);
+    if (!display) display = SDL_GetPrimaryDisplay();
+    return SDL_GetDisplayUsableBounds(display, bounds);
+}
+static inline SDL_PropertiesID RachelSDL_GetWindowProperties(void *window) {
+    return SDL_GetWindowProperties((SDL_Window *)window);
+}
 static inline const char *RachelSDL_GetWindowTitle(void *window) {
     return SDL_GetWindowTitle((SDL_Window *)window);
 }

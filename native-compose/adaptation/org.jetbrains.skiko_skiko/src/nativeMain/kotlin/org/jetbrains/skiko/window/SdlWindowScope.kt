@@ -47,6 +47,9 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
         val width = alloc<IntVar>()
         val height = alloc<IntVar>()
         check(RachelSDL_GetWindowSize(window, width.ptr, height.ptr)) { SDL_GetError()?.toKString() ?: "Unable to read window size" }
+        val x = alloc<IntVar>()
+        val y = alloc<IntVar>()
+        check(RachelSDL_GetWindowPosition(window, x.ptr, y.ptr)) { SDL_GetError()?.toKString() ?: "Unable to read window position" }
         val flags = RachelSDL_GetWindowFlags(window)
         NativeWindowState(
             title = RachelSDL_GetWindowTitle(window)?.toKString().orEmpty(),
@@ -56,7 +59,42 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
             maximized = flags and SDL_WINDOW_MAXIMIZED != 0uL,
             visible = flags and SDL_WINDOW_HIDDEN == 0uL,
             alwaysOnTop = flags and SDL_WINDOW_ALWAYS_ON_TOP != 0uL,
+            x = x.value,
+            y = y.value,
+            fullscreen = flags and SDL_WINDOW_FULLSCREEN != 0uL,
         )
+    }
+
+    override val displayBounds: NativeWindowBounds get() = memScoped {
+        checkHostThread()
+        val bounds = alloc<SDL_Rect>()
+        check(RachelSDL_GetWindowDisplayBounds(window, bounds.ptr)) { SDL_GetError()?.toKString() ?: "Unable to read display bounds" }
+        NativeWindowBounds(bounds.x, bounds.y, bounds.w, bounds.h)
+    }
+
+    override val windowHandle: Long? get() {
+        checkHostThread()
+        val properties = RachelSDL_GetWindowProperties(window)
+        val win32 = SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WIN32_HWND_POINTER, null)
+        if (win32 != null) return win32.rawValue.toLong()
+        val cocoa = SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, null)
+        if (cocoa != null) return cocoa.rawValue.toLong()
+        val x11 = SDL_GetNumberProperty(properties, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0L)
+        if (x11 != 0L) return x11
+        return SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, null)?.rawValue?.toLong()
+    }
+
+    override val displayHandle: Long? get() {
+        checkHostThread()
+        val properties = RachelSDL_GetWindowProperties(window)
+        val display = SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, null)
+            ?: SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, null)
+        return display?.rawValue?.toLong()
+    }
+
+    override val isPositionSupported: Boolean get() {
+        checkHostThread()
+        return SDL_GetCurrentVideoDriver()?.toKString() != "wayland"
     }
 
     override fun invalidate() {
@@ -91,6 +129,12 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
         checkHostThread()
         require(width in 1 .. 16384 && height in 1 .. 16384 && width.toLong() * height <= 67108864)
         check(RachelSDL_SetWindowSize(window, width, height)) { SDL_GetError()?.toKString() ?: "Unable to resize window" }
+    }
+
+    override fun setPosition(x: Int, y: Int): Boolean {
+        checkHostThread()
+        if (!isPositionSupported) return false
+        return RachelSDL_SetWindowPosition(window, x, y)
     }
 
     override fun setTitle(title: String) {
@@ -161,6 +205,11 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
             if (flags and SDL_WINDOW_MAXIMIZED == 0uL || flags and SDL_WINDOW_MINIMIZED != 0uL) check(RachelSDL_MaximizeWindow(window)) { SDL_GetError()?.toKString() ?: "Unable to maximize window" }
         }
         else if (flags and SDL_WINDOW_MAXIMIZED != 0uL) check(RachelSDL_RestoreWindow(window)) { SDL_GetError()?.toKString() ?: "Unable to restore window" }
+    }
+
+    override fun setFullscreen(fullscreen: Boolean) {
+        checkHostThread()
+        check(RachelSDL_SetFullscreen(window, fullscreen)) { SDL_GetError()?.toKString() ?: "Unable to change window fullscreen state" }
     }
 
     override fun setDropTarget(target: NativeWindowDropTarget?) {

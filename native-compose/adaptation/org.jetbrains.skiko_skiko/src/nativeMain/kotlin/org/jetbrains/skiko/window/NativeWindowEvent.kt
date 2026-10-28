@@ -4,7 +4,7 @@ sealed interface NativeWindowEvent {
     data object CloseRequested : NativeWindowEvent
     data object Wake : NativeWindowEvent
     data class WindowStateChanged(val kind: Kind) : NativeWindowEvent {
-        enum class Kind { Size, Placement, Visibility }
+        enum class Kind { Size, Placement, Visibility, Position }
     }
     data class Focus(val focused: Boolean) : NativeWindowEvent
     data object EnvironmentChanged : NativeWindowEvent

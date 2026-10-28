@@ -8,11 +8,14 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.registerSkikoComposeImplementation
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.NativeWindow
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowPosition
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import love.yinlin.coroutines.Coroutines
@@ -38,6 +41,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun BeginContent() {}
 
+    protected open val commandArgs: Array<String> = []
+
     protected open val title: String = ""
 
     protected open val icon: DrawableResource? = null
@@ -45,6 +50,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open val initSize: DpSize = DpSize(1200.dp, 700.dp)
 
     protected open val minSize: DpSize = DpSize(360.dp, 640.dp)
+
+    protected open val initPosition: WindowPosition = WindowPosition.Aligned(Alignment.Center)
+
+    protected open val initPlacement: WindowPlacement = WindowPlacement.Floating
 
     protected open val transparent: Boolean = true
 
@@ -56,7 +65,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
 
     val controller by lazy {
-        WindowController(initSize = initSize, initTitle = title, initIcon = icon, initRoundedCorner = roundedCorner, initUndecorated = undecorated, minSize = minSize)
+        WindowController(initSize = initSize, initTitle = title, initIcon = icon, initRoundedCorner = roundedCorner, initUndecorated = undecorated, minSize = minSize, placement = initPlacement, position = initPosition)
     }
 
     private val windowStarter = LaunchFlag()
@@ -91,9 +100,17 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 onMainWindowClose()
                 true
             },
-            onOpen = controller::attach,
+            onOpen = { window ->
+                controller.attach(window)
+                windowHandle = window.windowHandle
+                displayHandle = window.displayHandle
+            },
             onEvent = controller::onEvent,
-            onClose = controller::detach,
+            onClose = {
+                windowHandle = null
+                displayHandle = null
+                controller.detach()
+            },
         ) {
             LaunchedEffect(Unit) {
                 windowStarter { initPoolLater(this) }
@@ -101,7 +118,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
             val useRoundedCorner = transparent && controller.undecorated && !controller.maximize && controller.roundedCorner
             val borderShape = if (useRoundedCorner) Theme.shape.v1 else Theme.shape.rectangle
-            val windowModifier = if (controller.undecorated) {
+            val windowModifier = if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
                 Modifier.fillMaxSize().clip(borderShape).border(Theme.border.v10 / 2, Theme.color.outline.copy(alpha = 0.5f), borderShape)
             }
             else Modifier.fillMaxSize()
@@ -110,7 +127,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 controller.BindIcon()
                 controller.BindTray()
                 Column(modifier = Modifier.fillMaxSize()) {
-                    if (controller.undecorated) {
+                    if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
                         Box(modifier = Modifier.fillMaxWidth().windowDragArea(controller)) {
                             TopBar(controller, onMainWindowClose)
                         }

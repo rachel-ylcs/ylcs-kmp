@@ -15,7 +15,9 @@ internal class SdlWindowEvents(private val window: COpaquePointer, private val w
             wakeEventType -> send(NativeWindowEvent.Wake)
             SDL_EVENT_QUIT, SDL_EVENT_WINDOW_CLOSE_REQUESTED -> send(NativeWindowEvent.CloseRequested)
             SDL_EVENT_WINDOW_RESIZED, SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Size))
-            SDL_EVENT_WINDOW_MINIMIZED, SDL_EVENT_WINDOW_MAXIMIZED, SDL_EVENT_WINDOW_RESTORED -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Placement))
+            SDL_EVENT_WINDOW_MOVED -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Position))
+            SDL_EVENT_WINDOW_MINIMIZED, SDL_EVENT_WINDOW_MAXIMIZED, SDL_EVENT_WINDOW_RESTORED,
+            SDL_EVENT_WINDOW_ENTER_FULLSCREEN, SDL_EVENT_WINDOW_LEAVE_FULLSCREEN -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Placement))
             SDL_EVENT_WINDOW_SHOWN, SDL_EVENT_WINDOW_HIDDEN -> send(NativeWindowEvent.WindowStateChanged(NativeWindowEvent.WindowStateChanged.Kind.Visibility))
             SDL_EVENT_WINDOW_FOCUS_GAINED -> send(NativeWindowEvent.Focus(true))
             SDL_EVENT_SYSTEM_THEME_CHANGED, SDL_EVENT_LOCALE_CHANGED, SDL_EVENT_WINDOW_DISPLAY_CHANGED,
