@@ -27,8 +27,12 @@ internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable 
 
     val context: CoroutineContext get() = this + job
 
+    fun isDispatchThread(): Boolean = getCurrentThreadId() == ownerThread && !closed && !closing
+
     fun claim(): NativeUiDispatcher {
+        check(isDispatchThread()) { "Claim the Native UI dispatcher on its host thread" }
         check(!closed && !closing && !claimed) { "A Native Compose window already owns this host thread" }
+        nativeMainDispatcher?.attach(this)
         claimed = true
         return this
     }
@@ -96,6 +100,7 @@ internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable 
         }
         finally {
             synchronized(lock) { closed = true }
+            nativeMainDispatcher?.detach(this)
             wake = {}
             if (currentNativeUiDispatcher === this) currentNativeUiDispatcher = null
         }

@@ -107,4 +107,6 @@ Release 链接后自动分离符号，桥插件与 Rachel 的 `nativeExecutable`
 
 `NativeWindow` 在创建场景前自动调用 `registerSkikoComposeImplementation()`，注册 Skiko 图形和文本后端。若自行管理底层 Compose 场景，或在窗口创建前使用 `Path()`、`ImageBitmap()`、文本排版等后端 API，需要在首次使用前完成注册。
 
+Windows/Linux 的 UI 工件在应用启动时自动注册 `Dispatchers.Main`，窗口创建后将任务投递到同一个 Native UI 事件队列；`MainScope()`、`Dispatchers.Main.immediate` 和 Rachel 的 `Coroutines.main` 无需额外初始化。窗口启动前可以创建作用域、提交任务，任务会等待窗口事件循环开始；后台切回 Main、延迟和超时恢复均返回 UI 线程。关闭窗口后新的 Main 任务会被取消，重新打开窗口会接入新的 UI 队列；应用自行创建的作用域仍由应用负责取消。macOS 保留 coroutines 的系统主队列。此接入使用 coroutines `1.11.0` 的 Native 内部注入接口，上游升级时需保留调度器回归检查。
+
 框架库沿用自身 Maven group/GAV，发布 KMP root 及启用的 Native target publication。JVM、Android 等用户按普通方式依赖；Native 用户应用匹配版本的桥插件。公开 Compose 类型按模块 API 导出规则声明，保持消费者可见的依赖完整。
