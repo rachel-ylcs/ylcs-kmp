@@ -10,6 +10,7 @@ on:
       - 'native-compose/verification/**'
       - 'native-compose/build.gradle.kts'
       - 'build-logic/native-bridge/**'
+      - 'build-logic/native-binaries/**'
       - 'build-logic/repository-conventions/**'
       - 'build-logic/public-plugin/**'
       - 'build-logic/settings.gradle.kts'
@@ -31,6 +32,7 @@ on:
       - 'native-compose/verification/**'
       - 'native-compose/build.gradle.kts'
       - 'build-logic/native-bridge/**'
+      - 'build-logic/native-binaries/**'
       - 'build-logic/repository-conventions/**'
       - 'build-logic/public-plugin/**'
       - 'build-logic/settings.gradle.kts'
@@ -75,6 +77,7 @@ jobs:
               - 'native-compose/verification/**'
               - 'native-compose/build.gradle.kts'
               - 'build-logic/native-bridge/**'
+              - 'build-logic/native-binaries/**'
               - 'build-logic/repository-conventions/**'
               - 'build-logic/public-plugin/**'
               - 'build-logic/settings.gradle.kts'
@@ -246,6 +249,7 @@ jobs:
             native-compose/vendor/skiko/workspace/skiko/skiko-skottie/build/test-results/
             build-logic/native-bridge/build/test-results/
             build-logic/native-bridge/build/reports/tests/
+            build-logic/public-plugin/build/test-results/
             build-logic/repository-conventions/build/test-results/
             build/native-ci/
             build/reports/profile/

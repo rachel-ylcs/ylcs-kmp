@@ -1,5 +1,6 @@
 package love.yinlin.gradle
 
+import love.yinlin.nativebinary.NativeReleaseSymbols
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
@@ -39,5 +40,6 @@ open class KotlinNativeExecutableTemplate : KotlinNativeTemplate() {
         }
 
         native()
+        NativeReleaseSymbols.configure(project, this)
     }
 }

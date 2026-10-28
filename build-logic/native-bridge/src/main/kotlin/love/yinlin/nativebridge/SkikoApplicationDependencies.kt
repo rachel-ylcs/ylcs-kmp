@@ -18,15 +18,13 @@ internal object SkikoApplicationDependencies {
     private fun configureSkiko(project: Project, application: NativeApplicationExtension, bridge: NativeBridgeExtension, nativeRoot: File?) {
         if (nativeRoot != null) {
             for (target in NativeRuntimeAttributes.artifactSuffixes.keys) application.runtime(target) {
-                files.from(nativeRoot.resolve("vendor/icu/workspace/icudtl.dat"))
-                files.from(nativeRoot.resolve("vendor/icu/workspace/icu-LICENSE.txt"))
+                files.from(nativeRoot.resolve("vendor/icu/workspace/text/icudtl.dat"))
             }
         }
         else {
             val module = bridge.redirects.getByName("skiko-core").module.get().split(':')
             for ((target, suffix) in NativeRuntimeAttributes.artifactSuffixes) application.runtime(target) {
-                artifacts.put("${module[0]}:${module[1]}-$suffix:${module[2]}:icudtl@dat", "icudtl.dat")
-                artifacts.put("${module[0]}:${module[1]}-$suffix:${module[2]}:icu-license@txt", "icu-LICENSE.txt")
+                artifacts.put("${module[0]}:${module[1]}-$suffix:${module[2]}:icudtl-text@dat", "icudtl.dat")
             }
         }
     }

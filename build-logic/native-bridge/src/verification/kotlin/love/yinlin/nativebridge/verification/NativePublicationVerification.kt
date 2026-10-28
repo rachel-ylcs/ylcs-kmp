@@ -137,6 +137,9 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
                 val icu = native.resolve("$artifact-$suffix-$version-icudtl.dat")
                 val expectedIcu = nativeDirectory.resolve("upstream/icu.json").readJson()["data"].jsonObject()["sha256"]
                 check(icu.isFile && icu.digest("SHA-256") == expectedIcu) { "Complete ICU locale data is missing or has the wrong version: $icu" }
+                val textIcu = native.resolve("$artifact-$suffix-$version-icudtl-text.dat")
+                val expectedTextIcu = nativeDirectory.resolve("upstream/icu.json").readJson()["runtime"].jsonObject()["sha256"]
+                check(textIcu.isFile && textIcu.digest("SHA-256") == expectedTextIcu) { "JetBrains text ICU data is missing or has the wrong version: $textIcu" }
                 val license = native.resolve("$artifact-$suffix-$version-icu-license.txt")
                 check(license.isFile && license.digest("SHA-256") == nativeDirectory.resolve("upstream/icu.json").readJson()["licenseSha256"]) { "ICU data license is missing: $license" }
                 if (target == "linux_x64") for (system in listOf("fontconfig", "GL", "dl")) check(exportedOptions.any { "-l$system" in it }) { "Linux $system link dependency is missing" }

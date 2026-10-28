@@ -391,6 +391,48 @@ class NativeBridgeFunctionalTest {
     }
 
     @Test
+    fun applicationsUseTextIcuWithoutCopyingTheSourceLicense() {
+        for (sourceBuild in listOf(false, true)) {
+            val directory = project()
+            if (sourceBuild) {
+                directory.resolve("settings.gradle.kts").appendText("gradle.extensions.extraProperties.set(\"love.yinlin.nativeCompose.root\", file(\"native-compose\"))\n")
+                val data = directory.resolve("native-compose/vendor/icu/workspace").apply { mkdirs() }
+                data.resolve("icudtl.dat").writeText("complete locale data")
+                data.resolve("icu-LICENSE.txt").writeText("source license")
+                data.resolve("text/icudtl.dat").apply {
+                    parentFile.mkdirs()
+                    writeText("JetBrains text data")
+                }
+            }
+            consumer(directory, "mingwX64(\"windows\"); linuxX64(\"linux\"); macosArm64(\"macos\")", extra = """
+                nativeApplication {
+                    enabled.set(true)
+                    skikoRuntime()
+                }
+                tasks.register("verifyApplicationIcu") {
+                    doLast {
+                        check(nativeApplication.runtimes.size == 3)
+                        nativeApplication.runtimes.forEach { runtime ->
+                            if ($sourceBuild) {
+                                check(runtime.files.singleFile.readText() == "JetBrains text data")
+                                check(runtime.artifacts.get().isEmpty())
+                            }
+                            else {
+                                check(runtime.files.isEmpty)
+                                val artifact = runtime.artifacts.get().entries.single()
+                                check(artifact.key.endsWith(":icudtl-text@dat"))
+                                check(artifact.value == "icudtl.dat")
+                            }
+                        }
+                        println("APPLICATION_TEXT_ICU_VERIFIED")
+                    }
+                }
+            """.trimIndent())
+            assertContains(runner(directory, "verifyApplicationIcu").build().output, "APPLICATION_TEXT_ICU_VERIFIED")
+        }
+    }
+
+    @Test
     fun skikoTestsStageOnlyHostDataAndKeepLibraryBinariesUntouched() {
         val project = project()
         val compatibility = Properties().apply {
@@ -860,6 +902,77 @@ class NativeBridgeFunctionalTest {
     }
 
     @Test
+    fun standaloneNativeTemplatesSeparateSymbolsWithoutTheComposeBridge() {
+        val project = project()
+        val windows = HostManager.host.name == "mingw_x64"
+        val macos = HostManager.host.name.startsWith("macos_")
+        val target = if (windows) "windows" else if (macos) "macos" else "linux"
+        val classpath = System.getProperty("native.tests.rachelClasspath").split(File.pathSeparator).map(::File)
+        project.resolve("settings.gradle.kts").appendText("include(\"application\", \"library\")\n")
+        for (module in listOf("application", "library")) {
+            val directory = project.resolve(module).apply { mkdirs() }
+            val template = if (module == "application") "nativeExecutable" else "nativeLibrary"
+            val binary = if (module == "application") "executable" else "sharedLib"
+            directory.resolve("build.gradle.kts").writeText("""
+                import love.yinlin.gradle.*
+                plugins { id("love.yinlin.rachel") }
+                repositories { mavenCentral() }
+                rachel {
+                    $template {
+                        ${target}Target = true
+                        $binary { baseName = "symbol-probe" }
+                    }
+                }
+            """.trimIndent())
+            val source = directory.resolve("src/nativeMain/kotlin/Probe.kt").apply { parentFile.mkdirs() }
+            source.writeText(if (module == "application") """
+                fun main() {
+                    Exception("NATIVE_TEMPLATE_STACKTRACE").printStackTrace()
+                    println("NATIVE_TEMPLATE_ALIVE")
+                }
+            """.trimIndent() else """
+                @OptIn(kotlin.experimental.ExperimentalNativeApi::class)
+                @kotlin.native.CName("probe_symbols")
+                fun probe(value: Int): Int = value + 1
+            """.trimIndent())
+        }
+        val suffix = target.replaceFirstChar(Char::uppercase)
+        val arguments = listOf(":application:linkDebugExecutable$suffix", ":application:linkReleaseExecutable$suffix", ":library:linkReleaseShared$suffix")
+        runner(project, *arguments.toTypedArray()).withPluginClasspath(classpath).build()
+        val application = project.resolve("application/build/bin/$target/releaseExecutable/" + if (windows) "symbol-probe.exe" else "symbol-probe.kexe")
+        val process = ProcessBuilder(application.absolutePath).redirectErrorStream(true).start()
+        val text = process.inputStream.bufferedReader().use { it.readText() }
+        assertEquals(0, process.waitFor(), text)
+        assertContains(text, "NATIVE_TEMPLATE_STACKTRACE")
+        assertContains(text, "NATIVE_TEMPLATE_ALIVE")
+        val library = project.resolve("library/build/bin/$target/releaseShared/" + if (windows) "symbol_probe.dll" else if (macos) "libsymbol_probe.dylib" else "libsymbol_probe.so")
+        for ((module, binary) in listOf("application" to "releaseExecutable", "library" to "releaseShared")) {
+            val symbols = project.resolve("$module/build/nativeSymbols/$target/$binary")
+            assertTrue(symbols.resolve("symbols.properties").isFile)
+            assertTrue(symbols.walkTopDown().any { it.isFile && it.name != "symbols.properties" })
+            assertFalse(project.resolve("$module/build/nativeSymbols/$target/debugExecutable").exists())
+        }
+        val debug = project.resolve("application/build/bin/$target/debugExecutable/" + if (windows) "symbol-probe.exe" else "symbol-probe.kexe")
+        val debugBefore = debug.readBytes()
+        val repeated = runner(project, *arguments.toTypedArray()).withPluginClasspath(classpath).build()
+        assertContains(repeated.output, ":application:linkReleaseExecutable$suffix UP-TO-DATE")
+        assertTrue(debugBefore.contentEquals(debug.readBytes()), "Release processing changed Debug")
+        // The same tooling is embedded in both plugins. Co-application must not strip/archive twice.
+        val metadata = Properties().apply { NativeBridgeFunctionalTest::class.java.getResourceAsStream("/plugin-under-test-metadata.properties")!!.use { load(it) } }
+        val bridgeClasspath = metadata.getProperty("implementation-classpath").split(File.pathSeparator).map(::File)
+        for (module in listOf("application", "library")) project.resolve("$module/build.gradle.kts").appendText("\napply(plugin = \"love.yinlin.native-bridge\")\n")
+        val combined = runner(project, *arguments.toTypedArray()).withPluginClasspath((classpath + bridgeClasspath).distinct()).build()
+        assertEquals(2, combined.output.lineSequence().count { it.startsWith("Release symbols:") })
+        // Kotlin/Native owns runtime threads in this DLL. Keep it loaded for the lifetime of its host process.
+        val java = File(System.getProperty("java.home"), "bin/" + if (windows) "java.exe" else "java")
+        val probeClasspath = listOf(NativeLibraryExportProbe::class.java, Unit::class.java).map { File(it.protectionDomain.codeSource.location.toURI()).path }.distinct().joinToString(File.pathSeparator)
+        val probe = ProcessBuilder(java.path, "--enable-native-access=ALL-UNNAMED", "-cp", probeClasspath, NativeLibraryExportProbe::class.java.name, library.path).redirectErrorStream(true).start()
+        val probeOutput = probe.inputStream.bufferedReader().use { it.readText() }
+        assertEquals(0, probe.waitFor(), probeOutput)
+        assertContains(probeOutput, "NATIVE_EXPORTED_RESULT=42")
+    }
+
+    @Test
     fun hostComposeTasksRunBothBuildTypesAndPrepareAnUnpackedApplication() {
         val project = project()
         val windows = System.getProperty("os.name").startsWith("Windows")
@@ -906,12 +1019,19 @@ class NativeBridgeFunctionalTest {
             @OptIn(ExperimentalForeignApi::class)
             fun main() {
                 check(GetConsoleWindow() == null) { "A graphical desktop application must not attach a console" }
+                Exception("NATIVE_STACKTRACE_SURVIVED").printStackTrace()
                 println("COMPOSE_HOST_ALIAS_EXECUTED")
             }
-        """.trimIndent() else "fun main() { println(\"COMPOSE_HOST_ALIAS_EXECUTED\") }\n")
+        """.trimIndent() else """
+            fun main() {
+                Exception("NATIVE_STACKTRACE_SURVIVED").printStackTrace()
+                println("COMPOSE_HOST_ALIAS_EXECUTED")
+            }
+        """.trimIndent())
         val result = runner(project, "composeRun", "composeReleaseRun", "composeDistribution", "verifyPackagingScope").build()
         assertContains(result.output, "DESKTOP_NATIVE_PACKAGING_SCOPE_OK")
-        assertEquals(2, result.output.lineSequence().count { it == "COMPOSE_HOST_ALIAS_EXECUTED" })
+        assertEquals(2, Regex("COMPOSE_HOST_ALIAS_EXECUTED").findAll(result.output).count())
+        assertContains(result.output, "NATIVE_STACKTRACE_SURVIVED")
         val distribution = project.resolve("build/nativeApplication/arbitraryHostName/releaseExecutable")
         val executable = if (macos) distribution.resolve("NativeProbe.app/Contents/MacOS/native-probe.kexe") else distribution.resolve(if (windows) "native-probe.exe" else "native-probe.kexe")
         assertTrue(executable.isFile)
@@ -920,6 +1040,13 @@ class NativeBridgeFunctionalTest {
         assertFalse(distribution.resolve("application-icon.png").exists())
         if (macos) assertContains(distribution.resolve("NativeProbe.app/Contents/Info.plist").readText(), "Fixture Author")
         assertFalse(project.resolve("build/distributions").exists())
+        val symbols = project.resolve("build/nativeSymbols/arbitraryHostName/releaseExecutable")
+        assertTrue(symbols.resolve("symbols.properties").isFile)
+        assertTrue(symbols.walkTopDown().any { it.isFile && it.name != "symbols.properties" })
+        assertFalse(project.resolve("build/nativeSymbols/arbitraryHostName/debugExecutable").exists())
+        assertTrue(distribution.walkTopDown().none { it.extension in setOf("debug", "unstripped", "dSYM", "pdb") || it.name == "symbols.properties" })
+        val repeated = runner(project, "composeDistribution").build()
+        assertContains(repeated.output, ":linkReleaseExecutableArbitraryHostName UP-TO-DATE")
         if (windows) {
             for (buildType in listOf("debug", "release")) {
                 for (directory in listOf("bin", "nativeApplication")) {
@@ -928,6 +1055,11 @@ class NativeBridgeFunctionalTest {
                     val header = pe.getInt(0x3c)
                     assertEquals(0x4550, pe.getInt(header), executable.path)
                     assertEquals(2, pe.getShort(header + 24 + 68).toInt(), "Windows GUI subsystem: ${executable.path}")
+                    if (buildType == "release") {
+                        assertEquals(0, pe.getInt(header + 12), "Stripped COFF pointer: ${executable.path}")
+                        assertEquals(0, pe.getInt(header + 16), "Stripped COFF count: ${executable.path}")
+                    }
+                    else assertTrue(pe.getInt(header + 16) > 0, "Debug symbols must remain: ${executable.path}")
                 }
             }
             val info = ProcessBuilder("powershell.exe", "-NoProfile", "-NonInteractive", "-Command", "(Get-Item -LiteralPath '" + distribution.resolve("native-probe.exe").absolutePath.replace("'", "''") + "').VersionInfo | Select-Object -ExpandProperty ProductName").redirectErrorStream(true).start()

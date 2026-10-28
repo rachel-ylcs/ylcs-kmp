@@ -33,6 +33,9 @@ dependencies {
 
 kotlin {
     jvmToolchain(25)
+    // Embed the shared binary tooling so plain Native projects do not need the Compose bridge.
+    sourceSets.main { kotlin.srcDir("../native-binaries/src/main/kotlin") }
+    sourceSets.test { kotlin.srcDir("../native-binaries/src/test/kotlin") }
 }
 
 val bootstrapJar = tasks.register<Jar>("bootstrapJar") {

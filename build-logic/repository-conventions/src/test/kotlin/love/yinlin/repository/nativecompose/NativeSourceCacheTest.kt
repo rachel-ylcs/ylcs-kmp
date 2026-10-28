@@ -68,6 +68,10 @@ class NativeSourceCacheTest {
             }
             for (root in listOf("skiko/workspace", "compose/workspace", "resources/workspace", "maven/workspace", "maven/states", "icu/workspace")) vendor.resolve(root).mkdirs()
             vendor.resolve("icu/workspace/icudtl.dat").writeText("locale data")
+            vendor.resolve("icu/workspace/text/icudtl.dat").apply {
+                parentFile.mkdirs()
+                writeText("text data")
+            }
             vendor.resolve("compose/workspace/src/A.kt").apply {
                 parentFile.mkdirs()
                 writeText("source")
@@ -91,6 +95,7 @@ class NativeSourceCacheTest {
                 val names = zip.entries().asSequence().map { it.name }.toSet()
                 assertTrue("compose/workspace/src/A.kt" in names && "compose/workspace/.git/HEAD" in names)
                 assertTrue("icu/workspace/icudtl.dat" in names)
+                assertTrue("icu/workspace/text/icudtl.dat" in names)
                 assertTrue("sdl-source-3.4.18/include/SDL3/SDL.h" in names)
                 assertFalse(names.any { "/build/" in it || "/dependencies/" in it })
             }
@@ -101,6 +106,7 @@ class NativeSourceCacheTest {
             assertEquals("source", vendor.resolve("compose/workspace/src/A.kt").readText())
             assertEquals("locked commit", vendor.resolve("compose/workspace/.git/HEAD").readText())
             assertEquals("locale data", vendor.resolve("icu/workspace/icudtl.dat").readText())
+            assertEquals("text data", vendor.resolve("icu/workspace/text/icudtl.dat").readText())
             assertEquals("SDL source header", vendor.resolve("sdl-source-3.4.18/include/SDL3/SDL.h").readText())
         } finally { assertTrue(work.deleteRecursively()) }
     }

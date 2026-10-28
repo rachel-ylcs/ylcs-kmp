@@ -66,6 +66,7 @@ class NativeUpstreamSync(directory: File) {
         check(lock["skia"] == skiko["skia"]) { "Review the ICU data version when changing the Skia SDK" }
         val source = lock["source"].sourceObject()
         val data = lock["data"].sourceObject()
+        val runtime = lock["runtime"].sourceObject()
         val owner = vendor.resolve("icu")
         workspace.locked(owner) {
             val archive = owner.resolve("icu-data.zip")
@@ -73,18 +74,29 @@ class NativeUpstreamSync(directory: File) {
             val marker = build.resolve(".rachel-prepared.json")
             val fingerprint = bytesHash(sourceBytes(mapOf("lock" to lock, "inputs" to inputHashes())))
             val previous = if (marker.isFile) marker.sourceJson() else emptyMap()
-            if (previous["fingerprint"] != fingerprint || !build.resolve("icudtl.dat").isFile || !build.resolve("icu-LICENSE.txt").isFile) stage(".icu-data-") { staging ->
+            if (previous["fingerprint"] != fingerprint || !build.resolve("icudtl.dat").isFile || !build.resolve("text/icudtl.dat").isFile || !build.resolve("icu-LICENSE.txt").isFile) stage(".icu-data-") { staging ->
                 downloadSource(source["url"] as String, archive, source["sha256"] as String, offline, 64L * 1024 * 1024)
                 SourceArchive.extract(archive, staging, false)
                 val input = staging.resolve(sourceRelativePath(data["file"] as String))
                 check(input.sourceHash() == data["sha256"] && staging.resolve("LICENSE").sourceHash() == lock["licenseSha256"]) { "ICU data/license checksum mismatch" }
                 Files.move(input.toPath(), staging.resolve("icudtl.dat").toPath())
                 Files.move(staging.resolve("LICENSE").toPath(), staging.resolve("icu-LICENSE.txt").toPath())
+                // ICU data is platform-independent on the three little-endian desktop targets.
+                // The pinned Windows SDK carries the external data file; Apple/Linux embed it.
+                val key = runtime["archive"] as String
+                val sdkHash = skiko["skiaAssets"].sourceObject().getValue(key) as String
+                val sdk = vendor.resolve("skiko/skia/$sdkHash.zip")
+                downloadSource("https://github.com/JetBrains/skia/releases/download/${skiko["skia"]}/Skia-${skiko["skia"]}-$key.zip", sdk, sdkHash, offline, 1024L * 1024 * 1024)
+                val selected = SourceArchive.extract(sdk, staging, false) { relative ->
+                    if (relative == runtime["entry"]) "text/icudtl.dat" else null
+                }
+                check(selected["text/icudtl.dat"] == runtime["sha256"]) { "JetBrains text ICU data differs from its lock" }
                 workspace.synchronize(staging, build, marker, mapOf("schema" to 3, "fingerprint" to fingerprint, "version" to lock["version"]))
             }
             check(build.resolve("icudtl.dat").sourceHash() == data["sha256"]) { "Prepared ICU data differs from its lock" }
             check(build.resolve("icu-LICENSE.txt").sourceHash() == lock["licenseSha256"]) { "Prepared ICU license differs from its lock" }
-            println("Prepared complete ICU ${lock["version"]} locale data")
+            check(build.resolve("text/icudtl.dat").sourceHash() == runtime["sha256"]) { "Prepared text ICU data differs from its lock" }
+            println("Prepared ICU ${lock["version"]}: JetBrains text runtime and complete locale test data")
         }
     }
 

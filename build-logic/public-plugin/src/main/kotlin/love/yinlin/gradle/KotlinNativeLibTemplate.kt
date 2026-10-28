@@ -1,5 +1,6 @@
 package love.yinlin.gradle
 
+import love.yinlin.nativebinary.NativeReleaseSymbols
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.SharedLibrary
 
@@ -34,5 +35,6 @@ open class KotlinNativeLibTemplate : KotlinNativeTemplate() {
         }
 
         native()
+        NativeReleaseSymbols.configure(project, this)
     }
 }

@@ -89,6 +89,10 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
         val targetPublication = name
         publishing.publications.withType<MavenPublication>().configureEach {
             if (name == targetPublication) {
+                artifact(nativeComposeDirectory.resolve("vendor/icu/workspace/text/icudtl.dat")) {
+                    classifier = "icudtl-text"
+                    extension = "dat"
+                }
                 artifact(nativeComposeDirectory.resolve("vendor/icu/workspace/icudtl.dat")) {
                     classifier = "icudtl"
                     extension = "dat"

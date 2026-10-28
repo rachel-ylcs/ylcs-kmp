@@ -11,7 +11,10 @@ plugins {
 group = "love.yinlin.native"
 version = libs.versions.rachel.get()
 
-kotlin { jvmToolchain(25) }
+kotlin {
+    jvmToolchain(25)
+    sourceSets.main { kotlin.srcDir("../native-binaries/src/main/kotlin") }
+}
 
 val settingsSource = sourceSets.create("settings")
 val verificationSource = sourceSets.create("verification")

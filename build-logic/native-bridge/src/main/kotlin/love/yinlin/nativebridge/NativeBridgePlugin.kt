@@ -1,5 +1,6 @@
 package love.yinlin.nativebridge
 
+import love.yinlin.nativebinary.NativeReleaseSymbols
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentSelector
@@ -15,6 +16,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.Executable
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinSharedNativeCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.konan.target.HostManager
 import java.util.Properties
 
@@ -50,6 +52,9 @@ class NativeBridgePlugin : Plugin<Project> {
         application.baseName.convention(project.name)
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             val kotlin = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+            kotlin.targets.withType(KotlinNativeTarget::class.java).configureEach {
+                NativeReleaseSymbols.configure(project, this)
+            }
             configureReport(project, kotlin, bridge)
             NativePortDependencyAudit.configure(project, kotlin, bridge) { sourceProperty(project, "source", it) as? ComponentSelector }
             configureRedirects(project, kotlin, bridge)
@@ -236,6 +241,7 @@ class NativeBridgePlugin : Plugin<Project> {
                 val resourceDirectory = NativeDesktopPackaging.resourceDirectory(desktop, target.konanTarget.name)
                 val executablePath = listOf(executableDirectory, binary.outputFile.name).filter { it.isNotEmpty() }.joinToString("/")
                 val composeResources = ComposeApplicationResources.register(project, target, binary, suffix)
+                val symbolRecord = if (binary.buildType == NativeBuildType.RELEASE) project.layout.buildDirectory.file("nativeSymbols/${target.name}/${binary.name}-distribution.properties") else null
                 val stage = project.tasks.register("stage$suffix", Sync::class.java) {
                     group = "native application"
                     description = "Stage ${target.konanTarget.name} ${binary.name} with its runtime files"
@@ -261,12 +267,17 @@ class NativeBridgePlugin : Plugin<Project> {
                     }
                     duplicatesStrategy = DuplicatesStrategy.FAIL
                     into(project.layout.buildDirectory.dir("nativeApplication/${target.name}/${binary.name}"))
+                    if (symbolRecord != null) outputs.file(symbolRecord).withPropertyName("packagedNativeBinaryIdentity")
                     doFirst {
                         require(HostManager.host == target.konanTarget) { "Stage and verify this executable on ${target.konanTarget.name}" }
                         val missing = runtime.files.files.filterNot { file -> file.exists() }
                         require(missing.isEmpty()) { "Missing native runtime files: ${missing.joinToString()}" }
                     }
-                    doLast { NativeDesktopPackaging.finish(destinationDir, destinationDir.resolve(executablePath), target.konanTarget.name, desktop) }
+                    doLast {
+                        val staged = destinationDir.resolve(executablePath)
+                        NativeDesktopPackaging.finish(destinationDir, staged, target.konanTarget.name, desktop)
+                        if (symbolRecord != null) NativeReleaseSymbols.recordDistribution(staged, symbolRecord.get().asFile)
+                    }
                 }
                 project.tasks.register("run$suffix", RunNativeApplication::class.java) {
                     group = "native application"

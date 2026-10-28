@@ -39,7 +39,9 @@
 
 Material3、Adaptive、Navigation3 使用官方 macOS sources JAR 中的真实共享实现；缺失 actual 由适配源码提供。日期和数字本地化共用 Skia ICU，macOS 的 `CalendarLocale` 保留 `NSLocale` 类型身份。
 
-Skia SDK 的 ICU 数据只包含文本排版所需的部分资源。完整日期和数字本地化数据由 `upstream/icu.json` 锁定，随三个目标的 Skiko publication 以 `icudtl@dat` 发布。桥插件将 `icudtl.dat` 和 `icu-LICENSE.txt` 复制到应用目录；库测试使用 `nativeBridge { skikoTests() }` 准备同一数据。Linux/macOS 首次使用日期服务时注册只读内存映射，Windows 使用 Skia 的数据加载器。
+应用默认分发 JetBrains Skia SDK 自带的约 3.72 MiB 裁剪版 ICU 数据，包含中英文文本边界规则、中日文词典及 Unicode 规范化等基础数据。`upstream/icu.json` 锁定源 SDK 和数据哈希；三个桌面目标共用同一份小端数据，以 `icudtl-text@dat` 随 Skiko publication 发布，桥插件在分发目录中将其命名为 `icudtl.dat`。应用分发目录不额外复制 ICU 许可证，适配源码也不单独维护许可证副本；上游归档及 Maven 许可来源保持原有管理方式。
+
+裁剪版不包含完整的各语言日期、数字、货币等本地化资源。完整 ICU 数据仍以 `icudtl@dat` 发布，`nativeBridge { skikoTests() }` 和移植维护测试使用完整数据，以验证 Material3 日期及数字本地化能力；需要这些能力的应用必须自行选用完整数据。Linux/macOS 首次使用日期服务时注册只读内存映射，Windows 使用 Skia 的数据加载器。
 
 `testHost` 执行当前宿主库测试；`publishHost` 输出到 `native-compose/vendor/build/repository`；`verifyHost` 校验 Maven 文件、校验和、目标、KLIB 身份、静态库、许可、依赖闭包及维护测试报告。缺失、失败或跳过的测试不能作为通过结果。
 
@@ -98,6 +100,8 @@ composeDesktopPackage {
 ```
 
 该配置与 JVM 的 `desktopPackage {}` 独立，同一模块可同时配置。`composeRun` 运行宿主 Debug，`composeReleaseRun` 运行 Release，`composeDistribution` 输出 `build/nativeApplication/<target>/releaseExecutable` 普通目录，包含 Compose 资源和平台运行数据。Windows 图标/版本信息嵌入 EXE；macOS 使用 `.app`、Info.plist 和 ICNS。自定义 `composePublish` 可消费此目录进行复制或 ZIP 打包。
+
+Release 链接后自动分离符号，桥插件与 Rachel 的 `nativeExecutable`、`nativeLibrary` 模板共用此处理；Debug 保持原样。链接输出和应用分发目录使用剥离后的 EXE、ELF 或动态库，符号归档在模块 `build/nativeSymbols/<target>/<binary>/`：Windows/Linux 为 `<binary>.debug`，macOS 为 `<binary>.unstripped` 及链接器已生成的 `.dSYM`。`symbols.properties` 记录剥离前后 SHA-256；旁边的 `<binary>-distribution.properties` 记录嵌入应用资源后最终分发文件的 SHA-256，用于匹配对应构建。macOS 剥离后重新进行 ad-hoc 签名。符号不会复制进分发目录。请在清理 `build` 前自行归档符号；普通 Release 未生成的 DWARF 行号信息不会凭空补齐，Windows 的 `.debug` 是 COFF 格式而非 PDB。Linux 使用 `objcopy`，Windows 使用 Kotlin/Native 已下载的 MinGW `objcopy`，特殊工具链可通过 `-Prachel.native.objcopy=/path/to/objcopy` 指定。
 
 `NativeWindow` 在创建场景前自动调用 `registerSkikoComposeImplementation()`，注册 Skiko 图形和文本后端。若自行管理底层 Compose 场景，或在窗口创建前使用 `Path()`、`ImageBitmap()`、文本排版等后端 API，需要在首次使用前完成注册。
 
