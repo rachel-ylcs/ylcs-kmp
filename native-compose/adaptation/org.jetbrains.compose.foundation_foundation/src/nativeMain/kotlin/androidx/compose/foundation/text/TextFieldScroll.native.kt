@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 @Composable
 internal actual fun rememberTextFieldOverscrollEffect(): OverscrollEffect? = null
 
+@Suppress("DEPRECATION")
 internal actual fun Modifier.textFieldScroll(
     scrollerPosition: TextFieldScrollerPosition,
     textFieldValue: TextFieldValue,

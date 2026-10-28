@@ -24,6 +24,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.OffsetMapping
 
 @Composable
+@Suppress("DEPRECATION")
 internal actual fun Modifier.textFieldPointer(
     manager: TextFieldSelectionManager,
     enabled: Boolean,
