@@ -88,6 +88,81 @@ implementation("love.yinlin.compose:app:x.x.x")
 | ![rachel](ylcs-docs/docs/assets/ui/collection.png)  | ![rachel](ylcs-docs/docs/assets/ui/calendar.png) |
 
 
+# 全平台模块支持
+
+下表按目录层级列出 `ylcs-module` 中的全部模块。`✅` 表示支持该 target，`➖` 表示未启用该 target，或该平台仅有空实现、占位实现。模块内部分功能的平台差异见用途栏。构建工具在 Gradle 中运行，不具有应用运行 target。支持 target 不等同于所有 API 均已通过该平台的运行验证。
+
+| 模块层级（相对 `ylcs-module/`） | Android | iOS | Desktop JVM | WasmJS | JS | Native Windows | Native Linux | Native macOS | 模块用途 |
+| --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | --- |
+| [`├─ build-tool`](ylcs-module/build-tool) | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 聚合各平台库测试任务；无应用运行 target |
+| [`├─ dokka`](ylcs-module/dokka) | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 聚合模块 API 并生成 Dokka 站点；无应用运行 target |
+| [`├─ core`](ylcs-module/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 平台识别、协程、序列化、集合、编码与字节操作 |
+| **`├─ foundation/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  ├─ context`](ylcs-module/foundation/context) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 平台基础上下文与宿主能力提供者 |
+| [`│  ├─ filesystem`](ylcs-module/foundation/filesystem) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 文件、流、平台目录与隐式文件 URI |
+| [`│  ├─ network`](ylcs-module/foundation/network) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Ktor HTTP、下载与文本 WebSocket |
+| [`│  ├─ startup`](ylcs-module/foundation/startup) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 启动服务依赖图、初始化与销毁 |
+| [`│  ├─ compression`](ylcs-module/foundation/compression) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | RLE、LZ4、Snappy、Deflate、Zlib、Gzip 编解码 |
+| [`│  ├─ cryptography`](ylcs-module/foundation/cryptography) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 摘要、对称加密与相关编码工具 |
+| [`│  ├─ fts`](ylcs-module/foundation/fts) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 多字段全文、前缀、整词与模糊检索 |
+| **`│  ├─ parser/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  │  ├─ arguments`](ylcs-module/foundation/parser/arguments) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 命令行参数解析与类型化读取 |
+| [`│  │  ├─ lrc`](ylcs-module/foundation/parser/lrc) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | LRC 歌词、时间戳与元数据读写 |
+| [`│  │  ├─ markdown`](ylcs-module/foundation/parser/markdown) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Markdown 语法树、DSL、解析与写入 |
+| [`│  │  ├─ toml`](ylcs-module/foundation/parser/toml) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | TOML 文档模型、DSL、解析与写入 |
+| [`│  │  ├─ yaml`](ylcs-module/foundation/parser/yaml) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | YAML 文档模型、DSL、解析与写入 |
+| **`├─ compose/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  ├─ core`](ylcs-module/compose/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Compose 状态扩展、图形辅助与生命周期信号 |
+| [`│  ├─ theme`](ylcs-module/compose/theme) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 主题、排版、尺寸、安全区与设备布局分类 |
+| [`│  ├─ ui`](ylcs-module/compose/ui) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 基础布局、文本、输入、图像、动画与浮层 |
+| [`│  ├─ icons`](ylcs-module/compose/icons) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Compose 图标资源 |
+| [`│  ├─ platform-view`](ylcs-module/compose/platform-view) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Android View、Swing、UIKit、DOM 宿主；Native 仅公共状态层 |
+| [`│  ├─ screen`](ylcs-module/compose/screen) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Navigation 3 页面导航与 ViewModel 生命周期 |
+| [`│  ├─ cache`](ylcs-module/compose/cache) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 内存状态缓存与持久缓存抽象 |
+| [`│  ├─ app`](ylcs-module/compose/app) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 跨平台应用入口、主题与窗口生命周期 |
+| **`│  ├─ game/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  │  ├─ core`](ylcs-module/compose/game/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Compose 游戏引擎、实体、视口、事件与插件 |
+| **`│  ├─ startup/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  │  ├─ config`](ylcs-module/compose/startup/config) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | 基于 KV 的可观察持久配置 |
+| [`│  │  ├─ exception`](ylcs-module/compose/startup/exception) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 未处理异常收集与记录服务 |
+| [`│  │  ├─ mmkv-kmp`](ylcs-module/compose/startup/mmkv-kmp) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | 平台键值存储；移动端/桌面 MMKV 与 Web 存储适配 |
+| [`│  │  ├─ picker`](ylcs-module/compose/startup/picker) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | 文件、目录等平台选择器 |
+| **`│  ├─ components/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  │  ├─ image`](ylcs-module/compose/components/image) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 异步图片、动图、缩放、缓存与裁剪选区 |
+| [`│  │  ├─ blur`](ylcs-module/compose/components/blur) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 模糊与遮罩效果 |
+| [`│  │  ├─ calendar`](ylcs-module/compose/components/calendar) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 日历、农历与日期选择状态 |
+| [`│  │  ├─ data-table`](ylcs-module/compose/components/data-table) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 数据表格、排序、编辑与选择 |
+| [`│  │  ├─ drag-drop`](ylcs-module/compose/components/drag-drop) | ✅ | ➖ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 文本与文件拖放；iOS 当前为空实现 |
+| [`│  │  ├─ hexview`](ylcs-module/compose/components/hexview) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 十六进制数据查看 |
+| [`│  │  ├─ log-output`](ylcs-module/compose/components/log-output) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 日志输出与查看组件 |
+| [`│  │  ├─ lottie`](ylcs-module/compose/components/lottie) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Lottie 动画渲染 |
+| [`│  │  ├─ media`](ylcs-module/compose/components/media) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | 音频、音乐与视频；JVM Linux/macOS 视频后端为空实现 |
+| [`│  │  ├─ pagination-layout`](ylcs-module/compose/components/pagination-layout) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 分页数据状态与加载布局 |
+| [`│  │  ├─ qrcode`](ylcs-module/compose/components/qrcode) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 全 target 二维码生成；扫码仅 Android/iOS 实现 |
+| [`│  │  ├─ reordering`](ylcs-module/compose/components/reordering) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 拖动列表重排 |
+| [`│  │  ├─ rich-text`](ylcs-module/compose/components/rich-text) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 富文本解析、节点与渲染 |
+| [`│  │  ├─ webview`](ylcs-module/compose/components/webview) | ✅ | ✅ | ➖ | ✅ | ✅ | ➖ | ➖ | ➖ | Android/iOS/Web 网页视图；JVM 为占位实现 |
+| **`├─ cs/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  ├─ core`](ylcs-module/cs/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 共享 API、资源树、文件参数与 Socket 契约 |
+| [`│  ├─ client-engine`](ylcs-module/cs/client-engine) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 类型化 POST、multipart 请求与 Socket 客户端 |
+| [`│  ├─ server-engine`](ylcs-module/cs/server-engine) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ✅ | Ktor CIO 原生服务端、路由、上传与插件 |
+| [`│  ├─ server-service-mysql`](ylcs-module/cs/server-service-mysql) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ✅ | SQLx4k MySQL 连接池、查询与事务 |
+| [`│  ├─ server-service-redis`](ylcs-module/cs/server-service-redis) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ✅ | ReThis Redis 连接池与命令封装 |
+| **`├─ native/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| **`│  ├─ win32/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  │  ├─ core`](ylcs-module/native/win32/core) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ➖ | ➖ | Kotlin/Native Win32 基础封装 |
+| **`├─ platform/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  ├─ native-lib-loader`](ylcs-module/platform/native-lib-loader) | ✅ | ✅ | ✅ | ➖ | ➖ | ✅ | ✅ | ✅ | 动态库装载；Web 接口为空操作 |
+| **`│  ├─ ffi/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  │  ├─ core`](ylcs-module/platform/ffi/core) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | JDK Foreign Function & Memory API 基础封装 |
+| [`│  │  ├─ posix`](ylcs-module/platform/ffi/posix) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | JVM 调用 POSIX libc；仅适用于相应操作系统 |
+| [`│  │  ├─ win32`](ylcs-module/platform/ffi/win32) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | JVM 调用 Win32；仅适用于 Windows |
+| **`│  ├─ os/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | 模块分组 |
+| [`│  │  ├─ single-instance`](ylcs-module/platform/os/single-instance) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | JVM 桌面应用的操作系统单实例锁 |
+| [`│  │  ├─ window`](ylcs-module/platform/os/window) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | JVM 原生窗口鼠标穿透；Linux 当前为空实现 |
+
+平台声明和默认开关以各模块 `build.gradle.kts` 及 `build-logic/public-plugin` 模板为准。WasmJS 指浏览器 WebAssembly target；桌面 Native 分别为 `mingwX64("windows")`、`linuxX64("linux")`、`macosArm64("macos")`。iOS 包含 `iosArm64`，并在 Apple Silicon macOS 宿主上配置 `iosSimulatorArm64`；Android 当前 minSdk 为 28，打包 ABI 为 `arm64-v8a`。Compose Native 消费端需要匹配版本的 [Native Compose 桥插件](native-compose/README.md)；JVM FFI 模块不代表支持 Kotlin/Native。权限、系统服务及原生依赖要求仍以具体 API 为准。
+
 # 案例：银临茶舍跨平台 App
 
 > [!IMPORTANT]

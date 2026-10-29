@@ -52,9 +52,9 @@ class DemoSocketsManager(session: Any) : SocketsManager(session) {
 
 ## 退出路径
 
-正常结束后执行 `onClose()`，再以 NORMAL 原因关闭 socket。普通收包或处理异常先交给 `onError()`，随后继续上述路径。
+连接管理器成功创建后，收包循环由 `cleaning` 包围。正常结束、普通异常、取消或 `onError()` 抛错，均在 `finally` 中进入 `Coroutines.wait` 的不可取消清理上下文：先调用 `onClose()`，再通过嵌套 `finally` 尝试以 NORMAL 原因关闭 socket。即使 `onClose()` 抛错，底层关闭仍会尝试执行。
 
-取消异常由 `catchingError` 重新抛出；`onError` 与 `onClose` 本身抛错也可中断后续代码。当前循环不使用统一 `finally`，因此这些回调并非所有断开情况下均保证完成的资源清理机制。
+取消异常继续传播，不调用普通错误处理来代替取消。管理器 factory 在清理作用域建立前执行，构造失败不触发该管理器的 `onClose()`；构造过程中已经创建的资源需要自行处理。`onClose()` 和关闭 session 本身仍可能失败，业务回调应明确资源所有权。
 
 ## 鉴权与共享状态
 
@@ -65,6 +65,18 @@ HTTP 请求参数不会自动成为 Socket 鉴权上下文。业务应定义连�
 ## 客户端地址配合
 
 当前客户端辅助函数固定使用 WSS 443。部署端应将声明路径转发到原生服务端的本机监听端口。客户端具体限制见[客户端 WebSocket](../3_client/sockets.md)。
+
+## 业务中的 Socket 注册
+
+游戏接口注册函数为每条歌词游戏连接创建新的管理器：
+
+示例来源：[GameAPI.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/server/src/nativeMain/kotlin/love/yinlin/cs/GameAPI.kt#L153)。
+
+```kotlin
+LyricsSockets.connect { LyricsSocketsManager(mysql, AN, it) }
+```
+
+`mysql` 与 `AN` 是 `ServerScope` 的共享服务，`it` 是本次握手的 session。`LyricsSocketsManager` 处理登录、邀请与游戏消息；传输层不自动复用普通 HTTP 请求的鉴权。共享路径及消息 DTO 位于 `ylcs-app/cs` 的 `LyricsSockets.kt`。
 
 ## 源码入口
 

@@ -58,6 +58,7 @@ fun prepare() {
 
 - `rememberFocusWindowState()` 与 `FocusWindowEffect` 反映生命周期是否达到 `RESUMED`。
 - `rememberOffScreenWindowState()` 与 `OffScreenWindowEffect` 在 `START` 阶段给出 `true`，在停止或离开组合时给出 `false`。
+- 主窗口与独立窗口各自提供的 LifecycleOwner 决定观察范围；页面内读取时还需考虑 Navigation 条目的 Owner。
 
 `OffScreen` 系列名称不表示 `true` 对应离屏。应按实际值的语义判断可见期间的工作，并关注当前 LifecycleOwner 的归属。页面 `initialize`、策略回调 `resume` 与这些组合期生命周期信号具有不同用途，见[导航](../2_ui/navigation.md)。
 
@@ -83,6 +84,23 @@ fun prepare() {
 | 颜色、排版、尺寸与动画约定 | `compose:theme` |
 | 可交互组件与布局 | `compose:ui` |
 | 页面模型与导航 | `compose:screen` |
+
+## Gallery 中的状态声明
+
+图片外观示例使用状态委托分别保存整数选择、Boolean 开关与 Float 透明度。以下声明位于 `AppearanceExamples()` 的组合作用域中：
+
+示例来源：[ImagePage.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/gallery/src/commonMain/kotlin/love/yinlin/page/ImagePage.kt#L309)。
+
+```kotlin
+var quality by rememberValueState(1)
+var circular by rememberFalse()
+var tint by rememberFalse()
+var fadeIn by rememberTrue()
+var alpha by rememberValueState(1f)
+var version by rememberValueState(0)
+```
+
+`rememberValueState` 按参数类型选择状态；委托读写还需导入 Compose 的 `getValue` / `setValue`。这些状态属于组合位置，不能据此推断图片缓存或页面业务数据会跨进程保留。
 
 ## 源码入口
 

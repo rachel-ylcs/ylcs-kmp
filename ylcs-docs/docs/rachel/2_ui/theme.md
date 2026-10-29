@@ -87,6 +87,21 @@ Box(Modifier.padding(padding)) {
 
 主题定制应保持颜色语义、内容对比度和尺寸用途一致。明暗切换、字体缩放和窗口尺寸变化需要共同验证。默认值可通过相应主题的 `Default.copy(...)` 等接口局部调整，具体复制方式以类型定义为准。
 
+## 实际应用的主题覆写
+
+Gallery 在共享应用的属性 getter 中读取可观察状态，切换外观时整棵主题子树随之更新：
+
+示例来源：[GalleryApplication.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/gallery/src/commonMain/kotlin/love/yinlin/GalleryApplication.kt#L17)。
+
+```kotlin
+override val themeMode: ThemeMode get() = if (darkMode) ThemeMode.DARK else ThemeMode.LIGHT
+override val mainFontResource = Res.font.font
+override val colorSystem: ColorSystem get() = if (galleryPalette == GalleryPalette.Framework) ColorSystem.Default else GalleryColors
+override val toolingTheme = ToolingTheme(enableBallonTip = true)
+```
+
+`mainFontResource` 使用当前模块生成的 `Res`。`colorSystem` 可以在默认与自定义配色之间切换；固定配色的 `Default.copy(light = ..., dark = ...)` 用法可参考 ModernScreen 的 `ModernScreenApplication`。
+
 ## 源码入口
 
 - `ylcs-module/compose/theme/src/commonMain/kotlin/love/yinlin/compose/Theme.kt`

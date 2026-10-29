@@ -71,6 +71,26 @@ val ipLog = object : IPLogPlugin() {
 
 当前内置插件不自动提供业务鉴权、通用代理、完整 CORS 策略或上传限流。需要的能力应通过明确的插件、业务接口或部署配置添加，并核对目标平台的依赖可用性。
 
+## 业务中的插件列表
+
+以下为原生服务端入口的实际配置，四个 Socket 参数都由入口显式指定：
+
+示例来源：[Main.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/server/src/nativeMain/kotlin/Main.kt#L23)。
+
+```kotlin
+override val plugins: List<BasicServerPlugin> = [
+    JsonPlugin,
+    WebSocketPlugin(
+        socketPingPeriod = 15.seconds,
+        socketTimeout = 15.seconds,
+        socketMaxFrameSize = Long.MAX_VALUE,
+        socketMasking = false
+    )
+]
+```
+
+此配置允许极大的单帧长度，属于当前业务入口选择，不是框架推荐的容量默认值。`IPLogPlugin` 还将自身普通日志异常通过 `catchingError` 忽略；自定义插件若采用不同错误处理，不能假定会得到相同表现。
+
 ## 源码入口
 
 - `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/BasicServerPlugin.kt`

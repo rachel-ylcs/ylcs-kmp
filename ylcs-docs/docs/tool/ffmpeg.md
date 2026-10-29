@@ -6,9 +6,9 @@
 
 | 项目 | 源码或产物值 |
 | --- | --- |
-| Media3 | 1.11.1 |
+| Media3 | 1.12.0-alpha02，来自根版本目录 |
 | Android NDK | 29.0.14206865 |
-| minSdk | 29 |
+| minSdk | 28，来自根构建配置 |
 | 打包 ABI | `arm64-v8a` |
 | JNI 库名 | `ffmpegJNI` |
 | 文件 | `ylcs-module/compose/components/media/src/androidMain/jniLibs/arm64-v8a/libffmpegJNI.so` |
@@ -33,7 +33,7 @@ val supportsFlac = FfmpegLibrary.supportsFormat(MimeTypes.AUDIO_FLAC)
 
 ## 重建入口
 
-重建时使用与项目 Media3 版本匹配的源码，并固定 FFmpeg 的具体提交。Media3 1.11.1 的构建说明要求先构建 FFmpeg，再通过上游 Gradle/CMake 流程生成 JNI wrapper；其脚本中的 `ANDROID_ABI` 表示 Native API level。参见 [Media3 1.11.1 FFmpeg 构建说明](https://github.com/androidx/media/blob/1.11.1/libraries/decoder_ffmpeg/README.md)。
+重建时使用与项目 Media3 版本匹配的源码，并固定 FFmpeg 的具体提交。可参考 [Media3 1.11.1 FFmpeg 构建说明](https://github.com/androidx/media/blob/1.11.1/libraries/decoder_ffmpeg/README.md) 所述“先构建 FFmpeg，再构建 JNI wrapper”的流程；该旧版说明不是当前 `1.12.0-alpha02` 依赖或仓库二进制的重建记录，实际脚本、参数和 JNI 签名须按选定版本重新核对。该参考脚本中的 `ANDROID_ABI` 表示 Native API level。
 
 以下变量示例按本项目 NDK 与 minSdk 配置调整，具体 decoder 和脚本补丁需随重建记录固定：
 
@@ -41,7 +41,7 @@ val supportsFlac = FfmpegLibrary.supportsFormat(MimeTypes.AUDIO_FLAC)
 FFMPEG_MODULE_PATH="/path/to/media/libraries/decoder_ffmpeg/src/main"
 NDK_PATH="/path/to/android-ndk/29.0.14206865"
 HOST_PLATFORM="linux-x86_64"
-ANDROID_ABI=29
+ANDROID_ABI=28
 ENABLED_DECODERS=(aac mp3 flac opus vorbis)
 
 cd "${FFMPEG_MODULE_PATH}/jni"
@@ -79,6 +79,23 @@ LOAD 段对齐至少应达到 `2**14`。使用本机已安装的 Android Build T
 ## 维护记录
 
 每次替换预编译库应记录源码版本、启用功能、产物摘要、目标架构与验证结果。上游适配代码和 FFmpeg 依赖的许可信息应分别保存，并与实际构建配置一致。
+
+## 播放器中的实际接入
+
+Android 的 `FfmpegRenderersFactory.build` 设置音频属性、拔出耳机暂停以及自定义 renderer factory。具体调用方包括 `MusicService.kt`、`AudioPlayer.android.kt` 与 `VideoPlayer.android.kt`，以 `keepFocus` 控制是否由播放器处理音频焦点。可参考 [FfmpegRenderersFactory.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-module/compose/components/media/src/androidMain/kotlin/love/yinlin/media/FfmpegRenderersFactory.kt)：
+
+```kotlin
+fun build(context: Context, keepFocus: Boolean): ExoPlayer = ExoPlayer.Builder(context)
+    .setAudioAttributes(AudioAttributes.Builder()
+        .setUsage(C.USAGE_MEDIA)
+        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+        .build(), !keepFocus)
+    .setHandleAudioBecomingNoisy(true)
+    .setRenderersFactory(FfmpegRenderersFactory(context))
+    .build()
+```
+
+这是 factory companion 中的实际方法。自建播放器的使用方仍需管理播放、焦点和 `release()`；指定此 factory 不会自动建立业务媒体服务或通知栏。
 
 ## 源码入口
 

@@ -86,6 +86,26 @@ object DemoSockets : Sockets("/demo/events", "示例事件")
 
 `@APIDoc`、`@APIParam` 与 `@APIReturn` 用于保留接口说明，不替代运行时校验或鉴权。
 
+## 业务契约示例
+
+共享业务模块 `ylcs-app/cs` 集中维护真实接口声明。状态查询没有输入、返回一个 `ServerStatus`；头像上传接收令牌和非空文件、没有输出：
+
+示例来源：[APIMap.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/cs/src/commonMain/kotlin/love/yinlin/cs/APIMap.kt#L43)。
+
+```kotlin
+val ApiCommonGetServerStatus by API.post.i().o<ServerStatus>()
+```
+
+示例来源：[APIMap.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/cs/src/commonMain/kotlin/love/yinlin/cs/APIMap.kt#L279)。
+
+```kotlin
+@APIParam("token")
+@APIParam("avatar")
+val ApiProfileUpdateAvatar by API.form.i<String, APIFile>().o()
+```
+
+它们分别生成 `/common/getServerStatus` 和 `/profile/updateAvatar`。`APIParam`、`APIReturn`、`APIDoc` 使用 SOURCE 保留策略，说明信息存在于源码，不提供运行时反射元数据或输入验证。客户端调用与服务端响应示例见对应章节。
+
 ## 源码入口
 
 - `ylcs-module/cs/core/src/commonMain/kotlin/love/yinlin/cs/API.kt`

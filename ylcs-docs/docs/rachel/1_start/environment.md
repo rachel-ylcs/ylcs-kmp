@@ -6,21 +6,21 @@ Rachel 使用仓库根目录的 Gradle Wrapper，以及 `build-logic` 中的统�
 
 | 项目 | 当前配置 | 定义位置 |
 | --- | --- | --- |
-| Gradle Wrapper | 9.8.0 | `gradle/wrapper/gradle-wrapper.properties` |
-| Kotlin | 2.5.0-Beta1 | `libs.versions.toml` |
-| Compose Multiplatform | 1.13.0-alpha02 | `libs.versions.toml` |
+| Gradle Wrapper | 9.8.2 | `gradle/wrapper/gradle-wrapper.properties` |
+| Kotlin | 2.5.0-Beta2 | `libs.versions.toml` |
+| Compose Multiplatform | 1.13.0-beta01 | `libs.versions.toml` |
 | Android Gradle Plugin | 9.3.3 | `libs.versions.toml` |
 | Ktor | 3.6.0 | `libs.versions.toml` |
 | Coroutines | 1.11.0 | `libs.versions.toml` |
 | Lifecycle | 2.11.0 | `libs.versions.toml` |
-| Navigation 3 | 1.2.0-rc01 | `libs.versions.toml` |
+| Navigation 3 | 1.2.0 | `libs.versions.toml` |
 | JDK / JVM target | 25 | `settings.gradle.kts` 的 `repository {}` |
-| Android | minSdk 26、compileSdk 37.1、targetSdk 37 | `settings.gradle.kts` 的 `repository {}` |
+| Android | minSdk 28、compileSdk 37.1、targetSdk 37 | `settings.gradle.kts` 的 `repository {}` |
 | Android NDK / ABI | 29.0.14206865 / `arm64-v8a` | `settings.gradle.kts` 的 `repository {}` |
 | iOS deployment target | 26.0 | `settings.gradle.kts` 的 `repository {}` |
 | 构建插件 / 框架 / 应用版本 | 3.7.1，versionCode 371 | `libs.versions.toml` 的 `rachel` / `rachelCode` |
 
-IDE 的 Gradle JVM 与命令行构建均需使用 JDK 25。Gradle 版本由 Wrapper 管理。上述表格记录源码配置，不代表所有工具链组合均已在当前主机验证。
+IDE 的 Gradle JVM 与命令行构建均需使用 JDK 25。Gradle 版本由 Wrapper 管理。各平台还需准备相应 SDK、原生依赖与宿主工具链，不能仅凭版本目录中的依赖声明判断编译或运行环境已经完备。
 
 ## 工程结构
 
@@ -28,6 +28,7 @@ IDE 的 Gradle JVM 与命令行构建均需使用 JDK 25。Gradle 版本由 Wrap
 ylcs-kmp/
 ├─ build-logic/              # 通用构建插件与本仓库约定
 ├─ ylcs-module/              # 公共框架模块
+├─ native-compose/           # 桌面 Native Compose 移植、适配与验证
 ├─ ylcs-app/
 │  ├─ app/                   # 共享业务模块
 │  ├─ android-app/           # Android 入口
@@ -45,7 +46,7 @@ ylcs-kmp/
 
 新增 Gradle 模块时，需在 `settings.gradle.kts` 中注册，并按照相邻模块使用 `install`、`rachel {}` 与 `lib` DSL。依赖通过版本目录与 `projects.*` 引用声明。
 
-通用模板、轻量配置类型与 `install` 入口统一位于 `build-logic/public-plugin`；`repository-conventions` 只服务本仓库。根目录 `settings.gradle.kts` 的 `repository {}` 分为 `shared`、`rachel` 和 `ylcs` 三部分，框架与业务共用 `shared` 的命名空间，版本统一读取根版本目录。公开插件的接入和发布方式见仓库 `build-logic/README.md`。
+通用模板、轻量配置类型与 `install` 入口统一位于 `build-logic/public-plugin`；`repository-conventions` 只服务本仓库。根目录 `settings.gradle.kts` 的 `repository {}` 在顶层设置 `namespace` 等共享信息，通过 `rachel {}` 设置构建默认值，通过 `ylcs {}` 设置应用与后端参数，并用 `modules {}` 注册项目。版本统一读取根版本目录。构建 DSL 见[构建插件与模块配置](build.md)，桌面 Native Compose 的消费与维护见 [Native Compose 说明](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/native-compose/README.md)。
 
 ## 目标平台与主机限制
 
@@ -154,6 +155,8 @@ CI 的 `.github/actions/package-ios` 会先生成 SwiftPM 链接包，再以 Rel
 `.github/workflows/docs.yml` 依次生成 Gallery、ModernScreen 与 Dokka 页面，再由 MkDocs 发布站点。对应的生成任务为 `:ylcs-app:gallery:galleryPublish`、`:ylcs-app:modern-screen:modernScreenPublish` 与 `dokkaGenerateHtml`。
 
 `ylcs-docs/docs/overrides/` 中的相关页面属于生成内容。修改指南应编辑 Markdown；修改生成行为应编辑源代码或构建模板。
+
+仅检查手写指南时，可以安装与工作流相同的 `mkdocs-material`、`mkdocs-glightbox`，在 `ylcs-docs` 中执行 `mkdocs build`。配置中的 `custom_dir` 要求 `docs/overrides` 目录存在，CI 在生成页面前创建该目录。没有先运行 Gallery、ModernScreen 和 Dokka 生成任务时，导航中的三个生成页面会缺失；指南构建不能替代这些生成任务及其依赖的多平台构建验证。
 
 ## 源码入口
 

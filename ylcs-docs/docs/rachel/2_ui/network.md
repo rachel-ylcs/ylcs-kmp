@@ -112,11 +112,27 @@ socketClient.connect("api.example.com", "/events", connection)
 
 `connect` 固定使用 `wss` 与 443 端口，只将文本帧交给 `onMessage`，并持续挂起至连接结束。`send` 返回值仅反映本地发送调用，不代表对端业务确认。
 
-正常结束或普通异常后的代码会依次通知断开、关闭 session 并清空引用。取消异常与回调异常可能提前中断该后续路径；当前实现未用统一 `finally` 保证所有退出情况的回调与清理。重连、退避和业务确认由应用管理。
+连接流程通过 `cleaning` 的 `finally` 进入清理，并在 `Coroutines.wait` 的不可取消上下文中调用 `onDisconnect()`。即使断开回调抛错，内部 `finally` 仍会尝试清空当前连接引用并关闭本次 session；只有引用仍指向本次 session 时才清空，避免覆盖后来建立的连接。取消异常继续传播，清理本身也可能失败。`onDisconnect()` 因而既可能出现在正常结束后，也可能出现在握手失败或取消后，不能据此推断曾成功连接。重连、退避和业务确认由应用管理。
 
 ## 平台约束
 
 浏览器请求仍受 CORS、Cookie 与混合内容策略限制。移动端需具备对应网络权限及平台配置。公共 URL 或请求封装不会改变平台网络访问规则。
+
+## 业务网络请求示例
+
+第三方业务的 `RadioAPI.requestUser` 使用 JSON 对象重载，再将响应交给业务解析器：
+
+示例来源：[RadioAPI.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/third-party/src/commonMain/kotlin/love/yinlin/tpl/radio/RadioAPI.kt#L87)。
+
+```kotlin
+suspend fun requestUser(id: String): RadioUser? = NetClient.Common.request({
+    url = RadioUrl.user(id)
+}) { json: JsonObject ->
+    Fetcher.extractUser(json)
+}
+```
+
+`RadioUrl`、`RadioUser` 和 `Fetcher` 是该业务模块的类型。代码展示请求封装和响应类型的配合，不代表外部服务当前可访问或响应结构不会变化。`onResponse` 回到调用方协程上下文执行，若解析器计算量大，应显式安排 CPU 工作。
 
 ## 源码入口
 

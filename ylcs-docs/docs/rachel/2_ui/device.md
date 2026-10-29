@@ -73,6 +73,21 @@ fun AccountContent() {
 
 布局验证应覆盖宽度断点两侧、比例边界、窗口连续缩放、字体缩放与输入法出现后的可用空间。具体页面还需检查滚动、空数据、禁用状态和安全区。
 
+## 面板组件的实际布局分支
+
+`BasicSheet` 直接根据 `Device.Type` 选择停靠位置。以下为组件的覆写函数：
+
+示例来源：[BasicSheet.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-module/compose/ui/src/commonMain/kotlin/love/yinlin/compose/ui/floating/BasicSheet.kt#L53)。
+
+```kotlin
+override fun alignment(device: Device): Alignment = when (device.type) {
+    Device.Type.PORTRAIT -> Alignment.BottomCenter
+    Device.Type.LANDSCAPE, Device.Type.SQUARE -> Alignment.CenterEnd
+}
+```
+
+宽度等级与形态分类分开使用：这里不读取 `Device.Size`，因此不能将“桌面平台”或 LARGE 宽度直接当作右侧面板的判断条件。位置分支和进出动画使用相同的形态分类。
+
 ## 源码入口
 
 `ylcs-module/compose/theme/src/commonMain/kotlin/love/yinlin/compose/Device.kt`

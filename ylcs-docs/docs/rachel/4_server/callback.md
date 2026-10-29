@@ -65,6 +65,23 @@ API 响应作用域继承 `APICallbackScope`，因此可作为 callback 的 rece
 
 回调输入、事务和临时资源属于当前调用，不应保存至全局字段。未知键应显式返回业务失败，不应依赖强制解包。
 
+## 业务中的回调注册
+
+邮件奖励处理器通过传入的同一事务更新余额，并返回提示文本：
+
+示例来源：[CommonAPI.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/server/src/nativeMain/kotlin/love/yinlin/cs/CommonAPI.kt#L24)。
+
+```kotlin
+callMap[Mail.Filter.CoinReward] = { transaction, (val uid, val param1) ->
+    val coin = param1?.toIntOrNull() ?: 0
+    VN.throwIf(coin <= 0)
+    transaction.throwExecuteSQL("UPDATE user SET coin = coin + ? WHERE uid = ?", coin, uid)
+    "领取成功"
+}
+```
+
+MailAPI 先在事务中以 `FOR UPDATE` 读取邮件，检查处理状态，再按 filter 查找此回调；回调和将邮件标记为已处理的 UPDATE 使用同一个 `QueryExecutor`。`VN`、`Mail` 与邮件字段是业务上下文，事务与状态检查是调用方建立的约束，回调 Map 本身不提供一次性执行保证。
+
 ## 应用示例与源码
 
 业务服务端的 `ServerScope.callMap` 使用 `Mail.Filter`、`MailEntry`、String 与 `QueryExecutor` 四个类型参数。`MailAPI` 在事务中调用 `callback(transaction, mailEntry)`，各领域注册对应邮件处理器。

@@ -6,6 +6,8 @@ nav:
         - 3. 核心: rachel/1_start/core.md
         - 4. Compose 核心: rachel/1_start/compose_core.md
         - 5. C/S 核心: rachel/1_start/cs_core.md
+        - 6. 基础能力模块: rachel/1_start/foundation.md
+        - 7. 构建插件与模块配置: rachel/1_start/build.md
     - 跨平台UI:
         - 1. 程序入口: rachel/2_ui/entry.md
         - 2. 上下文环境: rachel/2_ui/context.md
@@ -16,6 +18,7 @@ nav:
         - 7. 组件: rachel/2_ui/component.md
         - 8. 浮窗: rachel/2_ui/floating.md
         - 9. 平台组件: rachel/2_ui/platform_component.md
+        - 10. 设备与自适应布局: rachel/2_ui/device.md
     - 客户端引擎:
         - 1. 配置入口: rachel/3_client/entry.md
         - 2. HTTP请求: rachel/3_client/request.md
@@ -32,6 +35,9 @@ nav:
         - 7. 回调: rachel/4_server/callback.md
         - 8. 服务: rachel/4_server/service.md
         - 9. 插件: rachel/4_server/plugin.md
+    - 工具与格式:
+        - MOD 文件格式与管理器: tool/mod.md
+        - Android FFmpeg 解码库: tool/ffmpeg.md
     - UI组件库: overrides/gallery/index.html
     - 现代导航库: overrides/modern-screen/index.html
     - 模块API合集: overrides/dokka/index.html

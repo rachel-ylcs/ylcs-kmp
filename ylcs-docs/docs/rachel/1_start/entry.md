@@ -154,4 +154,23 @@ class ScreenDetails(private val id: String) : Screen() {
 .\gradlew.bat :ylcs-app:modern-screen:modernScreenRun
 ```
 
-前者展示组件用法，后者展示导航行为。以上命令用于开发者本地验证，不代表文档示例已通过所有平台的编译与运行验证。
+前者展示组件用法，后者展示导航行为。两个任务当前都委托 `composeRun`，运行宿主 Native Debug 版本；Web 预览和 JVM 运行使用各模块配置的其他任务。
+
+## 仓库中的 Native 入口
+
+Gallery 的 Native 入口使用同一个共享应用抽象，并将进程参数显式传给平台子类。下面是入口文件中应用类和启动函数的实际实现：
+
+示例来源：[Main.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/gallery/src/nativeMain/kotlin/Main.kt#L7)。
+
+```kotlin
+private val applicationReference = LazyReference<NativeGalleryApplication>()
+
+private class NativeGalleryApplication(override val commandArgs: Array<String>) : GalleryApplication<NativeGalleryApplication>(applicationReference, PlatformContext.Instance) {
+    override val title = "Rachel UI Gallery"
+    override val initSize = DpSize(1280.dp, 768.dp)
+}
+
+fun main(args: Array<String>) = NativeGalleryApplication(args).run()
+```
+
+`GalleryApplication` 定义共享内容、主题和图片初始化。此入口位于 `nativeMain`；不能将 `commandArgs` 等桌面专属覆写直接放入所有平台共用的应用类。Gallery 的 `galleryRun` 当前委托 `composeRun`，运行宿主 Native Debug 版本。

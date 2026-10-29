@@ -55,6 +55,23 @@ val resource = APIRes(PublicRes.Users, id)
 
 `APIRes` 实现 `APIFile` 表示路径集合，但不是客户端上传数据包装。上传需使用 `apiFile(...)`，见[文件上传](file.md)。
 
+## 业务中的头像与版本
+
+About 界面的贡献者头像直接使用共享资源路径，并将缓存版本单独传给图片组件：
+
+示例来源：[UIAbout.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/app/account/src/commonMain/kotlin/love/yinlin/compose/ui/common/UIAbout.kt#L72)。
+
+```kotlin
+WebImage(
+    source = ServerRes.Users.User(contributor.uid).avatar.url,
+    version = DateEx.TodayLong.toString(),
+    modifier = Modifier.size(Theme.size.image8),
+    options = ImageOptions.Circular
+)
+```
+
+`contributor` 是外层列表项，`DateEx.TodayLong` 是该界面的按日更新策略。`version` 参与图片缓存键，不会由 `APIRes.url` 拼到网络地址上；同一资源需要即时更新时应使用适合业务的版本来源。
+
 ## 源码入口
 
 - `ylcs-module/cs/core/src/commonMain/kotlin/love/yinlin/cs/APIRes.kt`

@@ -9,11 +9,16 @@
 | Android | `android.app.Application` 的类型别名 | `contentResolver`、当前 `activity`、`activityResultRegistry` |
 | iOS | 提供 `Instance` 的上下文对象 | 当前 `UIViewController` |
 | JVM Desktop | 提供 `Instance` 的上下文对象 | 可空主窗口原生句柄 `windowHandle` |
-| Web 与桌面 Native | 提供 `Instance` 的上下文对象 | 基础 `rawContext` 及平台实现提供的扩展 |
+| Windows Native | 提供 `Instance` 的上下文对象 | 借用的 HWND，保存为 `windowHandle: Long?` |
+| Linux Native | 提供 `Instance` 的上下文对象 | 借用的 X11 Window ID / wl_surface 与 `displayHandle` |
+| macOS Native | 提供 `Instance` 的上下文对象 | 借用的 NSWindow 指针，保存为 `windowHandle: Long?` |
+| Web | 提供 `Instance` 的上下文对象 | 基础 `rawContext` |
 
 Android 的基础上下文为 Application。Activity 通过 Provider 另行提供，可能在启动时尚未建立，或在后续宿主重建时更新。
 
 `windowHandle` 和 iOS `controller` 的写入由平台入口管理，消费者读取时应处理空值。Provider 的存在不保证所有宿主能力同时可用。
+
+Native 窗口句柄由 SDL 持有，应用入口在连接主窗口时写入，关闭时清空。消费方不得释放句柄，或将主窗口 Provider 中的句柄当作其他独立窗口的句柄。Linux 的 `displayHandle` 与 `windowHandle` 必须使用同一后端对应的组合，X11 与 Wayland 的值不能互换。
 
 ## Compose 中的访问
 
@@ -47,6 +52,8 @@ val cachePath = PlatformFileSystem.cachePath(provider.rawContext, "example")
 `PlatformFileSystem` 位于 `love.yinlin.fs`。`dataPath`、`cachePath` 与 `appPath` 都是带上下文和应用名参数的函数。
 
 数据目录保存用户配置及需要保留的内容，缓存目录保存可重建数据。应用安装目录或可执行文件位置不应被假定为可写数据目录。获取路径也不代表目录已经创建，调用方需按用途创建目录。
+
+`PlatformFileSystem.getCurrentDirectory(): File?` 用于读取进程工作目录，不支持或读取失败时返回 `null`，浏览器固定返回 `null`。`setCurrentDirectory(path)` 返回是否设置成功。工作目录、安装目录与应用数据目录是不同概念；`ServerEngine --cd` 及 Gradle 运行任务的 `workingDirectory` 也具有各自的作用范围，见[服务端入口](../4_server/entry.md)与[构建插件](../1_start/build.md)。
 
 ## 文件 URI
 

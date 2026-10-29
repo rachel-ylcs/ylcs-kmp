@@ -22,6 +22,19 @@
 
 浏览器 CORS 由目标服务或受信任的同源转发端决定，客户端字符串处理不会自行授予跨域访问许可。
 
+## 当前转发辅助函数的实现
+
+业务中的两个辅助函数目前只返回原地址：
+
+示例来源：[TPProxy.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/third-party/src/commonMain/kotlin/love/yinlin/common/TPProxy.kt#L9)。
+
+```kotlin
+internal fun proxy(url: String): String = Platform.use(*Platform.Web, ifTrue = { url }, ifFalse = { url })
+internal fun proxyRes(url: String): String = Platform.use(*Platform.Web, ifTrue = { url }, ifFalse = { url })
+```
+
+虽然使用了平台分支，两侧表达式相同。这些函数属于 `internal` 业务实现，不是可用于建立服务端代理的公共 API，也不会消除跨域限制。
+
 ## 源码入口
 
 - `ylcs-app/third-party/src/commonMain/kotlin/love/yinlin/common/TPProxy.kt`
