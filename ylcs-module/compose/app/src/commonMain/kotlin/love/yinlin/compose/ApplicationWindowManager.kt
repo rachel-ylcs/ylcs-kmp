@@ -10,6 +10,8 @@ internal class ApplicationWindowManager(private val application: Application<*>)
     private val windows = mutableStateListOf<ApplicationWindow>()
     private var closed = false
 
+    val isEmpty: Boolean get() = windows.isEmpty()
+
     fun open(window: ApplicationWindow) = Coroutines.dispatchUI {
         if (!closed && window !in windows) {
             val registered = window.register {

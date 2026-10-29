@@ -48,8 +48,8 @@ class ScreenLyricsSettings : BasicScreen() {
             if (!isAttached) attach()
         }
         else {
-            // 如果当前处于禁用悬浮歌词状态, 但悬浮歌词附加上去了则脱离
-            if (isAttached) detach()
+            // 尚未附加的窗口也可能正在等待权限，需要一起取消。
+            detach()
         }
     }
 

@@ -4,8 +4,15 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
 import love.yinlin.foundation.PlatformContext
@@ -19,6 +26,23 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     self: BaseLazyReference<A>,
     context: PlatformContext,
 ) : Application<A>(self, context) {
+    override var activity: ComponentActivity? by mutableStateOf(null)
+    private val windowHosts = mutableMapOf<LifecycleOwner, AndroidApplicationWindowHost>()
+
+    /**
+     * 打开由 [owner] 管理的独立悬浮窗。Owner 销毁时关闭其所有窗口，窗口内容不依赖 Activity 的组合。
+     * 后台悬浮窗应使用 Service 管理的 LifecycleOwner；申请权限时仍需一个前台 Activity。
+     */
+    fun openWindow(window: ApplicationWindow, owner: LifecycleOwner) = Coroutines.dispatchUI {
+        if (owner.lifecycle.currentState == Lifecycle.State.DESTROYED) window.close()
+        else {
+            val host = windowHosts.getOrPut(owner) {
+                AndroidApplicationWindowHost(this, owner) { windowHosts.remove(owner) }
+            }
+            host.open(window)
+        }
+    }
+
     @Composable
     open fun BeginContent(activity: ComposeActivity) {}
 

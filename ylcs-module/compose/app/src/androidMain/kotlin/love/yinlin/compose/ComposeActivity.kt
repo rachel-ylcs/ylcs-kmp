@@ -45,8 +45,11 @@ abstract class ComposeActivity : ComponentActivity() {
     }
 
     final override fun onDestroy() {
-        instance.destroyPoolBefore()
-        super.onDestroy()
+        try { instance.destroyPoolBefore() }
+        finally {
+            if (instance.activity === this) instance.activity = null
+            super.onDestroy()
+        }
     }
 
     final override fun onNewIntent(intent: Intent) {
