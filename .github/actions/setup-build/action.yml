@@ -54,7 +54,7 @@ runs:
       if: ${{ inputs.android == 'true' }}
       uses: android-actions/setup-android@v4
       with:
-        packages: 'platform-tools platforms;android-37.1'
+        packages: 'platform-tools platforms;android-37.2'
 
     - name: Setup MSVC
       if: ${{ inputs.msvc == 'true' && runner.os == 'Windows' }}
