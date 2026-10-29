@@ -77,6 +77,29 @@ PlatformFileSystem.cachePath(PlatformContext.Instance, "ServerNative")
 
 限制应根据实际上传协议在入口和业务校验层明确。文件名、MIME 与扩展名不能替代内容验证。复杂媒体处理应在临时文件有效期内完成，或先转存至具有明确所有权的工作目录。
 
+## 共享声明与服务端接收
+
+当前头像接口使用非空文件声明，与接收处理器保持一致：
+
+示例来源：[APIMap.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/cs/src/commonMain/kotlin/love/yinlin/cs/APIMap.kt#L279)。
+
+```kotlin
+@APIParam("token")
+@APIParam("avatar")
+val ApiProfileUpdateAvatar by API.form.i<String, APIFile>().o()
+```
+
+示例来源：[ProfileAPI.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/server/src/nativeMain/kotlin/love/yinlin/cs/ProfileAPI.kt#L93)。
+
+```kotlin
+ApiProfileUpdateAvatar.response { token, avatar ->
+    val uid = AN.throwExpireToken(token)
+    avatar.copy(ServerRes.Users.User(uid).avatar)
+}
+```
+
+multipart 的索引 `0` 对应 token，索引 `1` 对应文件内容。`avatar` 由请求解析器持有，处理器需在返回前完成使用；`copy` 复制的是集合中的第一个文件，单文件业务如果需要拒绝多文件，必须显式验证 `num`。当前处理器没有单独执行该数量检查。
+
 ## 源码入口
 
 - `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/APIScope.kt` 中的 `FormResult` 与 `internalResponseForm`

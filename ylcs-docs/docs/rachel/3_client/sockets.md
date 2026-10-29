@@ -61,7 +61,7 @@ ClientEngine.baseUrl = https://api.example.com:8443/base
 
 只有文本帧进入 `onMessage`。回调在连接收集流程中执行，耗时处理会延迟后续消息，应按工作性质切换上下文。
 
-正常结束或普通收包异常后，当前代码调用 `onDisconnect`、关闭 session 并清空引用。取消异常会由 `catchingError` 重新抛出；`onError` 或 `onDisconnect` 本身抛错也可提前中断后续代码。因此不能将这些回调描述为所有退出情况下均保证执行的 `finally` 清理钩子。
+连接实现以 `cleaning` 包围握手和收包流程，正常返回、普通异常、取消或 `onError` 抛错均进入清理。清理在 `Coroutines.wait` 的不可取消上下文中调用 `onDisconnect()`，其内部 `finally` 再尝试清空本次连接引用并关闭 session。握手失败同样会进入 `onDisconnect()`；应用应将其用于复位状态，避免假定它只与成功的 `onConnect()` 成对出现。取消异常不会转为普通失败，回调和底层关闭操作自身的异常仍可能向调用方传播。
 
 同一个 `Connection` 不应被并发用于多次连接。再次连接时虽然会尝试关闭已有 session，但封装不提供并发连接状态机。
 
@@ -70,6 +70,22 @@ ClientEngine.baseUrl = https://api.example.com:8443/base
 当前封装不自动重连。应用需要按协议定义断线状态、退避、重新鉴权、心跳与消息确认。重试循环应等待本次连接结束，并在所属生命周期取消后停止，避免在错误回调中递归连接。
 
 服务端注册与消息管理见[服务端 WebSocket](../4_server/sockets.md)。
+
+## 业务中的连接作用域
+
+歌词游戏页面将连接挂起函数放入页面协程中：
+
+示例来源：[ScreenGuessLyrics.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/app/game-guess-lyrics/src/commonMain/kotlin/love/yinlin/screen/ScreenGuessLyrics.kt#L183)。
+
+```kotlin
+override fun initialize() {
+    launch {
+        openSockets()
+    }
+}
+```
+
+`openSockets()` 委托 `LyricsSockets.openConnection(connection)`。同文件的 `onConnect()` 序列化 `LyricsSockets.CM.Login`，`onMessage()` 解析 `LyricsSockets.SM`，展示共享 Socket DTO 与传输层分工。页面实际清理会取消 `viewModelScope`，单纯被其他页面覆盖不会自动结束连接。
 
 ## 源码入口
 

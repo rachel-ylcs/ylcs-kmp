@@ -20,7 +20,7 @@
 
 未修改的 macOS 实现直接从锁定的上游源码目录加入 `macosMain`，与适配源码一起编译成 Rachel 工件。例如 `ui-util` 使用上游 `macosMain`，`ui-text` 使用上游 `nativeMain`、`darwinMain` 和 `macosMain`。适配目录没有同名文件，不代表使用官方 macOS 二进制工件。
 
-源码同步位于 `build-logic/repository-conventions`，SDL 构建及验证工具位于 `build-logic/native-bridge`。维护流程使用 Gradle/Kotlin，不依赖 Python。
+源码同步位于 `build-logic/repository-conventions`，SDL 构建及验证工具位于 `build-logic/native-bridge`，Release 二进制与符号处理的共享实现位于 `build-logic/native-binaries`。后者由插件编译其源码，不是 `build-logic/settings.gradle.kts` 中单独 include 的项目。维护流程使用 Gradle/Kotlin，不依赖 Python。
 
 SDL 静态 SDK 使用 [upstream/sdl.json](upstream/sdl.json) 中的窗口宿主构建配置：保留窗口、输入、剪贴板、拖放、托盘、原生对话框和 Skiko 所需的图形上下文接入，以及 SDL 软件渲染回退；关闭音频、摄像头、手柄、触觉、HIDAPI、传感器、电源查询、独立 SDL GPU 和 SDL 自身不使用的硬件 renderer。Compose 的 D3D12/Metal/OpenGL GPU 渲染继续由 Skia/Skiko 提供。源码同步会对 SDL 的动态 API 总开关应用可重复、带上游格式检查的调整，让静态链接可以裁剪未引用 API；该 SDK 不支持通过 `SDL3_DYNAMIC_API` 替换运行时实现。配置和同步逻辑均参与源码/SDK 缓存身份，修改后会自动重建。
 
@@ -101,9 +101,9 @@ Windows、macOS 和 X11 支持禁用普通窗口焦点；Wayland 普通顶层窗
 
 鼠标穿透通过受锁定补丁管理的 SDL 窗口扩展实现，要求无系统标题栏；恢复系统标题栏时自动关闭穿透。Windows 使用 layered／transparent 扩展样式，并在关闭穿透时恢复原有相关样式位；窗口宿主预先注册不带 `CS_OWNDC` 的窗口类，以兼容分层输入穿透，保留 D3D12／软件渲染。macOS 使用 NSWindow 的忽略鼠标事件属性；X11 使用 SHAPE 1.1 输入区域；Wayland 使用 wl_surface 的空输入区域。切换不会清空绘制内容，缺少所需后端能力时明确报错。补丁哈希参与源码和静态 SDK 缓存身份。
 
-Rachel 的 `compose:app` Native `PlatformApplication` 默认采用透明、无系统标题栏窗口，支持与 JVM 类似的 `title`、`icon: DrawableResource?`、`initSize`、`minSize`、`roundedCorner` 和 `TopBar(controller, onExit)`。`controller.icon`、`controller.undecorated` 和 `controller.roundedCorner` 可在运行时更新；`transparent` 必须在创建窗口前配置。自定义标题栏默认交给系统拖动，交互控件区域用 `Modifier.windowDragArea(controller, draggable = false)` 排除，边缘保持系统缩放；切回系统装饰后隐藏 Compose 标题栏。位图、XML Vector 和 SVG 图标共用 Painter 栅格化，macOS 设置应用 Dock 图标；Wayland 不支持图标协议时保留系统图标，不中断应用。窗口实际透明还需要 Compose 内容使用透明背景。
+Rachel 的 `compose:app` Native `PlatformApplication` 默认采用透明、无系统标题栏窗口，支持与 JVM 类似的 `title`、`icon: DrawableResource?`、`initSize`、`minSize`、`roundedCorner` 和 `TopBar(controller, onExit)`。`controller.icon`、`controller.undecorated` 和 `controller.roundedCorner` 可在运行时更新；`transparent` 必须在创建窗口前配置。自定义标题栏通过 `WindowScope.DragArea` 识别主鼠标键拖动，再调用底层窗口的 `startDrag()` 发起平台拖动；支持长按与双击回调。交互控件区域可用 `Modifier.windowDragArea(controller, draggable = false)` 禁止拖动，边缘保持系统缩放；切回系统装饰后隐藏 Compose 标题栏。位图、XML Vector 和 SVG 图标共用 Painter 栅格化，macOS 设置应用 Dock 图标；Wayland 不支持图标协议时保留系统图标，不中断应用。窗口实际透明还需要 Compose 内容使用透明背景。
 
-JVM 和 Native 应用通过 `openWindow(ApplicationWindow)` 注册独立子窗口，无需在主窗口的 `Content` 或 `MultipleWindow` 中挂载。子窗口分别实现 `Window(content)` 和 `Content()`：JVM 的前者可直接调用官方 `Window(onCloseRequest = ::close)`，Native 的前者可调用 `love.yinlin.compose.NativeWindow` 扩展。框架自动为内容提供应用的主题、字体、资源及 `LocalPlatformContext`，平台宿主保留各窗口独立的 Lifecycle、ViewModelStore 和 Compose 作用域。透明子窗口可覆盖 `background = Color.Transparent`。
+JVM 和 Native 应用通过 `openWindow(ApplicationWindow)` 注册独立子窗口，由应用的窗口管理器挂载，当前没有 `MultipleWindow` 覆写入口。子窗口分别实现 `Window(content)` 和 `Content()`：JVM 的前者可直接调用官方 `Window(onCloseRequest = ::close)`，Native 的前者可调用 `love.yinlin.compose.NativeWindow` 扩展。框架自动为内容提供应用的主题、字体、资源及 `LocalPlatformContext`，平台宿主保留各窗口独立的 Lifecycle、ViewModelStore 和 Compose 作用域。透明子窗口可覆盖 `background = Color.Transparent`。
 
 每次打开创建新的 `ApplicationWindow` 实例，可将需保留的业务状态放在外部。窗口激活时调用 `initialize()`，离开组合时取消其 `scope` 并调用 `uninitialize()`；`close()` 只关闭自身。主窗口关闭后停止接受新窗口，关闭所有子窗口及其原生资源，完成应用清理后结束进程。Native 的多个窗口共用一个 SDL 事件循环，按窗口 ID 分发输入、关闭及唤醒事件；独立的应用级 Compose 组合管理子窗口，即使主窗口隐藏或最小化也继续驱动其生命周期。系统主题和语言等全局变更广播到所有窗口。子窗口不建立原生父子关系或模态关系。
 
@@ -167,3 +167,23 @@ Release 链接后自动分离符号，桥插件与 Rachel 的 `nativeExecutable`
 Windows/Linux 的 UI 工件在应用启动时自动注册 `Dispatchers.Main`，窗口创建后将任务投递到同一个 Native UI 事件队列；`MainScope()`、`Dispatchers.Main.immediate` 和 Rachel 的 `Coroutines.main` 无需额外初始化。窗口启动前可以创建作用域、提交任务，任务会等待窗口事件循环开始；后台切回 Main、延迟和超时恢复均返回 UI 线程。关闭窗口后新的 Main 任务会被取消，重新打开窗口会接入新的 UI 队列；应用自行创建的作用域仍由应用负责取消。macOS 保留 coroutines 的系统主队列。此接入使用 coroutines `1.11.0` 的 Native 内部注入接口，上游升级时需保留调度器回归检查。
 
 框架库沿用自身 Maven group/GAV，发布 KMP root 及启用的 Native target publication。JVM、Android 等用户按普通方式依赖；Native 用户应用匹配版本的桥插件。公开 Compose 类型按模块 API 导出规则声明，保持消费者可见的依赖完整。
+
+## 窗口作用域与源码示例
+
+`compose:ui` 的 Native `WindowScope` 是 `org.jetbrains.skiko.window.NativeWindowScope` 的类型别名。`DragArea` 是作用域扩展，创建跟随组合生命周期的拖动区域；区域离开组合时注销注册，窗口或拖动配置改变时更新绑定。应用不再通过 `WindowController.draggable` 配置全局拖动开关。
+
+实际主窗口在 `PlatformApplication.native.kt` 的 `ComposedLayout` 内使用：
+
+```kotlin
+DragArea(enabled = !controller.maximize, onDoubleClick = { controller.toggleMaximize() }, modifier = Modifier.fillMaxWidth()) {
+    TopBar(controller, onMainWindowClose)
+}
+```
+
+`controller`、`TopBar` 与 `onMainWindowClose` 属于应用宿主。需要额外拖动区域的组件应传入当前窗口作用域，避免持有其他窗口的 scope。`addDragArea` 的返回值具有注销责任；直接使用底层接口时必须在所属生命周期结束时关闭注册。
+
+- [DragArea 公共签名](../ylcs-module/compose/ui/src/pcMain/kotlin/love/yinlin/compose/ui/window/DragArea.kt)
+- [Native 拖动实现](../ylcs-module/compose/ui/src/nativeMain/kotlin/love/yinlin/compose/ui/window/DragArea.native.kt)
+- [Native 应用宿主](../ylcs-module/compose/app/src/nativeMain/kotlin/love/yinlin/compose/PlatformApplication.native.kt)
+- [独立 Native 窗口扩展](../ylcs-module/compose/app/src/nativeMain/kotlin/love/yinlin/compose/ApplicationWindow.native.kt)
+- [桌面打包回归用例](../build-logic/native-bridge/src/test/kotlin/love/yinlin/nativebridge/NativeDesktopPackagingTest.kt)

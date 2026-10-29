@@ -76,40 +76,108 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 | `qrcode` | 二维码相关组件 |
 | `reordering` | 列表重排 |
 | `rich-text` | 富文本渲染 |
-| `url-image` | 网络图片、Sketch 与缓存 |
 | `webview` | 原生网页视图与状态 |
 
 这些模块需按使用范围添加项目依赖。日历已位于独立模块，不属于基础 `compose:ui` 的 `widget` 包内容。各模块目标与平台实现以其构建脚本和源集为准。
 
-## 异步图片
+## 可选组件的平台边界
 
-`compose/components/image` 提供 `BasicImage`、`WebImage`、`LocalFileImage` 和 `ResourceFileImage`，与基于 Sketch 的 `url-image` 模块分开。使用前调用 `ImageManager.initialize(context, appName, configuration)`；管理器只能成功初始化一次，`shutdown()` 释放资源后也不能重新初始化。管理器未就绪时，图片组件显示空占位。
+可选组件不具有完全相同的平台覆盖，完整目标矩阵见[仓库首页](https://github.com/rachel-ylcs/ylcs-kmp#全平台模块支持)。当前实现还存在以下功能差异：
 
-`BasicImage` 接受网络、本地文件、Compose 资源、字节数组及已注册的自定义 `ImageSource`。网络请求头通过 `ImageSource.Network` 传入。每个显示位置单独持有 `rememberImageState()`；同源、同版本、同解码参数的并发请求共享加载结果，各位置独立控制动画播放和缩放。
+| 模块 | 当前边界 |
+| --- | --- |
+| `media` | 配置 Android、iOS、Desktop JVM、JS、WasmJS，没有桌面 Native target；JVM 的 Linux/macOS 视频后端为空实现 |
+| `webview` | Android、iOS、Web 有视图实现；JVM 只显示不支持占位，桌面 Native 未启用 |
+| `qrcode` | 所有已声明目标可生成二维码；扫码界面仅 Android/iOS 有实现，其余为占位 |
+| `drag-drop` | iOS 的 `dragDrop` 当前直接返回原 Modifier，不接收拖放；桌面 Native 使用 SDL 与 Compose 的目标命中检查 |
+| `platform-view` | 公共状态管理层包含桌面 Native target，但尚无对应原生控件嵌入 Host |
 
-`version: String? = null` 是可选缓存版本，不拼入 URL 或文件路径。为 `null` 时只根据输入源识别原始内容；非空值时附加版本键，空字符串也是一个明确版本，与 `null` 区分。解码结果按目标尺寸、填充方式、画质与动图模式分别匹配内存缓存；新请求可以复用同内容、同画质和同动图模式下尺寸足够的已有结果。本地文件内容改变后需设置或更新 `version`。`state.retry()` 允许复用已有缓存；读取失败可重试，解码失败时默认占位不提供重试入口。内存缓存保存解码结果，磁盘缓存保存网络图片原始字节，不按显示尺寸生成磁盘副本；浏览器不启用图片磁盘缓存。`ImageManager.clearCache()` 取消在途加载并清理两级缓存；已经显示的图片不会自动刷新。网络进度按约 100ms 间隔更新，加载成功返回前同步最终字节数；响应没有内容长度时 `progress.total` 为 `null`。
+平台声明不保证权限、外部服务或运行资源已经就绪。媒体与系统视图的原生资源由对应所有者释放，不能把 `remember` 当作全部平台资源的清理机制。
 
-`ImageConfiguration(loadingDelayMillis = 500L)` 设置 loading 占位的显示门槛，默认 500ms，设为 `0L` 可立即显示。门槛覆盖默认和自定义 `ImagePlaceholder.loading`，快速成功的图片不会创建加载圈；失败仍立即显示错误占位。延迟期间继续收集真实字节进度，因此加载圈首次显示时使用当前下载比例。未知总长度时，默认旋转圈从本次加载已经历的时间计算初始相位；自定义动画可调用 `state.loadingElapsedMillis()`，按自身绘制节奏更新。重试、输入或版本变化会重新计时，旧请求的显示任务随取消一起结束。
+## 图片初始化与输入
 
-默认画质为 `ImageQuality.Medium`。`quality` 是统一画质入口，内部选择平台支持的解码重采样和绘制滤波策略，不再按画质固定放大解码尺寸，也不进行尺寸分档。每次加载取首个有效布局的物理像素尺寸，结合 `ContentScale`、原图尺寸和像素预算计算解码尺寸；初始零尺寸会等待有效布局。请求不变时，后续布局变大、变小或变为零都只调整绘制范围，保持原解码结果，也不因加载期间布局变化而追加解码。这与 Coil / Sketch 的 Compose 图片组件在请求不变时的行为一致；大幅放大可能降低清晰度，缩小后仍持有原解码像素。输入、版本、画质、动图模式、`ContentScale` 变化，或调用 `state.retry()` 等重新发起请求时，才解析当时的布局尺寸并尝试缓存。显式启用缩放查看时，静态图仍可按缩放档位请求更多像素。已移除 `ImageQuality.sizeMultiplier` 和 `ImageDecodeOptions.sizeMultiplier`；自定义解码器直接使用 `targetSize`。`ImagePlaceholder` 决定未显式指定尺寸时的保留空间，成功加载后保持容器尺寸。组件不绘制背景，也不提供背景配置；空态图标、加载圈、读取失败和损坏图标均保持透明底色；`ContentScale` 和 `alignment` 决定图片绘制范围，留白不触发图片的 `onClick`。
+`compose/components/image` 提供 `BasicImage`、`WebImage`、`LocalFileImage` 和 `ResourceFileImage`。当前工程已经移除 `url-image` 与 Sketch 接入。
 
-淡入默认开启，可通过 `ImageOptions(fadeIn = false)` 关闭。当前输入源和版本首次成功加载时使用主题默认时长淡入。重组、滚出后返回、保留状态重挂载、内存缓存命中及已显示后开启淡入均不重播；只有首次结果需要淡入时，绘制节点才启动短期动画协程。静态图直接调整绘制透明度，淡入结束后不保留额外内容层或动画状态；同内容重新请求后的结果替换会结束已有淡入，`alpha` 仍独立控制图片透明度。
+使用方需管理 `ImageManager.initialize(context, appName, configuration)` 与 `shutdown()` 的生命周期。业务模块 `app/global` 的 `StartupImage` 以同步服务封装这两个调用；它不是基础库提供的 Startup API。Gallery 在共享应用中用 `sync` 执行初始化，见[应用入口](entry.md)。管理器只能成功初始化一次，关闭后不能重新初始化。未就绪时图片组件显示空占位，初始化完成后开始加载。
 
-GIF / WebP 按文件循环次数逐帧播放，`ImageOptions(animated = false)` 只显示首帧。缩放通过 `ImageOptions(zoom = true)` 开启，支持双击、双指、滚轮与放大后的拖动，也可调用 `state.zoom`。`Modifier.cropImageRegion(imageState, cropImageState, aspectRatio)` 添加裁剪选区，`cropImageState.result` 返回相对于原图的比例坐标。
+| 入口 | 输入 |
+| --- | --- |
+| `WebImage` | 可空网络地址；空白地址显示空占位 |
+| `LocalFileImage` | 框架 `File` |
+| `ResourceFileImage` | Compose 资源 URI，例如 `Res.getUri(...)` |
+| `BasicImage` | `ImageSource`，包括 Network、文件、资源、字节数组及已注册的自定义源 |
 
-请求由布局节点管理，尺寸就绪后立即尝试内存缓存，读取和解码使用框架的 IO / CPU 协程上下文；能否并行执行由平台运行时决定，浏览器默认上下文不等同于独立 Worker。普通静态图在绘制节点观察结果和执行首次淡入；缩放与动图使用独立的 Composable，动图只在 Painter 绘制时读取帧状态，逐帧更新不重新组合图片或创建 Painter。缩放状态在启用缩放或显式访问 `state.zoom` 时创建，此后持续同步边界。静态图不注册动图的可见性监听；未配置点击、缩放时不创建对应的交互状态。`state.contentRect` 和裁剪使用的几何信息按需计算并缓存，尺寸、内容和显示参数改变后自动失效，不依赖每次重组的 `SideEffect`。
+自定义请求头使用 `ImageSource.Network` 并交给 `BasicImage`。每个显示位置持有独立的 `rememberImageState()`；同源、同版本及同解码选项的并发加载可共享结果，各位置分别管理动画和缩放。
 
-内置字节数组输入复用 `ImageSource.Bytes` 已持有的防御性副本，跳过无 IO 的原始读取任务；自定义输入仍保留读取、进度和共享语义。Android / Desktop 的标准本地文件可通过 JVM 文件流直接填充最终数组，减少通用分段缓冲的拷贝；Desktop 的内置 PNG / 静态 WebP 文件还可直接读入 Skia 编码缓冲，省去完整的托管编码数组。调用方提供的自定义 `File` 仍使用其自身读取实现，iOS / Web 也保留通用文件路径。稳定长度的本地文件与已知长度的网络响应直接填充最终数组；未知长度或读取期间长度改变时使用有界缓冲，始终受原始字节预算限制，不额外缓存整图字节来换取速度。
+## 图片预算与加载状态
 
-Skia 实现对 JPEG 缩略图使用原生 1/2、1/4、1/8 预采样，再绘制到目标尺寸，保留 EXIF 方向；非 sRGB ICC 图片沿用完整解码路径。预采样保留目标尺寸约定，像素结果可能与完整解码后缩放不同。
+`ImageConfiguration` 的当前默认配置为：
 
-静态 WebP 从容器标志识别后直接进入静态解码，避免读取动画帧表。Skia 的普通 sRGB 静态图片通过 Codec 解码：同尺寸 PNG / BMP 直接移交不可变像素，WebP 直接在目标尺寸解码。PNG 缩略图沿用 Image 栅格缩放路径，避免在原生解码耗时占主导的场景增加工作位图包装；非 sRGB ICC 图片也保留原来的色彩转换路径。Skia 动图保留可复用的工作帧，WebP 工作帧按目标尺寸分配，通过 Pixmap 复制或缩放后发布独立的不可变位图，移除逐帧的 Data / Image / Canvas 中间对象。Android WebP 复用帧编码缓冲和可复用的解码位图，已发布的动画帧仍独立持有像素；静态图片和 GIF / WebP 帧在移交显示前调用 `prepareToDraw()`，提前发起系统支持的绘制准备。
+| 配置 | 默认值 | 含义 |
+| --- | --- | --- |
+| `maxMemoryCacheBytes` | 64 MiB | 解码结果的内存缓存预算 |
+| `maxDiskCacheBytes` | 256 MiB | 网络原始字节的磁盘缓存预算 |
+| `maxSourceBytes` | 64 MiB | 单个输入的原始字节上限 |
+| `maxDecodePixels` | 64 × 1024 × 1024 像素 | 解码像素预算，允许范围为 1 至该上限 |
+| `loadingDelayMillis` | 500 ms | loading 占位的显示门槛，0 表示立即显示 |
+| `cacheDirectory` | `null` | 非浏览器平台使用默认应用缓存目录；可显式覆盖 |
 
-Android 静态图片在兼容的硬件加速显示目标上自动请求硬件位图，不增加画质参数。最低支持 Android 9 / API 28，静态图统一使用 `ImageDecoder` 处理目标尺寸、色彩和 EXIF 方向；已移除 API 26/27 的兼容解码、设备黑名单及文件描述符检查。预览、已知的软件绘制目标及软件图层使用软件请求，硬件与软件请求分别匹配解码缓存；Android 内存预算优先读取实际位图分配量，包含高精度像素和行对齐。硬件位图不可直接读写像素，也不能绘制到软件 Canvas；将已显示界面额外截取到软件画布时仍需注意这一平台限制。硬件位图优化像素存储与绘制准备，不等于 PNG / WebP 的压缩解码由 GPU 完成。
+浏览器不启用图片磁盘缓存。预算描述不同层面的资源，缓存预算不等于应用全部图片内存的硬上限，已显示图片也会持有解码结果。
 
-Android 的内置动态 WebP 使用系统 `AnimatedImageDrawable` 播放，避免逐帧经过 Kotlin 编码、合成和发布位图。加载阶段取得首帧与系统播放器，首个显示位置可接管播放器，其他显示位置各自建立播放状态；缓存只保留可选的弱引用接管入口，不强持有播放器。播放开关、组件可见性、前后台与卸载共同管理播放；系统 `stop()` 保留当前画面，再次 `start()` 从头播放，返回前台也遵循此规则。Android 9/10 的动画字节输入保留 direct buffer 处理。系统不支持该输入或显式自定义 WebP 解码器时保留通用逐帧路径，注册无关格式不会关闭内置 WebP 的系统路径；GIF 继续使用原有实现，避免改变短帧延迟策略。公开解码器的 `frame(index)` 仍支持访问 WebP 任意帧，需要非首帧时才建立逐帧解码器。普通布局变化只缩放现有结果，不重建播放器。
+加载进度通过 state 读取；响应没有 Content-Length 时 `progress.total` 为 `null`。进度按约 100 ms 更新，成功前同步最终字节数。loading 门槛只控制占位显示，延迟期间仍下载并收集进度；失败时立即显示错误占位。
 
-内置支持 JPEG、PNG、BMP、GIF 和 WebP。BMP 使用系统 / Skia 原生解码器，进入原生解码前校验 CORE / INFO 头部、像素偏移和尺寸预算，支持正常行序与自顶向下的行序；调色板和 bitfields 的具体变体由平台解码器决定。
+`state.retry()` 重新发起请求并允许复用缓存。默认读取失败占位提供重试，解码失败占位没有默认重试入口；自定义交互可以自行决定是否再次加载。输入、版本或重试变化会重新计算加载显示时间。
+
+## 图片缓存与版本
+
+`version: String?` 默认 `null`，参与缓存身份，不拼入 URL 或文件路径。`null` 表示不附加显式版本，空字符串是一个独立版本。本地文件内容发生变化时，应更新版本；可变网络资源也应采用业务可观察的版本来源。
+
+内存缓存保存解码结果，磁盘缓存保存网络图片的原始字节，不按显示尺寸创建多份磁盘文件。内存结果还按尺寸、画质、动图模式和平台解码选项匹配，尺寸足够的兼容结果可以复用。
+
+`ImageManager.clearCache()` 取消在途加载并清理两级缓存，已经显示的结果不会自动刷新。需要刷新某个显示位置时，更新输入、版本或显式触发该 state 的重试，而不是只清空磁盘目录。
+
+## 图片尺寸、画质与绘制
+
+默认 `ImageQuality.Medium`；`ImageOptions.quality` 统一选择平台重采样和绘制滤波策略。每次请求取首个有效布局的物理像素尺寸，结合 `ContentScale`、原图尺寸和像素预算确定解码大小，零尺寸会等待有效布局。
+
+请求不变时，后续布局缩放只改变绘制范围，不自动重新解码。大幅放大可能降低清晰度，缩小后也仍持有原解码结果。输入、版本、画质、动图模式、`ContentScale` 变化或显式重试会使用当时的布局重新请求。开启缩放查看后，静态图还可按缩放档位请求更多像素。
+
+`ImagePlaceholder` 决定没有显式尺寸时的保留空间，成功后保持容器尺寸。组件不绘制背景，`ContentScale` 与 `alignment` 决定内容区域，留白不触发图片 `onClick`。`alpha` 和 `colorFilter` 控制绘制外观，圆形裁剪使用 `ImageOptions.Circular` 或 `circular = true`。
+
+## 图片动画、缩放与裁剪
+
+淡入默认开启，可用 `ImageOptions(fadeIn = false)` 关闭。当前输入和版本首次成功加载时使用主题动画时长；重组、保留 state 重新挂载和内存缓存命中不重播。淡入不改变 `alpha` 的公开语义。
+
+GIF / WebP 按文件循环配置播放，`ImageOptions(animated = false)` 仅显示首帧。`ImageOptions(zoom = true)` 开启双击、双指、滚轮和放大后拖动，也可通过 `state.zoom` 控制。`Modifier.cropImageRegion(imageState, cropImageState, aspectRatio)` 显示裁剪选区，结果为相对于原图的比例坐标，并非已经生成裁剪后的文件。
+
+Android 动态 WebP 默认使用系统 `AnimatedImageDrawable`；系统停止后保留画面，再次启动从头播放。前后台、可见性和卸载会影响播放，不能假设动图在离屏期间持续推进到同一帧。布局改变只缩放现有结果，不因此重建播放器。
+
+## 图片格式与平台约束
+
+内置格式包括 JPEG、PNG、BMP、GIF 和 WebP。BMP 会先检查头部、像素偏移与尺寸预算，具体调色板和 bitfields 变体仍由平台解码器决定。可通过 `ImageConfiguration.inputs` 与 `formats` 注册自定义输入和格式处理器。
+
+Android 最低 API 28，静态解码使用 `ImageDecoder`。兼容的硬件加速显示目标自动使用硬件位图，预览和已知软件绘制目标使用软件请求。硬件位图不能直接读取像素，也不能直接绘制到软件 Canvas；额外执行软件截图时需考虑这一限制。不同平台的色彩处理、缩略采样与动图后端可能产生不同像素结果。
+
+读取和解码使用框架的 IO / CPU 上下文，浏览器上下文不等同于独立 Worker。自定义解码器应遵循 `targetSize`、原始字节与像素预算，并明确释放原生资源；旧版 `sizeMultiplier` 不是当前 API。
+
+## Gallery 中的资源图片
+
+以下片段来自 `ImagePage.ResourceExamples` 的每个图片显示位置；资源、state 与是否播放动图分别配置：
+
+示例来源：[ImagePage.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/gallery/src/commonMain/kotlin/love/yinlin/page/ImagePage.kt#L90)。
+
+```kotlin
+val state = rememberImageState()
+ResourceFileImage(
+    Res.getUri(uri),
+    contentDescription = description,
+    modifier = Modifier.size(Theme.size.image2),
+    state = state,
+    options = ImageOptions(animated = false),
+)
+```
+
+`uri`、`description` 来自外层样本列表，`Res` 由 Gallery 模块生成。每个显示位置创建自己的 state；同一 state 不应被多个同时显示的位置共享。图片管理器需先初始化。
 
 ## 示例与 API
 

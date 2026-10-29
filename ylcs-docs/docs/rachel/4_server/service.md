@@ -116,6 +116,21 @@ redis.pipeline {
 
 请求用户、事务和临时文件不应成为共享服务字段。长期后台任务需要明确的作用域、并发限制和关闭流程。
 
+## 业务中的 MySQL 与 Redis 注册
+
+实际 `ServerScope` 使用明确列表控制服务启动顺序：
+
+示例来源：[ServerScope.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/server/src/nativeMain/kotlin/love/yinlin/cs/ServerScope.kt#L13)。
+
+```kotlin
+val mysql: MysqlService = MysqlService(this)
+val redis: RedisService = RedisService(this)
+
+override val services: List<ServerService> = [mysql, redis]
+```
+
+API 响应处理器通过该作用域访问服务。服务端配置中的 `mysql` 和 `redis` 节点应与这两个服务的 `name` 一致；这套列表与客户端 Startup 依赖图是两套生命周期机制。
+
 ## 源码入口
 
 - `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/ServerService.kt`

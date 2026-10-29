@@ -20,6 +20,7 @@ Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化框�
 | `ylcs-module` | 公共基础库                         |
 | `ylcs-app`    | 作为范例的跨平台APP的客户端与服务端           |
 | `build-logic`    | 插件安装、源集组织、代码生成、原生构建、打包与发布 DSL |
+| `native-compose` | Windows、Linux、macOS 桌面 Native Compose 移植、适配、上游锁与消费验证 |
 | `ylcs-docs`   | MkDocs 文档与站点配置                |
 
 ## 环境与命令
@@ -54,7 +55,7 @@ Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化框�
 
 ## kotlin 语法风格
 
-kotlin 目前版本为2.5.0（可能更高），支持各类语法糖实现，编写 kotlin 代码时需要保持和其他模块相同风格，且优先使用编译器最新支持的语法。此外框架在`ylcs-module:core`模块提供了较多框架风格的语法糖，此模块是全模块必须引入的模块，请放心优先使用。
+Kotlin 编译器版本以 `libs.versions.toml` 为准，语言特性开关位于 `settings.gradle.kts` 的 `repository.rachel.languageFeatures`。编写 Kotlin 代码时保持相邻模块的语法风格，并仅使用当前工具链和已启用特性支持的语法。框架在 `ylcs-module:core` 提供协程、序列化、集合等扩展；通过已有模块依赖使用这些能力。
 
 - 集合字面量采用 kotlin 2.5 的语法糖：用 `[]`替换 `emptyList`以及`listOf`等各类`List`、`Array`、`Set`的辅助函数。
 - 结构化绑定采用 kotlin 2.5 的规范，基于位置的使用`[]`，基于名称的使用`()`。

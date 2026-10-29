@@ -58,13 +58,25 @@ val error = ApiDemoEcho.request("example") { value ->
 
 异常随后进入所选调用形式的结果通道，取消异常除外。202 对应业务失败是该引擎的协议约定，接入不遵守该协议的后端时应另行适配。
 
-请求和响应读取在 I/O 上下文执行，成功解码回调恢复至调用方上下文。回调中的本地异常也可能作为请求失败返回，因此不能仅凭失败结果断定服务端未完成操作。
+网络请求在 I/O 上下文执行；200 响应的 block 切回调用方上下文后，才执行声明输出的读取、解码与成功回调。回调中的本地异常也可能作为请求失败返回，因此不能仅凭失败结果断定服务端未完成操作。体积较大的输出应避免在 UI 上下文执行昂贵的后续处理。
 
 ## 生命周期与能力边界
 
 请求为挂起函数，页面中使用 `launch`，应用服务使用具有明确所有者的任务作用域。引擎不自动处理令牌刷新、重试、请求缓存、写入幂等或 WebSocket 重连。
 
 鉴权信息应根据共享契约显式传递，或在应用自己的请求层中组合。当前 `ClientEngine` 没有旧文档中的 `proxy()` 辅助函数，代理现状见[代理能力](../4_server/proxy.md)。
+
+## 业务中的初始化入口
+
+共享业务应用在构造阶段设置后端地址，早于平台启动与页面请求：
+
+示例来源：[AbstractRachelApplication.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/app/global/src/commonMain/kotlin/love/yinlin/AbstractRachelApplication.kt#L34)。
+
+```kotlin
+ClientEngine.init(Local.API_BASE_URL)
+```
+
+`Local.API_BASE_URL` 是业务配置，不由引擎自动发现。初始化仅赋值地址，不进行连通性探测或加载远程配置；也不意味着所有异步服务已经就绪。
 
 ## 源码入口
 

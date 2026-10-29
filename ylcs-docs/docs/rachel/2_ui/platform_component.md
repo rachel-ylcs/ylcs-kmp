@@ -107,3 +107,37 @@ WebView 保留现有 API：通过 `state.url = newUrl` 发起导航，通过 `go
 旧的 `PlatformView`、`rememberPlatformView`、`HostView`、`Monitor` 和独立的更新/释放接口由新的 state + Host API 替代。创建逻辑迁到 `factory`，监听安装迁到 `attach`，按字段的差异同步迁到 `synchronize`，原生视图清理迁到 `detach`。公开 `release` 表示释放 state，不能用于手动销毁仍被 Host 持有的视图。
 
 iOS 默认使用协作交互且不强制 overlay；确有需要的组件可以覆盖 `properties`。相机预览与视频层不拦截 Compose 控件触摸，WebView 使用非协作交互。Android、Swing、UIKit 和 DOM 的混合绘制及输入行为仍需各平台验证。
+
+## 业务 WebView 的所有权
+
+业务页面 `ScreenWebpage` 将 `WebViewState` 保存在页面实例中，在页面清理时释放，并先消费网页内部返回：
+
+示例来源：[ScreenWebpage.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/app/viewer/src/commonMain/kotlin/love/yinlin/screen/ScreenWebpage.kt#L19)。
+
+```kotlin
+@Stable
+class ScreenWebpage(url: String) : Screen() {
+    private val state = WebViewState(url)
+
+    override val title: String by derivedStateOf { state.title }
+
+    override fun uninitialize() {
+        state.release()
+    }
+
+    override fun onBack() {
+        if (state.canGoBack) state.goBack()
+        else pop()
+    }
+
+    @Composable
+    override fun Content() {
+        WebView(
+            state = state,
+            modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize()
+        )
+    }
+}
+```
+
+这是 Android/iOS/Web 实现的使用模式。JVM 的 `WebView` 当前仅显示 `UnsupportedPlatformComponent`，其 state 不建立原生网页视图；业务的 `navigateScreenWebPage` 因而在 JVM Desktop 上改为系统浏览器打开。桌面 Native 没有启用此 WebView 模块。宿主状态更新、旧回调失效与延迟释放的测试见 `TestPlatformViewState`。

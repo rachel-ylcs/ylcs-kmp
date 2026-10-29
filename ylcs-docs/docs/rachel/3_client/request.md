@@ -81,6 +81,20 @@ when (error) {
 
 客户端不自动合并重复请求或重试写入。读取任务可由状态所有者取消或替换；写入操作应明确重复提交限制及服务端幂等语义。
 
+## 业务中的结果转换
+
+`DataSourceAccount.checkUpdate` 保留请求失败通道，只将成功结果的第一项转换为业务模型：
+
+示例来源：[DataSourceAccount.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/app/account/src/commonMain/kotlin/love/yinlin/compose/ds/DataSourceAccount.kt#L126)。
+
+```kotlin
+suspend fun checkUpdate(): Data<ServerStatus> {
+    return ApiCommonGetServerStatus.request().map { it.o1 }
+}
+```
+
+`ApiCommonGetServerStatus` 在共享 `APIMap.kt` 中声明为零输入、单输出；`Data.map` 只转换成功数据。该写法适用于上层继续区分网络、鉴权或协议错误的场景，比在请求后直接丢弃错误信息更适合更新检查的状态展示。
+
 ## 源码入口
 
 - `ylcs-module/cs/client-engine/src/commonMain/kotlin/love/yinlin/cs/PostRequest.kt`

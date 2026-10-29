@@ -28,7 +28,7 @@ override val public = PublicRes.path
 - 根据扩展名选择 Content-Type，未知类型使用 `application/octet-stream`。
 - 为文本、SVG 及部分 application 文本类型补充 UTF-8 charset。
 - 通过 Source 流式响应，并提供文件长度。
-- 路径无对应文件时返回 404。
+- 路径无对应文件或文件长度为零时返回 404，零字节文件不会以 200 响应。
 
 封装未提供目录列表、ETag、Range、压缩和显式 Cache-Control。需要相关能力时由部署层或独立路由实现。
 
@@ -54,6 +54,21 @@ uploaded.copy(target)
 ## 缓存策略
 
 不可变资源可使用内容摘要名称；头像等可变资源应通过版本与缓存头明确更新行为。客户端 `.url` 仅生成地址，资源缓存策略需与部署配置共同确定。
+
+## 业务中的资源落盘
+
+头像处理器将共享用户资源路径作为复制目标：
+
+示例来源：[ProfileAPI.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/server/src/nativeMain/kotlin/love/yinlin/cs/ProfileAPI.kt#L93)。
+
+```kotlin
+ApiProfileUpdateAvatar.response { token, avatar ->
+    val uid = AN.throwExpireToken(token)
+    avatar.copy(ServerRes.Users.User(uid).avatar)
+}
+```
+
+`AN` 负责校验业务令牌；`ServerRes.Users.User(uid).avatar` 生成 `public/users/<uid>/avatar.webp`。该片段展示当前实现，复制调用本身不检查图片编码或尺寸，也不会将路径自动改为引擎绝对目录。内容校验、目录准备与文件覆盖策略需在使用场景中明确。
 
 ## 源码入口
 

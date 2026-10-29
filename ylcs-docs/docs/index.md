@@ -21,6 +21,7 @@ Rachel 是基于 Kotlin Multiplatform 与 Compose Multiplatform 的模块化开�
 | `ylcs-module/platform/*`、`native/*` | FFI、动态库加载、操作系统集成及 Win32 封装 |
 | `ylcs-app/*` | 业务应用、组件展厅、导航示例、服务端与 MOD 工具 |
 | `build-logic` | 插件安装、源集组织、代码生成、原生构建、打包与发布 DSL |
+| `native-compose` | Windows、Linux、macOS 的 Compose Native 上游锁、适配、桥接与消费验证 |
 
 基础库与业务应用保持单向依赖。共享协议集中声明接口和传输模型，具体网络请求、数据库访问与界面交互分别由相应模块实现。
 
@@ -39,9 +40,28 @@ Android 当前仅打包 `arm64-v8a`。iOS 启用 `iosArm64`，并在 Apple Silic
 | 管理页面与状态 | [导航与页面](rachel/2_ui/navigation.md)、[应用服务](rachel/2_ui/service.md) |
 | 接入共享后端 | [C/S 共享契约](rachel/1_start/cs_core.md)、[客户端引擎](rachel/3_client/entry.md)、[服务端引擎](rachel/4_server/entry.md) |
 | 扩展公共能力 | [核心库](rachel/1_start/core.md)、[Compose 核心](rachel/1_start/compose_core.md)、[平台组件](rachel/2_ui/platform_component.md) |
+| 使用解析器、压缩、摘要或检索 | [基础能力模块](rachel/1_start/foundation.md) |
+| 新增模块、配置目标与分发 | [构建插件与模块配置](rachel/1_start/build.md) |
 | 维护媒体工具 | [MOD 文件格式](tool/mod.md)、[Android FFmpeg 解码库](tool/ffmpeg.md) |
 
 文档中的业务示例用于说明框架调用方式；未展开的业务类型、数据仓库和校验函数需要由使用方实现。平台专属示例应放置在对应源集中。
+
+## 文档位置与维护边界
+
+| 位置 | 内容与维护方式 |
+| --- | --- |
+| 根目录 `README.md`、`README_en.md` | 项目介绍、预览与全模块平台支持矩阵 |
+| 根目录 `AGENTS.md` | 自动化代码协作的仓库约定，不是面向使用方的 API 说明 |
+| `native-compose/README.md` | 桌面 Native Compose 的消费、窗口、分发与移植维护 |
+| `ylcs-docs/docs/index.md` | 框架与指南索引 |
+| `ylcs-docs/docs/rachel/1_start/*.md` | 环境、构建、核心库、共享契约与基础能力 |
+| `ylcs-docs/docs/rachel/2_ui/*.md` | 入口、上下文、主题、设备、导航、服务、网络、组件与浮层 |
+| `ylcs-docs/docs/rachel/3_client/*.md` | 客户端请求、资源、上传与 WebSocket |
+| `ylcs-docs/docs/rachel/4_server/*.md` | 原生服务端、接口、资源、上传、Socket、回调、数据库与插件 |
+| `ylcs-docs/docs/tool/*.md` | MOD 协议、MOD Manager 与 Android FFmpeg 适配 |
+| `ylcs-docs/docs/overrides/` | 站点模板及发布流程生成的 Gallery、ModernScreen、Dokka 页面；生成结果从相应源码维护 |
+
+模块平台矩阵来自各模块构建脚本及模板的默认目标，源码中的占位或空实现另外注明。完整矩阵见[仓库首页](https://github.com/rachel-ylcs/ylcs-kmp#全平台模块支持)。指南中的源码链接指向当前 `main`；阅读历史版本时应同时切换代码与文档版本。
 
 ## 状态与资源归属
 

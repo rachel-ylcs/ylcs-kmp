@@ -1,6 +1,6 @@
 # 应用入口与生命周期
 
-`PlatformApplication` 将共享应用连接到 Android、Desktop、Web 与 iOS 宿主。共享层定义主题、根内容和启动服务，平台层负责系统上下文、界面容器与平台事件。
+`PlatformApplication` 将共享应用连接到 Android、JVM Desktop、Native Desktop、Web 与 iOS 宿主。共享层定义主题、根内容和启动服务，平台层负责系统上下文、界面容器与平台事件。
 
 ## 共享应用结构
 
@@ -67,9 +67,21 @@ fun main() {
 }
 ```
 
-平台配置包括 `commandArgs`、标题、图标、初始尺寸、最小尺寸、圆角、Swing 混合参数与标题栏。`MultipleWindow()` 用于组合额外窗口；运行期主窗口状态由 `WindowController` 管理。
+平台配置包括 `commandArgs`、标题、图标、初始尺寸、最小尺寸、圆角、Swing 混合参数与标题栏。运行期主窗口状态由 `WindowController` 管理，独立窗口通过 `openWindow(ApplicationWindow)` 注册；当前类型没有 `MultipleWindow()` 覆写入口。
 
 第一阶段初始化发生在窗口循环建立前，主窗口首次进入组合时通过 `LaunchFlag` 执行第二阶段初始化。退出主窗口前执行 `destroyPoolBefore()`，窗口循环结束后执行 `destroyPool()` 并取消主协程域。
+
+## Native Desktop
+
+Windows、Linux、macOS 的 Native 入口同样调用 `PlatformApplication.run()`，通过移植的 `NativeWindow` 与 SDL 事件循环运行，不依赖 JVM。模块需要启用桌面 Native target，并安装 `libs.plugins.nativeBridge`；构建和分发方式见[构建插件](../1_start/build.md)与 [Native Compose 说明](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/native-compose/README.md)。
+
+Native 主窗口在 `onOpen` 中连接 `WindowController` 并填入平台句柄，首次组合时调度第二阶段服务，在 `onClose` 中清空句柄并解除控制器绑定。除标题、图标与尺寸外，还支持 `initPosition`、`initPlacement`、`transparent`、`undecorated`、`focusable`、`resizable`、`clickThrough` 等初始设置；运行期状态通过控制器更新。`transparent` 是创建参数，不能作为普通运行期状态修改。
+
+## 独立窗口
+
+`ApplicationWindow.Window(content)` 负责建立一个平台窗口，`Content()` 负责窗口内容。JVM 可使用官方 Compose `Window`，Native 可使用 `love.yinlin.compose.NativeWindow` 扩展。内容自动继承应用的主题、字体与 `LocalPlatformContext`。窗口激活后可使用其 `scope`；离开组合时取消该作用域并调用 `uninitialize()`。
+
+每次打开使用新实例，系统关闭事件应调用该实例的 `close()`。主窗口退出时应用停止接受新窗口并关闭其管理的所有窗口。Android 使用 `openWindow(window, owner: LifecycleOwner)`，可由服务生命周期持有系统悬浮窗，详见[浮层与系统悬浮窗](floating.md)。Web 和 iOS 当前没有对应的 `openWindow` 实现。
 
 ## Web
 
@@ -109,6 +121,31 @@ Swift 宿主持有该实例，先调用 `run()` 初始化应用，再由 `UIView
 | `implicitFileUri(uri)` | 创建平台可解释的文件 URI 包装 |
 
 返回值反映当前实现能报告的结果。例如 Web 剪贴板写入是异步浏览器请求，公共 Boolean 返回值不代表用户权限与最终写入已经确认。
+
+## 入口中的服务与主题组合
+
+Gallery 将主题状态和一次性图片初始化放在共享应用中，平台入口只建立宿主。以下是实际的共享应用实现：
+
+示例来源：[GalleryApplication.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/gallery/src/commonMain/kotlin/love/yinlin/GalleryApplication.kt#L15)。
+
+```kotlin
+@Stable
+abstract class GalleryApplication<out A : GalleryApplication<A>>(self: BaseLazyReference<A>, context: PlatformContext) : PlatformApplication<A>(self, context) {
+    override val themeMode: ThemeMode get() = if (darkMode) ThemeMode.DARK else ThemeMode.LIGHT
+    override val mainFontResource = Res.font.font
+    override val colorSystem: ColorSystem get() = if (galleryPalette == GalleryPalette.Framework) ColorSystem.Default else GalleryColors
+    override val toolingTheme = ToolingTheme(enableBallonTip = true)
+
+    init {
+        sync { ImageManager.initialize(rawContext, "RachelGallery") }
+    }
+
+    @Composable
+    final override fun Content() = App()
+}
+```
+
+`darkMode`、`galleryPalette`、`GalleryColors` 与 `App()` 来自 Gallery 工程，代码片段需要该上下文。`sync` 在启动池初始化时执行；可复用的业务服务还应建立对应销毁责任，不能从这一演示推断全部图片管理器生命周期都已自动处理。
 
 ## 源码入口
 

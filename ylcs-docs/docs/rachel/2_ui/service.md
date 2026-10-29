@@ -97,10 +97,10 @@ private val prepareCache by async(
 | `StartupConfig` / `compose:startup:config` | 基于 KV 的可观察持久配置 |
 | `StartupPicker` / `compose:startup:picker` | 文件与目录选择等平台交互 |
 | `StartupExceptionHandler` / `compose:startup:exception` | 未处理异常收集与自定义记录 |
-| `StartupUrlImage` / `compose:components:url-image` | 网络图片、Sketch 与缓存初始化 |
+| `ImageManager` / `compose:components:image` | 图片解码与缓存；由应用持有初始化及关闭生命周期 |
 | `compose:cache` | 内存状态缓存与磁盘缓存抽象 |
 
-`ylcs-app/app/global` 中的 `StartupCache` 是应用组合示例。配置服务与异常记录等依赖可参考 `AbstractRachelApplication`，新增依赖时仍需核对真实图关系。
+`ylcs-app/app/global` 中的 `StartupCache` 与 `StartupImage` 是业务应用的服务组合示例，后者使用同步工厂初始化 `ImageManager`，在 `destroy()` 中关闭管理器；它们不是基础库导出的内置 Startup。配置服务与异常记录等依赖可参考 `AbstractRachelApplication`，新增依赖时仍需核对真实图关系。
 
 ## 配置委托
 
@@ -122,6 +122,35 @@ val config by startup(StartupConfig.custom(::AppConfig))
 数据库、播放器、持久配置和全局客户端适合应用服务。页面加载状态由 `ScreenModel` 管理，组合可见期间的订阅由 Compose effect 管理，无状态逻辑保留为普通函数或对象。
 
 `Startup` 本身不提供自动独立协程域。服务长期任务应绑定明确的应用级所有者，并在服务结束时停止。
+
+## 业务图片服务的完整封装
+
+`app/global` 中的 `StartupImage` 展示了同步服务的常见写法：工厂构造时初始化依赖，应用销毁时关闭它。该类型属于业务模块：
+
+示例来源：[StartupImage.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/app/global/src/commonMain/kotlin/love/yinlin/startup/StartupImage.kt#L11)。
+
+```kotlin
+@Stable
+class StartupImage(pool: StartupPool, appName: String, configuration: ImageConfiguration) : SyncStartup(pool) {
+    class Factory(
+        private val appName: String = "Rachel",
+        private val configuration: ImageConfiguration = ImageConfiguration(),
+    ) : SyncStartupFactory<StartupImage>() {
+        override val id: String = StartupID<StartupImage>()
+        override fun build(pool: StartupPool): StartupImage = StartupImage(pool, appName, configuration)
+    }
+
+    init {
+        ImageManager.initialize(pool.rawContext, appName, configuration)
+    }
+
+    suspend fun clearCache() = ImageManager.clearCache()
+
+    override fun destroy() = ImageManager.shutdown()
+}
+```
+
+基础库使用方可以采用相同的生命周期模式，并按依赖关系注册工厂。`StartupImage` 不会让 `compose:startup:config`、MMKV 或 Picker 自动获得桌面 Native 支持；这几个可选模块的目标需要分别核对。依赖执行顺序与逆序销毁的测试见 `foundation/startup` 的 `TestStartupDependencies`。
 
 ## 源码入口
 

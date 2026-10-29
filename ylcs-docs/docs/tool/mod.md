@@ -143,11 +143,25 @@ Gradle 的 Debug 和 Release 运行任务使用仓库 `work/modManager` 作为�
 
 `composeDistribution` 在当前宿主生成 `ylcs-app/mod-manager/build/nativeApplication/<windows|linux|macos>/releaseExecutable/`，包含可执行程序、Compose 资源和 `icudtl.dat`。Windows 为 `ModManager.exe`，Linux 为 `ModManager.kexe`，macOS 为 `ModManager.app`。Debug 运行任务先准备相邻的 `debugExecutable/` 完整目录，再启动其中的程序。`build/bin/<target>/<binary>/` 仅为链接产物，不能直接复制它作为完整分发包。符号文件单独存放在 `build/nativeSymbols`，不进入应用分发目录。
 
-发布由 CI 完成，不提供本地 Publish 任务。推送 `modManager*` 标签触发 `release_mod_manager.yml`，分别在 Windows、Linux、macOS 宿主构建 Release ZIP，并上传三个平台的应用 artifact 和独立符号 artifact。全量 `v*` 发布的 `release.yml` 复用相同工作流，将三个应用 ZIP 一并附加到 Release；符号仅保存在独立 artifact 中。ZIP 名称为 `ModManager-<mingw_x64|linux_x64|macos_arm64>-release.zip`，保留 Linux/macOS 可执行权限。
+发布由 CI 完成，不提供本地 Publish 任务。推送 `modManager*` 标签触发 `release_mod_manager.yml`，分别在 Windows、Linux、macOS 宿主执行 `packageWindowsReleaseExecutable`、`packageLinuxReleaseExecutable`、`packageMacosReleaseExecutable`，上传三个平台的应用 ZIP artifact。全量 `v*` 发布的 `release.yml` 复用相同工作流，将三个应用 ZIP 一并附加到 Release。ZIP 名称为 `ModManager-<mingw_x64|linux_x64|macos_arm64>-release.zip`，保留 Linux/macOS 可执行权限。当前该工作流没有上传独立符号 artifact；本地生成的 `build/nativeSymbols` 不会因此自动保留。
 
 工具支持预览、解包、合并或分别打包、资源筛选和部署。源目录发现流程检查 config、audio、record、background 与 lyrics 等基础资源。
 
 部署流程为每首媒体生成只包含 BASE 的 `base.rachel`，同时复制 DEPLOYMENT 资源作为旁路文件。该目录组织是工具部署策略，不增加 v5 归档字段。
+
+## 管理器中的实际打包调用
+
+MOD Manager 将业务筛选结果交给格式库，并使用 File 的写入作用域管理 Sink：
+
+示例来源：[ScreenMain.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/mod-manager/src/nativeMain/kotlin/love/yinlin/screen/ScreenMain.kt#L125)。
+
+```kotlin
+File(app.outputPath, filename).write { sink ->
+    ModFactory.Merge(paths, sink).process(filters = filters, onProcess = onProcess)
+}
+```
+
+`filename`、`paths`、`filters` 和 `onProcess` 来自管理器的挂起打包方法。`Merge.process` 不接管外层输出文件的最终发布策略；处理中断时应处理不完整输出，不能把已创建文件等同于有效归档。
 
 ## 源码入口
 

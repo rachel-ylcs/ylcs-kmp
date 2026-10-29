@@ -149,6 +149,23 @@ override fun onDeepLink(manager: ScreenManager, uri: Uri) {
 
 跨页面状态通过应用服务或显式注入的业务状态所有者共享。当前模块没有旧版 `DataSource` / `MultiDataSource` 导航接口，不应依赖全局页面查找修改其他页面。
 
+## 导航示例工程的根宿主
+
+ModernScreen 将根宿主和路由注册分开，实际入口如下：
+
+示例来源：[App.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/modern-screen/src/commonMain/kotlin/love/yinlin/App.kt#L9)。
+
+```kotlin
+@Composable
+fun App() {
+    ScreenManager.Navigation<OverviewScreen> {
+        registerGallery(GalleryRoutes())
+    }
+}
+```
+
+`registerGallery` 是示例工程自己的注册扩展，不是框架内置 API。导航的参数、复用与清理规则分别由 `ScreenArgsTest`、`ScreenResumeTest`、`ScreenNavigationTest`、`ScreenStoreTest` 等用例覆盖；这些测试也包含错误类型、重复实例和作用域清理边界，使用内部测试夹具时不能直接当作公开导航 API 复制。
+
 ## 源码与示例
 
 实现位于 `ylcs-module/compose/screen/src/commonMain/kotlin/love/yinlin/compose/screen/`，行为用例位于同模块 `commonTest`。交互示例位于 `ylcs-app/modern-screen`：

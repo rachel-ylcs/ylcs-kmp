@@ -94,6 +94,25 @@ override val logger = ServerLogger(
 
 可执行文件需与目标操作系统及架构匹配。数据库、Redis、静态资源和外部代理属于部署依赖，不包含在单个可执行文件中。
 
+## 业务服务的启动准备
+
+业务入口在服务 `onStart()` 完成后、建立路由前完成鉴权准备和歌词数据加载：
+
+示例来源：[Main.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/server/src/nativeMain/kotlin/Main.kt#L35)。
+
+```kotlin
+override suspend fun onServerPrepare() {
+    // 初始化鉴权密钥
+    apiScope.AN.init()
+    logger.info("Resource | Get user token secret key successfully.")
+    // 初始化歌词游戏歌词表
+    val librarySize = LyricsSocketsManager.initLibrary(File(currentDirectory, "lyrics_game.json"))
+    logger.info("Resource | Lyrics game library initialized, size = $librarySize.")
+}
+```
+
+`apiScope` 是已创建的 `ServerScope`，依赖的 MySQL/Redis 由 `services` 列表启动。歌词文件基于 `engine.currentDirectory` 定位；该文件、服务配置和数据库内容都是部署输入，不由示例代码或可执行程序自动生成。
+
 ## 源码入口
 
 - `ylcs-module/cs/server-engine/src/nativeMain/kotlin/love/yinlin/cs/ServerEngine.kt`

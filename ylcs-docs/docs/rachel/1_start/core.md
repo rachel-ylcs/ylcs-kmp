@@ -38,6 +38,8 @@ Coroutines.timeout(3_000) {
 
 `mainContext`、`cpuContext` 与 `ioContext` 根据平台提供实际调度上下文。`Coroutines.with(context)` 用于恢复或指定其他协程上下文。阻塞 I/O 应置于适合的平台调度器中。
 
+`Coroutines.mainImmediate` 使用主线程立即调度语义；`Coroutines.wait` 切入 `NonCancellable`，用于需要等待完成的清理，不会自动切换到 I/O 线程。浏览器的 IO/CPU 上下文不等同于独立 Worker，不能仅凭切换上下文推断计算会并行执行。
+
 异常辅助函数位于 `love.yinlin.extension`：
 
 | 函数 | 普通异常处理 |
@@ -103,6 +105,8 @@ val text = file.readText()
 
 平台目录通过 `appPath(context, appName)`、`dataPath(context, appName)` 与 `cachePath(context, appName)` 获取，返回 `File`。数据目录用于持久内容，缓存目录用于可重建内容。安装位置不应直接作为默认用户数据目录。
 
+进程工作目录可通过 `getCurrentDirectory()` 读取，浏览器没有这一概念而返回 `null`；`setCurrentDirectory(File)` 返回操作结果，不替代应用数据目录配置。
+
 文件操作包括元数据、目录遍历、创建、删除、复制、移动及字节和文本读写。带 `Sync` 后缀的接口执行同步操作；挂起接口按实现切换调度上下文。`read`、`write` 及 Source/Sink 接口适合流式处理大文件。
 
 `RegularUri`、Android 的 `ContentUri` 与 iOS 的 `SandboxUri` 保留不同的平台文件访问语义。`ImplicitUri` 不保证可转换为普通绝对路径。
@@ -120,6 +124,33 @@ val text = file.readText()
 | `encoding/*` | UTF、GBK、ASCII 等编码转换 |
 | `concurrent/*` | 原子值、锁与互斥封装 |
 | `data/Data.kt` | `Data.Success` 与 `Data.Failure` 结果模型 |
+
+压缩、加密、全文检索和各解析器的独立模块、测试示例及限制见[基础能力模块](foundation.md)。
+
+## 字节读写测试示例
+
+`TestByteArrayIO.constructorsAndSharedBytes` 验证数组包装保留引用、默认大端写入和新建缓冲区的零初始化。以下保留测试方法，断言来自 `kotlin.test`：
+
+示例来源：[TestByteArrayIO.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-module/core/src/commonTest/kotlin/love/yinlin/io/TestByteArrayIO.kt#L12)。
+
+```kotlin
+fun constructorsAndSharedBytes() {
+    val raw = ByteArray(4)
+    val wrapped = ByteArrayIO(raw)
+
+    assertSame(raw, wrapped.bytes)
+    assertEquals(4, wrapped.size)
+
+    wrapped.writeInt(0, 0x01020304)
+    assertContentEquals([1, 2, 3, 4], raw)
+
+    val created = ByteArrayIO(size = 2)
+    assertEquals(2, created.size)
+    assertContentEquals([0, 0], created.bytes)
+}
+```
+
+`ByteArrayIO(raw)` 不复制输入，写入会修改原数组；读写索引与长度必须处于缓冲区范围内。`signedIntegersRespectEndian` 验证显式 `Endian.LITTLE`，其余边界测试验证负长度、越界、整型溢出和尾部零长度区间。
 
 ## 源码入口
 

@@ -1,4 +1,4 @@
-# 浮层
+# 浮层与系统悬浮窗
 
 Rachel 通过 `Floating`、Dialog、Sheet、Tip 与 FAB 管理覆盖层交互。浮层实例保存打开状态，组合侧调用 `Land()` 渲染对应内容。
 
@@ -101,7 +101,55 @@ Tip 默认显示 3 秒，不显示遮罩，也不接管返回键。新提示会�
 
 `Floating` 统一打开参数、进出动画、遮罩、外部点击、返回键及离开组合时的关闭。自定义实现需明确关闭策略，并验证安全区、键盘、焦点与多浮层叠加行为。
 
-## 源码入口
+## Gallery 中的挂起交互
+
+Gallery 的加载对话框由挂起按钮回调打开，演示任务结束后关闭：
+
+示例来源：[FloatingPage.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/gallery/src/commonMain/kotlin/love/yinlin/page/FloatingPage.kt#L149)。
+
+```kotlin
+PrimaryLoadingButton("open", onClick = {
+    dialogLoading.open("Please wait 3s!") {
+        delay(3.seconds)
+    }
+})
+```
+
+`dialogLoading` 是 `FloatingPage` 的稳定成员，页面还在组合中调用它的 `Land()`。`delay` 与 `seconds` 来自协程和 Kotlin Duration；演示的任务完成仅表示交互完成，业务保存是否成功仍应由业务结果明确表达。
+
+## Android 系统悬浮窗
+
+页面 Dialog、Sheet 等由当前组合树绘制。Android 的系统悬浮窗使用 `compose:app` 中的 `ApplicationWindow.OverlayWindow`，底层为 `love.yinlin.compose.window.FloatingView`；该底层类型当前也位于 `compose:app`，不是 `compose:core`。
+
+应用调用 `openWindow(window, owner: LifecycleOwner)` 注册系统悬浮窗。Owner 销毁时该宿主关闭其窗口；使用服务 Owner 可以让歌词窗的存续范围与服务一致。每次打开仍需创建新的 `ApplicationWindow`，不能重新打开已关闭的实例。
+
+业务 [FloatingLyrics.android.kt](https://github.com/rachel-ylcs/ylcs-kmp/blob/main/ylcs-app/app/music/src/androidMain/kotlin/love/yinlin/media/lyrics/FloatingLyrics.android.kt) 在窗口的 `Window` 方法中建立不可触摸的歌词浮窗：
+
+```kotlin
+@Composable
+override fun Window(content: @Composable () -> Unit) {
+    OverlayWindow(
+        touchable = false,
+        onPermissionFailed = { if (currentWindow === this) app.config.enabledFloatingLyrics = false },
+        onOpen = {
+            view = it
+            if (currentWindow === this) isAttached = true
+        },
+        onClose = { view = null },
+        content = content,
+    )
+}
+```
+
+`view`、`currentWindow` 与 `isAttached` 属于该业务对象，回调用于同步实际挂载状态。窗口内容自动使用应用主题；透明内容由窗口覆写 `background`。需要改变位置时，在 `onOpen` 得到底层 `FloatingView` 后调用 `updateLayoutParams`。
+
+Manifest 需声明 `android.permission.SYSTEM_ALERT_WINDOW`。`OverlayWindow` 检查权限，缺少权限时等待前台 Activity 可用并发起设置页请求；Activity 重建后重建尚未完成的请求，明确拒绝时关闭窗口并调用 `onPermissionFailed`。窗口关闭时注销权限 launcher 并释放 View。不能将窗口对象已经激活视为已经获得系统权限或已经挂载，实际挂载以 `onOpen` 为准。
+
+`layoutInScreen` 和 `touchable` 是创建参数。`FloatingView` 使用基于 Application 的显示/窗口 Context，并为 ComposeView 安装独立的 Lifecycle、SavedStateRegistry 和 ViewModelStore；释放时解除引用，不要求把 Activity 保存到长生命周期服务中。
+
+## 实现位置
 
 - `ylcs-module/compose/ui/src/commonMain/kotlin/love/yinlin/compose/ui/floating/`
 - `ylcs-module/compose/screen/src/commonMain/kotlin/love/yinlin/compose/screen/BasicScreen.kt`
+- `ylcs-module/compose/app/src/androidMain/kotlin/love/yinlin/compose/ApplicationWindow.android.kt`
+- `ylcs-module/compose/app/src/androidMain/kotlin/love/yinlin/compose/window/FloatingView.kt`
