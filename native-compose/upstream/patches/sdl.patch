@@ -406,7 +406,7 @@ new file mode 100644
 +    wl_surface_set_input_region(data->surface, region);
 +    if (region) wl_region_destroy(region);
 +    wl_surface_commit(data->surface);
-+    wl_display_flush(video->display);
++    WAYLAND_wl_display_flush(video->display);
 +    return true;
 +}
 +#endif
