@@ -3,6 +3,7 @@ package love.yinlin.nativebridge
 import org.gradle.api.Action
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
@@ -13,6 +14,8 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
     abstract val entryPoint: Property<String>
     abstract val baseName: Property<String>
     abstract val arguments: ListProperty<String>
+    /** 仅供 Gradle 启动进程使用，不改变二进制及资源的分发位置。 */
+    abstract val workingDirectory: DirectoryProperty
     abstract val resources: ConfigurableFileCollection
     val desktop = NativeDesktopDistribution()
     val skikoRuntimeEnabled: Property<Boolean> = objects.property(Boolean::class.java).convention(false)

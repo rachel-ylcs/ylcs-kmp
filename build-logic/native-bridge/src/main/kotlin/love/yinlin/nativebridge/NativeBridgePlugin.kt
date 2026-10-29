@@ -286,6 +286,7 @@ class NativeBridgePlugin : Plugin<Project> {
                     distribution.set(project.layout.dir(stage.map { task -> task.destinationDir }))
                     executableName.set(executablePath)
                     arguments.set(application.arguments)
+                    workingDirectory.convention(application.workingDirectory.orElse(distribution))
                 }
                 project.tasks.register("package$suffix", Zip::class.java) {
                     group = "native application"

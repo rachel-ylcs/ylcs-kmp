@@ -265,6 +265,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
             application.entryPoint.set(application.desktop.entryPoint)
             application.baseName.set(application.desktop.packageName)
             application.arguments.addAll(application.desktop.arguments)
+            application.desktop.workingDirectory?.let { application.workingDirectory.set(it) }
         }
 
         with(extension) {

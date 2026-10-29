@@ -6,6 +6,8 @@ class NativeDesktopDistribution {
     internal var enabled = false
     var entryPoint: String = "main"
     var arguments: List<String> = emptyList()
+    /** Gradle 运行任务的工作目录；不存在时自动创建，不写入分发物。默认使用应用分发目录。 */
+    var workingDirectory: File? = null
     var packageName: String = "application"
     var displayName: String = "Application"
     var packageVersion: String = "1.0.0"

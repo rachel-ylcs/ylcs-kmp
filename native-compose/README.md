@@ -140,12 +140,25 @@ composeDesktopPackage {
     vendor = "Example"
     author = "Example Team"
     copyright = "Copyright 2026 Example"
+    workingDirectory = rootProject.layout.projectDirectory.dir("work/modManager").asFile
+    arguments = listOf("--profile", "development")
     windows { iconFile = file("icons/app.ico") }
     macos { iconFile = file("icons/app.icns") }
 }
 ```
 
 该配置与 JVM 的 `desktopPackage {}` 独立，同一模块可同时配置。`composeRun` 运行宿主 Debug，`composeReleaseRun` 运行 Release，`composeDistribution` 输出 `build/nativeApplication/<target>/releaseExecutable` 普通目录，包含 Compose 资源和平台运行数据。Windows 图标/版本信息嵌入 EXE；macOS 使用 `.app`、Info.plist 和 ICNS。自定义 `composePublish` 可消费此目录进行复制或 ZIP 打包。
+
+`workingDirectory` 只设置 Gradle 运行任务所启动进程的当前目录，不存在时自动创建；未配置时沿用应用分发目录。`arguments` 按独立参数传递，包含空格的参数无需手动添加引号。二进制仍从 `build/nativeApplication` 中启动，ICU 和 Compose 资源继续按可执行程序所在位置查找。两项配置均不会写入二进制、应用 Bundle 或启动脚本，直接运行打包后的程序时仍由启动方式决定当前目录和参数。
+
+仅使用桥插件时，可以配置相同选项：
+
+```kotlin
+nativeApplication {
+    workingDirectory.set(file("work"))
+    arguments.set(listOf("--profile", "development"))
+}
+```
 
 Release 链接后自动分离符号，桥插件与 Rachel 的 `nativeExecutable`、`nativeLibrary` 模板共用此处理；Debug 保持原样。链接输出和应用分发目录使用剥离后的 EXE、ELF 或动态库，符号归档在模块 `build/nativeSymbols/<target>/<binary>/`：Windows/Linux 为 `<binary>.debug`，macOS 为 `<binary>.unstripped` 及链接器已生成的 `.dSYM`。`symbols.properties` 记录剥离前后 SHA-256；旁边的 `<binary>-distribution.properties` 记录嵌入应用资源后最终分发文件的 SHA-256，用于匹配对应构建。macOS 剥离后重新进行 ad-hoc 签名。符号不会复制进分发目录。请在清理 `build` 前自行归档符号；普通 Release 未生成的 DWARF 行号信息不会凭空补齐，Windows 的 `.debug` 是 COFF 格式而非 PDB。Linux 使用 `objcopy`，Windows 使用 Kotlin/Native 已下载的 MinGW `objcopy`，特殊工具链可通过 `-Prachel.native.objcopy=/path/to/objcopy` 指定。
 
