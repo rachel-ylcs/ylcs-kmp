@@ -291,15 +291,7 @@ class NativeBridgePlugin : Plugin<Project> {
                 project.tasks.register("package$suffix", Zip::class.java) {
                     group = "native application"
                     dependsOn(stage)
-                    from(stage.map { task -> task.destinationDir }) {
-                        include { it.relativePath.pathString == executablePath }
-                        filePermissions { unix("rwxr-xr-x") }
-                    }
-                    from(stage.map { task -> task.destinationDir }) {
-                        exclude { it.relativePath.pathString == executablePath }
-                        filePermissions { unix("rw-r--r--") }
-                    }
-                    dirPermissions { unix("rwxr-xr-x") }
+                    NativeDesktopPackaging.configureArchive(this, stage.map { task -> task.destinationDir }, executablePath)
                     archiveBaseName.set(application.baseName)
                     archiveClassifier.set("${target.konanTarget.name}-${binary.buildType.name.lowercase()}")
                     destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))

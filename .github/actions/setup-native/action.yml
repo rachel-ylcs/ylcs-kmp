@@ -9,22 +9,28 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Configure macOS CI compilation
-      if: ${{ runner.os == 'macOS' }}
+    - name: Configure desktop Native CI compilation
+      if: ${{ runner.os == 'macOS' || inputs.tools == 'true' }}
       shell: bash
+      env:
+        NATIVE_CI_WORKERS: ${{ runner.os == 'Windows' && '2' || '1' }}
       run: |
         # User-home properties override the local-development defaults in every build.
         # Cold CI workers should not rebuild per-file project caches for each test binary.
+        # Bound concurrent links and share one compiler JVM instead of the local 16G/8G heaps.
         gradle_user_home="${GRADLE_USER_HOME:-$HOME/.gradle}"
+        if [[ "$RUNNER_OS" == 'Windows' ]]; then
+          gradle_user_home="$(cygpath -u "$gradle_user_home")"
+        fi
         mkdir -p "$gradle_user_home"
         cat >> "$gradle_user_home/gradle.properties" <<'EOF'
 
         kotlin.incremental.native=false
         kotlin.native.parallelThreads=1
-        org.gradle.workers.max=1
         org.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED
         kotlin.compiler.execution.strategy=in-process
         EOF
+        printf 'org.gradle.workers.max=%s\n' "$NATIVE_CI_WORKERS" >> "$gradle_user_home/gradle.properties"
     - name: Resolve Native cache inputs
       id: inputs
       shell: bash

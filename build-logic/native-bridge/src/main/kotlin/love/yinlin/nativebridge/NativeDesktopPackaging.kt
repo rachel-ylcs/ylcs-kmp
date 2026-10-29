@@ -1,11 +1,39 @@
 package love.yinlin.nativebridge
 
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.bundling.Zip
 import java.io.File
+import java.util.zip.ZipFile
 
 internal object NativeDesktopPackaging {
     fun executableDirectory(desktop: NativeDesktopDistribution, target: String): String = if (desktop.enabled && target == "macos_arm64") "${desktop.packageName}.app/Contents/MacOS" else ""
 
     fun resourceDirectory(desktop: NativeDesktopDistribution, target: String): String = if (desktop.enabled && target == "macos_arm64") "${desktop.packageName}.app/Contents/Resources" else ""
+
+    fun configureArchive(archive: Zip, directory: Provider<File>, executablePath: String) {
+        with(archive) {
+            from(directory) {
+                // Path patterns also traverse parent directories inside a macOS .app bundle.
+                include(executablePath)
+                filePermissions { unix("rwxr-xr-x") }
+            }
+            from(directory) {
+                exclude(executablePath)
+                filePermissions { unix("rw-r--r--") }
+            }
+            dirPermissions { unix("rwxr-xr-x") }
+            doFirst {
+                val executable = directory.get().resolve(executablePath)
+                require(executable.isFile && executable.length() > 0) { "Missing staged Native executable: $executable" }
+            }
+            doLast {
+                ZipFile(archiveFile.get().asFile).use { zip ->
+                    val executable = zip.getEntry(executablePath)
+                    require(executable != null && !executable.isDirectory && executable.size > 0 && executable.size == directory.get().resolve(executablePath).length()) { "Native archive is missing its executable: $executablePath" }
+                }
+            }
+        }
+    }
 
     fun finish(directory: File, executable: File, target: String, desktop: NativeDesktopDistribution) {
         if (!desktop.enabled) return

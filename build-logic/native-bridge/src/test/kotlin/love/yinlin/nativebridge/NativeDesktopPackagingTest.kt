@@ -1,13 +1,63 @@
 package love.yinlin.nativebridge
 
+import org.gradle.api.tasks.bundling.Zip
+import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.attribute.PosixFilePermissions
+import java.util.zip.ZipFile
 import kotlin.test.*
 
 class NativeDesktopPackagingTest {
     @get:Rule val temporary = TemporaryFolder()
+
+    @Test
+    fun archivesKeepExecutablesInFlatAndMacosBundleLayouts() {
+        for (executablePath in listOf("ModManager.exe", "ModManager.kexe", "ModManager.app/Contents/MacOS/ModManager.kexe")) {
+            val project = ProjectBuilder.builder().withProjectDir(temporary.newFolder()).build()
+            val distribution = project.file("distribution").apply { mkdirs() }
+            val executable = distribution.resolve(executablePath).apply {
+                parentFile.mkdirs()
+                writeBytes(byteArrayOf(0x4d, 0x5a, 1, 2, 3))
+            }
+            val runtime = executable.parentFile.resolve("icudtl.dat").apply { writeText("runtime fixture") }
+            val archive = project.tasks.register("packageNative", Zip::class.java).get().apply {
+                destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
+                archiveFileName.set("application.zip")
+                NativeDesktopPackaging.configureArchive(this, project.provider { distribution }, executablePath)
+            }
+            archive.destinationDirectory.get().asFile.mkdirs()
+            archive.actions.forEach { it.execute(archive) }
+            ZipFile(archive.archiveFile.get().asFile).use { zip ->
+                assertContentEquals(executable.readBytes(), zip.getInputStream(zip.getEntry(executablePath)).readBytes())
+                val runtimePath = runtime.relativeTo(distribution).invariantSeparatorsPath
+                assertContentEquals(runtime.readBytes(), zip.getInputStream(zip.getEntry(runtimePath)).readBytes())
+                assertEquals(2, zip.entries().asSequence().count { !it.isDirectory })
+            }
+            FileSystems.newFileSystem(archive.archiveFile.get().asFile.toPath(), emptyMap<String, Any>()).use { zip ->
+                assertEquals(PosixFilePermissions.fromString("rwxr-xr-x"), Files.getAttribute(zip.getPath("/$executablePath"), "zip:permissions"))
+                assertEquals(PosixFilePermissions.fromString("rw-r--r--"), Files.getAttribute(zip.getPath("/${runtime.relativeTo(distribution).invariantSeparatorsPath}"), "zip:permissions"))
+            }
+        }
+    }
+
+    @Test
+    fun archiveRejectsAResourceOnlyDistribution() {
+        val project = ProjectBuilder.builder().withProjectDir(temporary.newFolder()).build()
+        val distribution = project.file("distribution").apply { mkdirs() }
+        distribution.resolve("icudtl.dat").writeText("runtime fixture")
+        val archive = project.tasks.register("packageNative", Zip::class.java).get().apply {
+            destinationDirectory.set(project.layout.buildDirectory.dir("distributions"))
+            archiveFileName.set("application.zip")
+            NativeDesktopPackaging.configureArchive(this, project.provider { distribution }, "ModManager.app/Contents/MacOS/ModManager.kexe")
+        }
+        val error = assertFailsWith<IllegalArgumentException> { archive.actions.forEach { it.execute(archive) } }
+        assertContains(error.message.orEmpty(), "Missing staged Native executable")
+    }
 
     @Test
     fun macosBundleContainsExecutableMetadataAndEscapedAuthorFields() {

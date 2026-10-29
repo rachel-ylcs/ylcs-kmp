@@ -4,11 +4,29 @@ import org.gradle.api.tasks.testing.TestListener
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 
 afterEvaluate {
     val modules = project(":ylcs-module").subprojects.filter { it != project }
 
     modules.forEach { module ->
+        if (providers.environmentVariable("GITHUB_ACTIONS").orNull == "true") {
+            module.plugins.withId("org.jetbrains.kotlin.multiplatform") {
+                module.extensions.getByType<KotlinMultiplatformExtension>().targets.withType<KotlinNativeTarget>().configureEach {
+                    if (konanTarget.name in setOf("mingw_x64", "linux_x64", "macos_arm64", "macos_x64")) {
+                        binaries.withType<TestExecutable>().configureEach {
+                            // CI runs tests without the cost of DWARF generation or Release optimization.
+                            debuggable = false
+                            optimized = false
+                            // KGP normally enables assertions with debuggable; retain them explicitly.
+                            freeCompilerArgs += "-enable-assertions"
+                        }
+                    }
+                }
+            }
+        }
         module.tasks.withType<AbstractTestTask>().configureEach {
             val testPath = path
             val testLogger = logger
