@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 /**
  * Opens an independent Compose scene in the main NativeWindow event loop, without blocking it.
  * Close the returned handle on the UI thread to dispose the scene; SDL releases its peer on the next loop turn.
- * Window operations are available through onOpen. onClose runs after the scene has been disposed.
+ * Window operations are available through onOpen and the content receiver. onClose runs after the scene has been disposed.
  */
 @ExperimentalComposeUiApi
 fun openNativeWindow(
@@ -22,7 +22,7 @@ fun openNativeWindow(
     onOpen: (NativeWindowScope) -> Unit = {},
     onEvent: (NativeWindowEvent) -> Unit = {},
     onClose: () -> Unit = {},
-    content: @Composable () -> Unit,
+    content: @Composable NativeWindowScope.() -> Unit,
 ): AutoCloseable {
     registerSkikoComposeImplementation()
     val host = NativeSceneHost(onCloseRequest)
@@ -40,7 +40,8 @@ fun openNativeWindow(
             if (scale != 1f) it.setSize((options.width * scale).roundToInt(), (options.height * scale).roundToInt())
             host.attach(it)
             onOpen(it)
-            host.setContent(content)
+            val window = it
+            host.setContent { content(window) }
         }, onEvent = {
             host.onEvent(it)
             onEvent(it)

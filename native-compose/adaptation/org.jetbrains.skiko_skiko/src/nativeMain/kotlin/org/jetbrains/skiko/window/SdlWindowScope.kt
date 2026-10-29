@@ -16,6 +16,8 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
     private val trays = mutableSetOf<SdlNativeTray>()
     private var callbackFailure: Throwable? = null
     private var hitTest: SdlWindowHitTest? = null
+    private var defaultDragArea: ((Float, Float) -> Boolean)? = null
+    private val dragAreas = mutableMapOf<Any, (Float, Float) -> Boolean?>()
     private val dropTarget = SdlWindowDropTarget(window, ::onCallbackFailure)
     val shouldClose: Boolean get() = closing.load()
 
@@ -187,13 +189,52 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
 
     override fun setDragArea(hitTest: ((Float, Float) -> Boolean)?) {
         checkHostThread()
+        defaultDragArea = hitTest
+        updateDragAreas()
+    }
+
+    override fun addDragArea(hitTest: (Float, Float) -> Boolean?): AutoCloseable {
+        checkHostThread()
+        val registration = Any()
+        dragAreas[registration] = hitTest
+        try { updateDragAreas() }
+        catch (failure: Throwable) {
+            dragAreas.remove(registration)
+            throw failure
+        }
+        return object : AutoCloseable {
+            override fun close() {
+                if (!active.load()) return
+                checkHostThread()
+                if (dragAreas.remove(registration) != null) updateDragAreas()
+            }
+        }
+    }
+
+    private fun isDragArea(x: Float, y: Float): Boolean {
+        var draggable = defaultDragArea?.invoke(x, y) == true
+        for (area in dragAreas.values) {
+            when (area(x, y)) {
+                false -> return false
+                true -> draggable = true
+                null -> Unit
+            }
+        }
+        return draggable
+    }
+
+    override fun startDrag(): Boolean {
+        checkHostThread()
+        return RachelSDL_StartDrag(window)
+    }
+
+    private fun updateDragAreas() {
         val current = this.hitTest
-        if (hitTest == null) {
+        if (defaultDragArea == null && dragAreas.isEmpty()) {
             current?.dispose()
             this.hitTest = null
         }
-        else if (current != null) current.hitTest = hitTest
-        else this.hitTest = SdlWindowHitTest(window, hitTest, ::onCallbackFailure)
+        else if (current == null) this.hitTest = SdlWindowHitTest(window, ::isDragArea, ::onCallbackFailure)
     }
 
     override fun setVisible(visible: Boolean) {
@@ -267,6 +308,8 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
         trays.toList().forEach { it.close() }
         hitTest?.dispose()
         hitTest = null
+        defaultDragArea = null
+        dragAreas.clear()
         dropTarget.dispose()
         cursors.values.forEach(::RachelSDL_DestroyCursor)
         cursors.clear()

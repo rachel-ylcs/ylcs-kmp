@@ -51,7 +51,7 @@ class WindowController(
     private var windowClickThrough by mutableStateOf(initClickThrough)
     private var pendingPosition: WindowPosition? = null
     private var placementAfterFullscreen: WindowPlacement? = null
-    internal val dragAreas = mutableSetOf<WindowDragAreaNode>()
+    internal val windowScope: NativeWindowScope? get() = window
 
     var icon by mutableRefStateOf(initIcon)
     var roundedCorner by mutableStateOf(initRoundedCorner)
@@ -205,19 +205,16 @@ class WindowController(
         updatePlacement(window, windowPlacement)
         window.setMinimized(minimized)
         window.setVisible(shown)
-        window.setDragArea(::isDragArea)
         tray.attach(window) { title }
         active = true
     }
 
     internal fun detach() {
         tray.detach()
-        window?.setDragArea(null)
         window = null
         active = false
         pendingPosition = null
         placementAfterFullscreen = null
-        dragAreas.clear()
     }
 
     @Composable
@@ -233,17 +230,6 @@ class WindowController(
 
     @Composable
     internal fun BindTray() = tray.Bind(iconPainter)
-
-    private fun isDragArea(x: Float, y: Float): Boolean {
-        var draggable = false
-        for (area in dragAreas) {
-            if (area.contains(x, y)) {
-                if (!area.draggable) return false
-                draggable = true
-            }
-        }
-        return draggable
-    }
 
     internal fun onEvent(event: NativeWindowEvent) {
         val window = window ?: return

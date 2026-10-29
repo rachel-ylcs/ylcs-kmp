@@ -33,6 +33,10 @@ internal class TestNativeWindowScope(override val displayScale: Float = 1f, over
     override fun setIcon(width: Int, height: Int, pixels: IntArray): Boolean = true
     override fun createTray(tooltip: String): NativeTray? = null
     override fun setDragArea(hitTest: ((Float, Float) -> Boolean)?) = Unit
+    override fun addDragArea(hitTest: (Float, Float) -> Boolean?): AutoCloseable = object : AutoCloseable {
+        override fun close() = Unit
+    }
+    override fun startDrag(): Boolean = true
     override fun setVisible(visible: Boolean) = Unit
     override fun setAlwaysOnTop(alwaysOnTop: Boolean) = Unit
     override fun setMinimized(minimized: Boolean) = Unit

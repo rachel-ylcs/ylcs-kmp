@@ -175,26 +175,7 @@ jobs:
 
   package-modManager:
     name: Package Mod Manager
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          msvc: 'true'
-
-      - name: Build
-        run: ./gradlew ylcs-app:mod-manager:modManagerPublish
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-mod-manager
-          path: outputs/modManager.zip
+    uses: ./.github/workflows/release_mod_manager.yml
 
   package-landpage:
     name: Package Landpage
@@ -301,7 +282,9 @@ jobs:
             artifacts/ylcs-js/*
             artifacts/ylcs-wasm/*
             artifacts/ylcs-server/*
-            artifacts/ylcs-mod-manager/*
+            artifacts/ylcs-mod-manager-windows-x64/*.zip
+            artifacts/ylcs-mod-manager-linux-x64/*.zip
+            artifacts/ylcs-mod-manager-macos-arm64/*.zip
             artifacts/ylcs-landpage/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

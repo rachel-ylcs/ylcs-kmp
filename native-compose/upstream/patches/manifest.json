@@ -67,7 +67,7 @@
     },
     "sdl": {
         "file": "sdl.patch",
-        "sha256": "7648f952078e9bf3831c6f7d668967a018131e8a14f7beccd6e57c0c208227da",
+        "sha256": "3f23159c4e7fcf14a4cd1b1e450c7e7cc7fcdd6972dc300c1fbca2bd8ea7c29c",
         "sourceSha256": "9cd42377704398796071b8597cd7e21da254a43bad98c4199739647adc13fa6f"
     }
 }

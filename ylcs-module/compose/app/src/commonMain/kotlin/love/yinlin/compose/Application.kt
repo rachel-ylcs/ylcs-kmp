@@ -1,5 +1,7 @@
 package love.yinlin.compose
 
+import androidx.compose.foundation.ComposeFoundationFlags
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -34,7 +36,10 @@ abstract class Application<out A : Application<A>>(
     @Composable
     abstract fun Content()
 
+    @OptIn(ExperimentalFoundationApi::class)
     internal fun initApplication(scope: CoroutineScope) {
+        ComposeFoundationFlags.isNewContextMenuEnabled = true
+
         @Suppress("UNCHECKED_CAST")
         self.init(this as A)
         initPool(scope)

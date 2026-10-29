@@ -1,18 +1,18 @@
 package love.yinlin.util
 
 import androidx.compose.runtime.Stable
+import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingNull
-import java.nio.charset.StandardCharsets
-import java.util.HexFormat
-import java.util.Locale.getDefault
-import java.util.zip.Inflater
+import love.yinlin.foundation.compression.CompressionInvalidDataException
+import love.yinlin.foundation.compression.Zlib
 
 @Stable
 object QrcDecrypter {
     private const val XOR_KEY = "629F5B0900C35E95239F13117ED8923FBC90BB740EC347743D90AA3F51D8F411849FDE951DC3C609D59FFA66F9D8F0F7A090A1D6F3C3F3D6A190A0F7F0D8F966FA9FD509C6C31D95DE9F8411F4D8513FAA903D7447C30E74BB90BC3F92D87E11139F23955EC300095B9F6266A1D852F76790CAD64AC34AD6CA9067F752D8A166"
-    private val KEY1 = "!@#)(NHLiuy*$%^&".toByteArray(StandardCharsets.UTF_8)
-    private val KEY2 = "123ZXC!@#)(*$%^&".toByteArray(StandardCharsets.UTF_8)
-    private val KEY3 = "!@#)(*$%^&abcDEF".toByteArray(StandardCharsets.UTF_8)
+    private val KEY1 = "!@#)(NHLiuy*$%^&".encodeToByteArray()
+    private val KEY2 = "123ZXC!@#)(*$%^&".encodeToByteArray()
+    private val KEY3 = "!@#)(*$%^&abcDEF".encodeToByteArray()
+    private val zlib = Zlib()
     private const val ENCRYPT_MODE = 1
     private const val DECRYPT_MODE = 0
     private val sboxes: Array<IntArray> = [
@@ -408,7 +408,7 @@ object QrcDecrypter {
             var inputBlock = data.copyOfRange(i, i + blockSize)
             if (inputBlock.size < 8) inputBlock = inputBlock.copyOf(8)
             val outputBlock = processDesBlock(inputBlock, keySchedule)
-            System.arraycopy(outputBlock, 0, result, i, minOf(8, length - i))
+            outputBlock.copyInto(result, destinationOffset = i, endIndex = minOf(8, length - i))
             i += 8
         }
         return result
@@ -417,11 +417,11 @@ object QrcDecrypter {
     private fun hexToBytes(hexString: String): ByteArray {
         var hexString = hexString
         if (hexString.length % 2 != 0) hexString = "0$hexString"
-        return HexFormat.of().parseHex(hexString)
+        return hexString.hexToByteArray()
     }
 
     private fun bytesToHex(byteData: ByteArray): String {
-        return HexFormat.of().formatHex(byteData).uppercase(getDefault())
+        return byteData.toHexString(HexFormat.UpperCase)
     }
 
     private fun xorHexStrings(hexStr1: String): String {
@@ -440,12 +440,12 @@ object QrcDecrypter {
         val step1 = desDecrypt(encryptedData, KEY1)
         val step2 = desEncrypt(step1)
         val step3 = desDecrypt(step2, KEY3)
-        val inflater = Inflater()
-        inflater.setInput(step3)
-        val decompressed = ByteArray(step3.size * 4)
-        val decompressedLength = inflater.inflate(decompressed)
-        inflater.end()
-        return String(decompressed, 0, decompressedLength, StandardCharsets.UTF_8)
+        // DES 可在完整 zlib 流后留下填充；保留 Inflater 忽略尾部的行为，仍由 Zlib 校验完整流和输出大小。
+        val decompressed = catchingDefault({ failure ->
+            if (failure !is CompressionInvalidDataException || failure.offset !in 1 ..< step3.size) throw failure
+            zlib.decompress(step3.copyOf(failure.offset))
+        }) { zlib.decompress(step3) }
+        return decompressed.decodeToString()
     }
 
     private fun decryptByQrcHexContent(hexContent: String): String {

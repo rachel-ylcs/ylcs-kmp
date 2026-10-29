@@ -54,7 +54,7 @@ fun DefaultTopBar(
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth().windowDragArea(controller).background(bgBrush).padding(Theme.padding.value9),
+        modifier = Modifier.fillMaxWidth().background(bgBrush).padding(Theme.padding.value9),
         horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -70,6 +70,6 @@ fun DefaultTopBar(
             )
             SimpleEllipsisText(text = controller.title, style = Theme.typography.v7.bold)
         }
-        ActionScope.Right.Container(modifier = Modifier.windowDragArea(controller, draggable = false), content = actions)
+        ActionScope.Right.Container(content = actions)
     }
 }

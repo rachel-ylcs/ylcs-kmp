@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.zIndex
+import app
 import kotlinx.serialization.json.Json
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Theme
@@ -66,8 +67,6 @@ import love.yinlin.fs.*
 import love.yinlin.mod_manager.resources.Res
 import love.yinlin.mod_manager.resources.music
 import love.yinlin.util.QrcDecrypter
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
 import kotlin.collections.plusAssign
 
 @Stable
@@ -515,14 +514,18 @@ class ScreenRhyme(private val path: String?) : Screen() {
                             Box(modifier = Modifier.fillMaxSize().dragDrop(true, DragFlag.File) { dropResult ->
                                 catchingError {
                                     launch {
-                                        parseQrc(QrcDecrypter.decrypt((dropResult as DropResult.File).path.first().readByteArray()!!)!!)
+                                        val data = (dropResult as DropResult.File).path.first().readByteArray()!!
+                                        val qrc = Coroutines.cpu { QrcDecrypter.decrypt(data)!! }
+                                        parseQrc(qrc)
                                     }
                                 }?.then { slot.tip.error("解析失败") }
                             }) {
                                 ContextMenuProvider({
-                                    item("全选自动复制") {
-                                        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(rhymeConfigText), null)
-                                        slot.tip.success("复制成功")
+                                    item(text = "全选自动复制") {
+                                        launch {
+                                            if (app.copyText(rhymeConfigText)) slot.tip.success("复制成功")
+                                            else slot.tip.error("复制失败")
+                                        }
                                     }
                                 }) {
                                     SelectionBox {

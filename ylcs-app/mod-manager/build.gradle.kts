@@ -1,7 +1,5 @@
-import love.yinlin.gradle.desktopBinaryDir
-import love.yinlin.gradle.task.spec.zip
 import love.yinlin.repository.C
-import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.bundling.Zip
 
 plugins {
     install(
@@ -10,18 +8,22 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
     )
 }
 
 rachel {
     multiplatform {
         iosTarget = false
+        desktopTarget = false
         webTarget = false
+        nativeDesktopTarget = true
 
         sources {
             commonMain {
                 lib(
                     libs.compose.resources,
+                    projects.ylcsModule.foundation.compression,
                     projects.ylcsApp.mod,
                     projects.ylcsModule.compose.app,
                     projects.ylcsModule.compose.screen,
@@ -29,47 +31,31 @@ rachel {
                     projects.ylcsModule.compose.components.image,
                 )
             }
+
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
         }
 
-        val targetName = "ModManager"
-
-        desktopPackage {
-            packageName = targetName
-            jvmModules = listOf(
-                "java.instrument",
-                "java.net.http",
-                "java.management",
-                "jdk.unsupported"
-            )
-            windows { }
+        composeDesktopPackage {
+            entryPoint = "main"
+            packageName = "ModManager"
+            displayName = "Rachel MOD Manager"
+            workingDirectory = C.root.work.modManager.asFile
         }
 
         actions {
-            val desktopWorkspace = C.root.work.modManager.asFile
-            tasks.withType<JavaExec>().matching { it.name == "run" || it.name == "runRelease" }.configureEach {
-                jvmArgs("-Duser.dir=$desktopWorkspace")
-                doFirst { desktopWorkspace.mkdirs() }
+            tasks.withType<Zip>().matching { it.name.startsWith("package") && it.name.endsWith("ReleaseExecutable") }.configureEach {
+                archiveVersion.set("")
             }
 
             tasks.register("modManagerRunDebug") {
-                description = "运行MOD编辑器Debug桌面版"
-                dependsOn(tasks.named("run"))
-            }
-
-            tasks.register("modManagerPublish") {
-                description = "发布MOD编辑器桌面版"
-                dependsOn(tasks.named("createReleaseDistributable"))
-
-                doLast {
-                    val outputAppDir = C.root.outputs.dir(targetName)
-                    delete(outputAppDir)
-                    copy {
-                        from(desktopBinaryDir)
-                        into(C.root.outputs)
-                    }
-                    zip(outputAppDir, C.root.outputs.file("$targetName.zip"))
-                    delete(outputAppDir)
-                }
+                description = "运行MOD编辑器Debug原生桌面版"
+                dependsOn(tasks.named("composeRun"))
             }
         }
     }

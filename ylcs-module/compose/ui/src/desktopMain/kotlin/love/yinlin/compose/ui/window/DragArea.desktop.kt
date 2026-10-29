@@ -3,12 +3,13 @@ package love.yinlin.compose.ui.window
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.window.WindowScope
 import java.awt.MouseInfo
 import java.awt.Window
 import java.awt.event.MouseAdapter
@@ -36,12 +37,12 @@ private class DragHandler(private val window: Window) {
 
     val removeListener = object : MouseAdapter() {
         override fun mouseReleased(event: MouseEvent) {
-            window.removeMouseMotionListener(dragListener)
-            window.removeMouseListener(this)
+            stop()
         }
     }
 
     fun onDragStarted() {
+        stop()
         dragStartPoint = current ?: return
         val location = window.location
         windowLocationAtDragStart = IntOffset(location.x, location.y)
@@ -49,24 +50,56 @@ private class DragHandler(private val window: Window) {
         window.addMouseListener(removeListener)
         window.addMouseMotionListener(dragListener)
     }
+
+    fun stop() {
+        window.removeMouseMotionListener(dragListener)
+        window.removeMouseListener(removeListener)
+        dragStartPoint = null
+        windowLocationAtDragStart = null
+    }
 }
 
 @Composable
-fun WindowScope.DragArea(
-    enabled: Boolean = true,
-    onLongClick: ((Offset) -> Unit)? = null,
-    onDoubleClick: ((Offset) -> Unit)? = null,
+actual fun WindowScope.DragArea(
+    enabled: Boolean,
+    onLongClick: ((Offset) -> Unit)?,
+    onDoubleClick: ((Offset) -> Unit)?,
+    modifier: Modifier,
     content: @Composable () -> Unit
 ) {
-    val handler = remember { DragHandler(window) }
+    DragAreaContent(enabled, modifier, onLongClick, onDoubleClick, content)
+}
 
-    Box(modifier = Modifier.pointerInput(handler, enabled) {
+@Composable
+private fun WindowScope.DragAreaContent(
+    enabled: Boolean,
+    modifier: Modifier,
+    onLongClick: ((Offset) -> Unit)?,
+    onDoubleClick: ((Offset) -> Unit)?,
+    content: @Composable () -> Unit,
+) {
+    val handler = remember(window) { DragHandler(window) }
+    val currentLongClick = rememberUpdatedState(onLongClick)
+    val currentDoubleClick = rememberUpdatedState(onDoubleClick)
+
+    DisposableEffect(handler, enabled) {
+        if (!enabled) handler.stop()
+        onDispose { handler.stop() }
+    }
+
+    Box(modifier = modifier.pointerInput(handler, enabled, onLongClick != null, onDoubleClick != null) {
         detectTapGestures(
-            onPress = { if (enabled) handler.onDragStarted() },
-            onLongPress = onLongClick,
-            onDoubleTap = onDoubleClick
+            onPress = {
+                if (enabled) {
+                    handler.onDragStarted()
+                    try { tryAwaitRelease() }
+                    finally { handler.stop() }
+                }
+            },
+            onLongPress = if (onLongClick != null) { offset -> currentLongClick.value?.invoke(offset) } else null,
+            onDoubleTap = if (onDoubleClick != null) { offset -> currentDoubleClick.value?.invoke(offset) } else null,
         )
-    }) {
+    }, propagateMinConstraints = true) {
         content()
     }
 }

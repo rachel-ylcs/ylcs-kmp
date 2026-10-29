@@ -100,6 +100,13 @@ jobs:
               - 'ylcs-app/server/**'
             modManager:
               - *common
+              - 'ylcs-module/**/nativeMain/**'
+              - 'ylcs-module/**/pcMain/**'
+              - 'ylcs-module/**/skikoMain/**'
+              - 'ylcs-module/**/windowsMain/**'
+              - 'native-compose/adaptation/**'
+              - 'native-compose/upstream/**'
+              - 'native-compose/gradle/**'
               - 'ylcs-app/mod-manager/**'
             landpage:
               - *common
@@ -173,8 +180,9 @@ jobs:
     uses: ./.github/workflows/gradle-build.yml
     with:
       runner: windows-latest
-      task: ylcs-app:mod-manager:desktopJar
+      task: ylcs-app:mod-manager:compileKotlinWindows
       msvc: true
+      native-tools: true
 
   build-landpage:
     name: Build Landpage

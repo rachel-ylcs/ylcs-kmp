@@ -65,7 +65,7 @@ diff --git a/include/SDL3/SDL_rachelwindow.h b/include/SDL3/SDL_rachelwindow.h
 new file mode 100644
 --- /dev/null
 +++ b/include/SDL3/SDL_rachelwindow.h
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,46 @@
 +/*
 +  Simple DirectMedia Layer
 +  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
@@ -100,6 +100,7 @@ new file mode 100644
 +extern "C" {
 +#endif
 +extern SDL_DECLSPEC bool SDLCALL RachelSDL_SetWindowMousePassthrough(SDL_Window *window, bool enabled);
++extern SDL_DECLSPEC bool SDLCALL RachelSDL_StartWindowDrag(SDL_Window *window);
 +#ifdef __cplusplus
 +}
 +#endif
@@ -144,7 +145,7 @@ diff --git a/src/video/SDL_video.c b/src/video/SDL_video.c
  #include "SDL_clipboard_c.h"
  #include "SDL_egl_c.h"
  #include "SDL_surface_c.h"
-@@ -6170,6 +6171,52 @@
+@@ -6170,6 +6171,87 @@
      return _this->SetWindowHitTest(window, callback != NULL);
  }
 
@@ -192,6 +193,41 @@ diff --git a/src/video/SDL_video.c b/src/video/SDL_video.c
 +    result = SDL_Unsupported();
 +    if (!result) SDL_SetBooleanProperty(props, RACHEL_SDL_MOUSE_PASSTHROUGH, previous);
 +    return result;
++}
++
++/* Rachel extension: start moving only after the application accepts a pointer gesture. */
++#ifdef SDL_VIDEO_DRIVER_WINDOWS
++extern bool WIN_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++#endif
++#ifdef SDL_VIDEO_DRIVER_COCOA
++extern bool Cocoa_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++#endif
++#ifdef SDL_VIDEO_DRIVER_X11
++extern bool X11_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++#endif
++#ifdef SDL_VIDEO_DRIVER_WAYLAND
++extern bool Wayland_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++#endif
++
++bool SDLCALL RachelSDL_StartWindowDrag(SDL_Window *window)
++{
++    CHECK_WINDOW_MAGIC(window, false);
++    if (window->flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_MINIMIZED)) return false;
++    if (!(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_LMASK)) return false;
++    SDL_CaptureMouse(false);
++#ifdef SDL_VIDEO_DRIVER_WINDOWS
++    if (SDL_strcmp(_this->name, "windows") == 0) return WIN_RachelStartWindowDrag(_this, window);
++#endif
++#ifdef SDL_VIDEO_DRIVER_COCOA
++    if (SDL_strcmp(_this->name, "cocoa") == 0) return Cocoa_RachelStartWindowDrag(_this, window);
++#endif
++#ifdef SDL_VIDEO_DRIVER_X11
++    if (SDL_strcmp(_this->name, "x11") == 0) return X11_RachelStartWindowDrag(_this, window);
++#endif
++#ifdef SDL_VIDEO_DRIVER_WAYLAND
++    if (SDL_strcmp(_this->name, "wayland") == 0) return Wayland_RachelStartWindowDrag(_this, window);
++#endif
++    return SDL_Unsupported();
 +}
 +
  bool SDL_SetWindowShape(SDL_Window *window, SDL_Surface *shape)
@@ -319,7 +355,7 @@ diff --git a/src/video/cocoa/SDL_rachelwindow.m b/src/video/cocoa/SDL_rachelwind
 new file mode 100644
 --- /dev/null
 +++ b/src/video/cocoa/SDL_rachelwindow.m
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,64 @@
 +/*
 +  Simple DirectMedia Layer
 +  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
@@ -360,12 +396,35 @@ new file mode 100644
 +    }
 +    return true;
 +}
++
++bool Cocoa_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++bool Cocoa_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    @autoreleasepool {
++        SDL_CocoaWindowData *data = (__bridge SDL_CocoaWindowData *)window->internal;
++        NSEvent *event = NSApp.currentEvent;
++        if (!event || event.window != data.nswindow || event.type != NSEventTypeLeftMouseDown) {
++            event = [NSEvent mouseEventWithType:NSEventTypeLeftMouseDown
++                                     location:[data.nswindow mouseLocationOutsideOfEventStream]
++                                modifierFlags:NSEvent.modifierFlags
++                                    timestamp:NSProcessInfo.processInfo.systemUptime
++                                 windowNumber:data.nswindow.windowNumber
++                                      context:nil
++                                  eventNumber:0
++                                   clickCount:1
++                                     pressure:1.0];
++        }
++        if (!event) return SDL_SetError("Unable to create window move event");
++        [data.nswindow performWindowDragWithEvent:event];
++    }
++    return true;
++}
 +#endif
 diff --git a/src/video/wayland/SDL_rachelwindow.c b/src/video/wayland/SDL_rachelwindow.c
 new file mode 100644
 --- /dev/null
 +++ b/src/video/wayland/SDL_rachelwindow.c
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,70 @@
 +/*
 +  Simple DirectMedia Layer
 +  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
@@ -392,6 +451,11 @@ new file mode 100644
 +#ifdef SDL_VIDEO_DRIVER_WAYLAND
 +#include "SDL_waylandvideo.h"
 +#include "SDL_waylandwindow.h"
++#include "SDL_waylandevents_c.h"
++#include "xdg-shell-client-protocol.h"
++#ifdef HAVE_LIBDECOR_H
++#include <libdecor.h>
++#endif
 +
 +bool Wayland_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
 +bool Wayland_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled)
@@ -406,6 +470,27 @@ new file mode 100644
 +    wl_surface_set_input_region(data->surface, region);
 +    if (region) wl_region_destroy(region);
 +    wl_surface_commit(data->surface);
++    WAYLAND_wl_display_flush(video->display);
++    return true;
++}
++
++bool Wayland_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++bool Wayland_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    SDL_VideoData *video = _this->internal;
++    SDL_WindowData *data = window->internal;
++    SDL_WaylandSeat *seat = video->last_implicit_grab_seat;
++    if (!seat || seat->pointer.focus != data || seat->pointer.locked_pointer || !(seat->pointer.buttons_pressed & SDL_BUTTON_LMASK)) return false;
++#ifdef HAVE_LIBDECOR_H
++    if (data->shell_surface_type == WAYLAND_SHELL_SURFACE_TYPE_LIBDECOR && data->shell_surface.libdecor.frame) {
++        libdecor_frame_move(data->shell_surface.libdecor.frame, seat->wl_seat, seat->last_implicit_grab_serial);
++    } else
++#endif
++    if (data->shell_surface_type == WAYLAND_SHELL_SURFACE_TYPE_XDG_TOPLEVEL && data->shell_surface.xdg.toplevel.xdg_toplevel) {
++        xdg_toplevel_move(data->shell_surface.xdg.toplevel.xdg_toplevel, seat->wl_seat, seat->last_implicit_grab_serial);
++    } else {
++        return SDL_Unsupported();
++    }
 +    WAYLAND_wl_display_flush(video->display);
 +    return true;
 +}
@@ -542,7 +627,7 @@ diff --git a/src/video/windows/SDL_rachelwindow.c b/src/video/windows/SDL_rachel
 new file mode 100644
 --- /dev/null
 +++ b/src/video/windows/SDL_rachelwindow.c
-@@ -0,0 +1,56 @@
+@@ -0,0 +1,66 @@
 +/*
 +  Simple DirectMedia Layer
 +  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
@@ -596,6 +681,16 @@ new file mode 100644
 +        SetLastError(error);
 +        return WIN_SetError("SetWindowPos");
 +    }
++    return true;
++}
++
++bool WIN_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++bool WIN_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    POINT point;
++    if (!GetCursorPos(&point)) return WIN_SetError("GetCursorPos");
++    ReleaseCapture();
++    if (!PostMessageW(window->internal->hwnd, WM_SYSCOMMAND, SC_MOVE | HTCAPTION, MAKELPARAM(point.x, point.y))) return WIN_SetError("PostMessageW");
 +    return true;
 +}
 +#endif
@@ -740,7 +835,7 @@ diff --git a/src/video/x11/SDL_rachelwindow.c b/src/video/x11/SDL_rachelwindow.c
 new file mode 100644
 --- /dev/null
 +++ b/src/video/x11/SDL_rachelwindow.c
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,78 @@
 +/*
 +  Simple DirectMedia Layer
 +  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
@@ -792,6 +887,31 @@ new file mode 100644
 +#else
 +    return SDL_Unsupported();
 +#endif
++}
++
++bool X11_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window);
++bool X11_RachelStartWindowDrag(SDL_VideoDevice *_this, SDL_Window *window)
++{
++    SDL_WindowData *data = window->internal;
++    SDL_VideoData *video = _this->internal;
++    Display *display = video->display;
++    float x, y;
++    SDL_GetGlobalMouseState(&x, &y);
++    XEvent event;
++    SDL_zero(event);
++    event.xclient.type = ClientMessage;
++    event.xclient.window = data->xwindow;
++    event.xclient.message_type = video->atoms._NET_WM_MOVERESIZE;
++    event.xclient.format = 32;
++    event.xclient.data.l[0] = (long)x;
++    event.xclient.data.l[1] = (long)y;
++    event.xclient.data.l[2] = 8; /* _NET_WM_MOVERESIZE_MOVE */
++    event.xclient.data.l[3] = Button1;
++    event.xclient.data.l[4] = 1; /* normal application */
++    X11_XUngrabPointer(display, CurrentTime);
++    const int result = X11_XSendEvent(display, DefaultRootWindow(display), False, SubstructureRedirectMask | SubstructureNotifyMask, &event);
++    X11_XFlush(display);
++    return result != 0;
 +}
 +#endif
 diff --git a/src/video/x11/SDL_x11events.c b/src/video/x11/SDL_x11events.c

@@ -25,18 +25,16 @@ fun ApplicationWindow.NativeWindow(
     val currentEvent by rememberUpdatedState(onEvent)
     val currentClose by rememberUpdatedState(onClose)
     DisposableEffect(this) {
-        var scope: NativeWindowScope? = null
         val window = openNativeWindow(options, onCloseRequest = {
             close()
             true
         }, onOpen = {
-            scope = it
             currentOpen(it)
         }, onEvent = { currentEvent(it) }, onClose = {
             try { currentClose() }
             finally { close() }
         }) {
-            scope?.let { currentContent(it) }
+            currentContent(this)
         }
         onDispose { window.close() }
     }

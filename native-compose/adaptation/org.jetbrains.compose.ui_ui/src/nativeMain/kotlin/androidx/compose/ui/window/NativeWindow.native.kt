@@ -15,7 +15,7 @@ import kotlin.math.roundToInt
 fun NativeWindow(
     options: NativeWindowOptions = NativeWindowOptions(title = "Compose Native"),
     onCloseRequest: () -> Boolean = { true },
-    content: @Composable () -> Unit
+    content: @Composable NativeWindowScope.() -> Unit
 ) = NativeWindow(options = options, onCloseRequest = onCloseRequest, onOpen = {}, content = content)
 
 @Suppress("FunctionName")
@@ -27,7 +27,7 @@ fun NativeWindow(
     onEvent: (NativeWindowEvent) -> Unit = {},
     onClose: () -> Unit = {},
     applicationContent: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit
+    content: @Composable NativeWindowScope.() -> Unit
 ) {
     registerSkikoComposeImplementation()
     val application = applicationContent?.let { NativeApplicationComposition(it) }
@@ -55,7 +55,8 @@ fun NativeWindow(
             host.attach(it)
             onOpen(it)
             application?.attach(it)
-            host.setContent(content)
+            val window = it
+            host.setContent { content(window) }
         }, onEvent = {
             host.onEvent(it)
             onEvent(it)

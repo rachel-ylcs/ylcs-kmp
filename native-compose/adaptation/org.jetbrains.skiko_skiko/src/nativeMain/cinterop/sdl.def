@@ -229,6 +229,9 @@ static inline bool RachelSDL_IsWindowShowing(void *window) {
 static inline bool RachelSDL_SetFullscreen(void *window, bool fullscreen) {
     return SDL_SetWindowFullscreen((SDL_Window *)window, fullscreen);
 }
+static inline bool RachelSDL_StartDrag(void *window) {
+    return RachelSDL_StartWindowDrag((SDL_Window *)window);
+}
 static inline void RachelSDL_RequestRender(void *window) {
     SDL_Event event;
     SDL_zero(event);

@@ -23,15 +23,18 @@ import kotlinx.coroutines.delay
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
+import love.yinlin.extension.catchingDefault
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
+import love.yinlin.uri.Scheme
 import love.yinlin.uri.Uri
 import love.yinlin.uri.toJvmUri
 import org.jetbrains.compose.resources.DrawableResource
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import java.nio.file.Path
 import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.seconds
 
@@ -230,12 +233,20 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { controller.minimize = true }
 
-    actual suspend fun openUri(uri: Uri): Boolean {
+    actual suspend fun openUri(uri: Uri): Boolean = catchingDefault(false) {
         val desktop = Desktop.getDesktop()
-        return if (desktop.isSupported(Desktop.Action.BROWSE)) {
+        if (uri.scheme == Scheme.File) {
+            if (desktop.isSupported(Desktop.Action.OPEN)) {
+                desktop.open(Path.of(uri.toJvmUri()).toFile())
+                true
+            }
+            else false
+        }
+        else if (desktop.isSupported(Desktop.Action.BROWSE)) {
             desktop.browse(uri.toJvmUri())
             true
-        } else false
+        }
+        else false
     }
 
     actual suspend fun copyText(text: String): Boolean {

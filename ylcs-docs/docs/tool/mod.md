@@ -129,10 +129,21 @@ reader 要求 magic 和版本精确匹配，媒体数与长度有部分合法性
 
 ## MOD Manager
 
+工具仅构建 Windows x64、Linux x64、macOS arm64 的 Native Compose 应用，无需 JVM/JRE。
+
 ```powershell
 .\gradlew.bat :ylcs-app:mod-manager:modManagerRunDebug
-.\gradlew.bat :ylcs-app:mod-manager:modManagerPublish
+.\gradlew.bat :ylcs-app:mod-manager:composeReleaseRun
+.\gradlew.bat :ylcs-app:mod-manager:composeDistribution
 ```
+
+Gradle 的 Debug 和 Release 运行任务使用仓库 `work/modManager` 作为当前工作目录，对应 `C.root.work.modManager.asFile`；目录不存在时自动创建。`library`、`output` 和 `mod` 均位于该工作目录下。直接启动分发后的程序时，由启动方式决定当前工作目录，程序不内置仓库工作路径。
+
+应用在 `init` 块中同步创建 `library` 和 `output`，完成后才进入窗口与首屏初始化，避免异步创建目录和读取曲库发生竞争。曲库读取失败会显示提示。
+
+`composeDistribution` 在当前宿主生成 `ylcs-app/mod-manager/build/nativeApplication/<windows|linux|macos>/releaseExecutable/`，包含可执行程序、Compose 资源和 `icudtl.dat`。Windows 为 `ModManager.exe`，Linux 为 `ModManager.kexe`，macOS 为 `ModManager.app`。Debug 运行任务先准备相邻的 `debugExecutable/` 完整目录，再启动其中的程序。`build/bin/<target>/<binary>/` 仅为链接产物，不能直接复制它作为完整分发包。符号文件单独存放在 `build/nativeSymbols`，不进入应用分发目录。
+
+发布由 CI 完成，不提供本地 Publish 任务。推送 `modManager*` 标签触发 `release_mod_manager.yml`，分别在 Windows、Linux、macOS 宿主构建 Release ZIP，并上传三个平台的应用 artifact 和独立符号 artifact。全量 `v*` 发布的 `release.yml` 复用相同工作流，将三个应用 ZIP 一并附加到 Release；符号仅保存在独立 artifact 中。ZIP 名称为 `ModManager-<mingw_x64|linux_x64|macos_arm64>-release.zip`，保留 Linux/macOS 可执行权限。
 
 工具支持预览、解包、合并或分别打包、资源筛选和部署。源目录发现流程检查 config、audio、record、background 与 lyrics 等基础资源。
 
@@ -143,4 +154,4 @@ reader 要求 magic 和版本精确匹配，媒体数与长度有部分合法性
 - `ylcs-app/mod/src/commonMain/kotlin/love/yinlin/mod/ModFactory.kt`
 - `ylcs-app/mod/src/commonMain/kotlin/love/yinlin/data/mod/ModResourceType.kt`
 - `ylcs-app/mod/src/commonMain/kotlin/love/yinlin/data/music/MusicInfo.kt`
-- `ylcs-app/mod-manager/src/desktopMain/kotlin/love/yinlin/screen/ScreenMain.kt`
+- `ylcs-app/mod-manager/src/nativeMain/kotlin/love/yinlin/screen/ScreenMain.kt`

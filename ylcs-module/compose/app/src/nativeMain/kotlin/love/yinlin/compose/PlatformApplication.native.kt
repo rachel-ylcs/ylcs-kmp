@@ -19,6 +19,7 @@ import androidx.compose.ui.window.WindowPosition
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
 import love.yinlin.foundation.PlatformContext
@@ -144,7 +145,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     controller.BindTray()
                     Column(modifier = Modifier.fillMaxSize()) {
                         if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
-                            Box(modifier = Modifier.fillMaxWidth().windowDragArea(controller)) {
+                            DragArea(enabled = !controller.maximize, onDoubleClick = { controller.toggleMaximize() }, modifier = Modifier.fillMaxWidth()) {
                                 TopBar(controller, onMainWindowClose)
                             }
                         }

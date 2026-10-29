@@ -52,7 +52,7 @@ import love.yinlin.data.music.MusicInfo
 import love.yinlin.extension.*
 import love.yinlin.fs.*
 import love.yinlin.mod.ModFactory
-import java.awt.Desktop
+import org.jetbrains.skiko.window.NativeDesktop
 
 @Stable
 class ScreenMain : BasicScreen() {
@@ -74,21 +74,26 @@ class ScreenMain : BasicScreen() {
         onSearching = false
         boxStatus.status = StatefulStatus.Loading
 
-        val result = Coroutines.io {
-            app.libraryPath.list().filter { it.isDirectory() }.map { folder ->
-                catchingDefault({ ModItem(id = folder.name, name = folder.name, path = folder, enabled = false) }) {
-                    require(File(folder, ModResourceType.Record.filename).exists())
-                    require(File(folder, ModResourceType.Background.filename).exists())
-                    require(File(folder, ModResourceType.LineLyrics.filename).exists())
-                    require(File(folder, ModResourceType.Audio.filename).exists())
-                    val musicInfo = File(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
-                    ModItem(id = musicInfo.id, name = musicInfo.name, path = folder, enabled = true)
-                }
-            }.distinctBy { it.id }
-        }
+        catchingError {
+            val result = Coroutines.io {
+                app.libraryPath.list().filter { it.isDirectory() }.map { folder ->
+                    catchingDefault({ ModItem(id = folder.name, name = folder.name, path = folder, enabled = false) }) {
+                        require(File(folder, ModResourceType.Record.filename).exists())
+                        require(File(folder, ModResourceType.Background.filename).exists())
+                        require(File(folder, ModResourceType.LineLyrics.filename).exists())
+                        require(File(folder, ModResourceType.Audio.filename).exists())
+                        val musicInfo = File(folder, ModResourceType.Config.filename).readText()!!.parseJsonValue<MusicInfo>()
+                        ModItem(id = musicInfo.id, name = musicInfo.name, path = folder, enabled = true)
+                    }
+                }.distinctBy { it.id }
+            }
 
-        library.replaceAll(result)
-        boxStatus.status = if (result.isEmpty()) StatefulStatus.Empty else StatefulStatus.Content
+            library.replaceAll(result)
+            boxStatus.status = if (result.isEmpty()) StatefulStatus.Empty else StatefulStatus.Content
+        }?.then {
+            boxStatus.status = StatefulStatus.Empty
+            slot.tip.error("读取曲库失败：${it.message}")
+        }
     }
 
     private fun startSearch(input: String) {
@@ -190,8 +195,8 @@ class ScreenMain : BasicScreen() {
         val needRename = item.path.name != item.name
 
         ContextMenu(menus = {
-            item("预览") { modDetailsSheet.open(item) }
-            item("删除") {
+            item(text = "预览", icon = Icons.Preview) { modDetailsSheet.open(item) }
+            item(text = "删除", icon = Icons.Delete) {
                 launch {
                     if (slot.confirm.open(content = "真的要删除 ${item.name} 吗")) {
                         item.path.deleteRecursively()
@@ -200,14 +205,16 @@ class ScreenMain : BasicScreen() {
                 }
             }
             if (needRename) {
-                item("重命名") {
+                item(text = "重命名", icon = Icons.Edit) {
                     launch {
                         item.path.rename(item.name)?.then { loadLibrary() }
                     }
                 }
             }
-            item("打开所在目录") { Desktop.getDesktop().open(java.io.File(item.path.path)) }
-            item("音游编辑") {
+            item(text = "打开所在目录", icon = Icons.GotoNext) {
+                NativeDesktop.openFile(item.path.path)
+            }
+            item(text = "音游编辑", icon = Icons.MusicNote) {
                 launch { navigate(::ScreenRhyme, item.path.path) }
             }
         }) {

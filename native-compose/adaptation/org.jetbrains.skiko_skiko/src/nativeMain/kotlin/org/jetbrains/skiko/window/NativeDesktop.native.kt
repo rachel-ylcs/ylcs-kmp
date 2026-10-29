@@ -3,6 +3,7 @@ package org.jetbrains.skiko.window
 import kotlinx.cinterop.*
 import org.jetbrains.skiko.SystemTheme
 import org.jetbrains.skiko.currentSystemTheme
+import org.jetbrains.skiko.hostOs
 import org.jetbrains.skiko.internal.sdl.*
 import org.jetbrains.skiko.internal.sdl.SDL_SystemTheme.*
 import kotlin.concurrent.Volatile
@@ -62,8 +63,48 @@ object NativeDesktop {
 
     fun hasClipboardText(): Boolean = SDL_HasClipboardText()
 
+    /** Open a filesystem path with the system application. Call on the window host thread. */
+    fun openFile(path: String): Boolean = openNativeFile(path)
+
     fun openUri(uri: String): Boolean {
         require(uri.isNotBlank() && '\u0000' !in uri) { "URI is empty or contains a NUL character" }
+        // SDL passes this straight to ShellExecuteW on Windows. Its file-URL handling
+        // does not reliably decode UTF-8 escapes, so open the decoded Unicode path.
+        // Other schemes and platforms must retain their URI escaping.
+        if (hostOs.isWindows && uri.startsWith("file://", ignoreCase = true)) {
+            val location = uri.substring(7).substringBefore('#').substringBefore('?')
+            require(location.isNotEmpty()) { "File URI path is empty" }
+            val path = when {
+                location.startsWith('/') || location.getOrNull(1) == ':' -> location
+                location.startsWith("localhost/", ignoreCase = true) -> location.substring(9)
+                else -> "//$location"
+            }
+            val decoded = decodeFileUriPath(path)
+            val windowsPath = if (decoded.startsWith('/') && decoded.getOrNull(2) == ':') decoded.substring(1) else decoded
+            require(windowsPath.isNotBlank() && '\u0000' !in windowsPath) { "File URI path is empty or contains a NUL character" }
+            return SDL_OpenURL(windowsPath.replace('/', '\\'))
+        }
         return SDL_OpenURL(uri)
     }
+
+    private fun decodeFileUriPath(path: String): String {
+        val encoded = path.encodeToByteArray()
+        val decoded = ByteArray(encoded.size)
+        var input = 0
+        var output = 0
+        while (input < encoded.size) {
+            if (encoded[input] == '%'.code.toByte()) {
+                require(input + 2 < encoded.size) { "Incomplete escape in file URI" }
+                val high = encoded[input + 1].toInt().toChar().digitToIntOrNull(16)
+                val low = encoded[input + 2].toInt().toChar().digitToIntOrNull(16)
+                require(high != null && low != null) { "Invalid escape in file URI" }
+                decoded[output++] = ((high shl 4) or low).toByte()
+                input += 3
+            }
+            else decoded[output++] = encoded[input++]
+        }
+        return decoded.decodeToString(endIndex = output, throwOnInvalidSequence = true)
+    }
 }
+
+internal expect fun openNativeFile(path: String): Boolean
