@@ -21,14 +21,14 @@ expect abstract class PlatformApplication<out A : PlatformApplication<A>>(
     fun backHome()
 
     /**
-     * 打开Uri
+     * 打开Uri。Native Desktop 自动切换到窗口主线程，其他平台保留调用上下文。
      */
-    fun openUri(uri: Uri): Boolean
+    suspend fun openUri(uri: Uri): Boolean
 
     /**
-     * 复制文本
+     * 复制文本。Native Desktop 自动切换到窗口主线程，其他平台保留调用上下文。
      */
-    fun copyText(text: String): Boolean
+    suspend fun copyText(text: String): Boolean
 
     /**
      * 隐式Uri

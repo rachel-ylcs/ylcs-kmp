@@ -30,7 +30,7 @@ fun DefaultTopBarActions(controller: WindowController, onExit: () -> Unit) {
     Icon(
         icon = Icons.CropSquare,
         tip = if (controller.maximize) Theme.value.windowMaximizeBackText else Theme.value.windowMaximizeText,
-        onClick = controller::toggleMaximize,
+        onClick = if (controller.resizable || controller.maximize) controller::toggleMaximize else null,
         modifier = Modifier.size(Theme.size.smallIcon)
     )
     Icon(

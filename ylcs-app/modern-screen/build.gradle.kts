@@ -20,7 +20,10 @@ rachel {
 
         sources {
             commonMain {
-                lib(projects.ylcsModule.compose.screen)
+                lib(
+                    projects.ylcsModule.compose.app,
+                    projects.ylcsModule.compose.screen,
+                )
             }
 
             desktopMain(commonMain)

@@ -61,11 +61,17 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     protected open val roundedCorner: Boolean = true
 
+    protected open val focusable: Boolean = true
+
+    protected open val resizable: Boolean = true
+
+    protected open val clickThrough: Boolean = false
+
     @Composable
     protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
 
     val controller by lazy {
-        WindowController(initSize = initSize, initTitle = title, initIcon = icon, initRoundedCorner = roundedCorner, initUndecorated = undecorated, minSize = minSize, placement = initPlacement, position = initPosition)
+        WindowController(initSize = initSize, initTitle = title, initIcon = icon, initRoundedCorner = roundedCorner, initUndecorated = undecorated, minSize = minSize, placement = initPlacement, position = initPosition, initFocusable = focusable, initResizable = resizable, initClickThrough = clickThrough)
     }
 
     private val windowStarter = LaunchFlag()
@@ -94,7 +100,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 width = controller.size.width.value.roundToInt(),
                 height = controller.size.height.value.roundToInt(),
                 transparent = transparent,
-                undecorated = controller.undecorated
+                undecorated = controller.undecorated,
+                focusable = controller.focusable,
+                resizable = controller.resizable,
+                clickThrough = controller.clickThrough
             ),
             onCloseRequest = {
                 onMainWindowClose()
@@ -102,13 +111,11 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             },
             onOpen = { window ->
                 controller.attach(window)
-                windowHandle = window.windowHandle
-                displayHandle = window.displayHandle
+                openWindowContext(window)
             },
             onEvent = controller::onEvent,
             onClose = {
-                windowHandle = null
-                displayHandle = null
+                closeWindowContext()
                 controller.detach()
             },
         ) {
@@ -149,13 +156,12 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { controller.minimize = true }
 
-    actual fun openUri(uri: Uri): Boolean = catchingDefault(false) {
-        if (Coroutines.mainImmediateDispatchNeeded) false else NativeDesktop.openUri(uri.toString())
+    actual suspend fun openUri(uri: Uri): Boolean = Coroutines.mainImmediate {
+        catchingDefault(false) { NativeDesktop.openUri(uri.toString()) }
     }
 
-    actual fun copyText(text: String): Boolean = catchingDefault(false) {
-        if (Coroutines.mainImmediateDispatchNeeded) false
-        else {
+    actual suspend fun copyText(text: String): Boolean = Coroutines.mainImmediate {
+        catchingDefault(false) {
             NativeDesktop.setClipboardText(text)
             true
         }

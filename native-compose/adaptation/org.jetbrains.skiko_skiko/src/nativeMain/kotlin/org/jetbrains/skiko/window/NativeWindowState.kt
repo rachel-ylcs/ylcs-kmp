@@ -11,4 +11,6 @@ data class NativeWindowState(
     val x: Int = 0,
     val y: Int = 0,
     val fullscreen: Boolean = false,
+    val resizable: Boolean = true,
+    val clickThrough: Boolean = false,
 )

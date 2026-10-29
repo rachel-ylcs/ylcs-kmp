@@ -56,13 +56,13 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { }
 
-    actual fun openUri(uri: Uri): Boolean {
+    actual suspend fun openUri(uri: Uri): Boolean {
         window.open(uri.toString(), "_blank")
         return true
     }
 
     @OptIn(ExperimentalWasmJsInterop::class)
-    actual fun copyText(text: String): Boolean {
+    actual suspend fun copyText(text: String): Boolean {
         window.navigator.clipboard.writeText(text)
         return true
     }

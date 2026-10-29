@@ -32,14 +32,14 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         rawContext.startActivity(intent)
     }
 
-    actual fun openUri(uri: Uri): Boolean = catchingDefault(false) {
+    actual suspend fun openUri(uri: Uri): Boolean = catchingDefault(false) {
         val intent = Intent(Intent.ACTION_VIEW, uri.toAndroidUri())
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         rawContext.startActivity(intent)
         true
     }
 
-    actual fun copyText(text: String): Boolean = catchingDefault(false) {
+    actual suspend fun copyText(text: String): Boolean = catchingDefault(false) {
         val clipboard = rawContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("", text)
         clipboard.setPrimaryClip(clip)

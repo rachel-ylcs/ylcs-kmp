@@ -229,6 +229,8 @@ internal class WindowsDirect3DRenderer(
             contextFailed = windowsDirect3DIsDeviceLost(nativeDevice)
             throw RenderException("Could not ${if (isResize) "resize" else "create"} the Direct3D swap chain (${formatHResult(result)})")
         }
+        // DirectComposition is attached lazily with the first swap chain, not with the D3D device.
+        if (transparencyRequested && !transparencySupported) throw RenderException("Direct3D swap chain does not provide transparent composition")
         width = newWidth
         height = newHeight
         sourceWidth = 0

@@ -162,7 +162,9 @@ class ScreenUser : BasicScreen() {
                 }
             }
             BoardButton("店铺", Icons2.Taobao) {
-                if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+                launch {
+                    if (!app.openUri(UriGenerator.taobao("280201975"))) slot.tip.warning("未安装淘宝")
+                }
             }
         }
         BoardButtonContainer("超管空间") {

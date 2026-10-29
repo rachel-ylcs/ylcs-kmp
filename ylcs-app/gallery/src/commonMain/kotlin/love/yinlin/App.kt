@@ -20,10 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.MainScope
-import love.yinlin.compose.ColorSystem
 import love.yinlin.compose.Theme
-import love.yinlin.compose.ThemeMode
-import love.yinlin.compose.ToolingTheme
 import love.yinlin.compose.data.ItemKey
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.ui.animation.AnimationContent
@@ -54,32 +51,25 @@ fun App() {
     val query = search.text.trim()
     val filtered = remember(query) { PageItem.searchIndex.search(query) }
 
-    Theme(
-        mainFontResource = Res.font.font,
-        themeMode = if (darkMode) ThemeMode.DARK else ThemeMode.LIGHT,
-        colorSystem = if (galleryPalette == GalleryPalette.Framework) ColorSystem.Default else GalleryColors,
-        toolingTheme = remember { ToolingTheme(enableBallonTip = true) },
-    ) {
-        BoxWithConstraints(Modifier.fillMaxSize().background(Theme.color.background)) {
-            val wide = maxWidth >= 1080.dp
-            Row(Modifier.fillMaxSize()) {
-                if (wide) {
-                    GallerySidebar(selected, filtered, search)
-                    VerticalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
-                }
-                BoxWithConstraints(Modifier.weight(1f).fillMaxHeight()) {
-                    CompositionLocalProvider(LocalGalleryCompact provides (maxWidth < 820.dp)) {
-                        Column(Modifier.fillMaxSize()) {
-                            GalleryToolbar(selected, wide, filtered, search)
-                            HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
-                            AnimationContent(
-                                state = selected.id,
-                                modifier = Modifier.weight(1f).fillMaxWidth(),
-                            ) { id ->
-                                val item = PageItem.allEntries.first { it.id == id }
-                                holder.SaveableStateProvider(id) {
-                                    item.page.Content()
-                                }
+    BoxWithConstraints(Modifier.fillMaxSize().background(Theme.color.background)) {
+        val wide = maxWidth >= 1080.dp
+        Row(Modifier.fillMaxSize()) {
+            if (wide) {
+                GallerySidebar(selected, filtered, search)
+                VerticalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
+            }
+            BoxWithConstraints(Modifier.weight(1f).fillMaxHeight()) {
+                CompositionLocalProvider(LocalGalleryCompact provides (maxWidth < 820.dp)) {
+                    Column(Modifier.fillMaxSize()) {
+                        GalleryToolbar(selected, wide, filtered, search)
+                        HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
+                        AnimationContent(
+                            state = selected.id,
+                            modifier = Modifier.weight(1f).fillMaxWidth(),
+                        ) { id ->
+                            val item = PageItem.allEntries.first { it.id == id }
+                            holder.SaveableStateProvider(id) {
+                                item.page.Content()
                             }
                         }
                     }

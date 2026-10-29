@@ -156,9 +156,16 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 alwaysOnTop = controller.alwaysOnTop,
                 state = controller.rawState,
             ) {
-                LaunchedEffect(Unit) {
+                val handle = remember(window) { lazy(LazyThreadSafetyMode.NONE) { window.windowHandle } }
+                DisposableEffect(window) {
+                    onDispose {
+                        if (handle.isInitialized() && this@PlatformApplication.windowHandle == handle.value) this@PlatformApplication.windowHandle = null
+                    }
+                }
+
+                LaunchedEffect(window) {
                     Fixup.swingWindowMaximizeBounds(window)
-                    this@PlatformApplication.windowHandle = window.windowHandle
+                    this@PlatformApplication.windowHandle = handle.value
 
                     windowStarter { initPoolLater(this) }
                 }
@@ -211,7 +218,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { controller.minimize = true }
 
-    actual fun openUri(uri: Uri): Boolean {
+    actual suspend fun openUri(uri: Uri): Boolean {
         val desktop = Desktop.getDesktop()
         return if (desktop.isSupported(Desktop.Action.BROWSE)) {
             desktop.browse(uri.toJvmUri())
@@ -219,7 +226,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         } else false
     }
 
-    actual fun copyText(text: String): Boolean {
+    actual suspend fun copyText(text: String): Boolean {
         val clipboard = Toolkit.getDefaultToolkit().systemClipboard
         val selection = StringSelection(text)
         clipboard.setContents(selection, null)

@@ -23,7 +23,7 @@ rachel {
                 lib(
                     libs.compose.resources,
                     projects.ylcsModule.foundation.fts,
-                    projects.ylcsModule.compose.ui,
+                    projects.ylcsModule.compose.app,
                     projects.ylcsModule.compose.components.image,
                     projects.ylcsModule.compose.components.blur,
                     projects.ylcsModule.compose.components.calendar,

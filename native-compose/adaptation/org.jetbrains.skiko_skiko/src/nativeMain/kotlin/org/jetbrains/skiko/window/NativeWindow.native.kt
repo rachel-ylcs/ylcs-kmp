@@ -47,7 +47,7 @@ object NativeWindow {
         check(!running) { "A NativeWindow event loop is already running" }
         running = true
         try {
-            check(SDL_Init(SDL_INIT_VIDEO)) { SDL_GetError()?.toKString() ?: "SDL_Init failed" }
+            check(RachelSDL_InitWindowHost()) { SDL_GetError()?.toKString() ?: "SDL_Init failed" }
             try { runWindow(options, onOpen, onEvent, onClose, render) }
             finally { SDL_Quit() }
         }
@@ -56,7 +56,9 @@ object NativeWindow {
 
     private fun runWindow(options: NativeWindowOptions = NativeWindowOptions(), onOpen: (NativeWindowScope) -> Unit, onEvent: (NativeWindowEvent) -> Unit, onClose: () -> Unit, render: (Canvas, Int, Int, Long) -> Unit) = memScoped {
         val software = options.backend == NativeWindowBackend.SOFTWARE
-        var flags = SDL_WINDOW_RESIZABLE or SDL_WINDOW_HIGH_PIXEL_DENSITY
+        var flags = SDL_WINDOW_HIGH_PIXEL_DENSITY
+        if (options.resizable) flags = flags or SDL_WINDOW_RESIZABLE
+        if (!options.focusable && SDL_GetCurrentVideoDriver()?.toKString() != "wayland") flags = flags or SDL_WINDOW_NOT_FOCUSABLE
         if (!software) flags = flags or gpuWindowFlags()
         if (options.transparent) flags = flags or SDL_WINDOW_TRANSPARENT
         if (options.undecorated) flags = flags or SDL_WINDOW_BORDERLESS
@@ -72,7 +74,9 @@ object NativeWindow {
                 check(wakeEventType != UInt.MAX_VALUE) { "Unable to register the Native window wake event" }
                 val scope = SdlWindowScope(window, wakeEventType)
                 try {
+                    if (options.clickThrough) scope.setClickThrough(true)
                     onOpen(scope)
+                    onEvent(NativeWindowEvent.Focus(RachelSDL_GetWindowFlags(window) and SDL_WINDOW_INPUT_FOCUS != 0uL))
                     val events = SdlWindowEvents(window, wakeEventType, onEvent)
                     println("Renderer: ${renderer.description}; statically linked SDL3")
                     val event = alloc<SDL_Event>()

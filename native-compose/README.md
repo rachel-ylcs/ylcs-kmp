@@ -95,6 +95,12 @@ rachel {
 
 `NativeWindowOptions` 支持创建时的 `transparent` 和 `undecorated`，默认均为 `false`。透明模式贯通 SDL 窗口与 Windows D3D12、Linux Vulkan、macOS Metal 的 alpha 缓冲；Linux 需要支持透明合成的窗口管理器和 Vulkan surface。`NativeWindowScope` 提供图标、最小尺寸、窗口装饰及标题栏命中区域接口；图标像素由 SDL 复制，拖动回调在窗口关闭前解绑。
 
+窗口可通过 `focusable`、`resizable` 和 `clickThrough` 配置输入焦点、用户缩放及整窗鼠标穿透，默认分别为 true、true、false。Rachel Native 应用可覆盖同名初始属性，并在运行时修改 `controller.focusable`、`controller.resizable`、`controller.clickThrough`。全屏期间的缩放开关在退出全屏后应用，不可缩放的普通窗口不提供最大化操作。焦点与鼠标穿透独立控制，不获取焦点时仍然正常绘制。
+
+Windows、macOS 和 X11 支持禁用普通窗口焦点；Wayland 普通顶层窗口的 `focusable` 配置仅保存赋值，不调用 SDL 修改焦点能力，也不抛异常或回写配置值。鼠标穿透、用户缩放和标题栏拖动分别独立控制，Wayland 的鼠标穿透仍可正常使用。
+
+鼠标穿透通过受锁定补丁管理的 SDL 窗口扩展实现，要求无系统标题栏；恢复系统标题栏时自动关闭穿透。Windows 使用 layered／transparent 扩展样式，并在关闭穿透时恢复原有相关样式位；窗口宿主预先注册不带 `CS_OWNDC` 的窗口类，以兼容分层输入穿透，保留 D3D12／软件渲染。macOS 使用 NSWindow 的忽略鼠标事件属性；X11 使用 SHAPE 1.1 输入区域；Wayland 使用 wl_surface 的空输入区域。切换不会清空绘制内容，缺少所需后端能力时明确报错。补丁哈希参与源码和静态 SDK 缓存身份。
+
 Rachel 的 `compose:app` Native `PlatformApplication` 默认采用透明、无系统标题栏窗口，支持与 JVM 类似的 `title`、`icon: DrawableResource?`、`initSize`、`minSize`、`roundedCorner` 和 `TopBar(controller, onExit)`。`controller.icon`、`controller.undecorated` 和 `controller.roundedCorner` 可在运行时更新；`transparent` 必须在创建窗口前配置。自定义标题栏默认交给系统拖动，交互控件区域用 `Modifier.windowDragArea(controller, draggable = false)` 排除，边缘保持系统缩放；切回系统装饰后隐藏 Compose 标题栏。位图、XML Vector 和 SVG 图标共用 Painter 栅格化，macOS 设置应用 Dock 图标；Wayland 不支持图标协议时保留系统图标，不中断应用。窗口实际透明还需要 Compose 内容使用透明背景。
 
 `initPosition` 使用 `WindowPosition.Absolute(x.dp, y.dp)`、`WindowPosition.Aligned(Alignment.Center)` 或 `WindowPosition.PlatformDefault`，`initPlacement` 使用 `WindowPlacement.Floating`、`Maximized` 或 `Fullscreen`。运行时可修改 `controller.position`、`controller.placement`，系统移动、缩放、最大化和全屏事件会回写状态。对齐以当前显示器工作区为准；绝对坐标按当前显示器的 dp／SDL 窗口坐标比例转换。最大化、全屏或最小化期间的位置请求在还原后应用，`PlatformDefault` 只用于初始位置。Wayland 不开放全局窗口定位，`controller.isPositionSupported` 为 false，位置由合成器决定。

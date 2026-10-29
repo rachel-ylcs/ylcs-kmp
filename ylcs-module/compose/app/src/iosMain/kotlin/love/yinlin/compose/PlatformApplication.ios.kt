@@ -38,7 +38,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     actual fun backHome() { }
 
-    actual fun openUri(uri: Uri): Boolean = catchingDefault(false) {
+    actual suspend fun openUri(uri: Uri): Boolean = catchingDefault(false) {
         val application = UIApplication.sharedApplication
         uri.toNSUrl()?.let { url ->
             application.canOpenURL(url)
@@ -46,7 +46,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         } ?: false
     }
 
-    actual fun copyText(text: String): Boolean {
+    actual suspend fun copyText(text: String): Boolean {
         UIPasteboard.generalPasteboard.setString(text)
         return true
     }

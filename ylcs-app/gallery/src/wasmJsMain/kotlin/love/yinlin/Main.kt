@@ -1,13 +1,10 @@
 package love.yinlin
 
-import androidx.compose.ui.window.ComposeViewport
-import kotlinx.browser.document
-import love.yinlin.compose.image.ImageManager
+import love.yinlin.extension.LazyReference
 import love.yinlin.foundation.PlatformContext
 
-fun main() {
-    ImageManager.initialize(PlatformContext.Instance, "RachelGallery")
-    ComposeViewport(viewportContainer = document.body!!) {
-        App()
-    }
-}
+private val applicationReference = LazyReference<WebGalleryApplication>()
+
+private class WebGalleryApplication : GalleryApplication<WebGalleryApplication>(applicationReference, PlatformContext.Instance)
+
+fun main() = WebGalleryApplication().run()

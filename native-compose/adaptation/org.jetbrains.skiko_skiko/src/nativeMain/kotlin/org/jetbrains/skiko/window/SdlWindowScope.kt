@@ -62,6 +62,8 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
             x = x.value,
             y = y.value,
             fullscreen = flags and SDL_WINDOW_FULLSCREEN != 0uL,
+            resizable = flags and SDL_WINDOW_RESIZABLE != 0uL,
+            clickThrough = RachelSDL_GetWindowClickThrough(window),
         )
     }
 
@@ -151,7 +153,24 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
 
     override fun setUndecorated(undecorated: Boolean) {
         checkHostThread()
+        if (!undecorated && RachelSDL_GetWindowClickThrough(window)) setClickThrough(false)
         check(RachelSDL_SetWindowUndecorated(window, undecorated)) { SDL_GetError()?.toKString() ?: "Unable to change window decorations" }
+    }
+
+    override fun setFocusable(focusable: Boolean) {
+        checkHostThread()
+        if (SDL_GetCurrentVideoDriver()?.toKString() == "wayland") return
+        check(RachelSDL_SetWindowFocusable(window, focusable)) { SDL_GetError()?.toKString() ?: "Unable to change window focusability" }
+    }
+
+    override fun setResizable(resizable: Boolean) {
+        checkHostThread()
+        check(RachelSDL_SetWindowResizable(window, resizable)) { SDL_GetError()?.toKString() ?: "Unable to change window resizability" }
+    }
+
+    override fun setClickThrough(enabled: Boolean) {
+        checkHostThread()
+        check(RachelSDL_SetWindowClickThrough(window, enabled)) { SDL_GetError()?.toKString() ?: "Unable to change window mouse passthrough" }
     }
 
     override fun setIcon(width: Int, height: Int, pixels: IntArray): Boolean {

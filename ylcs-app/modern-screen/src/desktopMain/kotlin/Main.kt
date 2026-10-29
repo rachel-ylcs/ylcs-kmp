@@ -1,17 +1,14 @@
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.v2.WindowBoundsProvider
-import androidx.compose.ui.window.v2.WindowSizeProvider
-import androidx.compose.ui.window.v2.WindowState
-import androidx.compose.ui.window.v2.singleWindowApplication
-import love.yinlin.App
+import love.yinlin.ModernScreenApplication
+import love.yinlin.extension.LazyReference
+import love.yinlin.foundation.PlatformContext
 
-@OptIn(ExperimentalComposeUiApi::class)
-fun main() = singleWindowApplication(
-    state = WindowState(initialBoundsProvider = WindowBoundsProvider(
-        sizeProvider = WindowSizeProvider.Fixed(1280.dp, 768.dp)
-    )),
-    title = "Rachel UI Modern Screen"
-) {
-    App()
+private val applicationReference = LazyReference<DesktopModernScreenApplication>()
+
+private class DesktopModernScreenApplication(override val commandArgs: Array<String>) : ModernScreenApplication<DesktopModernScreenApplication>(applicationReference, PlatformContext.Instance) {
+    override val title = "Rachel UI Modern Screen"
+    override val initSize = DpSize(1280.dp, 768.dp)
 }
+
+fun main(args: Array<String>) = DesktopModernScreenApplication(args).run()

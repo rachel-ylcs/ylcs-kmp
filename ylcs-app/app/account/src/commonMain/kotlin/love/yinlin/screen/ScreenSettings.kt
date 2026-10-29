@@ -519,12 +519,12 @@ class ScreenSettings : Screen() {
                     SecondaryButton(
                         text = "银临茶舍官网",
                         icon = Icons.Home,
-                        onClick = { app.openUri(Uri(scheme = Scheme.Https, host = "yinlin.love")) }
+                        onClick = { launch { app.openUri(Uri(scheme = Scheme.Https, host = "yinlin.love")) } }
                     )
                     TertiaryButton(
                         text = "Github开源",
                         icon = Icons2.Github,
-                        onClick = { app.openUri(Uri(scheme = Scheme.Https, host = "github.com", path = "/rachel-ylcs/ylcs-kmp")) }
+                        onClick = { launch { app.openUri(Uri(scheme = Scheme.Https, host = "github.com", path = "/rachel-ylcs/ylcs-kmp")) } }
                     )
                 }
 

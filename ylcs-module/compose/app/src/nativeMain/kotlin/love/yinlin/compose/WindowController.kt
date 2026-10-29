@@ -32,6 +32,9 @@ class WindowController(
     private val minSize: DpSize = DpSize(360.dp, 640.dp),
     placement: WindowPlacement = WindowPlacement.Floating,
     position: WindowPosition = WindowPosition.Aligned(Alignment.Center),
+    initFocusable: Boolean = true,
+    initResizable: Boolean = true,
+    initClickThrough: Boolean = false,
 ) {
     private var window by mutableRefStateOf<NativeWindowScope?>(null)
     private var active by mutableStateOf(false)
@@ -43,6 +46,9 @@ class WindowController(
     private var windowTitle by mutableStateOf(initTitle)
     private var windowSize by mutableStateOf(initSize)
     private var windowUndecorated by mutableStateOf(initUndecorated)
+    private var windowFocusable by mutableStateOf(initFocusable)
+    private var windowResizable by mutableStateOf(initResizable)
+    private var windowClickThrough by mutableStateOf(initClickThrough)
     private var pendingPosition: WindowPosition? = null
     private var placementAfterFullscreen: WindowPlacement? = null
     internal val dragAreas = mutableSetOf<WindowDragAreaNode>()
@@ -58,6 +64,8 @@ class WindowController(
         validateSize(initSize)
         validateSize(minSize)
         validatePosition(position)
+        require(!initClickThrough || initUndecorated) { "Mouse passthrough requires an undecorated window" }
+        require(placement != WindowPlacement.Maximized || initResizable) { "A non-resizable window cannot be maximized" }
     }
 
     val isActive: Boolean get() = active
@@ -71,6 +79,7 @@ class WindowController(
         get() = windowPlacement
         set(value) {
             if (windowPlacement == value) return
+            require(value != WindowPlacement.Maximized || windowResizable) { "A non-resizable window cannot be maximized" }
             window?.let { updatePlacement(it, value) }
             windowPlacement = value
             if (value != WindowPlacement.Floating) minimized = false
@@ -103,8 +112,37 @@ class WindowController(
         }
 
     fun toggleMaximize() {
+        if (windowPlacement == WindowPlacement.Floating && !windowResizable) return
         placement = if (windowPlacement == WindowPlacement.Floating) WindowPlacement.Maximized else WindowPlacement.Floating
     }
+
+    /** 保存配置值；Wayland 普通顶层窗口忽略焦点能力变更。 */
+    var focusable: Boolean
+        get() = windowFocusable
+        set(value) {
+            if (windowFocusable == value) return
+            window?.setFocusable(value)
+            windowFocusable = value
+        }
+
+    /** 全屏期间的修改在退出全屏后应用。 */
+    var resizable: Boolean
+        get() = windowResizable
+        set(value) {
+            if (windowResizable == value) return
+            window?.let { if (!it.state.fullscreen) it.setResizable(value) }
+            windowResizable = value
+        }
+
+    /** 整窗鼠标穿透；保留绘制内容，需要无系统标题栏。焦点设置独立控制。 */
+    var clickThrough: Boolean
+        get() = windowClickThrough
+        set(value) {
+            if (windowClickThrough == value) return
+            require(!value || windowUndecorated) { "Mouse passthrough requires an undecorated window" }
+            window?.setClickThrough(value)
+            windowClickThrough = value
+        }
 
     var visible: Boolean
         get() = shown
@@ -144,6 +182,7 @@ class WindowController(
         get() = windowUndecorated
         set(value) {
             if (windowUndecorated == value) return
+            if (!value && windowClickThrough) clickThrough = false
             window?.setUndecorated(value)
             windowUndecorated = value
         }
@@ -155,6 +194,9 @@ class WindowController(
         this.window = window
         window.setTitle(windowTitle)
         window.setUndecorated(windowUndecorated)
+        window.setFocusable(windowFocusable)
+        window.setResizable(windowResizable)
+        window.setClickThrough(windowClickThrough)
         updateMinimumSize(window)
         resize(window, windowSize)
         if (window.isPositionSupported) move(window, windowPosition)
@@ -225,6 +267,7 @@ class WindowController(
                 }
                 windowTitle = state.title
                 topmost = state.alwaysOnTop
+                if (!state.fullscreen && state.resizable != windowResizable) window.setResizable(windowResizable)
                 updateGeometry(window, state)
                 applyPendingPosition(window)
             }

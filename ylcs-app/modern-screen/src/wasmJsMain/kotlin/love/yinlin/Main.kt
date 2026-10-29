@@ -1,10 +1,10 @@
 package love.yinlin
 
-import androidx.compose.ui.window.ComposeViewport
-import kotlinx.browser.document
+import love.yinlin.extension.LazyReference
+import love.yinlin.foundation.PlatformContext
 
-fun main() {
-    ComposeViewport(viewportContainer = document.body!!) {
-        App()
-    }
-}
+private val applicationReference = LazyReference<WebModernScreenApplication>()
+
+private class WebModernScreenApplication : ModernScreenApplication<WebModernScreenApplication>(applicationReference, PlatformContext.Instance)
+
+fun main() = WebModernScreenApplication().run()

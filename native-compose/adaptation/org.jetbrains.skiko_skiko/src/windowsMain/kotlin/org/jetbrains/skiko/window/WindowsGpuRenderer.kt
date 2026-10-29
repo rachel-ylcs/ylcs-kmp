@@ -24,7 +24,6 @@ internal class WindowsGpuRenderer(window: COpaquePointer, transparent: Boolean, 
             layer.renderDelegate = SkikoRenderDelegate { canvas, width, height, _ -> draw(canvas, width, height) }
             layer.attachTo(hwnd.rawValue.toLong())
             check(layer.renderApi == GraphicsApi.DIRECT3D) { "D3D12 initialization fell back to ${layer.renderApi}" }
-            check(!transparent || layer.diagnostics.hasTransparentWindowBuffer) { "D3D12 could not create a transparent window buffer" }
         }
         catch (failure: Throwable) {
             layer.detach()

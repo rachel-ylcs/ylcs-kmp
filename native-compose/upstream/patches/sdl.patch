@@ -61,11 +61,61 @@ new file mode 100644
 +    RachelSDL_QueryDrop(window, 0, 0, 0);
 +}
 +#endif
+diff --git a/include/SDL3/SDL_rachelwindow.h b/include/SDL3/SDL_rachelwindow.h
+new file mode 100644
+--- /dev/null
++++ b/include/SDL3/SDL_rachelwindow.h
+@@ -0,0 +1,45 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied
++  warranty.  In no event will the authors be held liable for any damages
++  arising from the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it
++  freely, subject to the following restrictions:
++
++  1. The origin of this software must not be misrepresented; you must not
++     claim that you wrote the original software. If you use this software
++     in a product, an acknowledgment in the product documentation would be
++     appreciated but is not required.
++  2. Altered source versions must be plainly marked as such, and must not be
++     misrepresented as being the original software.
++  3. This notice may not be removed or altered from any source distribution.
++*/
++
++/* Rachel extension: whole-window mouse passthrough. */
++#ifndef SDL_rachelwindow_h_
++#define SDL_rachelwindow_h_
++#include "SDL_video.h"
++#include "SDL_properties.h"
++#include "SDL_begin_code.h"
++
++#define RACHEL_SDL_MOUSE_PASSTHROUGH "rachel.window.mouse_passthrough"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++extern SDL_DECLSPEC bool SDLCALL RachelSDL_SetWindowMousePassthrough(SDL_Window *window, bool enabled);
++#ifdef __cplusplus
++}
++#endif
++
++static inline bool RachelSDL_WindowMousePassthrough(SDL_Window *window)
++{
++    return SDL_GetBooleanProperty(SDL_GetWindowProperties(window), RACHEL_SDL_MOUSE_PASSTHROUGH, false);
++}
++
++#include "SDL_close_code.h"
++#endif
 diff --git a/src/events/SDL_dropevents.c b/src/events/SDL_dropevents.c
 --- a/src/events/SDL_dropevents.c
 +++ b/src/events/SDL_dropevents.c
 @@ -111,5 +111,6 @@
- 
+
  bool SDL_SendDropComplete(SDL_Window *window)
  {
 +    RachelSDL_EndDrop(window);
@@ -77,17 +127,111 @@ diff --git a/src/events/SDL_dropevents_c.h b/src/events/SDL_dropevents_c.h
 @@ -23,6 +23,8 @@
  #ifndef SDL_dropevents_c_h_
  #define SDL_dropevents_c_h_
- 
+
 +#include <SDL3/SDL_racheldrop.h>
 +
  extern bool SDL_SendDropFile(SDL_Window *window, const char *source, const char *file);
  extern bool SDL_SendDropPosition(SDL_Window *window, float x, float y);
  extern bool SDL_SendDropText(SDL_Window *window, const char *text);
+diff --git a/src/video/SDL_video.c b/src/video/SDL_video.c
+--- a/src/video/SDL_video.c
++++ b/src/video/SDL_video.c
+@@ -24,6 +24,7 @@
+ // The high-level video driver subsystem
+
+ #include "SDL_sysvideo.h"
++#include <SDL3/SDL_rachelwindow.h>
+ #include "SDL_clipboard_c.h"
+ #include "SDL_egl_c.h"
+ #include "SDL_surface_c.h"
+@@ -6170,6 +6171,52 @@
+     return _this->SetWindowHitTest(window, callback != NULL);
+ }
+
++
++#ifdef SDL_VIDEO_DRIVER_WINDOWS
++extern bool WIN_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++#endif
++#ifdef SDL_VIDEO_DRIVER_COCOA
++extern bool Cocoa_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++#endif
++#ifdef SDL_VIDEO_DRIVER_X11
++extern bool X11_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++#endif
++#ifdef SDL_VIDEO_DRIVER_WAYLAND
++extern bool Wayland_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++#endif
++
++bool SDLCALL RachelSDL_SetWindowMousePassthrough(SDL_Window *window, bool enabled)
++{
++    CHECK_WINDOW_MAGIC(window, false);
++    if (enabled && !(window->flags & SDL_WINDOW_BORDERLESS)) {
++        return SDL_SetError("Mouse passthrough requires a borderless window");
++    }
++    const bool previous = RachelSDL_WindowMousePassthrough(window);
++    if (previous == enabled) return true;
++    SDL_PropertiesID props = SDL_GetWindowProperties(window);
++    if (!SDL_SetBooleanProperty(props, RACHEL_SDL_MOUSE_PASSTHROUGH, enabled)) return false;
++    bool result = false;
++#ifdef SDL_VIDEO_DRIVER_WINDOWS
++    if (SDL_strcmp(_this->name, "windows") == 0) result = WIN_RachelMousePassthrough(_this, window, enabled);
++    else
++#endif
++#ifdef SDL_VIDEO_DRIVER_COCOA
++    if (SDL_strcmp(_this->name, "cocoa") == 0) result = Cocoa_RachelMousePassthrough(_this, window, enabled);
++    else
++#endif
++#ifdef SDL_VIDEO_DRIVER_X11
++    if (SDL_strcmp(_this->name, "x11") == 0) result = X11_RachelMousePassthrough(_this, window, enabled);
++    else
++#endif
++#ifdef SDL_VIDEO_DRIVER_WAYLAND
++    if (SDL_strcmp(_this->name, "wayland") == 0) result = Wayland_RachelMousePassthrough(_this, window, enabled);
++    else
++#endif
++    result = SDL_Unsupported();
++    if (!result) SDL_SetBooleanProperty(props, RACHEL_SDL_MOUSE_PASSTHROUGH, previous);
++    return result;
++}
++
+ bool SDL_SetWindowShape(SDL_Window *window, SDL_Surface *shape)
+ {
+     SDL_PropertiesID props;
+diff --git a/src/video/cocoa/SDL_cocoashape.m b/src/video/cocoa/SDL_cocoashape.m
+--- a/src/video/cocoa/SDL_cocoashape.m
++++ b/src/video/cocoa/SDL_cocoashape.m
+@@ -19,6 +19,7 @@
+   3. This notice may not be removed or altered from any source distribution.
+ */
+ #include "SDL_internal.h"
++#include <SDL3/SDL_rachelwindow.h>
+
+ #ifdef SDL_VIDEO_DRIVER_COCOA
+
+@@ -31,6 +32,10 @@
+     SDL_CocoaWindowData *data = (__bridge SDL_CocoaWindowData *)window->internal;
+     BOOL ignoresMouseEvents = NO;
+
++    if (RachelSDL_WindowMousePassthrough(window)) {
++        data.nswindow.ignoresMouseEvents = YES;
++        return true;
++    }
+     if (shape) {
+         SDL_FPoint point;
+         SDL_GetGlobalMouseState(&point.x, &point.y);
 diff --git a/src/video/cocoa/SDL_cocoawindow.m b/src/video/cocoa/SDL_cocoawindow.m
 --- a/src/video/cocoa/SDL_cocoawindow.m
 +++ b/src/video/cocoa/SDL_cocoawindow.m
-@@ -163,13 +163,7 @@
- 
+@@ -19,6 +19,7 @@
+   3. This notice may not be removed or altered from any source distribution.
+ */
+ #include "SDL_internal.h"
++#include <SDL3/SDL_rachelwindow.h>
+
+ #ifdef SDL_VIDEO_DRIVER_COCOA
+
+@@ -163,13 +164,7 @@
+
  - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
  {
 -    if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) == NSDragOperationGeneric) {
@@ -99,10 +243,10 @@ diff --git a/src/video/cocoa/SDL_cocoawindow.m b/src/video/cocoa/SDL_cocoawindow
 -    return NSDragOperationNone; // no idea what to do with this, reject it.
 +    return [self draggingUpdated:sender];
  }
- 
+
  - (void)draggingExited:(id<NSDraggingInfo>)sender
-@@ -180,29 +174,29 @@
- 
+@@ -180,29 +175,29 @@
+
  - (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender
  {
 -    if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) == NSDragOperationGeneric) {
@@ -140,7 +284,7 @@ diff --git a/src/video/cocoa/SDL_cocoawindow.m b/src/video/cocoa/SDL_cocoawindow
 +    if (mask & NSDragOperationGeneric) return NSDragOperationGeneric;
 +    return NSDragOperationNone;
  }
- 
+
  - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
  {
 +    if ([self draggingUpdated:sender] == NSDragOperationNone) {
@@ -150,7 +294,7 @@ diff --git a/src/video/cocoa/SDL_cocoawindow.m b/src/video/cocoa/SDL_cocoawindow
      SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
                   ". [SDL] In performDragOperation, draggingSourceOperationMask %lx, "
                   "expected Generic %lx, others Copy %lx, Link %lx, Private %lx, Move %lx, Delete %lx\n",
-@@ -223,7 +217,8 @@
+@@ -223,7 +218,8 @@
      }
      @autoreleasepool {
          NSPasteboard *pasteboard = [sender draggingPasteboard];
@@ -160,13 +304,119 @@ diff --git a/src/video/cocoa/SDL_cocoawindow.m b/src/video/cocoa/SDL_cocoawindow
          SDL_Window *sdlwindow = [self findSDLWindow];
          NSData *pboardData;
          id pboardPlist;
+@@ -1057,6 +1053,10 @@
+     SDL_Surface *shape = (SDL_Surface *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_SHAPE_POINTER, NULL);
+     BOOL ignoresMouseEvents = NO;
+
++    if (RachelSDL_WindowMousePassthrough(window)) {
++        _data.nswindow.ignoresMouseEvents = YES;
++        return;
++    }
+     if (shape) {
+         NSPoint point = [theEvent locationInWindow];
+         NSRect windowRect = [[_data.nswindow contentView] frame];
+diff --git a/src/video/cocoa/SDL_rachelwindow.m b/src/video/cocoa/SDL_rachelwindow.m
+new file mode 100644
+--- /dev/null
++++ b/src/video/cocoa/SDL_rachelwindow.m
+@@ -0,0 +1,41 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied
++  warranty.  In no event will the authors be held liable for any damages
++  arising from the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it
++  freely, subject to the following restrictions:
++
++  1. The origin of this software must not be misrepresented; you must not
++     claim that you wrote the original software. If you use this software
++     in a product, an acknowledgment in the product documentation would be
++     appreciated but is not required.
++  2. Altered source versions must be plainly marked as such, and must not be
++     misrepresented as being the original software.
++  3. This notice may not be removed or altered from any source distribution.
++*/
++
++/* Rachel extension: whole-window mouse passthrough. */
++#include "SDL_internal.h"
++#ifdef SDL_VIDEO_DRIVER_COCOA
++#include "SDL_cocoavideo.h"
++#include "SDL_cocoashape.h"
++
++bool Cocoa_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++bool Cocoa_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled)
++{
++    @autoreleasepool {
++        SDL_CocoaWindowData *data = (__bridge SDL_CocoaWindowData *)window->internal;
++        if (enabled) data.nswindow.ignoresMouseEvents = YES;
++        else {
++            SDL_Surface *shape = (SDL_Surface *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_SHAPE_POINTER, NULL);
++            return Cocoa_UpdateWindowShape(_this, window, shape);
++        }
++    }
++    return true;
++}
++#endif
+diff --git a/src/video/wayland/SDL_rachelwindow.c b/src/video/wayland/SDL_rachelwindow.c
+new file mode 100644
+--- /dev/null
++++ b/src/video/wayland/SDL_rachelwindow.c
+@@ -0,0 +1,44 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied
++  warranty.  In no event will the authors be held liable for any damages
++  arising from the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it
++  freely, subject to the following restrictions:
++
++  1. The origin of this software must not be misrepresented; you must not
++     claim that you wrote the original software. If you use this software
++     in a product, an acknowledgment in the product documentation would be
++     appreciated but is not required.
++  2. Altered source versions must be plainly marked as such, and must not be
++     misrepresented as being the original software.
++  3. This notice may not be removed or altered from any source distribution.
++*/
++
++/* Rachel extension: whole-window mouse passthrough. */
++#include "SDL_internal.h"
++#ifdef SDL_VIDEO_DRIVER_WAYLAND
++#include "SDL_waylandvideo.h"
++#include "SDL_waylandwindow.h"
++
++bool Wayland_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++bool Wayland_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled)
++{
++    SDL_VideoData *video = _this->internal;
++    SDL_WindowData *data = window->internal;
++    struct wl_region *region = NULL;
++    if (enabled) {
++        region = wl_compositor_create_region(video->compositor);
++        if (!region) return SDL_OutOfMemory();
++    }
++    wl_surface_set_input_region(data->surface, region);
++    if (region) wl_region_destroy(region);
++    wl_surface_commit(data->surface);
++    wl_display_flush(video->display);
++    return true;
++}
++#endif
 diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_waylandevents.c
 --- a/src/video/wayland/SDL_waylandevents.c
 +++ b/src/video/wayland/SDL_waylandevents.c
 @@ -2755,12 +2755,41 @@
      }
  }
- 
+
 +/* Rachel: negotiate without reading the offered data before the user drops it. */
 +static void Wayland_RachelDropTarget(SDL_WaylandDataDevice *device, float x, float y)
 +{
@@ -204,7 +454,7 @@ diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_wayla
 +    data_device->dnd_window = NULL;
      data_device->has_mime_file = false;
      data_device->has_mime_text = false;
- 
+
 @@ -2777,13 +2806,11 @@
          if (Wayland_data_offer_has_mime(data_device->drag_offer, FILE_PORTAL_MIME)) {
              data_device->has_mime_file = true;
@@ -217,7 +467,7 @@ diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_wayla
              data_device->mime_type = FILE_MIME;
 -            wl_data_offer_accept(id, serial, FILE_MIME);
          }
- 
+
          size_t mime_count = 0;
 @@ -2792,22 +2819,17 @@
              if (Wayland_data_offer_has_mime(data_device->drag_offer, text_mime_types[i])) {
@@ -227,7 +477,7 @@ diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_wayla
                  break;
              }
          }
- 
+
          if (data_device->has_mime_file || data_device->has_mime_text) {
 -            // SDL only supports "copy" style drag and drop
 -            if (wl_data_offer_get_version(data_device->drag_offer->offer) >= WL_DATA_OFFER_SET_ACTIONS_SINCE_VERSION) {
@@ -254,12 +504,12 @@ diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_wayla
 @@ -2873,7 +2896,7 @@
  {
      SDL_WaylandDataDevice *data_device = data;
- 
+
 -    if (data_device->drag_offer && data_device->dnd_window && (data_device->has_mime_file || data_device->has_mime_text)) {
 +    if (data_device->drag_offer && data_device->dnd_window) {
          const float dx = (float)(wl_fixed_to_double(x) * data_device->dnd_window->internal->pointer_scale.x);
          const float dy = (float)(wl_fixed_to_double(y) * data_device->dnd_window->internal->pointer_scale.y);
- 
+
 @@ -2882,6 +2905,7 @@
           *      hammer the DBus interface hundreds or even thousands of times per second.
           */
@@ -276,7 +526,7 @@ diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_wayla
 +        SDL_PropertiesID props = SDL_GetWindowProperties(data_device->dnd_window);
 +        Wayland_RachelDropTarget(data_device, SDL_GetFloatProperty(props, "rachel.drop.x", 0), SDL_GetFloatProperty(props, "rachel.drop.y", 0));
 +    }
- 
+
      if (data_device->drag_offer && data_device->dnd_window && (data_device->has_mime_file || data_device->has_mime_text)) {
          SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
 @@ -2907,7 +2935,7 @@
@@ -288,13 +538,74 @@ diff --git a/src/video/wayland/SDL_waylandevents.c b/src/video/wayland/SDL_wayla
              void *buffer = Wayland_data_offer_receive(data_device->drag_offer, FILE_PORTAL_MIME, &length, false);
              if (buffer) {
                  SDL_DBusContext *dbus = SDL_DBus_GetContext();
+diff --git a/src/video/windows/SDL_rachelwindow.c b/src/video/windows/SDL_rachelwindow.c
+new file mode 100644
+--- /dev/null
++++ b/src/video/windows/SDL_rachelwindow.c
+@@ -0,0 +1,56 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied
++  warranty.  In no event will the authors be held liable for any damages
++  arising from the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it
++  freely, subject to the following restrictions:
++
++  1. The origin of this software must not be misrepresented; you must not
++     claim that you wrote the original software. If you use this software
++     in a product, an acknowledgment in the product documentation would be
++     appreciated but is not required.
++  2. Altered source versions must be plainly marked as such, and must not be
++     misrepresented as being the original software.
++  3. This notice may not be removed or altered from any source distribution.
++*/
++
++/* Rachel extension: whole-window mouse passthrough. */
++#include "SDL_internal.h"
++#if defined(SDL_VIDEO_DRIVER_WINDOWS) && !defined(SDL_PLATFORM_XBOXONE) && !defined(SDL_PLATFORM_XBOXSERIES)
++#include "SDL_windowsvideo.h"
++
++bool WIN_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++bool WIN_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled)
++{
++    HWND hwnd = window->internal->hwnd;
++    if (enabled && (GetClassLongPtrW(hwnd, GCL_STYLE) & (CS_OWNDC | CS_CLASSDC))) {
++        return SDL_SetError("Mouse passthrough requires a window class without CS_OWNDC or CS_CLASSDC");
++    }
++    SDL_PropertiesID props = SDL_GetWindowProperties(window);
++    const LONG_PTR mask = WS_EX_LAYERED | WS_EX_TRANSPARENT;
++    const LONG_PTR style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
++    const LONG_PTR original = enabled ? (style & mask) : (LONG_PTR)SDL_GetNumberProperty(props, "rachel.window.mouse.original_style", 0);
++    if (enabled && !SDL_SetNumberProperty(props, "rachel.window.mouse.original_style", (Sint64)original)) return false;
++    const LONG_PTR next = enabled ? (style | mask) : ((style & ~mask) | original);
++    SetLastError(0);
++    if (!SetWindowLongPtrW(hwnd, GWL_EXSTYLE, next) && GetLastError()) return WIN_SetError("SetWindowLongPtrW");
++    if (enabled && !(style & WS_EX_LAYERED) && !SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA)) {
++        DWORD error = GetLastError();
++        SetWindowLongPtrW(hwnd, GWL_EXSTYLE, style);
++        SetLastError(error);
++        return WIN_SetError("SetLayeredWindowAttributes");
++    }
++    if (!SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_NOACTIVATE)) {
++        DWORD error = GetLastError();
++        SetWindowLongPtrW(hwnd, GWL_EXSTYLE, style);
++        SetLastError(error);
++        return WIN_SetError("SetWindowPos");
++    }
++    return true;
++}
++#endif
 diff --git a/src/video/windows/SDL_windowswindow.c b/src/video/windows/SDL_windowswindow.c
 --- a/src/video/windows/SDL_windowswindow.c
 +++ b/src/video/windows/SDL_windowswindow.c
 @@ -1764,22 +1764,35 @@
      return E_NOINTERFACE;
  }
- 
+
 +/* Rachel: negotiate the format and hit target before advertising COPY to OLE. */
 +static Uint32 WIN_RachelDropTypes(SDLDropTarget *target, IDataObject *data)
 +{
@@ -338,7 +649,7 @@ diff --git a/src/video/windows/SDL_windowswindow.c b/src/video/windows/SDL_windo
 +    *pdwEffect = WIN_RachelDropEffect(target, *pdwEffect, pt, WIN_RachelDropTypes(target, pDataObject));
      return S_OK;
  }
- 
+
 @@ -1787,18 +1800,7 @@
                                             DWORD grfKeyState,
                                             POINTL pt, DWORD *pdwEffect)
@@ -358,7 +669,7 @@ diff --git a/src/video/windows/SDL_windowswindow.c b/src/video/windows/SDL_windo
 +    *pdwEffect = WIN_RachelDropEffect(target, *pdwEffect, pt, RachelSDL_DropTypes(target->window));
      return S_OK;
  }
- 
+
 @@ -1814,15 +1816,11 @@
                                         IDataObject *pDataObject, DWORD grfKeyState,
                                         POINTL pt, DWORD *pdwEffect)
@@ -378,7 +689,7 @@ diff --git a/src/video/windows/SDL_windowswindow.c b/src/video/windows/SDL_windo
 +        SDL_SendDropComplete(target->window);
 +        return S_OK;
      }
- 
+
      {
 @@ -1855,7 +1853,7 @@
          fetc.lindex = -1;
@@ -425,6 +736,64 @@ diff --git a/src/video/windows/SDL_windowswindow.c b/src/video/windows/SDL_windo
              SDL_LogTrace(SDL_LOG_CATEGORY_INPUT,
                           ". In Drop File for QueryGetData, format %08x '%s', success",
                           fetc.cfFormat, format_mime);
+diff --git a/src/video/x11/SDL_rachelwindow.c b/src/video/x11/SDL_rachelwindow.c
+new file mode 100644
+--- /dev/null
++++ b/src/video/x11/SDL_rachelwindow.c
+@@ -0,0 +1,53 @@
++/*
++  Simple DirectMedia Layer
++  Copyright (C) 1997-2026 Sam Lantinga <slouken@libsdl.org>
++
++  This software is provided 'as-is', without any express or implied
++  warranty.  In no event will the authors be held liable for any damages
++  arising from the use of this software.
++
++  Permission is granted to anyone to use this software for any purpose,
++  including commercial applications, and to alter it and redistribute it
++  freely, subject to the following restrictions:
++
++  1. The origin of this software must not be misrepresented; you must not
++     claim that you wrote the original software. If you use this software
++     in a product, an acknowledgment in the product documentation would be
++     appreciated but is not required.
++  2. Altered source versions must be plainly marked as such, and must not be
++     misrepresented as being the original software.
++  3. This notice may not be removed or altered from any source distribution.
++*/
++
++/* Rachel extension: whole-window mouse passthrough. */
++#include "SDL_internal.h"
++#ifdef SDL_VIDEO_DRIVER_X11
++#include "SDL_x11video.h"
++#include "SDL_x11shape.h"
++
++bool X11_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++bool X11_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled)
++{
++#ifdef SDL_VIDEO_DRIVER_X11_XSHAPE
++    SDL_WindowData *data = window->internal;
++    Display *display = data->videodata->display;
++    int major = 0, minor = 0;
++    if (!SDL_X11_HAVE_XSHAPE || !X11_XShapeQueryVersion(display, &major, &minor) || major < 1 || (major == 1 && minor < 1)) {
++        return SDL_SetError("Mouse passthrough requires X11 SHAPE 1.1");
++    }
++    if (enabled) {
++        Region region = X11_XCreateRegion();
++        if (!region) return SDL_OutOfMemory();
++        X11_XShapeCombineRegion(display, data->xwindow, ShapeInput, 0, 0, region, ShapeSet);
++        X11_XDestroyRegion(region);
++    } else {
++        SDL_Surface *shape = (SDL_Surface *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_SHAPE_POINTER, NULL);
++        if (!X11_UpdateWindowShape(_this, window, shape)) return false;
++    }
++    X11_XFlush(display);
++    return true;
++#else
++    return SDL_Unsupported();
++#endif
++}
++#endif
 diff --git a/src/video/x11/SDL_x11events.c b/src/video/x11/SDL_x11events.c
 --- a/src/video/x11/SDL_x11events.c
 +++ b/src/video/x11/SDL_x11events.c
@@ -461,7 +830,7 @@ diff --git a/src/video/x11/SDL_x11events.c b/src/video/x11/SDL_x11events.c
 +    Uint32 accepted = RachelSDL_QueryDrop(window, types, x, y);
 +    return accepted == RACHEL_SDL_DROP_FILE ? file : accepted == RACHEL_SDL_DROP_TEXT ? text : None;
  }
- 
+
  struct KeyRepeatCheckData
 @@ -1754,10 +1782,13 @@
                  X11_ReadProperty(&p, display, data->xdnd_source, videodata->atoms.XdndTypeList);
@@ -479,11 +848,11 @@ diff --git a/src/video/x11/SDL_x11events.c b/src/video/x11/SDL_x11events.c
  #ifdef DEBUG_XEVENTS
 @@ -1784,6 +1815,7 @@
                                            root_x, root_y, &window_x, &window_y, &ChildReturn);
- 
+
                  SDL_SendDropPosition(data->window, (float)window_x, (float)window_y);
 +                data->xdnd_req = X11_RachelDropTarget(data->window, (float)window_x, (float)window_y);
              }
- 
+
              // reply with status
 @@ -1794,14 +1826,16 @@
              m.message_type = videodata->atoms.XdndStatus;
@@ -495,7 +864,7 @@ diff --git a/src/video/x11/SDL_x11events.c b/src/video/x11/SDL_x11events.c
              m.data.l[3] = 0;
 -            m.data.l[4] = videodata->atoms.XdndActionCopy; // we only accept copying anyway
 +            m.data.l[4] = data->xdnd_req != None ? videodata->atoms.XdndActionCopy : None;
- 
+
              X11_XSendEvent(display, xevent->xclient.data.l[0], False, NoEventMask, (XEvent *)&m);
              X11_XFlush(display);
          } else if (xevent->xclient.message_type == videodata->atoms.XdndDrop) {
@@ -504,3 +873,37 @@ diff --git a/src/video/x11/SDL_x11events.c b/src/video/x11/SDL_x11events.c
              if (data->xdnd_req == None) {
                  // say again - not interested!
                  SDL_zero(m);
+diff --git a/src/video/x11/SDL_x11shape.c b/src/video/x11/SDL_x11shape.c
+--- a/src/video/x11/SDL_x11shape.c
++++ b/src/video/x11/SDL_x11shape.c
+@@ -19,6 +19,7 @@
+   3. This notice may not be removed or altered from any source distribution.
+ */
+ #include "SDL_internal.h"
++#include <SDL3/SDL_rachelwindow.h>
+
+ #ifdef SDL_VIDEO_DRIVER_X11
+
+@@ -53,8 +54,11 @@
+ }
+ #endif // SDL_VIDEO_DRIVER_X11_XSHAPE
+
++extern bool X11_RachelMousePassthrough(SDL_VideoDevice *_this, SDL_Window *window, bool enabled);
++
+ bool X11_UpdateWindowShape(SDL_VideoDevice *_this, SDL_Window *window, SDL_Surface *shape)
+ {
++    if (RachelSDL_WindowMousePassthrough(window)) return X11_RachelMousePassthrough(_this, window, true);
+     bool result = false;
+
+ #ifdef SDL_VIDEO_DRIVER_X11_XSHAPE
+diff --git a/src/video/x11/SDL_x11sym.h b/src/video/x11/SDL_x11sym.h
+--- a/src/video/x11/SDL_x11sym.h
++++ b/src/video/x11/SDL_x11sym.h
+@@ -358,6 +358,7 @@
+
+ #ifdef SDL_VIDEO_DRIVER_X11_XSHAPE
+ SDL_X11_MODULE(XSHAPE)
++SDL_X11_SYM(Status,XShapeQueryVersion,(Display *a,int *b,int *c))
+ SDL_X11_SYM(void,XShapeCombineMask,(Display *dpy,Window dest,int dest_kind,int x_off,int y_off,Pixmap src,int op))
+ SDL_X11_SYM(void,XShapeCombineRegion,(Display *a,Window b,int c,int d,int e,Region f,int g))
+ #endif

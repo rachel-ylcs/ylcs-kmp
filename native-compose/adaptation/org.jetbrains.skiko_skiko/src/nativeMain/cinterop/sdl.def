@@ -1,9 +1,27 @@
-headers = SDL3/SDL.h SDL3/SDL_vulkan.h SDL3/SDL_metal.h SDL3/SDL_racheldrop.h
+headers = SDL3/SDL.h SDL3/SDL_vulkan.h SDL3/SDL_metal.h SDL3/SDL_racheldrop.h SDL3/SDL_rachelwindow.h
 headerFilter = SDL3/**
 package = org.jetbrains.skiko.internal.sdl
 ---
 // Keep SDL's private object layouts opaque while exposing handles that the IDE can resolve.
 // Kotlin's exported cnames forward declarations currently have IDE indexing limitations.
+#if defined(SDL_PLATFORM_WINDOWS)
+#ifndef SDL_MAIN_HANDLED
+#define SDL_MAIN_HANDLED
+#endif
+#include <SDL3/SDL_main.h>
+#endif
+static inline bool RachelSDL_InitWindowHost(void) {
+#if defined(SDL_PLATFORM_WINDOWS)
+    // Layered input passthrough cannot use SDL's default CS_OWNDC class. The video driver
+    // retains this registration until SDL_Quit; the D3D12/software host does not need CS_OWNDC.
+    if (!SDL_RegisterApp("RachelComposeWindow", 0, NULL)) return false;
+    const bool initialized = SDL_Init(SDL_INIT_VIDEO);
+    SDL_UnregisterApp();
+    return initialized;
+#else
+    return SDL_Init(SDL_INIT_VIDEO);
+#endif
+}
 static inline bool RachelSDL_IsFile(const char *path) {
     SDL_PathInfo info;
     return SDL_GetPathInfo(path, &info) && info.type == SDL_PATHTYPE_FILE;
@@ -66,6 +84,18 @@ static inline bool RachelSDL_SetWindowMinimumSize(void *window, int width, int h
 }
 static inline bool RachelSDL_SetWindowUndecorated(void *window, bool undecorated) {
     return SDL_SetWindowBordered((SDL_Window *)window, !undecorated);
+}
+static inline bool RachelSDL_SetWindowFocusable(void *window, bool focusable) {
+    return SDL_SetWindowFocusable((SDL_Window *)window, focusable);
+}
+static inline bool RachelSDL_SetWindowResizable(void *window, bool resizable) {
+    return SDL_SetWindowResizable((SDL_Window *)window, resizable);
+}
+static inline bool RachelSDL_SetWindowClickThrough(void *window, bool enabled) {
+    return RachelSDL_SetWindowMousePassthrough((SDL_Window *)window, enabled);
+}
+static inline bool RachelSDL_GetWindowClickThrough(void *window) {
+    return RachelSDL_WindowMousePassthrough((SDL_Window *)window);
 }
 // SDL copies the pixels before returning. Neither the borrowed array nor the surface is retained.
 static inline bool RachelSDL_SetWindowIcon(void *window, int width, int height, void *pixels) {
