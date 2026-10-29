@@ -25,5 +25,7 @@ actual object PlatformFileSystem {
 
     actual fun cachePath(context: PlatformContext, appName: String): File = File(System.getProperty("java.io.tmpdir"), appName, "temp")
 
+    actual fun getCurrentDirectory(): File? = System.getProperty("user.dir")?.takeIf { it.isNotEmpty() }?.let(File::invoke)
+
     actual fun setCurrentDirectory(path: File): Boolean = false
 }

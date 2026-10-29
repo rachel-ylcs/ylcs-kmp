@@ -29,6 +29,11 @@ expect object PlatformFileSystem {
     fun cachePath(context: PlatformContext, appName: String): File
 
     /**
+     * 获取当前工作目录，不支持或读取失败时返回 null。浏览器平台不提供进程工作目录。
+     */
+    fun getCurrentDirectory(): File?
+
+    /**
      * 设置当前工作目录
      */
     fun setCurrentDirectory(path: File): Boolean

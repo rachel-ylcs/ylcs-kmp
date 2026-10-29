@@ -74,8 +74,8 @@ class ScreenMain : BasicScreen() {
         onSearching = false
         boxStatus.status = StatefulStatus.Loading
 
-        catchingError {
-            val result = Coroutines.io {
+        val result = Coroutines.io {
+            catchingDefault([]) {
                 app.libraryPath.list().filter { it.isDirectory() }.map { folder ->
                     catchingDefault({ ModItem(id = folder.name, name = folder.name, path = folder, enabled = false) }) {
                         require(File(folder, ModResourceType.Record.filename).exists())
@@ -87,13 +87,10 @@ class ScreenMain : BasicScreen() {
                     }
                 }.distinctBy { it.id }
             }
-
-            library.replaceAll(result)
-            boxStatus.status = if (result.isEmpty()) StatefulStatus.Empty else StatefulStatus.Content
-        }?.then {
-            boxStatus.status = StatefulStatus.Empty
-            slot.tip.error("读取曲库失败：${it.message}")
         }
+
+        library.replaceAll(result)
+        boxStatus.status = if (result.isEmpty()) StatefulStatus.Empty else StatefulStatus.Content
     }
 
     private fun startSearch(input: String) {

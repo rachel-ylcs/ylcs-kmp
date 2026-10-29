@@ -6,7 +6,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -17,11 +16,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import love.yinlin.compose.extension.staticLocalComposition
 import love.yinlin.extension.cleaning
 
-internal val LocalAndroidApplicationWindowHost = staticCompositionLocalOf<AndroidApplicationWindowHost> { error("OverlayWindow requires an application window host") }
+internal val LocalAndroidApplicationWindowHost = staticLocalComposition<AndroidApplicationWindowHost>()
 
-/** 独立于 Activity 的窗口组合；上层 Owner 销毁时同步释放所有窗口。 */
 internal class AndroidApplicationWindowHost(
     val application: PlatformApplication<*>,
     private val owner: LifecycleOwner,
@@ -44,7 +43,7 @@ internal class AndroidApplicationWindowHost(
 
     init {
         owner.lifecycle.addObserver(this)
-        scope.launch { for (change in changes) Snapshot.sendApplyNotifications() }
+        scope.launch { for (_ in changes) Snapshot.sendApplyNotifications() }
         scope.launch { recomposer.runRecomposeAndApplyChanges() }
         scope.launch {
             snapshotFlow { windows.isEmpty }.first { it }
@@ -52,7 +51,9 @@ internal class AndroidApplicationWindowHost(
         }
         try {
             composition.setContent {
-                CompositionLocalProvider(LocalAndroidApplicationWindowHost provides this) { windows.Content() }
+                CompositionLocalProvider(LocalAndroidApplicationWindowHost provides this) {
+                    windows.Content()
+                }
             }
         }
         catch (failure: Throwable) {

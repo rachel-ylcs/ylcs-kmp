@@ -14,7 +14,6 @@ abstract class NativeApplicationExtension @Inject constructor(objects: ObjectFac
     abstract val entryPoint: Property<String>
     abstract val baseName: Property<String>
     abstract val arguments: ListProperty<String>
-    /** 仅供 Gradle 启动进程使用，不改变二进制及资源的分发位置。 */
     abstract val workingDirectory: DirectoryProperty
     abstract val resources: ConfigurableFileCollection
     val desktop = NativeDesktopDistribution()

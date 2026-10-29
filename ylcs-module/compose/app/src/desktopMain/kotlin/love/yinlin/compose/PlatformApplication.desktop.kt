@@ -24,6 +24,7 @@ import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
@@ -101,7 +102,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     private val windows = ApplicationWindowManager(this)
 
-    /** 注册独立子窗口；窗口内容、主题及释放由应用管理。 */
     fun openWindow(window: ApplicationWindow) = windows.open(window)
 
     val controller by lazy {
@@ -130,16 +130,16 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         registerSkikoComposeImplementation()
 
         var closeRequested = false
-        try {
+
+        cleaning({
             initApplication(scope = mainScope)
+
             application(exitProcessOnExit = false) {
                 val onMainWindowClose = {
                     if (!closeRequested) {
                         closeRequested = true
-                        try { destroyPoolBefore() }
-                        finally {
-                            try { windows.close() }
-                            finally { exitApplication() }
+                        cleaning(::destroyPoolBefore) {
+                            cleaning(windows::close, ::exitApplication)
                         }
                     }
                 }
@@ -216,23 +216,23 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                 // 多窗口
                 windows.Content()
             }
-        }
-        finally {
-            try {
+        }) {
+            cleaning({
                 windows.close()
                 if (!closeRequested) destroyPoolBefore()
-            }
-            finally {
-                try { destroyPool() }
-                finally { mainScope.cancel() }
+            }) {
+                cleaning(::destroyPool) {
+                    cleaning(mainScope::cancel) {
+                        exitProcess(0)
+                    }
+                }
             }
         }
-
-        exitProcess(0)
     }
 
     actual fun backHome() { controller.minimize = true }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     actual suspend fun openUri(uri: Uri): Boolean = catchingDefault(false) {
         val desktop = Desktop.getDesktop()
         if (uri.scheme == Scheme.File) {

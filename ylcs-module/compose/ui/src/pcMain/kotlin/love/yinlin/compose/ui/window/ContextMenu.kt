@@ -48,7 +48,6 @@ data class ContextMenuItem(
 class ContextMenuScope {
     private val menus: MutableList<ContextMenuItem> = []
 
-    /** [icon] 为空时不保留图标占位。 */
     fun item(text: String, enabled: Boolean = true, icon: ImageVector? = null, onClick: () -> Unit) {
         menus += ContextMenuItem(text, enabled, onClick, icon)
     }
@@ -136,8 +135,7 @@ fun ContextMenu(
 }
 
 /**
- * 为普通上下文菜单和新文本上下文菜单注入额外条目。
- * 文本菜单需要在首次创建组合前启用 ComposeFoundationFlags.isNewContextMenuEnabled，Application 已统一启用。
+ * 为普通上下文菜单和新文本上下文菜单注入额外条目
  */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)

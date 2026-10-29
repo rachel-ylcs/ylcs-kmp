@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import love.yinlin.extension.catching
+import love.yinlin.extension.cleaning
 import love.yinlin.extension.then
 
 abstract class ComposeActivity : ComponentActivity() {
@@ -45,8 +46,7 @@ abstract class ComposeActivity : ComponentActivity() {
     }
 
     final override fun onDestroy() {
-        try { instance.destroyPoolBefore() }
-        finally {
+        cleaning(instance::destroyPoolBefore) {
             if (instance.activity === this) instance.activity = null
             super.onDestroy()
         }

@@ -8,7 +8,6 @@ import org.jetbrains.skiko.internal.sdl.*
 import org.jetbrains.skiko.internal.sdl.SDL_SystemTheme.*
 import kotlin.concurrent.Volatile
 
-/** Main-thread desktop services. Clipboard access requires an initialized Native window host. */
 object NativeDesktop {
     @Volatile
     private var theme: SystemTheme? = null
@@ -63,14 +62,10 @@ object NativeDesktop {
 
     fun hasClipboardText(): Boolean = SDL_HasClipboardText()
 
-    /** Open a filesystem path with the system application. Call on the window host thread. */
     fun openFile(path: String): Boolean = openNativeFile(path)
 
     fun openUri(uri: String): Boolean {
         require(uri.isNotBlank() && '\u0000' !in uri) { "URI is empty or contains a NUL character" }
-        // SDL passes this straight to ShellExecuteW on Windows. Its file-URL handling
-        // does not reliably decode UTF-8 escapes, so open the decoded Unicode path.
-        // Other schemes and platforms must retain their URI escaping.
         if (hostOs.isWindows && uri.startsWith("file://", ignoreCase = true)) {
             val location = uri.substring(7).substringBefore('#').substringBefore('?')
             require(location.isNotEmpty()) { "File URI path is empty" }

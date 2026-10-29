@@ -3,6 +3,7 @@ package love.yinlin.compose
 import android.app.Application
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import love.yinlin.extension.cleaning
 
 abstract class ComposeApplication : Application() {
     abstract fun buildInstance(): PlatformApplication<*>
@@ -21,8 +22,12 @@ abstract class ComposeApplication : Application() {
     }
 
     final override fun onTerminate() {
-        if (::instance.isInitialized) instance.destroyPool()
-        applicationScope.cancel()
-        super.onTerminate()
+        cleaning({
+            if (::instance.isInitialized) instance.destroyPool()
+        }) {
+            cleaning(applicationScope::cancel) {
+                super.onTerminate()
+            }
+        }
     }
 }

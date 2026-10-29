@@ -1,8 +1,35 @@
 package love.yinlin.fs
 
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.windows.CreateDirectoryW
+import platform.windows.RemoveDirectoryW
+import kotlin.random.Random
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class WindowsTest {
+    @OptIn(ExperimentalForeignApi::class)
+    @Test
+    fun testCurrentDirectoryWithUnicode() {
+        val original = assertNotNull(PlatformFileSystem.getCurrentDirectory())
+        val directory = File("${StandardPath.Temp.path}rachel-cwd-${Random.nextLong().toULong()}-中文")
+        assertTrue(CreateDirectoryW(directory.path, null) != 0)
+        try {
+            assertTrue(PlatformFileSystem.setCurrentDirectory(directory))
+            val current = assertNotNull(PlatformFileSystem.getCurrentDirectory())
+            assertEquals(directory, current)
+            assertTrue(current.isAbsolute)
+        }
+        finally {
+            val restored = PlatformFileSystem.setCurrentDirectory(original)
+            val removed = RemoveDirectoryW(directory.path) != 0
+            assertTrue(restored)
+            assertTrue(removed)
+        }
+    }
+
     @Test
     fun testStandardPath() {
         println(StandardPath.Windows.path)

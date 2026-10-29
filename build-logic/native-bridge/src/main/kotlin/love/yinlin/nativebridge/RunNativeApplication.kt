@@ -21,7 +21,6 @@ abstract class RunNativeApplication : DefaultTask() {
     abstract val distribution: DirectoryProperty
     @get:Input abstract val executableName: Property<String>
     @get:Input abstract val arguments: ListProperty<String>
-    // This is mutable application data, not a build input; it may not exist before the first run.
     @get:Internal abstract val workingDirectory: DirectoryProperty
     @get:Inject abstract val execOperations: ExecOperations
 

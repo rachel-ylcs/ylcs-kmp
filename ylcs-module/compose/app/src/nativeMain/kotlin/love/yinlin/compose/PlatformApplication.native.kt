@@ -22,6 +22,7 @@ import love.yinlin.coroutines.Coroutines
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.extension.BaseLazyReference
 import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
@@ -81,7 +82,6 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     private val windows = ApplicationWindowManager(this)
 
-    /** 注册独立子窗口；窗口内容、主题及释放由应用管理。 */
     fun openWindow(window: ApplicationWindow) = windows.open(window)
 
     fun run() {
@@ -92,16 +92,16 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         val onMainWindowClose = {
             if (!closeRequested) {
                 closeRequested = true
-                try { destroyPoolBefore() }
-                finally {
-                    try { windows.close() }
-                    finally { controller.close() }
+
+                cleaning(::destroyPoolBefore) {
+                    cleaning(windows::close, controller::close)
                 }
             }
         }
 
-        try {
+        cleaning({
             initApplication(scope = mainScope)
+
             @OptIn(ExperimentalComposeUiApi::class)
             NativeWindow(
                 options = NativeWindowOptions(
@@ -156,19 +156,18 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     }
                 }
             }
-        }
-        finally {
-            try {
+        }) {
+            cleaning({
                 windows.close()
                 if (!closeRequested) destroyPoolBefore()
-            }
-            finally {
-                try { destroyPool() }
-                finally { mainScope.cancel() }
+            }) {
+                cleaning(::destroyPool) {
+                    cleaning(mainScope::cancel) {
+                        exit(0)
+                    }
+                }
             }
         }
-
-        exit(0)
     }
 
     actual fun backHome() { controller.minimize = true }

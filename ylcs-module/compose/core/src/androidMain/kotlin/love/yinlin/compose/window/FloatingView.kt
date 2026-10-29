@@ -17,10 +17,6 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import love.yinlin.extension.cleaning
 
-/**
- * WindowManager 悬浮窗的底层宿主。调用方负责悬浮窗权限，并在主线程创建、更新和移除窗口。
- * 每次挂载使用独立的窗口 Context、Lifecycle、SavedStateRegistry 和 ViewModelStore，不持有 Activity。
- */
 abstract class FloatingView {
     open val layoutInScreen: Boolean = true
     open val touchable: Boolean = true

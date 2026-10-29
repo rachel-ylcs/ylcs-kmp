@@ -1,5 +1,7 @@
 package love.yinlin.fs
 
+import android.system.Os
+import love.yinlin.extension.catchingNull
 import love.yinlin.foundation.PlatformContext
 
 actual object PlatformFileSystem {
@@ -8,5 +10,6 @@ actual object PlatformFileSystem {
     actual fun appPath(context: PlatformContext, appName: String): File = File(context.dataDir.absolutePath)
     actual fun dataPath(context: PlatformContext, appName: String): File = File(context.filesDir.absolutePath)
     actual fun cachePath(context: PlatformContext, appName: String): File = File(context.cacheDir.absolutePath, "temp")
+    actual fun getCurrentDirectory(): File? = catchingNull { File(Os.readlink("/proc/self/cwd")) }
     actual fun setCurrentDirectory(path: File): Boolean = false
 }

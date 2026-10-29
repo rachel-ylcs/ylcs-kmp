@@ -13,7 +13,6 @@ import love.yinlin.extension.catchingError
 import love.yinlin.extension.cleaning
 import kotlin.uuid.Uuid
 
-/** 一次性的权限请求；关闭窗口或销毁 Activity 后不再接收结果，也不保留 Activity。 */
 internal class OverlayPermissionRequest(activity: ComponentActivity, onResult: (Boolean?) -> Unit) : LifecycleEventObserver {
     private var activity: ComponentActivity? = activity
     private var onResult: ((Boolean?) -> Unit)? = onResult
@@ -67,6 +66,8 @@ internal class OverlayPermissionRequest(activity: ComponentActivity, onResult: (
         this.activity = null
         this.launcher = null
         onResult = null
-        cleaning({ activity?.lifecycle?.removeObserver(this) }) { launcher?.unregister() }
+        cleaning({ activity?.lifecycle?.removeObserver(this) }) {
+            launcher?.unregister()
+        }
     }
 }

@@ -12,13 +12,13 @@ import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.InspectorInfo
+import love.yinlin.compose.platform.inspector
 
 @Composable
 actual fun WindowScope.DragArea(enabled: Boolean, onLongClick: ((Offset) -> Unit)?, onDoubleClick: ((Offset) -> Unit)?, modifier: Modifier, content: @Composable () -> Unit) {
     Box(modifier = modifier then WindowDragAreaElement(this, enabled, onLongClick, onDoubleClick), propagateMinConstraints = true, content = { content() })
 }
 
-/** 设置区域是否允许移动所属窗口，子组件仍按 Compose 的事件消费规则优先处理。 */
 @Stable
 fun Modifier.windowDragArea(window: WindowScope, draggable: Boolean = true): Modifier = this then WindowDragAreaElement(window, draggable, null, null)
 
@@ -44,7 +44,6 @@ private class WindowDragAreaNode(var window: WindowScope, var draggable: Boolean
     })
 
     override fun onAttach() {
-        // Keep native border resizing, while window movement is negotiated by Compose gestures.
         registration = window.addDragArea { _, _ -> false }
     }
 
@@ -76,8 +75,7 @@ private data class WindowDragAreaElement(val window: WindowScope, val draggable:
         node.update(window, draggable, onLongClick, onDoubleClick)
     }
 
-    override fun InspectorInfo.inspectableProperties() {
-        name = "windowDragArea"
-        properties["draggable"] = draggable
+    override fun InspectorInfo.inspectableProperties() = inspector("windowDragArea") {
+        "draggable" bind draggable
     }
 }

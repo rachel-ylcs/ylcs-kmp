@@ -23,9 +23,7 @@ interface NativeWindowScope {
     fun setIcon(width: Int, height: Int, pixels: IntArray): Boolean
     fun createTray(tooltip: String = ""): NativeTray?
     fun setDragArea(hitTest: ((Float, Float) -> Boolean)?)
-    /** Register a pixel-coordinate region. null means outside, false excludes dragging; close on the host thread. */
     fun addDragArea(hitTest: (Float, Float) -> Boolean?): AutoCloseable
-    /** Start a system window move while the primary mouse button is held. Call after Compose gesture dispatch. */
     fun startDrag(): Boolean
     fun setVisible(visible: Boolean)
     fun setAlwaysOnTop(alwaysOnTop: Boolean)

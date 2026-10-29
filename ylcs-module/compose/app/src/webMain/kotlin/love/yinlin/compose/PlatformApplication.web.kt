@@ -8,6 +8,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import love.yinlin.extension.BaseLazyReference
+import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.RegularUri
@@ -34,11 +35,12 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         window.onload = {
             initPoolLater(mainScope)
         }
+
         // 有待考证
         window.onclose = {
-            destroyPoolBefore()
-            destroyPool()
-            mainScope.cancel()
+            cleaning(::destroyPoolBefore) {
+                cleaning(::destroyPool, mainScope::cancel)
+            }
         }
 
         ComposeViewport(

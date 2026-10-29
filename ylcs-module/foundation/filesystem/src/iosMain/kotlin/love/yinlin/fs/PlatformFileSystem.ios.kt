@@ -19,5 +19,7 @@ actual object PlatformFileSystem {
 
     actual fun cachePath(context: PlatformContext, appName: String): File = File(searchPath(NSCachesDirectory), "temp")
 
+    actual fun getCurrentDirectory(): File? = NSFileManager.defaultManager.currentDirectoryPath.takeIf { it.isNotEmpty() }?.let(File::invoke)
+
     actual fun setCurrentDirectory(path: File): Boolean = chdir(path.path) == 0
 }
