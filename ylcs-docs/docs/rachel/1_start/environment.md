@@ -53,6 +53,19 @@ ylcs-kmp/
 
 桌面原生目标分别为 `mingwX64("windows")`、`linuxX64("linux")` 和 `macosArm64("macos")`。模块可关闭不需要的目标；原生编译、链接和打包仍受宿主及依赖工具链限制。iOS 构建需要 macOS 与 Xcode。
 
+`multiplatform`、`native`、`nativeExecutable` 和 `nativeLibrary` 模板可以用 `cpp` 列表注册 main compilation 的 CInterop：
+
+```kotlin
+native {
+    cpp = listOf("shared")
+}
+windows {
+    cpp = listOf("win32")
+}
+```
+
+`native {}` 的条目应用到已启用的三个桌面 Native 目标，`windows {}`、`linux {}`、`macos {}` 补充各自的条目。同名条目只注册一次，多次赋值不会清除已有配置；定义文件沿用 `src/nativeInterop/cinterop/<name>.def`，额外选项仍可通过 `compilations` 中的 `cinterops.named(name)` 配置。
+
 涉及 C/C++、Rust 或预编译库的模块，应按 `.gitmodules` 初始化所需子模块，并参考 `.github/actions/setup-build/action.yml` 准备工具。预编译库可用不代表已完成对应原生源码的重新构建。
 
 ## 源集组织

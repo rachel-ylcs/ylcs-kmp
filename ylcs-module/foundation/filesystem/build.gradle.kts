@@ -62,9 +62,7 @@ rachel {
         }
 
         windows {
-            compilations.getByName("main") {
-                cinterops.create("win32")
-            }
+            cpp = listOf("win32")
         }
     }
 }

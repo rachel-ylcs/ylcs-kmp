@@ -149,6 +149,17 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
         }
     }
 
+    /**
+     * 为当前 Native target 的 main compilation 注册 CInterop，沿用 src/nativeInterop/cinterop/<name>.def。
+     * 共享和平台配置中的声明会合并，同名条目只注册一次；赋值不会删除已有 CInterop。
+     */
+    var KotlinNativeTarget.cpp: List<String>
+        get() = compilations.getByName("main").cinterops.names.toList()
+        set(value) {
+            val interops = compilations.getByName("main").cinterops
+            for (name in value) interops.maybeCreate(name)
+        }
+
     // 启用编译器实验性特性
     fun KotlinCommonCompilerOptions.useLanguageFeature(vararg features: String) {
         freeCompilerArgs.addAll(defaults.languageFeatures + features)

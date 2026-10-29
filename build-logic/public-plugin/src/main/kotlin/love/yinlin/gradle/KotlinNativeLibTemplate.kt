@@ -15,16 +15,6 @@ open class KotlinNativeLibTemplate : KotlinNativeTemplate() {
     }
     internal fun SharedLibrary.sharedLib() { sharedLibBlock(this) }
 
-    private var nativeBlock: KotlinNativeTarget.() -> Unit = {}
-    fun native(block: KotlinNativeTarget.() -> Unit) {
-        val previous = nativeBlock
-        nativeBlock = {
-            previous()
-            block()
-        }
-    }
-    internal fun KotlinNativeTarget.native() { nativeBlock(this) }
-
     final override fun KotlinNativeTarget.baseNative() {
         binaries {
             sharedLib {

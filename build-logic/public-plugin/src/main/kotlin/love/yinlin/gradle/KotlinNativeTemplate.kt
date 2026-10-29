@@ -50,7 +50,44 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
     var macosTarget: Boolean
         get() = macosTargetOverride ?: nativeDesktopTarget
         set(value) { macosTargetOverride = value }
-    open fun KotlinNativeTarget.baseNative() { }
+    private var windowsBlock: KotlinNativeTarget.() -> Unit = {}
+    fun windows(block: KotlinNativeTarget.() -> Unit) {
+        val previous = windowsBlock
+        windowsBlock = {
+            previous()
+            block()
+        }
+    }
+    internal fun KotlinNativeTarget.windows() { windowsBlock(this) }
+    private var linuxBlock: KotlinNativeTarget.() -> Unit = {}
+    fun linux(block: KotlinNativeTarget.() -> Unit) {
+        val previous = linuxBlock
+        linuxBlock = {
+            previous()
+            block()
+        }
+    }
+    internal fun KotlinNativeTarget.linux() { linuxBlock(this) }
+    private var macosBlock: KotlinNativeTarget.() -> Unit = {}
+    fun macos(block: KotlinNativeTarget.() -> Unit) {
+        val previous = macosBlock
+        macosBlock = {
+            previous()
+            block()
+        }
+    }
+    internal fun KotlinNativeTarget.macos() { macosBlock(this) }
+    private var nativeBlock: KotlinNativeTarget.() -> Unit = {}
+    fun native(block: KotlinNativeTarget.() -> Unit) {
+        val previous = nativeBlock
+        nativeBlock = {
+            previous()
+            block()
+        }
+    }
+    internal fun KotlinNativeTarget.native() { nativeBlock(this) }
+
+    open fun KotlinNativeTarget.baseNative() { native() }
 
     final override fun Project.build(extension: KotlinMultiplatformExtension) {
         with(extension) {
@@ -59,9 +96,9 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
             }
 
             val nativeTargets = buildList {
-                if (windowsTarget) add(mingwX64("windows"))
-                if (linuxTarget) add(linuxX64("linux"))
-                if (macosTarget) add(macosArm64("macos"))
+                if (windowsTarget) add(mingwX64("windows") { windows() })
+                if (linuxTarget) add(linuxX64("linux") { linux() })
+                if (macosTarget) add(macosArm64("macos") { macos() })
             }
             val nativeMain = sourceSets.maybeCreate("nativeMain").apply { dependsOn(sourceSets.commonMain.get()) }
             val nativeTest = sourceSets.maybeCreate("nativeTest").apply { dependsOn(sourceSets.commonTest.get()) }
