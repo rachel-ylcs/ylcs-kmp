@@ -33,8 +33,8 @@ Covering cross-platform entry, shared UI, dependent service startup, client and 
 
 |Target|  VM  |  Native  |  Native Compose  |
 |:---:|:---:|:---:|:---:|
-|  Android  |✅|➖|➖|
-|  iOS  |➖|✅|➖|
+|  Android  |✅|➖|✅|
+|  iOS  |➖|✅|✅|
 |  Windows  |✅|✅|✅|
 |  Linux  |✅|✅|✅|
 |  macOS  |✅|✅|✅|

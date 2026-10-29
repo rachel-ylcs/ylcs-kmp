@@ -33,8 +33,8 @@
 
 |Target|  VM  |  Native  |  Native Compose  |
 |:---:|:---:|:---:|:---:|
-|  Android  |✅|➖|➖|
-|  iOS  |➖|✅|➖|
+|  Android  |✅|➖|✅|
+|  iOS  |➖|✅|✅|
 |  Windows  |✅|✅|✅|
 |  Linux  |✅|✅|✅|
 |  macOS  |✅|✅|✅|
