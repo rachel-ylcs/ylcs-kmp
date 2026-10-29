@@ -26,16 +26,26 @@ fun NativeWindow(
     onOpen: (NativeWindowScope) -> Unit,
     onEvent: (NativeWindowEvent) -> Unit = {},
     onClose: () -> Unit = {},
+    applicationContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     registerSkikoComposeImplementation()
-    val host = NativeSceneHost(onCloseRequest)
+    val application = applicationContent?.let { NativeApplicationComposition(it) }
+    val host = try { NativeSceneHost(onCloseRequest) }
+    catch (failure: Throwable) {
+        try { application?.close() }
+        catch (cleanup: Throwable) { if (cleanup !== failure) failure.addSuppressed(cleanup) }
+        throw failure
+    }
     var closed = false
     val dispose: () -> Unit = {
         if (!closed) {
             closed = true
             try { onClose() }
-            finally { host.close() }
+            finally {
+                try { host.close() }
+                finally { application?.close() }
+            }
         }
     }
     try {
@@ -44,11 +54,12 @@ fun NativeWindow(
             if (scale != 1f) it.setSize((options.width * scale).roundToInt(), (options.height * scale).roundToInt())
             host.attach(it)
             onOpen(it)
+            application?.attach(it)
             host.setContent(content)
         }, onEvent = {
             host.onEvent(it)
             onEvent(it)
-        }, onClose = dispose, render = host::render)
+        }, onClose = dispose, onFrame = { application?.frame(it) }, render = host::render)
     }
     finally { dispose() }
 }

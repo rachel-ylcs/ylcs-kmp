@@ -9,7 +9,6 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.concurrent.Volatile
-import kotlin.native.concurrent.ThreadLocal
 import kotlin.time.Duration.Companion.milliseconds
 
 internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable {
@@ -30,7 +29,7 @@ internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable 
 
     fun claim(): NativeUiDispatcher {
         check(isDispatchThread()) { "Claim the Native UI dispatcher on its host thread" }
-        check(!closed && !closing && !claimed) { "A Native Compose window already owns this host thread" }
+        check(!closed && !closing && !claimed) { "This Native UI dispatcher is already claimed" }
         nativeMainDispatcher?.attach(this)
         claimed = true
         return this
@@ -101,13 +100,9 @@ internal class NativeUiDispatcher : CoroutineDispatcher(), Delay, AutoCloseable 
             synchronized(lock) { closed = true }
             nativeMainDispatcher?.detach(this)
             wake = {}
-            if (currentNativeUiDispatcher === this) currentNativeUiDispatcher = null
         }
         failure?.let { throw it }
     }
 }
 
-@ThreadLocal
-private var currentNativeUiDispatcher: NativeUiDispatcher? = null
-
-internal fun nativeUiDispatcher(): NativeUiDispatcher = currentNativeUiDispatcher ?: NativeUiDispatcher().also { currentNativeUiDispatcher = it }
+internal fun nativeUiDispatcher(): NativeUiDispatcher = NativeUiDispatcher()

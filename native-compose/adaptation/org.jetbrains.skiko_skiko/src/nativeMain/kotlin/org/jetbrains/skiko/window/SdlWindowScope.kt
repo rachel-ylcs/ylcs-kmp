@@ -9,6 +9,7 @@ import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 internal class SdlWindowScope(private val window: COpaquePointer, private val wakeEventType: UInt) : NativeWindowScope {
+    private val windowId = RachelSDL_GetWindowID(window)
     private val active = AtomicBoolean(true)
     private val closing = AtomicBoolean(false)
     private val cursors = mutableMapOf<NativeWindowCursor, COpaquePointer>()
@@ -100,7 +101,7 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
     }
 
     override fun invalidate() {
-        if (active.load()) RachelSDL_WakeEventLoop(wakeEventType)
+        if (active.load()) RachelSDL_WakeEventLoop(wakeEventType, windowId)
     }
 
     override fun close() {

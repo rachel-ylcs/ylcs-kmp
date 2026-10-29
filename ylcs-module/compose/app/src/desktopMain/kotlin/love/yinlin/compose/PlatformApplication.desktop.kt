@@ -11,7 +11,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.registerSkikoComposeImplementation
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.WindowDecoration
 import androidx.compose.ui.window.WindowPlacement
@@ -97,11 +96,10 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
     @Composable
     protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
 
-    /**
-     * 多窗口
-     */
-    @Composable
-    protected open fun ApplicationScope.MultipleWindow() {}
+    private val windows = ApplicationWindowManager(this)
+
+    /** 注册独立子窗口；窗口内容、主题及释放由应用管理。 */
+    fun openWindow(window: ApplicationWindow) = windows.open(window)
 
     val controller by lazy {
         WindowController(
@@ -128,90 +126,104 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         @OptIn(InternalComposeUiApi::class)
         registerSkikoComposeImplementation()
 
-        initApplication(scope = mainScope)
-
-        application(exitProcessOnExit = false) {
-            val onMainWindowClose = {
-                destroyPoolBefore()
-                exitApplication()
-            }
-
-            if (isAOTMode) {
-                LaunchedEffect(Unit) {
-                    controller.title = "AOT Running"
-                    delay(10.seconds)
-                    onMainWindowClose()
-                }
-            }
-
-            // 主窗口
-            Window(
-                onCloseRequest = onMainWindowClose,
-                title = controller.title,
-                icon = controller.iconPainter,
-                visible = controller.visible,
-                decoration = WindowDecoration.Undecorated(),
-                resizable = !controller.maximize,
-                transparent = true,
-                alwaysOnTop = controller.alwaysOnTop,
-                state = controller.rawState,
-            ) {
-                val handle = remember(window) { lazy(LazyThreadSafetyMode.NONE) { window.windowHandle } }
-                DisposableEffect(window) {
-                    onDispose {
-                        if (handle.isInitialized() && this@PlatformApplication.windowHandle == handle.value) this@PlatformApplication.windowHandle = null
-                    }
-                }
-
-                LaunchedEffect(window) {
-                    Fixup.swingWindowMaximizeBounds(window)
-                    this@PlatformApplication.windowHandle = handle.value
-
-                    windowStarter { initPoolLater(this) }
-                }
-
-                Fixup.swingWindowMinimize(this, minSize)
-
-                val useRoundedCorner by rememberDerivedState { !controller.maximize && controller.roundedCorner }
-                val borderWidth = Theme.border.v10 / 2
-                val borderColor = Theme.color.outline.copy(alpha = 0.5f)
-                val borderShape = if (useRoundedCorner) Theme.shape.v1 else Theme.shape.rectangle
-
-                ComposedLayout(modifier = Modifier.fillMaxSize().clip(borderShape).border(borderWidth, borderColor, borderShape)) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        DragArea(
-                            enabled = !controller.maximize,
-                            onDoubleClick = { controller.toggleMaximize() },
-                        ) {
-                            TopBar(controller, onMainWindowClose)
-                        }
-
-                        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                            BeginContent()
-                            Content()
+        var closeRequested = false
+        try {
+            initApplication(scope = mainScope)
+            application(exitProcessOnExit = false) {
+                val onMainWindowClose = {
+                    if (!closeRequested) {
+                        closeRequested = true
+                        try { destroyPoolBefore() }
+                        finally {
+                            try { windows.close() }
+                            finally { exitApplication() }
                         }
                     }
                 }
-            }
 
-            // 托盘
-            val tray = controller.tray
-            if (tray.visible) {
-                Tray(
-                    icon = tray.painter ?: controller.iconPainter,
-                    state = tray.state,
-                    tooltip = controller.title,
-                    onAction = { tray.onDoubleClick?.invoke() }
-                )
-            }
+                if (isAOTMode) {
+                    LaunchedEffect(Unit) {
+                        controller.title = "AOT Running"
+                        delay(10.seconds)
+                        onMainWindowClose()
+                    }
+                }
 
-            // 多窗口
-            MultipleWindow()
+                // 主窗口
+                Window(
+                    onCloseRequest = onMainWindowClose,
+                    title = controller.title,
+                    icon = controller.iconPainter,
+                    visible = controller.visible,
+                    decoration = WindowDecoration.Undecorated(),
+                    resizable = !controller.maximize,
+                    transparent = true,
+                    alwaysOnTop = controller.alwaysOnTop,
+                    state = controller.rawState,
+                ) {
+                    val handle = remember(window) { lazy(LazyThreadSafetyMode.NONE) { window.windowHandle } }
+                    DisposableEffect(window) {
+                        onDispose {
+                            if (handle.isInitialized() && this@PlatformApplication.windowHandle == handle.value) this@PlatformApplication.windowHandle = null
+                        }
+                    }
+
+                    LaunchedEffect(window) {
+                        Fixup.swingWindowMaximizeBounds(window)
+                        this@PlatformApplication.windowHandle = handle.value
+
+                        windowStarter { initPoolLater(this) }
+                    }
+
+                    Fixup.swingWindowMinimize(this, minSize)
+
+                    val useRoundedCorner by rememberDerivedState { !controller.maximize && controller.roundedCorner }
+                    val borderWidth = Theme.border.v10 / 2
+                    val borderColor = Theme.color.outline.copy(alpha = 0.5f)
+                    val borderShape = if (useRoundedCorner) Theme.shape.v1 else Theme.shape.rectangle
+
+                    ComposedLayout(modifier = Modifier.fillMaxSize().clip(borderShape).border(borderWidth, borderColor, borderShape)) {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            DragArea(
+                                enabled = !controller.maximize,
+                                onDoubleClick = { controller.toggleMaximize() },
+                            ) {
+                                TopBar(controller, onMainWindowClose)
+                            }
+
+                            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                                BeginContent()
+                                Content()
+                            }
+                        }
+                    }
+                }
+
+                // 托盘
+                val tray = controller.tray
+                if (tray.visible) {
+                    Tray(
+                        icon = tray.painter ?: controller.iconPainter,
+                        state = tray.state,
+                        tooltip = controller.title,
+                        onAction = { tray.onDoubleClick?.invoke() }
+                    )
+                }
+
+                // 多窗口
+                windows.Content()
+            }
         }
-
-        destroyPool()
-
-        mainScope.cancel()
+        finally {
+            try {
+                windows.close()
+                if (!closeRequested) destroyPoolBefore()
+            }
+            finally {
+                try { destroyPool() }
+                finally { mainScope.cancel() }
+            }
+        }
 
         exitProcess(0)
     }

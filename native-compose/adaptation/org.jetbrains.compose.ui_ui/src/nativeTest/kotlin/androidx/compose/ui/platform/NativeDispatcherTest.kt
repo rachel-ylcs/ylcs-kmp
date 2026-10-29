@@ -75,12 +75,12 @@ class NativeDispatcherTest {
     }
 
     @Test
-    fun oneHostClaimsTheThreadAndClosingAllowsAReplacement() {
+    fun windowsHaveIndependentDispatchersOnTheSameThread() {
         val first = nativeUiDispatcher().claim()
-        try { assertFailsWith<IllegalStateException> { nativeUiDispatcher().claim() } }
-        finally { first.close() }
         val second = nativeUiDispatcher().claim()
-        assertNotSame(first, second)
-        second.close()
+        try { assertNotSame(first, second) }
+        finally { first.close() }
+        try { second.runCurrent() }
+        finally { second.close() }
     }
 }

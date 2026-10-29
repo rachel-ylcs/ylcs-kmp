@@ -205,10 +205,18 @@ static inline bool RachelSDL_SetCursor(void *cursor) {
 static inline void RachelSDL_DestroyCursor(void *cursor) {
     SDL_DestroyCursor((SDL_Cursor *)cursor);
 }
-static inline void RachelSDL_WakeEventLoop(Uint32 type) {
+static inline Uint32 RachelSDL_GetWindowID(void *window) {
+    return SDL_GetWindowID((SDL_Window *)window);
+}
+static inline Uint32 RachelSDL_GetEventWindowID(const SDL_Event *event) {
+    SDL_Window *window = SDL_GetWindowFromEvent(event);
+    return window ? SDL_GetWindowID(window) : 0;
+}
+static inline void RachelSDL_WakeEventLoop(Uint32 type, Uint32 windowID) {
     SDL_Event event;
     SDL_zero(event);
     event.type = type;
+    event.user.windowID = windowID;
     SDL_PushEvent(&event);
 }
 static inline bool RachelSDL_IsFullscreen(void *window) {

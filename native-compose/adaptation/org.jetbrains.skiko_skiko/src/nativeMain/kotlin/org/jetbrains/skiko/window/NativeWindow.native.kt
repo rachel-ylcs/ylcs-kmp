@@ -6,6 +6,7 @@ import org.jetbrains.skiko.internal.sdl.*
 
 object NativeWindow {
     private var running = false
+    private var session: SdlWindowSession? = null
 
     fun run(
         options: NativeWindowOptions = NativeWindowOptions(),
@@ -42,74 +43,36 @@ object NativeWindow {
         onOpen: (NativeWindowScope) -> Unit = {},
         onEvent: (NativeWindowEvent) -> Unit = {},
         onClose: () -> Unit = {},
+        onFrame: (Long) -> Unit = {},
         render: (canvas: Canvas, width: Int, height: Int, nanoTime: Long) -> Unit,
-    ) = memScoped {
+    ) {
         check(!running) { "A NativeWindow event loop is already running" }
         running = true
         try {
             check(RachelSDL_InitWindowHost()) { SDL_GetError()?.toKString() ?: "SDL_Init failed" }
-            try { runWindow(options, onOpen, onEvent, onClose, render) }
+            try {
+                val host = SdlWindowSession()
+                session = host
+                try {
+                    host.create(options, onOpen, onEvent, onClose, render)
+                    host.run(onFrame)
+                }
+                finally {
+                    try { host.close() }
+                    finally { session = null }
+                }
+            }
             finally { SDL_Quit() }
         }
         finally { running = false }
     }
 
-    private fun runWindow(options: NativeWindowOptions = NativeWindowOptions(), onOpen: (NativeWindowScope) -> Unit, onEvent: (NativeWindowEvent) -> Unit, onClose: () -> Unit, render: (Canvas, Int, Int, Long) -> Unit) = memScoped {
-        val software = options.backend == NativeWindowBackend.SOFTWARE
-        var flags = SDL_WINDOW_HIGH_PIXEL_DENSITY
-        if (options.resizable) flags = flags or SDL_WINDOW_RESIZABLE
-        if (!options.focusable && SDL_GetCurrentVideoDriver()?.toKString() != "wayland") flags = flags or SDL_WINDOW_NOT_FOCUSABLE
-        if (!software) flags = flags or gpuWindowFlags()
-        if (options.transparent) flags = flags or SDL_WINDOW_TRANSPARENT
-        if (options.undecorated) flags = flags or SDL_WINDOW_BORDERLESS
-        val window = checkNotNull(RachelSDL_CreateWindow(options.title, options.width, options.height, flags)) {
-            SDL_GetError()?.toKString() ?: "SDL_CreateWindow failed"
-        }
-        try {
-            var nanoTime = 0L
-            val draw: (Canvas, Int, Int) -> Unit = { canvas, width, height -> render(canvas, width, height, nanoTime) }
-            val renderer = if (software) RasterWindowRenderer(window, draw) else createGpuRenderer(window, options.transparent, draw)
-            try {
-                val wakeEventType = SDL_RegisterEvents(1)
-                check(wakeEventType != UInt.MAX_VALUE) { "Unable to register the Native window wake event" }
-                val scope = SdlWindowScope(window, wakeEventType)
-                try {
-                    if (options.clickThrough) scope.setClickThrough(true)
-                    onOpen(scope)
-                    onEvent(NativeWindowEvent.Focus(RachelSDL_GetWindowFlags(window) and SDL_WINDOW_INPUT_FOCUS != 0uL))
-                    val events = SdlWindowEvents(window, wakeEventType, onEvent)
-                    println("Renderer: ${renderer.description}; statically linked SDL3")
-                    val event = alloc<SDL_Event>()
-                    val width = alloc<IntVar>()
-                    val height = alloc<IntVar>()
-                    var dirty = true
-                    while (!scope.shouldClose) {
-                        if (SDL_WaitEventTimeout(event.ptr, if (dirty) 0 else 250)) {
-                            do {
-                                events.dispatch(event)
-                                dirty = true
-                            } while (SDL_PollEvent(event.ptr))
-                        }
-                        scope.rethrowCallbackFailure()
-                        if (scope.shouldClose || !dirty) continue
-                        check(RachelSDL_GetWindowSizeInPixels(window, width.ptr, height.ptr))
-                        check(width.value in 0 .. 16384 && height.value in 0 .. 16384 && width.value.toLong() * height.value <= 67108864)
-                        val frameStarted = SDL_GetTicks()
-                        nanoTime = SDL_GetTicksNS().toLong()
-
-                        dirty = false
-                        if (width.value > 0 && height.value > 0) renderer.render(width.value, height.value)
-                        val elapsed = SDL_GetTicks() - frameStarted
-                        if (elapsed < 16uL) SDL_Delay((16uL - elapsed).toUInt())
-                    }
-                }
-                finally {
-                    try { onClose() }
-                    finally { scope.dispose() }
-                }
-            }
-            finally { renderer.close() }
-        }
-        finally { RachelSDL_DestroyWindow(window) }
-    }
+    /** Creates an independent window in the running event loop. Closing it does not close the main window. */
+    fun openChild(
+        options: NativeWindowOptions = NativeWindowOptions(),
+        onOpen: (NativeWindowScope) -> Unit = {},
+        onEvent: (NativeWindowEvent) -> Unit = {},
+        onClose: () -> Unit = {},
+        render: (canvas: Canvas, width: Int, height: Int, nanoTime: Long) -> Unit,
+    ): NativeWindowScope = checkNotNull(session) { "Start the main NativeWindow before creating another window" }.create(options, onOpen, onEvent, onClose, render)
 }

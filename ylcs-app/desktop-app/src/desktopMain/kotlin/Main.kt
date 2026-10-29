@@ -1,7 +1,6 @@
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.ApplicationScope
 import love.yinlin.Local
 import love.yinlin.RachelApplication
 import love.yinlin.app.global.resources.Res
@@ -57,9 +56,5 @@ fun main(args: Array<String>) {
             DefaultTopBarActions(controller, onExit)
         }
 
-        @Composable
-        override fun ApplicationScope.MultipleWindow() {
-            musicPlayer?.floatingLyrics?.Content()
-        }
     }.run()
 }

@@ -13,19 +13,20 @@ import kotlin.native.Platform
 
 internal class NativeMainDispatcher : MainCoroutineDispatcher() {
     private val lock = SynchronizedObject()
-    private var host: NativeUiDispatcher? = null
+    private val hosts = mutableListOf<NativeUiDispatcher>()
     private var started = false
     private val pending = ArrayDeque<Pair<CoroutineContext, Runnable>>()
 
     override val immediate: MainCoroutineDispatcher = object : MainCoroutineDispatcher() {
         override val immediate: MainCoroutineDispatcher get() = this
-        override fun isDispatchNeeded(context: CoroutineContext): Boolean = synchronized(lock) { host?.isDispatchThread() != true }
+        override fun isDispatchNeeded(context: CoroutineContext): Boolean = synchronized(lock) { hosts.firstOrNull()?.isDispatchThread() != true }
         override fun dispatch(context: CoroutineContext, block: Runnable) = this@NativeMainDispatcher.dispatch(context, block)
         override fun toString(): String = "Dispatchers.Main.immediate"
     }
 
     override fun dispatch(context: CoroutineContext, block: Runnable) {
         val dispatcher = synchronized(lock) {
+            val host = hosts.firstOrNull()
             if (host == null && !started) {
                 pending.addLast(context to block)
                 return
@@ -42,8 +43,8 @@ internal class NativeMainDispatcher : MainCoroutineDispatcher() {
     fun attach(dispatcher: NativeUiDispatcher) {
         check(dispatcher.isDispatchThread()) { "Attach Dispatchers.Main on the Native UI host thread" }
         synchronized(lock) {
-            check(host == null) { "Dispatchers.Main already has a Native Compose UI host" }
-            host = dispatcher
+            check(dispatcher !in hosts) { "This Native Compose UI host is already attached" }
+            hosts.add(dispatcher)
             started = true
             while (true) {
                 val [context, block] = pending.removeFirstOrNull() ?: break
@@ -53,7 +54,7 @@ internal class NativeMainDispatcher : MainCoroutineDispatcher() {
     }
 
     fun detach(dispatcher: NativeUiDispatcher) {
-        synchronized(lock) { if (host === dispatcher) host = null }
+        synchronized(lock) { hosts.remove(dispatcher) }
     }
 
     override fun toString(): String = "Dispatchers.Main"

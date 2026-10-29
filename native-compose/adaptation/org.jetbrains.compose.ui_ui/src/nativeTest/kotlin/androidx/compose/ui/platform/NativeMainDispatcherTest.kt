@@ -145,7 +145,14 @@ class NativeMainDispatcherTest {
         val second = NativeUiDispatcher()
         main.attach(first)
         try {
+            main.attach(second)
             assertFailsWith<IllegalStateException> { main.attach(second) }
+            var primaryRan = false
+            scope.launch { primaryRan = true }
+            second.runCurrent()
+            assertFalse(primaryRan)
+            first.runCurrent()
+            assertTrue(primaryRan)
             main.detach(second)
             assertFalse(main.immediate.isDispatchNeeded(EmptyCoroutineContext))
             main.detach(first)

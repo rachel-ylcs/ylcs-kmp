@@ -1,6 +1,7 @@
 package love.yinlin.media.lyrics
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -21,6 +22,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import love.yinlin.app
 import love.yinlin.compose.Colors
+import love.yinlin.compose.ApplicationWindow
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.node.condition
@@ -47,10 +49,21 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
     )
 
     var canMove: Boolean by mutableStateOf(false)
+    private var currentWindow: ApplicationWindow? = null
 
-    actual fun attach() { isAttached = true }
+    actual fun attach() {
+        if (isAttached) return
+        isAttached = true
+        val window = createWindow()
+        currentWindow = window
+        app.openWindow(window)
+    }
 
-    actual fun detach() { isAttached = false }
+    actual fun detach() {
+        currentWindow?.close()
+        currentWindow = null
+        isAttached = false
+    }
 
     actual suspend fun initDelay() {
         if (app.config.enabledFloatingLyrics && !isAttached) attach()
@@ -61,11 +74,20 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
     }
 
     @OptIn(FlowPreview::class)
-    @Composable
-    fun Content() {
-        if (isAttached) {
+    private fun createWindow(): ApplicationWindow = object : ApplicationWindow() {
+        override val background = Colors.Transparent
+
+        override fun uninitialize() {
+            if (currentWindow === this) {
+                currentWindow = null
+                isAttached = false
+            }
+        }
+
+        @Composable
+        override fun Window(content: @Composable () -> Unit) {
             Window(
-                onCloseRequest = {},
+                onCloseRequest = ::close,
                 state = windowState,
                 title = "",
                 decoration = WindowDecoration.Undecorated(),
@@ -90,17 +112,15 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
                 }
 
                 if (mp.isInit) {
-                    DragArea(enabled = canMove) {
-                        app.ComposedLayout(
-                            modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) },
-                            bgColor = Colors.Transparent
-                        ) {
-                            if (mp.isPlaying) {
-                                mp.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
-                            }
-                        }
-                    }
+                    DragArea(enabled = canMove) { content() }
                 }
+            }
+        }
+
+        @Composable
+        override fun Content() {
+            Box(modifier = Modifier.fillMaxSize().condition(canMove) { background(Colors.Black.copy(alpha = 0.5f)) }) {
+                if (mp.isPlaying) mp.engine.FloatingLyricsCanvas(modifier = Modifier.fillMaxSize(), config = app.config.lyricsEngineConfig, textStyle = Theme.typography.v3.bold)
             }
         }
     }

@@ -78,78 +78,94 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     val mainScope = MainScope()
 
+    private val windows = ApplicationWindowManager(this)
+
+    /** 注册独立子窗口；窗口内容、主题及释放由应用管理。 */
+    fun openWindow(window: ApplicationWindow) = windows.open(window)
+
     fun run() {
         @OptIn(InternalComposeUiApi::class)
         registerSkikoComposeImplementation()
-
-        initApplication(scope = mainScope)
 
         var closeRequested = false
         val onMainWindowClose = {
             if (!closeRequested) {
                 closeRequested = true
-                destroyPoolBefore()
-                controller.close()
-            }
-        }
-
-        @OptIn(ExperimentalComposeUiApi::class)
-        NativeWindow(
-            options = NativeWindowOptions(
-                title = controller.title,
-                width = controller.size.width.value.roundToInt(),
-                height = controller.size.height.value.roundToInt(),
-                transparent = transparent,
-                undecorated = controller.undecorated,
-                focusable = controller.focusable,
-                resizable = controller.resizable,
-                clickThrough = controller.clickThrough
-            ),
-            onCloseRequest = {
-                onMainWindowClose()
-                true
-            },
-            onOpen = { window ->
-                controller.attach(window)
-                openWindowContext(window)
-            },
-            onEvent = controller::onEvent,
-            onClose = {
-                closeWindowContext()
-                controller.detach()
-            },
-        ) {
-            LaunchedEffect(Unit) {
-                windowStarter { initPoolLater(this) }
-            }
-
-            val useRoundedCorner = transparent && controller.undecorated && !controller.maximize && controller.roundedCorner
-            val borderShape = if (useRoundedCorner) Theme.shape.v1 else Theme.shape.rectangle
-            val windowModifier = if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
-                Modifier.fillMaxSize().clip(borderShape).border(Theme.border.v10 / 2, Theme.color.outline.copy(alpha = 0.5f), borderShape)
-            }
-            else Modifier.fillMaxSize()
-
-            ComposedLayout(modifier = windowModifier) {
-                controller.BindIcon()
-                controller.BindTray()
-                Column(modifier = Modifier.fillMaxSize()) {
-                    if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
-                        Box(modifier = Modifier.fillMaxWidth().windowDragArea(controller)) {
-                            TopBar(controller, onMainWindowClose)
-                        }
-                    }
-                    Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                        BeginContent()
-                        Content()
-                    }
+                try { destroyPoolBefore() }
+                finally {
+                    try { windows.close() }
+                    finally { controller.close() }
                 }
             }
         }
 
-        destroyPool()
+        try {
+            initApplication(scope = mainScope)
+            @OptIn(ExperimentalComposeUiApi::class)
+            NativeWindow(
+                options = NativeWindowOptions(
+                    title = controller.title,
+                    width = controller.size.width.value.roundToInt(),
+                    height = controller.size.height.value.roundToInt(),
+                    transparent = transparent,
+                    undecorated = controller.undecorated,
+                    focusable = controller.focusable,
+                    resizable = controller.resizable,
+                    clickThrough = controller.clickThrough
+                ),
+                onCloseRequest = {
+                    onMainWindowClose()
+                    true
+                },
+                onOpen = { window ->
+                    controller.attach(window)
+                    openWindowContext(window)
+                },
+                onEvent = controller::onEvent,
+                onClose = {
+                    closeWindowContext()
+                    controller.detach()
+                },
+                applicationContent = { windows.Content() },
+            ) {
+                LaunchedEffect(Unit) {
+                    windowStarter { initPoolLater(this) }
+                }
 
-        mainScope.cancel()
+                val useRoundedCorner = transparent && controller.undecorated && !controller.maximize && controller.roundedCorner
+                val borderShape = if (useRoundedCorner) Theme.shape.v1 else Theme.shape.rectangle
+                val windowModifier = if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
+                    Modifier.fillMaxSize().clip(borderShape).border(Theme.border.v10 / 2, Theme.color.outline.copy(alpha = 0.5f), borderShape)
+                }
+                else Modifier.fillMaxSize()
+
+                ComposedLayout(modifier = windowModifier) {
+                    controller.BindIcon()
+                    controller.BindTray()
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
+                            Box(modifier = Modifier.fillMaxWidth().windowDragArea(controller)) {
+                                TopBar(controller, onMainWindowClose)
+                            }
+                        }
+                        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                            BeginContent()
+                            Content()
+                        }
+                    }
+                }
+            }
+        }
+        finally {
+            try {
+                windows.close()
+                if (!closeRequested) destroyPoolBefore()
+            }
+            finally {
+                try { destroyPool() }
+                finally { mainScope.cancel() }
+            }
+        }
 
         exit(0)
     }

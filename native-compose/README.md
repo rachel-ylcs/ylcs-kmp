@@ -103,6 +103,10 @@ Windows、macOS 和 X11 支持禁用普通窗口焦点；Wayland 普通顶层窗
 
 Rachel 的 `compose:app` Native `PlatformApplication` 默认采用透明、无系统标题栏窗口，支持与 JVM 类似的 `title`、`icon: DrawableResource?`、`initSize`、`minSize`、`roundedCorner` 和 `TopBar(controller, onExit)`。`controller.icon`、`controller.undecorated` 和 `controller.roundedCorner` 可在运行时更新；`transparent` 必须在创建窗口前配置。自定义标题栏默认交给系统拖动，交互控件区域用 `Modifier.windowDragArea(controller, draggable = false)` 排除，边缘保持系统缩放；切回系统装饰后隐藏 Compose 标题栏。位图、XML Vector 和 SVG 图标共用 Painter 栅格化，macOS 设置应用 Dock 图标；Wayland 不支持图标协议时保留系统图标，不中断应用。窗口实际透明还需要 Compose 内容使用透明背景。
 
+JVM 和 Native 应用通过 `openWindow(ApplicationWindow)` 注册独立子窗口，无需在主窗口的 `Content` 或 `MultipleWindow` 中挂载。子窗口分别实现 `Window(content)` 和 `Content()`：JVM 的前者可直接调用官方 `Window(onCloseRequest = ::close)`，Native 的前者可调用 `love.yinlin.compose.NativeWindow` 扩展。框架自动为内容提供应用的主题、字体、资源及 `LocalPlatformContext`，平台宿主保留各窗口独立的 Lifecycle、ViewModelStore 和 Compose 作用域。透明子窗口可覆盖 `background = Color.Transparent`。
+
+每次打开创建新的 `ApplicationWindow` 实例，可将需保留的业务状态放在外部。窗口激活时调用 `initialize()`，离开组合时取消其 `scope` 并调用 `uninitialize()`；`close()` 只关闭自身。主窗口关闭后停止接受新窗口，关闭所有子窗口及其原生资源，完成应用清理后结束进程。Native 的多个窗口共用一个 SDL 事件循环，按窗口 ID 分发输入、关闭及唤醒事件；独立的应用级 Compose 组合管理子窗口，即使主窗口隐藏或最小化也继续驱动其生命周期。系统主题和语言等全局变更广播到所有窗口。子窗口不建立原生父子关系或模态关系。
+
 `initPosition` 使用 `WindowPosition.Absolute(x.dp, y.dp)`、`WindowPosition.Aligned(Alignment.Center)` 或 `WindowPosition.PlatformDefault`，`initPlacement` 使用 `WindowPlacement.Floating`、`Maximized` 或 `Fullscreen`。运行时可修改 `controller.position`、`controller.placement`，系统移动、缩放、最大化和全屏事件会回写状态。对齐以当前显示器工作区为准；绝对坐标按当前显示器的 dp／SDL 窗口坐标比例转换。最大化、全屏或最小化期间的位置请求在还原后应用，`PlatformDefault` 只用于初始位置。Wayland 不开放全局窗口定位，`controller.isPositionSupported` 为 false，位置由合成器决定。
 
 `foundation:context` 的 Windows、Linux、macOS 分别维护 `PlatformContextProvider actual`，不增加共享 Native Provider 声明或句柄类型包装。各自的 `windowHandle: Long?` 分别保存 HWND、NSWindow 指针、X11 Window ID 或 wl_surface 指针；Linux 另有 `displayHandle: Long?` 保存 X11 Display 或 wl_display 指针。应用通过内部的平台接线在连接窗口时填入句柄，关闭时清空。句柄由 SDL 持有，消费端不得释放、跨窗口缓存或在窗口关闭后使用；context 模块不依赖 Skiko。
