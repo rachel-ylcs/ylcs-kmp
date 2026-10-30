@@ -24,7 +24,7 @@ savedstate = "1.5.0"
 material3 = "1.4.0-alpha01"
 navigation3 = "1.2.0"
 coroutines = "1.11.0"
-ktor = "3.6.0"
+ktor = "3.6.1"
 mmkv = "2.4.3"
 
 # ----- [Android] -----
