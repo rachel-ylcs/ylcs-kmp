@@ -45,7 +45,7 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     val cache by startup(StartupCache.Factory(cachePath))
 
     private val pickerService by startup(StartupPicker.Factory())
-    val picker get() = pickerService.picker
+    val picker get() = pickerService.instance
 
     val image by startup(StartupImage.Factory(
         appName = Local.info.appName,
@@ -56,10 +56,10 @@ abstract class AbstractRachelApplication(context: PlatformContext) : PlatformApp
     )
 
     private val kvService by startup(StartupKV.Factory(configPath))
-    val kv get() = kvService.kv
+    val kv get() = kvService.instance
 
     private val configService by startup(StartupAppConfig.Factory())
-    val config get() = configService.config
+    val config get() = configService.instance
 
     val exceptionHandler by startup(StartupExceptionHandler.Factory("crash_key") { key, e, error ->
         kv.set(key, "${DateEx.CurrentString}\n${error}")

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 project(picker LANGUAGES C CXX)
 
+if(APPLE)
+    enable_language(OBJC OBJCXX)
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(MSVC)
@@ -26,7 +30,6 @@ add_library(picker SHARED main.cpp)
 target_include_directories(picker PRIVATE ${JNI_INCLUDE_DIRS} ${NATIVE_JNI_DIR})
 target_link_libraries(picker PRIVATE SDL3::SDL3-static)
 if(APPLE)
-    enable_language(OBJCXX)
     target_sources(picker PRIVATE DialogMainThread.mm)
     target_link_libraries(picker PRIVATE "-framework Cocoa")
 endif()

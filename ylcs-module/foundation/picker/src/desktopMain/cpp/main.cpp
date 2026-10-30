@@ -116,7 +116,7 @@ namespace {
 }
 
 extern "C" {
-    JNIEXPORT jstring JNICALL Java_love_yinlin_picker_NativePicker_openFileDialog(JNIEnv *env, jclass, jlong owner, jstring title, jstring filterName, jstring filter) {
+    JNIEXPORT jstring JNICALL Java_love_yinlin_foundation_picker_NativePicker_openFileDialog(JNIEnv *env, jclass, jlong owner, jstring title, jstring filterName, jstring filter) {
         try {
             auto paths = dialog(env, owner, title, filterName, filter, nullptr, false);
             return paths.empty() ? nullptr : string_to_java(env, paths.front());
@@ -126,7 +126,7 @@ extern "C" {
         }
     }
 
-    JNIEXPORT jobjectArray JNICALL Java_love_yinlin_picker_NativePicker_openMultipleFileDialog(JNIEnv *env, jclass, jlong owner, jint maxNum, jstring title, jstring filterName, jstring filter) {
+    JNIEXPORT jobjectArray JNICALL Java_love_yinlin_foundation_picker_NativePicker_openMultipleFileDialog(JNIEnv *env, jclass, jlong owner, jint maxNum, jstring title, jstring filterName, jstring filter) {
         try {
             auto paths = dialog(env, owner, title, filterName, filter, nullptr, maxNum > 1);
             auto stringClass = env->FindClass("java/lang/String");
@@ -147,7 +147,7 @@ extern "C" {
         }
     }
 
-    JNIEXPORT jstring JNICALL Java_love_yinlin_picker_NativePicker_saveFileDialog(JNIEnv *env, jclass, jlong owner, jstring title, jstring filename, jstring filter, jstring filterName) {
+    JNIEXPORT jstring JNICALL Java_love_yinlin_foundation_picker_NativePicker_saveFileDialog(JNIEnv *env, jclass, jlong owner, jstring title, jstring filename, jstring filter, jstring filterName) {
         try {
             auto paths = dialog(env, owner, title, filterName, filter, filename, false);
             return paths.empty() ? nullptr : string_to_java(env, paths.front());

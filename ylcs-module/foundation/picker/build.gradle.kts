@@ -16,16 +16,18 @@ rachel {
     multiplatform {
         nativeDesktopTarget = true
 
-        desktop {
-            cpp = listOf(rootProject.file("native-compose/vendor/sdl-source-${libs.versions.sdl.get()}").path)
-        }
+        interop {
+            val sdlSource = rootProject.file("native-compose/vendor/sdl-source-${libs.versions.sdl.get()}")
 
-        native {
-            cpp = listOf("sdl3")
-            compilations.getByName("main").cinterops.getByName("sdl3") {
-                // 独立生成声明，避免 Skiko 的同名头文件使共享 metadata 丢失 SDL API。
-                dependencyFiles = files()
-                includeDirs(rootProject.file("native-compose/vendor/sdl-source-${libs.versions.sdl.get()}/include"))
+            desktop {
+                cpp(sdlSource.path)
+            }
+
+            native {
+                cpp("sdl3") {
+                    dependencyFiles = files()
+                    includeDirs(sdlSource.resolve("include").path)
+                }
             }
         }
 

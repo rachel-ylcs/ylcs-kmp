@@ -69,8 +69,6 @@ object Coroutines {
         return withTimeout(limit.milliseconds, block)
     }
 
-    val mainImmediateDispatchNeeded: Boolean get() = Dispatchers.Main.immediate.isDispatchNeeded(emptyContext)
-
     inline fun dispatchUI(crossinline action: () -> Unit) {
         val dispatcher = Dispatchers.Main.immediate
         val defaultContext = emptyContext

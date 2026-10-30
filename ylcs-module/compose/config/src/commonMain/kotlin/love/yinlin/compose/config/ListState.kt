@@ -7,7 +7,7 @@ import androidx.compose.ui.util.fastMap
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import love.yinlin.extension.replaceAll
-import love.yinlin.kv.KV
+import love.yinlin.foundation.kv.KV
 
 @Stable
 open class ListState<T>(

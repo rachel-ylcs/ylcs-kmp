@@ -1,6 +1,7 @@
 headers = rachel_kv.h
 headerFilter = rachel_kv.h
-package = love.yinlin.kv.internal
+package = love.yinlin.foundation.kv.internal
+noStringConversion = rachel_kv_set_bool rachel_kv_get_bool rachel_kv_set_int rachel_kv_get_int rachel_kv_set_long rachel_kv_get_long rachel_kv_set_float rachel_kv_get_float rachel_kv_set_double rachel_kv_get_double rachel_kv_set_string rachel_kv_set_bytes rachel_kv_get_string rachel_kv_get_bytes rachel_kv_contains rachel_kv_remove
 staticLibraries = librachel_kv.a libcore.a
 linkerOpts.mingw = -ladvapi32
 linkerOpts.linux = -lstdc++fs -lstdc++ -lpthread

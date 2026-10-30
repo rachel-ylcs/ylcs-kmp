@@ -17,6 +17,14 @@ rachel {
 
         webTestHeadless = false
 
+        interop {
+            native {
+                windows {
+                    cpp("win32")
+                }
+            }
+        }
+
         sources {
             commonMain {
                 lib(
@@ -59,10 +67,6 @@ rachel {
             linuxMain(nativeMain)
 
             macosMain(appleMain)
-        }
-
-        windows {
-            cpp = listOf("win32")
         }
     }
 }

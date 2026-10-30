@@ -14,7 +14,6 @@ import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExtension
@@ -83,21 +82,10 @@ class KotlinMultiplatformSourceSetsScope(
     val pcTest: KotlinSourceSet by lazy { set.maybeCreate("pcTest") }
 }
 
-// swift 依赖包结构
-sealed interface SwiftPackage {
-    data class Remote(
-        val url: String,
-        val version: String,
-        val products: List<String>
-    ) : SwiftPackage
-
-    data class Local(
-        val name: String,
-        val importedClangModules: List<String> = emptyList()
-    ) : SwiftPackage
-}
-
 open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
+    internal val interopSettings = KotlinMultiplatformInterop()
+    fun interop(block: KotlinMultiplatformInterop.() -> Unit) { interopSettings.block() }
+
     // SourceSets
     private var sourceBlock: KotlinMultiplatformSourceSetsScope.() -> Unit = {}
     fun sources(block: KotlinMultiplatformSourceSetsScope.() -> Unit) {
@@ -133,8 +121,6 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
     internal fun KotlinNativeTarget.ios() { iosBlock(this) }
     var iosFrameworkBaseName: String? = null
     var iosFrameworkIsStatic: Boolean? = null
-    var swiftPackages: List<SwiftPackage> = emptyList()
-    var swiftDiscoverClangModulesImplicitly: Boolean = true  // 是否自动发现 SwiftPM 的 Clang 模块；关闭后按声明的模块列表导入
 
     // Desktop
     var desktopTarget: Boolean = true
@@ -348,24 +334,7 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                 if (buildDefaults.platform == BuildPlatform.Mac) {
                     extensions.findByType<SwiftPMImportExtension>()?.apply {
                         iosMinimumDeploymentTarget.set(buildDefaults.ios.target)
-                        discoverClangModulesImplicitly.set(swiftDiscoverClangModulesImplicitly)
-
-                        val localSPMDir = iosLocalSPMDir
-
-                        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-                        for (pkg in swiftPackages) {
-                            when (pkg) {
-                                is SwiftPackage.Remote -> swiftPackage(
-                                    url = url(pkg.url),
-                                    version = from(pkg.version),
-                                    products = pkg.products.map { product(it, platforms = setOf(iOS())) },
-                                )
-                                is SwiftPackage.Local -> localSwiftPackage(
-                                    directory = localSPMDir.dir(pkg.name),
-                                    products = listOf(product(pkg.name, platforms = setOf(iOS()), importedClangModules = pkg.importedClangModules.toSet())),
-                                )
-                            }
-                        }
+                        interopSettings.iosSettings.configure(this, iosLocalSPMDir)
                     }
                 }
             }
@@ -565,7 +534,8 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
         }
 
         configureActions()
-        registerDesktopNative(desktopNativeKMPSourceDir, "desktopJar", desktopCppSources)
+        registerDesktopNative(desktopNativeKMPSourceDir, "desktopJar", interopSettings.desktopSettings.sources.toList())
+        interopSettings.configureNative(extension)
         registerNativeCpp(extension)
     }
 }

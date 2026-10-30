@@ -5,7 +5,7 @@ import love.yinlin.foundation.StartupPool
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.foundation.SyncStartupFactory
 import love.yinlin.fs.File
-import love.yinlin.kv.KVManager
+import love.yinlin.foundation.kv.KV
 
 class StartupKV(pool: StartupPool, initPath: File) : SyncStartup(pool) {
     class Factory(private val initPath: File) : SyncStartupFactory<StartupKV>() {
@@ -13,11 +13,7 @@ class StartupKV(pool: StartupPool, initPath: File) : SyncStartup(pool) {
         override fun build(pool: StartupPool) = StartupKV(pool, initPath)
     }
 
-    init {
-        KVManager.initialize(pool.rawContext, initPath)
-    }
+    val instance = KV(pool.rawContext, initPath)
 
-    val kv get() = KVManager.kv
-
-    override fun destroy() = KVManager.shutdown()
+    override fun destroy() = instance.close()
 }

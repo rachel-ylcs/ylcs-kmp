@@ -20,6 +20,9 @@ class KotlinJvmSourceSetsScope(
 }
 
 open class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
+    internal val interopSettings = KotlinJvmInterop()
+    fun interop(block: KotlinJvmInterop.() -> Unit) { interopSettings.block() }
+
     private var sourceBlock: KotlinJvmSourceSetsScope.() -> Unit = {}
     fun sources(block: KotlinJvmSourceSetsScope.() -> Unit) {
         val previous = sourceBlock
@@ -84,6 +87,6 @@ open class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
 
         configureActions()
         registerDesktopProguard(extension.target.compilations.getByName("main"))
-        registerDesktopNative(desktopNativeJVMSourceDir, "jar", desktopCppSources)
+        registerDesktopNative(desktopNativeJVMSourceDir, "jar", interopSettings.desktopSettings.sources.toList())
     }
 }

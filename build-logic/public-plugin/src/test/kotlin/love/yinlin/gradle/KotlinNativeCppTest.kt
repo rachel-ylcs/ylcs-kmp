@@ -22,27 +22,33 @@ class KotlinNativeCppTest {
         definition.writeText("language = C\n")
 
         with(KotlinMultiplatformTemplate()) {
-            native { cpp = listOf("shared", "shared") }
-            native { cpp = listOf("extra") }
-            windows { cpp = listOf("win32", "shared") }
-            linux { cpp = listOf("posix") }
-            macos { cpp = listOf("cocoa") }
+            interop {
+                native {
+                    cpp("shared") { compilerOpts("-DSHARED") }
+                    windows { cpp("win32") }
+                    linux { cpp("posix") }
+                    macos { cpp("cocoa") }
+                }
+            }
+            interop {
+                native {
+                    cpp("shared") { compilerOpts("-DSECOND") }
+                    cpp("extra")
+                }
+            }
+            interopSettings.configureNative(kotlin)
 
             for (target in targets) {
                 with(target) {
-                    when (name) {
-                        "windows" -> windows()
-                        "linux" -> linux()
-                        "macos" -> macos()
-                    }
-                    native()
                     val platformInterop = when (name) {
                         "windows" -> "win32"
                         "linux" -> "posix"
                         else -> "cocoa"
                     }
-                    assertEquals(setOf("shared", "extra", platformInterop), cpp.toSet())
-                    assertEquals(definition, compilations.getByName("main").cinterops.getByName("shared").definitionFile.get().asFile)
+                    val interops = compilations.getByName("main").cinterops
+                    assertEquals(setOf("shared", "extra", platformInterop), interops.names)
+                    assertEquals(listOf("-DSHARED", "-DSECOND"), interops.getByName("shared").compilerOpts)
+                    assertEquals(definition, interops.getByName("shared").definitionFile.get().asFile)
                     assertTrue(compilations.getByName("test").cinterops.isEmpty())
                 }
             }
@@ -59,11 +65,18 @@ class KotlinNativeCppTest {
         val existing = interops.create("existing") { definitionFile.set(definition) }
 
         with(KotlinMultiplatformTemplate()) {
-            target.cpp = listOf("existing", "extra", "extra")
-            target.cpp = listOf("extra")
-            assertEquals(setOf("existing", "extra"), target.cpp.toSet())
+            interop {
+                native {
+                    cpp("existing") { packageName = "test.existing" }
+                    cpp("extra")
+                    cpp("extra")
+                }
+            }
+            interopSettings.configureNative(project.extensions.getByType<KotlinMultiplatformExtension>())
+            assertEquals(setOf("existing", "extra"), interops.names)
             assertSame(existing, interops.getByName("existing"))
             assertEquals(definition, existing.definitionFile.get().asFile)
+            assertEquals("test.existing", existing.packageName)
         }
     }
 
@@ -77,16 +90,40 @@ class KotlinNativeCppTest {
             template.internalBackendInfo = BackendInfo("test.framework", ":fixture", project.projectDir.path)
 
             with(template) {
-                windows { cpp = listOf("win32") }
-                native { cpp = listOf("shared", "win32") }
+                interop {
+                    native {
+                        cpp("shared")
+                        cpp("win32")
+                        windows { cpp("win32") }
+                    }
+                }
                 with(target) {
-                    windows()
                     baseNative()
-                    assertEquals(setOf("win32", "shared"), cpp.toSet())
+                    interopSettings.configureNative(project.extensions.getByType<KotlinMultiplatformExtension>())
+                    assertEquals(setOf("win32", "shared"), compilations.getByName("main").cinterops.names)
                     if (template is KotlinNativeExecutableTemplate) assertTrue(binaries.any { it is Executable })
                     if (template is KotlinNativeLibTemplate) assertTrue(binaries.any { it is SharedLibrary })
                 }
             }
+        }
+    }
+
+    @Test
+    fun desktopSourcesAccumulateAcrossInteropBlocks() {
+        with(KotlinJvmTemplate()) {
+            interop { desktop { cpp("src/nativeMain/cpp") } }
+            interop {
+                desktop {
+                    cpp("src/nativeMain/cpp")
+                    cpp("shared/cpp")
+                }
+            }
+            assertEquals(listOf("src/nativeMain/cpp", "shared/cpp"), interopSettings.desktopSettings.sources.toList())
+        }
+        with(KotlinMultiplatformTemplate()) {
+            interop { desktop { cpp("shared/cpp") } }
+            interop { desktop { cpp("shared/extra") } }
+            assertEquals(listOf("shared/cpp", "shared/extra"), interopSettings.desktopSettings.sources.toList())
         }
     }
 }

@@ -327,10 +327,6 @@ implementation("love.yinlin.compose:app:x.x.x")
 - **[dokka](ylcs-module/dokka) · Gradle 构建工具**<br>
   聚合模块 API 并生成 Dokka 站点；无应用运行 target
 
-## 平台配置与接入说明
-
-平台声明和默认开关以各模块 `build.gradle.kts` 及 `build-logic/public-plugin` 模板为准。WasmJS 指浏览器 WebAssembly target；桌面 Native 分别为 `mingwX64("windows")`、`linuxX64("linux")`、`macosArm64("macos")`。iOS 包含 `iosArm64`，并在 Apple Silicon macOS 宿主上配置 `iosSimulatorArm64`；Android 当前 minSdk 为 28，打包 ABI 为 `arm64-v8a`。Compose Native 消费端需要匹配版本的 [Native Compose 桥插件](native-compose/README.md)；JVM FFI 模块不代表支持 Kotlin/Native。权限、系统服务及原生依赖要求仍以具体 API 为准。
-
 # 案例：银临茶舍跨平台 App
 
 > [!IMPORTANT]

@@ -2,9 +2,9 @@ package love.yinlin.compose.config
 
 import androidx.compose.runtime.Stable
 import kotlinx.serialization.KSerializer
-import love.yinlin.kv.KV
-import love.yinlin.kv.getJson
-import love.yinlin.kv.setJson
+import love.yinlin.foundation.kv.KV
+import love.yinlin.foundation.kv.getJson
+import love.yinlin.foundation.kv.setJson
 
 @Stable
 abstract class CollectionState<C, RC : C>(

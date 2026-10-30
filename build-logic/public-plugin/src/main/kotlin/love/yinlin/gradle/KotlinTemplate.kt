@@ -15,13 +15,11 @@ import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinBaseExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.plugin.HasKotlinDependencies
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
-import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 // 在 ExportLib 后面的库将会被导出给其他模块可见
 data object ExportLib
@@ -108,8 +106,6 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
     internal lateinit var owner: Project
     protected val defaults: BuildDefaults get() = owner.buildDefaults
 
-    internal var desktopCppSources: List<String> = emptyList()
-
     internal lateinit var internalBackendInfo: BackendInfo
 
     // 下面的值只能在 Template 的非 init 中使用
@@ -152,27 +148,6 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
             }
         }
     }
-
-    /** 在默认 JVM C++ 目录之外跟踪共享源码，并通过 RACHEL_CPP_SOURCE_DIRS 提供给 CMake。 */
-    var KotlinJvmTarget.cpp: List<String>
-        get() = desktopCppSources
-        set(value) { desktopCppSources = value }
-
-    /** 为纯 JVM 模板配置附加 C++ 源码目录。 */
-    var KotlinJvmExtension.cpp: List<String>
-        get() = desktopCppSources
-        set(value) { desktopCppSources = value }
-
-    /**
-     * 为当前 Native target 的 main compilation 注册 CInterop，沿用 src/nativeInterop/cinterop/<name>.def。
-     * 共享和平台配置中的声明会合并，同名条目只注册一次；赋值不会删除已有 CInterop。
-     */
-    var KotlinNativeTarget.cpp: List<String>
-        get() = compilations.getByName("main").cinterops.names.toList()
-        set(value) {
-            val interops = compilations.getByName("main").cinterops
-            for (name in value) interops.maybeCreate(name)
-        }
 
     // 启用编译器实验性特性
     fun KotlinCommonCompilerOptions.useLanguageFeature(vararg features: String) {

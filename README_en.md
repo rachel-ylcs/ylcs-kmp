@@ -328,10 +328,6 @@ These modules run in Gradle and have no application runtime targets.
 - **[dokka](ylcs-module/dokka) · Gradle build tool**<br>
   Aggregate module APIs into the Dokka site; no application runtime target
 
-## Platform configuration and integration
-
-Targets and defaults come from each module’s `build.gradle.kts` and `build-logic/public-plugin` templates. WasmJS is the browser WebAssembly target. Native desktop targets are `mingwX64("windows")`, `linuxX64("linux")` and `macosArm64("macos")`; iOS includes `iosArm64` and, on an Apple Silicon macOS host, `iosSimulatorArm64`. Android currently uses minSdk 28 and packages `arm64-v8a`. Compose Native consumers need the matching [Native Compose bridge](native-compose/README.md); JVM FFI targets do not imply Kotlin/Native support. Platform permissions, system services and native dependencies remain API-specific.
-
 # Sample: 银临茶舍 Cross-Platform App
 
 > [!IMPORTANT]

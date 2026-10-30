@@ -4,8 +4,7 @@ import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
 import love.yinlin.foundation.SyncStartup
 import love.yinlin.foundation.SyncStartupFactory
-import love.yinlin.exception.ExceptionHandler
-import love.yinlin.exception.ExceptionManager
+import love.yinlin.foundation.exception.ExceptionHandler
 
 class StartupExceptionHandler(
     pool: StartupPool,
@@ -20,9 +19,7 @@ class StartupExceptionHandler(
         override fun build(pool: StartupPool): StartupExceptionHandler = StartupExceptionHandler(pool, crashKey, handler)
     }
 
-    init {
-        ExceptionManager.initialize(crashKey, handler)
-    }
+    val instance = ExceptionHandler.setup(crashKey, handler)
 
-    override fun destroy() = ExceptionManager.shutdown()
+    override fun destroy() = instance.close()
 }

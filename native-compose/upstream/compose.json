@@ -594,7 +594,7 @@
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive",
-            "alias": "native-compose-adaptive",
+            "alias": "native-compose-material3-adaptive",
             "sourceRepository": "maven",
             "sourcePath": "adaptive",
             "sourceArchive": {
@@ -622,14 +622,14 @@
                 ]
             },
             "version": "1.4.0-alpha01",
-            "versionRef": "compose-adaptive"
+            "versionRef": "material3"
         },
         "adaptive-layout": {
             "family": "adaptive",
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-layout",
-            "alias": "native-compose-adaptive-layout",
+            "alias": "native-compose-material3-adaptive-layout",
             "sourceRepository": "maven",
             "sourcePath": "adaptive-layout",
             "sourceArchive": {
@@ -660,14 +660,14 @@
                 ]
             },
             "version": "1.4.0-alpha01",
-            "versionRef": "compose-adaptive"
+            "versionRef": "material3"
         },
         "adaptive-navigation": {
             "family": "adaptive",
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-navigation",
-            "alias": "native-compose-adaptive-navigation",
+            "alias": "native-compose-material3-adaptive-navigation",
             "sourceRepository": "maven",
             "sourcePath": "adaptive-navigation",
             "sourceArchive": {
@@ -692,14 +692,14 @@
                 ]
             },
             "version": "1.4.0-alpha01",
-            "versionRef": "compose-adaptive"
+            "versionRef": "material3"
         },
         "adaptive-navigation3": {
             "family": "adaptive",
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-navigation3",
-            "alias": "native-compose-adaptive-navigation3",
+            "alias": "native-compose-material3-adaptive-navigation3",
             "sourceRepository": "maven",
             "sourcePath": "adaptive-navigation3",
             "sourceArchive": {
@@ -724,7 +724,7 @@
                 ]
             },
             "version": "1.4.0-alpha01",
-            "versionRef": "compose-adaptive"
+            "versionRef": "material3"
         }
     }
 }

@@ -26,6 +26,9 @@ class KotlinNativeSourceSetsScope(
 }
 
 open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>() {
+    internal val interopSettings = KotlinNativeInterop()
+    fun interop(block: KotlinNativeInterop.() -> Unit) { interopSettings.block() }
+
     // SourceSets
     private var sourceBlock: KotlinNativeSourceSetsScope.() -> Unit = {}
     fun sources(block: KotlinNativeSourceSetsScope.() -> Unit) {
@@ -122,6 +125,7 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
         }
 
         configureActions()
+        interopSettings.configureNative(extension)
         registerNativeCpp(extension)
     }
 }

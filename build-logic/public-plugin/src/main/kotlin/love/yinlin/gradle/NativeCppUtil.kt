@@ -2,6 +2,7 @@ package love.yinlin.gradle
 
 import love.yinlin.gradle.task.BuildNativeCppTask
 import org.gradle.api.Project
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -36,7 +37,12 @@ internal fun Project.registerNativeCpp(extension: KotlinMultiplatformExtension) 
         compilation.cinterops.configureEach {
             includeDirs(source)
             extraOpts("-libraryPath", producer.get().libraryDirectory.get().asFile.invariantSeparatorsPath)
-            tasks.named(interopProcessingTaskName).configure { dependsOn(producer) }
+            tasks.named(interopProcessingTaskName).configure {
+                dependsOn(producer)
+                inputs.files(producer.flatMap { it.libraryDirectory }.map { it.asFileTree.matching { include("**/*.a", "**/*.lib") } })
+                    .withPropertyName("nativeCppLibraries")
+                    .withPathSensitivity(PathSensitivity.RELATIVE)
+            }
         }
         compilation.compileTaskProvider.configure { dependsOn(producer) }
     }

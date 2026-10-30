@@ -1,5 +1,4 @@
 import love.yinlin.gradle.ExportLib
-import love.yinlin.gradle.SwiftPackage
 
 plugins {
     install(
@@ -16,12 +15,18 @@ rachel {
     multiplatform {
         nativeDesktopTarget = true
 
-        desktop {
-            cpp = listOf("src/nativeMain/cpp")
-        }
-
-        native {
-            cpp = listOf("kv")
+        interop {
+            desktop {
+                cpp("src/nativeMain/cpp")
+            }
+            native {
+                cpp("kv")
+            }
+            ios {
+                discoverClangModulesImplicitly = false
+                spm("https://github.com/Tencent/MMKV.git", libs.versions.mmkv.get(), "MMKV")
+                spm("Dummy")
+            }
         }
 
         sources {
@@ -58,13 +63,5 @@ rachel {
 
             macosMain(nativeMain)
         }
-
-        // 仅导入 MMKV 的公开 API，避免扫描 MMKVCoreOpenSSL 中需要宏定义的内部模板头文件。
-        swiftDiscoverClangModulesImplicitly = false
-
-        swiftPackages = listOf(
-            SwiftPackage.Remote("https://github.com/Tencent/MMKV.git", libs.versions.mmkv.get(), listOf("MMKV")),
-            SwiftPackage.Local("Dummy"),
-        )
     }
 }

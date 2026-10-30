@@ -9,10 +9,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.mainImmediateContext
 
 /**
  * 一个独立窗口的生命周期。每次打开使用新实例，持久业务状态可由调用方另行持有。
@@ -59,7 +59,7 @@ abstract class ApplicationWindow {
     }
 
     internal fun activate() {
-        windowScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+        windowScope = CoroutineScope(SupervisorJob() + mainImmediateContext)
         isActive = true
         initialize()
     }

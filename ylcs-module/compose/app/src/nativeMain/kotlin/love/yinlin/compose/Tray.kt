@@ -8,11 +8,11 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.coroutines.mainImmediateContext
 import org.jetbrains.skiko.window.NativeTray
 import org.jetbrains.skiko.window.NativeWindowScope
 
@@ -54,7 +54,7 @@ class Tray {
 
     internal fun attach(window: NativeWindowScope, title: () -> String) {
         check(scope == null) { "Tray is already attached" }
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+        val scope = CoroutineScope(SupervisorJob() + mainImmediateContext)
         this.scope = scope
 
         scope.launch(start = CoroutineStart.UNDISPATCHED) {

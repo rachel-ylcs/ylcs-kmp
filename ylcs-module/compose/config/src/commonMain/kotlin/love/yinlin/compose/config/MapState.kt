@@ -6,7 +6,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import love.yinlin.compose.extension.toMutableStateMap
 import love.yinlin.extension.replaceAll
-import love.yinlin.kv.KV
+import love.yinlin.foundation.kv.KV
 
 @Stable
 open class MapState<K, V>(

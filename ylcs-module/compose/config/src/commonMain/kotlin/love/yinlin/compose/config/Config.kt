@@ -2,14 +2,13 @@ package love.yinlin.compose.config
 
 import androidx.compose.runtime.*
 import kotlinx.serialization.serializer
-import love.yinlin.kv.KV
-import love.yinlin.kv.getJson
-import love.yinlin.kv.setJson
+import love.yinlin.foundation.kv.KV
+import love.yinlin.foundation.kv.getJson
+import love.yinlin.foundation.kv.setJson
 import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.toJsonString
 import love.yinlin.extension.lazyName
 
-/** 持有可观察配置委托；注入的 KV 由调用方管理，不随配置对象销毁。 */
 @Stable
 open class Config(@PublishedApi internal val kv: KV) {
     inline fun <reified T : Enum<T>> enumState(

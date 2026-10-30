@@ -1,6 +1,6 @@
 package love.yinlin.startup
 
-import love.yinlin.data.config.AppConfig
+import love.yinlin.AppConfig
 import love.yinlin.foundation.StartupID
 import love.yinlin.foundation.StartupPool
 import love.yinlin.foundation.SyncStartup
@@ -13,5 +13,5 @@ class StartupAppConfig(pool: StartupPool) : SyncStartup(pool) {
         override fun build(pool: StartupPool) = StartupAppConfig(pool)
     }
 
-    val config = AppConfig(pool.requireClass<StartupKV>().kv)
+    val instance = AppConfig(pool.requireClass<StartupKV>().instance)
 }

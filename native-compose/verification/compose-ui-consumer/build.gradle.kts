@@ -39,7 +39,7 @@ kotlin {
                 implementation(libs.native.compose.material3.asProvider())
                 implementation(libs.native.compose.material3.windowSizeClass)
                 implementation(libs.native.compose.material3.adaptive.navigation.suite)
-                implementation(libs.native.compose.adaptive.navigation3)
+                implementation(libs.native.compose.material3.adaptive.navigation3)
             }
             else {
                 implementation(libs.compose.foundation)
@@ -50,7 +50,7 @@ kotlin {
                 implementation(libs.compose.material3.asProvider())
                 implementation(libs.compose.material3.windowSizeClass)
                 implementation(libs.compose.material3.adaptive.navigation.suite)
-                implementation(libs.compose.adaptive.navigation3)
+                implementation(libs.compose.material3.adaptive.navigation3)
             }
             implementation(libs.androidx.navigation3.viewmodel)
         }
