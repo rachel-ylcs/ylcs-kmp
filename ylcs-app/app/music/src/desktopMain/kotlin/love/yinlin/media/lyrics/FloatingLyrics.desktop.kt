@@ -27,7 +27,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
-import love.yinlin.platform.NativeWindow
+import love.yinlin.platform.updateClickThrough
 import love.yinlin.startup.StartupMusicPlayer
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -97,7 +97,7 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
                 alwaysOnTop = true
             ) {
                 LaunchedEffect(canMove) {
-                    NativeWindow.updateClickThrough(window.windowHandle, !canMove)
+                    updateClickThrough(window.windowHandle, !canMove)
                 }
 
                 LaunchedEffect(windowState.isInitialized) {

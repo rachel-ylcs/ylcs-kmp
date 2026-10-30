@@ -160,7 +160,6 @@ repository {
                 }
                 module("os") {
                     module("single-instance")
-                    module("window")
                 }
             }
         }

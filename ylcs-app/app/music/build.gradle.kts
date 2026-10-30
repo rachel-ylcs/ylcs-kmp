@@ -38,7 +38,10 @@ rachel {
             iosMainList(iosMain)
 
             desktopMain(commonMain) {
-                lib(projects.ylcsModule.platform.os.window)
+                lib(
+                    projects.ylcsModule.platform.ffi.posix,
+                    projects.ylcsModule.platform.ffi.win32,
+                )
             }
 
             webMain(commonMain)
