@@ -148,7 +148,7 @@ class NativeUpstreamSync(directory: File) {
         val values = linkedMapOf("deploy.version" to catalog.versions.getValue("skiko"), "deploy.group" to skiko["group"].toString(), "dependencies.skia" to skiko["skia"].toString(),
             "skiko.kotlin.language.version" to catalog.versions.getValue("kotlin").split('.').take(2).joinToString("."), "skiko.kotlin.api.version" to catalog.versions.getValue("kotlin").split('.').take(2).joinToString("."))
         val rootProperties = repository.resolve("gradle.properties").readText()
-        Regex("(?m)^kotlin\\.native\\.ignoreDisabledTargets[ \\t]*=[ \\t]*([^\r\n]*)").find(rootProperties)?.let { values["kotlin.native.ignoreDisabledTargets"] = it.groupValues[1].trim() }
+        Regex("(?m)^(kotlin\\.native\\.(?:ignoreDisabledTargets|jvmArgs))[ \\t]*=[ \\t]*([^\r\n]*)").findAll(rootProperties).forEach { values[it.groupValues[1]] = it.groupValues[2].trim() }
         var text = properties.readText()
         for ((name, value) in values) {
             val pattern = Regex("(?m)^${Regex.escape(name)}[^\r\n]*")

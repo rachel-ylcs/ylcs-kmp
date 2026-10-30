@@ -220,7 +220,7 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
         writeSource(vendor, build.resolve("settings.gradle.kts"), templates.resolve("compose-ui.settings.gradle.kts.template").readText().replace("__PROJECTS__", projects.joinToString("\n")).toByteArray())
         writeSource(vendor, build.resolve("build.gradle.kts"), templates.resolve("compose-ui.build.gradle.kts.template").readText().replace("__JAVA_VERSION__", sync.catalog.java.toString()).toByteArray())
         val properties = linkedMapOf("kotlin.mpp.applyDefaultHierarchyTemplate" to "false")
-        Regex("(?m)^kotlin\\.native\\.ignoreDisabledTargets[ \\t]*=[ \\t]*([^\r\n]*)").find(sync.repository.resolve("gradle.properties").readText())?.let { properties["kotlin.native.ignoreDisabledTargets"] = it.groupValues[1].trim() }
+        Regex("(?m)^(kotlin\\.native\\.(?:ignoreDisabledTargets|jvmArgs))[ \\t]*=[ \\t]*([^\r\n]*)").findAll(sync.repository.resolve("gradle.properties").readText()).forEach { properties[it.groupValues[1]] = it.groupValues[2].trim() }
         writeSource(vendor, build.resolve("gradle.properties"), properties.entries.joinToString("\n", postfix = "\n") { "${it.key}=${it.value}" }.toByteArray())
         build.resolve("gradle/wrapper").mkdirs()
         if (!build.resolve("gradle/wrapper/gradle-wrapper.properties").exists()) build.resolve("gradle/wrapper/gradle-wrapper.properties").writeText("")
