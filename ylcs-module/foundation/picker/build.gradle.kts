@@ -44,7 +44,7 @@ rachel {
             iosMainList(iosMain)
 
             desktopMain(commonMain) {
-                lib(projects.ylcsModule.platform.nativeLibLoader)
+                lib(projects.ylcsModule.foundation.libloader)
             }
 
             webMain(commonMain)

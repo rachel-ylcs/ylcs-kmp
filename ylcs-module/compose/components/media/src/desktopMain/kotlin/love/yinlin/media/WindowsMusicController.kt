@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import love.yinlin.annotation.NativeLibApi
 import love.yinlin.compose.data.media.MediaPlayMode
 import love.yinlin.coroutines.mainContext
+import love.yinlin.foundation.NativeLibApi
 import love.yinlin.foundation.PlatformContext
 import kotlin.time.Duration.Companion.milliseconds
 

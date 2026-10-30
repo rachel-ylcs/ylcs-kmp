@@ -1,8 +1,8 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
-import love.yinlin.annotation.NativeLibApi
-import love.yinlin.platform.NativeLibLoader
+import love.yinlin.foundation.LibLoader
+import love.yinlin.foundation.NativeLibApi
 import love.yinlin.platform.Platform
 import love.yinlin.platform.platform
 
@@ -10,7 +10,7 @@ import love.yinlin.platform.platform
 @NativeLibApi
 internal object DesktopMusicController {
     init {
-        NativeLibLoader.resource("ylcs-module.compose.components.media")
+        LibLoader.resource("ylcs-module.compose.components.media")
     }
 
     fun build(fetcher: MediaMetadataFetcher): MusicPlayer = when (platform) {

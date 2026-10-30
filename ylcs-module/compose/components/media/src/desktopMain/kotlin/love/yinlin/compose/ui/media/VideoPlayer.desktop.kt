@@ -6,13 +6,13 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.skiaCanvas
-import love.yinlin.annotation.NativeLibApi
 import love.yinlin.extension.then
+import love.yinlin.foundation.LibLoader
+import love.yinlin.foundation.NativeLibApi
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.LinuxVideoController
 import love.yinlin.media.MacOSVideoController
 import love.yinlin.media.WindowsVideoController
-import love.yinlin.platform.NativeLibLoader
 import love.yinlin.platform.Platform
 import love.yinlin.platform.platform
 import org.jetbrains.skia.Bitmap
@@ -26,7 +26,7 @@ import org.jetbrains.skia.SamplingMode
 abstract class DesktopVideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
     companion object {
         init {
-            NativeLibLoader.resource("ylcs-module.compose.components.media")
+            LibLoader.resource("ylcs-module.compose.components.media")
         }
     }
 

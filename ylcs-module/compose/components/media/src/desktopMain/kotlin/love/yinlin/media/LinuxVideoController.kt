@@ -1,7 +1,7 @@
 package love.yinlin.media
 
 import androidx.compose.runtime.Stable
-import love.yinlin.annotation.NativeLibApi
+import love.yinlin.foundation.NativeLibApi
 import love.yinlin.compose.ui.media.DesktopVideoController
 import love.yinlin.compose.ui.media.VideoActionBar
 

@@ -1,6 +1,6 @@
 package love.yinlin.foundation.kv
 
-import love.yinlin.annotation.NativeLibApi
+import love.yinlin.foundation.NativeLibApi
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.fs.File
 

@@ -6,8 +6,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.io.Sink
 import kotlinx.io.Source
-import love.yinlin.annotation.NativeLibApi
 import love.yinlin.coroutines.Coroutines
+import love.yinlin.foundation.NativeLibApi
 import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.fs.File
 import love.yinlin.fs.safeSources

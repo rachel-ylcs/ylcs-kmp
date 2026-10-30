@@ -1,13 +1,13 @@
 package love.yinlin.foundation.kv
 
-import love.yinlin.annotation.NativeLibApi
-import love.yinlin.platform.NativeLibLoader
+import love.yinlin.foundation.LibLoader
+import love.yinlin.foundation.NativeLibApi
 
 @NativeLibApi
 class NativeKV(path: String) : AutoCloseable {
     companion object {
         init {
-            NativeLibLoader.resource("ylcs-module.foundation.kv")
+            LibLoader.resource("ylcs-module.foundation.kv")
         }
 
         @JvmStatic

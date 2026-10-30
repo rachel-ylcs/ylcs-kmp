@@ -29,7 +29,6 @@ rachel {
             desktopMain(commonMain) {
                 lib(
                     projects.ylcsApp.app.portal,
-                    projects.ylcsModule.platform.nativeLibLoader,
                     projects.ylcsModule.platform.os.singleInstance,
                 )
             }

@@ -1,12 +1,12 @@
 package love.yinlin.foundation.picker
 
-import love.yinlin.annotation.NativeLibApi
-import love.yinlin.platform.NativeLibLoader
+import love.yinlin.foundation.LibLoader
+import love.yinlin.foundation.NativeLibApi
 
 @NativeLibApi
 internal object NativePicker {
     init {
-        NativeLibLoader.resource("ylcs-module.foundation.picker")
+        LibLoader.resource("ylcs-module.foundation.picker")
     }
 
     @JvmStatic

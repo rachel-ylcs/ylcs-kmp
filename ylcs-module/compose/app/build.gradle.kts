@@ -21,7 +21,7 @@ rachel {
         sources {
             commonMain {
                 lib(
-                    projects.ylcsModule.platform.nativeLibLoader,
+                    projects.ylcsModule.foundation.libloader,
                     libs.compose.resources,
                     ExportLib,
                     projects.ylcsModule.foundation.startup,

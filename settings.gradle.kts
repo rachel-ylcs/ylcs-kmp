@@ -104,7 +104,7 @@ repository {
             module("core")
 
             module("foundation") {
-                module("context")
+                module("context", "libloader")
                 module("filesystem", "network", "startup")
                 module("picker", "kv", "exception")
                 module("compression", "cryptography")
@@ -154,7 +154,6 @@ repository {
             }
 
             module("platform") {
-                module("native-lib-loader")
                 module("ffi") {
                     module("core")
                     module("posix", "win32")
