@@ -14,7 +14,6 @@ import love.yinlin.compose.screen.ClearPolicy
 import love.yinlin.compose.screen.CreatePolicy
 import love.yinlin.compose.screen.ScreenManager
 import love.yinlin.compose.screen.ScreenModel
-import love.yinlin.compose.ui.input.CheckBox
 import love.yinlin.compose.ui.input.Filter
 import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.SecondaryButton
@@ -37,16 +36,21 @@ internal class PolicyLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, Ga
                 screen(scope::beta)
             }
         }
-        GalleryCard("八种组合的契约") {
-            Paragraph("New：总是新增；即使选择 Clear，也保留原栈。")
+        GalleryCard("十二种组合的契约") {
+            Paragraph("New：总是新增；None / Clear 保留原栈，Pop 在新增前移除非根当前页。")
             Paragraph("Replace：替换最靠近栈顶的同类型实例，再将新实例放到栈顶。")
             Paragraph("Move：复用最靠近栈顶的同类型实例；不更新参数，也不调用 resume。")
             Paragraph("Resume：复用同一实例并调用 resume；本演示只更新当前参数，保留计数器和初始参数。")
             Paragraph("Clear：找到同类型目标时，清理它上方的页面；目标下方保持原样。没有目标时，Replace / Move / Resume 都按 New 处理，并忽略 Clear。")
+            Paragraph("Pop：切换前退出当前页，保留其他页面；只剩根页时忽略退出。目标就是当前同类页时，Replace 只替换当前页，Move 不做任何操作，Resume 只唤醒当前页。没有同类目标时按 New + Pop 处理。")
             CodeBlock("""
                 navigate(routes::alpha, 99, CreatePolicy.New + ClearPolicy.None)
                 navigate(routes::alpha, 99, CreatePolicy.Move + ClearPolicy.Clear)
                 navigate(routes::alpha, 99, CreatePolicy.Resume + ClearPolicy.None)
+                navigate(routes::alpha, 99, CreatePolicy.New + ClearPolicy.Pop)
+                navigate(routes::alpha, 99, CreatePolicy.Replace + ClearPolicy.Pop)
+                navigate(routes::alpha, 99, CreatePolicy.Move + ClearPolicy.Pop)
+                navigate(routes::alpha, 99, CreatePolicy.Resume + ClearPolicy.Pop)
 
                 override fun resume() = withResume { value: Int ->
                     currentValue = value
@@ -59,7 +63,7 @@ internal class PolicyLabScreen(routes: GalleryRoutes) : GalleryScreen(routes, Ga
 @Stable
 internal class PolicyRoutes(val journal: GalleryJournal, val name: String) {
     var create by mutableStateOf(CreatePolicy.New)
-    var clear by mutableStateOf(false)
+    var clear by mutableStateOf(ClearPolicy.None)
     var target by mutableStateOf("A")
     val request = InputState("99", maxLength = 8)
     var lastResult by mutableStateOf("实验根页 H 已就绪。pop() 会保留最后一个页面。")
@@ -74,7 +78,7 @@ internal class PolicyRoutes(val journal: GalleryJournal, val name: String) {
 
     fun send(caller: ScreenModel) {
         val value = request.text.toIntOrNull() ?: return
-        val policy = create + if (clear) ClearPolicy.Clear else ClearPolicy.None
+        val policy = create + clear
         journal.event(name, "请求", "$create + ${policy.clearPolicy} → $target($value)")
         if (target == "A") caller.navigate(::alpha, value, policy) else caller.navigate(::beta, value, policy)
         lastResult = "已执行 $create + ${policy.clearPolicy} → $target($value)。请查看当前页面的真实编号、初始参数、当前参数、计数和 resume 次数。"
@@ -111,9 +115,10 @@ internal class PolicyRoutes(val journal: GalleryJournal, val name: String) {
 
     fun prediction(): String {
         val prefix = if (target == "A") "H → A1 → B1" else "H → A1 → B1 → A2"
-        val intervening = if (target == "A" && !clear) " → B2" else ""
+        val intervening = if (target == "A" && clear == ClearPolicy.None) " → B2" else ""
+        val newPrefix = if (clear == ClearPolicy.Pop) "H → A1 → B1 → A2" else "H → A1 → B1 → A2 → B2"
         return when (create) {
-            CreatePolicy.New -> "H → A1 → B1 → A2 → B2 → $target(新)"
+            CreatePolicy.New -> "$newPrefix → $target(新)"
             CreatePolicy.Replace -> "$prefix$intervening → $target(新)"
             CreatePolicy.Move -> "$prefix$intervening → ${target}2"
             CreatePolicy.Resume -> "$prefix$intervening → ${target}2(当前=${request.text})"
@@ -168,14 +173,15 @@ internal abstract class PolicyPage(
             }
             Filter(size = CreatePolicy.entries.size, selectedProvider = { scope.create == CreatePolicy.entries[it] },
                 titleProvider = { CreatePolicy.entries[it].name }, onClick = { index, _ -> scope.create = CreatePolicy.entries[index] })
+            Filter(size = ClearPolicy.entries.size, selectedProvider = { scope.clear == ClearPolicy.entries[it] },
+                titleProvider = { ClearPolicy.entries[it].name }, onClick = { index, _ -> scope.clear = ClearPolicy.entries[index] })
             Actions {
                 Filter(size = 2, selectedProvider = { scope.target == if (it == 0) "A" else "B" },
                     titleProvider = { if (it == 0) "目标 A" else "目标 B" }, onClick = { index, _ -> scope.target = if (index == 0) "A" else "B" })
-                CheckBox(scope.clear, { scope.clear = it }, "Clear 上方页面")
                 Input(modifier = Modifier.width(160.dp), state = scope.request, hint = "整数参数")
             }
             Actions {
-                PrimaryButton("执行 ${scope.create} → ${scope.target}", enabled = scope.request.text.toIntOrNull() != null) { scope.send(this@PolicyPage) }
+                PrimaryButton("执行 ${scope.create} + ${scope.clear} → ${scope.target}", enabled = scope.request.text.toIntOrNull() != null) { scope.send(this@PolicyPage) }
                 SecondaryButton("重建示例栈") { scope.reset(this@PolicyPage, seed = true) }
                 TextButton("清空到根页") { scope.reset(this@PolicyPage, seed = false) }
                 TextButton("快速 New × 5") {
@@ -191,6 +197,11 @@ internal abstract class PolicyPage(
                 Paragraph(scope.seedDescription)
                 CodeBlock("起点：H → A1 → B1 → A2 → B2\n预期：${scope.prediction()}")
                 Paragraph("示例栈把 A2 的计数预设为 3。同类匹配忽略参数：请求 A(99) 应命中 A2；Move / Resume 应保留编号和计数，Replace 应创建计数为 0 的新实例。")
+                if (scope.clear == ClearPolicy.Pop) {
+                    Paragraph("目标 A：每次先重建示例栈。New 移除 B2 后新建 A；Replace 同时替换 A2、移除 B2；Move / Resume 移除 B2 后复用 A2，Resume 另将当前参数更新为请求值。")
+                    Paragraph("目标 B：每次先重建示例栈。New / Replace 只换掉当前 B2，不应删除 B1；Move 保持 B2 和回调次数不变；Resume 保持 B2 编号并增加一次 resume。")
+                    Paragraph("根页与无匹配目标：清空到根页后选择 Pop，四种创建策略都会保留 H 并新建目标。再选择另一个尚未创建的类型，确认当前页退出后新建目标。")
+                }
             }
         }
     }

@@ -146,8 +146,9 @@ class ScreenKeyNavigationTest {
             val top = manager.requireTopScreen<Screen1>()
 
             val remaining = when {
-                create == CreatePolicy.New -> before
+                create == CreatePolicy.New -> if (clear == ClearPolicy.Pop) before.dropLast(1) else before
                 clear == ClearPolicy.Clear -> before.take(3)
+                clear == ClearPolicy.Pop -> before.filter { it.id != target.screenKey.id && it.id != cover.screenKey.id }
                 else -> before.filter { it.id != target.screenKey.id }
             }
             assertContentEquals(remaining + top.screenKey, manager.backStack, "$create / $clear / $stringFirst")
@@ -168,7 +169,7 @@ class ScreenKeyNavigationTest {
                 assertEquals(if (create == CreatePolicy.Resume) 1 else 0, top.resumeCount)
             }
             assertEquals(if (create == CreatePolicy.Replace) 1 else 0, target.clearCount)
-            assertEquals(if (create != CreatePolicy.New && clear == ClearPolicy.Clear) 1 else 0, cover.clearCount)
+            assertEquals(if (clear == ClearPolicy.Pop || create != CreatePolicy.New && clear == ClearPolicy.Clear) 1 else 0, cover.clearCount)
         }
     }
 
@@ -185,18 +186,22 @@ class ScreenKeyNavigationTest {
             home.navigate(name, "not an Int", create + clear)
             val missing = manager.requireTopScreen<Custom404>()
 
-            assertContentEquals(before + missing.screenKey, manager.backStack)
+            val pops = clear == ClearPolicy.Pop
+            assertContentEquals((if (pops) before.dropLast(1) else before) + missing.screenKey, manager.backStack)
             assertTrue(missing.screenKey.isUnboundKey)
             assertEquals(name, missing.screenKey.type)
             assertEquals(0, missing.resumeCount)
             assertEquals(7, real.value)
-            assertEquals(0, real.clearCount)
-            assertSame(real, manager.store[real.screenKey.id])
+            assertEquals(if (pops) 1 else 0, real.clearCount)
+            if (pops) assertNull(manager.store[real.screenKey.id])
+            else assertSame(real, manager.store[real.screenKey.id])
 
             missing.navigate("one", 99, CreatePolicy.Resume + ClearPolicy.None)
-            assertSame(real, manager.requireTopScreen<Screen1>())
-            assertEquals(99, real.value)
-            assertEquals(1, real.resumeCount)
+            val selected = manager.requireTopScreen<Screen1>()
+            if (pops) assertNotSame(real, selected)
+            else assertSame(real, selected)
+            assertEquals(99, selected.value)
+            assertEquals(if (pops) 0 else 1, selected.resumeCount)
             assertSame(missing, manager.store[missing.screenKey.id])
         }
     }

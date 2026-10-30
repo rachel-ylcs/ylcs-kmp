@@ -24,7 +24,7 @@ internal class OverviewScreen(routes: GalleryRoutes) : GalleryScreen(routes, Gal
                 SecondaryButton("查看状态与生命周期") { navigate(routes::state) }
             }
             Actions {
-                Metric("导航策略", "4 × 2")
+                Metric("导航策略", "${CreatePolicy.entries.size} × ${ClearPolicy.entries.size}")
                 Metric("类型安全参数", "0–5 个")
                 Metric("已构造 / 已清理", "${journal.createdCount} / ${journal.clearedCount}")
             }

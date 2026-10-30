@@ -5,7 +5,7 @@ import androidx.compose.runtime.Stable
 @Stable
 internal sealed interface NavigationPlan {
     @Stable
-    data class StackChange(val fromIndex: Int, val toIndex: Int)
+    data class StackChange(val fromIndex: Int, val toIndex: Int, val popCurrent: Boolean = false)
 
     val key: ScreenKey
     val change: StackChange?

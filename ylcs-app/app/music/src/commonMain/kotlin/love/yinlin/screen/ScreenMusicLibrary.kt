@@ -21,6 +21,8 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceMusic
+import love.yinlin.compose.screen.ClearPolicy
+import love.yinlin.compose.screen.CreatePolicy
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.DialogChoice
@@ -331,8 +333,7 @@ class ScreenMusicLibrary : Screen() {
             ) {
                 SimpleEllipsisText(text = "曲库空空的,快去工坊里下载吧!", style = Theme.typography.v6)
                 PrimaryLoadingButton(text = "工坊", icon = Icons.Token, onClick = {
-                    pop()
-                    navigate(::ScreenModCenter)
+                    navigate(::ScreenModCenter, CreatePolicy.New + ClearPolicy.Pop)
                 })
             }
         }

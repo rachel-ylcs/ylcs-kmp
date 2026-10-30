@@ -25,6 +25,8 @@ import love.yinlin.compose.graphics.encode
 import love.yinlin.compose.graphics.thumbnail
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.image.input.ImageSource
+import love.yinlin.compose.screen.ClearPolicy
+import love.yinlin.compose.screen.CreatePolicy
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.common.ContributorLayout
 import love.yinlin.compose.ui.common.SettingsLayout
@@ -96,8 +98,7 @@ class ScreenSettings : Screen() {
                     icon = Icons.Login,
                     hasDivider = false,
                     onClick = {
-                        pop()
-                        navigate(::ScreenLogin)
+                        navigate(::ScreenLogin, CreatePolicy.New + ClearPolicy.Pop)
                     }
                 )
             }

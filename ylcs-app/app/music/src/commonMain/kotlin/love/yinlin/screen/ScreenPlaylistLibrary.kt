@@ -24,6 +24,8 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceMusic
 import love.yinlin.compose.extension.mutableRefStateOf
+import love.yinlin.compose.screen.ClearPolicy
+import love.yinlin.compose.screen.CreatePolicy
 import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.collection.TreeView
 import love.yinlin.compose.ui.floating.DialogChoice
@@ -265,8 +267,7 @@ class ScreenPlaylistLibrary : Screen() {
             ) {
                 SimpleEllipsisText(text = "快去曲库添加歌曲吧~", style = Theme.typography.v6)
                 PrimaryLoadingButton(text = "曲库", icon = Icons.LibraryMusic, onClick = {
-                    pop()
-                    navigate(::ScreenMusicLibrary)
+                    navigate(::ScreenMusicLibrary, CreatePolicy.New + ClearPolicy.Pop)
                 })
             }
         }

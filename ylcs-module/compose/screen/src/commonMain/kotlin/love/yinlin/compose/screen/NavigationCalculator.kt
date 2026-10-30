@@ -13,10 +13,11 @@ internal object NavigationCalculator {
     }
 
     private fun stackChange(backStack: List<ScreenKey>, targetIndex: Int, clearPolicy: ClearPolicy): NavigationPlan.StackChange {
-        if (targetIndex == -1) return NavigationPlan.StackChange(backStack.size, backStack.size)
+        val popCurrent = clearPolicy == ClearPolicy.Pop && backStack.size > 1 && targetIndex != backStack.lastIndex
+        if (targetIndex == -1) return NavigationPlan.StackChange(backStack.size, backStack.size, popCurrent)
 
         val toIndex = if (clearPolicy == ClearPolicy.Clear) backStack.size else targetIndex + 1
-        return NavigationPlan.StackChange(targetIndex, toIndex)
+        return NavigationPlan.StackChange(targetIndex, toIndex, popCurrent)
     }
 
     /**
@@ -24,6 +25,7 @@ internal object NavigationCalculator {
      *
      * New 以及未匹配目标时忽略 Clear。Move、Resume 保留原 key；
      * Resume 的新参数放在计算结果中，不覆盖 key 的初始参数。
+     * Pop 在切换目标时移除非根当前页；目标就是当前页时仅执行对应创建策略。
      * 计划只记录索引和目标引用，不创建新栈列表，不复制或序列化已有参数。
      * 索引以当前栈为准，调用方需保证计算与执行之间原栈不变，并串行执行。
      */

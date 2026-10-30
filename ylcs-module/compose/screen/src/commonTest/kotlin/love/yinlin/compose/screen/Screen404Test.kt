@@ -163,10 +163,11 @@ class Screen404Test {
                 val result: Unit = manager.navigateTo("missing.A", ScreenArgs.build(99), create + clear)
                 val selected = manager.requireTopScreen<Custom404>()
                 val expected = when (create) {
-                    CreatePolicy.New -> [home, firstKey, middle, targetKey, upper, selected.screenKey]
-                    CreatePolicy.Replace -> if (clear == ClearPolicy.Clear) [home, firstKey, middle, selected.screenKey]
+                    CreatePolicy.New -> if (clear == ClearPolicy.Pop) [home, firstKey, middle, targetKey, selected.screenKey]
+                        else [home, firstKey, middle, targetKey, upper, selected.screenKey]
+                    CreatePolicy.Replace -> if (clear != ClearPolicy.None) [home, firstKey, middle, selected.screenKey]
                         else [home, firstKey, middle, upper, selected.screenKey]
-                    CreatePolicy.Move, CreatePolicy.Resume -> if (clear == ClearPolicy.Clear) [home, firstKey, middle, targetKey]
+                    CreatePolicy.Move, CreatePolicy.Resume -> if (clear != ClearPolicy.None) [home, firstKey, middle, targetKey]
                         else [home, firstKey, middle, upper, targetKey]
                 }
 
@@ -190,7 +191,7 @@ class Screen404Test {
                     assertEquals(4, factoryCalls)
                 }
                 assertEquals(if (create == CreatePolicy.Replace) 1 else 0, target.clearCount)
-                assertEquals(create != CreatePolicy.New && clear == ClearPolicy.Clear, manager.store[upper.id] == null)
+                assertEquals(clear == ClearPolicy.Pop || create != CreatePolicy.New && clear == ClearPolicy.Clear, manager.store[upper.id] == null)
             }
         }
     }

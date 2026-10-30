@@ -44,17 +44,18 @@ class NavigationCalculatorTest {
     private data class Result(val after: List<ScreenKey>, val removed: List<ScreenKey>)
 
     private fun requireChange(before: List<ScreenKey>, plan: NavigationPlan, message: String = "change"): Result {
-        (val fromIndex, val toIndex) = assertNotNull(plan.change, message)
+        (val fromIndex, val toIndex, val popCurrent) = assertNotNull(plan.change, message)
         assertTrue(fromIndex in 0 .. before.size, message)
         assertTrue(toIndex in fromIndex.. before.size, message)
         val after = buildList {
             for (index in before.indices) {
-                if (index !in fromIndex..<toIndex) add(before[index])
+                if (index !in fromIndex ..< toIndex && !(popCurrent && index == before.lastIndex)) add(before[index])
             }
             add(plan.key)
         }
         val firstRemoved = if (plan is NavigationPlan.Create) fromIndex else fromIndex + 1
         val removed = buildList {
+            if (popCurrent) add(before.last())
             for (index in firstRemoved ..<toIndex) add(before[index])
         }
         return Result(after, removed)
@@ -75,12 +76,16 @@ class NavigationCalculatorTest {
         val cases = [
             Case(CreatePolicy.New + ClearPolicy.None, [0, 1, 2, 3, 4], [], creates = true),
             Case(CreatePolicy.New + ClearPolicy.Clear, [0, 1, 2, 3, 4], [], creates = true),
+            Case(CreatePolicy.New + ClearPolicy.Pop, [0, 1, 2, 3], [4], creates = true),
             Case(CreatePolicy.Replace + ClearPolicy.None, [0, 1, 3, 4], [2], creates = true),
             Case(CreatePolicy.Replace + ClearPolicy.Clear, [0, 1], [2, 3, 4], creates = true),
+            Case(CreatePolicy.Replace + ClearPolicy.Pop, [0, 1, 3], [4, 2], creates = true),
             Case(CreatePolicy.Move + ClearPolicy.None, [0, 1, 3, 4, 2], []),
             Case(CreatePolicy.Move + ClearPolicy.Clear, [0, 1, 2], [3, 4]),
+            Case(CreatePolicy.Move + ClearPolicy.Pop, [0, 1, 3, 2], [4]),
             Case(CreatePolicy.Resume + ClearPolicy.None, [0, 1, 3, 4, 2], [], resumes = true),
-            Case(CreatePolicy.Resume + ClearPolicy.Clear, [0, 1, 2], [3, 4], resumes = true)
+            Case(CreatePolicy.Resume + ClearPolicy.Clear, [0, 1, 2], [3, 4], resumes = true),
+            Case(CreatePolicy.Resume + ClearPolicy.Pop, [0, 1, 3, 2], [4], resumes = true)
         ]
 
         for (case in cases) {
@@ -126,12 +131,13 @@ class NavigationCalculatorTest {
             val key = plan.key
             (val after, val removed) = requireChange(before, plan)
 
-            assertReferences(before + key, after, message)
+            val pops = policy.clearPolicy == ClearPolicy.Pop
+            assertReferences((if (pops) before.dropLast(1) else before) + key, after, message)
             assertSame(key, after.last(), message)
             assertEquals("Missing", key.type, message)
             assertSame(requestArgs, key.args, message)
             assertFalse(before.any { it.id == key.id }, message)
-            assertTrue(removed.isEmpty(), message)
+            assertReferences(if (pops) [before.last()] else [], removed, message)
         }
     }
 
@@ -433,7 +439,7 @@ class NavigationCalculatorTest {
             }
             val fromIndex = if (policy.createPolicy == CreatePolicy.New) before.size else index
             val toIndex = if (policy.createPolicy == CreatePolicy.New || policy.clearPolicy == ClearPolicy.Clear) before.size else index + 1
-            assertEquals(NavigationPlan.StackChange(fromIndex, toIndex), plan.change)
+            assertEquals(NavigationPlan.StackChange(fromIndex, toIndex, policy.clearPolicy == ClearPolicy.Pop), plan.change)
         }
 
         assertReferences([firstTyped, firstUnbound, lastTyped, lastUnbound], before.take(4))

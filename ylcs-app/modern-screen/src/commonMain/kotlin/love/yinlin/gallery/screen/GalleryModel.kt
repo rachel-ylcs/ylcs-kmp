@@ -140,7 +140,7 @@ internal abstract class ObservedScreen(
 
 internal enum class GallerySection(val title: String, val caption: String) {
     Overview("概览", "从这里开始"),
-    Policies("导航策略", "New / Replace / Move / Resume"),
+    Policies("导航策略", "4 种创建 × None / Clear / Pop"),
     Arguments("类型安全参数", "0–5 个参数与 Resume"),
     State("状态与生命周期", "ViewModel · 组合 · 协程"),
     Nested("嵌套与隔离", "两个独立导航区域"),

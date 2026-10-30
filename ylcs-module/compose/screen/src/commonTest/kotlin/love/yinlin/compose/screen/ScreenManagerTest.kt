@@ -319,10 +319,11 @@ class ScreenManagerTest {
                 manager.navigate(::NumberScreen, 99, policy = create + clear)
                 val result = manager.requireTopScreen<NumberScreen>()
                 val expected = when (create) {
-                    CreatePolicy.New -> [rootKey, firstKey, middleKey, targetKey, topKey, result.screenKey]
-                    CreatePolicy.Replace -> if (clear == ClearPolicy.Clear) [rootKey, firstKey, middleKey, result.screenKey]
+                    CreatePolicy.New -> if (clear == ClearPolicy.Pop) [rootKey, firstKey, middleKey, targetKey, result.screenKey]
+                        else [rootKey, firstKey, middleKey, targetKey, topKey, result.screenKey]
+                    CreatePolicy.Replace -> if (clear != ClearPolicy.None) [rootKey, firstKey, middleKey, result.screenKey]
                         else [rootKey, firstKey, middleKey, topKey, result.screenKey]
-                    CreatePolicy.Move, CreatePolicy.Resume -> if (clear == ClearPolicy.Clear) [rootKey, firstKey, middleKey, targetKey]
+                    CreatePolicy.Move, CreatePolicy.Resume -> if (clear != ClearPolicy.None) [rootKey, firstKey, middleKey, targetKey]
                         else [rootKey, firstKey, middleKey, topKey, targetKey]
                 }
 
@@ -331,7 +332,7 @@ class ScreenManagerTest {
                 assertEquals(0, first.clearCount)
                 assertEquals(10, first.value)
                 assertEquals(if (create == CreatePolicy.Replace) 1 else 0, target.clearCount)
-                assertEquals(if (create != CreatePolicy.New && clear == ClearPolicy.Clear) 1 else 0, top.clearCount)
+                assertEquals(if (clear == ClearPolicy.Pop || create != CreatePolicy.New && clear == ClearPolicy.Clear) 1 else 0, top.clearCount)
                 assertEquals(1, result.initializeCount)
                 if (create == CreatePolicy.Move || create == CreatePolicy.Resume) {
                     assertSame(target, result)
@@ -391,6 +392,58 @@ class ScreenManagerTest {
         assertEquals(3, screen.value)
         assertEquals(1, screen.resumeCount)
         assertEquals(1, screen.initializeCount)
+    }
+
+    @Test
+    fun popPolicyAtSameTypeTopNeverRemovesTheOlderInstance() {
+        for (create in CreatePolicy.entries) {
+            val manager = createManager()
+            val root = manager.requireTopScreen<RootScreen>()
+            root.navigate(::NumberScreen, 1)
+            val older = manager.requireTopScreen<NumberScreen>()
+            older.navigate(::NumberScreen, 2)
+            val current = manager.requireTopScreen<NumberScreen>()
+
+            current.navigate(::NumberScreen, 99, create + ClearPolicy.Pop)
+            val result = manager.requireTopScreen<NumberScreen>()
+
+            assertContentEquals([root.screenKey, older.screenKey, result.screenKey], manager.backStack)
+            assertSame(older, manager.store[older.screenKey.id])
+            assertEquals(0, older.clearCount)
+            assertEquals(if (create == CreatePolicy.New || create == CreatePolicy.Replace) 1 else 0, current.clearCount)
+            assertEquals(1, result.initializeCount)
+            assertEquals(if (create == CreatePolicy.Move) 2 else 99, result.value)
+            assertEquals(if (create == CreatePolicy.Resume) 1 else 0, result.resumeCount)
+            if (create == CreatePolicy.Move || create == CreatePolicy.Resume) assertSame(current, result)
+            else assertNotSame(current, result)
+        }
+    }
+
+    @Test
+    fun screenCanSwitchWithPopWhileItsExitingViewRetainsTheInstance() {
+        val manager = createManager()
+        val root = manager.requireTopScreen<RootScreen>()
+        root.navigate(::OtherScreen, "settings")
+        val source = manager.requireTopScreen<OtherScreen>()
+        val job = assertNotNull(source.viewModelScope.coroutineContext[Job])
+
+        manager.store.retain(source.screenKey.id).use {
+            source.navigate(::NumberScreen, 7, CreatePolicy.New + ClearPolicy.Pop)
+            val destination = manager.requireTopScreen<NumberScreen>()
+
+            assertContentEquals([root.screenKey, destination.screenKey], manager.backStack)
+            assertTrue(destination.foundSelfDuringInitialize)
+            assertEquals(0, source.clearCount)
+            assertTrue(job.isActive)
+            assertFalse(manager.isActive(source.screenKey.id))
+            assertFailsWith<IllegalArgumentException> { source.navigate(::RootScreen) }
+        }
+
+        assertNull(manager.store[source.screenKey.id])
+        assertEquals(1, source.clearCount)
+        assertTrue(job.isCancelled)
+        assertTrue(manager.pop())
+        assertSame(root, manager.requireTopScreen<RootScreen>())
     }
 
     @Test
@@ -468,19 +521,21 @@ class ScreenManagerTest {
         val stack = manager.backStack.toList()
         shouldFail = true
 
-        val caught = assertFailsWith<IllegalStateException> {
-            manager.navigate(::NumberScreen, 2, policy = CreatePolicy.Replace + ClearPolicy.Clear)
+        for (clear in [ClearPolicy.Clear, ClearPolicy.Pop]) {
+            val caught = assertFailsWith<IllegalStateException> {
+                top.navigate(::NumberScreen, 2, policy = CreatePolicy.Replace + clear)
+            }
+
+            assertSame(failure, caught)
+            assertContentEquals(stack, manager.backStack)
+            assertSame(original, manager.store[original.screenKey.id])
+            assertSame(top, top(manager))
+            assertEquals(0, original.clearCount)
+            assertEquals(0, top.clearCount)
         }
 
-        assertSame(failure, caught)
-        assertContentEquals(stack, manager.backStack)
-        assertSame(original, manager.store[original.screenKey.id])
-        assertSame(top, top(manager))
-        assertEquals(0, original.clearCount)
-        assertEquals(0, top.clearCount)
-
         shouldFail = false
-        manager.navigate(::NumberScreen, 2, policy = CreatePolicy.Replace + ClearPolicy.Clear)
+        top.navigate(::NumberScreen, 2, policy = CreatePolicy.Replace + ClearPolicy.Pop)
         val replacement = manager.requireTopScreen<NumberScreen>()
         assertEquals(2, replacement.value)
         assertEquals(1, original.clearCount)
@@ -970,13 +1025,14 @@ class ScreenManagerTest {
 
     @Test
     fun multiStepNavigationPublishesOnlyTheCompleteStack() {
-        for (create in [CreatePolicy.Replace, CreatePolicy.Move, CreatePolicy.Resume]) {
+        for (create in CreatePolicy.entries) {
             for (clear in ClearPolicy.entries) {
                 val manager = createManager()
                 val root = assertIs<RootScreen>(top(manager))
                 manager.navigate(::NumberScreen, 1)
                 manager.navigate(::OtherScreen, "upper")
                 val upper = manager.requireTopScreen<OtherScreen>()
+                val before = manager.backStack.toList()
                 val observed: MutableList<Any> = []
                 val published: MutableList<List<ScreenKey>> = []
                 Snapshot.observe(readObserver = { observed.add(it) }, writeObserver = null) { manager.backStack.size }
@@ -987,7 +1043,8 @@ class ScreenManagerTest {
                 cleaning({
                     manager.navigate(::NumberScreen, 7, policy = create + clear)
                     val result = manager.requireTopScreen<NumberScreen>()
-                    val expected = if (clear == ClearPolicy.Clear) [root.screenKey, result.screenKey]
+                    val expected = if (create == CreatePolicy.New) (if (clear == ClearPolicy.Pop) before.dropLast(1) else before) + result.screenKey
+                    else if (clear != ClearPolicy.None) [root.screenKey, result.screenKey]
                     else [root.screenKey, upper.screenKey, result.screenKey]
 
                     assertEquals([expected], published, "$create + $clear")

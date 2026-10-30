@@ -116,13 +116,15 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
             if (plan is NavigationPlan.Create) createScreen(plan.key)
             else require(plan.key.id in store) { "The screen entry is no longer active: ${plan.key.id}." }
 
-            plan.change?.let { (val fromIndex, val toIndex) ->
+            plan.change?.let { (val fromIndex, val toIndex, val popCurrent) ->
                 val firstRemoved = if (plan is NavigationPlan.Create) fromIndex else fromIndex + 1
-                if (firstRemoved < toIndex) removed = buildList {
+                if (popCurrent || firstRemoved < toIndex) removed = buildList {
+                    if (popCurrent) add(backStack.last())
                     for (index in firstRemoved  ..< toIndex) add(backStack[index])
                 }
                 runCatching {
                     Snapshot.withMutableSnapshot {
+                        if (popCurrent) backStack.removeAt(backStack.lastIndex)
                         if (fromIndex < toIndex) backStack.removeRange(fromIndex, toIndex)
                         backStack.add(plan.key)
                     }
