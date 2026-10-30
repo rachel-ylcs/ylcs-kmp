@@ -1,0 +1,28 @@
+headers = SDL3/SDL_dialog.h SDL3/SDL_properties.h SDL3/SDL_error.h
+headerFilter = SDL3/SDL_dialog.h SDL3/SDL_properties.h SDL3/SDL_error.h
+package = love.yinlin.picker.internal
+---
+#include <SDL3/SDL_video.h>
+static inline void *RachelPicker_FindWindow(Uint64 handle) {
+    int count = 0;
+    SDL_Window **windows = SDL_GetWindows(&count);
+    if (!windows) return NULL;
+    SDL_Window *result = NULL;
+    for (int index = 0; index < count; ++index) {
+        SDL_PropertiesID properties = SDL_GetWindowProperties(windows[index]);
+#if defined(SDL_PLATFORM_WINDOWS)
+        bool matches = (Uint64)(uintptr_t)SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL) == handle;
+#elif defined(SDL_PLATFORM_MACOS)
+        bool matches = (Uint64)(uintptr_t)SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL) == handle;
+#else
+        bool matches = (Uint64)SDL_GetNumberProperty(properties, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0) == handle ||
+            (Uint64)(uintptr_t)SDL_GetPointerProperty(properties, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL) == handle;
+#endif
+        if (matches) {
+            result = windows[index];
+            break;
+        }
+    }
+    SDL_free(windows);
+    return result;
+}

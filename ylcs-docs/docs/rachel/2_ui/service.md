@@ -39,7 +39,8 @@ class SessionStartup(pool: StartupPool) : AsyncStartup(pool) {
 在应用构造阶段注册服务：
 
 ```kotlin
-val kv by startup(StartupKVFactory(configPath))
+private val kvService by startup(StartupKV.Factory(configPath))
+val kv get() = kvService.kv
 val session by startup(SessionStartup.Factory())
 val player by startupLazy(StartupMusicPlayer.Factory())
 ```
@@ -93,27 +94,28 @@ private val prepareCache by async(
 
 | 模块或服务 | 作用 |
 | --- | --- |
-| `StartupKV` / `compose:startup:mmkv-kmp` | 跨平台键值存储 |
-| `StartupConfig` / `compose:startup:config` | 基于 KV 的可观察持久配置 |
-| `StartupPicker` / `compose:startup:picker` | 文件与目录选择等平台交互 |
-| `StartupExceptionHandler` / `compose:startup:exception` | 未处理异常收集与自定义记录 |
+| `KVManager` / `foundation:kv` | 显式注册上下文和存储目录的跨平台键值存储 |
+| `Config` / `compose:config` | 注入 KV 的可观察持久配置 |
+| `PickerManager` / `foundation:picker` | 显式注册上下文的系统选择器 |
+| `ExceptionManager` / `foundation:exception` | 未处理异常收集与自定义记录 |
 | `ImageManager` / `compose:components:image` | 图片解码与缓存；由应用持有初始化及关闭生命周期 |
 | `compose:cache` | 内存状态缓存与磁盘缓存抽象 |
 
-`ylcs-app/app/global` 中的 `StartupCache` 与 `StartupImage` 是业务应用的服务组合示例，后者使用同步工厂初始化 `ImageManager`，在 `destroy()` 中关闭管理器；它们不是基础库导出的内置 Startup。配置服务与异常记录等依赖可参考 `AbstractRachelApplication`，新增依赖时仍需核对真实图关系。
+`ylcs-app/app/global` 中的 `StartupKV`、`StartupPicker`、`StartupAppConfig`、`StartupExceptionHandler`、`StartupCache` 与 `StartupImage` 是业务应用的服务组合示例。它们在构造时注册对应管理器，在 `destroy()` 中关闭管理器；基础库本身不依赖 Startup。配置服务与异常记录等依赖可参考 `AbstractRachelApplication`，新增依赖时仍需核对真实图关系。
 
 ## 配置委托
 
 ```kotlin
-class AppConfig(pool: StartupPool) : StartupConfig(pool) {
+class AppConfig(kv: KV) : Config(kv) {
     var darkMode by booleanState(default = false)
     var fontScale by floatState(default = 1f)
 }
 
-val config by startup(StartupConfig.custom(::AppConfig))
+KVManager.initialize(context, configPath)
+val config = AppConfig(KVManager.kv)
 ```
 
-`StartupConfig.custom` 固定依赖 `StartupKV`。配置接口包括 `booleanState`、`intState`、`longState`、`floatState`、`doubleState`、`stringState`、`enumState`、`jsonState`、`listState`、`mapState` 与 `cacheState`。
+`Config` 不持有 KV 的销毁权；应用退出时由创建者关闭 KV，使用管理器时调用 `KVManager.shutdown()`。业务可通过依赖 `StartupKV` 的同步服务创建配置对象，继续暴露 `app.config.xxx`。配置接口包括 `booleanState`、`intState`、`longState`、`floatState`、`doubleState`、`stringState`、`enumState`、`jsonState`、`listState`、`mapState` 与 `cacheState`。
 
 配置键由属性名与版本参数按实现组合。重命名属性或调整版本会影响读取的存储键，应明确旧值迁移或重置规则。复杂 JSON 的兼容性由配置模型负责。
 
@@ -150,10 +152,12 @@ class StartupImage(pool: StartupPool, appName: String, configuration: ImageConfi
 }
 ```
 
-基础库使用方可以采用相同的生命周期模式，并按依赖关系注册工厂。`StartupImage` 不会让 `compose:startup:config`、MMKV 或 Picker 自动获得桌面 Native 支持；这几个可选模块的目标需要分别核对。依赖执行顺序与逆序销毁的测试见 `foundation/startup` 的 `TestStartupDependencies`。
+基础库使用方可以采用相同的生命周期模式，并按依赖关系注册工厂，也可以在普通应用入口直接初始化管理器。Picker、MMKV、Config 和 Exception 均已启用桌面 Native target。依赖执行顺序与逆序销毁的测试见 `foundation/startup` 的 `TestStartupDependencies`。
 
 ## 源码入口
 
 - `ylcs-module/foundation/startup/src/commonMain/kotlin/love/yinlin/foundation/StartupPool.kt`
 - `ylcs-module/compose/app/src/commonMain/kotlin/love/yinlin/compose/StateStartupMap.kt`
-- `ylcs-module/compose/startup/config/src/commonMain/kotlin/love/yinlin/startup/StartupConfig.kt`
+- `ylcs-module/compose/config/src/commonMain/kotlin/love/yinlin/compose/config/Config.kt`
+- `ylcs-module/foundation/kv/src/commonMain/kotlin/love/yinlin/kv/KVManager.kt`
+- `ylcs-module/foundation/picker/src/commonMain/kotlin/love/yinlin/picker/PickerManager.kt`

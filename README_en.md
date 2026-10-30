@@ -110,7 +110,7 @@ Find modules by purpose:
 ## Core and foundation
 
 <details open>
-<summary>13 modules · Platform basics, files, networking, compression, cryptography and parsing</summary>
+<summary>16 modules · Platform basics, files, networking, compression, cryptography and parsing</summary>
 
 ### Core
 
@@ -140,6 +140,15 @@ Find modules by purpose:
 - **[fts](ylcs-module/foundation/fts) · All platforms**<br>
   Multi-field full-text, prefix, whole-word and fuzzy search
 
+- **[kv](ylcs-module/foundation/kv) · All platforms**<br>
+  Platform KV storage; mobile/desktop MMKV and Web storage adapters
+
+- **[picker](ylcs-module/foundation/picker) · All platforms**<br>
+  Platform file and directory pickers
+
+- **[exception](ylcs-module/foundation/exception) · All platforms**<br>
+  Unhandled exception collection and reporting service
+
 ### Text and data parsers · `foundation/parser/`
 
 - **[arguments](ylcs-module/foundation/parser/arguments) · All platforms**<br>
@@ -162,7 +171,7 @@ Find modules by purpose:
 ## Compose UI and applications
 
 <details open>
-<summary>Core libraries · 9 modules · Themes, UI, navigation, application entry points and games</summary>
+<summary>Core libraries · 10 modules · Themes, UI, navigation, application entry points and games</summary>
 
 ### Core libraries · `compose/`
 
@@ -190,27 +199,13 @@ Find modules by purpose:
 - **[app](ylcs-module/compose/app) · All platforms**<br>
   Application entry points, themes and window lifecycles
 
+- **[config](ylcs-module/compose/config) · All platforms**<br>
+  Observable persistent configuration backed by KV storage
+
 ### Games · `compose/game/`
 
 - **[core](ylcs-module/compose/game/core) · All platforms**<br>
   Compose game engine, entities, viewports, events and plugins
-
-</details>
-
-<details>
-<summary>Startup services · 4 modules · Configuration, exceptions, KV storage and pickers (compose/startup)</summary>
-
-- **[config](ylcs-module/compose/startup/config) · Android · iOS · Desktop JVM · Web**<br>
-  Observable persistent configuration backed by KV storage
-
-- **[exception](ylcs-module/compose/startup/exception) · All platforms**<br>
-  Unhandled exception collection and reporting service
-
-- **[mmkv-kmp](ylcs-module/compose/startup/mmkv-kmp) · Android · iOS · Desktop JVM · Web**<br>
-  Platform KV storage; mobile/desktop MMKV and Web storage adapters
-
-- **[picker](ylcs-module/compose/startup/picker) · Android · iOS · Desktop JVM · Web**<br>
-  Platform file and directory pickers
 
 </details>
 
@@ -387,7 +382,6 @@ Sort by first letter.
 |:--------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | Library  |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
 | Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
-| Library  |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
 | Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
 | Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
 | Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |

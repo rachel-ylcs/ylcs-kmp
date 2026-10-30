@@ -1,0 +1,7 @@
+headers = rachel_kv.h
+headerFilter = rachel_kv.h
+package = love.yinlin.kv.internal
+staticLibraries = librachel_kv.a libcore.a
+linkerOpts.mingw = -ladvapi32
+linkerOpts.linux = -lstdc++fs -lstdc++ -lpthread
+linkerOpts.osx = -lc++

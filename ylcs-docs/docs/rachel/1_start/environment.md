@@ -142,7 +142,7 @@ XCODEPROJ_PATH="$PWD/ylcs-app/iosApp/iosApp.xcodeproj" \
 
 CI 的 `.github/actions/package-ios` 会先生成 SwiftPM 链接包，再以 Release 配置归档 iOS 真机应用并打包未签名 IPA。仅执行 `linkDebugFrameworkIosArm64` 不会验证 Swift 宿主编译和 Xcode 归档。
 
-`mmkv-kmp` 设置 `swiftDiscoverClangModulesImplicitly = false`，按声明的 `MMKV` 模块导入公开 Objective-C API。其内部 `MMKVCoreOpenSSL` 模块包含需要预先定义宏的模板头文件，自动扫描并尝试独立导入这些头文件会产生 cinterop 错误诊断；即使 Gradle 返回成功，Xcode 仍会将这些诊断记为脚本阶段错误并使归档失败。该配置仅收窄 Kotlin API 的导入范围，底层依赖仍由 SwiftPM 编译和链接。
+`kv` 设置 `swiftDiscoverClangModulesImplicitly = false`，按声明的 `MMKV` 模块导入公开 Objective-C API。其内部 `MMKVCoreOpenSSL` 模块包含需要预先定义宏的模板头文件，自动扫描并尝试独立导入这些头文件会产生 cinterop 错误诊断；即使 Gradle 返回成功，Xcode 仍会将这些诊断记为脚本阶段错误并使归档失败。该配置仅收窄 Kotlin API 的导入范围，底层依赖仍由 SwiftPM 编译和链接。
 
 ### Linux Release 与 AOT
 

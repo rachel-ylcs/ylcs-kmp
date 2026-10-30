@@ -122,5 +122,6 @@ open class KotlinNativeTemplate : KotlinTemplate<KotlinMultiplatformExtension>()
         }
 
         configureActions()
+        registerNativeCpp(extension)
     }
 }

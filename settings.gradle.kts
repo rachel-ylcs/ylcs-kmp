@@ -106,6 +106,7 @@ repository {
             module("foundation") {
                 module("context")
                 module("filesystem", "network", "startup")
+                module("picker", "kv", "exception")
                 module("compression", "cryptography")
                 module("fts")
                 module("parser") {
@@ -115,12 +116,9 @@ repository {
 
             module("compose") {
                 module("core")
-                module("theme", "ui", "icons", "platform-view", "screen", "cache", "app")
+                module("theme", "ui", "icons", "platform-view", "screen", "cache", "app", "config")
                 module("game") {
                     module("core")
-                }
-                module("startup") {
-                    module("config", "exception", "mmkv-kmp", "picker")
                 }
                 module("components") {
                     module(

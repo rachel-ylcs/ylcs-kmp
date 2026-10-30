@@ -30,6 +30,16 @@ open class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
     }
     internal fun KotlinJvmSourceSetsScope.source() { sourceBlock(this) }
 
+    private var desktopBlock: KotlinJvmExtension.() -> Unit = {}
+    fun desktop(block: KotlinJvmExtension.() -> Unit) {
+        val previous = desktopBlock
+        desktopBlock = {
+            previous()
+            block()
+        }
+    }
+    internal fun KotlinJvmExtension.desktop() { desktopBlock(this) }
+
     var jvmName: String = ""
     var jvmMainClass: String? = null
     var jvmArgs: List<String> = emptyList()
@@ -55,6 +65,8 @@ open class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
                 jvmTarget.set(JvmTarget.fromTarget(buildDefaults.jvm.target))
             }
 
+            desktop()
+
             KotlinJvmSourceSetsScope(this@build, sourceSets).source()
 
             action()
@@ -72,6 +84,6 @@ open class KotlinJvmTemplate : KotlinTemplate<KotlinJvmExtension>() {
 
         configureActions()
         registerDesktopProguard(extension.target.compilations.getByName("main"))
-        registerDesktopNative(desktopNativeJVMSourceDir, "jar")
+        registerDesktopNative(desktopNativeJVMSourceDir, "jar", desktopCppSources)
     }
 }

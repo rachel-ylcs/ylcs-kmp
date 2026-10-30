@@ -25,12 +25,12 @@ rachel {
                     projects.ylcsApp.thirdParty,
 
                     projects.ylcsModule.foundation.cryptography,
+                    projects.ylcsModule.foundation.picker,
 
                     projects.ylcsModule.cs.clientEngine,
 
-                    projects.ylcsModule.compose.startup.picker,
-                    projects.ylcsModule.compose.startup.exception,
-                    projects.ylcsModule.compose.startup.config,
+                    projects.ylcsModule.foundation.exception,
+                    projects.ylcsModule.compose.config,
 
                     projects.ylcsModule.compose.app,
                     projects.ylcsModule.compose.cache,

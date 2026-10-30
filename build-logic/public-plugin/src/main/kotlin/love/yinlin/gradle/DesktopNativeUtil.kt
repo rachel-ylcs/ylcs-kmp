@@ -13,9 +13,10 @@ import org.gradle.kotlin.dsl.withType
 
 private const val NativeUsage = "rachel-desktop-native"
 
-internal fun Project.registerDesktopNative(source: Directory, jarTaskName: String) {
+internal fun Project.registerDesktopNative(source: Directory, jarTaskName: String, additionalSources: List<String> = emptyList()) {
     val producer = tasks.register<BuildDesktopNativeTask>("buildDesktopNative") {
         inputDir.set(source)
+        additionalSourceDirs.from(additionalSources.map(::file))
         onlyIf("CMake sources are present and are not ignored") { ensureNativeBuild(inputDir.get().asFile) }
     }
     tasks.matching { it.name == jarTaskName }.configureEach { dependsOn(producer) }

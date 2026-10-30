@@ -109,7 +109,7 @@ implementation("love.yinlin.compose:app:x.x.x")
 ## 核心与基础能力
 
 <details open>
-<summary>13 个模块 · 平台基础、文件、网络、压缩、加密与解析</summary>
+<summary>16 个模块 · 平台基础、文件、网络、压缩、加密与解析</summary>
 
 ### 核心
 
@@ -139,6 +139,15 @@ implementation("love.yinlin.compose:app:x.x.x")
 - **[fts](ylcs-module/foundation/fts) · 全平台**<br>
   多字段全文、前缀、整词与模糊检索
 
+- **[kv](ylcs-module/foundation/kv) · 全平台**<br>
+  平台键值存储；移动端/桌面 MMKV 与 Web 存储适配
+
+- **[picker](ylcs-module/foundation/picker) · 全平台**<br>
+  文件、目录等平台选择器
+
+- **[exception](ylcs-module/foundation/exception) · 全平台**<br>
+  未处理异常收集与记录服务
+
 ### 文本与数据解析 · `foundation/parser/`
 
 - **[arguments](ylcs-module/foundation/parser/arguments) · 全平台**<br>
@@ -161,7 +170,7 @@ implementation("love.yinlin.compose:app:x.x.x")
 ## Compose 界面与应用
 
 <details open>
-<summary>基础模块 · 9 个模块 · 主题、UI、导航、应用入口与游戏</summary>
+<summary>基础模块 · 10 个模块 · 主题、UI、导航、应用入口与游戏</summary>
 
 ### 基础模块 · `compose/`
 
@@ -189,27 +198,13 @@ implementation("love.yinlin.compose:app:x.x.x")
 - **[app](ylcs-module/compose/app) · 全平台**<br>
   跨平台应用入口、主题与窗口生命周期
 
+- **[config](ylcs-module/compose/config) · 全平台**<br>
+  基于 KV 的可观察持久配置
+
 ### 游戏 · `compose/game/`
 
 - **[core](ylcs-module/compose/game/core) · 全平台**<br>
   Compose 游戏引擎、实体、视口、事件与插件
-
-</details>
-
-<details>
-<summary>启动服务 · 4 个模块 · 配置、异常、键值存储与选择器（compose/startup）</summary>
-
-- **[config](ylcs-module/compose/startup/config) · Android · iOS · JVM 桌面 · Web**<br>
-  基于 KV 的可观察持久配置
-
-- **[exception](ylcs-module/compose/startup/exception) · 全平台**<br>
-  未处理异常收集与记录服务
-
-- **[mmkv-kmp](ylcs-module/compose/startup/mmkv-kmp) · Android · iOS · JVM 桌面 · Web**<br>
-  平台键值存储；移动端/桌面 MMKV 与 Web 存储适配
-
-- **[picker](ylcs-module/compose/startup/picker) · Android · iOS · JVM 桌面 · Web**<br>
-  文件、目录等平台选择器
 
 </details>
 
@@ -384,7 +379,6 @@ https://private-user-images.githubusercontent.com/76944654/586743677-ce62598a-75
 |:--------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | Library  |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
 | Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
-| Library  |     mlabbe      |                                                   [nativefiledialog](https://github.com/mlabbe/nativefiledialog)                                                   |
 | Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
 | Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
 | Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |

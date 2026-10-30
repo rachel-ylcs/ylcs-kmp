@@ -1,0 +1,53 @@
+import love.yinlin.gradle.ExportLib
+
+plugins {
+    install(
+        libs.plugins.rachel,
+        libs.plugins.kotlinMultiplatform,
+        libs.plugins.kotlinSerialization,
+        libs.plugins.androidLibrary,
+        libs.plugins.mavenPublish,
+        libs.plugins.dokka,
+    )
+}
+
+rachel {
+    multiplatform {
+        nativeDesktopTarget = true
+
+        sources {
+            commonMain {
+                lib(
+                    ExportLib,
+                    projects.ylcsModule.core,
+                )
+            }
+
+            appleMain(commonMain)
+
+            jvmMain(commonMain)
+
+            androidMain(jvmMain)
+
+            iosMain(appleMain)
+
+            iosMainList(iosMain)
+
+            desktopMain(jvmMain)
+
+            webMain(commonMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
+
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(appleMain)
+        }
+    }
+}

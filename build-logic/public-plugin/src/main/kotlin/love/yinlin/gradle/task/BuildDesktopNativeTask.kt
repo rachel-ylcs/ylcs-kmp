@@ -3,6 +3,7 @@ package love.yinlin.gradle.task
 import love.yinlin.gradle.BuildArchitecture
 import love.yinlin.gradle.BuildPlatform
 import love.yinlin.gradle.buildDefaults
+import love.yinlin.gradle.cmakeCacheNeedsReset
 import love.yinlin.gradle.defaultNativeModuleName
 import love.yinlin.gradle.desktopNativeBuildDir
 import org.gradle.api.DefaultTask
@@ -31,6 +32,10 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val inputDir: DirectoryProperty
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val additionalSourceDirs: ConfigurableFileCollection
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
@@ -106,11 +111,13 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
         build.mkdirs()
         val platform = nativePlatform.get()
         val type = buildType.get()
+        val fresh = if (cmakeCacheNeedsReset(build, inputDir.get().asFile)) "--fresh " else ""
         val options = buildList {
             add("CMAKE_BUILD_TYPE" to type)
             add("NATIVE_JNI_DIR" to "\"${nativeJniDir.get().asFile.absolutePath}\"")
             add("NATIVE_OUTPUT_DIR" to "\"${output.absolutePath}\"")
             add("NATIVE_OUTPUT_NAME" to nativeModuleName.get())
+            add("RACHEL_CPP_SOURCE_DIRS" to "\"${additionalSourceDirs.files.joinToString(";") { it.invariantSeparatorsPath }}\"")
             if (platform == BuildPlatform.Windows) add("CMAKE_SHARED_LINKER_FLAGS" to "\"/NOEXP /NOIMPLIB\"")
             addAll(cmakeOptions.get())
         }.joinToString(" ") { (key, value) -> "-D$key=$value" }
@@ -121,9 +128,9 @@ abstract class BuildDesktopNativeTask : DefaultTask() {
             val vcvars = File(visualStudio).resolve("VC/Auxiliary/Build/vcvars64.bat")
             if (!vcvars.isFile) throw GradleException("Can not find Visual Studio from VS_PATH environment variable!")
             commands.add(0, "call \"$vcvars\"")
-            commands.add("cmake \"%NATIVE_SOURCE_DIR%\" -G Ninja $options")
+            commands.add("cmake ${fresh}\"%NATIVE_SOURCE_DIR%\" -G Ninja $options")
         }
-        else commands.add($$"cmake \"${NATIVE_SOURCE_DIR}\" $$options")
+        else commands.add($$"cmake $$fresh\"${NATIVE_SOURCE_DIR}\" $$options")
         commands.add("cmake --build . --config $type --parallel ${parallelism.get()}")
         execOperations.exec {
             workingDir(build)
