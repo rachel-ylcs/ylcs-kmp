@@ -91,76 +91,249 @@ The interface library covers various components such as themes, text, inputs, im
 
 # Cross-Platform Module Support
 
-The hierarchy below covers every module under `ylcs-module`. `✅` indicates a supported target; `➖` indicates a target that is not enabled or has only a no-op/placeholder implementation. Feature-specific limits are described in the purpose column. Build tools run in Gradle and have no application runtime targets. A supported target does not establish that every API has been tested on every platform.
+Browse all 54 modules under `ylcs-module` by function. Each module name links to its source directory, followed by its supported platforms, purpose and platform-specific limits.
 
-| Module hierarchy (under `ylcs-module/`) | Android | iOS | Desktop JVM | WasmJS | JS | Native Windows | Native Linux | Native macOS | Purpose |
-| --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | --- |
-| [`├─ build-tool`](ylcs-module/build-tool) | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Aggregate platform test tasks; no application runtime target |
-| [`├─ dokka`](ylcs-module/dokka) | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Aggregate module APIs into the Dokka site; no application runtime target |
-| [`├─ core`](ylcs-module/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Platform detection, coroutines, serialization, collections, encodings and byte operations |
-| **`├─ foundation/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  ├─ context`](ylcs-module/foundation/context) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Platform context and host capability providers |
-| [`│  ├─ filesystem`](ylcs-module/foundation/filesystem) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Files, streams, platform directories and implicit file URIs |
-| [`│  ├─ network`](ylcs-module/foundation/network) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Ktor HTTP requests, downloads and text WebSockets |
-| [`│  ├─ startup`](ylcs-module/foundation/startup) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Startup dependency graphs, initialization and teardown |
-| [`│  ├─ compression`](ylcs-module/foundation/compression) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | RLE, LZ4, Snappy, Deflate, Zlib and Gzip codecs |
-| [`│  ├─ cryptography`](ylcs-module/foundation/cryptography) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Digests, symmetric ciphers and encoding utilities |
-| [`│  ├─ fts`](ylcs-module/foundation/fts) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Multi-field full-text, prefix, whole-word and fuzzy search |
-| **`│  ├─ parser/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  │  ├─ arguments`](ylcs-module/foundation/parser/arguments) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Command-line parsing and typed argument access |
-| [`│  │  ├─ lrc`](ylcs-module/foundation/parser/lrc) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | LRC lyrics, timestamps and metadata parsing and writing |
-| [`│  │  ├─ markdown`](ylcs-module/foundation/parser/markdown) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Markdown syntax trees, DSL, parsing and writing |
-| [`│  │  ├─ toml`](ylcs-module/foundation/parser/toml) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | TOML document model, DSL, parsing and writing |
-| [`│  │  ├─ yaml`](ylcs-module/foundation/parser/yaml) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | YAML document model, DSL, parsing and writing |
-| **`├─ compose/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  ├─ core`](ylcs-module/compose/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Compose state helpers, graphics utilities and lifecycle signals |
-| [`│  ├─ theme`](ylcs-module/compose/theme) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Themes, typography, dimensions, insets and layout classification |
-| [`│  ├─ ui`](ylcs-module/compose/ui) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Basic layouts, text, inputs, images, animations and floating UI |
-| [`│  ├─ icons`](ylcs-module/compose/icons) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Compose icon resources |
-| [`│  ├─ platform-view`](ylcs-module/compose/platform-view) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Android View, Swing, UIKit and DOM hosts; Native exposes the common state layer only |
-| [`│  ├─ screen`](ylcs-module/compose/screen) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Navigation 3 screens and ViewModel lifecycles |
-| [`│  ├─ cache`](ylcs-module/compose/cache) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | In-memory state caches and persistent cache abstractions |
-| [`│  ├─ app`](ylcs-module/compose/app) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Application entry points, themes and window lifecycles |
-| **`│  ├─ game/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  │  ├─ core`](ylcs-module/compose/game/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Compose game engine, entities, viewports, events and plugins |
-| **`│  ├─ startup/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  │  ├─ config`](ylcs-module/compose/startup/config) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | Observable persistent configuration backed by KV storage |
-| [`│  │  ├─ exception`](ylcs-module/compose/startup/exception) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Unhandled exception collection and reporting service |
-| [`│  │  ├─ mmkv-kmp`](ylcs-module/compose/startup/mmkv-kmp) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | Platform KV storage; mobile/desktop MMKV and Web storage adapters |
-| [`│  │  ├─ picker`](ylcs-module/compose/startup/picker) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | Platform file and directory pickers |
-| **`│  ├─ components/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  │  ├─ image`](ylcs-module/compose/components/image) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Async images, animations, zoom, caching and crop regions |
-| [`│  │  ├─ blur`](ylcs-module/compose/components/blur) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Blur and mask effects |
-| [`│  │  ├─ calendar`](ylcs-module/compose/components/calendar) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Calendars, lunar dates and date-selection state |
-| [`│  │  ├─ data-table`](ylcs-module/compose/components/data-table) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Data tables, sorting, editing and selection |
-| [`│  │  ├─ drag-drop`](ylcs-module/compose/components/drag-drop) | ✅ | ➖ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Text and file drag-and-drop; the iOS implementation is currently a no-op |
-| [`│  │  ├─ hexview`](ylcs-module/compose/components/hexview) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Hexadecimal data viewer |
-| [`│  │  ├─ log-output`](ylcs-module/compose/components/log-output) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Log output and viewer components |
-| [`│  │  ├─ lottie`](ylcs-module/compose/components/lottie) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Lottie animation rendering |
-| [`│  │  ├─ media`](ylcs-module/compose/components/media) | ✅ | ✅ | ✅ | ✅ | ✅ | ➖ | ➖ | ➖ | Audio, music and video; JVM Linux/macOS video backends are currently no-ops |
-| [`│  │  ├─ pagination-layout`](ylcs-module/compose/components/pagination-layout) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Paginated data state and loading layouts |
-| [`│  │  ├─ qrcode`](ylcs-module/compose/components/qrcode) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | QR generation on all targets; scanning implemented on Android/iOS only |
-| [`│  │  ├─ reordering`](ylcs-module/compose/components/reordering) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Drag-to-reorder lists |
-| [`│  │  ├─ rich-text`](ylcs-module/compose/components/rich-text) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Rich-text parsing, nodes and rendering |
-| [`│  │  ├─ webview`](ylcs-module/compose/components/webview) | ✅ | ✅ | ➖ | ✅ | ✅ | ➖ | ➖ | ➖ | Android/iOS/Web views; JVM provides a placeholder implementation |
-| **`├─ cs/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  ├─ core`](ylcs-module/cs/core) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Shared API, resource-tree, file-parameter and socket contracts |
-| [`│  ├─ client-engine`](ylcs-module/cs/client-engine) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Typed POST and multipart requests and socket client helpers |
-| [`│  ├─ server-engine`](ylcs-module/cs/server-engine) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ✅ | Ktor CIO native server, routes, uploads and plugins |
-| [`│  ├─ server-service-mysql`](ylcs-module/cs/server-service-mysql) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ✅ | SQLx4k MySQL pools, queries and transactions |
-| [`│  ├─ server-service-redis`](ylcs-module/cs/server-service-redis) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ✅ | ✅ | ReThis Redis pools and command helpers |
-| **`├─ native/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| **`│  ├─ win32/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  │  ├─ core`](ylcs-module/native/win32/core) | ➖ | ➖ | ➖ | ➖ | ➖ | ✅ | ➖ | ➖ | Kotlin/Native Win32 foundations |
-| **`├─ platform/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  ├─ native-lib-loader`](ylcs-module/platform/native-lib-loader) | ✅ | ✅ | ✅ | ➖ | ➖ | ✅ | ✅ | ✅ | Native library loading; Web calls are no-ops |
-| **`│  ├─ ffi/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  │  ├─ core`](ylcs-module/platform/ffi/core) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | JDK Foreign Function & Memory API foundations |
-| [`│  │  ├─ posix`](ylcs-module/platform/ffi/posix) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | POSIX libc access from JVM on the relevant operating systems |
-| [`│  │  ├─ win32`](ylcs-module/platform/ffi/win32) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | Win32 access from JVM on Windows |
-| **`│  ├─ os/`** | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | ➖ | Module group |
-| [`│  │  ├─ single-instance`](ylcs-module/platform/os/single-instance) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | OS-level single-instance locks for JVM desktop applications |
-| [`│  │  ├─ window`](ylcs-module/platform/os/window) | ➖ | ➖ | ✅ | ➖ | ➖ | ➖ | ➖ | ➖ | JVM native-window click-through; Linux is currently a no-op |
+- **All platforms**: Android, iOS, Desktop JVM, Web (JS / WasmJS), and Native Windows / Linux / macOS.
+- **Web**: both JS and WasmJS; any differences are listed separately.
+- **Desktop JVM** and **Native Windows / Linux / macOS** identify JVM and Kotlin/Native targets respectively. Modules limited to particular operating systems list those systems explicitly.
+
+An omitted platform has no enabled target or only a no-op/placeholder implementation. Individual API limitations appear in the module descriptions. A supported target does not establish that every API has been tested on that platform. Build tools run in Gradle and have no application runtime targets.
+
+Find modules by purpose:
+
+- **[Core and foundation](#core-and-foundation)**: Platform basics, coroutines, files, networking, compression, cryptography and parsing.
+- **[Compose UI and applications](#compose-ui-and-applications)**: Themes, UI, navigation, application entry points, games, startup services and components.
+- **[Client and server](#client-and-server)**: Shared contracts, client engine, Native servers and databases.
+- **[Platform integration](#platform-integration)**: Win32, library loading, JVM FFI and operating-system features.
+- **[Build tools](#build-tools)**: Test aggregation and API documentation.
+
+## Core and foundation
+
+<details open>
+<summary>13 modules · Platform basics, files, networking, compression, cryptography and parsing</summary>
+
+### Core
+
+- **[core](ylcs-module/core) · All platforms**<br>
+  Platform detection, coroutines, serialization, collections, encodings and byte operations
+
+### Foundation services · `foundation/`
+
+- **[context](ylcs-module/foundation/context) · All platforms**<br>
+  Platform context and host capability providers
+
+- **[filesystem](ylcs-module/foundation/filesystem) · All platforms**<br>
+  Files, streams, platform directories and implicit file URIs
+
+- **[network](ylcs-module/foundation/network) · All platforms**<br>
+  Ktor HTTP requests, downloads and text WebSockets
+
+- **[startup](ylcs-module/foundation/startup) · All platforms**<br>
+  Startup dependency graphs, initialization and teardown
+
+- **[compression](ylcs-module/foundation/compression) · All platforms**<br>
+  RLE, LZ4, Snappy, Deflate, Zlib and Gzip codecs
+
+- **[cryptography](ylcs-module/foundation/cryptography) · All platforms**<br>
+  Digests, symmetric ciphers and encoding utilities
+
+- **[fts](ylcs-module/foundation/fts) · All platforms**<br>
+  Multi-field full-text, prefix, whole-word and fuzzy search
+
+### Text and data parsers · `foundation/parser/`
+
+- **[arguments](ylcs-module/foundation/parser/arguments) · All platforms**<br>
+  Command-line parsing and typed argument access
+
+- **[lrc](ylcs-module/foundation/parser/lrc) · All platforms**<br>
+  LRC lyrics, timestamps and metadata parsing and writing
+
+- **[markdown](ylcs-module/foundation/parser/markdown) · All platforms**<br>
+  Markdown syntax trees, DSL, parsing and writing
+
+- **[toml](ylcs-module/foundation/parser/toml) · All platforms**<br>
+  TOML document model, DSL, parsing and writing
+
+- **[yaml](ylcs-module/foundation/parser/yaml) · All platforms**<br>
+  YAML document model, DSL, parsing and writing
+
+</details>
+
+## Compose UI and applications
+
+<details open>
+<summary>Core libraries · 9 modules · Themes, UI, navigation, application entry points and games</summary>
+
+### Core libraries · `compose/`
+
+- **[core](ylcs-module/compose/core) · All platforms**<br>
+  Compose state helpers, graphics utilities and lifecycle signals
+
+- **[theme](ylcs-module/compose/theme) · All platforms**<br>
+  Themes, typography, dimensions, insets and layout classification
+
+- **[ui](ylcs-module/compose/ui) · All platforms**<br>
+  Basic layouts, text, inputs, images, animations and floating UI
+
+- **[icons](ylcs-module/compose/icons) · All platforms**<br>
+  Compose icon resources
+
+- **[platform-view](ylcs-module/compose/platform-view) · All platforms**<br>
+  Android View, Swing, UIKit and DOM hosts; Native exposes the common state layer only
+
+- **[screen](ylcs-module/compose/screen) · All platforms**<br>
+  Navigation 3 screens and ViewModel lifecycles
+
+- **[cache](ylcs-module/compose/cache) · All platforms**<br>
+  In-memory state caches and persistent cache abstractions
+
+- **[app](ylcs-module/compose/app) · All platforms**<br>
+  Application entry points, themes and window lifecycles
+
+### Games · `compose/game/`
+
+- **[core](ylcs-module/compose/game/core) · All platforms**<br>
+  Compose game engine, entities, viewports, events and plugins
+
+</details>
+
+<details>
+<summary>Startup services · 4 modules · Configuration, exceptions, KV storage and pickers (compose/startup)</summary>
+
+- **[config](ylcs-module/compose/startup/config) · Android · iOS · Desktop JVM · Web**<br>
+  Observable persistent configuration backed by KV storage
+
+- **[exception](ylcs-module/compose/startup/exception) · All platforms**<br>
+  Unhandled exception collection and reporting service
+
+- **[mmkv-kmp](ylcs-module/compose/startup/mmkv-kmp) · Android · iOS · Desktop JVM · Web**<br>
+  Platform KV storage; mobile/desktop MMKV and Web storage adapters
+
+- **[picker](ylcs-module/compose/startup/picker) · Android · iOS · Desktop JVM · Web**<br>
+  Platform file and directory pickers
+
+</details>
+
+<details>
+<summary>UI components · 14 modules · Images, blur, calendars, drag-and-drop, media and QR codes (compose/components)</summary>
+
+- **[image](ylcs-module/compose/components/image) · All platforms**<br>
+  Async images, animations, zoom, caching and crop regions
+
+- **[blur](ylcs-module/compose/components/blur) · All platforms**<br>
+  Blur and mask effects
+
+- **[calendar](ylcs-module/compose/components/calendar) · All platforms**<br>
+  Calendars, lunar dates and date-selection state
+
+- **[data-table](ylcs-module/compose/components/data-table) · All platforms**<br>
+  Data tables, sorting, editing and selection
+
+- **[drag-drop](ylcs-module/compose/components/drag-drop) · Android · Desktop JVM · Web · Native Windows / Linux / macOS**<br>
+  Text and file drag-and-drop; the iOS implementation is currently a no-op
+
+- **[hexview](ylcs-module/compose/components/hexview) · All platforms**<br>
+  Hexadecimal data viewer
+
+- **[log-output](ylcs-module/compose/components/log-output) · All platforms**<br>
+  Log output and viewer components
+
+- **[lottie](ylcs-module/compose/components/lottie) · All platforms**<br>
+  Lottie animation rendering
+
+- **[media](ylcs-module/compose/components/media) · Android · iOS · Desktop JVM · Web**<br>
+  Audio, music and video; JVM Linux/macOS video backends are currently no-ops
+
+- **[pagination-layout](ylcs-module/compose/components/pagination-layout) · All platforms**<br>
+  Paginated data state and loading layouts
+
+- **[qrcode](ylcs-module/compose/components/qrcode) · All platforms**<br>
+  QR generation on all targets; scanning implemented on Android/iOS only
+
+- **[reordering](ylcs-module/compose/components/reordering) · All platforms**<br>
+  Drag-to-reorder lists
+
+- **[rich-text](ylcs-module/compose/components/rich-text) · All platforms**<br>
+  Rich-text parsing, nodes and rendering
+
+- **[webview](ylcs-module/compose/components/webview) · Android · iOS · Web**<br>
+  Android/iOS/Web views; JVM provides a placeholder implementation
+
+</details>
+
+## Client and server
+
+<details>
+<summary>5 modules · Shared contracts, client engine, Native servers, MySQL and Redis</summary>
+
+### Shared contracts and client · `cs/`
+
+- **[core](ylcs-module/cs/core) · All platforms**<br>
+  Shared API, resource-tree, file-parameter and socket contracts
+
+- **[client-engine](ylcs-module/cs/client-engine) · All platforms**<br>
+  Typed POST and multipart requests and socket client helpers
+
+### Native servers · `cs/`
+
+- **[server-engine](ylcs-module/cs/server-engine) · Native Windows / Linux / macOS**<br>
+  Ktor CIO native server, routes, uploads and plugins
+
+- **[server-service-mysql](ylcs-module/cs/server-service-mysql) · Native Windows / Linux / macOS**<br>
+  SQLx4k MySQL pools, queries and transactions
+
+- **[server-service-redis](ylcs-module/cs/server-service-redis) · Native Windows / Linux / macOS**<br>
+  ReThis Redis pools and command helpers
+
+</details>
+
+## Platform integration
+
+<details>
+<summary>7 modules · Win32, library loading, JVM FFI, windows and single-instance locks</summary>
+
+### Kotlin/Native Win32 · `native/win32/`
+
+- **[core](ylcs-module/native/win32/core) · Native Windows**<br>
+  Kotlin/Native Win32 foundations
+
+### Library loading · `platform/`
+
+- **[native-lib-loader](ylcs-module/platform/native-lib-loader) · Android · iOS · Desktop JVM · Native Windows / Linux / macOS**<br>
+  Native library loading; Web calls are no-ops
+
+### JVM FFI · `platform/ffi/`
+
+- **[core](ylcs-module/platform/ffi/core) · Desktop JVM**<br>
+  JDK Foreign Function & Memory API foundations
+
+- **[posix](ylcs-module/platform/ffi/posix) · Desktop JVM**<br>
+  POSIX libc access from JVM on the relevant operating systems
+
+- **[win32](ylcs-module/platform/ffi/win32) · Desktop JVM**<br>
+  Win32 access from JVM on Windows
+
+### Desktop operating systems · `platform/os/`
+
+- **[single-instance](ylcs-module/platform/os/single-instance) · Desktop JVM**<br>
+  OS-level single-instance locks for JVM desktop applications
+
+- **[window](ylcs-module/platform/os/window) · Desktop JVM**<br>
+  JVM native-window click-through; Linux is currently a no-op
+
+</details>
+
+## Build tools
+
+These modules run in Gradle and have no application runtime targets.
+
+- **[build-tool](ylcs-module/build-tool) · Gradle build tool**<br>
+  Aggregate platform test tasks; no application runtime target
+
+- **[dokka](ylcs-module/dokka) · Gradle build tool**<br>
+  Aggregate module APIs into the Dokka site; no application runtime target
+
+## Platform configuration and integration
 
 Targets and defaults come from each module’s `build.gradle.kts` and `build-logic/public-plugin` templates. WasmJS is the browser WebAssembly target. Native desktop targets are `mingwX64("windows")`, `linuxX64("linux")` and `macosArm64("macos")`; iOS includes `iosArm64` and, on an Apple Silicon macOS host, `iosSimulatorArm64`. Android currently uses minSdk 28 and packages `arm64-v8a`. Compose Native consumers need the matching [Native Compose bridge](native-compose/README.md); JVM FFI targets do not imply Kotlin/Native support. Platform permissions, system services and native dependencies remain API-specific.
 
