@@ -14,14 +14,15 @@ import love.yinlin.compose.screen.DeepLink
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.foundation.PlatformContext
+import love.yinlin.foundation.os.SingleInstance
 import love.yinlin.platform.Platform
-import love.yinlin.platform.SingleInstance
 import love.yinlin.uri.toUri
 import org.jetbrains.compose.resources.DrawableResource
 import java.awt.Desktop
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-    SingleInstance.run("${Local.info.appName}.lock")
+    if (!SingleInstance.run("${Local.info.appName}.lock")) exitProcess(0)
 
     // 配置 macOS 深度链接
     Platform.use(Platform.MacOS) {

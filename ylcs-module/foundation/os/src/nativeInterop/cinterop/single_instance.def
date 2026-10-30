@@ -1,0 +1,23 @@
+package = love.yinlin.foundation.os.internal
+excludedFunctions = RachelSingleInstanceMessageCallback
+linkerOpts = -framework CoreFoundation
+---
+#include <CoreFoundation/CoreFoundation.h>
+#include <stdbool.h>
+
+static CFDataRef RachelSingleInstanceMessageCallback(CFMessagePortRef port, SInt32 message, CFDataRef data, void *info) {
+    return NULL;
+}
+
+static inline void *RachelSingleInstanceCreatePort(const char *key) {
+    CFStringRef name = CFStringCreateWithCString(NULL, key, kCFStringEncodingUTF8);
+    if (!name) return NULL;
+    Boolean existing = false;
+    CFMessagePortRef port = CFMessagePortCreateLocal(NULL, name, RachelSingleInstanceMessageCallback, NULL, &existing);
+    CFRelease(name);
+    if (existing && port) {
+        CFRelease(port);
+        return NULL;
+    }
+    return port;
+}

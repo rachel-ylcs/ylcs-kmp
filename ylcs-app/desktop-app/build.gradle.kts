@@ -22,14 +22,11 @@ rachel {
         webTarget = false
 
         sources {
-            commonMain {
-                lib(libs.compose.resources)
-            }
-
-            desktopMain(commonMain) {
+            desktopMain {
                 lib(
+                    libs.compose.resources,
                     projects.ylcsApp.app.portal,
-                    projects.ylcsModule.platform.os.singleInstance,
+                    projects.ylcsModule.foundation.os,
                 )
             }
         }

@@ -105,7 +105,7 @@ repository {
 
             module("foundation") {
                 module("context", "libloader")
-                module("filesystem", "network", "startup")
+                module("filesystem", "network", "startup", "os")
                 module("picker", "kv", "exception")
                 module("compression", "cryptography")
                 module("fts")
@@ -147,19 +147,16 @@ repository {
                 module("server-service-mysql", "server-service-redis")
             }
 
-            module("native") {
-                module("win32") {
-                    module("core")
-                }
-            }
-
             module("platform") {
                 module("ffi") {
                     module("core")
                     module("posix", "win32")
                 }
-                module("os") {
-                    module("single-instance")
+
+                module("native") {
+                    module("win32") {
+                        module("core")
+                    }
                 }
             }
         }
