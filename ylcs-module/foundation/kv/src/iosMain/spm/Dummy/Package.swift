@@ -14,7 +14,7 @@ let package = Package(
         .target(
             name: "Dummy",
             linkerSettings: [
-                .linkedFramework("UIKit")
+                .linkedFramework("UIKit", .when(platforms: [.iOS]))
             ]
         )
     ]

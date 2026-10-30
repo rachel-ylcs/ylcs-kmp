@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(rachel_kv LANGUAGES C CXX)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(zlib "" CACHE FILEPATH "" FORCE)
 set(MMKV_CORE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/mmkv/Core")
 if(RACHEL_NATIVE_TARGET)

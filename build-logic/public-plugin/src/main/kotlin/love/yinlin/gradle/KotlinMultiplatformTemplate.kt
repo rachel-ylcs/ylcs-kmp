@@ -355,11 +355,14 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
                         @OptIn(ExperimentalKotlinGradlePluginApi::class)
                         for (pkg in swiftPackages) {
                             when (pkg) {
-                                is SwiftPackage.Remote -> swiftPackage(pkg.url, pkg.version, pkg.products)
+                                is SwiftPackage.Remote -> swiftPackage(
+                                    url = url(pkg.url),
+                                    version = from(pkg.version),
+                                    products = pkg.products.map { product(it, platforms = setOf(iOS())) },
+                                )
                                 is SwiftPackage.Local -> localSwiftPackage(
                                     directory = localSPMDir.dir(pkg.name),
-                                    products = listOf(pkg.name),
-                                    importedClangModules = pkg.importedClangModules,
+                                    products = listOf(product(pkg.name, platforms = setOf(iOS()), importedClangModules = pkg.importedClangModules.toSet())),
                                 )
                             }
                         }
