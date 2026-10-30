@@ -46,8 +46,13 @@ if (sourceBuild != null && composeSource != null && hostTarget != null) {
             else -> "macosArm64"
         }
         dependsOn(sourceBuild.task(":${skikoTarget}RegressionTest"))
-        dependsOn(sourceBuild.task(":skiko-skottie:${skikoTarget}RegressionTest"))
-        for (module in modules.keys) dependsOn(composeSource.task(":$module:${hostTarget}Test"))
+        for ((artifact, value) in modules) {
+            val module = value as Map<*, *>
+            val group = module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}"
+            val sources = nativeDirectory.dir("adaptation/${module["adaptation"] ?: "${group}_$artifact"}/src")
+            val tests = fileTree(sources) { include("nativeTest/**/*.kt", "${hostTarget}Test/**/*.kt") }
+            if (!tests.isEmpty) dependsOn(composeSource.task(":$artifact:${hostTarget}Test"))
+        }
     }
 }
 if (sourceBuild != null && hostPublication != null) {

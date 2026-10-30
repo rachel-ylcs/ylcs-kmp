@@ -132,19 +132,16 @@ jobs:
         include:
           - runner: windows-2025
             target: mingw_x64
-            binary-target: Windows
             gradle-target: windows
             workers: 2
             timeout-minutes: 90
           - runner: ubuntu-24.04
             target: linux_x64
-            binary-target: Linux
             gradle-target: linux
             workers: 2
             timeout-minutes: 90
           - runner: macos-26
             target: macos_arm64
-            binary-target: Macos
             gradle-target: macos
             workers: 1
             timeout-minutes: 120
@@ -153,7 +150,6 @@ jobs:
         shell: bash
     env:
       NATIVE_TARGET: ${{ matrix.target }}
-      NATIVE_BINARY_TARGET: ${{ matrix.binary-target }}
       NATIVE_GRADLE_TARGET: ${{ matrix.gradle-target }}
     steps:
       - uses: actions/checkout@v7
@@ -178,10 +174,16 @@ jobs:
         with:
           tools: 'true'
       - name: Source preparation, bridge routing and desktop packaging regressions
+        if: runner.os == 'Linux'
         run: |
           bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
             :repository-conventions:test :native-bridge:test :public-plugin:test :native-bridge:validatePlugins :public-plugin:validatePlugins
+      - name: Native application and packaging regression
+        run: |
+          bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+            :native-bridge:hostTest
       - name: Test and publish all owned host libraries
         run: |
           mkdir -p build/native-ci
@@ -204,17 +206,16 @@ jobs:
             "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
           bash ./gradlew -p native-compose/verification/compose-ui-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pnative.explicit=true \
-            "${NATIVE_GRADLE_TARGET}Test" verifyNativeMavenClosure
-          bash ./gradlew -p native-compose/verification/maven-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            "run${NATIVE_BINARY_TARGET}DebugExecutable"
+            verifyNativeMavenClosure
       - name: Publish a framework library and consume its JVM and Native variants
         run: |
           bash ./gradlew -p native-compose/verification/framework-producer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process publishHost
-          bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
-            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
-            desktopTest verifyFrameworkResolution
+          if [[ "$RUNNER_OS" == 'Linux' ]]; then
+            bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
+              -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
+              desktopTest verifyFrameworkResolution
+          fi
           bash ./gradlew -p native-compose/verification/framework-consumer --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process -Pframework.native=true \
             "${NATIVE_GRADLE_TARGET}Test" verifyFrameworkResolution

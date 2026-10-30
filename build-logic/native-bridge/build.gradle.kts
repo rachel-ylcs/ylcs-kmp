@@ -151,7 +151,20 @@ afterEvaluate {
     }
 }
 
-tasks.test {
+val hostPackagingTest = "love.yinlin.nativebridge.NativeBridgeFunctionalTest.hostComposeTasksRunBothBuildTypesAndPrepareAnUnpackedApplication"
+
+tasks.register<Test>("hostTest") {
+    group = "verification"
+    description = "Run the host Native executable and distribution regression"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    filter { includeTestsMatching(hostPackagingTest) }
+    shouldRunAfter(tasks.test)
+}
+
+tasks.test { filter { excludeTestsMatching(hostPackagingTest) } }
+
+tasks.withType<Test>().configureEach {
     useJUnit()
     inputs.files(rachelTestPlugin)
     doFirst { systemProperty("native.tests.rachelClasspath", rachelTestPlugin.asPath) }

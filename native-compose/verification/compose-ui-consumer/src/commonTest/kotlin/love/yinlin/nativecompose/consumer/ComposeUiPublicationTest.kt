@@ -50,6 +50,10 @@ class ComposeUiPublicationTest {
 
     @Test
     fun publishedTextUsesTheNativeLocaleAndStaticIcuBridge() {
+        val chinese = Locale("zh-Hans-CN")
+        assertEquals("zh", chinese.language)
+        assertEquals("Hans", chinese.script)
+        assertEquals("CN", chinese.region)
         val locale = Locale("tr-TR")
         assertEquals("tr", locale.language)
         assertEquals("TR", locale.region)

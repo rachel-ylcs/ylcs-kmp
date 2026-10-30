@@ -25,6 +25,12 @@ import androidx.navigation3.ui.NavDisplay
 import love.yinlin.nativecompose.consumer.resources.Res
 import love.yinlin.nativecompose.consumer.resources.publication_greeting
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Color
+import org.jetbrains.skia.EncodedImageFormat
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Surface
 import org.jetbrains.skia.impl.use
 import org.jetbrains.skia.skottie.Animation
 import kotlin.test.*
@@ -108,11 +114,30 @@ class ComposeRuntimePublicationTest {
     }
 
     @Test
-    fun skottieExtensionLinksItsCoreAndNativeBridgeFromMaven() {
-        Animation.makeFromString("""{"v":"5.7.4","fr":30,"ip":0,"op":30,"w":16,"h":24,"layers":[]}""").use { animation ->
-            assertEquals(16f, animation.width)
-            assertEquals(24f, animation.height)
-            assertEquals(1f, animation.duration)
+    fun skottieExtensionRendersAndEncodesImagesFromMaven() {
+        Surface.makeRasterN32Premul(64, 64).use { surface ->
+            surface.canvas.clear(Color.WHITE)
+            Animation.makeFromString(SkottieFixture).use { animation ->
+                assertEquals(64f, animation.width)
+                assertEquals(64f, animation.height)
+                animation.seek(.5f).render(surface.canvas)
+            }
+            Bitmap().use { pixels ->
+                assertTrue(pixels.allocPixels(ImageInfo.makeN32Premul(64, 64)))
+                assertTrue(surface.readPixels(pixels, 0, 0))
+                assertEquals(Color.BLUE, pixels.getColor(16, 16))
+                assertEquals(Color.WHITE, pixels.getColor(0, 0))
+            }
+            surface.makeImageSnapshot().use { image ->
+                assertNotNull(image.encodeToData(EncodedImageFormat.PNG)).use { data ->
+                    Image.makeFromEncoded(data.bytes).use { decoded ->
+                        assertEquals(64, decoded.width)
+                        assertEquals(64, decoded.height)
+                    }
+                }
+            }
         }
     }
 }
+
+private const val SkottieFixture = """{"v":"5.7.4","fr":30,"ip":0,"op":60,"w":64,"h":64,"ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":1,"nm":"Blue","sr":1,"ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},"p":{"a":0,"k":[8,8,0]},"a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},"sw":32,"sh":32,"sc":"#0000ff","ip":0,"op":60,"st":0,"bm":0}]}"""

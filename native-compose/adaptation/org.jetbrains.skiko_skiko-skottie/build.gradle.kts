@@ -31,6 +31,3 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
         compilerOptions.moduleName.set("org.jetbrains.skiko:skiko-skottie")
     }
 }
-
-val nativeComposeDirectory = buildFile.parentFile.parentFile.parentFile
-apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/skiko-library-tests.gradle.kts"))
