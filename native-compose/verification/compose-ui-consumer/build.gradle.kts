@@ -1,8 +1,12 @@
 import groovy.json.JsonSlurper
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
+import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeTest
 import org.jetbrains.kotlin.konan.target.Family
 import org.jetbrains.kotlin.konan.target.HostManager
+import java.time.Duration
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -50,7 +54,10 @@ kotlin {
             }
             implementation(libs.androidx.navigation3.viewmodel)
         }
-        commonTest.dependencies { implementation(kotlin("test")) }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.kotlinx.coroutines.test)
+        }
         val nativeMain = create("nativeMain") { dependsOn(commonMain.get()) }
         val nativeTest = create("nativeTest") { dependsOn(commonTest.get()) }
         for (target in listOf("windows", "linux", "macos")) {
@@ -61,6 +68,14 @@ kotlin {
 }
 
 nativeBridge { skikoTests() }
+
+tasks.withType<KotlinNativeTest>().configureEach {
+    timeout.set(Duration.ofMinutes(5))
+    testLogging {
+        events(TestLogEvent.STARTED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+}
 
 compose.resources {
     publicResClass = true

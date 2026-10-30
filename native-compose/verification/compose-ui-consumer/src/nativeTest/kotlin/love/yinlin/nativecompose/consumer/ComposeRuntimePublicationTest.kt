@@ -22,7 +22,6 @@ import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDe
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import kotlinx.coroutines.runBlocking
 import love.yinlin.nativecompose.consumer.resources.Res
 import love.yinlin.nativecompose.consumer.resources.publication_greeting
 import org.jetbrains.compose.resources.getString
@@ -36,7 +35,7 @@ class ComposeRuntimePublicationTest {
     fun installGraphicsBackend() { registerSkikoComposeImplementation() }
 
     @Test
-    fun materialDatePickerRendersAndUpdatesItsSelectionFromMaven() = runBlocking {
+    fun materialDatePickerRendersAndUpdatesItsSelectionFromMaven() = runPublishedComposeTest {
         var state: DatePickerState? = null
         PublishedSceneFixture(coroutineContext).use { scene ->
             scene.content {
@@ -56,7 +55,7 @@ class ComposeRuntimePublicationTest {
     }
 
     @Test
-    fun navigationEntriesRetainTextAndIsolateAndClearViewModels() = runBlocking {
+    fun navigationEntriesRetainTextAndIsolateAndClearViewModels() = runPublishedComposeTest {
         val stack = mutableStateListOf(0)
         val models: MutableMap<Int, PublishedEntryViewModel> = mutableMapOf()
         val texts: MutableMap<Int, TextFieldState> = mutableMapOf()
@@ -103,7 +102,7 @@ class ComposeRuntimePublicationTest {
     }
 
     @Test
-    fun generatedResourcesAreDeployedBesideTheNativeTestBinary() = runBlocking {
+    fun generatedResourcesAreDeployedBesideTheNativeTestBinary() = runPublishedComposeTest {
         assertEquals("Native 资源 😀", getString(Res.string.publication_greeting))
         assertEquals("Maven resource 中文 😀", Res.readBytes("files/目录 含空格.txt").decodeToString().trim())
     }

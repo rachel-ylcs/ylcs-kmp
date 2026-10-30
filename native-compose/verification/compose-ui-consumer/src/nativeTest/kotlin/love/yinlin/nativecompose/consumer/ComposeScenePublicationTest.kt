@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.registerSkikoComposeImplementation
 import androidx.compose.ui.scene.CanvasLayersComposeScene
 import androidx.compose.ui.scene.SingleComposeSceneRenderingScope
 import androidx.compose.ui.unit.IntSize
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ImageInfo
 import org.jetbrains.skia.Surface
@@ -22,7 +21,7 @@ import kotlin.test.*
 /** Exercises only public API, using published KLIBs without source/composite substitutions. */
 class ComposeScenePublicationTest {
     @Test
-    fun publishedUiComposesDrawsRecomposesAndDisposes() = runBlocking {
+    fun publishedUiComposesDrawsRecomposesAndDisposes() = runPublishedComposeTest {
         registerSkikoComposeImplementation()
         val recomposer = FrameRecomposer(coroutineContext)
         val scene = CanvasLayersComposeScene(recomposer, size = IntSize(32, 24))

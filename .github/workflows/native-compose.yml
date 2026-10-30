@@ -194,6 +194,7 @@ jobs:
           bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             :native-bridge:verifyNativeHost
       - name: Consume the published KLIBs without source substitutions
+        timeout-minutes: 15
         run: |
           bash ./gradlew -p build-logic --no-daemon --build-cache --max-workers=${{ matrix.workers }} --stacktrace \
             -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process \
