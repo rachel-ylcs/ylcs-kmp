@@ -5,6 +5,9 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 
 @Stable
 expect class WebViewState(initUrl: String = "") : PlatformViewStateOwner {
+    override val isActive: Boolean
+    override fun release()
+
     var url: String // URL
 
     val loadingState: WebViewLoadingState // 加载状态

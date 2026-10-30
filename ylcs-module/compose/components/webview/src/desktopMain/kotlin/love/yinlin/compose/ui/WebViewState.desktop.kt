@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 
 @Stable
 actual class WebViewState actual constructor(initUrl: String) : PlatformViewStateOwner {
-    override val isActive: Boolean = false
-    override fun release() {}
+    actual override val isActive: Boolean = false
+    actual override fun release() {}
     actual var url: String = initUrl
     actual val loadingState: WebViewLoadingState = WebViewLoadingState.Initializing
     actual val title: String = ""
