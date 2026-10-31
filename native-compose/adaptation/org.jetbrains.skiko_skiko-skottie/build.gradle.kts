@@ -37,10 +37,8 @@ if (dokkaBuild) {
     extensions.configure<DokkaExtension> {
         modulePath.set("native-compose/skottie")
         dokkaPublications.named("html") { moduleName.set("Native Compose / Skottie") }
-        dokkaSourceSets.configureEach {
-            suppressedFiles.from(provider { sourceRoots.files.filter { !it.canonicalFile.toPath().startsWith(adaptationDirectory.toPath()) } })
-        }
     }
+    apply(from = adaptationDirectory.parentFile.parentFile.parentFile.resolve("build-logic/native-bridge/gradle/dokka-sources.gradle.kts"))
 }
 
 kotlin.targets.withType<KotlinNativeTarget>().configureEach {

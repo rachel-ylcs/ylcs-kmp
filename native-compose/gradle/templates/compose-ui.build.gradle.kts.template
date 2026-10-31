@@ -43,14 +43,11 @@ subprojects {
 
     if (dokkaBuild) {
         apply(plugin = "org.jetbrains.dokka")
-        val adaptation = nativeDirectory.resolve("adaptation/${module["adaptation"] ?: "${upstreamGroup}_${project.name}"}/src").canonicalFile
         extensions.configure<DokkaExtension> {
             modulePath.set("native-compose/${project.name}")
             dokkaPublications.named("html") { moduleName.set("Native Compose / ${project.name}") }
-            dokkaSourceSets.configureEach {
-                suppressedFiles.from(provider { sourceRoots.files.filter { !it.canonicalFile.toPath().startsWith(adaptation.toPath()) } })
-            }
         }
+        apply(from = repositoryDirectory.resolve("build-logic/native-bridge/gradle/dokka-sources.gradle.kts"))
     }
 
     plugins.withId("org.jetbrains.kotlin.multiplatform") {

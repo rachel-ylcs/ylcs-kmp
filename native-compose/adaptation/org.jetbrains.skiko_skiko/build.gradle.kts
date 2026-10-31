@@ -32,10 +32,8 @@ if (dokkaBuild) {
     extensions.configure<DokkaExtension> {
         modulePath.set("native-compose/skiko")
         dokkaPublications.named("html") { moduleName.set("Native Compose / Skiko") }
-        dokkaSourceSets.configureEach {
-            suppressedFiles.from(provider { sourceRoots.files.filter { !it.canonicalFile.toPath().startsWith(adaptationDirectory.toPath()) } })
-        }
     }
+    apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/dokka-sources.gradle.kts"))
 }
 
 // Configure source roots after upstream has registered every platform task.

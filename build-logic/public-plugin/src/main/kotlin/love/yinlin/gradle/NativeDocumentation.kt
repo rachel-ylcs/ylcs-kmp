@@ -12,6 +12,7 @@ internal val Project.isDokkaBuild: Boolean get() = providers.gradleProperty("rac
 internal fun Project.configureDokkaCInterops(extension: KotlinMultiplatformExtension) {
     if (!isDokkaBuild) return
     extension.targets.withType<KotlinNativeTarget>().configureEach {
+        if (konanTarget.name !in setOf("mingw_x64", "linux_x64", "macos_arm64")) return@configureEach
         val targetName = name.replaceFirstChar(Char::uppercase)
         compilations.getByName("main").cinterops.configureEach {
             val interopName = name
