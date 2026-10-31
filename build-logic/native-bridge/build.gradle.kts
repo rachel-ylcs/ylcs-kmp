@@ -43,6 +43,7 @@ dependencies {
     compileOnly(libs.gradle.plugin.compose)
     add(composeTestPlugin.name, libs.gradle.plugin.compose)
     add(composeTestPlugin.name, libs.gradle.plugin.composeCompiler)
+    add(composeTestPlugin.name, project(":native-dokka"))
     add(rachelTestPlugin.name, project(":public-plugin"))
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test-junit"))
