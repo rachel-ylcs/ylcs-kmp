@@ -291,7 +291,9 @@ class ScreenTopic(currentTopic: Topic) : Screen() {
     private fun RichTextLayout(text: RichString, modifier: Modifier = Modifier) {
         RachelRichText(
             text = text,
-            onLinkClick = ::navigateScreenWebPage,
+            onLinkClick = {
+                ScreenWebpage.navigateFrom(this, it)
+            },
             onTopicClick = {},
             onAtClick = { navigate(::ScreenUserCard, it.toIntOrNull() ?: 0) },
             modifier = modifier,

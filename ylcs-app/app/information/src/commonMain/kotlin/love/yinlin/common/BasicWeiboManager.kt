@@ -29,9 +29,9 @@ import love.yinlin.data.weibo.WeiboMedia
 import love.yinlin.extension.catchingNull
 import love.yinlin.screen.ScreenImagePreview
 import love.yinlin.screen.ScreenVideo
+import love.yinlin.screen.ScreenWebpage
 import love.yinlin.screen.ScreenWeiboDetails
 import love.yinlin.screen.ScreenWeiboUser
-import love.yinlin.screen.navigateScreenWebPage
 import love.yinlin.tpl.weibo.WeiboAPI
 import love.yinlin.tpl.weibo.WeiboCookie
 import love.yinlin.tpl.weibo.weiboHtmlToRichString
@@ -74,11 +74,15 @@ abstract class BasicWeiboManager : MessageManager<Weibo>() {
             text = richString,
             modifier = modifier,
             overflow = TextOverflow.Ellipsis,
-            onLinkClick = { navigateScreenWebPage(it) },
-            onTopicClick = { navigateScreenWebPage(it) },
+            onLinkClick = {
+                ScreenWebpage.navigateFrom(this, it)
+            },
+            onTopicClick = {
+                ScreenWebpage.navigateFrom(this, it)
+            },
             onAtClick = { arg ->
                 val name = arg.substringAfterLast("/n/")
-                if (name.isEmpty()) navigateScreenWebPage(name)
+                if (name.isEmpty()) ScreenWebpage.navigateFrom(this, name)
                 else if (searchUserMutex.tryLock()) {
                     launch {
                         val user = catchingNull {
@@ -86,7 +90,7 @@ abstract class BasicWeiboManager : MessageManager<Weibo>() {
                             WeiboAPI.searchUser(name, cookie)?.find { it.name == name }
                         }
                         searchUserMutex.unlock()
-                        if (user == null) navigateScreenWebPage(name)
+                        if (user == null) ScreenWebpage.navigateFrom(this@MessageTextRender, name)
                         else navigate(::ScreenWeiboUser, user.id)
                     }
                 }

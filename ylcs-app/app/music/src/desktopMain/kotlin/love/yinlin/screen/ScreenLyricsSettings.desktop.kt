@@ -37,9 +37,9 @@ actual fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfi
     app.config.lyricsEngineConfig = newConfig
 
     // 触发桌面悬浮歌词修改窗口尺寸和位置
-    val desktopConfig = newConfig.desktop
+    (val x, val y, val width, val height) = newConfig.desktop
     musicPlayer?.floatingLyrics?.updateWindowState(
-        size = DpSize(desktopConfig.width.dp, desktopConfig.height.dp),
-        position = DpOffset(desktopConfig.x.dp, desktopConfig.y.dp)
+        size = DpSize(width.dp, height.dp),
+        position = DpOffset(x.dp, y.dp)
     )
 }

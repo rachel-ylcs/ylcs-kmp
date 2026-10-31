@@ -167,17 +167,17 @@ class ScreenActivityDetails(private val aid: Int) : Screen() {
                     }
                     link.damai?.ifEmpty { null }?.then { damai ->
                         LinkIcon("大麦", painterResource(Res.drawable.img_damai), Colors.Unspecified) {
-                            navigateScreenWebPage("https://m.damai.cn/shows/item.html?itemId=${damai}")
+                            ScreenWebpage.navigateFrom(this@ScreenActivityDetails, "https://m.damai.cn/shows/item.html?itemId=${damai}")
                         }
                     }
                     link.maoyan?.ifEmpty { null }?.then { maoyan ->
                         LinkIcon("猫眼", painterResource(Res.drawable.img_maoyan), Colors.Unspecified) {
-                            navigateScreenWebPage("https://show.maoyan.com/qqw#/detail/${maoyan}")
+                            ScreenWebpage.navigateFrom(this@ScreenActivityDetails, "https://show.maoyan.com/qqw#/detail/${maoyan}")
                         }
                     }
                     link.link?.ifEmpty { null }?.then { link ->
                         LinkIcon("直播", rememberVectorPainter(Icons.Link)) {
-                            navigateScreenWebPage(link)
+                            ScreenWebpage.navigateFrom(this@ScreenActivityDetails, link)
                         }
                     }
 

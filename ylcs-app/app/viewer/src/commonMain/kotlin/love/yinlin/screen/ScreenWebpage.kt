@@ -18,6 +18,22 @@ import love.yinlin.platform.Platform
 
 @Stable
 class ScreenWebpage(url: String) : Screen() {
+    companion object {
+        fun navigateFrom(previous: BasicScreen, arg: String) {
+            Platform.use(
+                *Platform.DesktopFamily,
+                ifTrue = {
+                    previous.launch {
+                        Uri.parse(arg)?.let { app.openUri(it) }
+                    }
+                },
+                ifFalse = {
+                    previous.navigate(::ScreenWebpage, arg)
+                }
+            )
+        }
+    }
+
     private val state = WebViewState(url)
 
     override val title: String by derivedStateOf { state.title }
@@ -40,16 +56,3 @@ class ScreenWebpage(url: String) : Screen() {
     }
 }
 
-fun BasicScreen.navigateScreenWebPage(arg: String) {
-    Platform.use(
-        *Platform.Desktop,
-        ifTrue = {
-            launch {
-                Uri.parse(arg)?.let { app.openUri(it) }
-            }
-        },
-        ifFalse = {
-            navigate(::ScreenWebpage, arg)
-        }
-    )
-}

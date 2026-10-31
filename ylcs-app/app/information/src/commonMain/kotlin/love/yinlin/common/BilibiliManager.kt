@@ -24,7 +24,7 @@ import love.yinlin.data.information.UnifiedMedia
 import love.yinlin.data.information.UnifiedMessage
 import love.yinlin.screen.ScreenBilibiliSettings
 import love.yinlin.screen.ScreenImagePreview
-import love.yinlin.screen.navigateScreenWebPage
+import love.yinlin.screen.ScreenWebpage
 import love.yinlin.tpl.bilibili.BilibiliAPI
 import love.yinlin.tpl.bilibili.BilibiliCookie
 import love.yinlin.tpl.bilibili.bilibiliRichTextToRichString
@@ -95,8 +95,8 @@ class BilibiliManager : MessageManager<Bilibili>() {
             text = richString,
             modifier = modifier,
             overflow = TextOverflow.Ellipsis,
-            onLinkClick = { navigateScreenWebPage(it) },
-            onTopicClick = { navigateScreenWebPage(it) },
+            onLinkClick = { ScreenWebpage.navigateFrom(this, it) },
+            onTopicClick = { ScreenWebpage.navigateFrom(this, it) },
             onAtClick = { _ ->
 
             }

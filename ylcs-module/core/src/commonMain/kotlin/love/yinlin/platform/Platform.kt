@@ -20,6 +20,10 @@ enum class Platform {
         val Desktop: Array<Platform> = [Windows, Linux, MacOS]
         val DesktopNative: Array<Platform> = [WindowsNative, LinuxNative, MacOSNative]
         val Web: Array<Platform> = [WebJs, WebWasm]
+        val WindowsFamily: Array<Platform> = [Windows, WindowsNative]
+        val LinuxFamily: Array<Platform> = [Linux, LinuxNative]
+        val MacOSFamily: Array<Platform> = [MacOS, MacOSNative]
+        val DesktopFamily: Array<Platform> = [Windows, Linux, MacOS, WindowsNative, LinuxNative, MacOSNative]
 
         fun contains(vararg filter: Platform): Boolean = platform in filter
         inline fun use(vararg filter: Platform, block: () -> Unit) = if (platform in filter) block() else Unit

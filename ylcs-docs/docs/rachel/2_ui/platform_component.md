@@ -140,4 +140,4 @@ class ScreenWebpage(url: String) : Screen() {
 }
 ```
 
-这是 Android/iOS/Web 实现的使用模式。JVM 的 `WebView` 当前仅显示 `UnsupportedPlatformComponent`，其 state 不建立原生网页视图；业务的 `navigateScreenWebPage` 因而在 JVM Desktop 上改为系统浏览器打开。桌面 Native 没有启用此 WebView 模块。宿主状态更新、旧回调失效与延迟释放的测试见 `TestPlatformViewState`。
+这是 Android/iOS/Web 实现的使用模式。JVM 的 `WebView` 当前仅显示 `UnsupportedPlatformComponent`，其 state 不建立原生网页视图；业务的 `ScreenWebPage.navigateFrom` 因而在 JVM Desktop 上改为系统浏览器打开。桌面 Native 没有启用此 WebView 模块。宿主状态更新、旧回调失效与延迟释放的测试见 `TestPlatformViewState`。

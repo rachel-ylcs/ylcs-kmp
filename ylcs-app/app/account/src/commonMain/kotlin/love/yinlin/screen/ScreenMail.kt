@@ -204,7 +204,9 @@ class ScreenMail : Screen() {
                 }
                 RachelRichText(
                     text = remember(args) { RachelRichParser.parse(args.content) },
-                    onLinkClick = ::navigateScreenWebPage,
+                    onLinkClick = {
+                        ScreenWebpage.navigateFrom(this@ScreenMail, it)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }
