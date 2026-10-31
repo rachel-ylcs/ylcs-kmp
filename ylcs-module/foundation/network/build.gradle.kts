@@ -22,6 +22,8 @@ rachel {
                     libs.ktor.client.negotiation,
                     libs.ktor.client.encoding,
                     libs.ktor.client.websockets,
+
+                    projects.ylcsModule.foundation.compression,
                     ExportLib,
                     libs.ktor.client,
                     projects.ylcsModule.foundation.filesystem,
@@ -44,6 +46,18 @@ rachel {
                 lib(libs.ktor.okhttp)
             }
 
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain) {
+                lib(libs.ktor.windows)
+            }
+
+            linuxMain(nativeMain) {
+                lib(libs.ktor.cio)
+            }
+
+            macosMain(appleMain)
+
             webMain(commonMain) {
                 lib(libs.ktor.js)
             }
@@ -51,16 +65,6 @@ rachel {
             jsMain(webMain)
 
             wasmJsMain(webMain)
-
-            windowsMain(commonMain) {
-                lib(libs.ktor.windows)
-            }
-
-            linuxMain(commonMain) {
-                lib(libs.ktor.cio)
-            }
-
-            macosMain(appleMain)
         }
     }
 }

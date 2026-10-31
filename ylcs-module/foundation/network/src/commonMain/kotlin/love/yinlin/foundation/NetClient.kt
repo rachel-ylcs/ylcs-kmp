@@ -5,7 +5,6 @@ import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.plugins.HttpRedirect
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.onDownload
@@ -182,13 +181,6 @@ internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useRedirect() {
 
     install(HttpRedirect) {
         allowHttpsDowngrade = true
-    }
-}
-
-internal fun <T : HttpClientEngineConfig> HttpClientConfig<T>.useEncoding() {
-    install(ContentEncoding) {
-        deflate(1.0F)
-        gzip(0.9F)
     }
 }
 
