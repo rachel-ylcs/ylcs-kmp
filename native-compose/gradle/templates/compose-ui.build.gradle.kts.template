@@ -15,7 +15,7 @@ plugins {
     // Native Bridge Settings supplies KGP from the root build-logic version catalog.
     id("org.jetbrains.kotlin.multiplatform") apply false
     alias(libs.plugins.composeCompiler) apply false
-    alias(libs.plugins.dokka) apply false
+    id("love.yinlin.native-dokka") apply false
 }
 
 val repositoryDirectory = rootDir.resolve("../../../../..").canonicalFile
@@ -42,12 +42,11 @@ subprojects {
     layout.buildDirectory.set(buildDirectory.resolve(name))
 
     if (dokkaBuild) {
-        apply(plugin = "org.jetbrains.dokka")
+        apply(plugin = "love.yinlin.native-dokka")
         extensions.configure<DokkaExtension> {
             modulePath.set("native-compose/${project.name}")
             dokkaPublications.named("html") { moduleName.set("Native Compose / ${project.name}") }
         }
-        apply(from = repositoryDirectory.resolve("build-logic/native-bridge/gradle/dokka-sources.gradle.kts"))
     }
 
     plugins.withId("org.jetbrains.kotlin.multiplatform") {

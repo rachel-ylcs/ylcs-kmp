@@ -10,7 +10,7 @@ plugins {
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum")
-    id("org.jetbrains.dokka") version libs.versions.dokka.get() apply false
+    id("love.yinlin.native-dokka") apply false
 }
 
 val adaptationDirectory = buildFile.parentFile.canonicalFile
@@ -28,12 +28,11 @@ extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectCo
 apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))
 
 if (dokkaBuild) {
-    apply(plugin = "org.jetbrains.dokka")
+    apply(plugin = "love.yinlin.native-dokka")
     extensions.configure<DokkaExtension> {
         modulePath.set("native-compose/skiko")
         dokkaPublications.named("html") { moduleName.set("Native Compose / Skiko") }
     }
-    apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/dokka-sources.gradle.kts"))
 }
 
 // Configure source roots after upstream has registered every platform task.

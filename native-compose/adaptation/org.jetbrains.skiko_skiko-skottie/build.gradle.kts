@@ -9,7 +9,7 @@ plugins {
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum")
-    id("org.jetbrains.dokka") apply false
+    id("love.yinlin.native-dokka") apply false
 }
 
 val adaptationDirectory = buildFile.parentFile.canonicalFile
@@ -33,12 +33,11 @@ extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectCo
 apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))
 
 if (dokkaBuild) {
-    apply(plugin = "org.jetbrains.dokka")
+    apply(plugin = "love.yinlin.native-dokka")
     extensions.configure<DokkaExtension> {
         modulePath.set("native-compose/skottie")
         dokkaPublications.named("html") { moduleName.set("Native Compose / Skottie") }
     }
-    apply(from = adaptationDirectory.parentFile.parentFile.parentFile.resolve("build-logic/native-bridge/gradle/dokka-sources.gradle.kts"))
 }
 
 kotlin.targets.withType<KotlinNativeTarget>().configureEach {

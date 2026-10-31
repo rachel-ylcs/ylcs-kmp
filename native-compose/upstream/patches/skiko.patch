@@ -2242,8 +2242,9 @@ diff --git a/skiko/settings.gradle.kts b/skiko/settings.gradle.kts
 index 31ceaa5..36edb07 100644
 --- a/skiko/settings.gradle.kts
 +++ b/skiko/settings.gradle.kts
-@@ -9,16 +9,20 @@ dependencyResolutionManagement {
+@@ -9,16 +9,21 @@ dependencyResolutionManagement {
  pluginManagement {
++    includeBuild("../../../../../build-logic")
      repositories {
          mavenCentral {
 -            url = uri("https://cache-redirector.jetbrains.com/maven-central")

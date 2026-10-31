@@ -26,5 +26,6 @@ rootProject.name = "rachel-build-logic"
 include(
     "public-plugin",
     "repository-conventions",
-    "native-bridge"
+    "native-bridge",
+    "native-dokka"
 )
