@@ -2,5 +2,5 @@
 	path = ylcs-module/foundation/kv/src/nativeMain/cpp/mmkv
 	url = https://github.com/Tencent/MMKV.git
 [submodule "miniaudio"]
-	path = ylcs-module/compose/components/media/src/desktopMain/cpp/miniaudio
+	path = ylcs-module/compose/components/media/src/nativeMain/cpp/miniaudio
 	url = https://github.com/mackron/miniaudio.git

@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 import love.yinlin.coroutines.mainContext
 import love.yinlin.foundation.PlatformContext
 import love.yinlin.media.FfmpegRenderersFactory
-import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(UnstableApi::class)
 private class AndroidVideoController(context: PlatformContext, topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoController(topBar, bottomBar) {
@@ -56,7 +55,7 @@ private class AndroidVideoController(context: PlatformContext, topBar: VideoActi
                 if (value) {
                     while (this@launch.isActive) {
                         position = exoPlayer.currentPosition
-                        delay(100.milliseconds)
+                        delay(DefaultUpdateFrequency)
                     }
                 }
             }

@@ -28,29 +28,25 @@ if(NOT Java_FOUND)
 endif()
 find_package(JNI REQUIRED)
 
-if(WIN32 OR CYGWIN)
-    set(PLAYER_SOURCES windows.cpp)
-elseif(APPLE)
-    set(PLAYER_SOURCES miniaudio_jni.cpp miniaudio/miniaudio.c)
-elseif(UNIX AND NOT APPLE)
-    set(PLAYER_SOURCES miniaudio_jni.cpp miniaudio/miniaudio.c)
-else()
-    message(FATAL_ERROR "Unsupported platform: ${CMAKE_SYSTEM_NAME}")
-endif()
+find_path(AUDIO_SHARED_CPP_DIR rachel_audio.h PATHS ${RACHEL_CPP_SOURCE_DIRS} NO_DEFAULT_PATH REQUIRED)
+add_subdirectory("${AUDIO_SHARED_CPP_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/shared-audio")
+
+set(PLAYER_SOURCES audio_jni.cpp video_jni.cpp sound_jni.cpp)
 
 add_library(player SHARED
     ${PLAYER_SOURCES}
+    $<TARGET_OBJECTS:rachel_audio_objects>
 )
 
 target_include_directories(player PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/miniaudio
     ${JNI_INCLUDE_DIRS}
     ${NATIVE_JNI_DIR}
 )
 
 target_link_libraries(player PRIVATE
     ${JNI_LIBRARIES}
+    rachel_audio
 )
 
 if(UNIX)

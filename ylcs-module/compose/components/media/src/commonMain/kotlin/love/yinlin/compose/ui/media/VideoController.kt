@@ -16,6 +16,7 @@ import love.yinlin.compose.ui.animation.AnimationVisibility
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.node.silentClick
 import love.yinlin.extension.then
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
@@ -42,7 +43,7 @@ private fun VideoPlayerControlBar(
         }
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().background(Colors.Dark.copy(alpha = 0.5f)).padding(Theme.padding.value),
+            modifier = Modifier.fillMaxWidth().background(Colors.Dark.copy(alpha = 0.5f)).padding(Theme.padding.value9),
             horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
             verticalAlignment = Alignment.CenterVertically,
             content = content
@@ -52,6 +53,10 @@ private fun VideoPlayerControlBar(
 
 @Stable
 abstract class VideoController(topBar: VideoActionBar.Factory, bottomBar: VideoActionBar.Factory) : VideoState() {
+    companion object {
+        val DefaultUpdateFrequency = 100.milliseconds
+    }
+
     protected abstract fun releaseController()
 
     @Composable

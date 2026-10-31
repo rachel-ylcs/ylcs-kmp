@@ -1,0 +1,7 @@
+headers = rachel_audio.h
+headerFilter = rachel_audio.h
+package = love.yinlin.media.internal
+staticLibraries = librachel_audio.a
+linkerOpts.mingw = -lruntimeobject -lshlwapi -lole32 -loleaut32 -luuid -lwindowsapp -ld3d11 -ldxgi
+linkerOpts.linux = -lstdc++ -lpthread -ldl -lm
+linkerOpts.osx = -lc++ -framework AVFoundation -framework CoreMedia -framework CoreVideo -framework Foundation -framework CoreFoundation -framework CoreAudio -framework AudioToolbox -framework AudioUnit

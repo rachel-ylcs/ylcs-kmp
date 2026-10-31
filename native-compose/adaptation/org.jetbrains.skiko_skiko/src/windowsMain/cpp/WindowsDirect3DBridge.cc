@@ -6,6 +6,8 @@
 #include <d3d12.h>
 #include <dcomp.h>
 #include <dxgi1_6.h>
+#include "ganesh/d3d/GrD3DBackendSurface.h"
+#include "ganesh/d3d/GrD3DTypes.h"
 
 namespace {
 
@@ -43,9 +45,13 @@ namespace {
         IDCompositionVisual *compositionVisual = nullptr;
         char adapterName[512] = {};
         UINT64 adapterMemory = 0;
+        void *context = nullptr;
+        WindowsDirect3DDevice *nextContext = nullptr;
     };
 
     HRESULT gLastCreateError = S_OK;
+    SRWLOCK gContextLock = SRWLOCK_INIT;
+    WindowsDirect3DDevice *gContexts = nullptr;
 
     using DCompositionCreateDeviceFunction = HRESULT(WINAPI *)(IDXGIDevice *,
         REFIID, void **);
@@ -576,11 +582,49 @@ extern "C" KInt skiko_windows_d3d_last_error(KNativePointer handle) {
     return state == nullptr ? E_INVALIDARG : static_cast<KInt>(state->lastError);
 }
 
+extern "C" void skiko_windows_d3d_set_context(KNativePointer handle, KNativePointer context) {
+    auto *state = static_cast<WindowsDirect3DDevice *>(handle);
+    if (state == nullptr) return;
+    AcquireSRWLockExclusive(&gContextLock);
+    auto **link = &gContexts;
+    while (*link != nullptr && *link != state) link = &(*link)->nextContext;
+    if (*link == state) *link = state->nextContext;
+    state->context = context;
+    state->nextContext = context == nullptr ? nullptr : gContexts;
+    if (context != nullptr) gContexts = state;
+    ReleaseSRWLockExclusive(&gContextLock);
+}
+
+extern "C" KBoolean skiko_windows_d3d_acquire_context(KNativePointer context, void **device, void **queue) {
+    if (device == nullptr || queue == nullptr) return 0;
+    *device = nullptr;
+    *queue = nullptr;
+    AcquireSRWLockShared(&gContextLock);
+    for (auto *state = gContexts; state != nullptr; state = state->nextContext) {
+        if (state->context == context) {
+            state->device->AddRef();
+            state->queue->AddRef();
+            *device = state->device;
+            *queue = state->queue;
+            break;
+        }
+    }
+    ReleaseSRWLockShared(&gContextLock);
+    return *device != nullptr;
+}
+
+extern "C" KInt skiko_windows_d3d_target_state(KNativePointer target) {
+    if (target == nullptr) return -1;
+    auto *renderTarget = static_cast<GrBackendRenderTarget *>(target);
+    return static_cast<KInt>(GrBackendRenderTargets::GetD3DTextureResourceInfo(*renderTarget).fResourceState);
+}
+
 extern "C" void skiko_windows_d3d_close(KNativePointer handle,
     KBoolean contextLost) {
     auto *state = reinterpret_cast<WindowsDirect3DDevice *>(handle);
     if (state == nullptr)
         return;
+    skiko_windows_d3d_set_context(handle, nullptr);
     if (contextLost == 0)
         waitForGpuIdle(state);
     releaseBuffers(state);

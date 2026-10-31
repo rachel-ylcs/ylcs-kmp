@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class, InternalSkikoApi::class)
 
 package org.jetbrains.skiko
 
@@ -8,6 +8,7 @@ import kotlinx.cinterop.interpretCPointer
 import kotlinx.cinterop.toKString
 import org.jetbrains.skia.*
 import org.jetbrains.skia.impl.NativePointer
+import org.jetbrains.skia.impl.getPtr
 import kotlin.native.internal.NativePtr
 
 /** D3D12/Ganesh renderer for a native Win32-backed [SkiaLayer]. */
@@ -70,6 +71,7 @@ internal class WindowsDirect3DRenderer(
                 devicePtr = requiredNativePointer(windowsDirect3DDevice(nativeDevice), "device"),
                 queuePtr = requiredNativePointer(windowsDirect3DQueue(nativeDevice), "command queue"),
             ).also { context ->
+                windowsDirect3DSetContext(nativeDevice, getPtr(context))
                 if (properties.gpuResourceCacheLimit >= 0L) {
                     context.resourceCacheLimit = properties.gpuResourceCacheLimit
                 }
@@ -106,7 +108,7 @@ internal class WindowsDirect3DRenderer(
             // the visible source rectangle. Keep Compose and Skia in the same pixel coordinate
             // space and clip work outside the current client area.
             canvas.clipRect(Rect.makeWH(width.toFloat(), height.toFloat()))
-            block(canvas)
+            withDirect3DContext(checkNotNull(directContext)) { block(canvas) }
         }
         finally {
             canvas.restoreToCount(saveCount)
@@ -366,3 +368,6 @@ private external fun windowsDirect3DLastError(handle: NativePointer): Int
 
 @ExternalSymbolName("skiko_windows_d3d_close")
 private external fun windowsDirect3DClose(handle: NativePointer, contextLost: Boolean)
+
+@ExternalSymbolName("skiko_windows_d3d_set_context")
+private external fun windowsDirect3DSetContext(handle: NativePointer, context: NativePointer)

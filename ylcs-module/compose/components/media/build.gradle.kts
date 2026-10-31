@@ -7,6 +7,7 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
         libs.plugins.androidLibrary,
         libs.plugins.mavenPublish,
         libs.plugins.dokka,
@@ -15,6 +16,17 @@ plugins {
 
 rachel {
     multiplatform {
+        nativeDesktopTarget = true
+
+        interop {
+            desktop {
+                cpp("src/nativeMain/cpp")
+            }
+            native {
+                cpp("audio")
+            }
+        }
+
         sources {
             commonMain {
                 lib(
@@ -39,9 +51,19 @@ rachel {
 
             iosMainList(iosMain)
 
-            desktopMain(commonMain) {
+            pcMain(commonMain)
+
+            desktopMain(pcMain) {
                 lib(projects.ylcsModule.foundation.libloader)
             }
+
+            nativeMain(pcMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
 
             webMain(commonMain) {
                 lib(projects.ylcsModule.compose.platformView)

@@ -21,7 +21,6 @@ import platform.AVFoundation.*
 import platform.CoreGraphics.CGRectMake
 import platform.QuartzCore.CATransaction
 import platform.UIKit.*
-import kotlin.time.Duration.Companion.milliseconds
 
 private class VideoView : UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
     val videoLayer = AVPlayerLayer()
@@ -114,7 +113,7 @@ private class IOSVideoController(topBar: VideoActionBar.Factory, bottomBar: Vide
                     current.checkForFailure()
                     if (!isActive || lifetime.isClosed) break
                     synchronize()
-                    delay(100.milliseconds)
+                    delay(DefaultUpdateFrequency)
                 }
             }?.let { failure ->
                 player?.pause()
