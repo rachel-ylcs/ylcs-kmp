@@ -17,6 +17,8 @@ internal fun Project.configureDokkaCInterops(extension: KotlinMultiplatformExten
         compilations.getByName("main").cinterops.configureEach {
             val interopName = name
             val original = definitionFile.orNull ?: layout.projectDirectory.file("src/nativeInterop/cinterop/$interopName.def")
+            val source = original.asFile.canonicalFile
+            if (!source.isFile || source.toPath().startsWith(layout.buildDirectory.get().asFile.canonicalFile.toPath())) return@configureEach
             val prepare = tasks.register<PrepareDokkaCInteropTask>("prepare${targetName}${interopName.replaceFirstChar(Char::uppercase)}DokkaInterop") {
                 definitionFile.set(original)
                 outputFile.set(layout.buildDirectory.file("dokka-cinterop/$targetName/$interopName/${original.asFile.name}"))
