@@ -8,7 +8,11 @@ actual object PlatformFileSystem {
     actual val PathSeparator: Char = '/'
     actual val LineSeparator: String = "\n"
 
-    actual fun appPath(context: PlatformContext, appName: String): File = checkNotNull(getCurrentDirectory()) { "Cannot read the current working directory" }
+    actual fun appPath(context: PlatformContext, appName: String): File {
+        val workingDir = getCurrentDirectory()
+        if (workingDir != null && NSFileManager.defaultManager.isWritableFileAtPath(workingDir.path)) return workingDir
+        return File(NSHomeDirectory(), "Library", "Application Support", appName)
+    }
 
     actual fun dataPath(context: PlatformContext, appName: String): File = File(appPath(context, appName), "data")
 

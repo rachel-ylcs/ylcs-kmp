@@ -17,7 +17,7 @@ class MainApplication(override val commandArgs: Array<String>) : PlatformApplica
     override val initSize: DpSize = DpSize(1200.dp, 800.dp)
     override val toolingTheme: ToolingTheme = ToolingTheme(enableBallonTip = true)
 
-    val rootPath = PlatformFileSystem.getCurrentDirectory()!!
+    val rootPath = PlatformFileSystem.appPath(rawContext, "ModManager")
     val libraryPath = File(rootPath, "library")
     val outputPath = File(rootPath, "output")
     val modPath = File(rootPath, "mod")
