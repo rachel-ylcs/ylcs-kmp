@@ -89,6 +89,9 @@ internal data class PageItem(
                 ComponentItem("AdaptiveTwoBox", "调整窗口宽度，观察两个不同大小的内容如何重新排列。"),
                 ComponentItem("HorizontalScrollContainer", "在横向列表上使用鼠标滚轮；Row、LazyRow 和 Pager 分别展示滚动方式。", "HorizontalPager"),
             ]),
+            PageItem("platform-view", Icons.Package, "原生视图", "Platform View", "嵌入平台原生文本组件，检查参数同步、重挂载和 Compose 内容叠放。", PlatformViewPage, PageGroup.Layout, [
+                ComponentItem("原生组件嵌入", "编辑原生文本，更新外部参数，移除后重新挂载，并点击覆盖在原生区域上的 Compose 按钮。Linux Native 暂未支持。", "PlatformViewState PlatformViewHost rememberPlatformViewState attach detach release HWND Win32 EDIT NSTextField Swing JTextArea HTMLTextAreaElement Windows macOS JVM Web 生命周期 焦点 叠放"),
+            ]),
             PageItem("collection", Icons.GridOn, "集合", "Trees & Tags", "用层级结构与可删除标签整理更多内容。", CollectionPage, PageGroup.Layout, [
                 ComponentItem("TreeView", "展开层级节点，查看图标、缩进与嵌套的子节点。"),
                 ComponentItem("TagView", "五十个标签按可用宽度换行，点击删除以观察集合更新。"),

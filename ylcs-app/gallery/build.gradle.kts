@@ -24,6 +24,7 @@ rachel {
                     libs.compose.resources,
                     projects.ylcsModule.foundation.fts,
                     projects.ylcsModule.compose.app,
+                    projects.ylcsModule.compose.platformView,
                     projects.ylcsModule.compose.components.image,
                     projects.ylcsModule.compose.components.blur,
                     projects.ylcsModule.compose.components.calendar,
@@ -46,7 +47,11 @@ rachel {
 
             macosMain(nativeMain)
 
-            wasmJsMain(commonMain)
+            webMain(commonMain)
+
+            jsMain(webMain)
+
+            wasmJsMain(webMain)
         }
 
         desktopPackage {
