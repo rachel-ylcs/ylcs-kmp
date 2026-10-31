@@ -1,0 +1,421 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>InteropScope</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.7.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/nativeMain">native</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/nativeMain" data-filter=":/nativeMain">
+                                <span class="checkbox--icon"></span>
+                                native
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="Native Compose / Skiko::org.jetbrains.skia.impl/InteropScope///PointingToDeclaration//-408471265">
+  <div class="breadcrumbs"><a href="../../index.html">Native Compose / Skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skia.impl</a><span class="delimiter">/</span><span class="current">InteropScope</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Interop</span><wbr><span><span>Scope</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">class </span><a href="index.html">InteropScope</a></div></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="-407331199%2FConstructors%2F-408471265" anchor-label="InteropScope" id="-407331199%2FConstructors%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-interop-scope.html"><span>Interop</span><wbr><span><span>Scope</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-407331199%2FConstructors%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="495692704%2FFunctions%2F-408471265" anchor-label="booleanCallback" id="495692704%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="boolean-callback.html"><span>boolean</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="495692704%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="boolean-callback.html"><span class="token function">booleanCallback</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1945699120%2FFunctions%2F-408471265" anchor-label="callback" id="-1945699120%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="callback.html"><span><span>callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1945699120%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="callback.html"><span class="token function">callback</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1524623737%2FFunctions%2F-408471265" anchor-label="fromInterop" id="-1524623737%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="from-interop.html"><span>from</span><wbr><span><span>Interop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1524623737%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">result<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">result<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double-array/index.html">DoubleArray</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">result<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float-array/index.html">FloatArray</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">result<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">result<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">result<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short-array/index.html">ShortArray</a></span></span><span class="token punctuation">)</span></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">inline </span><span class="token keyword">fun </span><span class="token operator">&lt;</span><span class="token keyword">reified </span><a href="from-interop.html">T</a><span class="token operator">&gt; </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">decoder<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia.impl/-array-interop-decoder/index.html">ArrayInteropDecoder</a><span class="token operator">&lt;</span><a href="from-interop.html">T</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="from-interop.html">T</a><span class="token operator">&gt;</span></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop.html"><span class="token function">fromInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">result<span class="token operator">: </span><a href="../-native-pointer-array/index.html">NativePointerArray</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1546507222%2FFunctions%2F-408471265" anchor-label="fromInteropNativePointerArray" id="-1546507222%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="from-interop-native-pointer-array.html"><span>from</span><wbr><span>Interop</span><wbr><span>Native</span><wbr><span>Pointer</span><wbr><span><span>Array</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1546507222%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop-native-pointer-array.html"><span class="token function">fromInteropNativePointerArray</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-native-pointer-array/index.html">NativePointerArray</a></div><br><div class="symbol monospace"><span class="token keyword">fun </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token punctuation">.</span><a href="from-interop-native-pointer-array.html"><span class="token function">fromInteropNativePointerArray</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">size<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-native-pointer-array/index.html">NativePointerArray</a></div><div class="brief "><p class="paragraph">Copies an external Native pointer buffer; its owner must keep <a href="from-interop-native-pointer-array.html">size</a> elements readable.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1507287360%2FFunctions%2F-408471265" anchor-label="intCallback" id="1507287360%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="int-callback.html"><span>int</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1507287360%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="int-callback.html"><span class="token function">intCallback</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="336693517%2FFunctions%2F-408471265" anchor-label="interopPointerCallback" id="336693517%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="interop-pointer-callback.html"><span>interop</span><wbr><span>Pointer</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="336693517%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="interop-pointer-callback.html"><span class="token function">interopPointerCallback</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="92121929%2FFunctions%2F-408471265" anchor-label="nativePointerCallback" id="92121929%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="native-pointer-callback.html"><span>native</span><wbr><span>Pointer</span><wbr><span><span>Callback</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="92121929%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="native-pointer-callback.html"><span class="token function">nativePointerCallback</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">callback<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../-native-pointer/index.html">NativePointer</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-650061541%2FFunctions%2F-408471265" anchor-label="release" id="-650061541%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="release.html"><span><span>release</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-650061541%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="release.html"><span class="token function">release</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-585501632%2FFunctions%2F-408471265" anchor-label="toInterop" id="-585501632%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-interop.html"><span>to</span><wbr><span><span>Interop</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-585501632%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">stringArray<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double-array/index.html">DoubleArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float-array/index.html">FloatArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long-array/index.html">LongArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short-array/index.html">ShortArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">string<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop.html"><span class="token function">toInterop</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="../-native-pointer-array/index.html">NativePointerArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1822752884%2FFunctions%2F-408471265" anchor-label="toInteropForArraysOfPointers" id="-1822752884%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-interop-for-arrays-of-pointers.html"><span>to</span><wbr><span>Interop</span><wbr><span>For</span><wbr><span>Arrays</span><wbr><span>Of</span><wbr><span><span>Pointers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1822752884%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop-for-arrays-of-pointers.html"><span class="token function">toInteropForArraysOfPointers</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">interopPointers<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span class="token operator">&lt;</span><a href="../-interop-pointer/index.html">InteropPointer</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1694273239%2FFunctions%2F-408471265" anchor-label="toInteropForResult" id="1694273239%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="to-interop-for-result.html"><span>to</span><wbr><span>Interop</span><wbr><span>For</span><wbr><span><span>Result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1694273239%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop-for-result.html"><span class="token function">toInteropForResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop-for-result.html"><span class="token function">toInteropForResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-double-array/index.html">DoubleArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop-for-result.html"><span class="token function">toInteropForResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float-array/index.html">FloatArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop-for-result.html"><span class="token function">toInteropForResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int-array/index.html">IntArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop-for-result.html"><span class="token function">toInteropForResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-short-array/index.html">ShortArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="to-interop-for-result.html"><span class="token function">toInteropForResult</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">array<span class="token operator">: </span><a href="../-native-pointer-array/index.html">NativePointerArray</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="759048335%2FFunctions%2F-408471265" anchor-label="virtual" id="759048335%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="virtual.html"><span><span>virtual</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="759048335%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="virtual.html"><span class="token function">virtual</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">method<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1211292183%2FFunctions%2F-408471265" anchor-label="virtualBoolean" id="-1211292183%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="virtual-boolean.html"><span>virtual</span><wbr><span><span>Boolean</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1211292183%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="virtual-boolean.html"><span class="token function">virtualBoolean</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">method<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-675471159%2FFunctions%2F-408471265" anchor-label="virtualInt" id="-675471159%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="virtual-int.html"><span>virtual</span><wbr><span><span>Int</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-675471159%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="virtual-int.html"><span class="token function">virtualInt</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">method<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-865765446%2FFunctions%2F-408471265" anchor-label="virtualInteropPointer" id="-865765446%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="virtual-interop-pointer.html"><span>virtual</span><wbr><span>Interop</span><wbr><span><span>Pointer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-865765446%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="virtual-interop-pointer.html"><span class="token function">virtualInteropPointer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">method<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../-interop-pointer/index.html">InteropPointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1016624352%2FFunctions%2F-408471265" anchor-label="virtualNativePointer" id="1016624352%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="virtual-native-pointer.html"><span>virtual</span><wbr><span>Native</span><wbr><span><span>Pointer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1016624352%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="virtual-native-pointer.html"><span class="token function">virtualNativePointer</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">method<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="../-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-interop-pointer/index.html">InteropPointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

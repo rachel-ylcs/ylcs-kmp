@@ -1,0 +1,574 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>LinuxSkiaLayerComponent</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.7.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/linuxMain">linux</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/linuxMain" data-filter=":/linuxMain">
+                                <span class="checkbox--icon"></span>
+                                linux
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="Native Compose / Skiko::org.jetbrains.skiko/LinuxSkiaLayerComponent///PointingToDeclaration//1160507349">
+  <div class="breadcrumbs"><a href="../../index.html">Native Compose / Skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko</a><span class="delimiter">/</span><span class="current">LinuxSkiaLayerComponent</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Linux</span><wbr><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Component</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="index.html">LinuxSkiaLayerComponent</a></div><p class="paragraph">Platform host used by the Kotlin/Native Linux <a href="../-skia-layer/index.html">SkiaLayer</a>.</p><p class="paragraph">Skiko owns the Skia and Ganesh objects while the embedding toolkit owns the native window and its event loop. Implementations must invoke <a href="request-render.html">requestRender</a> on the window thread.</p></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="622092337%2FProperties%2F1160507349" anchor-label="contentScale" id="622092337%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="content-scale.html"><span>content</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="622092337%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="content-scale.html">contentScale</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">Scale from logical coordinates to physical pixels.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="917306761%2FProperties%2F1160507349" anchor-label="displayRefreshRate" id="917306761%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="display-refresh-rate.html"><span>display</span><wbr><span>Refresh</span><wbr><span><span>Rate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="917306761%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="display-refresh-rate.html">displayRefreshRate</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">Refresh rate of the display containing this window.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="302948957%2FProperties%2F1160507349" anchor-label="drawableHeight" id="302948957%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="drawable-height.html"><span>drawable</span><wbr><span><span>Height</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="302948957%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="drawable-height.html">drawableHeight</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="603570672%2FProperties%2F1160507349" anchor-label="drawableWidth" id="603570672%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="drawable-width.html"><span>drawable</span><wbr><span><span>Width</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="603570672%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="drawable-width.html">drawableWidth</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Current drawable size in physical pixels.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-962918513%2FProperties%2F1160507349" anchor-label="effectiveFrameBufferCount" id="-962918513%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="effective-frame-buffer-count.html"><span>effective</span><wbr><span>Frame</span><wbr><span>Buffer</span><wbr><span><span>Count</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-962918513%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="effective-frame-buffer-count.html">effectiveFrameBufferCount</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Effective number of buffers exposed by the presentation API, or null when it is unknown.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="325590343%2FProperties%2F1160507349" anchor-label="fullscreen" id="325590343%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fullscreen.html"><span><span>fullscreen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="325590343%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">var </span><a href="fullscreen.html">fullscreen</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-963834419%2FProperties%2F1160507349" anchor-label="openGlResolver" id="-963834419%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="open-gl-resolver.html"><span>open</span><wbr><span>Gl</span><wbr><span><span>Resolver</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-963834419%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="open-gl-resolver.html">openGlResolver</a><span class="token operator">: </span><a href="../../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a></div><div class="brief "><p class="paragraph">Native <code class="lang-kotlin">GrGLGetProc</code> callback used to assemble Skia's OpenGL function table.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1628440830%2FProperties%2F1160507349" anchor-label="openGlResolverContext" id="1628440830%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="open-gl-resolver-context.html"><span>open</span><wbr><span>Gl</span><wbr><span>Resolver</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1628440830%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="open-gl-resolver-context.html">openGlResolverContext</a><span class="token operator">: </span><a href="../../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a></div><div class="brief "><p class="paragraph">Context passed to <a href="open-gl-resolver.html">openGlResolver</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-818285920%2FProperties%2F1160507349" anchor-label="pixelGeometry" id="-818285920%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pixel-geometry.html"><span>pixel</span><wbr><span><span>Geometry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-818285920%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="pixel-geometry.html">pixelGeometry</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-pixel-geometry/index.html">PixelGeometry</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1348698890%2FProperties%2F1160507349" anchor-label="transparency" id="1348698890%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="transparency.html"><span><span>transparency</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1348698890%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="transparency.html">transparency</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1211126338%2FProperties%2F1160507349" anchor-label="transparencySupported" id="1211126338%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="transparency-supported.html"><span>transparency</span><wbr><span><span>Supported</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1211126338%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">val </span><a href="transparency-supported.html">transparencySupported</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the host created a window buffer whose alpha channel reaches the window system.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-517355478%2FProperties%2F1160507349" anchor-label="windowHandle" id="-517355478%2FProperties%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="window-handle.html"><span>window</span><wbr><span><span>Handle</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-517355478%2FProperties%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">val </span><a href="window-handle.html">windowHandle</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></div><div class="brief "><p class="paragraph">Native window object exposed through <a href="../-skia-layer/component.html">SkiaLayer.component</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="2002077094%2FFunctions%2F1160507349" anchor-label="beginSoftwareRendering" id="2002077094%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="begin-software-rendering.html"><span>begin</span><wbr><span>Software</span><wbr><span><span>Rendering</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2002077094%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="begin-software-rendering.html"><span class="token function">beginSoftwareRendering</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Prepares the host to present Skia raster surfaces.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-632006579%2FFunctions%2F1160507349" anchor-label="configureFrameBuffering" id="-632006579%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="configure-frame-buffering.html"><span>configure</span><wbr><span>Frame</span><wbr><span><span>Buffering</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-632006579%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="configure-frame-buffering.html"><span class="token function">configureFrameBuffering</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">frameBuffering<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-frame-buffering/index.html">FrameBuffering</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Applies framebuffer configuration before a context is created.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-693665419%2FFunctions%2F1160507349" anchor-label="configureGpuPriority" id="-693665419%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="configure-gpu-priority.html"><span>configure</span><wbr><span>Gpu</span><wbr><span><span>Priority</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-693665419%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="configure-gpu-priority.html"><span class="token function">configureGpuPriority</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">priority<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-gpu-priority/index.html">GpuPriority</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Applies a platform-specific GPU preference before a context is created.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1914047820%2FFunctions%2F1160507349" anchor-label="createOpenGlContext" id="-1914047820%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-open-gl-context.html"><span>create</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1914047820%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="create-open-gl-context.html"><span class="token function">createOpenGlContext</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="436527294%2FFunctions%2F1160507349" anchor-label="createVulkanWindow" id="436527294%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-vulkan-window.html"><span>create</span><wbr><span>Vulkan</span><wbr><span><span>Window</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="436527294%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="create-vulkan-window.html"><span class="token function">createVulkanWindow</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">properties<span class="token operator">: </span><a href="../[linux]-skia-layer-properties/index.html">SkiaLayerProperties</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-linux-vulkan-window/index.html">LinuxVulkanWindow</a></div><div class="brief "><p class="paragraph">Transfers ownership of a toolkit-backed Vulkan window to this layer's renderer.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="824974419%2FFunctions%2F1160507349" anchor-label="deleteOpenGlContext" id="824974419%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete-open-gl-context.html"><span>delete</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="824974419%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="delete-open-gl-context.html"><span class="token function">deleteOpenGlContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-195294056%2FFunctions%2F1160507349" anchor-label="endSoftwareRendering" id="-195294056%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="end-software-rendering.html"><span>end</span><wbr><span>Software</span><wbr><span><span>Rendering</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-195294056%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="end-software-rendering.html"><span class="token function">endSoftwareRendering</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Releases resources allocated by <a href="begin-software-rendering.html">beginSoftwareRendering</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-189229874%2FFunctions%2F1160507349" anchor-label="isOpenGlContextLost" id="-189229874%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-open-gl-context-lost.html"><span>is</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span>Context</span><wbr><span><span>Lost</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-189229874%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="is-open-gl-context-lost.html"><span class="token function">isOpenGlContextLost</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Returns true after the platform reports that the current OpenGL context was lost.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1027236715%2FFunctions%2F1160507349" anchor-label="makeOpenGlContextCurrent" id="1027236715%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="make-open-gl-context-current.html"><span>make</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span>Context</span><wbr><span><span>Current</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1027236715%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="make-open-gl-context-current.html"><span class="token function">makeOpenGlContextCurrent</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-29979163%2FFunctions%2F1160507349" anchor-label="openGlRendererName" id="-29979163%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="open-gl-renderer-name.html"><span>open</span><wbr><span>Gl</span><wbr><span>Renderer</span><wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-29979163%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="open-gl-renderer-name.html"><span class="token function">openGlRendererName</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Name of the adapter backing the current OpenGL context, when available.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="107156598%2FFunctions%2F1160507349" anchor-label="presentSoftwareFrame" id="107156598%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="present-software-frame.html"><span>present</span><wbr><span>Software</span><wbr><span><span>Frame</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="107156598%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="present-software-frame.html"><span class="token function">presentSoftwareFrame</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pixels<span class="token operator">: </span><a href="../../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">rowBytes<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Presents premultiplied native N32 pixels to the window.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2147063981%2FFunctions%2F1160507349" anchor-label="requestRender" id="-2147063981%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="request-render.html"><span>request</span><wbr><span><span>Render</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2147063981%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="request-render.html"><span class="token function">requestRender</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Wakes the embedding toolkit's event loop so it can call <a href="../-skia-layer/[linux]render.html">SkiaLayer.render</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2097462579%2FFunctions%2F1160507349" anchor-label="setOpenGlSwapInterval" id="-2097462579%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-open-gl-swap-interval.html"><span>set</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span>Swap</span><wbr><span><span>Interval</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2097462579%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="set-open-gl-swap-interval.html"><span class="token function">setOpenGlSwapInterval</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">interval<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Returns whether the requested presentation interval was accepted.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1098052921%2FFunctions%2F1160507349" anchor-label="swapOpenGlBuffers" id="-1098052921%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="swap-open-gl-buffers.html"><span>swap</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span><span>Buffers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1098052921%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">abstract </span><span class="token keyword">fun </span><a href="swap-open-gl-buffers.html"><span class="token function">swapOpenGlBuffers</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

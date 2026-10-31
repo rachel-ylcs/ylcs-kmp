@@ -1,0 +1,526 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>SkiaLayer</title>
+<link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.7.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/linuxMain">linux</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/macosArm64Main">macosArm64</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/windowsMain">windows</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/linuxMain" data-filter=":/linuxMain">
+                                <span class="checkbox--icon"></span>
+                                linux
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/macosArm64Main" data-filter=":/macosArm64Main">
+                                <span class="checkbox--icon"></span>
+                                macosArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/windowsMain" data-filter=":/windowsMain">
+                                <span class="checkbox--icon"></span>
+                                windows
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="Native Compose / Skiko::org.jetbrains.skiko/SkiaLayer///PointingToDeclaration//882612111">
+  <div class="breadcrumbs"><a href="../../index.html">Native Compose / Skiko</a><span class="delimiter">/</span><a href="../index.html">org.jetbrains.skiko</a><span class="delimiter">/</span><span class="current">SkiaLayer</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Skia</span><wbr><span><span>Layer</span></span></h1>
+    <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+      <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">SkiaLayer</a></div><p class="paragraph">Generic layer for Skiko rendering.</p></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">SkiaLayer</a></div><p class="paragraph">SkiaLayer implementation for macOS. Supports <a href="../../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/-m-e-t-a-l/index.html">GraphicsApi.METAL</a> and <a href="../../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/-o-p-e-n-g-l/index.html">GraphicsApi.OPENGL</a>.</p></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">SkiaLayer</a></div><p class="paragraph">Kotlin/Native Windows layer backed by a Win32 HWND.</p></div>    </div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="1311903101%2FConstructors%2F882612111" anchor-label="SkiaLayer" id="1311903101%2FConstructors%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skia-layer.html"><span>Skia</span><wbr><span><span>Layer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1311903101%2FConstructors%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">properties<span class="token operator">: </span><a href="../[linux]-skia-layer-properties/index.html">SkiaLayerProperties</a><span class="token operator"> = </span>SkiaLayerProperties()<span class="token punctuation">, </span></span><span class="parameter ">analytics<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer-analytics/index.html">SkiaLayerAnalytics</a><span class="token operator"> = </span>SkiaLayerAnalytics.Empty</span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">properties<span class="token operator">: </span><a href="../[windows]-skia-layer-properties/index.html">SkiaLayerProperties</a><span class="token operator"> = </span>SkiaLayerProperties()<span class="token punctuation">, </span></span><span class="parameter ">analytics<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer-analytics/index.html">SkiaLayerAnalytics</a><span class="token operator"> = </span>SkiaLayerAnalytics.Empty<span class="token punctuation">, </span></span><span class="parameter ">pixelGeometry<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-pixel-geometry/index.html">PixelGeometry</a><span class="token operator"> = </span>SkikoProperties.pixelGeometry</span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="159352266%2FProperties%2F882612111" anchor-label="component" id="159352266%2FProperties%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="component.html"><span><span>component</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="159352266%2FProperties%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="component.html">component</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Underlying platform component.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="component.html">component</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Underlying platform component.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="component.html">component</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Underlying platform component.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1379860510%2FProperties%2F882612111" anchor-label="contentScale" id="-1379860510%2FProperties%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="content-scale.html"><span>content</span><wbr><span><span>Scale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1379860510%2FProperties%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="content-scale.html">contentScale</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">Current content scale.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="content-scale.html">contentScale</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">The scale factor of <span data-unresolved-link="platform.AppKit/NSWindow///PointingToDeclaration/">NSWindow</span> https://developer.apple.com/documentation/appkit/nswindow/1419459-backingscalefactor</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="content-scale.html">contentScale</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-float/index.html">Float</a></div><div class="brief "><p class="paragraph">Current content scale.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1271993989%2FProperties%2F-416977732" anchor-label="diagnostics" id="-1271993989%2FProperties%2F-416977732" data-filterable-set=":/linuxMain,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/windowsMain" data-filterable-set=":/linuxMain,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]diagnostics.html"><span><span>diagnostics</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1271993989%2FProperties%2F-416977732"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[linux]diagnostics.html">diagnostics</a><span class="token operator">: </span><a href="../-linux-skia-layer-diagnostics/index.html">LinuxSkiaLayerDiagnostics</a></div><div class="brief "><p class="paragraph">Current renderer and recovery counters for diagnostics and support tooling.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[windows]diagnostics.html">diagnostics</a><span class="token operator">: </span><a href="../-windows-skia-layer-diagnostics/index.html">WindowsSkiaLayerDiagnostics</a></div><div class="brief "><p class="paragraph">Current renderer and recovery counters for diagnostics and support tooling.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="292222264%2FProperties%2F882612111" anchor-label="fullscreen" id="292222264%2FProperties%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="fullscreen.html"><span><span>fullscreen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="292222264%2FProperties%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="fullscreen.html">fullscreen</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If rendering is full screen.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="fullscreen.html">fullscreen</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Fullscreen follows the attached Native host. An NSView-only attachment does not own its window.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="fullscreen.html">fullscreen</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">If rendering is full screen.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1800382944%2FProperties%2F-416977732" anchor-label="hasPendingRender" id="1800382944%2FProperties%2F-416977732" data-filterable-set=":/linuxMain,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/windowsMain" data-filterable-set=":/linuxMain,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]has-pending-render.html"><span>has</span><wbr><span>Pending</span><wbr><span><span>Render</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1800382944%2FProperties%2F-416977732"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[linux]has-pending-render.html">hasPendingRender</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">True when <a href="need-render.html">needRender</a> has requested a frame that has not been presented yet.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[windows]has-pending-render.html">hasPendingRender</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">True when <a href="need-render.html">needRender</a> has requested a frame that has not been presented yet.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="128803017%2FProperties%2F-444939233" anchor-label="nsView" id="128803017%2FProperties%2F-444939233" data-filterable-set=":/macosArm64Main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="ns-view.html"><span>ns</span><wbr><span><span>View</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="128803017%2FProperties%2F-444939233"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-active="" data-toggle=":/macosArm64Main">macosArm64</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">lateinit </span><span class="token keyword">var </span><a href="ns-view.html">nsView</a><span class="token operator">: </span><span data-unresolved-link="platform.AppKit/NSView///PointingToDeclaration/">NSView</span></div><div class="brief "><p class="paragraph">Underlying <span data-unresolved-link="platform.AppKit/NSView///PointingToDeclaration/">NSView</span></p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1545685263%2FProperties%2F882612111" anchor-label="pixelGeometry" id="1545685263%2FProperties%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pixel-geometry.html"><span>pixel</span><wbr><span><span>Geometry</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1545685263%2FProperties%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="pixel-geometry.html">pixelGeometry</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-pixel-geometry/index.html">PixelGeometry</a></div><div class="brief "><p class="paragraph">Pixel geometry corresponding to graphics device which renders this layer</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="pixel-geometry.html">pixelGeometry</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-pixel-geometry/index.html">PixelGeometry</a></div><div class="brief "><p class="paragraph">Pixel geometry corresponding to graphics device which renders this layer</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="pixel-geometry.html">pixelGeometry</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-pixel-geometry/index.html">PixelGeometry</a></div><div class="brief "><p class="paragraph">Pixel geometry corresponding to graphics device which renders this layer</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-45024576%2FProperties%2F-416977732" anchor-label="properties" id="-45024576%2FProperties%2F-416977732" data-filterable-set=":/linuxMain,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/windowsMain" data-filterable-set=":/linuxMain,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]properties.html"><span><span>properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-45024576%2FProperties%2F-416977732"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[linux]properties.html">properties</a><span class="token operator">: </span><a href="../[linux]-skia-layer-properties/index.html">SkiaLayerProperties</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[windows]properties.html">properties</a><span class="token operator">: </span><a href="../[windows]-skia-layer-properties/index.html">SkiaLayerProperties</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1620896771%2FProperties%2F882612111" anchor-label="renderApi" id="1620896771%2FProperties%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="render-api.html"><span>render</span><wbr><span><span>Api</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1620896771%2FProperties%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="render-api.html">renderApi</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a></div><div class="brief "><p class="paragraph">Current graphics API used for rendering.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="render-api.html">renderApi</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a></div><div class="brief "><p class="paragraph">Graphics API used by the native macOS renderer.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="render-api.html">renderApi</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a></div><div class="brief "><p class="paragraph">Current graphics API used for rendering.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-558679880%2FProperties%2F882612111" anchor-label="renderDelegate" id="-558679880%2FProperties%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="render-delegate.html"><span>render</span><wbr><span><span>Delegate</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-558679880%2FProperties%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="render-delegate.html">renderDelegate</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Current view used for rendering.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="render-delegate.html">renderDelegate</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Implements rendering logic and events processing.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">var </span><a href="render-delegate.html">renderDelegate</a><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Current view used for rendering.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-601489778%2FProperties%2F882612111" anchor-label="rendererDescription" id="-601489778%2FProperties%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]renderer-description.html"><span>renderer</span><wbr><span><span>Description</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-601489778%2FProperties%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[linux]renderer-description.html">rendererDescription</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">val </span><a href="[macos-arm64]renderer-description.html">rendererDescription</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="[windows]renderer-description.html">rendererDescription</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-653253957%2FProperties%2F857082419" anchor-label="transparency" id="-653253957%2FProperties%2F857082419" data-filterable-set=":/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="transparency.html"><span><span>transparency</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-653253957%2FProperties%2F857082419"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-active="" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">var </span><a href="transparency.html">transparency</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Whether the attached Win32 window should expose a composited buffer with per-pixel alpha.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1712101964%2FFunctions%2F882612111" anchor-label="attachTo" id="-1712101964%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="attach-to.html"><span>attach</span><wbr><span><span>To</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1712101964%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="attach-to.html"><span class="token function">attachTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">container<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Attach this <a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a> to platform container. Actual type of attach container is platform-specific.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="attach-to.html"><span class="token function">attachTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">container<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span></div><div class="brief "></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="attach-to.html"><span class="token function">attachTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">container<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Attach this <a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a> to platform container. Actual type of attach container is platform-specific.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-275073184%2FFunctions%2F882612111" anchor-label="detach" id="-275073184%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="detach.html"><span><span>detach</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-275073184%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="detach.html"><span class="token function">detach</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Detach this <a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a> from platform container.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="detach.html"><span class="token function">detach</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Detach this <a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a> from platform container.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="detach.html"><span class="token function">detach</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Detach this <a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skiko-render-delegate/index.html">SkikoRenderDelegate</a> from platform container.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-587114996%2FFunctions%2F882612111" anchor-label="drawOpenGlTexture" id="-587114996%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]draw-open-gl-texture.html"><span>draw</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span><span>Texture</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-587114996%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[linux]draw-open-gl-texture.html"><span class="token function">drawOpenGlTexture</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">textureId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">canvas<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-canvas/index.html">Canvas</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[macos-arm64]draw-open-gl-texture.html"><span class="token function">drawOpenGlTexture</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">textureId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">canvas<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-canvas/index.html">Canvas</a></span></span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[windows]draw-open-gl-texture.html"><span class="token function">drawOpenGlTexture</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">textureId<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">canvas<span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-canvas/index.html">Canvas</a></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="310000972%2FFunctions%2F-444939233" anchor-label="isShowing" id="310000972%2FFunctions%2F-444939233" data-filterable-set=":/macosArm64Main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-showing.html"><span>is</span><wbr><span><span>Showing</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="310000972%2FFunctions%2F-444939233"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-active="" data-toggle=":/macosArm64Main">macosArm64</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="is-showing.html"><span class="token function">isShowing</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="918724358%2FFunctions%2F882612111" anchor-label="needRedraw" id="918724358%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="need-redraw.html"><span>need</span><wbr><span><span>Redraw</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="918724358%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="need-redraw.html"><span class="token function"><strike>needRedraw</strike></span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="need-redraw.html"><span class="token function"><strike>needRedraw</strike></span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="need-redraw.html"><span class="token function"><strike>needRedraw</strike></span></a><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1296115532%2FFunctions%2F882612111" anchor-label="needRender" id="1296115532%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="need-render.html"><span>need</span><wbr><span><span>Render</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1296115532%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="need-render.html"><span class="token function">needRender</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">throttledToVsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Request redrawing of the content; The <a href="render-delegate.html">renderDelegate</a> will be asked to re-render, and the result will be drawn on the screen.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="need-render.html"><span class="token function">needRender</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">throttledToVsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Schedules a frame to an appropriate moment.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="need-render.html"><span class="token function">needRender</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">throttledToVsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Request redrawing of the content; The <a href="render-delegate.html">renderDelegate</a> will be asked to re-render, and the result will be drawn on the screen.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1965006658%2FFunctions%2F882612111" anchor-label="render" id="1965006658%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]render.html"><span><span>render</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1965006658%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[linux]render.html"><span class="token function">render</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">force<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Renders a pending frame. The embedding toolkit calls this from its native window thread.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[macos-arm64]render.html"><span class="token function">render</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">force<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[windows]render.html"><span class="token function">render</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">force<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Renders one pending frame on the thread that owns the attached HWND.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-781092976%2FFunctions%2F882612111" anchor-label="snapshot" id="-781092976%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]snapshot.html"><span><span>snapshot</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-781092976%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[linux]snapshot.html"><span class="token function">snapshot</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-bitmap/index.html">Bitmap</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[macos-arm64]snapshot.html"><span class="token function">snapshot</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-bitmap/index.html">Bitmap</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="[windows]snapshot.html"><span class="token function">snapshot</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">width<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">height<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../../native-compose/skiko/org.jetbrains.skia/-bitmap/index.html">Bitmap</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="15509644%2FFunctions%2F882612111" anchor-label="withOpenGlContext" id="15509644%2FFunctions%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../../native-compose/skiko/org.jetbrains.skiko/-skia-layer/[windows]with-open-gl-context.html"><span>with</span><wbr><span>Open</span><wbr><span>Gl</span><wbr><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="15509644%2FFunctions%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="[linux]with-open-gl-context.html">T</a><span class="token operator">&gt; </span><a href="[linux]with-open-gl-context.html"><span class="token function">withOpenGlContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="[linux]with-open-gl-context.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="[linux]with-open-gl-context.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="[macos-arm64]with-open-gl-context.html">T</a><span class="token operator">&gt; </span><a href="[macos-arm64]with-open-gl-context.html"><span class="token function">withOpenGlContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="[macos-arm64]with-open-gl-context.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="[macos-arm64]with-open-gl-context.html">T</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">fun </span><span class="token operator">&lt;</span><a href="[windows]with-open-gl-context.html">T</a><span class="token operator">&gt; </span><a href="[windows]with-open-gl-context.html"><span class="token function">withOpenGlContext</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">block<span class="token operator">: </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="[windows]with-open-gl-context.html">T</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="[windows]with-open-gl-context.html">T</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

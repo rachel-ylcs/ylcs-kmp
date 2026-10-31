@@ -1,0 +1,395 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>org.jetbrains.skiko</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script></head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+<a class="library-name--link" href="../../../index.html" tabindex="1">
+                    Rachel
+            </a>        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle" type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">3.7.1
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/linuxMain">linux</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/macosArm64Main">macosArm64</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/nativeMain">native</button>
+                <button class="platform-tag platform-selector native-like" data-active="" aria-pressed="true" data-filter=":/windowsMain">windows</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox" data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox" aria-expanded="false" aria-label="Toggle source sets"></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/linuxMain" data-filter=":/linuxMain">
+                                <span class="checkbox--icon"></span>
+                                linux
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/macosArm64Main" data-filter=":/macosArm64Main">
+                                <span class="checkbox--icon"></span>
+                                macosArm64
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/nativeMain" data-filter=":/nativeMain">
+                                <span class="checkbox--icon"></span>
+                                native
+                            </label>
+                        </li>
+                        <li role="option" class="dropdown--option platform-selector-option native-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":/windowsMain" data-filter=":/windowsMain">
+                                <span class="checkbox--icon"></span>
+                                windows
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button" type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config="{&quot;defaultSize&quot;: 280, &quot;minSize&quot;: 200, &quot;maxSize&quot;: 400}">
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list" data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Rachel
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="package" id="content" pageids="Native Compose / Skiko::org.jetbrains.skiko////PointingToDeclaration//1880606690">
+  <div class="breadcrumbs"><a href="../index.html">Native Compose / Skiko</a><span class="delimiter">/</span><span class="current">org.jetbrains.skiko</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Package-level</span></span> <span><span>declarations</span></span></h1>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="TYPE">Types</button><button class="section-tab" data-togglable="FUNCTION,EXTENSION_FUNCTION">Functions</button><button class="section-tab" data-togglable="PROPERTY,EXTENSION_PROPERTY">Properties</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-567971011%2FClasslikes%2F1160507349" anchor-label="LinuxSkiaLayerComponent" id="-567971011%2FClasslikes%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-linux-skia-layer-component/index.html"><span>Linux</span><wbr><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Component</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-567971011%2FClasslikes%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-linux-skia-layer-component/index.html">LinuxSkiaLayerComponent</a></div><div class="brief "><p class="paragraph">Platform host used by the Kotlin/Native Linux <a href="-skia-layer/index.html">SkiaLayer</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1326312658%2FClasslikes%2F1160507349" anchor-label="LinuxSkiaLayerDiagnostics" id="-1326312658%2FClasslikes%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-linux-skia-layer-diagnostics/index.html"><span>Linux</span><wbr><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Diagnostics</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1326312658%2FClasslikes%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-linux-skia-layer-diagnostics/index.html">LinuxSkiaLayerDiagnostics</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>renderApi<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>rendererDescription<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>deviceName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>renderedFrameCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fallbackCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>contextRecoveryCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>lastFailure<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>isVsyncEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>frameBuffering<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-frame-buffering/index.html">FrameBuffering</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>effectiveFrameBufferCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>transparencyRequested<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>hasTransparentWindowBuffer<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>adapterPriority<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-gpu-priority/index.html">GpuPriority</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>gpuResourceCacheLimit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>pixelGeometry<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skia/-pixel-geometry/index.html">PixelGeometry</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fpsAverage<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fpsMinimum<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fpsMaximum<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-583506594%2FClasslikes%2F1160507349" anchor-label="LinuxVulkanWindow" id="-583506594%2FClasslikes%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-linux-vulkan-window/index.html"><span>Linux</span><wbr><span>Vulkan</span><wbr><span><span>Window</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-583506594%2FClasslikes%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-linux-vulkan-window/index.html">LinuxVulkanWindow</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">instanceExtensions<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">surfaceFactory<span class="token operator">: </span><a href="../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">userData<span class="token operator">: </span><a href="../org.jetbrains.skia.impl/-native-pointer/index.html">NativePointer</a><span class="token punctuation">, </span></span><span class="parameter ">properties<span class="token operator">: </span><a href="[linux]-skia-layer-properties/index.html">SkiaLayerProperties</a><span class="token operator"> = </span>SkiaLayerProperties()<span class="token punctuation">, </span></span><span class="parameter ">transparent<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Owns a Ganesh Vulkan device and swapchain for a toolkit's Linux window.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="93925214%2FClasslikes%2F-444939233" anchor-label="MacosSkiaLayerComponent" id="93925214%2FClasslikes%2F-444939233" data-filterable-set=":/macosArm64Main"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-macos-skia-layer-component/index.html"><span>Macos</span><wbr><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Component</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="93925214%2FClasslikes%2F-444939233"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-active="" data-toggle=":/macosArm64Main">macosArm64</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">interface </span><a href="-macos-skia-layer-component/index.html">MacosSkiaLayerComponent</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="576333804%2FClasslikes%2F882612111" anchor-label="SkiaLayer" id="576333804%2FClasslikes%2F882612111" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/macosArm64Main,:/windowsMain" data-filterable-set=":/linuxMain,:/macosArm64Main,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-skia-layer/index.html"><span>Skia</span><wbr><span><span>Layer</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="576333804%2FClasslikes%2F882612111"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/macosArm64Main" data-filterable-set=":/macosArm64Main" data-toggle=":/macosArm64Main">macosArm64</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">Generic layer for Skiko rendering.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/macosArm64Main"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">SkiaLayer implementation for macOS. Supports <a href="../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/-m-e-t-a-l/index.html">GraphicsApi.METAL</a> and <a href="../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/-o-p-e-n-g-l/index.html">GraphicsApi.OPENGL</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">open </span><span class="token keyword">class </span><a href="-skia-layer/index.html">SkiaLayer</a></div><div class="brief "><p class="paragraph">Kotlin/Native Windows layer backed by a Win32 HWND.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="442901561%2FClasslikes%2F-416977732" anchor-label="SkiaLayerProperties" id="442901561%2FClasslikes%2F-416977732" data-filterable-set=":/linuxMain,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/windowsMain" data-filterable-set=":/linuxMain,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../native-compose/skiko/org.jetbrains.skiko/[windows]-skia-layer-properties/index.html"><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="442901561%2FClasslikes%2F-416977732"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="[linux]-skia-layer-properties/index.html">SkiaLayerProperties</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>isVsyncEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span>SkikoProperties.vsyncEnabled<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>isVsyncFramelimitFallbackEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span>SkikoProperties.vsyncFramelimitFallbackEnabled<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>frameBuffering<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-frame-buffering/index.html">FrameBuffering</a><span class="token operator"> = </span>SkikoProperties.frameBuffering<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>renderApi<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a><span class="token operator"> = </span>SkikoProperties.renderApi<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>adapterPriority<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-gpu-priority/index.html">GpuPriority</a><span class="token operator"> = </span>SkikoProperties.gpuPriority<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>gpuResourceCacheLimit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span>SkikoProperties.gpuResourceCacheLimit</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Rendering configuration for a Kotlin/Native Linux <a href="-skia-layer/index.html">SkiaLayer</a>.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="[windows]-skia-layer-properties/index.html">SkiaLayerProperties</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>isVsyncEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span>SkikoProperties.vsyncEnabled<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>isVsyncFramelimitFallbackEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span>SkikoProperties.vsyncFramelimitFallbackEnabled<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>frameBuffering<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-frame-buffering/index.html">FrameBuffering</a><span class="token operator"> = </span>SkikoProperties.frameBuffering<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>renderApi<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a><span class="token operator"> = </span>SkikoProperties.renderApi<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>adapterPriority<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-gpu-priority/index.html">GpuPriority</a><span class="token operator"> = </span>SkikoProperties.gpuPriority<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>gpuResourceCacheLimit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span>SkikoProperties.gpuResourceCacheLimit</span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Rendering configuration for a Kotlin/Native Windows <a href="-skia-layer/index.html">SkiaLayer</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-320186043%2FClasslikes%2F-416977732" anchor-label="SkikoProperties" id="-320186043%2FClasslikes%2F-416977732" data-filterable-set=":/linuxMain,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/windowsMain" data-filterable-set=":/linuxMain,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../../native-compose/skiko/org.jetbrains.skiko/[windows]-skiko-properties/index.html"><span>Skiko</span><wbr><span><span>Properties</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-320186043%2FClasslikes%2F-416977732"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="[linux]-skiko-properties/index.html">SkikoProperties</a></div><div class="brief "><p class="paragraph">Environment-backed rendering defaults for Kotlin/Native Linux.</p></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">object </span><a href="[windows]-skiko-properties/index.html">SkikoProperties</a></div><div class="brief "><p class="paragraph">Environment-backed rendering defaults for Kotlin/Native Windows.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-429577789%2FClasslikes%2F857082419" anchor-label="WindowsNativeWindow" id="-429577789%2FClasslikes%2F857082419" data-filterable-set=":/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-windows-native-window/index.html"><span>Windows</span><wbr><span>Native</span><wbr><span><span>Window</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-429577789%2FClasslikes%2F857082419"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-active="" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">class </span><a href="-windows-native-window/index.html">WindowsNativeWindow</a></div><div class="brief "><p class="paragraph">A Win32 window accepted by <a href="-skia-layer/attach-to.html">SkiaLayer.attachTo</a>.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="759289599%2FClasslikes%2F857082419" anchor-label="WindowsSkiaLayerDiagnostics" id="759289599%2FClasslikes%2F857082419" data-filterable-set=":/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-windows-skia-layer-diagnostics/index.html"><span>Windows</span><wbr><span>Skia</span><wbr><span>Layer</span><wbr><span><span>Diagnostics</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="759289599%2FClasslikes%2F857082419"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-active="" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-windows-skia-layer-diagnostics/index.html">WindowsSkiaLayerDiagnostics</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>renderApi<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-graphics-api/index.html">GraphicsApi</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>rendererDescription<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>deviceName<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>renderedFrameCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fallbackCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>contextRecoveryCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>lastFailure<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>isVsyncEnabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>frameBuffering<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-frame-buffering/index.html">FrameBuffering</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>effectiveFrameBufferCount<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>transparencyRequested<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>hasTransparentWindowBuffer<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>adapterPriority<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-gpu-priority/index.html">GpuPriority</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>gpuResourceCacheLimit<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>pixelGeometry<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skia/-pixel-geometry/index.html">PixelGeometry</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fpsAverage<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fpsMinimum<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>fpsMaximum<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1029754094%2FProperties%2F857082419" anchor-label="currentDirect3DContext" id="1029754094%2FProperties%2F857082419" data-filterable-set=":/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="current-direct3-d-context.html"><span>current</span><wbr><span><span>Direct3DContext</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1029754094%2FProperties%2F857082419"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-active="" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">val </span><a href="current-direct3-d-context.html">currentDirect3DContext</a><span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skia/-direct-context/index.html">DirectContext</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Borrowed from the active Native renderer; use on its render thread and never close it.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1059629801%2FProperties%2F-416977732" anchor-label="currentSystemTheme" id="1059629801%2FProperties%2F-416977732" data-filterable-set=":/linuxMain,:/windowsMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain,:/windowsMain" data-filterable-set=":/linuxMain,:/windowsMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="current-system-theme.html"><span>current</span><wbr><span>System</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1059629801%2FProperties%2F-416977732"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button><button class="platform-bookmark" data-filterable-current=":/windowsMain" data-filterable-set=":/windowsMain" data-toggle=":/windowsMain">windows</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div><div class="content sourceset-dependent-content" data-togglable=":/windowsMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">val </span><a href="current-system-theme.html">currentSystemTheme</a><span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1959357898%2FFunctions%2F-408471265" anchor-label="currentNanoTime" id="-1959357898%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="current-nano-time.html"><span>current</span><wbr><span>Nano</span><wbr><span><span>Time</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1959357898%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">fun </span><a href="current-nano-time.html"><span class="token function">currentNanoTime</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="749164744%2FFunctions%2F-408471265" anchor-label="loadBytesFromPath" id="749164744%2FFunctions%2F-408471265" data-filterable-set=":/nativeMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="load-bytes-from-path.html"><span>load</span><wbr><span>Bytes</span><wbr><span>From</span><wbr><span><span>Path</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="749164744%2FFunctions%2F-408471265"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/nativeMain" data-filterable-set=":/nativeMain" data-active="" data-toggle=":/nativeMain">native</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/nativeMain"><div class="symbol monospace"><span class="token keyword">actual </span><span class="token keyword">suspend </span><span class="token keyword">fun </span><a href="load-bytes-from-path.html"><span class="token function">loadBytesFromPath</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">path<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-byte-array/index.html">ByteArray</a></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2111217208%2FFunctions%2F1160507349" anchor-label="updateLinuxSystemTheme" id="-2111217208%2FFunctions%2F1160507349" data-filterable-set=":/linuxMain"></a>
+          <div class="table-row table-row_content" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-linux-system-theme.html"><span>update</span><wbr><span>Linux</span><wbr><span>System</span><wbr><span><span>Theme</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2111217208%2FFunctions%2F1160507349"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted  with-platform-tabs" data-platform-hinted="data-platform-hinted">
+                    <div class="platform-bookmarks-row" data-toggle-list="data-toggle-list"><button class="platform-bookmark" data-filterable-current=":/linuxMain" data-filterable-set=":/linuxMain" data-active="" data-toggle=":/linuxMain">linux</button></div>
+<div class="content sourceset-dependent-content" data-active="" data-togglable=":/linuxMain"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-linux-system-theme.html"><span class="token function">updateLinuxSystemTheme</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">theme<span class="token operator">: </span><a href="../../../native-compose/skiko/org.jetbrains.skiko/-system-theme/index.html">SystemTheme</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Updates Skiko's synchronous theme value from the platform host's existing theme observer.</p></div></div>                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
