@@ -49,6 +49,7 @@ object NativeWindow {
         check(!running) { "A NativeWindow event loop is already running" }
         running = true
         try {
+            SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1")
             check(RachelSDL_InitWindowHost()) { SDL_GetError()?.toKString() ?: "SDL_Init failed" }
             try {
                 val host = SdlWindowSession()
