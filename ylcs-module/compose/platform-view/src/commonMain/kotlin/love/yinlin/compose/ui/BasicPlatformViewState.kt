@@ -54,7 +54,10 @@ abstract class BasicPlatformViewState<V : Any, P : Any> : PlatformViewStateOwner
         Coroutines.dispatchUI {
             releaseRequested = true
             active = false
-            platformViewCleanup(*bindings.map { binding -> { binding.cancelTasks() } }.toTypedArray(), ::finishRelease)
+            platformViewCleanup(
+                *bindings.map { binding -> { binding.cancelTasks() } }.toTypedArray(),
+                ::finishRelease
+            )
         }
     }
 
@@ -89,10 +92,15 @@ abstract class BasicPlatformViewState<V : Any, P : Any> : PlatformViewStateOwner
 
     internal fun finish(binding: PlatformViewBinding<V, P>) {
         deactivate(binding)
-        platformViewCleanup(binding::cancelTasks, { binding.view?.let(::detach) }, {
-            binding.clear()
-            bindings.remove(binding)
-        }, ::finishRelease)
+        platformViewCleanup(
+            binding::cancelTasks,
+            { binding.view?.let(::detach) },
+            {
+                binding.clear()
+                bindings.remove(binding)
+            },
+            ::finishRelease
+        )
     }
 
     private fun finishRelease() {

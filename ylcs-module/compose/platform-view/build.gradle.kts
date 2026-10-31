@@ -38,6 +38,14 @@ rachel {
 
             iosMainList(iosMain)
 
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
+
             webMain(commonMain)
 
             jsMain(webMain)

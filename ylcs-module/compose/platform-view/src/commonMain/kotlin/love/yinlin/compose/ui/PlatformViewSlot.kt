@@ -33,7 +33,10 @@ internal class PlatformViewSlot<V : Any, P : Any>(private val state: BasicPlatfo
 
     override fun onForgotten() {
         remembered = false
-        platformViewCleanup({ binding?.deactivate() }, { onForgotten?.invoke() })
+        platformViewCleanup(
+            { binding?.deactivate() },
+            { onForgotten?.invoke() }
+        )
     }
 
     override fun onAbandoned() = finish()

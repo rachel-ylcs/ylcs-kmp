@@ -21,6 +21,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toDpSize
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.LocalNativeWindowContext
+import androidx.compose.ui.window.NativeWindowContext
+import androidx.compose.ui.viewinterop.LocalInteropContainer
+import androidx.compose.ui.viewinterop.TrackInteropPlacementContainer
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.enableSavedStateHandles
 import androidx.navigationevent.DirectNavigationEventInput
@@ -54,6 +58,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
     private val locales = mutableStateOf(LocaleList.current)
     private var closed = false
     @Volatile private var window: NativeWindowScope? = null
+    private var windowContext: NativeWindowContext? = null
 
     private val platform = object : PlatformContext.Empty() {
         override val architectureComponentsOwner: PlatformArchitectureComponentsOwner get() = owner
@@ -81,13 +86,21 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
             owner.setLifecycleState(Lifecycle.State.CREATED)
             recomposer = FrameRecomposer(dispatcher.context, ::invalidate)
             createdRecomposer = recomposer
-            scene = CanvasLayersComposeScene(recomposer, platformContext = platform,
-                invalidateLayout = rendering::onSceneInvalidation, invalidateDraw = rendering::onSceneInvalidation)
+            scene = CanvasLayersComposeScene(recomposer, platformContext = platform, invalidateLayout = rendering::onSceneInvalidation, invalidateDraw = rendering::onSceneInvalidation)
         }
         catch (error: Throwable) {
-            val cleanup: List<() -> Unit> = [{ createdRecomposer?.close() },
-                { createdOwner?.let { if (it.lifecycle.currentState != Lifecycle.State.INITIALIZED) it.setLifecycleState(Lifecycle.State.DESTROYED) } },
-                { createdOwner?.viewModelStore?.clear() }, { createdOwner?.navigationEventDispatcher?.dispose() }, dispatcher::close]
+            val cleanup: List<() -> Unit> = [
+                { createdRecomposer?.close() },
+                {
+                    createdOwner?.let {
+                        if (it.lifecycle.currentState != Lifecycle.State.INITIALIZED) it.setLifecycleState(Lifecycle.State.DESTROYED)
+                    }
+                },
+                { createdOwner?.viewModelStore?.clear() },
+                { createdOwner?.navigationEventDispatcher?.dispose() },
+                dispatcher::close
+            ]
+
             for (action in cleanup) {
                 try { action() }
                 catch (failure: Throwable) { if (failure !== error) error.addSuppressed(failure) }
@@ -99,6 +112,9 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
     fun attach(window: NativeWindowScope) {
         check(!closed && this.window == null) { "Native scene host is already attached or closed" }
         this.window = window
+        windowContext = NativeWindowContext(window, scene::hitTestInteropView) { update ->
+            dispatcher.dispatch(dispatcher.context, update)
+        }
         dispatcher.wake = window::invalidate
         textInput.attach(window)
         refreshEnvironment()
@@ -112,8 +128,11 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
 
     fun setContent(content: @Composable () -> Unit) {
         check(!closed)
+        val context = checkNotNull(windowContext) { "Attach the Native window before setting its content" }
         scene.setContent {
-            CompositionLocalProvider(LocalSystemTheme provides systemTheme.value, content = content)
+            CompositionLocalProvider(LocalSystemTheme provides systemTheme.value, LocalNativeWindowContext provides context, LocalInteropContainer provides context.interopContainer) {
+                context.interopContainer.TrackInteropPlacementContainer(content)
+            }
         }
     }
 
@@ -121,8 +140,10 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         check(!closed)
         updateGeometry(width, height)
         dispatcher.runCurrent()
+        windowContext?.updateNativeFocus()
         with(rendering) {
             canvasHolder.drawInto(canvas) { scene.render(recomposer, this@drawInto, nanoTime) }
+            windowContext?.updateViewOrder()
         }
         dispatcher.runCurrent()
         textInput.updateInputArea()
@@ -132,6 +153,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         if (closed) return
         dispatcher.runCurrent()
         if (event == NativeWindowEvent.Wake) return
+        if ((event is NativeWindowEvent.Key || event is NativeWindowEvent.TextInput || event is NativeWindowEvent.TextEditing) && windowContext?.hasNativeKeyboardFocus() == true) return
         window?.let { updateGeometry(it.pixelWidth, it.pixelHeight) }
         when (event) {
             NativeWindowEvent.Wake, is NativeWindowEvent.WindowStateChanged -> Unit
@@ -289,7 +311,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
         closed = true
         var failure: Throwable? = null
         val cleanup: List<() -> Unit> = [{ window?.setDropTarget(null) }, ::endDropPreview, dropObserver::stop, dropObserver::clear,
-            scene::close, recomposer::close, dispatcher::runCurrent, textInput::close,
+            scene::close, { windowContext?.dispose() }, recomposer::close, dispatcher::runCurrent, textInput::close,
             { owner.setLifecycleState(Lifecycle.State.DESTROYED) }, owner.viewModelStore::clear, owner.navigationEventDispatcher::dispose, dispatcher::close]
         for (action in cleanup) {
             try { action() }
@@ -300,6 +322,7 @@ internal class NativeSceneHost(private val onCloseRequest: () -> Boolean = { tru
             }
         }
         drops.clear()
+        windowContext = null
         window = null
         failure?.let { throw it }
     }
