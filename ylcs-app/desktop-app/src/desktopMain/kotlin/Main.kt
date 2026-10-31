@@ -56,6 +56,5 @@ fun main(args: Array<String>) {
 
             DefaultTopBarActions(controller, onExit)
         }
-
     }.run()
 }

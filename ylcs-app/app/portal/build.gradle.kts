@@ -8,12 +8,15 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
         libs.plugins.androidLibrary,
     )
 }
 
 rachel {
     multiplatform {
+        nativeDesktopTarget = true
+
         iosFrameworkBaseName = C.app.projectName
         iosFrameworkIsStatic = true
 

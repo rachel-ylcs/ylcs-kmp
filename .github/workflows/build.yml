@@ -30,6 +30,7 @@ jobs:
       android: ${{ steps.filter.outputs.android }}
       ios: ${{ steps.filter.outputs.ios }}
       desktop: ${{ steps.filter.outputs.desktop }}
+      nativeDesktop: ${{ steps.filter.outputs.nativeDesktop }}
       web: ${{ steps.filter.outputs.web }}
       server: ${{ steps.filter.outputs.server }}
       modManager: ${{ steps.filter.outputs.modManager }}
@@ -86,6 +87,14 @@ jobs:
               - 'ylcs-app/app/**/jvmMain/**'
               - 'ylcs-app/app/**/desktopMain/**'
               - 'ylcs-app/desktop-app/**'
+            nativeDesktop:
+              - *client
+              - 'ylcs-module/**/src/{nativeMain,nativeInterop,pcMain,skikoMain,posixMain,appleMain,windowsMain,linuxMain,macosMain}/**'
+              - 'ylcs-app/app/**/src/{nativeMain,nativeInterop,pcMain,skikoMain,posixMain,appleMain,windowsMain,linuxMain,macosMain}/**'
+              - 'native-compose/adaptation/**'
+              - 'native-compose/upstream/**'
+              - 'native-compose/gradle/**'
+              - 'ylcs-app/native-desktop-app/**'
             web:
               - *client
               - 'ylcs-module/**/webMain/**'
@@ -153,6 +162,28 @@ jobs:
       submodules: recursive
       msvc: true
       gtk: true
+
+  build-nativeDesktop:
+    name: Build Native Desktop / ${{ matrix.target }}
+    needs: changes
+    if: ${{ needs.changes.outputs.nativeDesktop == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: Windows
+          - runner: ubuntu-24.04
+            target: Linux
+          - runner: macos-26
+            target: Macos
+    uses: ./.github/workflows/gradle-build.yml
+    with:
+      runner: ${{ matrix.runner }}
+      task: ylcs-app:native-desktop-app:linkDebugExecutable${{ matrix.target }}
+      submodules: recursive
+      msvc: ${{ startsWith(matrix.runner, 'windows-') }}
+      native-tools: true
 
   build-web:
     name: Build Web

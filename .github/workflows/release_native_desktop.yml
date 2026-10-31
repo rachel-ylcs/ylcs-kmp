@@ -1,0 +1,43 @@
+name: ReleaseNativeDesktop
+
+on:
+  push:
+    tags:
+      - 'nativeDesktop*'
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  package-native-desktop:
+    name: Package Windows Native Desktop Artifact
+    runs-on: windows-2025
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          msvc: 'true'
+          native-tools: 'true'
+
+      - name: Build Windows Native Artifact
+        run: >-
+          bash ./gradlew :ylcs-app:native-desktop-app:nativeDesktopArtifact
+          --no-daemon --build-cache --max-workers=2 --console=plain
+
+      - name: Upload Application
+        uses: actions/upload-artifact@v7
+        with:
+          name: ylcs-native-windows-x64
+          path: outputs/ylcs-native-windows.zip
+          if-no-files-found: error

@@ -1,0 +1,44 @@
+package love.yinlin.screen
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import love.yinlin.app
+import love.yinlin.extension.then
+import love.yinlin.media.lyrics.LyricsEngineConfig
+
+@Composable
+actual fun ScreenLyricsSettings.PlatformContent() {
+    musicPlayer?.floatingLyrics?.then { floatingLyrics ->
+        DisposableEffect(floatingLyrics) {
+            config = app.config.lyricsEngineConfig
+            floatingLyrics.canMove = true
+            onDispose { floatingLyrics.canMove = false }
+        }
+
+        LyricsSwitch(modifier = Modifier.fillMaxWidth(), onCheckedChange = {
+            app.config.enabledFloatingLyrics = it
+            floatingLyrics.check()
+        })
+
+        LyricsPreview(modifier = Modifier.fillMaxWidth())
+
+        LyricsFontSizeLayout(modifier = Modifier.fillMaxWidth())
+
+        LyricsColorLayout(modifier = Modifier.fillMaxWidth())
+    }
+}
+
+actual fun ScreenLyricsSettings.resetLyricsSettings(newConfig: LyricsEngineConfig) {
+    app.config.lyricsEngineConfig = newConfig
+
+    (val x, val y, val width, val height) = newConfig.desktop
+    musicPlayer?.floatingLyrics?.updateWindowState(
+        size = DpSize(width.dp, height.dp),
+        position = DpOffset(x.dp, y.dp)
+    )
+}

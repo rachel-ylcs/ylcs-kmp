@@ -177,6 +177,52 @@ jobs:
     name: Package Mod Manager
     uses: ./.github/workflows/release_mod_manager.yml
 
+  package-nativeDesktop:
+    name: Publish Native Desktop / ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            platform: windows-x64
+            workers: 2
+          - runner: ubuntu-24.04
+            platform: linux-x64
+            workers: 2
+          - runner: macos-26
+            platform: macos-arm64
+            workers: 1
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          msvc: ${{ runner.os == 'Windows' }}
+          native-tools: 'true'
+
+      - name: Publish Native Release Distribution
+        run: >-
+          bash ./gradlew :ylcs-app:native-desktop-app:nativeDesktopPublish
+          --no-daemon --build-cache --max-workers=${{ matrix.workers }} --console=plain
+
+      - name: Upload Application
+        uses: actions/upload-artifact@v7
+        with:
+          name: ylcs-native-${{ matrix.platform }}
+          path: outputs/*Native*.zip
+          if-no-files-found: error
+
   package-landpage:
     name: Package Landpage
     runs-on: ubuntu-latest
@@ -209,6 +255,7 @@ jobs:
       package-web,
       package-server,
       package-modManager,
+      package-nativeDesktop,
       package-landpage
     ]
     runs-on: ubuntu-latest
@@ -285,6 +332,9 @@ jobs:
             artifacts/ylcs-mod-manager-windows-x64/*.zip
             artifacts/ylcs-mod-manager-linux-x64/*.zip
             artifacts/ylcs-mod-manager-macos-arm64/*.zip
+            artifacts/ylcs-native-windows-x64/*.zip
+            artifacts/ylcs-native-linux-x64/*.zip
+            artifacts/ylcs-native-macos-arm64/*.zip
             artifacts/ylcs-landpage/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

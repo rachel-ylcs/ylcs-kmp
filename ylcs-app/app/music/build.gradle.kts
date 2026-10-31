@@ -5,12 +5,15 @@ plugins {
         libs.plugins.kotlinSerialization,
         libs.plugins.composeMultiplatform,
         libs.plugins.composeCompiler,
+        libs.plugins.nativeBridge,
         libs.plugins.androidLibrary,
     )
 }
 
 rachel {
     multiplatform {
+        nativeDesktopTarget = true
+
         sources {
             commonMain {
                 lib(
@@ -43,6 +46,14 @@ rachel {
                     projects.ylcsModule.platform.ffi.win32,
                 )
             }
+
+            nativeMain(commonMain)
+
+            windowsMain(nativeMain)
+
+            linuxMain(nativeMain)
+
+            macosMain(nativeMain)
 
             webMain(commonMain)
 

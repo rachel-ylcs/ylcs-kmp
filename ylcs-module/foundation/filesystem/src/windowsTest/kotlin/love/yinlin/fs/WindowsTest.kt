@@ -1,6 +1,7 @@
 package love.yinlin.fs
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import love.yinlin.foundation.PlatformContext
 import platform.windows.CreateDirectoryW
 import platform.windows.RemoveDirectoryW
 import kotlin.random.Random
@@ -21,6 +22,8 @@ class WindowsTest {
             val current = assertNotNull(PlatformFileSystem.getCurrentDirectory())
             assertEquals(directory, current)
             assertTrue(current.isAbsolute)
+            assertEquals(current, PlatformFileSystem.appPath(PlatformContext.Instance, "test"))
+            assertEquals(File(current, "data"), PlatformFileSystem.dataPath(PlatformContext.Instance, "test"))
         }
         finally {
             val restored = PlatformFileSystem.setCurrentDirectory(original)

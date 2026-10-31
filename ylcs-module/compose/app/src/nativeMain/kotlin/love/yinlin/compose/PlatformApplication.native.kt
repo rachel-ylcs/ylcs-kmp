@@ -30,8 +30,8 @@ import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.skiko.window.NativeDesktop
 import org.jetbrains.skiko.window.NativeWindowOptions
-import platform.posix.exit
 import kotlin.math.roundToInt
+import kotlin.system.exitProcess
 
 @Stable
 actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual constructor(
@@ -163,7 +163,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
             }) {
                 cleaning(::destroyPool) {
                     cleaning(mainScope::cancel) {
-                        exit(0)
+                        exitProcess(0)
                     }
                 }
             }

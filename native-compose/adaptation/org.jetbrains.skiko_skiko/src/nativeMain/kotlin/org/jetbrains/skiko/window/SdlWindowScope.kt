@@ -244,6 +244,7 @@ internal class SdlWindowScope(private val window: COpaquePointer, private val wa
 
     override fun setAlwaysOnTop(alwaysOnTop: Boolean) {
         checkHostThread()
+        if (SDL_GetCurrentVideoDriver()?.toKString() == "wayland") return
         check(RachelSDL_SetWindowAlwaysOnTop(window, alwaysOnTop)) { SDL_GetError()?.toKString() ?: "Unable to change window topmost state" }
     }
 
