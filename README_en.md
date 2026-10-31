@@ -91,26 +91,27 @@ The interface library covers various components such as themes, text, inputs, im
 
 # Cross-Platform Module Support
 
-Browse all 54 modules under `ylcs-module` by function. Each module name links to its source directory, followed by its supported platforms, purpose and platform-specific limits.
+Browse all 53 modules under `ylcs-module` in their current directory structure: 18 core and foundation modules, 24 Compose modules, 5 client/server modules, 4 platform integration modules, and 2 build tools. Each module name links to its source directory, followed by its supported platforms, purpose and platform-specific limits.
 
 - **All platforms**: Android, iOS, Desktop JVM, Web (JS / WasmJS), and Native Windows / Linux / macOS.
 - **Web**: both JS and WasmJS; any differences are listed separately.
 - **Desktop JVM** and **Native Windows / Linux / macOS** identify JVM and Kotlin/Native targets respectively. Modules limited to particular operating systems list those systems explicitly.
+- **Native Compose**: General-purpose foundation and Compose modules enable all three desktop Native targets. Compose uses the [bridge plugin](native-compose) to resolve the maintained ports; individual module descriptions list differences in system capabilities.
 
 An omitted platform has no enabled target or only a no-op/placeholder implementation. Individual API limitations appear in the module descriptions. A supported target does not establish that every API has been tested on that platform. Build tools run in Gradle and have no application runtime targets.
 
 Find modules by purpose:
 
-- **[Core and foundation](#core-and-foundation)**: Platform basics, coroutines, files, networking, compression, cryptography and parsing.
-- **[Compose UI and applications](#compose-ui-and-applications)**: Themes, UI, navigation, application entry points, games, startup services and components.
+- **[Core and foundation](#core-and-foundation)**: Platform basics, coroutines, contexts, files, networking, storage, pickers, startup services, exception handling and parsing.
+- **[Compose UI and applications](#compose-ui-and-applications)**: Themes, UI, navigation, application entry points, configuration, games and components.
 - **[Client and server](#client-and-server)**: Shared contracts, client engine, Native servers and databases.
-- **[Platform integration](#platform-integration)**: Win32, library loading, JVM FFI and operating-system features.
+- **[Platform integration](#platform-integration)**: JVM FFI and Kotlin/Native Win32 bindings.
 - **[Build tools](#build-tools)**: Test aggregation and API documentation.
 
 ## Core and foundation
 
 <details open>
-<summary>16 modules · Platform basics, files, networking, compression, cryptography and parsing</summary>
+<summary>18 modules · Core, contexts, library loading, files, networking, single instances, storage, pickers, services and parsing</summary>
 
 ### Core
 
@@ -122,6 +123,9 @@ Find modules by purpose:
 - **[context](ylcs-module/foundation/context) · All platforms**<br>
   Platform context and host capability providers
 
+- **[libloader](ylcs-module/foundation/libloader) · Android · iOS · Desktop JVM · Native Windows / Linux / macOS**<br>
+  Dynamic library loading; JVM supports packaged library resources, Native uses system loaders, and Web calls are no-ops
+
 - **[filesystem](ylcs-module/foundation/filesystem) · All platforms**<br>
   Files, streams, platform directories and implicit file URIs
 
@@ -129,7 +133,10 @@ Find modules by purpose:
   Ktor HTTP requests, downloads and text WebSockets
 
 - **[startup](ylcs-module/foundation/startup) · All platforms**<br>
-  Startup dependency graphs, initialization and teardown
+  Startup dependency graphs, initialization and teardown; pickers, KV storage, configuration and exception handling work independently and can be registered as application services
+
+- **[os](ylcs-module/foundation/os) · Desktop JVM · Native Windows / Linux / macOS**<br>
+  Single-instance control for desktop processes; Android, iOS and Web provide compatibility implementations without instance restrictions
 
 - **[compression](ylcs-module/foundation/compression) · All platforms**<br>
   RLE, LZ4, Snappy, Deflate, Zlib and Gzip codecs
@@ -141,13 +148,13 @@ Find modules by purpose:
   Multi-field full-text, prefix, whole-word and fuzzy search
 
 - **[kv](ylcs-module/foundation/kv) · All platforms**<br>
-  Platform KV storage; mobile/desktop MMKV and Web storage adapters
+  Standalone KV storage with constructor-injected context and storage directory; mobile/desktop use MMKV and Web uses browser storage
 
 - **[picker](ylcs-module/foundation/picker) · All platforms**<br>
-  Platform file and directory pickers
+  Image, file and save-location selection with constructor-injected context; independent of Compose and startup, with SDL3 system dialogs shared by JVM and Native desktop
 
 - **[exception](ylcs-module/foundation/exception) · All platforms**<br>
-  Unhandled exception collection and reporting service
+  Unhandled exception callbacks and reporting, registered independently through `ExceptionHandler.setup`; application startup services can own their lifecycle
 
 ### Text and data parsers · `foundation/parser/`
 
@@ -188,7 +195,7 @@ Find modules by purpose:
   Compose icon resources
 
 - **[platform-view](ylcs-module/compose/platform-view) · All platforms**<br>
-  Android View, Swing, UIKit and DOM hosts; Native exposes the common state layer only
+  Platform view state binding and lifecycle management, with Android View, Swing, UIKit and DOM hosts; Native provides the shared state layer but no system-native widget host yet
 
 - **[screen](ylcs-module/compose/screen) · All platforms**<br>
   Navigation 3 screens and ViewModel lifecycles
@@ -197,10 +204,10 @@ Find modules by purpose:
   In-memory state caches and persistent cache abstractions
 
 - **[app](ylcs-module/compose/app) · All platforms**<br>
-  Application entry points, themes and window lifecycles
+  Application entry points, themes and window lifecycles, including JVM/Native desktop multi-window management and Android floating windows
 
 - **[config](ylcs-module/compose/config) · All platforms**<br>
-  Observable persistent configuration backed by KV storage
+  Observable persistent Compose configuration backed by `foundation/kv`, usable independently of startup
 
 ### Games · `compose/game/`
 
@@ -224,8 +231,8 @@ Find modules by purpose:
 - **[data-table](ylcs-module/compose/components/data-table) · All platforms**<br>
   Data tables, sorting, editing and selection
 
-- **[drag-drop](ylcs-module/compose/components/drag-drop) · Android · Desktop JVM · Web · Native Windows / Linux / macOS**<br>
-  Text and file drag-and-drop; the iOS implementation is currently a no-op
+- **[drag-drop](ylcs-module/compose/components/drag-drop) · Desktop JVM · Web · Native Windows / Linux / macOS**<br>
+  Text and file drops within component bounds; Android/iOS calls do not enable drag-and-drop
 
 - **[hexview](ylcs-module/compose/components/hexview) · All platforms**<br>
   Hexadecimal data viewer
@@ -236,8 +243,8 @@ Find modules by purpose:
 - **[lottie](ylcs-module/compose/components/lottie) · All platforms**<br>
   Lottie animation rendering
 
-- **[media](ylcs-module/compose/components/media) · Android · iOS · Desktop JVM · Web**<br>
-  Audio, music and video; JVM Linux/macOS video backends are currently no-ops
+- **[media](ylcs-module/compose/components/media) · All platforms**<br>
+  Audio, music, sound effects and video; JVM/Native desktop audio shares miniaudio, while video uses Windows WinRT, Linux GStreamer and macOS AVFoundation. Linux video requires system GStreamer and codec plugins. Web supports video and sound effects loaded from bytes; AudioPlayer/MusicPlayer are currently no-ops
 
 - **[pagination-layout](ylcs-module/compose/components/pagination-layout) · All platforms**<br>
   Paginated data state and loading layouts
@@ -252,7 +259,7 @@ Find modules by purpose:
   Rich-text parsing, nodes and rendering
 
 - **[webview](ylcs-module/compose/components/webview) · Android · iOS · Web**<br>
-  Android/iOS/Web views; JVM provides a placeholder implementation
+  Android/iOS native browsers and Web iframes; JVM/Native desktop targets provide placeholders, and headless request interception is implemented on Android only
 
 </details>
 
@@ -285,19 +292,16 @@ Find modules by purpose:
 ## Platform integration
 
 <details>
-<summary>7 modules · Win32, library loading, JVM FFI, windows and single-instance locks</summary>
+<summary>4 modules · JVM FFI and Kotlin/Native Win32 bindings</summary>
 
-### Kotlin/Native Win32 · `native/win32/`
+### Kotlin/Native Win32 · `platform/native/win32/`
 
-- **[core](ylcs-module/native/win32/core) · Native Windows**<br>
+- **[core](ylcs-module/platform/native/win32/core) · Native Windows**<br>
   Kotlin/Native Win32 foundations
 
-### Library loading · `platform/`
-
-- **[native-lib-loader](ylcs-module/platform/native-lib-loader) · Android · iOS · Desktop JVM · Native Windows / Linux / macOS**<br>
-  Native library loading; Web calls are no-ops
-
 ### JVM FFI · `platform/ffi/`
+
+These modules expose C ABIs to JVM code. Kotlin/Native uses CInterop for system APIs and does not depend on these JVM modules.
 
 - **[core](ylcs-module/platform/ffi/core) · Desktop JVM**<br>
   JDK Foreign Function & Memory API foundations
@@ -307,14 +311,6 @@ Find modules by purpose:
 
 - **[win32](ylcs-module/platform/ffi/win32) · Desktop JVM**<br>
   Win32 access from JVM on Windows
-
-### Desktop operating systems · `platform/os/`
-
-- **[single-instance](ylcs-module/platform/os/single-instance) · Desktop JVM**<br>
-  OS-level single-instance locks for JVM desktop applications
-
-- **[window](ylcs-module/platform/os/window) · Desktop JVM**<br>
-  JVM native-window click-through; Linux is currently a no-op
 
 </details>
 
@@ -378,6 +374,7 @@ Sort by first letter.
 |:--------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | Library  |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
 | Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
+| Library  |mackron|[miniaudio](https://github.com/mackron/miniaudio)|
 | Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
 | Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
 | Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |

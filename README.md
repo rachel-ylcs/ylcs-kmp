@@ -90,26 +90,27 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 # 全平台模块支持
 
-按功能分组列出 `ylcs-module` 中的全部 54 个模块。点击模块名进入源码目录；每个条目先标注支持平台，再说明用途和平台差异。
+按当前目录结构列出 `ylcs-module` 中的全部 53 个模块：核心与基础能力 18 个、Compose 24 个、客户端与服务端 5 个、平台集成 4 个、构建工具 2 个。点击模块名进入源码目录；每个条目先标注支持平台，再说明用途和平台差异。
 
 - **全平台**：Android、iOS、JVM 桌面、Web（JS / WasmJS），以及 Native Windows / Linux / macOS。
 - **Web**：同时支持 JS 和 WasmJS；两者存在差异时分别标注。
 - **JVM 桌面**与 **Native Windows / Linux / macOS** 分别表示 JVM 与 Kotlin/Native target；仅支持其中部分系统时单独列出。
+- **Native Compose**：通用基础库与 Compose 模块均已启用三个桌面 Native target；Compose 通过[桥插件](native-compose)接入自有移植工件，具体系统能力的差异见各模块说明。
 
 未列出的平台表示未启用对应 target，或仅有空实现、占位实现。模块内部分 API 的限制见条目说明。支持 target 不等同于所有 API 均已通过该平台的运行验证。构建工具在 Gradle 中运行，不具有应用运行 target。
 
 按用途查找：
 
-- **[核心与基础能力](#核心与基础能力)**：平台基础、协程、文件、网络、压缩、加密与解析。
-- **[Compose 界面与应用](#compose-界面与应用)**：主题、UI、导航、应用入口、游戏、启动服务与组件。
+- **[核心与基础能力](#核心与基础能力)**：平台基础、协程、上下文、文件、网络、存储、选择器、启动服务、异常处理与解析。
+- **[Compose 界面与应用](#compose-界面与应用)**：主题、UI、导航、应用入口、配置、游戏与组件。
 - **[客户端与服务端](#客户端与服务端)**：共享协议、客户端引擎、Native 服务端与数据库。
-- **[平台集成](#平台集成)**：Win32、动态库、JVM FFI 与操作系统能力。
+- **[平台集成](#平台集成)**：JVM FFI 与 Kotlin/Native Win32 专属封装。
 - **[构建工具](#构建工具)**：测试聚合与 API 文档生成。
 
 ## 核心与基础能力
 
 <details open>
-<summary>16 个模块 · 平台基础、文件、网络、压缩、加密与解析</summary>
+<summary>18 个模块 · 核心、上下文、动态库、文件、网络、单实例、存储、选择器、服务与解析</summary>
 
 ### 核心
 
@@ -121,6 +122,9 @@ implementation("love.yinlin.compose:app:x.x.x")
 - **[context](ylcs-module/foundation/context) · 全平台**<br>
   平台基础上下文与宿主能力提供者
 
+- **[libloader](ylcs-module/foundation/libloader) · Android · iOS · JVM 桌面 · Native Windows / Linux / macOS**<br>
+  动态库装载；JVM 支持资源中的动态库，Native 使用系统装载接口，Web 调用为空操作
+
 - **[filesystem](ylcs-module/foundation/filesystem) · 全平台**<br>
   文件、流、平台目录与隐式文件 URI
 
@@ -128,7 +132,10 @@ implementation("love.yinlin.compose:app:x.x.x")
   Ktor HTTP、下载与文本 WebSocket
 
 - **[startup](ylcs-module/foundation/startup) · 全平台**<br>
-  启动服务依赖图、初始化与销毁
+  启动服务依赖图、初始化与销毁；选择器、KV、配置和异常处理可独立使用，由业务按需接入服务
+
+- **[os](ylcs-module/foundation/os) · JVM 桌面 · Native Windows / Linux / macOS**<br>
+  桌面应用的进程单实例控制；Android、iOS、Web 提供不限制实例的兼容实现
 
 - **[compression](ylcs-module/foundation/compression) · 全平台**<br>
   RLE、LZ4、Snappy、Deflate、Zlib、Gzip 编解码
@@ -140,13 +147,13 @@ implementation("love.yinlin.compose:app:x.x.x")
   多字段全文、前缀、整词与模糊检索
 
 - **[kv](ylcs-module/foundation/kv) · 全平台**<br>
-  平台键值存储；移动端/桌面 MMKV 与 Web 存储适配
+  独立键值存储，通过构造参数注入上下文与存储目录；移动端/桌面采用 MMKV，Web 使用浏览器存储
 
 - **[picker](ylcs-module/foundation/picker) · 全平台**<br>
-  文件、目录等平台选择器
+  图片、文件与保存位置选择，通过构造参数注入上下文；不依赖 Compose 或 startup，JVM/Native 桌面复用 SDL3 系统对话框
 
 - **[exception](ylcs-module/foundation/exception) · 全平台**<br>
-  未处理异常收集与记录服务
+  未处理异常回调与报告，通过 `ExceptionHandler.setup` 独立注册，可由业务启动服务管理生命周期
 
 ### 文本与数据解析 · `foundation/parser/`
 
@@ -187,7 +194,7 @@ implementation("love.yinlin.compose:app:x.x.x")
   Compose 图标资源
 
 - **[platform-view](ylcs-module/compose/platform-view) · 全平台**<br>
-  Android View、Swing、UIKit、DOM 宿主；Native 仅公共状态层
+  平台视图的状态绑定与生命周期；提供 Android View、Swing、UIKit、DOM 宿主，Native 可用公共状态层，尚无系统原生控件宿主
 
 - **[screen](ylcs-module/compose/screen) · 全平台**<br>
   Navigation 3 页面导航与 ViewModel 生命周期
@@ -196,10 +203,10 @@ implementation("love.yinlin.compose:app:x.x.x")
   内存状态缓存与持久缓存抽象
 
 - **[app](ylcs-module/compose/app) · 全平台**<br>
-  跨平台应用入口、主题与窗口生命周期
+  跨平台应用入口、主题与窗口生命周期；JVM/Native 桌面多窗口及 Android 悬浮窗
 
 - **[config](ylcs-module/compose/config) · 全平台**<br>
-  基于 KV 的可观察持久配置
+  基于 `foundation/kv` 的 Compose 可观察持久配置，可独立使用，不依赖 startup
 
 ### 游戏 · `compose/game/`
 
@@ -223,8 +230,8 @@ implementation("love.yinlin.compose:app:x.x.x")
 - **[data-table](ylcs-module/compose/components/data-table) · 全平台**<br>
   数据表格、排序、编辑与选择
 
-- **[drag-drop](ylcs-module/compose/components/drag-drop) · Android · JVM 桌面 · Web · Native Windows / Linux / macOS**<br>
-  文本与文件拖放；iOS 当前为空实现
+- **[drag-drop](ylcs-module/compose/components/drag-drop) · JVM 桌面 · Web · Native Windows / Linux / macOS**<br>
+  组件区域内的文本与文件拖放；Android/iOS 调用不启用拖放
 
 - **[hexview](ylcs-module/compose/components/hexview) · 全平台**<br>
   十六进制数据查看
@@ -235,8 +242,8 @@ implementation("love.yinlin.compose:app:x.x.x")
 - **[lottie](ylcs-module/compose/components/lottie) · 全平台**<br>
   Lottie 动画渲染
 
-- **[media](ylcs-module/compose/components/media) · Android · iOS · JVM 桌面 · Web**<br>
-  音频、音乐与视频；JVM Linux/macOS 视频后端为空实现
+- **[media](ylcs-module/compose/components/media) · 全平台**<br>
+  音频、音乐、音效与视频；JVM/Native 桌面音频共用 miniaudio，视频分别使用 Windows WinRT、Linux GStreamer、macOS AVFoundation，Linux 视频需要系统 GStreamer 及解码插件。Web 支持视频与字节音效，AudioPlayer/MusicPlayer 当前为空实现
 
 - **[pagination-layout](ylcs-module/compose/components/pagination-layout) · 全平台**<br>
   分页数据状态与加载布局
@@ -251,7 +258,7 @@ implementation("love.yinlin.compose:app:x.x.x")
   富文本解析、节点与渲染
 
 - **[webview](ylcs-module/compose/components/webview) · Android · iOS · Web**<br>
-  Android/iOS/Web 网页视图；JVM 为占位实现
+  Android/iOS 原生网页视图与 Web iframe；JVM/Native 桌面 target 提供占位实现，无界面网页拦截仅 Android 实现
 
 </details>
 
@@ -284,19 +291,16 @@ implementation("love.yinlin.compose:app:x.x.x")
 ## 平台集成
 
 <details>
-<summary>7 个模块 · Win32、动态库、JVM FFI、窗口与单实例</summary>
+<summary>4 个模块 · JVM FFI 与 Kotlin/Native Win32 专属封装</summary>
 
-### Kotlin/Native Win32 · `native/win32/`
+### Kotlin/Native Win32 · `platform/native/win32/`
 
-- **[core](ylcs-module/native/win32/core) · Native Windows**<br>
+- **[core](ylcs-module/platform/native/win32/core) · Native Windows**<br>
   Kotlin/Native Win32 基础封装
 
-### 动态库装载 · `platform/`
-
-- **[native-lib-loader](ylcs-module/platform/native-lib-loader) · Android · iOS · JVM 桌面 · Native Windows / Linux / macOS**<br>
-  动态库装载；Web 接口为空操作
-
 ### JVM FFI · `platform/ffi/`
+
+以下模块面向 JVM 调用 C ABI；Kotlin/Native 端通过 CInterop 接入系统接口，不依赖这些 JVM 模块。
 
 - **[core](ylcs-module/platform/ffi/core) · JVM 桌面**<br>
   JDK Foreign Function & Memory API 基础封装
@@ -306,14 +310,6 @@ implementation("love.yinlin.compose:app:x.x.x")
 
 - **[win32](ylcs-module/platform/ffi/win32) · JVM 桌面**<br>
   JVM 调用 Win32；仅适用于 Windows
-
-### 桌面操作系统 · `platform/os/`
-
-- **[single-instance](ylcs-module/platform/os/single-instance) · JVM 桌面**<br>
-  JVM 桌面应用的操作系统单实例锁
-
-- **[window](ylcs-module/platform/os/window) · JVM 桌面**<br>
-  JVM 原生窗口鼠标穿透；Linux 当前为空实现
 
 </details>
 
@@ -375,6 +371,7 @@ https://private-user-images.githubusercontent.com/76944654/586743677-ce62598a-75
 |:--------:|:---------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | Library  |     Google      |                                                            [media3](https://github.com/androidx/media)                                                             |
 | Library  |    Jetbrains    | [kotlin](https://github.com/JetBrains/kotlin), [compose-multiplatform](https://github.com/JetBrains/compose-multiplatform), [ktor](https://github.com/ktorio/ktor) |
+| Library  |mackron|[miniaudio](https://github.com/mackron/miniaudio)|
 | Library  |      smyrgeorge      |                                                             [sqlx4k](https://github.com/smyrgeorge/sqlx4k)                                                              |
 | Library  |     Tencent     |                                        [MMKV](https://github.com/Tencent/MMKV), [libpag](https://github.com/Tencent/libpag)                                        |
 | Library  |     vendelieu     |                                        [re.this](https://github.com/vendelieu/re.this)                                        |
