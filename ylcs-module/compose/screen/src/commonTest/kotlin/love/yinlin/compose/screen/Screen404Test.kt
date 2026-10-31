@@ -45,7 +45,7 @@ class Screen404Test {
     private fun createManager(registry: ScreenRegistry, initial: List<ScreenKey>, owner: ViewModelStore = newOwner()): ScreenManager =
         ViewModelProvider.create(
             store = owner,
-            factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial) } },
+            factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial, TestNavigationTimeSource()) } },
         )[ScreenID().toString(), ScreenManager::class]
 
     private fun newOwner(): ViewModelStore = ViewModelStore().also { owners += it }

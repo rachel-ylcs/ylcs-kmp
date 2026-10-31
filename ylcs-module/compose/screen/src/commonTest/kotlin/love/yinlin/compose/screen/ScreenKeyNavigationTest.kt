@@ -66,7 +66,7 @@ class ScreenKeyNavigationTest {
         val owner = ViewModelStore().also { owners += it }
         return ViewModelProvider.create(
             store = owner,
-            factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial) } }
+            factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial, TestNavigationTimeSource()) } }
         )[TestManagerID, ScreenManager::class]
     }
 

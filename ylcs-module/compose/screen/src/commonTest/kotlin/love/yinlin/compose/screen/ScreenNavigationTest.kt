@@ -52,7 +52,7 @@ class ScreenNavigationTest {
         owner: ViewModelStore = owner(),
         id: String = this.managerId,
         registry: ScreenRegistry = this.registry
-    ): ScreenManager = ScreenManager.obtainScreenManager(owner, id, metaClassName<Main>()) { registry }
+    ): ScreenManager = ScreenManager.obtainScreenManager(owner, id, metaClassName<Main>(), TestNavigationTimeSource()) { registry }
 
     @AfterTest
     fun clearOwners() {

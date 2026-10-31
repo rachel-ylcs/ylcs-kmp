@@ -107,7 +107,7 @@ navigate(::ScreenHome, policy = CreatePolicy.Move + ClearPolicy.Clear)
 
 `ClearPolicy.None` 保留目标上方的其他页面；`ClearPolicy.Clear` 清理目标与原栈顶之间的页面。`New` 或未匹配目标时不额外执行沿途清理。`pop()` 保留栈中最后一个条目。
 
-当前实现没有旧版的固定 300 ms 导航防抖。需要限制连续提交时，应由交互或业务层定义规则。栈变更应在界面线程串行执行。
+每个 `ScreenManager` 的所有 `navigate` 重载与 `pop()` 共用 200 ms 导航防抖窗口。首次请求立即执行；距上次放行不足 200 ms 的请求直接忽略，不改变栈、不创建页面、不触发生命周期回调，也不会延迟执行或延长窗口；被忽略的 `pop()` 返回 `false`。恰好达到 200 ms 后可再次执行。窗口使用单调时钟计时，不同管理器独立计时。栈变更应在界面线程串行执行。
 
 ## Resume 参数
 

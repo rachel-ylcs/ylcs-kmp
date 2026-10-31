@@ -116,7 +116,7 @@ class ScreenManagerTest {
         name: String = TestManagerID
     ): ScreenManager = ViewModelProvider.create(
         store = owner,
-        factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial) } }
+        factory = viewModelFactory { addInitializer(ScreenManager::class) { ScreenManager(registry, initial, TestNavigationTimeSource()) } }
     )[name, ScreenManager::class]
 
     @AfterTest

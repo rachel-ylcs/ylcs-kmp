@@ -26,11 +26,18 @@ import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.rememberImmersivePadding
 import love.yinlin.extension.cleaning
 import love.yinlin.reflect.metaClassName
+import kotlin.time.ComparableTimeMark
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
+/**
+ * 页面导航管理器，所有 navigate 重载与 pop 共用 200ms 窗口，窗口内后续请求直接忽略。
+ * 导航操作应在界面线程串行执行。
+ */
 @OptIn(CompatibleRachelApi::class)
 @Suppress("unused")
 @Stable
-class ScreenManager internal constructor(private val registry: ScreenRegistry, initialBackStack: List<ScreenKey>) : ViewModel() {
+class ScreenManager internal constructor(private val registry: ScreenRegistry, initialBackStack: List<ScreenKey>, private val navigationTimeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic) : ViewModel() {
     internal val store = ScreenStore()
 
     internal val backStack: List<ScreenKey> field = mutableStateListOf<ScreenKey>()
@@ -39,6 +46,7 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
         private set
 
     private var changing: Boolean = false
+    private var lastNavigationTime: ComparableTimeMark? = null
 
     internal constructor(registry: ScreenRegistry) : this(registry, [])
 
@@ -109,7 +117,16 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
         return screen.navEntry
     }
 
+    private fun acceptNavigation(): Boolean {
+        val now = navigationTimeSource.markNow()
+        if (lastNavigationTime?.let { now - it < 200.milliseconds } == true) return false
+        lastNavigationTime = now
+        return true
+    }
+
     private fun execute(buildPlan: () -> NavigationPlan) {
+        if (!acceptNavigation()) return
+
         var removed: List<ScreenKey> = []
         val plan = change {
             val plan = buildPlan()
@@ -203,6 +220,8 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
         navigateKey(key, ScreenArgs.build(arg1, arg2, arg3, arg4, arg5), policy)
 
     internal fun pop(): Boolean {
+        if (!acceptNavigation()) return false
+
         val removed = change { if (backStack.size <= 1) null else backStack.removeAt(backStack.lastIndex) } ?: return false
         finish([removed])
         return true
@@ -214,12 +233,13 @@ class ScreenManager internal constructor(private val registry: ScreenRegistry, i
             store: ViewModelStore,
             managerId: String,
             mainType: String,
+            navigationTimeSource: TimeSource.WithComparableMarks = TimeSource.Monotonic,
             registry: () -> ScreenRegistry
         ): ScreenManager = ViewModelProvider.create(
             store = store,
             factory = viewModelFactory {
                 addInitializer(ScreenManager::class) {
-                    ScreenManager(registry(), [ScreenKey(type = mainType)])
+                    ScreenManager(registry(), [ScreenKey(type = mainType)], navigationTimeSource)
                 }
             }
         )[managerId, ScreenManager::class]

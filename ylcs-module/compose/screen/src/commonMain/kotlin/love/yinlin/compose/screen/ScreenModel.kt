@@ -141,7 +141,10 @@ abstract class ScreenModel : ViewModel() {
     inline fun <reified A1, reified A2, reified A3, reified A4, reified A5> navigate(key: String, arg1: A1, arg2: A2, arg3: A3, arg4: A4, arg5: A5, policy: NavigationPolicy = NavigationPolicy.Default): Unit =
         activeManager().navigate(key, arg1, arg2, arg3, arg4, arg5, policy)
 
-    // 执行所属导航栈的返回操作，保留最后一个页面
+    /**
+     * 执行所属导航栈的返回操作，保留最后一个页面，与 navigate 共用 200ms 防抖窗口。
+     * @return 实际移除页面时返回 true；仅剩最后一个页面或请求被防抖忽略时返回 false。
+     */
     fun pop(): Boolean = activeManager().pop()
 
     protected inline fun withResume(block: () -> Unit) {
