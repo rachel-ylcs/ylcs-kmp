@@ -2,7 +2,7 @@
     "schema": 1,
     "skiko": {
         "file": "skiko.patch",
-        "sha256": "e4c9ea5ddff79f6807311e32497dfe5cd23805e506951649b0cef4ba6c6b54fd",
+        "sha256": "fc94aab614a26c5cf8f995ff198f7fe223914bdb1bb61dae53c82ed404805079",
         "sources": {
             "skiko-upstream": {
                 "repository": "JetBrains/skiko",

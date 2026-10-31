@@ -1093,7 +1093,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
              includeHeadersNonRecursive(coreProjectDir.resolve("src/commonMain/cpp/common/include"))
          }
          includeHeadersNonRecursive(skiaHeadersDirs(unpackedSkia))
-@@ -270,11 +311,14 @@
+@@ -270,11 +311,21 @@
      target: KotlinNativeTarget,
      coreNativeSymbolSourcesFor: ((OS, Arch, Boolean) -> Configuration)? = null
  ) = with(this.project) {
@@ -1105,12 +1105,19 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
 +
 +    // Kotlin sources can be cross-compiled on another host, but the native C++
 +    // bridge and final linkage require the target platform toolchain.
++    if (providers.gradleProperty("rachel.dokka").orNull == "true") {
++        val targetString = "${os.idWithSuffix(isUikitSim = target.isUikitSimulator())}-${arch.id}"
++        val interopName = if (os == OS.IOS || os == OS.TVOS) "uikit" else cinteropName
++        configureCinterop(interopName, os, arch, target, targetString, emptyList())
++        return
++    }
++
 +    if (!os.isCompatibleWithHost) return
 +
      val isUikitSim = target.isUikitSimulator()
  
      val targetString = "${os.idWithSuffix(isUikitSim = isUikitSim)}-${arch.id}"
-@@ -283,7 +327,10 @@
+@@ -283,7 +334,10 @@
      val unpackedSkia = unzipper.get()
      val skiaDir = unpackedSkia.absolutePath
  
@@ -1122,7 +1129,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
      val bridgesLibraryPath = bridgesLibrary.get().asFile.absolutePath
  
      // For iOS/tvOS we patch every library so that public Skia symbols are
-@@ -293,24 +340,78 @@
+@@ -293,24 +347,78 @@
      // unsupported shapes fall back to a "_skiko" suffix.
      val requiresSymbolPatching = os == OS.IOS || os == OS.TVOS
      val patchedLibsDir = layout.buildDirectory.dir("nativeBridges/patched/$targetString").get().asFile
@@ -1214,7 +1221,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
  
      val hiddenSymbolsFile = layout.buildDirectory.file(
          "nativeHiddenSymbols/$targetString/${if (os.isLinux) "symbols.map" else "symbols.txt"}"
-@@ -322,24 +423,26 @@
+@@ -322,24 +430,26 @@
      } else {
          nativeArchives
      }
@@ -1254,7 +1261,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
          }
          OS.IOS -> {
              // list of linker options to be included into klib, which are needed for skiko consumers
-@@ -364,16 +467,34 @@
+@@ -364,16 +474,34 @@
                  "-L/usr/lib64",
                  "-L/usr/lib/${if (arch == Arch.Arm64) "aarch64" else "x86_64"}-linux-gnu",
              )
@@ -1294,7 +1301,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
              mutableListOfLinkerOptions(options)
          }
          else -> mutableListOf()
-@@ -390,7 +511,9 @@
+@@ -390,7 +518,9 @@
  
      // For some reason since 1.8.0 we need to set freeCompilerArgs for binaries AND for compilations
      target.binaries.all {
@@ -1305,7 +1312,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
      }
  
  
-@@ -414,13 +537,17 @@
+@@ -414,13 +544,17 @@
          }
          inputs.files(objectFiles)
          val outDir = layout.buildDirectory.dir("nativeBridges/static/$targetString").get().asFile
@@ -1324,7 +1331,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
              OS.MacOS, OS.IOS, OS.TVOS -> {
                  executable = "libtool"
                  argumentProviders.add { listOf("-static", "-o", staticLib) }
-@@ -431,6 +558,24 @@
+@@ -431,6 +565,24 @@
          file(outDir).mkdirs()
          outputs.dir(outDir)
      }
@@ -1349,7 +1356,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
 
      // For iOS/tvOS: patch all Skia + skiko-bridge symbols after linking.
      val compilationDependency = if (requiresSymbolPatching) {
-@@ -444,7 +589,7 @@
+@@ -444,7 +596,7 @@
          }
          project.registerSkikoTask<PatchSkiaSymbolsTask>(patchActionName, os, arch) {
              dependsOn(unzipper)
@@ -1358,7 +1365,7 @@ diff --git a/skiko/buildSrc/src/main/kotlin/tasks/configuration/NativeTasksConfi
              dependsOn(linkTask)
              if (coreSymbolSources != null) {
                  dependsOn(coreSymbolSources)
-@@ -458,19 +603,24 @@
+@@ -458,19 +610,24 @@
                  configureNativeSymbolSourcesElements(os, arch, isUikitSim, nativeArchives + bridgesLibraryPath, patchTask)
              }
          }

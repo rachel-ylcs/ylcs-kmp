@@ -14,6 +14,7 @@ import org.gradle.kotlin.dsl.withType
 private const val NativeUsage = "rachel-desktop-native"
 
 internal fun Project.registerDesktopNative(source: Directory, jarTaskName: String, additionalSources: List<String> = emptyList()) {
+    if (isDokkaBuild) return
     val producer = tasks.register<BuildDesktopNativeTask>("buildDesktopNative") {
         inputDir.set(source)
         additionalSourceDirs.from(additionalSources.map(::file))

@@ -4,6 +4,7 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
@@ -14,12 +15,15 @@ plugins {
     // Native Bridge Settings supplies KGP from the root build-logic version catalog.
     id("org.jetbrains.kotlin.multiplatform") apply false
     alias(libs.plugins.composeCompiler) apply false
+    alias(libs.plugins.dokka) apply false
 }
 
 val repositoryDirectory = rootDir.resolve("../../../../..").canonicalFile
 val nativeDirectory = repositoryDirectory.resolve("native-compose")
 val sourceLock = JsonSlurper().parse(nativeDirectory.resolve("upstream/compose.json")) as Map<*, *>
 val modules = sourceLock["modules"] as Map<*, *>
+val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"
+val buildDirectory = nativeDirectory.resolve(if (dokkaBuild) "vendor/build/dokka/compose-ui" else "vendor/build/compose-ui")
 val composeVersion = extensions.getByType<VersionCatalogsExtension>().named("libs").findVersion("cmp").get().requiredVersion
 val hostTarget = when (HostManager.host.name) {
     "mingw_x64" -> "windows"
@@ -27,7 +31,7 @@ val hostTarget = when (HostManager.host.name) {
     "macos_arm64" -> "macos"
     else -> error("Unsupported Native UI build host: ${HostManager.host}")
 }
-layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/root"))
+layout.buildDirectory.set(buildDirectory.resolve("root"))
 
 subprojects {
     // KLIB module identities follow upstream; Maven publication coordinates remain independent.
@@ -35,7 +39,19 @@ subprojects {
     val upstreamGroup = (module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}") as String
     group = upstreamGroup
     version = module["version"] ?: composeVersion
-    layout.buildDirectory.set(nativeDirectory.resolve("vendor/build/compose-ui/$name"))
+    layout.buildDirectory.set(buildDirectory.resolve(name))
+
+    if (dokkaBuild) {
+        apply(plugin = "org.jetbrains.dokka")
+        val adaptation = nativeDirectory.resolve("adaptation/${module["adaptation"] ?: "${upstreamGroup}_${project.name}"}/src").canonicalFile
+        extensions.configure<DokkaExtension> {
+            modulePath.set("native-compose/${project.name}")
+            dokkaPublications.named("html") { moduleName.set("Native Compose / ${project.name}") }
+            dokkaSourceSets.configureEach {
+                suppressedFiles.from(provider { sourceRoots.files.filter { !it.canonicalFile.toPath().startsWith(adaptation.toPath()) } })
+            }
+        }
+    }
 
     plugins.withId("org.jetbrains.kotlin.multiplatform") {
         extensions.configure<KotlinMultiplatformExtension> {

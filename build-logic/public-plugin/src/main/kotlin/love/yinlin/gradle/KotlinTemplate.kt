@@ -173,9 +173,11 @@ open class KotlinTemplate<T : KotlinBaseExtension> {
 internal inline fun <reified T : KotlinBaseExtension> Project.configureTemplate(t: KotlinTemplate<T>) {
     group = t.uniqueGroupName
     buildDefaults.versionCode?.let { version = it }
+    if (isDokkaBuild) layout.buildDirectory.set(rootProject.layout.buildDirectory.dir("dokka/analysis/${path.removePrefix(":").replace(':', '/')}"))
 
     with(t) {
         extensions.configure<T> { build(this) }
+        extensions.findByType<KotlinMultiplatformExtension>()?.let(::configureDokkaCInterops)
 
         if (providers.environmentVariable("GITHUB_ACTIONS").orNull == "true" && providers.environmentVariable("RUNNER_OS").orNull == "macOS") {
             extensions.findByType<KotlinMultiplatformExtension>()?.targets?.withType<KotlinNativeTarget>()?.configureEach {

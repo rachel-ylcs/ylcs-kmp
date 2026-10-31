@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.HostManager
@@ -9,9 +10,13 @@ plugins {
     `maven-publish`
     signing
     id("org.gradle.crypto.checksum")
+    id("org.jetbrains.dokka") version libs.versions.dokka.get() apply false
 }
 
-val adaptationDirectory = buildFile.parentFile
+val adaptationDirectory = buildFile.parentFile.canonicalFile
+val nativeComposeDirectory = adaptationDirectory.parentFile.parentFile
+val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"
+if (dokkaBuild) layout.buildDirectory.set(nativeComposeDirectory.resolve("vendor/build/dokka/skiko"))
 
 extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectContext ->
     project.group = "org.jetbrains.skiko"
@@ -21,6 +26,17 @@ extensions.extraProperties["rachel.skiko.configure"] = { context: SkikoProjectCo
 }
 
 apply(from = layout.projectDirectory.file("rachel-upstream.gradle.kts"))
+
+if (dokkaBuild) {
+    apply(plugin = "org.jetbrains.dokka")
+    extensions.configure<DokkaExtension> {
+        modulePath.set("native-compose/skiko")
+        dokkaPublications.named("html") { moduleName.set("Native Compose / Skiko") }
+        dokkaSourceSets.configureEach {
+            suppressedFiles.from(provider { sourceRoots.files.filter { !it.canonicalFile.toPath().startsWith(adaptationDirectory.toPath()) } })
+        }
+    }
+}
 
 // Configure source roots after upstream has registered every platform task.
 extensions.configure<KotlinMultiplatformExtension> {
@@ -62,7 +78,6 @@ tasks.withType<AbstractArchiveTask>().configureEach {
 
 // SDL belongs to the Native producer. Consumers receive its bindings, static
 // archive and portable system dependencies through this module's publication.
-val nativeComposeDirectory = adaptationDirectory.parentFile.parentFile
 apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/skiko-library-tests.gradle.kts"))
 val sdlLock = JsonSlurper().parse(nativeComposeDirectory.resolve("upstream/sdl.json")) as Map<*, *>
 val sdlVersion = sdlLock["version"] as String
@@ -72,7 +87,7 @@ val sdlArchive = if (sdlHost == "mingw_x64") "SDL3-static.lib" else "libSDL3.a"
 apply(from = nativeComposeDirectory.parentFile.resolve("build-logic/native-bridge/gradle/sdl-sdk.gradle.kts"))
 val prepareSdl = tasks.named("prepareSdlStatic")
 
-if (sdlHost == "mingw_x64") {
+if (sdlHost == "mingw_x64" && !dokkaBuild) {
     tasks.named<StripCoffDirectivesTask>("stripCoffDirectivesWindowsX64") {
         dependsOn(prepareSdl)
         inputLibraries.add(sdlSdk.resolve("lib/$sdlArchive"))
@@ -108,15 +123,16 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
     val output = layout.buildDirectory.file("cinterop/sdl-$name.def")
     val definition = adaptationDirectory.resolve("src/nativeMain/cinterop/sdl.def")
     val writeDefinition = tasks.register("writeSdlDef${name.replaceFirstChar(Char::uppercase)}") {
-        dependsOn(prepareSdl)
+        if (!dokkaBuild) dependsOn(prepareSdl)
         inputs.file(definition)
-        if (isHost) {
+        inputs.property("dokkaBuild", dokkaBuild)
+        if (isHost && !dokkaBuild) {
             inputs.file(sdlSdk.resolve("rachel-sdl.json"))
             if (sdlHost == "mingw_x64") dependsOn("stripCoffDirectivesWindowsX64")
         }
         outputs.file(output)
         doLast {
-            val header = if (isHost) {
+            val header = if (isHost && !dokkaBuild) {
                 val profile = JsonSlurper().parse(sdlSdk.resolve("rachel-sdl.json")) as Map<*, *>
                 val options = (profile["linkerOpts"] as List<*>).joinToString(" ")
                 "staticLibraries = $sdlArchive\nlinkerOpts = $options\n"
@@ -130,7 +146,7 @@ kotlin.targets.withType<KotlinNativeTarget>().configureEach {
     val interop = compilations.getByName("main").cinterops.create("sdl") {
         definitionFile.set(output)
         includeDirs(nativeComposeDirectory.resolve("vendor/sdl-source-$sdlVersion/include"))
-        if (isHost) extraOpts("-libraryPath", sdlLibraryDirectory.invariantSeparatorsPath)
+        if (isHost && !dokkaBuild) extraOpts("-libraryPath", sdlLibraryDirectory.invariantSeparatorsPath)
     }
     tasks.named(interop.interopProcessingTaskName).configure { dependsOn(writeDefinition) }
 }

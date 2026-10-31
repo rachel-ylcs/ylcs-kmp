@@ -21,6 +21,8 @@ internal fun Project.registerNativeCpp(extension: KotlinMultiplatformExtension) 
         if (konanTarget.name !in setOf("mingw_x64", "linux_x64", "macos_arm64")) return@configureEach
         val compilation = compilations.getByName("main")
         if (compilation.allKotlinSourceSets.none { it.name == "nativeMain" }) return@configureEach
+        compilation.cinterops.configureEach { includeDirs(source) }
+        if (isDokkaBuild) return@configureEach
 
         val producer = tasks.register<BuildNativeCppTask>("build${name.replaceFirstChar(Char::uppercase)}Native") {
             description = "Build C/C++ sources for the ${target.name} Kotlin/Native target"
@@ -35,7 +37,6 @@ internal fun Project.registerNativeCpp(extension: KotlinMultiplatformExtension) 
             onlyIf("The Kotlin/Native toolchain supports this target on the current host") { HostManager().isEnabled(target.konanTarget) }
         }
         compilation.cinterops.configureEach {
-            includeDirs(source)
             extraOpts("-libraryPath", producer.get().libraryDirectory.get().asFile.invariantSeparatorsPath)
             tasks.named(interopProcessingTaskName).configure {
                 dependsOn(producer)

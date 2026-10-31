@@ -1,20 +1,85 @@
 name: docs
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
       - 'ylcs-docs/**'
+      - 'ylcs-module/dokka/**'
+      - '.github/workflows/docs.yml'
 permissions:
-  contents: write
+  contents: read
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  deploy:
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          android: 'true'
+
+      - name: Build Web Examples
+        run: |
+          mkdir -p ylcs-docs/docs/overrides
+          ./gradlew :ylcs-app:gallery:galleryPublish :ylcs-app:modern-screen:modernScreenPublish \
+            --max-workers=2 --console=plain --stacktrace \
+            '-Dorg.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED' \
+            -Pkotlin.compiler.execution.strategy=in-process
+
+      - name: Upload Web Examples
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-examples
+          path: |
+            ylcs-docs/docs/overrides/gallery
+            ylcs-docs/docs/overrides/modern-screen
+          if-no-files-found: error
+          retention-days: 3
+
+  api:
     runs-on: macos-26
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
         with:
           submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          android: 'true'
+
+      - name: Build Dokka
+        run: |
+          mkdir -p ylcs-docs/docs/overrides
+          ./gradlew :ylcs-module:dokka:dokkaGeneratePublicationHtml \
+            -Prachel.dokka=true --max-workers=1 --console=plain --stacktrace
+
+      - name: Upload API Documentation
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-api
+          path: ylcs-docs/docs/overrides/dokka
+          if-no-files-found: error
+          retention-days: 3
+
+  deploy:
+    needs: [examples, api]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
 
       - name: Configure Git Credentials
         run: |
@@ -25,34 +90,23 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: Check Github Environment
-        run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
+      - name: Download Web Examples
+        uses: actions/download-artifact@v8
         with:
-          android: 'true'
+          name: docs-examples
+          path: ylcs-docs/docs/overrides
 
-      - name: Build Gallery
-        run: |
-          mkdir -p ylcs-docs/docs/overrides
-          ./gradlew ylcs-app:gallery:galleryPublish
-
-      - name: Build ModernScreen
-        run: |
-          mkdir -p ylcs-docs/docs/overrides
-          ./gradlew ylcs-app:modern-screen:modernScreenPublish
-
-      - name: Build Dokka
-        run: |
-          mkdir -p ylcs-docs/docs/overrides
-          ./gradlew dokkaGenerateHtml
+      - name: Download API Documentation
+        uses: actions/download-artifact@v8
+        with:
+          name: docs-api
+          path: ylcs-docs/docs/overrides/dokka
 
       - uses: actions/cache@v6
         with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: ~/.cache
-          restore-keys: mkdocs-material-
+          key: mkdocs-pip-${{ runner.os }}-${{ hashFiles('ylcs-docs/mkdocs.yml') }}
+          path: ~/.cache/pip
+          restore-keys: mkdocs-pip-${{ runner.os }}-
 
       - name: Pip Install Mkdocs Plugins
         run: |
