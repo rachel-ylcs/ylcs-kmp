@@ -8,6 +8,8 @@ on:
       - 'ylcs-docs/**'
       - 'ylcs-module/dokka/**'
       - '.github/workflows/docs.yml'
+    tags:
+      - 'docs*'
 permissions:
   contents: read
 concurrency:
