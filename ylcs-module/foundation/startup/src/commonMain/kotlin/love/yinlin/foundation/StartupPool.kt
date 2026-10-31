@@ -158,7 +158,7 @@ open class StartupPool(
     }
 
     fun initPoolLater(scope: CoroutineScope) {
-        scope.launch {
+        scope.launch(mainContext) {
             coroutineScope {
                 dependenciesList.map { factory ->
                     val id = factory.id
