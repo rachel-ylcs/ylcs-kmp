@@ -1,0 +1,155 @@
+name: Rachel Codex Bot
+run-name: Rachel Codex Bot · ${{ inputs.task_branch || github.ref_name }}
+
+on:
+  push:
+    branches:
+      - 'codex/tasks/**'
+  workflow_dispatch:
+    inputs:
+      task_branch:
+        description: Branch containing the .codex/task.json request manifest
+        required: true
+        type: string
+      base_branch:
+        description: Optional target branch override (defaults to the manifest value or main)
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: rachel-codex-bot-${{ inputs.task_branch || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  publish-task:
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip rachel-codex-bot]') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Create Rachel Codex Bot installation token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: 5563370
+          private-key: ${{ secrets.RACHEL_CODEX_APP_PRIVATE_KEY }}
+          owner: rachel-ylcs
+          repositories: ylcs-kmp
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Verify GitHub App installation
+        env:
+          ACTUAL_INSTALLATION_ID: ${{ steps.app-token.outputs.installation-id }}
+        run: |
+          test "$ACTUAL_INSTALLATION_ID" = "177412059" || {
+            echo "Unexpected GitHub App installation."
+            exit 1
+          }
+
+      - name: Checkout base workspace
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
+
+      - name: Load task manifest and apply patch
+        id: task
+        env:
+          TASK_BRANCH: ${{ inputs.task_branch || github.ref_name }}
+          BASE_BRANCH_OVERRIDE: ${{ inputs.base_branch || '' }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! "$TASK_BRANCH" =~ ^codex/tasks/[A-Za-z0-9._/-]+$ ]]; then
+            echo "Task branch must use the codex/tasks/ prefix."
+            exit 1
+          fi
+
+          git fetch origin "$TASK_BRANCH" --depth=1
+          git show FETCH_HEAD:.codex/task.json > "$RUNNER_TEMP/task.json"
+
+          BASE_BRANCH="${BASE_BRANCH_OVERRIDE:-$(jq -r '.base_branch // "main"' "$RUNNER_TEMP/task.json")}"
+          PR_BRANCH="$(jq -er '.pr_branch | strings | select(length > 0)' "$RUNNER_TEMP/task.json")"
+          PR_TITLE="$(jq -er '.title | strings | select(length > 0)' "$RUNNER_TEMP/task.json")"
+          COMMIT_MESSAGE="$(jq -er '.commit_message | strings | select(length > 0)' "$RUNNER_TEMP/task.json")"
+          PATCH_B64="$(jq -er '.patch_base64 | strings | select(length > 0)' "$RUNNER_TEMP/task.json")"
+
+          if [[ ! "$BASE_BRANCH" =~ ^[A-Za-z0-9._/-]+$ ]] || ! git check-ref-format --branch "$BASE_BRANCH"; then
+            echo "Invalid base branch in task manifest."
+            exit 1
+          fi
+          if [[ "$PR_BRANCH" != codex/* || "$PR_BRANCH" == codex/tasks/* ]] || ! git check-ref-format --branch "$PR_BRANCH"; then
+            echo "PR branch must be a valid codex/ branch and cannot use the codex/tasks/ namespace."
+            exit 1
+          fi
+
+          printf '%s' "$PATCH_B64" | base64 --decode > "$RUNNER_TEMP/task.patch"
+          test -s "$RUNNER_TEMP/task.patch"
+
+          git fetch origin "$BASE_BRANCH" --depth=1
+          git checkout -B rachel-codex-bot-base FETCH_HEAD
+          git apply --check "$RUNNER_TEMP/task.patch"
+          git apply "$RUNNER_TEMP/task.patch"
+          git diff --check
+
+          {
+            echo "base_branch=$BASE_BRANCH"
+            echo "pr_branch=$PR_BRANCH"
+            echo "title=$PR_TITLE"
+            echo "commit_message=$COMMIT_MESSAGE"
+            echo "task_branch=$TASK_BRANCH"
+          } >> "$GITHUB_OUTPUT"
+
+          BODY_DELIMITER="BODY_$(openssl rand -hex 12)"
+          {
+            echo "body<<$BODY_DELIMITER"
+            jq -r '.body // ""' "$RUNNER_TEMP/task.json"
+            echo "$BODY_DELIMITER"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Resolve Rachel Codex Bot identity
+        id: bot
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          gh api "/users/${APP_SLUG}[bot]" --jq '"login=\(.login)\nid=\(.id)"' >> "$GITHUB_OUTPUT"
+
+      - name: Create or update pull request as Rachel Codex Bot
+        id: pull-request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          branch: ${{ steps.task.outputs.pr_branch }}
+          base: ${{ steps.task.outputs.base_branch }}
+          delete-branch: false
+          commit-message: ${{ steps.task.outputs.commit_message }}
+          title: ${{ steps.task.outputs.title }}
+          body: ${{ steps.task.outputs.body }}
+          author: "Rachel Codex Bot <${{ steps.bot.outputs.id }}+${{ steps.bot.outputs.login }}@users.noreply.github.com>"
+          committer: "Rachel Codex Bot <${{ steps.bot.outputs.id }}+${{ steps.bot.outputs.login }}@users.noreply.github.com>"
+          sign-commits: true
+
+      - name: Report pull request
+        if: ${{ steps.pull-request.outputs.pull-request-number != '' }}
+        env:
+          PR_NUMBER: ${{ steps.pull-request.outputs.pull-request-number }}
+          PR_URL: ${{ steps.pull-request.outputs.pull-request-url }}
+        run: |
+          echo "Created or updated PR #$PR_NUMBER: $PR_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Remove temporary task branch
+        if: ${{ success() && github.event_name == 'push' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          TASK_BRANCH: ${{ steps.task.outputs.task_branch }}
+        run: |
+          gh api --method DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${TASK_BRANCH}"
