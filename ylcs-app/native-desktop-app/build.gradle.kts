@@ -63,22 +63,18 @@ rachel {
             }
             val archive = tasks.named<Zip>("package${target}ReleaseExecutable")
 
-            tasks.register<Copy>("nativeDesktopArtifact") {
-                description = "打包当前平台的原生桌面端工件"
-                dependsOn(archive)
+            for ((taskName, filename) in mapOf(
+                "nativeDesktopArtifact" to "ylcs-native-${target.lowercase()}.zip",
+                "nativeDesktopPublish" to "[$platform]${C.app.displayName}${C.versionName}.zip",
+            )) {
+                tasks.register<Copy>(taskName) {
+                    description = if (taskName == "nativeDesktopArtifact") "打包当前平台的原生桌面端工件" else "发布原生桌面端"
+                    dependsOn(archive)
 
-                from(archive.flatMap { it.archiveFile })
-                into(C.root.outputs)
-                rename { "ylcs-native-${target.lowercase()}.zip" }
-            }
-
-            tasks.register<Copy>("nativeDesktopPublish") {
-                description = "发布原生桌面端"
-                dependsOn(archive)
-
-                from(archive.flatMap { it.archiveFile })
-                into(C.root.outputs)
-                rename { "[$platform]${C.app.displayName}${C.versionName}.zip" }
+                    from(archive.flatMap { it.archiveFile })
+                    into(C.root.outputs)
+                    rename { filename }
+                }
             }
         }
     }

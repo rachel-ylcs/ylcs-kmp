@@ -1,5 +1,6 @@
 import love.yinlin.gradle.nativeBinaryDir
 import love.yinlin.repository.C
+import org.gradle.api.tasks.Copy
 
 plugins {
     install(
@@ -34,17 +35,12 @@ rachel {
         }
 
         actions {
-            tasks.register("serverPublish") {
+            tasks.register<Copy>("serverPublish") {
                 description = "发布服务端"
                 dependsOn(tasks.named("linkReleaseExecutableLinux"))
 
-                doLast {
-                    delete(C.root.outputs.file("server.kexe"))
-                    copy {
-                        from(nativeBinaryDir("linux", "server.kexe"))
-                        into(C.root.outputs)
-                    }
-                }
+                from(nativeBinaryDir("linux", "server.kexe"))
+                into(C.root.outputs)
             }
         }
     }

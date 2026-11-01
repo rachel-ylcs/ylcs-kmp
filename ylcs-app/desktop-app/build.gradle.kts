@@ -1,10 +1,9 @@
 import love.yinlin.gradle.BuildPlatform
 import love.yinlin.gradle.desktopBinaryDir
-import love.yinlin.gradle.packageResourcesDir
 import love.yinlin.repository.C
 import love.yinlin.gradle.task.CopyDesktopNativeTask
-import love.yinlin.gradle.task.spec.zip
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.bundling.Zip
 
 plugins {
     install(
@@ -89,47 +88,31 @@ rachel {
                 dependsOn(desktopCopyNativeLib)
             }
 
-            tasks.register("desktopArtifact") {
-                description = "打包当前平台的桌面端工件"
-                dependsOn(tasks.named("createReleaseDistributable"))
-
-                doLast {
-                    val outputDir = C.root.outputs
-                    delete(packageResourcesDir)
-                    copy {
-                        from(desktopBinaryDir)
-                        into(outputDir)
-                    }
-
-                    when (C.platform) {
-                        BuildPlatform.Windows -> zip(outputDir.dir(targetName), outputDir.file("ylcs-windows.zip"))
-                        BuildPlatform.Linux -> zip(outputDir.dir(targetName), outputDir.file("ylcs-linux.zip"))
-                        BuildPlatform.Mac -> zip(outputDir.dir("$targetName.app"), outputDir.file("ylcs-macos.zip"))
-                    }
-                }
+            val (platform, applicationDirectory) = when (C.platform) {
+                BuildPlatform.Windows -> "Windows" to targetName
+                BuildPlatform.Linux -> "Linux" to targetName
+                BuildPlatform.Mac -> "macOS" to "$targetName.app"
             }
+            val executablePath = when (C.platform) {
+                BuildPlatform.Windows -> "$applicationDirectory/$targetName.exe"
+                BuildPlatform.Linux -> "$applicationDirectory/bin/$targetName"
+                BuildPlatform.Mac -> "$applicationDirectory/Contents/MacOS/$targetName"
+            }
+            val executable = desktopBinaryDir.file(executablePath)
+            for ((taskName, filename) in mapOf(
+                "desktopArtifact" to "ylcs-${platform.lowercase()}.zip",
+                "desktopPublish" to "[$platform]${C.app.displayName}${C.versionName}.zip",
+            )) {
+                tasks.register<Zip>(taskName) {
+                    description = if (taskName == "desktopArtifact") "打包当前平台的桌面端工件" else "发布桌面端"
+                    dependsOn(tasks.named("createReleaseDistributable"))
 
-            tasks.register("desktopPublish") {
-                description = "发布桌面端"
-                dependsOn(tasks.named("createReleaseDistributable"))
-
-                doLast {
-                    val outputDir = C.root.outputs
-                    delete(packageResourcesDir)
-                    copy {
-                        from(desktopBinaryDir)
-                        into(outputDir)
-                    }
-
-                    val artifactName = "${C.app.displayName}${C.versionName}"
-                    val outputAppDir = outputDir.dir(targetName)
-                    when (C.platform) {
-                        BuildPlatform.Windows -> zip(outputAppDir, outputDir.file("[Windows]${artifactName}.zip"))
-                        BuildPlatform.Linux -> zip(outputAppDir, outputDir.file("[Linux]${artifactName}.zip"))
-                        BuildPlatform.Mac -> zip(outputDir.dir("$targetName.app"), outputDir.file("[macOS]${artifactName}.zip"))
-                    }
-
-                    delete(outputAppDir)
+                    from(desktopBinaryDir) { include("$applicationDirectory/**") }
+                    destinationDirectory.set(C.root.outputs)
+                    archiveFileName.set(filename)
+                    useFileSystemPermissions()
+                    inputs.file(executable).withPropertyName("desktopExecutable")
+                    doFirst { delete(C.root.outputs.dir(applicationDirectory)) }
                 }
             }
         }

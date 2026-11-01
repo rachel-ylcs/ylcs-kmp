@@ -1,5 +1,6 @@
 import love.yinlin.gradle.wasmBinaryDir
 import love.yinlin.repository.C
+import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -64,16 +65,12 @@ rachel {
                 dependsOn(tasks.named("composeRun"))
             }
 
-            tasks.register("modernScreenPublish") {
+            tasks.register<Sync>("modernScreenPublish") {
                 description = "发布网页版ModernScreen"
                 dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
-                doLast {
-                    copy {
-                        from(wasmBinaryDir)
-                        into(C.root.docs.modernScreen)
-                    }
-                }
+                from(wasmBinaryDir)
+                into(C.root.docs.modernScreen)
             }
         }
     }

@@ -1,5 +1,6 @@
 import love.yinlin.gradle.wasmBinaryDir
 import love.yinlin.repository.C
+import org.gradle.api.tasks.Sync
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -79,16 +80,12 @@ rachel {
                 dependsOn(tasks.named("composeRun"))
             }
 
-            tasks.register("galleryPublish") {
+            tasks.register<Sync>("galleryPublish") {
                 description = "发布网页版Gallery"
                 dependsOn(tasks.named("wasmJsBrowserDistribution"))
 
-                doLast {
-                    copy {
-                        from(wasmBinaryDir)
-                        into(C.root.docs.gallery)
-                    }
-                }
+                from(wasmBinaryDir)
+                into(C.root.docs.gallery)
             }
         }
     }

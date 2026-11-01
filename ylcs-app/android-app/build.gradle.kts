@@ -1,5 +1,6 @@
 import love.yinlin.repository.C
 import love.yinlin.repository.localProperties
+import org.gradle.api.tasks.Copy
 
 plugins {
     install(
@@ -53,29 +54,18 @@ rachel {
                 dependsOn(tasks.named("assembleDebug"))
             }
 
-            tasks.register("androidArtifact") {
-                description = "安卓端Release打包"
-                dependsOn(tasks.named("assembleRelease"))
+            val releaseApk = provider { originOutput }
+            for ((taskName, filename) in mapOf(
+                "androidArtifact" to "ylcs-android.apk",
+                "androidPublish" to "[Android]${C.app.displayName}${C.versionName}.apk",
+            )) {
+                tasks.register<Copy>(taskName) {
+                    description = if (taskName == "androidArtifact") "安卓端Release打包" else "发布安卓端安装包"
+                    dependsOn(tasks.named("assembleRelease"))
 
-                doLast {
-                    copy {
-                        from(originOutput)
-                        into(C.root.outputs)
-                        rename { _ -> "ylcs-android.apk" }
-                    }
-                }
-            }
-
-            tasks.register("androidPublish") {
-                description = "发布安卓端安装包"
-                dependsOn(tasks.named("assembleRelease"))
-
-                doLast {
-                    copy {
-                        from(originOutput)
-                        into(C.root.outputs)
-                        rename { _ -> "[Android]${C.app.displayName}${C.versionName}.apk" }
-                    }
+                    from(releaseApk)
+                    into(C.root.outputs)
+                    rename { filename }
                 }
             }
         }

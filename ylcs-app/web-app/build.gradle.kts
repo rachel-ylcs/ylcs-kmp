@@ -1,7 +1,7 @@
 import love.yinlin.gradle.jsBinaryDir
 import love.yinlin.repository.C
-import love.yinlin.gradle.task.spec.zip
 import love.yinlin.gradle.wasmBinaryDir
+import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -55,43 +55,35 @@ rachel {
                 dependsOn(tasks.named("wasmJsBrowserDevelopmentRun"))
             }
 
-            val outputJsDir = C.root.outputs.dir("webJs")
-            val outputWasmDir = C.root.outputs.dir("webWasm")
-
-            tasks.register("webArtifact") {
-                description = "打包网页版"
-                dependsOn(tasks.named("jsBrowserDistribution"))
-                dependsOn(tasks.named("wasmJsBrowserDistribution"))
-
-                doLast {
-                    copy {
-                        from(jsBinaryDir)
-                        into(outputJsDir)
+            for ((taskName, filename) in mapOf(
+                "webJsArtifact" to "ylcs-js.zip",
+                "webWasmArtifact" to "ylcs-wasm.zip",
+                "webPublish" to "[WebWasm]${C.app.displayName}${C.versionName}.zip",
+            )) {
+                val isJs = taskName == "webJsArtifact"
+                val binaryDirectory = if (isJs) jsBinaryDir else wasmBinaryDir
+                val outputDirectory = if (isJs) "webJs" else "webWasm"
+                tasks.register<Zip>(taskName) {
+                    description = when (taskName) {
+                        "webJsArtifact" -> "打包Web/Js网页版"
+                        "webWasmArtifact" -> "打包Web/Wasm网页版"
+                        else -> "发布网页版"
                     }
-                    delete(*outputJsDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                    copy {
-                        from(wasmBinaryDir)
-                        into(outputWasmDir)
+                    dependsOn(tasks.named(if (isJs) "jsBrowserDistribution" else "wasmJsBrowserDistribution"))
+
+                    from(binaryDirectory) {
+                        into(outputDirectory)
+                        exclude("*.map", "*.txt")
                     }
-                    delete(*outputWasmDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                    zip(outputJsDir, C.root.outputs.file("ylcs-js.zip"))
-                    zip(outputWasmDir, C.root.outputs.file("ylcs-wasm.zip"))
+                    destinationDirectory.set(C.root.outputs)
+                    archiveFileName.set(filename)
+                    doFirst { delete(C.root.outputs.dir(outputDirectory)) }
                 }
             }
 
-            tasks.register("webPublish") {
-                description = "发布网页版"
-                dependsOn(tasks.named("wasmJsBrowserDistribution"))
-
-                doLast {
-                    copy {
-                        from(wasmBinaryDir)
-                        into(outputWasmDir)
-                    }
-                    delete(*outputWasmDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                    zip(outputWasmDir, C.root.outputs.file("[WebWasm]${C.app.displayName}${C.versionName}.zip"))
-                    delete(outputWasmDir)
-                }
+            tasks.register("webArtifact") {
+                description = "打包网页版"
+                dependsOn(tasks.named("webJsArtifact"), tasks.named("webWasmArtifact"))
             }
         }
     }

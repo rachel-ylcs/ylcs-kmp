@@ -1,6 +1,6 @@
 import love.yinlin.gradle.*
 import love.yinlin.repository.C
-import love.yinlin.gradle.task.spec.zip
+import org.gradle.api.tasks.bundling.Zip
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -37,20 +37,17 @@ rachel {
                 dependsOn(tasks.named("jsBrowserDevelopmentRun"))
             }
 
-            tasks.register("landpagePublish") {
+            tasks.register<Zip>("landpagePublish") {
                 description = "发布落地页"
                 dependsOn(tasks.named("jsBrowserDistribution"))
 
-                doLast {
-                    val outputAppDir = C.root.outputs.dir("landpage")
-                    copy {
-                        from(jsBinaryDir)
-                        into(outputAppDir)
-                    }
-                    delete(*outputAppDir.asFile.listFiles { it.extension == "map" || it.extension == "txt" })
-                    zip(outputAppDir, C.root.outputs.file("landpage.zip"))
-                    delete(outputAppDir)
+                from(jsBinaryDir) {
+                    into("landpage")
+                    exclude("*.map", "*.txt")
                 }
+                destinationDirectory.set(C.root.outputs)
+                archiveFileName.set("landpage.zip")
+                doFirst { delete(C.root.outputs.dir("landpage")) }
             }
         }
     }
