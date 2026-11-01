@@ -90,7 +90,7 @@ rachel {
             }
 
             tasks.register("desktopArtifact") {
-                description = "桌面端打包"
+                description = "打包当前平台的桌面端工件"
                 dependsOn(tasks.named("createReleaseDistributable"))
 
                 doLast {

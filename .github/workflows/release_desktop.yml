@@ -1,0 +1,77 @@
+name: ReleaseDesktop
+
+on:
+  push:
+    tags:
+      - 'desktop*'
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      publish:
+        description: Use the product release task and filenames.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  package-desktop:
+    name: Package JVM Desktop / ${{ matrix.platform }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            platform: windows
+            publish-platform: Windows
+            workers: 2
+          - runner: ubuntu-22.04
+            platform: linux
+            publish-platform: Linux
+            workers: 2
+          - runner: macos-26
+            platform: macos
+            publish-platform: macOS
+            workers: 1
+    env:
+      GRADLE_TASK: ${{ inputs.publish && ':ylcs-app:desktop-app:desktopPublish' || ':ylcs-app:desktop-app:desktopArtifact' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          msvc: ${{ runner.os == 'Windows' }}
+          gtk: ${{ runner.os == 'Linux' }}
+          virtual-display: ${{ runner.os == 'Linux' }}
+
+      - name: Build JVM Desktop Distribution
+        if: ${{ runner.os != 'Linux' }}
+        run: >-
+          bash ./gradlew "$GRADLE_TASK"
+          --no-daemon --build-cache --max-workers=${{ matrix.workers }} --console=plain
+
+      - name: Build JVM Desktop Distribution with Virtual Display
+        if: ${{ runner.os == 'Linux' }}
+        env:
+          SKIKO_RENDER_API: SOFTWARE_FAST
+        run: >-
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24"
+          bash ./gradlew "$GRADLE_TASK"
+          --no-daemon --build-cache --max-workers=${{ matrix.workers }} --console=plain
+
+      - name: Upload Application
+        uses: actions/upload-artifact@v7
+        with:
+          name: ylcs-${{ matrix.platform }}
+          path: ${{ inputs.publish && format('outputs/*{0}*.zip', matrix.publish-platform) || format('outputs/ylcs-{0}.zip', matrix.platform) }}
+          if-no-files-found: error

@@ -53,76 +53,11 @@ jobs:
           name: ylcs-ios
           path: ${{ steps.package.outputs.path }}
 
-  package-windows:
-    name: Package Windows
-    runs-on: windows-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          msvc: 'true'
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktop-app:desktopArtifact
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-windows
-          path: outputs/ylcs-windows.zip
-
-  package-linux:
-    name: Package Linux
-    # 用太新的 Ubuntu 会导致 native 库链接的 glibc 版本过高，导致无法在较旧的 Linux 上运行
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          gtk: 'true'
-          virtual-display: 'true'
-
-      - name: Build
-        env:
-          SKIKO_RENDER_API: SOFTWARE_FAST
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" ./gradlew ylcs-app:desktop-app:desktopArtifact
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-linux
-          path: outputs/ylcs-linux.zip
-
-  package-macos:
-    name: Package macOS
-    runs-on: macos-26
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-
-      - name: Build
-        run: ./gradlew ylcs-app:desktop-app:desktopArtifact
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-macos
-          path: outputs/ylcs-macos.zip
+  package-desktop:
+    name: Package JVM Desktop
+    uses: ./.github/workflows/release_desktop.yml
+    with:
+      publish: true
 
   package-web:
     name: Package Web
@@ -178,50 +113,10 @@ jobs:
     uses: ./.github/workflows/release_mod_manager.yml
 
   package-nativeDesktop:
-    name: Publish Native Desktop / ${{ matrix.platform }}
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: windows-2025
-            platform: windows-x64
-            workers: 2
-          - runner: ubuntu-24.04
-            platform: linux-x64
-            workers: 2
-          - runner: macos-26
-            platform: macos-arm64
-            workers: 1
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          msvc: ${{ runner.os == 'Windows' }}
-          native-tools: 'true'
-
-      - name: Publish Native Release Distribution
-        run: >-
-          bash ./gradlew :ylcs-app:native-desktop-app:nativeDesktopPublish
-          --no-daemon --build-cache --max-workers=${{ matrix.workers }} --console=plain
-
-      - name: Upload Application
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-native-${{ matrix.platform }}
-          path: outputs/*Native*.zip
-          if-no-files-found: error
+    name: Package Native Desktop
+    uses: ./.github/workflows/release_native_desktop.yml
+    with:
+      publish: true
 
   package-landpage:
     name: Package Landpage
@@ -249,9 +144,7 @@ jobs:
     needs: [
       package-android,
       package-ios,
-      package-windows,
-      package-linux,
-      package-macos,
+      package-desktop,
       package-web,
       package-server,
       package-modManager,

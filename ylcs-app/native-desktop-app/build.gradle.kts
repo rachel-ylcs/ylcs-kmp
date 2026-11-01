@@ -64,12 +64,12 @@ rachel {
             val archive = tasks.named<Zip>("package${target}ReleaseExecutable")
 
             tasks.register<Copy>("nativeDesktopArtifact") {
-                description = "打包Windows原生桌面端工件"
+                description = "打包当前平台的原生桌面端工件"
                 dependsOn(archive)
 
                 from(archive.flatMap { it.archiveFile })
                 into(C.root.outputs)
-                rename { "ylcs-native-windows.zip" }
+                rename { "ylcs-native-${target.lowercase()}.zip" }
             }
 
             tasks.register<Copy>("nativeDesktopPublish") {
