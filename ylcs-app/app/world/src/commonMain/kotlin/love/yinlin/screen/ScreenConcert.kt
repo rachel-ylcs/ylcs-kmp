@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -63,6 +65,7 @@ import love.yinlin.data.rachel.concert.Concert
 import love.yinlin.data.rachel.concert.ConcertSong
 import love.yinlin.extension.cleaning
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 @Stable
 class ScreenConcert : BasicScreen() {
@@ -399,10 +402,31 @@ class ScreenConcert : BasicScreen() {
         }
     }
 
+    private val lightCardPalette = [
+        Color(0xFF278AA9), // 青蓝
+        Color(0xFF3A78C7), // 湖蓝
+        Color(0xFF826DC4), // 紫罗兰
+        Color(0xFFB56FA4), // 玫瑰紫
+        Color(0xFFC98276), // 珊瑚橙
+        Color(0xFFC59A52), // 琥珀黄
+        Color(0xFF80A060), // 鼠尾草绿
+        Color(0xFF3E9C85), // 薄荷绿
+    ]
+
+    private val darkCardPalette = [
+        Color(0xFF78B7D7), // 柔和青蓝
+        Color(0xFF86A5E4), // 浅蓝
+        Color(0xFFAC9ADB), // 薰衣草紫
+        Color(0xFFD7A0C8), // 浅玫瑰
+        Color(0xFFE4AAA1), // 柔珊瑚
+        Color(0xFFDFC28D), // 香槟金
+        Color(0xFFADC98B), // 嫩绿
+        Color(0xFF83C9B4), // 浅薄荷
+    ]
+
     @Composable
     private fun ConcertSongRow(item: ConcertSongItem, personal: Boolean = false) {
         val pid = item.song.pid?.takeIf { it.isNotBlank() }
-        val background = remember(pid) { pid?.let { ServerRes.Mod.Song(it).res(ModResourceType.Background.filename).url } }
 
         Surface(
             modifier = Modifier.fillMaxWidth().pointerIcon(PointerIcon.Hand, enabled = pid != null),
@@ -410,17 +434,18 @@ class ScreenConcert : BasicScreen() {
             tonalLevel = 1,
             onClick = if (pid != null) ({ openSong(item.song) }) else null,
         ) {
-            if (background != null) {
-                WebImage(
-                    source = background,
-                    modifier = Modifier.matchParentSize().zIndex(1f),
-                    contentScale = ContentScale.Crop,
-                    alpha = 0.12f
-                )
+            val darkMode = Theme.darkMode
+            val paletteColor = remember(darkMode, item) {
+                val palette = if (darkMode) darkCardPalette else lightCardPalette
+                val index = Random.nextInt(palette.size)
+                val color1 = palette[index]
+                val color2 = palette[(index + 1) % palette.size]
+                val fraction = 0.25f + Random.nextFloat() * 0.5f
+                lerp(color1, color2, fraction).copy(alpha = 0.12f)
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value).zIndex(2f),
+                modifier = Modifier.fillMaxWidth().background(paletteColor).padding(Theme.padding.value),
                 horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                 verticalAlignment = Alignment.CenterVertically
             ) {
