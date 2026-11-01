@@ -32,9 +32,12 @@ internal class WindowsPlatformViewContainer<V : COpaquePointer>(
 
     init {
         check(IsWindow(parent) != 0 && GetWindowThreadProcessId(parent, null) == GetCurrentThreadId()) { "Create platform views on their window's UI thread" }
-        container = checkNotNull(CreateWindowExW(WS_EX_CONTROLPARENT.toUInt(), "STATIC", "", (WS_CHILD or WS_CLIPCHILDREN or WS_CLIPSIBLINGS).toUInt(), 0, 0, 0, 0, parent, null, GetModuleHandleW(null), null)) { "Cannot create the platform view container: ${GetLastError()}" }
+        container = checkNotNull(CreateWindowExW((WS_EX_CONTROLPARENT or WS_EX_LAYERED).toUInt(), "STATIC", "", (WS_CHILD or WS_CLIPCHILDREN or WS_CLIPSIBLINGS).toUInt(), 0, 0, 0, 0, parent, null, GetModuleHandleW(null), null)) { "Cannot create the platform view container: ${GetLastError()}" }
 
-        try { WindowsPlatformViewInput.register(this) }
+        try {
+            check(SetLayeredWindowAttributes(container, 0u, 255u, LWA_ALPHA.toUInt()) != 0) { "Cannot make the platform view container opaque: ${GetLastError()}" }
+            WindowsPlatformViewInput.register(this)
+        }
         catch (failure: Throwable) {
             close()
             throw failure

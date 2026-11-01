@@ -12,7 +12,26 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 internal object NativeWindowsResources {
+    val applicationManifest = """
+        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+            <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+                <application>
+                    <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/>
+                </application>
+            </compatibility>
+        </assembly>
+    """.trimIndent()
+
     fun write(executable: File, desktop: NativeDesktopDistribution, icon: File?) {
+        val entries = mutableListOf(Triple(16, 1, versionInfo(desktop, executable.name)))
+        if (icon != null) entries += iconResources(icon.readBytes())
+        update(executable, entries)
+    }
+
+    fun ensureManifest(executable: File) = update(executable, emptyList())
+
+    private fun update(executable: File, resources: List<Triple<Int, Int, ByteArray>>) {
         require(System.getProperty("os.name").startsWith("Windows"))
         // EndUpdateResourceW can drop the COFF table while retaining its old symbol count.
         // Kotlin/Native uses its string table to find DWARF sections when printing exceptions.
@@ -25,12 +44,13 @@ internal object NativeWindowsResources {
             val end = linker.downcallHandle(kernel.find("EndUpdateResourceW").orElseThrow(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))
             val fileName = executable.absolutePath.toByteArray(Charsets.UTF_16LE) + byteArrayOf(0, 0)
             val name = arena.allocate(fileName.size.toLong()).also { it.copyFrom(MemorySegment.ofArray(fileName)) }
+            val hasManifest = hasManifest(linker, kernel, name)
+            if (hasManifest && resources.isEmpty()) return
+            val entries = if (hasManifest) resources else resources + Triple(24, 1, applicationManifest.toByteArray(Charsets.UTF_8))
             val handle = begin.invokeWithArguments(name, 0) as MemorySegment
             check(handle.address() != 0L) { "Cannot open the staged executable's Windows resources: $executable" }
             var active = true
             try {
-                val entries = mutableListOf(Triple(16, 1, versionInfo(desktop, executable.name)))
-                if (icon != null) entries += iconResources(icon.readBytes())
                 for ((type, id, bytes) in entries) {
                     val data = arena.allocate(bytes.size.toLong()).also { it.copyFrom(MemorySegment.ofArray(bytes)) }
                     check(update.invokeWithArguments(handle, MemorySegment.ofAddress(type.toLong()), MemorySegment.ofAddress(id.toLong()), 0.toShort(), data, bytes.size) as Int != 0) { "Cannot write Windows resource $type/$id to $executable" }
@@ -49,6 +69,18 @@ internal object NativeWindowsResources {
             }
         }
         symbols?.restore(executable)
+    }
+
+    private fun hasManifest(linker: Linker, kernel: SymbolLookup, fileName: MemorySegment): Boolean {
+        val load = linker.downcallHandle(kernel.find("LoadLibraryExW").orElseThrow(), FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT))
+        val find = linker.downcallHandle(kernel.find("FindResourceW").orElseThrow(), FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS))
+        val free = linker.downcallHandle(kernel.find("FreeLibrary").orElseThrow(), FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS))
+        val module = load.invokeWithArguments(fileName, MemorySegment.NULL, 2) as MemorySegment
+        check(module.address() != 0L) { "Cannot read the executable's Windows resources" }
+        return try {
+            (find.invokeWithArguments(module, MemorySegment.ofAddress(1), MemorySegment.ofAddress(24)) as MemorySegment).address() != 0L
+        }
+        finally { free.invokeWithArguments(module) }
     }
 
     internal fun iconResources(bytes: ByteArray): List<Triple<Int, Int, ByteArray>> {

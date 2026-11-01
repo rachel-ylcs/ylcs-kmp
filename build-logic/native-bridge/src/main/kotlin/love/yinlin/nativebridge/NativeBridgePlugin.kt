@@ -53,6 +53,15 @@ class NativeBridgePlugin : Plugin<Project> {
         project.pluginManager.withPlugin("org.jetbrains.kotlin.multiplatform") {
             val kotlin = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
             kotlin.targets.withType(KotlinNativeTarget::class.java).configureEach {
+                if (konanTarget.name == "mingw_x64" && System.getProperty("os.name").startsWith("Windows")) {
+                    binaries.withType(Executable::class.java).configureEach {
+                        val binary = this
+                        binary.linkTaskProvider.configure {
+                            inputs.property("nativeWindowsManifest", NativeWindowsResources.applicationManifest)
+                            doLast("ensureNativeWindowsManifest") { NativeWindowsResources.ensureManifest(binary.outputFile) }
+                        }
+                    }
+                }
                 NativeReleaseSymbols.configure(project, this)
             }
             configureReport(project, kotlin, bridge)
