@@ -58,15 +58,17 @@ rachel {
             for ((taskName, filename) in mapOf(
                 "webJsArtifact" to "ylcs-js.zip",
                 "webWasmArtifact" to "ylcs-wasm.zip",
+                "webJsPublish" to "[WebJs]${C.app.displayName}${C.versionName}.zip",
                 "webPublish" to "[WebWasm]${C.app.displayName}${C.versionName}.zip",
             )) {
-                val isJs = taskName == "webJsArtifact"
+                val isJs = taskName == "webJsArtifact" || taskName == "webJsPublish"
                 val binaryDirectory = if (isJs) jsBinaryDir else wasmBinaryDir
                 val outputDirectory = if (isJs) "webJs" else "webWasm"
                 tasks.register<Zip>(taskName) {
                     description = when (taskName) {
                         "webJsArtifact" -> "打包Web/Js网页版"
                         "webWasmArtifact" -> "打包Web/Wasm网页版"
+                        "webJsPublish" -> "发布Web/Js网页版"
                         else -> "发布网页版"
                     }
                     dependsOn(tasks.named(if (isJs) "jsBrowserDistribution" else "wasmJsBrowserDistribution"))

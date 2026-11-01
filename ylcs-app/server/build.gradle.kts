@@ -35,12 +35,14 @@ rachel {
         }
 
         actions {
-            tasks.register<Copy>("serverPublish") {
-                description = "发布服务端"
-                dependsOn(tasks.named("linkReleaseExecutableLinux"))
+            for (taskName in listOf("serverArtifact", "serverPublish")) {
+                tasks.register<Copy>(taskName) {
+                    description = if (taskName == "serverArtifact") "打包服务端工件" else "发布服务端"
+                    dependsOn(tasks.named("linkReleaseExecutableLinux"))
 
-                from(nativeBinaryDir("linux", "server.kexe"))
-                into(C.root.outputs)
+                    from(nativeBinaryDir("linux", "server.kexe"))
+                    into(C.root.outputs)
+                }
             }
         }
     }

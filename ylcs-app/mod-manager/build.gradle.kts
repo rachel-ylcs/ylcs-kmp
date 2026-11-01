@@ -1,4 +1,6 @@
+import love.yinlin.gradle.BuildPlatform
 import love.yinlin.repository.C
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
 plugins {
@@ -51,6 +53,26 @@ rachel {
         actions {
             tasks.withType<Zip>().matching { it.name.startsWith("package") && it.name.endsWith("ReleaseExecutable") }.configureEach {
                 archiveVersion.set("")
+            }
+
+            val (target, platform) = when (C.platform) {
+                BuildPlatform.Windows -> "Windows" to "WindowsNative"
+                BuildPlatform.Linux -> "Linux" to "LinuxNative"
+                BuildPlatform.Mac -> "Macos" to "macOSNative"
+            }
+            val archive = tasks.named<Zip>("package${target}ReleaseExecutable")
+            for ((taskName, filename) in mapOf(
+                "modManagerArtifact" to "ylcs-mod-manager-${target.lowercase()}.zip",
+                "modManagerPublish" to "[$platform]ModManager${C.versionName}.zip",
+            )) {
+                tasks.register<Copy>(taskName) {
+                    description = if (taskName == "modManagerArtifact") "打包MOD编辑器工件" else "发布MOD编辑器"
+                    dependsOn(archive)
+
+                    from(archive.flatMap { it.archiveFile })
+                    into(C.root.outputs)
+                    rename { filename }
+                }
             }
 
             tasks.register("modManagerRunDebug") {

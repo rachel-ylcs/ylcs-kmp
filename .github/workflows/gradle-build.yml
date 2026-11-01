@@ -35,6 +35,14 @@ on:
         description: Install tools required by a desktop Native target.
         type: boolean
         default: false
+      artifact-name:
+        description: Name of the uploaded artifact.
+        type: string
+        default: artifact
+      artifact-path:
+        description: Files to upload after building; leave empty to skip uploading.
+        type: string
+        default: ''
 
 jobs:
   build:
@@ -73,3 +81,11 @@ jobs:
           SKIKO_RENDER_API: SOFTWARE_FAST
         # AOT training launches the desktop app and needs an X11 display.
         run: xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" ./gradlew "$GRADLE_TASK"
+
+      - name: Upload Application
+        if: ${{ inputs.artifact-path != '' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.artifact-path }}
+          if-no-files-found: error

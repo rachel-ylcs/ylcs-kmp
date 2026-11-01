@@ -21,13 +21,14 @@ jobs:
           android: 'true'
 
       - name: Build
-        run: ./gradlew ylcs-app:android-app:androidArtifact
+        run: ./gradlew ylcs-app:android-app:androidPublish
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: ylcs-android
-          path: outputs/ylcs-android.apk
+          path: outputs/*Android*.apk
+          if-no-files-found: error
 
   package-ios:
     name: Package iOS
@@ -45,19 +46,22 @@ jobs:
         id: package
         uses: ./.github/actions/package-ios
         with:
-          ipa-name: "ylcs-ios.ipa"
+          ipa-name: "[iOS]银临茶舍${{ github.ref_name }}.ipa"
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: ylcs-ios
-          path: ${{ steps.package.outputs.path }}
+          path: outputs/*.ipa
+          if-no-files-found: error
 
   package-desktop:
     name: Package JVM Desktop
-    uses: ./.github/workflows/release_desktop.yml
+    uses: ./.github/workflows/desktop-build.yml
     with:
-      publish: true
+      task: :ylcs-app:desktop-app:desktopPublish
+      artifact-name: ylcs-{0}
+      artifact-path: outputs/*{1}*.zip
 
   package-web:
     name: Package Web
@@ -72,19 +76,21 @@ jobs:
         uses: ./.github/actions/setup-build
 
       - name: Build
-        run: ./gradlew ylcs-app:web-app:webArtifact
+        run: ./gradlew :ylcs-app:web-app:webJsPublish :ylcs-app:web-app:webPublish
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: ylcs-js
-          path: outputs/ylcs-js.zip
+          path: outputs/*WebJs*.zip
+          if-no-files-found: error
 
       - name: Upload
         uses: actions/upload-artifact@v7
         with:
           name: ylcs-wasm
-          path: outputs/ylcs-wasm.zip
+          path: outputs/*WebWasm*.zip
+          if-no-files-found: error
 
   package-server:
     name: Package Server
@@ -110,13 +116,22 @@ jobs:
 
   package-modManager:
     name: Package Mod Manager
-    uses: ./.github/workflows/release_mod_manager.yml
+    uses: ./.github/workflows/desktop-build.yml
+    with:
+      task: :ylcs-app:mod-manager:modManagerPublish
+      native: true
+      submodules: 'false'
+      artifact-name: ylcs-mod-manager-{0}
+      artifact-path: outputs/*ModManager*.zip
 
   package-nativeDesktop:
     name: Package Native Desktop
-    uses: ./.github/workflows/release_native_desktop.yml
+    uses: ./.github/workflows/desktop-build.yml
     with:
-      publish: true
+      task: :ylcs-app:native-desktop-app:nativeDesktopPublish
+      native: true
+      artifact-name: ylcs-native-{0}
+      artifact-path: outputs/*{1}*.zip
 
   package-landpage:
     name: Package Landpage

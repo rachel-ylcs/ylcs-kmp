@@ -1,0 +1,99 @@
+name: Desktop Build
+
+on:
+  workflow_call:
+    inputs:
+      task:
+        description: Fully qualified Gradle packaging task.
+        type: string
+        required: true
+      native:
+        description: Build a Kotlin Native desktop application.
+        type: boolean
+        default: false
+      submodules:
+        description: Whether to fetch submodules; accepts false, true, or recursive.
+        type: string
+        default: recursive
+      artifact-name:
+        description: Artifact name with platform placeholder {0}.
+        type: string
+        required: true
+      artifact-path:
+        description: Archive path with OS placeholder {0} and platform label placeholder {1}.
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  package-desktop:
+    name: Package / ${{ inputs.native && matrix.native-platform || matrix.platform }}
+    runs-on: ${{ inputs.native && matrix.native-runner || matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            native-platform: windows-x64
+            platform-label: Windows
+            native-platform-label: WindowsNative
+            runner: windows-2025
+            native-runner: windows-2025
+            workers: 2
+          - platform: linux
+            native-platform: linux-x64
+            platform-label: Linux
+            native-platform-label: LinuxNative
+            runner: ubuntu-22.04
+            native-runner: ubuntu-24.04
+            workers: 2
+          - platform: macos
+            native-platform: macos-arm64
+            platform-label: macOS
+            native-platform-label: macOSNative
+            runner: macos-26
+            native-runner: macos-26
+            workers: 1
+    env:
+      GRADLE_TASK: ${{ inputs.task }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: ${{ inputs.submodules }}
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          msvc: ${{ runner.os == 'Windows' }}
+          native-tools: ${{ inputs.native }}
+          gtk: ${{ !inputs.native && runner.os == 'Linux' }}
+          virtual-display: ${{ !inputs.native && runner.os == 'Linux' }}
+
+      - name: Build
+        if: ${{ inputs.native || runner.os != 'Linux' }}
+        run: >-
+          bash ./gradlew "$GRADLE_TASK"
+          --no-daemon --build-cache --max-workers=${{ matrix.workers }} --console=plain
+
+      - name: Build with Virtual Display
+        if: ${{ !inputs.native && runner.os == 'Linux' }}
+        env:
+          SKIKO_RENDER_API: SOFTWARE_FAST
+        run: >-
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24"
+          bash ./gradlew "$GRADLE_TASK"
+          --no-daemon --build-cache --max-workers=${{ matrix.workers }} --console=plain
+
+      - name: Upload Application
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ format(inputs.artifact-name, inputs.native && matrix.native-platform || matrix.platform) }}
+          path: ${{ format(inputs.artifact-path, matrix.platform, inputs.native && matrix.native-platform-label || matrix.platform-label) }}
+          if-no-files-found: error

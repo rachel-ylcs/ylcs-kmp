@@ -9,6 +9,8 @@ jobs:
     uses: ./.github/workflows/gradle-build.yml
     with:
       runner: ubuntu-latest
-      task: ylcs-app:android-app:androidPublish
+      task: ylcs-app:android-app:androidArtifact
       submodules: recursive
       android: true
+      artifact-name: ylcs-android
+      artifact-path: outputs/ylcs-android.apk

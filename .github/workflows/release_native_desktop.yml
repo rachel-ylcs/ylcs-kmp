@@ -6,64 +6,16 @@ on:
       - 'nativeDesktop*'
   workflow_dispatch:
   workflow_call:
-    inputs:
-      publish:
-        description: Use the product release task and filenames.
-        type: boolean
-        default: false
 
 permissions:
   contents: read
 
 jobs:
   package-native-desktop:
-    name: Package Native Desktop / ${{ matrix.platform }}
-    runs-on: ${{ matrix.runner }}
-    timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: windows-2025
-            platform: windows-x64
-            archive-platform: windows
-            publish-platform: WindowsNative
-            workers: 2
-          - runner: ubuntu-24.04
-            platform: linux-x64
-            archive-platform: linux
-            publish-platform: LinuxNative
-            workers: 2
-          - runner: macos-26
-            platform: macos-arm64
-            archive-platform: macos
-            publish-platform: macOSNative
-            workers: 1
-    env:
-      GRADLE_TASK: ${{ inputs.publish && ':ylcs-app:native-desktop-app:nativeDesktopPublish' || ':ylcs-app:native-desktop-app:nativeDesktopArtifact' }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          submodules: recursive
-
-      - name: Setup Build Environment
-        uses: ./.github/actions/setup-build
-        with:
-          msvc: ${{ runner.os == 'Windows' }}
-          native-tools: 'true'
-
-      - name: Build Native Desktop Distribution
-        run: >-
-          bash ./gradlew "$GRADLE_TASK"
-          --no-daemon --build-cache --max-workers=${{ matrix.workers }} --console=plain
-
-      - name: Upload Application
-        uses: actions/upload-artifact@v7
-        with:
-          name: ylcs-native-${{ matrix.platform }}
-          path: ${{ inputs.publish && format('outputs/*{0}*.zip', matrix.publish-platform) || format('outputs/ylcs-native-{0}.zip', matrix.archive-platform) }}
-          if-no-files-found: error
+    name: Package Native Desktop Artifact
+    uses: ./.github/workflows/desktop-build.yml
+    with:
+      task: :ylcs-app:native-desktop-app:nativeDesktopArtifact
+      native: true
+      artifact-name: ylcs-native-{0}
+      artifact-path: outputs/ylcs-native-{0}.zip

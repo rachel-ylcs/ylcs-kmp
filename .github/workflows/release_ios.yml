@@ -20,4 +20,11 @@ jobs:
         id: package
         uses: ./.github/actions/package-ios
         with:
-          ipa-name: "[iOS]银临茶舍${{ github.ref_name }}.ipa"
+          ipa-name: ylcs-ios.ipa
+
+      - name: Upload Application
+        uses: actions/upload-artifact@v7
+        with:
+          name: ylcs-ios
+          path: ${{ steps.package.outputs.path }}
+          if-no-files-found: error
