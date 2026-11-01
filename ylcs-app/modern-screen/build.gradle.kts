@@ -61,6 +61,11 @@ rachel {
 
         actions {
             tasks.register("modernScreenRun") {
+                description = "运行Debug桌面版ModernScreen"
+                dependsOn(tasks.named("run"))
+            }
+
+            tasks.register("nativeModernScreenRun") {
                 description = "运行Debug原生桌面版ModernScreen"
                 dependsOn(tasks.named("composeRun"))
             }

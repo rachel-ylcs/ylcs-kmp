@@ -8,13 +8,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -22,9 +22,7 @@ import kotlinx.coroutines.launch
 import love.yinlin.compose.Device
 import love.yinlin.compose.LocalImmersivePadding
 import love.yinlin.compose.Theme
-import love.yinlin.compose.bold
 import love.yinlin.compose.ui.animation.AnimationContent
-import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.node.shadow
@@ -106,78 +104,63 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
                 Type.Error -> Theme.color.error
             }
             val surface = Theme.color.surface
+            val brush = remember(accent, surface) {
+                Brush.horizontalGradient([
+                    accent.copy(alpha = 0.32f).compositeOver(surface),
+                    accent.copy(alpha = 0.24f).compositeOver(surface),
+                    surface
+                ])
+            }
+
             val shape = Theme.shape.v5
-            val padding = LocalImmersivePadding.current +
-                PaddingValues(horizontal = Theme.padding.h10, vertical = Theme.padding.v4)
+            val padding = LocalImmersivePadding.current + PaddingValues(horizontal = Theme.padding.h9, vertical = Theme.padding.v4)
             val duration = Theme.animation.duration.v7
 
             Box(
                 modifier = Modifier
                     .padding(padding)
                     .defaultMinSize(minWidth = Theme.size.cell1)
-                    .widthIn(max = 440.dp)
-                    .shadow(shape, Theme.shadow.v7)
+                    .widthIn(max = Theme.size.cell1 * 1.5f)
+                    .shadow(shape, radius = Theme.shadow.v7)
                     .clip(shape)
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(
-                                accent.copy(alpha = 0.12f).compositeOver(surface),
-                                accent.copy(alpha = 0.04f).compositeOver(surface),
-                                surface
-                            )
-                        )
-                    )
-                    .border(1.dp, accent.copy(alpha = 0.28f), shape)
+                    .background(brush)
+                    .border(Theme.border.v7, accent.copy(alpha = 0.48f), shape)
             ) {
                 AnimationContent(
                     state = data,
                     enter = {
-                        fadeIn(tween(duration, easing = FastOutSlowInEasing)) +
-                            slideInVertically(
-                                initialOffsetY = { -it / 4 },
-                                animationSpec = tween(duration, easing = FastOutSlowInEasing)
-                            )
+                        fadeIn(tween(duration, easing = FastOutSlowInEasing)) + slideInVertically(initialOffsetY = { -it / 4 }, animationSpec = tween(duration, easing = FastOutSlowInEasing))
                     },
                     exit = {
-                        fadeOut(tween(duration / 2)) +
-                            slideOutVertically(
-                                targetOffsetY = { -it / 5 },
-                                animationSpec = tween(duration / 2)
-                            )
+                        fadeOut(tween(duration / 2)) + slideOutVertically(targetOffsetY = { -it / 5 }, animationSpec = tween(duration / 2))
                     }
-                ) { current ->
+                ) { (val type, val text) ->
                     Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.padding(Theme.padding.value9),
+                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Box(modifier = Modifier.width(Theme.size.box4).height(Theme.size.icon).clip(Theme.shape.circle).background(accent))
+
                         Box(
-                            modifier = Modifier
-                                .width(3.dp)
-                                .height(30.dp)
-                                .clip(Theme.shape.circle)
-                                .background(accent)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(Theme.shape.circle)
-                                .background(accent.copy(alpha = 0.14f)),
+                            modifier = Modifier.size(Theme.size.icon).clip(Theme.shape.circle).background(accent.copy(alpha = 0.34f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            ThemeContainer(accent) {
-                                Icon(icon = when (current.type) {
+                            Icon(
+                                icon = when (type) {
                                     Type.Info -> Icons.Lightbulb
                                     Type.Success -> Icons.Check
                                     Type.Warning -> Icons.Warning
                                     Type.Error -> Icons.Error
-                                })
-                            }
+                                },
+                                color = accent,
+                                modifier = Modifier.size(Theme.size.smallIcon)
+                            )
                         }
+
                         Text(
-                            text = current.text,
+                            text = text,
                             color = Theme.color.onSurface,
-                            style = Theme.typography.v6.bold,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )

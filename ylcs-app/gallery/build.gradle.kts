@@ -76,6 +76,11 @@ rachel {
 
         actions {
             tasks.register("galleryRun") {
+                description = "运行Debug桌面版Gallery"
+                dependsOn(tasks.named("run"))
+            }
+
+            tasks.register("nativeGalleryRun") {
                 description = "运行Debug原生桌面版Gallery"
                 dependsOn(tasks.named("composeRun"))
             }
