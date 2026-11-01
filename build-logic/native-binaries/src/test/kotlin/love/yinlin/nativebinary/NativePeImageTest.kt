@@ -28,6 +28,26 @@ class NativePeImageTest {
         }
     }
 
+    @Test
+    fun resourceProtectionIsPreservedWithoutAcceptingRuntimeDamage() {
+        val resourceHeader = 0x98 + 240 + 40
+        for (flags in listOf(0x40000040, 0xc0000040.toInt())) {
+            val original = fixture()
+            ".rsrc\u0000\u0000\u0000".toByteArray().copyInto(original, resourceHeader)
+            ByteBuffer.wrap(original).order(ByteOrder.LITTLE_ENDIAN).putInt(resourceHeader + 36, flags)
+            val stripped = stripped(original)
+            ByteBuffer.wrap(stripped).order(ByteOrder.LITTLE_ENDIAN).putInt(resourceHeader + 36, 0xc0300040.toInt())
+            NativePeImage.restoreResourceProtection(original, stripped)
+            NativePeImage.verifyStripped(original, stripped)
+            for (offset in listOf(1536, 0x98 + 240 + 36 + 3)) {
+                val damaged = stripped.copyOf()
+                damaged[offset] = (damaged[offset].toInt() xor 0x80).toByte()
+                NativePeImage.restoreResourceProtection(original, damaged)
+                assertFailsWith<IllegalArgumentException> { NativePeImage.verifyStripped(original, damaged) }
+            }
+        }
+    }
+
     private fun stripped(original: ByteArray): ByteArray = original.copyOf(2560).also {
         ByteBuffer.wrap(it).order(ByteOrder.LITTLE_ENDIAN).putInt(0x80 + 12, 0).putInt(0x80 + 16, 0)
     }

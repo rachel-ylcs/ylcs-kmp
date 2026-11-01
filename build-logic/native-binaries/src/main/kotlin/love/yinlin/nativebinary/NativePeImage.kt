@@ -24,15 +24,23 @@ internal class NativePeImage(private val bytes: ByteArray) {
             val size = input.getInt(header + 16)
             val raw = input.getInt(header + 20)
             require(input.getInt(header + 8) >= 0 && size >= 0 && raw >= 0 && raw.toLong() + size <= bytes.size) { "Invalid PE section bounds" }
-            Section(bytes.copyOfRange(header, header + 8).toString(Charsets.ISO_8859_1).trimEnd('\u0000'), input.getInt(header + 8), input.getInt(header + 12), size, raw, input.getInt(header + 36))
+            Section(bytes.copyOfRange(header, header + 8).toString(Charsets.ISO_8859_1).trimEnd('\u0000'), input.getInt(header + 8), input.getInt(header + 12), size, raw, input.getInt(header + 36), header)
         }
     }
 
-    private data class Section(val name: String, val virtualSize: Int, val address: Int, val size: Int, val raw: Int, val flags: Int)
+    private data class Section(val name: String, val virtualSize: Int, val address: Int, val size: Int, val raw: Int, val flags: Int, val header: Int)
 
     private fun loaded(): List<Section> = sections.filter { it.name == ".reloc" || it.flags and 0xe0000000.toInt() != 0 && it.flags and 0x02000000 == 0 }
 
     companion object {
+        fun restoreResourceProtection(original: ByteArray, stripped: ByteArray) {
+            val resource = NativePeImage(original).sections.singleOrNull { it.name == ".rsrc" } ?: return
+            val after = NativePeImage(stripped)
+            val updated = after.sections.singleOrNull { it.name == ".rsrc" } ?: return
+            // BFD adds IMAGE_SCN_MEM_WRITE to resource sections even with --set-section-flags=readonly.
+            if (resource.flags and Int.MIN_VALUE == 0) after.input.putInt(updated.header + 36, updated.flags and Int.MAX_VALUE)
+        }
+
         fun verifyStripped(original: ByteArray, stripped: ByteArray) {
             val before = NativePeImage(original)
             val after = NativePeImage(stripped)

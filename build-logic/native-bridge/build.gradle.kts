@@ -160,6 +160,7 @@ tasks.register<Test>("hostTest") {
     testClassesDirs = sourceSets.test.get().output.classesDirs
     classpath = sourceSets.test.get().runtimeClasspath
     filter { includeTestsMatching(hostPackagingTest) }
+    testLogging { exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
     shouldRunAfter(tasks.test)
 }
 

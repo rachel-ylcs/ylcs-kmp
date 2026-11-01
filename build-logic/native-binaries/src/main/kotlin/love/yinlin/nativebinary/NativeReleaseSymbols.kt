@@ -74,7 +74,13 @@ object NativeReleaseSymbols {
                 val debug = directory.resolve("${binary.name}.debug")
                 command(listOf(objcopy, "--only-keep-debug", binary.absolutePath, work.resolve(debug.name).absolutePath))
                 command(listOf(objcopy, "--strip-all", binary.absolutePath, stripped.absolutePath))
-                if (platform == "mingw_x64") NativePeImage.verifyStripped(binary.readBytes(), stripped.readBytes())
+                if (platform == "mingw_x64") {
+                    val original = binary.readBytes()
+                    val image = stripped.readBytes()
+                    NativePeImage.restoreResourceProtection(original, image)
+                    NativePeImage.verifyStripped(original, image)
+                    stripped.writeBytes(image)
+                }
                 else {
                     // The basename and CRC let debuggers find the separate file after it is copied alongside the executable.
                     command(listOf(objcopy, "--add-gnu-debuglink=${work.resolve(debug.name).absolutePath}", stripped.absolutePath))
