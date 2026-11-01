@@ -13,15 +13,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.supervisorScope
+import kotlinx.io.writeString
 import love.yinlin.app
 import love.yinlin.compose.Colors
 import love.yinlin.compose.Device
@@ -35,7 +34,7 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.rememberDeviceType
-import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.floating.DialogDownload
 import love.yinlin.compose.ui.floating.download
 import love.yinlin.compose.ui.icon.Icons
@@ -53,18 +52,24 @@ import love.yinlin.data.radio.Radio
 import love.yinlin.data.radio.RadioUser
 import love.yinlin.data.radio.RadioUserInfo
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.catchingDefault
+import love.yinlin.extension.catchingNull
+import love.yinlin.extension.cleaning
+import love.yinlin.extension.parseJsonValue
 import love.yinlin.extension.replaceAll
 import love.yinlin.extension.timeString
+import love.yinlin.extension.toJsonString
 import love.yinlin.fs.File
 import love.yinlin.media.buildAudioPlayer
 import love.yinlin.tpl.radio.RadioAPI
 import kotlin.time.Duration.Companion.seconds
 
 @Stable
-class ScreenRadio : BasicScreen() {
+class ScreenRadio : Screen() {
     private val player = buildAudioPlayer(app.rawContext, ::nextRadio)
 
     private var isPlaying by mutableStateOf(false)
+    private var isPlayerReady by mutableStateOf(false)
     private var position by mutableLongStateOf(0L)
     private var duration by mutableLongStateOf(0L)
 
@@ -73,44 +78,25 @@ class ScreenRadio : BasicScreen() {
     private val rachel = RadioUserInfo.Default[0]
     private var radioUser: RadioUser? by mutableRefStateOf(null)
     private var radioPrograms: List<Radio> by mutableRefStateOf([])
+    private var isUpdating by mutableStateOf(true)
+    private var canDownload by mutableStateOf(false)
+
+    private val radioVersionKey: Int get() = radioPrograms.size
 
     private var localMap = mutableStateSetOf<String>()
     private var currentProgram: Radio? by mutableRefStateOf(null)
 
     private val Radio.audioPath: File get() = File(app.radioPath, id)
 
+    override val title: String = "电台"
+
     override fun initialize() {
         launch {
-            val result = supervisorScope {
-                [
-                    this.async { // 初始化播放器
-                        player.init()
-                        player.isInit
-                    },
-                    this.async { // 加载本地缓存
-                        val radioData = Coroutines.io {
-                            app.radioPath.list().filter {
-                                it.fileSize() > 1024 * 100 // 至少100KB的文件
-                            }.map { it.nameWithoutExtension }
-                        }
-                        localMap.replaceAll(radioData)
-                        true
-                    },
-                    this.async { // 加载电台用户
-                        val user = RadioAPI.requestUser(rachel.id) ?: return@async false
-                        radioUser = user
-                        true
-                    },
-                    this.async { // 加载电台节目
-                        val cookie = RadioAPI.generateCookie() ?: return@async false
-                        val programs = RadioAPI.requestPrograms(rachel.id, cookie) ?: return@async false
-                        radioPrograms = programs
-                        programs.isNotEmpty()
-                    }
-                ].awaitAll().fastAll { it }
+            isPlayerReady = catchingDefault(false) {
+                player.init()
+                player.isInit
             }
-
-            if (result) {
+            if (isPlayerReady) {
                 isPlayingFlow.collectLatest { value ->
                     isPlaying = value
                     duration = player.duration
@@ -126,13 +112,75 @@ class ScreenRadio : BasicScreen() {
             }
             else slot.tip.error("播放器加载失败")
         }
+
+        launch {
+            // 先展示本地信息，播放器与网络更新互不依赖
+            loadRadioInfo()?.let { [user, programs] ->
+                radioUser = user
+                radioPrograms = programs
+            }
+            val radioData = Coroutines.io {
+                catchingDefault([]) {
+                    app.radioPath.list().filter {
+                        it.name.isNotEmpty() && it.name.all { char -> char in '0' .. '9' } && it.fileSize() > 1024 * 100 // 至少100KB的音频文件
+                    }.map { it.name }
+                }
+            }
+            localMap.replaceAll(radioData)
+
+            val [user, programs] = supervisorScope {
+                val user = async { RadioAPI.requestUser(rachel.id) }
+                val programs = async {
+                    val cookie = RadioAPI.generateCookie() ?: return@async null
+                    RadioAPI.requestPrograms(rachel.id, cookie)
+                }
+                user.await() to programs.await()
+            }
+            isUpdating = false
+            if (user == null || programs == null || !isValidRadioInfo(user, programs)) {
+                slot.tip.warning("无法更新电台信息，仅可播放或删除已缓存节目")
+                return@launch
+            }
+
+            if (radioUser == null || programs.size > radioVersionKey) {
+                if (!saveRadioInfo(user, programs)) slot.tip.warning("电台信息缓存失败")
+                radioUser = user
+                radioPrograms = programs
+            }
+            canDownload = true
+        }
     }
 
     override fun uninitialize() {
         player.release()
     }
 
+    private fun isValidRadioInfo(user: RadioUser, programs: List<Radio>): Boolean {
+        val ids = programs.map { it.id }
+        return user.id == rachel.id && user.programNum == programs.size &&
+            ids.all { id -> id.isNotEmpty() && id.all { it in '0' .. '9' } } && ids.toSet().size == programs.size
+    }
+
+    private suspend fun loadRadioInfo(): Pair<RadioUser, List<Radio>>? = Coroutines.io {
+        catchingNull {
+            val user = File(app.radioPath, "user.json").readText()!!.parseJsonValue<RadioUser>()
+            val programs = File(app.radioPath, "list.json").readText()!!.parseJsonValue<List<Radio>>()
+            require(isValidRadioInfo(user, programs))
+            user to programs
+        }
+    }
+
+    private suspend fun saveRadioInfo(user: RadioUser, programs: List<Radio>): Boolean = Coroutines.io {
+        catchingDefault(false) {
+            app.radioPath.mkdir()
+            File(app.radioPath, "user.json").write { it.writeString(user.toJsonString()) }
+            File(app.radioPath, "list.json").write { it.writeString(programs.toJsonString()) }
+            true
+        }
+    }
+
     private suspend fun playProgram(program: Radio) {
+        if (!isPlayerReady) return
         player.load(program.audioPath, true)
         isPlayingFlow.value = true
         currentProgram = program
@@ -142,7 +190,7 @@ class ScreenRadio : BasicScreen() {
         launch {
             val current = currentProgram
             if (current != null) {
-                val index = radioPrograms.indexOf(current)
+                val index = radioPrograms.indexOfFirst { it.id == current.id }
                 if (index != -1) {
                     val size = radioPrograms.size
                     var target: Radio = current
@@ -161,17 +209,28 @@ class ScreenRadio : BasicScreen() {
     }
 
     private suspend fun downloadRadioProgram(program: Radio): Boolean {
-        // 先获取 audioUrl
-        val cookie = RadioAPI.generateCookie() ?: return false
-        val audio = RadioAPI.requestAudio(program.audioId, cookie) ?: return false
-        // 再下载
-        return program.audioPath.bufferedSink().use { sink ->
-            downloadDialog.download(audio.url, sink) { }
+        if (!canDownload) return false
+        val path = program.audioPath
+        var downloaded = false
+        cleaning({
+            downloaded = catchingDefault(false) {
+                // 先获取 audioUrl
+                val cookie = RadioAPI.generateCookie() ?: return@catchingDefault false
+                val audio = RadioAPI.requestAudio(program.audioId, cookie) ?: return@catchingDefault false
+                // 再下载，输出流关闭后才标记成功
+                path.bufferedSink().use { sink ->
+                    downloadDialog.download(audio.url, sink) { }
+                }
+            }
+            return downloaded
+        }) {
+            if (!downloaded) Coroutines.wait { path.delete() }
         }
     }
 
     private suspend fun deleteRadioProgram(program: Radio) {
-        if (currentProgram == program) {
+        if (program.id !in localMap) return
+        if (currentProgram?.id == program.id) {
             player.stop()
             isPlayingFlow.value = false
             currentProgram = null
@@ -192,6 +251,7 @@ class ScreenRadio : BasicScreen() {
 
             Icon(
                 icon = if (isPlaying) Icons.Pause else Icons.Play,
+                enabled = isPlayerReady && currentProgram != null,
                 onClick = {
                     if (currentProgram != null) {
                         if (isPlaying) player.pause()
@@ -267,7 +327,7 @@ class ScreenRadio : BasicScreen() {
                         .fillMaxHeight()
                         .aspectRatio(1f)
                         .clip(Theme.shape.v8)
-                        .condition(program == currentProgram) {
+                        .condition(program.id == currentProgram?.id) {
                             border(Theme.border.v5, Theme.color.primary, Theme.shape.v8)
                         },
                     contentAlignment = Alignment.Center
@@ -286,7 +346,12 @@ class ScreenRadio : BasicScreen() {
                             .zIndex(2f),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(icon = if (program.id in localMap) Icons.PlayArrow else Icons.Download, color = Colors.Dark)
+                        val cached = program.id in localMap
+                        Icon(
+                            icon = if (cached) Icons.PlayArrow else Icons.Download,
+                            color = Colors.Dark,
+                            enabled = if (cached) isPlayerReady else canDownload
+                        )
                     }
                 }
 
@@ -296,7 +361,11 @@ class ScreenRadio : BasicScreen() {
                 ) {
                     SimpleEllipsisText(
                         text = program.title,
-                        color = if (currentProgram == program) Theme.color.primary else LocalColor.current,
+                        color = when {
+                            currentProgram?.id == program.id -> Theme.color.primary
+                            program.id in localMap -> Theme.color.secondary
+                            else -> LocalColor.current
+                        },
                         style = Theme.typography.v7.bold,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -371,7 +440,7 @@ class ScreenRadio : BasicScreen() {
                 verticalArrangement = Arrangement.spacedBy(Theme.padding.v9)
             ) {
                 SimpleEllipsisText(
-                    text = radioUser?.name ?: "搜索电台中...",
+                    text = radioUser?.name ?: if (isUpdating) "搜索电台中..." else "暂无电台信息",
                     style = Theme.typography.v6.bold
                 )
 
@@ -424,10 +493,11 @@ class ScreenRadio : BasicScreen() {
             items(items = radioPrograms, key = { it.id }) { program ->
                 RadioProgramCard(
                     modifier = Modifier.fillMaxWidth().combinedClickable(
+                        enabled = program.id in localMap || canDownload,
                         onClick = {
                             launch {
                                 if (program.id in localMap) playProgram(program)
-                                else {
+                                else if (canDownload) {
                                     if (slot.confirm.open("下载该电台节目吗?", title = "时长: ${program.duration.timeString}")) {
                                         val result = Coroutines.io {
                                             downloadRadioProgram(program)
@@ -437,11 +507,14 @@ class ScreenRadio : BasicScreen() {
                                 }
                             }
                         },
-                        onLongClick = {
-                            launch {
-                                if (slot.confirm.open("删除该电台节目吗?")) deleteRadioProgram(program)
+                        onLongClick = if (program.id in localMap) {
+                            {
+                                launch {
+                                    if (slot.confirm.open("删除该电台节目吗?")) deleteRadioProgram(program)
+                                }
                             }
                         }
+                        else null
                     ).padding(Theme.padding.value),
                     program = program
                 )
@@ -450,7 +523,7 @@ class ScreenRadio : BasicScreen() {
     }
 
     @Composable
-    override fun BasicContent() {
+    override fun Content() {
         Box(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().padding(Theme.padding.eValue9)) {
             val deviceType by rememberDeviceType()
 
