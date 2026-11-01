@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
@@ -12,6 +11,7 @@ import androidx.compose.ui.window.v2.WindowBoundsProvider
 import androidx.compose.ui.window.v2.WindowPositionProvider
 import androidx.compose.ui.window.v2.WindowSizeProvider
 import androidx.compose.ui.window.v2.WindowState
+import love.yinlin.annotation.CompatibleRachelApi
 import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.ui.icon.Icons
 import org.jetbrains.compose.resources.DrawableResource
@@ -94,5 +94,6 @@ class WindowController(
     /**
      * 图标绘制
      */
-    val iconPainter: Painter @Composable get() = icon?.let { painterResource(it) } ?: rememberVectorPainter(Icons.ComposeMultiplatform)
+    @OptIn(CompatibleRachelApi::class)
+    val iconPainter: Painter @Composable get() = icon?.let { painterResource(it) } ?: rememberWindowVectorPainter(Icons.ComposeMultiplatform)
 }

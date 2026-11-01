@@ -7,8 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.ComposeUiFlags
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.CoroutineScope
@@ -38,10 +36,9 @@ abstract class Application<out A : Application<A>>(
     @Composable
     abstract fun Content()
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+    @OptIn(ExperimentalFoundationApi::class)
     internal fun initApplication(scope: CoroutineScope) {
         ComposeFoundationFlags.isNewContextMenuEnabled = true
-        ComposeUiFlags.isVectorDrawCacheSharingEnabled = false
 
         @Suppress("UNCHECKED_CAST")
         self.init(this as A)
