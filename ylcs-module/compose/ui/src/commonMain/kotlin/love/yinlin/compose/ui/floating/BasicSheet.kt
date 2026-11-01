@@ -93,7 +93,6 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
      * 圆角形式(只有两个角)
      */
     protected open val usePortraitRoundedCorner: Boolean = true
-    protected open val useLandscapeRoundedCorner: Boolean = false
 
     /**
      * 显示拖拽柄(仅在纵向模式)
@@ -215,11 +214,12 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
     @Composable
     private fun LandscapeSheet(args: A) {
         val controller = remember { SheetController(false, ::close) }
-        val shape = if (useLandscapeRoundedCorner) Theme.shape.v1.copy(topEnd = ZeroCornerSize, bottomEnd = ZeroCornerSize) else Theme.shape.rectangle
-        val sheetWidth = landscapeWidth ?: Theme.size.sheet
 
         Surface(
-            modifier = Modifier.width(sheetWidth).fillMaxHeight()
+            modifier = Modifier
+                .padding(Theme.padding.eValue8)
+                .width(landscapeWidth ?: Theme.size.sheet)
+                .fillMaxHeight()
                 .fastAnimateOffsetX(controller.offset)
                 .onSizeChanged { controller.dimension = it.width }
                 .draggable(
@@ -231,7 +231,7 @@ abstract class BasicSheet<A : Any> internal constructor(): Floating<A>() {
             tonalLevel = 5,
             contentAlignment = Alignment.TopStart,
             contentPadding = LocalImmersivePadding.current,
-            shape = shape
+            shape = Theme.shape.v1
         ) {
             Box(modifier = Modifier.condition(scrollable) {
                 verticalScroll(state = rememberScrollState())
