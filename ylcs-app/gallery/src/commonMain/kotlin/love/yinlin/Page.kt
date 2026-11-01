@@ -7,7 +7,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,7 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import love.yinlin.compose.Theme
 import love.yinlin.compose.ui.layout.HorizontalDivider
+import love.yinlin.compose.ui.navigation.TabBar
 import love.yinlin.compose.ui.text.Text
+
+private val LocalGallerySelectedComponentIndex = staticCompositionLocalOf { -1 }
 
 @Stable
 abstract class Page {
@@ -25,6 +32,9 @@ abstract class Page {
     @Composable
     protected fun ComponentColumn(content: @Composable ColumnScope.() -> Unit) {
         val compact = LocalGalleryCompact.current
+        val components = PageItem.forPage(this@Page)?.components.orEmpty()
+        val selectedComponent = rememberSaveable { mutableIntStateOf(0) }
+        val selectedIndex = if (components.isEmpty()) -1 else selectedComponent.intValue.coerceIn(0, components.lastIndex)
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             Column(
                 modifier = Modifier.widthIn(max = 1240.dp).fillMaxWidth().fillMaxHeight()
@@ -32,7 +42,18 @@ abstract class Page {
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 PageItem.forPage(this@Page)?.takeIf { it.components.isNotEmpty() }?.let { GalleryPageHeader(it) }
-                content()
+                if (components.size > 1) {
+                    TabBar(
+                        size = components.size,
+                        index = selectedIndex,
+                        onNavigate = { selectedComponent.intValue = it },
+                        titleProvider = { components[it].title },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                CompositionLocalProvider(LocalGallerySelectedComponentIndex provides selectedIndex) {
+                    content()
+                }
                 HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
                 GalleryCaption("RACHEL UI GALLERY  /  DESKTOP · WEB")
                 Spacer(Modifier.height(12.dp))
@@ -44,13 +65,15 @@ abstract class Page {
     protected fun ColumnScope.Component(title: String, content: @Composable ColumnScope.() -> Unit) {
         val item = PageItem.forPage(this@Page)
         val index = item?.components?.indexOfFirst { it.title == title } ?: -1
-        GalleryCard {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (index >= 0) GalleryBadge((index + 1).toString().padStart(2, '0'))
-                Text(title, fontSize = 19.sp, lineHeight = 27.sp)
+        if (index < 0 || index == LocalGallerySelectedComponentIndex.current) {
+            GalleryCard {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (index >= 0) GalleryBadge((index + 1).toString().padStart(2, '0'))
+                    Text(title, fontSize = 19.sp, lineHeight = 27.sp)
+                }
+                if (index >= 0) GalleryParagraph(item!!.components[index].description)
+                content()
             }
-            if (index >= 0) GalleryParagraph(item!!.components[index].description)
-            content()
         }
     }
 
