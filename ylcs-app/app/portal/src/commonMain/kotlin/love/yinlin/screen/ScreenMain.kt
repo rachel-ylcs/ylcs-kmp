@@ -42,8 +42,10 @@ import love.yinlin.compose.ui.common.PortalCardItem
 import love.yinlin.compose.ui.container.Banner
 import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.Surface
+import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.cs.url
@@ -96,16 +98,29 @@ class ScreenMain : BasicScreen() {
                 style = Theme.typography.v5.bold
             )
 
-            WebImage(
-                source = app.config.userProfile?.avatarPath?.url,
-                version = app.config.cacheUserAvatar.toString(),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(Theme.size.image9),
-                options = ImageOptions.Circular,
-                onClick = {
-                    navigate(::ScreenUser)
-                }
-            )
+            val userProfile = app.config.userProfile
+
+            if (userProfile != null) {
+                WebImage(
+                    source = userProfile.avatarPath.url,
+                    version = app.config.cacheUserAvatar.toString(),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(Theme.size.image9),
+                    options = ImageOptions.Circular,
+                    onClick = {
+                        navigate(::ScreenUser)
+                    }
+                )
+            }
+            else {
+                PrimaryButton(
+                    text = "登录",
+                    icon = Icons.VerifiedUser,
+                    onClick = {
+                        navigate(::ScreenLogin)
+                    }
+                )
+            }
         }
     }
 
