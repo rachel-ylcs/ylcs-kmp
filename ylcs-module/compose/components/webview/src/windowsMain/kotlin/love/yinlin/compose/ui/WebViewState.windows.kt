@@ -1,4 +1,4 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
 import androidx.compose.runtime.*
@@ -73,7 +73,7 @@ actual class WebViewState actual constructor(initUrl: String) : PlatformViewStat
     }
 
     private fun receive(event: Int, value: Long, text: String?) {
-        when (event) {
+        when (event.toUInt()) {
             RACHEL_WEBVIEW_READY -> stateLoadingState = WebViewLoadingState.Finished
             RACHEL_WEBVIEW_UNAVAILABLE -> {
                 available = false

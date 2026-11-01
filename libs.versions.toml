@@ -19,6 +19,7 @@ dokka = "2.3.0-Beta"
 
 skiko = "0.156.0"
 sdl = "3.4.18"
+webview2 = "1.0.4314.35"
 lifecycle = "2.11.0"
 savedstate = "1.5.0"
 material3 = "1.4.0-alpha01"

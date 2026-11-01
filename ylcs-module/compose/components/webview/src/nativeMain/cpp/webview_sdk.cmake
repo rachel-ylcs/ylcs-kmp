@@ -1,0 +1,91 @@
+if(NOT RACHEL_WEBVIEW2_VERSION)
+    message(FATAL_ERROR "Set RACHEL_WEBVIEW2_VERSION from the version catalog")
+endif()
+
+set(WEBVIEW2_ROOT "${CMAKE_CURRENT_BINARY_DIR}/webview2-${RACHEL_WEBVIEW2_VERSION}")
+set(WEBVIEW2_ARCHIVE "${WEBVIEW2_ROOT}/sdk.zip")
+set(WEBVIEW2_SDK "${WEBVIEW2_ROOT}/sdk")
+set(WEBVIEW2_HASH "90778deb1b77e36292828b4b5833c9255c27533f40e0ddd55891ae718944edc4")
+file(MAKE_DIRECTORY "${WEBVIEW2_ROOT}")
+if(EXISTS "${WEBVIEW2_ARCHIVE}")
+    file(SHA256 "${WEBVIEW2_ARCHIVE}" ARCHIVE_HASH)
+endif()
+if(NOT ARCHIVE_HASH STREQUAL WEBVIEW2_HASH)
+    file(DOWNLOAD
+        "https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/${RACHEL_WEBVIEW2_VERSION}/microsoft.web.webview2.${RACHEL_WEBVIEW2_VERSION}.nupkg"
+        "${WEBVIEW2_ARCHIVE}"
+        EXPECTED_HASH SHA256=${WEBVIEW2_HASH}
+        TLS_VERIFY ON
+        TIMEOUT 120
+    )
+endif()
+if(NOT EXISTS "${WEBVIEW2_SDK}/build/native/x64/WebView2LoaderStatic.lib")
+    file(ARCHIVE_EXTRACT INPUT "${WEBVIEW2_ARCHIVE}" DESTINATION "${WEBVIEW2_SDK}")
+endif()
+
+set(VS_ROOT "$ENV{VS_PATH}")
+if(NOT VS_ROOT)
+    set(VS_ROOT "$ENV{SKIKO_VSBT_PATH}")
+endif()
+if(NOT VS_ROOT)
+    set(VSWHERE "$ENV{ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe")
+    if(EXISTS "${VSWHERE}")
+        execute_process(COMMAND "${VSWHERE}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath OUTPUT_VARIABLE VS_ROOT OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+    endif()
+endif()
+file(GLOB MSVC_INCLUDE_DIRS "${VS_ROOT}/VC/Tools/MSVC/*/include")
+list(SORT MSVC_INCLUDE_DIRS COMPARE NATURAL ORDER DESCENDING)
+if(NOT MSVC_INCLUDE_DIRS)
+    message(FATAL_ERROR "The official static WebView2 loader requires the Visual C++ SDK; set VS_PATH")
+endif()
+list(GET MSVC_INCLUDE_DIRS 0 MSVC_INCLUDE)
+get_filename_component(MSVC_ROOT "${MSVC_INCLUDE}" DIRECTORY)
+file(GLOB UCRT_INCLUDE_DIRS "$ENV{WindowsSdkDir}/Include/*/ucrt" "C:/Program Files (x86)/Windows Kits/10/Include/*/ucrt")
+list(SORT UCRT_INCLUDE_DIRS COMPARE NATURAL ORDER DESCENDING)
+if(NOT UCRT_INCLUDE_DIRS)
+    message(FATAL_ERROR "The Windows Universal CRT SDK headers are missing")
+endif()
+list(GET UCRT_INCLUDE_DIRS 0 UCRT_INCLUDE)
+get_filename_component(WINDOWS_SDK_INCLUDE "${UCRT_INCLUDE}" DIRECTORY)
+
+function(webview_extract_object ARCHIVE MEMBER OUTPUT)
+    execute_process(COMMAND "${CMAKE_AR}" p "${ARCHIVE}" "${MEMBER}" OUTPUT_FILE "${OUTPUT}" COMMAND_ERROR_IS_FATAL ANY)
+    set_source_files_properties("${OUTPUT}" PROPERTIES EXTERNAL_OBJECT TRUE GENERATED TRUE)
+    set(WEBVIEW2_OBJECTS ${WEBVIEW2_OBJECTS} "${OUTPUT}" PARENT_SCOPE)
+endfunction()
+
+set(LOADER "${WEBVIEW2_SDK}/build/native/x64/WebView2LoaderStatic.lib")
+execute_process(COMMAND "${CMAKE_AR}" t "${LOADER}" OUTPUT_VARIABLE LOADER_MEMBERS OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+string(REPLACE "\r" "" LOADER_MEMBERS "${LOADER_MEMBERS}")
+string(REPLACE "\n" ";" LOADER_MEMBERS "${LOADER_MEMBERS}")
+foreach(MEMBER IN LISTS LOADER_MEMBERS)
+    get_filename_component(NAME "${MEMBER}" NAME)
+    webview_extract_object("${LOADER}" "${MEMBER}" "${WEBVIEW2_ROOT}/loader-${NAME}")
+endforeach()
+
+set(CRT "${MSVC_ROOT}/lib/x64/libcmt.lib")
+execute_process(COMMAND "${CMAKE_AR}" t "${CRT}" OUTPUT_VARIABLE CRT_MEMBERS OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ERROR_IS_FATAL ANY)
+string(REPLACE "\r" "" CRT_MEMBERS "${CRT_MEMBERS}")
+string(REPLACE "\n" ";" CRT_MEMBERS "${CRT_MEMBERS}")
+set(CRT_REQUIRED amdsecgs.obj guard_support.obj guard_dispatch.obj guard_xfg_dispatch.obj thread_safe_statics.obj)
+foreach(MEMBER IN LISTS CRT_MEMBERS)
+    get_filename_component(NAME "${MEMBER}" NAME)
+    if(NAME IN_LIST CRT_REQUIRED)
+        webview_extract_object("${CRT}" "${MEMBER}" "${WEBVIEW2_ROOT}/crt-${NAME}")
+        list(REMOVE_ITEM CRT_REQUIRED "${NAME}")
+    endif()
+endforeach()
+if(CRT_REQUIRED)
+    message(FATAL_ERROR "Unsupported Visual C++ SDK: missing WebView2 loader support objects ${CRT_REQUIRED}")
+endif()
+
+set(ALLOCATION_OBJECT "${WEBVIEW2_ROOT}/loader-allocation.obj")
+add_custom_command(OUTPUT "${ALLOCATION_OBJECT}"
+    COMMAND "${CMAKE_CXX_COMPILER}" --target=x86_64-pc-windows-msvc --driver-mode=cl /nologo /c /O2 /MT /Zl /std:c++17
+        "/imsvc${MSVC_INCLUDE}" "/imsvc${UCRT_INCLUDE}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/webview_loader_allocation.cpp" "/Fo${ALLOCATION_OBJECT}"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/webview_loader_allocation.cpp"
+    VERBATIM
+)
+set_source_files_properties("${ALLOCATION_OBJECT}" PROPERTIES EXTERNAL_OBJECT TRUE GENERATED TRUE)
+list(APPEND WEBVIEW2_OBJECTS "${ALLOCATION_OBJECT}")

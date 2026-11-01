@@ -1,4 +1,5 @@
 import love.yinlin.gradle.ExportLib
+import love.yinlin.gradle.task.BuildNativeCppTask
 
 plugins {
     install(
@@ -17,6 +18,17 @@ plugins {
 rachel {
     multiplatform {
         nativeDesktopTarget = true
+
+        interop {
+            native {
+                windows {
+                    cpp("webview")
+                }
+                macos {
+                    cpp("webviewObservation")
+                }
+            }
+        }
 
         sources {
             commonMain {
@@ -44,6 +56,12 @@ rachel {
             jsMain(webMain)
 
             wasmJsMain(webMain)
+        }
+
+        actions {
+            tasks.withType<BuildNativeCppTask>().configureEach {
+                cmakeOptions.add("RACHEL_WEBVIEW2_VERSION" to libs.versions.webview2.get())
+            }
         }
     }
 }

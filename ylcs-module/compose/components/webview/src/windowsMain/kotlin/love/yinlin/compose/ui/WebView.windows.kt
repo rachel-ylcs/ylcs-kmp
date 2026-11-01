@@ -1,20 +1,21 @@
-@file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+@file:OptIn(ExperimentalForeignApi::class)
 package love.yinlin.compose.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.cinterop.ExperimentalForeignApi
 import love.yinlin.compose.ui.tool.NavigationBack
 import love.yinlin.compose.ui.tool.UnsupportedPlatformComponent
+import love.yinlin.coroutines.Coroutines
 import love.yinlin.webview.internal.rachel_webview_available
 
 @Composable
 actual fun WebView(state: WebViewState, modifier: Modifier, config: WebViewConfig) {
     val runtime by produceState<Boolean?>(null, state) {
-        value = withContext(Dispatchers.Default) { rachel_webview_available() }
+        value = Coroutines.cpu { rachel_webview_available() }
     }
+
     when {
         runtime == null -> Box(modifier)
         runtime != true || !state.available -> UnsupportedPlatformComponent(modifier)

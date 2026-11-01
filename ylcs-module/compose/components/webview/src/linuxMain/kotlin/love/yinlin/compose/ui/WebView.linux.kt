@@ -5,10 +5,6 @@ import androidx.compose.ui.Modifier
 import love.yinlin.compose.ui.tool.UnsupportedPlatformComponent
 
 @Composable
-actual fun WebView(
-    state: WebViewState,
-    modifier: Modifier,
-    config: WebViewConfig,
-) {
-    UnsupportedPlatformComponent(modifier = modifier)
+actual fun WebView(state: WebViewState, modifier: Modifier, config: WebViewConfig) {
+    UnsupportedPlatformComponent(modifier)
 }

@@ -8,7 +8,7 @@ actual class WebViewState actual constructor(initUrl: String) : PlatformViewStat
     actual override val isActive: Boolean = false
     actual override fun release() {}
     actual var url: String = initUrl
-    actual val loadingState: WebViewLoadingState = WebViewLoadingState.Initializing
+    actual val loadingState: WebViewLoadingState = WebViewLoadingState.Finished
     actual val title: String = ""
     actual val icon: BitmapPainter? = null
     actual val canGoBack: Boolean = false
