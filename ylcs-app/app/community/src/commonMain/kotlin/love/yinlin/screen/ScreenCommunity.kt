@@ -16,8 +16,7 @@ import love.yinlin.compose.Theme
 import love.yinlin.compose.bold
 import love.yinlin.compose.ds.DataSourceDiscovery
 import love.yinlin.compose.image.data.ImageOptions
-import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.container.ActionScope
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.container.RachelStatefulProvider
 import love.yinlin.compose.ui.container.StatefulBox
 import love.yinlin.compose.ui.container.Surface
@@ -47,9 +46,19 @@ import love.yinlin.extension.enumSize
 import love.yinlin.extension.then
 
 @Stable
-class ScreenCommunity : BasicScreen() {
+class ScreenCommunity : Screen() {
     private val provider = RachelStatefulProvider()
     private val gridState = LazyStaggeredGridState()
+
+    override val title: String = "茶舍社区"
+
+    @Composable
+    override fun RowScope.RightActions() {
+        Icon(icon = Icons.Edit, tip = "发表", onClick = {
+            if (app.config.userProfile != null) navigate(::ScreenAddTopic)
+            else slot.tip.warning("请先登录")
+        })
+    }
 
     private suspend fun requestNewData(loading: Boolean) {
         provider.withLoading(loading) {
@@ -156,7 +165,7 @@ class ScreenCommunity : BasicScreen() {
     }
 
     @Composable
-    override fun BasicContent() {
+    override fun Content() {
         Column(modifier = Modifier.fillMaxSize()) {
             val immersivePadding = LocalImmersivePadding.current
 
@@ -165,29 +174,17 @@ class ScreenCommunity : BasicScreen() {
                 contentPadding = immersivePadding.withoutBottom,
                 shadowElevation = Theme.shadow.v3
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TabBar(
-                        size = enumSize<DiscoveryItem>(),
-                        index = DataSourceDiscovery.currentPage,
-                        onNavigate = {
-                            DataSourceDiscovery.currentPage = it
-                            launch { requestNewData(true) }
-                        },
-                        titleProvider = { Comment.Section.sectionName(enum<DiscoveryItem>(it).id) },
-                        iconProvider = { enum<DiscoveryItem>(it).icon },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ActionScope.Right.Container(modifier = Modifier.padding(end = Theme.padding.e)) {
-                        Icon(icon = Icons.Edit, tip = "发表", onClick = {
-                            if (app.config.userProfile != null) navigate(::ScreenAddTopic)
-                            else slot.tip.warning("请先登录")
-                        })
-                    }
-                }
+                TabBar(
+                    size = enumSize<DiscoveryItem>(),
+                    index = DataSourceDiscovery.currentPage,
+                    onNavigate = {
+                        DataSourceDiscovery.currentPage = it
+                        launch { requestNewData(true) }
+                    },
+                    titleProvider = { Comment.Section.sectionName(enum<DiscoveryItem>(it).id) },
+                    iconProvider = { enum<DiscoveryItem>(it).icon },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
             StatefulBox(

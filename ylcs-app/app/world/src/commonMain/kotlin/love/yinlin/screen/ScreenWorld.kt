@@ -38,7 +38,7 @@ import love.yinlin.compose.bold
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.interaction.collectState
-import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.data.common.WorldActivity
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
@@ -48,7 +48,7 @@ import love.yinlin.compose.ui.text.SimpleEllipsisText
 import love.yinlin.extension.cleaning
 
 @Stable
-class ScreenWorld : BasicScreen() {
+class ScreenWorld : Screen() {
     private val activities: List<WorldActivity> = [
         WorldActivity(
             id = "concert-memory",
@@ -69,6 +69,8 @@ class ScreenWorld : BasicScreen() {
         0.6f to Colors.Black.copy(alpha = 0.72f),
         1f to Colors.Black.copy(alpha = 0.94f),
     )
+
+    override val title: String = "世界"
 
     @Composable
     fun WorldActivityCard(
@@ -181,7 +183,7 @@ class ScreenWorld : BasicScreen() {
     }
 
     @Composable
-    override fun BasicContent() {
+    override fun Content() {
         val gridState = rememberLazyGridState()
         val visibleActivities: Set<String> by rememberDerivedState { gridState.layoutInfo.visibleItemsInfo.mapTo(mutableSetOf()) { it.key as String } }
 

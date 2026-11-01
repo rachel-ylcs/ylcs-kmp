@@ -20,7 +20,7 @@ import love.yinlin.compose.*
 import love.yinlin.compose.extension.rememberDerivedState
 import love.yinlin.compose.extension.rememberRefState
 import love.yinlin.compose.extension.rememberValueState
-import love.yinlin.compose.screen.BasicScreen
+import love.yinlin.compose.screen.Screen
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.Image
@@ -43,7 +43,7 @@ import love.yinlin.media.lyrics.LyricsEngineType
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngineType) : BasicScreen() {
+class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngineType) : Screen() {
     private val player = buildAudioPlayer(app.rawContext, ::resetPlayer)
     private val engine = LyricsEngine.clone(engineType)
     private val engineHost = LyricsEngineHost {
@@ -58,6 +58,8 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
     private val isPlayingFlow = MutableStateFlow(false)
 
     private val blurState = BlurState()
+
+    override val title: String = "伴奏"
 
     override fun initialize() {
         launch {
@@ -167,7 +169,7 @@ class ScreenAccompaniment(private val music: MusicInfo, engineType: LyricsEngine
     }
 
     @Composable
-    override fun BasicContent() {
+    override fun Content() {
         Theme.ThemeModeWrapper(true) {
             Box(
                 modifier = Modifier.fillMaxSize().background(Theme.color.background),

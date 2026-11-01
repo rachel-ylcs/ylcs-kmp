@@ -53,6 +53,7 @@ import love.yinlin.compose.ui.image.Image
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.SecondaryButton
+import love.yinlin.compose.ui.input.TertiaryButton
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.SimpleClipText
@@ -94,6 +95,7 @@ class ScreenUser : BasicScreen() {
             ActionScope.SplitContainer(
                 modifier = Modifier.padding(innerPadding).fillMaxWidth().padding(Theme.padding.eValue9),
                 left = {
+                    Icon(icon = Icons.ArrowBack, onClick = ::onBack)
                     Icon(icon = Icons.Settings, onClick = { navigate(::ScreenSettings) })
                 },
                 right = {
@@ -237,6 +239,7 @@ class ScreenUser : BasicScreen() {
                 SecondaryButton(text = "设置", icon = Icons.Settings, onClick = {
                     navigate(::ScreenSettings)
                 })
+                TertiaryButton(text = "返回", icon = Icons.ArrowBack, onClick = ::onBack)
             }
         }
     }

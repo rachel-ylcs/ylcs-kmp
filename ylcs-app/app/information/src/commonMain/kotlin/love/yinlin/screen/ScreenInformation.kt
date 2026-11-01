@@ -94,12 +94,22 @@ class ScreenInformation : BasicScreen() {
                     horizontalArrangement = Arrangement.spacedBy(Theme.padding.h),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        icon = Icons.Settings,
-                        onClick = {
-                            with(currentManager) { openSettings() }
-                        }
-                    )
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v)
+                    ) {
+                        Icon(
+                            icon = Icons.ArrowBack,
+                            onClick = ::onBack
+                        )
+
+                        Icon(
+                            icon = Icons.Settings,
+                            onClick = {
+                                with(currentManager) { openSettings() }
+                            }
+                        )
+                    }
+
                     HorizontalScrollContainer(state = state, modifier = Modifier.weight(1f)) {
                         LazyRow(
                             modifier = Modifier.fillMaxWidth().background(Theme.color.surface),

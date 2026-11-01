@@ -25,8 +25,7 @@ import love.yinlin.compose.extension.mutableRefStateOf
 import love.yinlin.compose.extension.rememberFalse
 import love.yinlin.compose.image.data.ImageOptions
 import love.yinlin.compose.screen.BasicScreen
-import love.yinlin.compose.ui.container.OverlayAction
-import love.yinlin.compose.ui.container.OverlayTopBar
+import love.yinlin.compose.ui.container.ActionScope
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.floating.Flyout
@@ -36,7 +35,9 @@ import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.icon.Icons2
 import love.yinlin.compose.ui.image.Icon
 import love.yinlin.compose.ui.image.WebImage
+import love.yinlin.compose.ui.input.PrimaryButton
 import love.yinlin.compose.ui.input.PrimaryTextButton
+import love.yinlin.compose.ui.input.SecondaryButton
 import love.yinlin.compose.ui.input.SecondaryTextButton
 import love.yinlin.compose.ui.input.TertiaryTextButton
 import love.yinlin.compose.ui.text.SelectionBox
@@ -186,10 +187,15 @@ class ScreenGame : BasicScreen() {
     @Composable
     override fun BasicContent() {
         Column(modifier = Modifier.padding(LocalImmersivePadding.current).fillMaxSize().verticalScroll(rememberScrollState())) {
-            OverlayTopBar(
-                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value9),
-                left = OverlayAction.Sync("对局", Icons.Castle) { navigate(::ScreenGameHistory) },
-                right = OverlayAction.Sync("历史", Icons.History) { navigate(::ScreenGameRecordHistory) }
+            ActionScope.SplitContainer(
+                modifier = Modifier.fillMaxWidth().padding(Theme.padding.value),
+                left = {
+                    Icon(icon = Icons.ArrowBack, onClick = ::onBack)
+                },
+                right = {
+                    PrimaryButton(text = "对局", icon = Icons.Castle, onClick = { navigate(::ScreenGameHistory) })
+                    SecondaryButton(text = "历史", icon = Icons.History, onClick = { navigate(::ScreenGameRecordHistory) })
+                }
             )
 
             for ([type, group] in GameMapper.Groups) {
