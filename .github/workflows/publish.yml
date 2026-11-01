@@ -6,8 +6,40 @@ on:
       - 'maven*'
 
 jobs:
+  windows-native:
+    name: Build Windows Native Libraries
+    runs-on: windows-2025
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup Build Environment
+        uses: ./.github/actions/setup-build
+        with:
+          msvc: 'true'
+          native-tools: 'true'
+
+      - name: Build Windows Native Libraries
+        run: >-
+          ./gradlew
+          :ylcs-module:compose:components:media:buildWindowsNative
+          :ylcs-module:compose:components:webview:buildWindowsNative
+          --no-configuration-cache
+
+      - name: Upload Windows Native Libraries
+        uses: actions/upload-artifact@v7
+        with:
+          name: maven-windows-native
+          path: |
+            ylcs-module/compose/components/media/build/nativeCpp/windows/lib/librachel_audio.a
+            ylcs-module/compose/components/webview/build/nativeCpp/windows/lib/librachel_webview.a
+          if-no-files-found: error
+
   publish:
     name: Publish To Maven Central
+    needs: windows-native
     runs-on: macos-26
     steps:
       - name: Checkout Code
@@ -26,6 +58,12 @@ jobs:
         with:
           node-version: 'lts/*'
 
+      - name: Download Windows Native Libraries
+        uses: actions/download-artifact@v8
+        with:
+          name: maven-windows-native
+          path: ylcs-module/compose/components
+
       - name: Run publish
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
@@ -33,4 +71,11 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
-        run: ./gradlew publishToMavenCentral --no-configuration-cache
+        # CInterop embeds the Windows archives built with the Windows and Visual C++ SDKs.
+        # Only their CMake producers are excluded on macOS; Windows publications still run.
+        run: |
+          test -s ylcs-module/compose/components/media/build/nativeCpp/windows/lib/librachel_audio.a
+          test -s ylcs-module/compose/components/webview/build/nativeCpp/windows/lib/librachel_webview.a
+          ./gradlew publishToMavenCentral --no-configuration-cache \
+            -x :ylcs-module:compose:components:media:buildWindowsNative \
+            -x :ylcs-module:compose:components:webview:buildWindowsNative

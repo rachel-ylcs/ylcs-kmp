@@ -100,6 +100,8 @@ Maven 发布坐标由模块路径和共享版本名生成，例如：
 
 坐标生成规则不证明某个版本已经发布。仓库内部开发优先使用项目依赖；仓库外使用前应确认目标仓库中的实际产物。
 
+推送 `maven*` 标签触发 `.github/workflows/publish.yml`。工作流先在 Windows 主机上构建 `media` 与 `webview` 的 Windows 静态库，因为它们分别需要 Windows C++/WinRT SDK 和 Visual C++ SDK；随后将两个归档恢复到 macOS 发布机各模块的 `build/nativeCpp/windows/lib` 目录。macOS 发布阶段仅排除这两个已完成的 CMake 构建任务，仍执行 Windows CInterop、Kotlin 编译、签名与 Maven 发布，并继续构建其他已启用平台的产物。发布前检查两个归档非空；Windows 构建或 artifact 传递失败时不继续发布。
+
 ## 常用命令
 
 以下命令在仓库根目录执行，任务名称已对应当前构建脚本：
