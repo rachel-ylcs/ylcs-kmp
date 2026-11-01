@@ -49,6 +49,9 @@ actual class WebViewState actual constructor(initUrl: String) : PlatformViewStat
 
     override fun attach(view: WKWebView) {
         appliedVersion = -1L
+        stateLoadingState = WebViewLoadingState.Initializing
+        stateCanGoBack = false
+        stateCanGoForward = false
         val delegate = object : NSObject(), WKNavigationDelegateProtocol {
             @ObjCSignatureOverride
             override fun webView(webView: WKWebView, didStartProvisionalNavigation: WKNavigation?) = onView(webView) {
@@ -98,8 +101,12 @@ actual class WebViewState actual constructor(initUrl: String) : PlatformViewStat
 
     private fun navigate(view: WKWebView, target: String) {
         appliedVersion = requestVersion
-        val address = NSURL(string = target.ifEmpty { "about:blank" })
-        view.loadRequest(NSMutableURLRequest(address))
+        val address = NSURL.URLWithString(target.ifEmpty { "about:blank" })
+        if (address != null) view.loadRequest(NSMutableURLRequest(address))
+        else {
+            stateError = WebViewError(-1L, "Invalid URL")
+            stateLoadingState = WebViewLoadingState.Finished
+        }
     }
 
     private fun failure(view: WKWebView, error: NSError) = onView(view) {

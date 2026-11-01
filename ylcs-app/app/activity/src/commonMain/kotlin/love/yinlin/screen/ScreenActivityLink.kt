@@ -35,7 +35,7 @@ class ScreenActivityLink : Screen() {
     @Composable
     override fun Content() {
         Platform.use(
-            *Platform.Web, *Platform.DesktopFamily,
+            *Platform.Web, *Platform.Desktop, Platform.LinuxNative,
             ifTrue = {
                 UnsupportedPlatformComponent(modifier = Modifier.fillMaxSize())
             },

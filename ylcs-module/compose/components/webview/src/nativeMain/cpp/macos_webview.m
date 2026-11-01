@@ -42,6 +42,10 @@ static char observationContext;
 
 void *rachel_webview_observe(void *view, RachelWebViewObservationListener listener, RachelWebViewObservationRelease release, void *context) {
     RachelWebViewObservation *observer = [RachelWebViewObservation new];
+    if (!observer) {
+        if (release) release(context);
+        return NULL;
+    }
     observer.view = (__bridge WKWebView *)view;
     observer.listener = listener;
     observer.releaseContext = release;

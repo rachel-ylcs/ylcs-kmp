@@ -3,7 +3,11 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <shlobj.h>
+#pragma push_macro("MIDL_INTERFACE")
+#undef MIDL_INTERFACE
+#define MIDL_INTERFACE(id) struct __declspec(uuid(id))
 #include <WebView2.h>
+#pragma pop_macro("MIDL_INTERFACE")
 #include <new>
 #include <string>
 #include <utility>
@@ -11,6 +15,11 @@
 namespace {
 
 constexpr wchar_t windowClass[] = L"Rachel.Native.WebView2";
+
+#pragma push_macro("__uuidof")
+#undef __uuidof
+template <typename T> const GUID &webviewSdkGuid() { return __uuidof(T); }
+#pragma pop_macro("__uuidof")
 
 template <typename T>
 class ComPtr {
@@ -55,20 +64,10 @@ std::string utf8(const wchar_t *text) {
     return result;
 }
 
-bool runtimeVersion(const wchar_t *value) {
-    if (!value || !*value) return false;
-    bool nonzero = false;
-    for (const wchar_t *p = value; *p; ++p) {
-        if (*p != L'.' && (*p < L'0' || *p > L'9')) return false;
-        if (*p >= L'1' && *p <= L'9') nonzero = true;
-    }
-    return nonzero;
-}
-
 bool installedRuntime() {
     LPWSTR version = nullptr;
     HRESULT result = GetAvailableCoreWebView2BrowserVersionString(nullptr, &version);
-    bool available = SUCCEEDED(result) && runtimeVersion(version);
+    bool available = SUCCEEDED(result) && version && *version;
     CoTaskMemFree(version);
     return available;
 }
@@ -105,7 +104,7 @@ public:
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void **value) override {
         if (!value) return E_POINTER;
         *value = nullptr;
-        if (iid != __uuidof(IUnknown) && iid != __uuidof(Interface)) return E_NOINTERFACE;
+        if (iid != IID_IUnknown && iid != webviewSdkGuid<Interface>()) return E_NOINTERFACE;
         *value = static_cast<Interface *>(this);
         AddRef();
         return S_OK;
@@ -185,11 +184,6 @@ class WebViewHost {
     HRESULT onEnvironment(HRESULT result, ICoreWebView2Environment *environment) {
         if (closed_) return S_OK;
         if (FAILED(result) || !environment) { fail(FAILED(result) ? result : E_FAIL); return S_OK; }
-        LPWSTR version = nullptr;
-        environment->get_BrowserVersionString(&version);
-        bool available = runtimeVersion(version);
-        CoTaskMemFree(version);
-        if (!available) { fail(HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)); return S_OK; }
         environment_.retain(environment);
         auto handler = callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>(&WebViewHost::onController);
         if (!handler) { fail(E_OUTOFMEMORY); return S_OK; }
