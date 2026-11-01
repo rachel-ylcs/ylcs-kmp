@@ -5,13 +5,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.openNativeWindow
 import love.yinlin.extension.cleaning
 import org.jetbrains.skiko.window.NativeWindowEvent
-import org.jetbrains.skiko.window.NativeWindowOptions
 import org.jetbrains.skiko.window.NativeWindowScope
 
-@Composable
 @OptIn(ExperimentalComposeUiApi::class)
+@Composable
 fun ApplicationWindow.NativeWindow(
-    options: NativeWindowOptions = NativeWindowOptions(title = "Compose Native"),
+    options: WindowOptions = WindowOptions(title = "Compose Native"),
     onOpen: (NativeWindowScope) -> Unit = {},
     onEvent: (NativeWindowEvent) -> Unit = {},
     onClose: () -> Unit = {},
@@ -23,7 +22,7 @@ fun ApplicationWindow.NativeWindow(
     val currentClose by rememberUpdatedState(onClose)
 
     DisposableEffect(this) {
-        val window = openNativeWindow(options, onCloseRequest = {
+        val window = openNativeWindow(options.asNativeWindowOptions, onCloseRequest = {
             close()
             true
         }, onOpen = {

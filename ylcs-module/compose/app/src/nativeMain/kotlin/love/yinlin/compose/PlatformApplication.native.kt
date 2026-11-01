@@ -29,7 +29,6 @@ import love.yinlin.uri.RegularUri
 import love.yinlin.uri.Uri
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.skiko.window.NativeDesktop
-import org.jetbrains.skiko.window.NativeWindowOptions
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -53,27 +52,25 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     protected open val minSize: DpSize = DpSize(360.dp, 640.dp)
 
-    protected open val initPosition: WindowPosition = WindowPosition.Aligned(Alignment.Center)
-
-    protected open val initPlacement: WindowPlacement = WindowPlacement.Floating
-
-    protected open val transparent: Boolean = true
-
-    protected open val undecorated: Boolean = true
-
     protected open val roundedCorner: Boolean = true
-
-    protected open val focusable: Boolean = true
-
-    protected open val resizable: Boolean = true
-
-    protected open val clickThrough: Boolean = false
 
     @Composable
     protected open fun TopBar(controller: WindowController, onExit: () -> Unit) = DefaultTopBar(controller, onExit)
 
     val controller by lazy {
-        WindowController(initSize = initSize, initTitle = title, initIcon = icon, initRoundedCorner = roundedCorner, initUndecorated = undecorated, minSize = minSize, placement = initPlacement, position = initPosition, initFocusable = focusable, initResizable = resizable, initClickThrough = clickThrough)
+        WindowController(
+            initSize = initSize,
+            initTitle = title,
+            initIcon = icon,
+            initRoundedCorner = roundedCorner,
+            initUndecorated = true,
+            minSize = minSize,
+            placement = WindowPlacement.Floating,
+            position = WindowPosition.Aligned(Alignment.Center),
+            initFocusable = true,
+            initResizable = true,
+            initClickThrough = false
+        )
     }
 
     private val windowStarter = LaunchFlag()
@@ -84,8 +81,8 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
 
     fun openWindow(window: ApplicationWindow) = windows.open(window)
 
+    @OptIn(ExperimentalComposeUiApi::class, InternalComposeUiApi::class)
     fun run() {
-        @OptIn(InternalComposeUiApi::class)
         registerSkikoComposeImplementation()
 
         var closeRequested = false
@@ -102,18 +99,17 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
         cleaning({
             initApplication(scope = mainScope)
 
-            @OptIn(ExperimentalComposeUiApi::class)
             NativeWindow(
-                options = NativeWindowOptions(
+                options = WindowOptions(
                     title = controller.title,
                     width = controller.size.width.value.roundToInt(),
                     height = controller.size.height.value.roundToInt(),
-                    transparent = transparent,
+                    transparent = true,
                     undecorated = controller.undecorated,
                     focusable = controller.focusable,
                     resizable = controller.resizable,
                     clickThrough = controller.clickThrough
-                ),
+                ).asNativeWindowOptions,
                 onCloseRequest = {
                     onMainWindowClose()
                     true
@@ -133,7 +129,7 @@ actual abstract class PlatformApplication<out A : PlatformApplication<A>> actual
                     windowStarter { initPoolLater(this) }
                 }
 
-                val useRoundedCorner = transparent && controller.undecorated && !controller.maximize && controller.roundedCorner
+                val useRoundedCorner = controller.undecorated && !controller.maximize && controller.roundedCorner
                 val borderShape = if (useRoundedCorner) Theme.shape.v1 else Theme.shape.rectangle
                 val windowModifier = if (controller.undecorated && controller.placement != WindowPlacement.Fullscreen) {
                     Modifier.fillMaxSize().clip(borderShape).border(Theme.border.v10 / 2, Theme.color.outline.copy(alpha = 0.5f), borderShape)

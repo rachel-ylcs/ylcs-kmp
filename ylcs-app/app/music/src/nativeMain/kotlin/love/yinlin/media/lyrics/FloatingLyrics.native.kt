@@ -15,13 +15,13 @@ import love.yinlin.compose.ApplicationWindow
 import love.yinlin.compose.Colors
 import love.yinlin.compose.NativeWindow
 import love.yinlin.compose.Theme
+import love.yinlin.compose.WindowOptions
 import love.yinlin.compose.bold
 import love.yinlin.compose.ui.node.condition
 import love.yinlin.compose.ui.window.DragArea
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.startup.StartupMusicPlayer
 import org.jetbrains.skiko.window.NativeWindowEvent
-import org.jetbrains.skiko.window.NativeWindowOptions
 import org.jetbrains.skiko.window.NativeWindowScope
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
@@ -99,7 +99,7 @@ actual class FloatingLyrics actual constructor(val mp: StartupMusicPlayer) {
         @Composable
         override fun Window(content: @Composable () -> Unit) {
             NativeWindow(
-                options = NativeWindowOptions(
+                options = WindowOptions(
                     title = "",
                     width = windowSize.width.value.roundToInt(),
                     height = windowSize.height.value.roundToInt(),
