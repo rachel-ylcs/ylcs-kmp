@@ -64,7 +64,6 @@ import love.yinlin.compose.ui.widget.QrcodeScanner
 import love.yinlin.cs.ApiProfileSignin
 import love.yinlin.cs.request
 import love.yinlin.cs.url
-import love.yinlin.data.Data
 import love.yinlin.data.rachel.follows.FollowTabItem
 import love.yinlin.data.rachel.profile.UserLevel
 import love.yinlin.data.rachel.profile.UserProfile
@@ -172,10 +171,9 @@ class ScreenUser : BasicScreen() {
                 BoardButton("添加活动", Icons.Gift) {
                     launch {
                         val index = addActivityDialog.open() ?: return@launch
-                        when (val result = DataSourceActivity.addActivity(index == 1)) {
-                            is Data.Success -> navigate(::ScreenModifyActivity, result.data)
-                            is Data.Failure -> result.throwable.errorTip
-                        }
+                        DataSourceActivity.addActivity(index == 1).onSuccess {
+                            navigate(::ScreenModifyActivity, it)
+                        }.exceptionOrNull().errorTip
                     }
                 }
                 BoardButton("秀动提取", Icons.Link) {

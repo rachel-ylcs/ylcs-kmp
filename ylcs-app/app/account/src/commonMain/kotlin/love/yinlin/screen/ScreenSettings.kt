@@ -48,7 +48,6 @@ import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.*
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.cs.url
-import love.yinlin.data.Data
 import love.yinlin.data.config.AnimationSpeedConfig
 import love.yinlin.data.config.FontScaleConfig
 import love.yinlin.data.rachel.literal.AppAbout
@@ -318,17 +317,13 @@ class ScreenSettings : Screen() {
                 icon = Icons.RocketLaunch,
                 text = Local.info.versionName,
                 onClick = {
-                    when (val result = DataSourceAccount.checkUpdate()) {
-                        is Data.Success -> {
-                            (val targetVersion, val minVersion) = result.data
-                            when {
-                                targetVersion > Local.info.version -> slot.tip.warning("新版本${targetVersion}可用")
-                                minVersion > Local.info.version -> slot.tip.error("当前不满足最低兼容版本$minVersion")
-                                else -> slot.tip.success("当前已是最新版本")
-                            }
+                    DataSourceAccount.checkUpdate().onSuccess { (val targetVersion, val minVersion) ->
+                        when {
+                            targetVersion > Local.info.version -> slot.tip.warning("新版本${targetVersion}可用")
+                            minVersion > Local.info.version -> slot.tip.error("当前不满足最低兼容版本$minVersion")
+                            else -> slot.tip.success("当前已是最新版本")
                         }
-                        is Data.Failure -> result.throwable.errorTip
-                    }
+                    }.exceptionOrNull().errorTip
                 }
             )
 

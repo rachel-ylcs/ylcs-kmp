@@ -9,8 +9,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
 import love.yinlin.app
 import love.yinlin.cs.*
-import love.yinlin.data.Data
-import love.yinlin.data.map
 import love.yinlin.data.rachel.activity.Activity
 import love.yinlin.extension.DateEx
 import love.yinlin.extension.findAssign
@@ -91,9 +89,9 @@ object DataSourceActivity {
         }
     }
 
-    suspend fun addActivity(hide: Boolean): Data<Int> {
+    suspend fun addActivity(hide: Boolean): Result<Int> {
         val result = ApiActivityAddActivity.request(app.config.userToken, hide).map { it.o1 }
-        if (result is Data.Success) requestNewActivity()
+        if (result.isSuccess) requestNewActivity()
         return result
     }
 }

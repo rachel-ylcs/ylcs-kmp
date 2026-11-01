@@ -48,7 +48,6 @@ import love.yinlin.compose.ui.text.rememberInputState
 import love.yinlin.cs.ApiBackupDownloadPlaylist
 import love.yinlin.cs.ApiBackupUploadPlaylist
 import love.yinlin.cs.request
-import love.yinlin.data.Data
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.data.music.MusicInfo
 import love.yinlin.data.music.MusicPlaylist
@@ -207,13 +206,12 @@ class ScreenPlaylistLibrary : Screen() {
 
     private suspend fun downloadCloudPlaylist(): Map<String, List<PlaylistPreviewItem>>? {
         if (app.config.userToken.isEmpty()) slot.tip.warning("请先登录")
-        else when (val result = ApiBackupDownloadPlaylist.request(app.config.userToken)) {
-            is Data.Success -> {
-                val playlist = catchingNull { decodePlaylist(result.data.o1.to()) }
+        else {
+            ApiBackupDownloadPlaylist.request(app.config.userToken).onSuccess {
+                val playlist = catchingNull { decodePlaylist(it.o1.to()) }
                 if (playlist == null) slot.tip.error("云端歌单存在异常")
                 return playlist
-            }
-            is Data.Failure -> slot.tip.error(result.throwable.message)
+            }.exceptionOrNull().errorTip
         }
         return null
     }

@@ -13,7 +13,6 @@ import kotlinx.io.RawSource
 import kotlinx.io.buffered
 import kotlinx.serialization.json.JsonArray
 import love.yinlin.annotation.CompatibleRachelApi
-import love.yinlin.data.Data
 import love.yinlin.encoding.convert
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
@@ -95,7 +94,9 @@ suspend inline fun API<APIType.Form>.internalFormCallback(
 suspend inline fun <reified R : Any> API<APIType.Form>.internalFormReturn(
     crossinline factory: APIFormScope.() -> Unit,
     crossinline block: suspend (HttpResponse) -> R
-) = catchingDefault({ Data.Failure(it) }) { Data.Success(internalForm(factory, block)) }
+) = catchingDefault({ Result.failure(it) }) {
+    Result.success(internalForm(factory, block))
+}
 
 suspend inline fun <reified R : Any> API<APIType.Form>.internalFormReturnNull(
     crossinline factory: APIFormScope.() -> Unit,

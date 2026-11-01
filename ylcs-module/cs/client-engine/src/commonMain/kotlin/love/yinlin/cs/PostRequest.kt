@@ -5,7 +5,6 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.JsonArray
-import love.yinlin.data.Data
 import love.yinlin.extension.catchingDefault
 import love.yinlin.extension.catchingError
 import love.yinlin.extension.catchingNull
@@ -21,7 +20,9 @@ suspend inline fun API<APIType.Post>.internalRequestCallback(
 suspend inline fun <reified R : Any> API<APIType.Post>.internalRequestReturn(
     noinline builder: HttpRequestBuilder.() -> Unit,
     crossinline block: suspend (HttpResponse) -> R
-) = catchingDefault({ Data.Failure(it) }) { Data.Success(internalRequest(builder, block)) }
+) = catchingDefault({ Result.failure(it) }) {
+    Result.success(internalRequest(builder, block))
+}
 
 suspend inline fun <reified R : Any> API<APIType.Post>.internalRequestReturnNull(
     noinline builder: HttpRequestBuilder.() -> Unit,

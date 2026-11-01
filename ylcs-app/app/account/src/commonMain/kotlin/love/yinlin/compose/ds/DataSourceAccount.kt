@@ -5,8 +5,6 @@ import love.yinlin.app
 import love.yinlin.compose.config.CacheState
 import love.yinlin.concurrent.atomic
 import love.yinlin.cs.*
-import love.yinlin.data.Data
-import love.yinlin.data.map
 import love.yinlin.data.rachel.profile.UserConstraint
 import love.yinlin.data.rachel.server.ServerStatus
 import love.yinlin.extension.DateEx
@@ -39,7 +37,7 @@ object DataSourceAccount {
                 } is UnauthorizedException
             }
             else { // 校验 Token
-                (ApiAccountValidateToken.request(token) as? Data.Success)?.data?.o1 == false
+                ApiAccountValidateToken.request(token).getOrNull()?.o1 == false
             }
             if (isExpired) {
                 cleanUserToken()
@@ -119,11 +117,7 @@ object DataSourceAccount {
         return null
     }
 
-    suspend fun sendFeedback(content: String): Throwable? {
-        return (ApiCommonSendFeedback.request(app.config.userToken, content) as? Data.Failure)?.throwable
-    }
+    suspend fun sendFeedback(content: String): Throwable? = ApiCommonSendFeedback.request(app.config.userToken, content).exceptionOrNull()
 
-    suspend fun checkUpdate(): Data<ServerStatus> {
-        return ApiCommonGetServerStatus.request().map { it.o1 }
-    }
+    suspend fun checkUpdate(): Result<ServerStatus> = ApiCommonGetServerStatus.request().map { it.o1 }
 }
