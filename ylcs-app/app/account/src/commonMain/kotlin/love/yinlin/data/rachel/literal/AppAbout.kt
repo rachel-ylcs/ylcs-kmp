@@ -8,11 +8,11 @@ import love.yinlin.compose.ui.icon.Icons
 @Stable
 internal object AppAbout {
      val updateInfo = AppUpdateInfo(
-        platform = "Android/iOS/Windows/Linux/macOS/Web 发布",
-        title = "银临茶舍 统一资讯源 演出记忆",
+        platform = "全平台发布",
+        title = "银临茶舍 原生桌面端上线",
         force = true,
         maintenance = true,
-        date = LocalDate(2026, 10, 18),
+        date = LocalDate(2026, 11, 1),
         groups = [
             AppUpdateRecordGroup(
                 type = "特性",
@@ -22,9 +22,7 @@ internal object AppAbout {
                 records = [
                     "1. 统一资讯源支持（微博、超话、B站、小红书、抖音）",
                     "2. 银临的剪刀手电台支持（本地缓存电台节目离线播放）",
-                    "3. 演出记忆板块支持（聆听每一场演出的回忆）",
-                    "4. iOS端，Linux端和macos端支持音频视频播放",
-                    "5. 安卓端支持Android17"
+                    "3. 演出记忆板块支持（聆听每一场演出的回忆）"
                 ]
             ),
             AppUpdateRecordGroup(
@@ -33,11 +31,11 @@ internal object AppAbout {
                 color = Colors.Pink4,
                 background = Colors.Pink2,
                 records = [
-                    "1. 重构所有客户端的UI界面",
-                    "2. 去除几乎所有曲库歌单更新时要求停止播放器的限制",
-                    "3. 九宫格图片超出九张时显示更多数量",
-                    "4. 桌面端支持批量下载资讯源图片",
-                    "5. 减少安卓端安装包大小，稍增桌面端大小，提升运行性能",
+                    "1. Android端向下兼容安卓9，优化安装包体积",
+                    "2. 桌面原生客户端上线，极致性能，支持windows, linux, macos",
+                    "3. 全平台支持音视频播放",
+                    "4. 移除在线更新及更新包的功能",
+                    "5. 为部分页面提供返回键",
                 ]
             ),
             AppUpdateRecordGroup(
@@ -46,10 +44,10 @@ internal object AppAbout {
                 color = Colors.Red4,
                 background = Colors.Red2,
                 records = [
-                    "1. 修复平台下载MOD歌手名称错误的问题",
-                    "2. 修复裁剪框点击外部消失的问题",
-                    "3. 修复MOD导入后当前播放列表数据异常崩溃的问题",
-                    "4. 修复歌单移动歌曲索引异常的问题"
+                    "1. 修复切换资讯源卡住的问题",
+                    "3. 修复iOS登录崩溃的问题",
+                    "3. 修复电台断网下无法浏览的问题",
+                    "4. 修复未登录时无法进入登录页的问题"
                 ]
             )
         ]
