@@ -1,15 +1,20 @@
 package love.yinlin.compose.ui.floating
 
-import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -22,7 +27,6 @@ import love.yinlin.compose.ui.animation.AnimationContent
 import love.yinlin.compose.ui.container.ThemeContainer
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.Icon
-import love.yinlin.compose.ui.node.fastAnimateRectBackground
 import love.yinlin.compose.ui.node.shadow
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.coroutines.mainContext
@@ -49,17 +53,24 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
 
     override fun alignment(device: Device): Alignment = Alignment.TopCenter
 
-    override fun enter(device: Device, animationDuration: Int): EnterTransition = scaleIn(
-        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing),
-        initialScale = 0.0001f
-    ) + fadeIn(
-        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
+    override fun enter(device: Device, animationDuration: Int): EnterTransition = fadeIn(
+        animationSpec = tween(animationDuration, easing = FastOutSlowInEasing)
+    ) + slideInVertically(
+        initialOffsetY = { -it / 2 },
+        animationSpec = tween(animationDuration, easing = FastOutSlowInEasing)
+    ) + scaleIn(
+        initialScale = 0.94f,
+        animationSpec = tween(animationDuration, easing = FastOutSlowInEasing)
     )
 
-    override fun exit(device: Device, animationDuration: Int): ExitTransition = scaleOut(
-        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
-    ) + fadeOut(
-        animationSpec = tween(durationMillis = animationDuration, easing = LinearOutSlowInEasing)
+    override fun exit(device: Device, animationDuration: Int): ExitTransition = fadeOut(
+        animationSpec = tween(animationDuration / 2, easing = FastOutSlowInEasing)
+    ) + slideOutVertically(
+        targetOffsetY = { -it / 4 },
+        animationSpec = tween(animationDuration / 2, easing = FastOutSlowInEasing)
+    ) + scaleOut(
+        targetScale = 0.98f,
+        animationSpec = tween(animationDuration / 2, easing = FastOutSlowInEasing)
     )
 
     override val zIndex: Float = Z_INDEX_TIP
@@ -88,53 +99,88 @@ class Tip(private val scope: CoroutineScope) : Floating<Tip.Data>() {
     @Composable
     fun Land() {
         LandFloating { _, data ->
-            val type = data.type
-            val shape = Theme.shape.v4
-            val padding = LocalImmersivePadding.current + PaddingValues(horizontal = Theme.padding.h10, vertical = Theme.padding.v4)
+            val accent = when (data.type) {
+                Type.Info -> Theme.color.primary
+                Type.Success -> Theme.color.secondary
+                Type.Warning -> Theme.color.warning
+                Type.Error -> Theme.color.error
+            }
+            val surface = Theme.color.surface
+            val shape = Theme.shape.v5
+            val padding = LocalImmersivePadding.current +
+                PaddingValues(horizontal = Theme.padding.h10, vertical = Theme.padding.v4)
+            val duration = Theme.animation.duration.v7
 
-            Box(modifier = Modifier
-                .padding(padding)
-                .defaultMinSize(minWidth = Theme.size.cell1)
-                .shadow(shape, Theme.shadow.v7)
-                .clip(shape)
-                .fastAnimateRectBackground(when (type) {
-                    Type.Info -> Theme.color.secondaryContainer
-                    Type.Success -> Theme.color.primaryContainer
-                    Type.Warning -> Theme.color.warning
-                    Type.Error -> Theme.color.error
-                })
-            ) {
-                val contentColor = when (type) {
-                    Type.Info, Type.Success -> Theme.color.onContainer
-                    Type.Warning -> Theme.color.onWarning
-                    Type.Error -> Theme.color.onError
-                }
-                val duration = Theme.animation.duration.v7
-
-                ThemeContainer(contentColor) {
-                    AnimationContent(
-                        state = data,
-                        enter = { fadeIn(tween(duration, delayMillis = (duration * 0.3f).toInt())) + slideInVertically { it / 2 } },
-                        exit = { fadeOut(tween(duration)) + slideOutVertically { -it / 2 } }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(Theme.padding.value9),
-                            horizontalArrangement = Arrangement.spacedBy(Theme.padding.h10),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(icon = when (it.type) {
-                                Type.Info -> Icons.Lightbulb
-                                Type.Success -> Icons.Check
-                                Type.Warning -> Icons.Warning
-                                Type.Error -> Icons.Error
-                            })
-                            Text(
-                                text = it.text,
-                                style = Theme.typography.v6.bold,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
+            Box(
+                modifier = Modifier
+                    .padding(padding)
+                    .defaultMinSize(minWidth = Theme.size.cell1)
+                    .widthIn(max = 440.dp)
+                    .shadow(shape, Theme.shadow.v7)
+                    .clip(shape)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                accent.copy(alpha = 0.12f).compositeOver(surface),
+                                accent.copy(alpha = 0.04f).compositeOver(surface),
+                                surface
                             )
+                        )
+                    )
+                    .border(1.dp, accent.copy(alpha = 0.28f), shape)
+            ) {
+                AnimationContent(
+                    state = data,
+                    enter = {
+                        fadeIn(tween(duration, easing = FastOutSlowInEasing)) +
+                            slideInVertically(
+                                initialOffsetY = { -it / 4 },
+                                animationSpec = tween(duration, easing = FastOutSlowInEasing)
+                            )
+                    },
+                    exit = {
+                        fadeOut(tween(duration / 2)) +
+                            slideOutVertically(
+                                targetOffsetY = { -it / 5 },
+                                animationSpec = tween(duration / 2)
+                            )
+                    }
+                ) { current ->
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .width(3.dp)
+                                .height(30.dp)
+                                .clip(Theme.shape.circle)
+                                .background(accent)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(Theme.shape.circle)
+                                .background(accent.copy(alpha = 0.14f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ThemeContainer(accent) {
+                                Icon(icon = when (current.type) {
+                                    Type.Info -> Icons.Lightbulb
+                                    Type.Success -> Icons.Check
+                                    Type.Warning -> Icons.Warning
+                                    Type.Error -> Icons.Error
+                                })
+                            }
                         }
+                        Text(
+                            text = current.text,
+                            color = Theme.color.onSurface,
+                            style = Theme.typography.v6.bold,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
