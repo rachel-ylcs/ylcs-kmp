@@ -24,6 +24,9 @@ internal fun Project.registerNativeCpp(extension: KotlinMultiplatformExtension) 
         compilation.cinterops.configureEach { includeDirs(source) }
         if (isDokkaBuild) return@configureEach
 
+        // CI may restore these archives and exclude the CMake producer on another host.
+        // Keep input paths independent of task outputs so Gradle can still snapshot them.
+        val nativeLibraries = layout.buildDirectory.dir("nativeCpp/${target.name}/lib")
         val producer = tasks.register<BuildNativeCppTask>("build${name.replaceFirstChar(Char::uppercase)}Native") {
             description = "Build C/C++ sources for the ${target.name} Kotlin/Native target"
             nativeTarget.set(target.konanTarget.name)
@@ -32,15 +35,15 @@ internal fun Project.registerNativeCpp(extension: KotlinMultiplatformExtension) 
             val distribution = tasks.named<KotlinNativeDownloadTask>("downloadKotlinNativeDistribution")
             nativeHome.set(distribution.flatMap { it.konanHome })
             dependsOn(distribution)
-            libraryDirectory.set(layout.buildDirectory.dir("nativeCpp/${target.name}/lib"))
+            libraryDirectory.set(nativeLibraries)
             cmakeBuildDirectory.set(layout.buildDirectory.dir("nativeCppBuild/${target.name}"))
             onlyIf("The Kotlin/Native toolchain supports this target on the current host") { HostManager().isEnabled(target.konanTarget) }
         }
         compilation.cinterops.configureEach {
-            extraOpts("-libraryPath", producer.get().libraryDirectory.get().asFile.invariantSeparatorsPath)
+            extraOpts("-libraryPath", nativeLibraries.get().asFile.invariantSeparatorsPath)
             tasks.named(interopProcessingTaskName).configure {
                 dependsOn(producer)
-                inputs.files(producer.flatMap { it.libraryDirectory }.map { it.asFileTree.matching { include("**/*.a", "**/*.lib") } })
+                inputs.files(nativeLibraries.map { it.asFileTree.matching { include("**/*.a", "**/*.lib") } })
                     .withPropertyName("nativeCppLibraries")
                     .withPathSensitivity(PathSensitivity.RELATIVE)
             }
