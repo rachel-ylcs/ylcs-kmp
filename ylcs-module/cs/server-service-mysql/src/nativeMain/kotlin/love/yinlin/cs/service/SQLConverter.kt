@@ -15,7 +15,7 @@ internal object SQLConverter {
         return when (type) {
             "BOOLEAN" -> (value.asInt() != 0).json
             "BINARY", "BLOB", "VARBINARY", "LONGBLOB" -> value.asByteArray().json
-            "BIT" -> (value.asChar() != Char.MIN_VALUE).json
+            "BIT" -> value.asBoolean().json
             "INT", "TINYINT", "SMALLINT", "MEDIUMINT" -> value.asInt().json
             "INT UNSIGNED" -> value.asUInt().toJson()
             "BIGINT" -> value.asLong().json
