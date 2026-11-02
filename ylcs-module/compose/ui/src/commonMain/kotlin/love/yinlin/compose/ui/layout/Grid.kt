@@ -3,6 +3,7 @@ package love.yinlin.compose.ui.layout
 import androidx.compose.foundation.layout.Fr
 import androidx.compose.foundation.layout.Grid
 import androidx.compose.foundation.layout.GridConfigurationScope
+import androidx.compose.foundation.layout.GridFlow
 import androidx.compose.foundation.layout.GridScope
 import androidx.compose.foundation.layout.GridTrackSize
 import androidx.compose.runtime.Composable
@@ -23,6 +24,11 @@ value class GridLayoutBuilder(private val raw: GridConfigurationScope) {
 
     @Stable
     private data class MinMax(val min: Dp, val max: Fr)
+
+    val minWidth get() = raw.constraints.minWidth
+    val maxWidth get() = raw.constraints.maxWidth
+    val minHeight get() = raw.constraints.minHeight
+    val maxHeight get() = raw.constraints.maxHeight
 
     val auto get() = Auto
     val min get() = Min
@@ -59,6 +65,8 @@ value class GridLayoutBuilder(private val raw: GridConfigurationScope) {
     fun s(x: Dp, y: Dp = x) = raw.gap(y, x)
 
     fun t(label: String, x: Int = 0, y: Int = 0, xs: Int = 1, ys: Int = 1) = raw.area(label, y, x, ys, xs)
+
+    fun direction(value: GridFlow) { raw.flow = value }
 }
 
 @JvmInline
