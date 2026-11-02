@@ -30,11 +30,11 @@ abstract class Page {
     abstract fun Content()
 
     @Composable
-    protected fun ComponentColumn(alwaysShowTabs: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
+    protected fun ComponentColumn(alwaysShowTabs: Boolean = false, showTabs: Boolean = true, content: @Composable ColumnScope.() -> Unit) {
         val compact = LocalGalleryCompact.current
         val components = PageItem.forPage(this@Page)?.components.orEmpty()
         val selectedComponent = rememberSaveable { mutableIntStateOf(0) }
-        val selectedIndex = if (components.isEmpty()) -1 else selectedComponent.intValue.coerceIn(0, components.lastIndex)
+        val selectedIndex = if (!showTabs || components.isEmpty()) -1 else selectedComponent.intValue.coerceIn(0, components.lastIndex)
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             Column(
                 modifier = Modifier.widthIn(max = 1240.dp).fillMaxWidth().fillMaxHeight()
@@ -42,7 +42,7 @@ abstract class Page {
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 PageItem.forPage(this@Page)?.takeIf { it.components.isNotEmpty() }?.let { GalleryPageHeader(it) }
-                if (components.size > 1 || (alwaysShowTabs && components.isNotEmpty())) {
+                if (showTabs && (components.size > 1 || (alwaysShowTabs && components.isNotEmpty()))) {
                     TabBar(
                         size = components.size,
                         index = selectedIndex,
@@ -65,7 +65,8 @@ abstract class Page {
     protected fun ColumnScope.Component(title: String, content: @Composable ColumnScope.() -> Unit) {
         val item = PageItem.forPage(this@Page)
         val index = item?.components?.indexOfFirst { it.title == title } ?: -1
-        if (index < 0 || index == LocalGallerySelectedComponentIndex.current) {
+        val selectedIndex = LocalGallerySelectedComponentIndex.current
+        if (selectedIndex < 0 || index < 0 || index == selectedIndex) {
             GalleryCard {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (index >= 0) GalleryBadge((index + 1).toString().padStart(2, '0'))

@@ -24,7 +24,7 @@ import love.yinlin.compose.ui.text.Text
 object ThemePage : Page() {
     @Composable
     override fun Content() {
-        ComponentColumn {
+        ComponentColumn(showTabs = false) {
             GalleryCard("选择你的外观", "下方色块来自当前主题。切换配色或明暗模式，可以即时对照整个界面。") {
                 GalleryActions {
                     GalleryPalette.entries.forEach { palette ->
