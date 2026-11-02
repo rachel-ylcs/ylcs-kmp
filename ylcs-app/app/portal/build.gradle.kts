@@ -47,6 +47,12 @@ rachel {
         }
 
         actions {
+            tasks.register<WriteProperties>("appGenVersionConfig") {
+                description = "生成应用版本号配置"
+                destinationFile = layout.buildDirectory.file("app-version.properties")
+                property("version", C.versionName)
+            }
+
             tasks.register("appleGenVersionConfig") {
                 description = "生成苹果版本号配置"
                 val content = """
