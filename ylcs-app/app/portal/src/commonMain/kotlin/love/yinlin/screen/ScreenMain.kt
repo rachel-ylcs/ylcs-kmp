@@ -2,9 +2,6 @@ package love.yinlin.screen
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,12 +18,10 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.withSaveLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlinx.datetime.number
 import love.yinlin.app
 import love.yinlin.app.portal.resources.*
 import love.yinlin.compose.*
@@ -40,17 +35,19 @@ import love.yinlin.compose.screen.BasicScreen
 import love.yinlin.compose.ui.common.PlayControlUI
 import love.yinlin.compose.ui.common.PortalCardItem
 import love.yinlin.compose.ui.container.Banner
-import love.yinlin.compose.ui.container.HorizontalScrollContainer
 import love.yinlin.compose.ui.container.Surface
 import love.yinlin.compose.ui.icon.Icons
 import love.yinlin.compose.ui.image.LocalFileImage
 import love.yinlin.compose.ui.image.WebImage
 import love.yinlin.compose.ui.input.PrimaryButton
-import love.yinlin.compose.ui.text.SimpleClipText
 import love.yinlin.compose.ui.text.SimpleEllipsisText
+import love.yinlin.compose.ui.widget.Calendar
+import love.yinlin.compose.ui.widget.CalendarState
 import love.yinlin.cs.url
 import love.yinlin.data.mod.ModResourceType
 import love.yinlin.extension.DateEx
+import love.yinlin.extension.findSelf
+import love.yinlin.extension.then
 import love.yinlin.isAppInitialized
 import love.yinlin.startup.StartupMusicPlayer
 
@@ -145,114 +142,24 @@ class ScreenMain : BasicScreen() {
         }
     }
 
+    private val calendarState = CalendarState()
+
     private val activityLayout = movableComposable { modifier: Modifier ->
         Surface(
             modifier = modifier,
-            contentPadding = Theme.padding.value9,
-            shape = Theme.shape.v7,
-            shadowElevation = Theme.shadow.v7
+            contentPadding = Theme.padding.eValue,
+            shape = Theme.shape.v1,
+            shadowElevation = Theme.shadow.v3
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Theme.padding.v7)
-            ) {
-                val today = remember { DateEx.Today }
-
-                val todayTitle by rememberDerivedState {
-                    val activity = DataSourceActivity.spanActivities[5].second
-                    activity?.shortTitle ?: activity?.title
+            Calendar(
+                state = calendarState,
+                events = DataSourceActivity.activityEvents,
+                onEventClick = { date ->
+                    DateEx.Formatter.standardDate.format(date)
+                        ?.findSelf(DataSourceActivity.activities) { it.ts }
+                        ?.then { navigate(::ScreenActivityDetails, it.aid) }
                 }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Theme.padding.h9),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val monthText = remember {
-                        val table = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"]
-                        "${table[today.month.number]}月"
-                    }
-
-                    SimpleClipText(
-                        text = monthText,
-                        style = Theme.typography.v6.bold
-                    )
-
-                    todayTitle?.let {
-                        SimpleEllipsisText(
-                            text = it,
-                            color = Theme.color.primary,
-                            style = Theme.typography.v6.bold,
-                            textAlign = TextAlign.End,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-
-                val state = rememberLazyListState(initialFirstVisibleItemIndex = 4)
-
-                HorizontalScrollContainer(state, modifier = Modifier.fillMaxWidth()) {
-                    val shape = Theme.shape.v7
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        state = state,
-                        horizontalArrangement = Arrangement.spacedBy(Theme.padding.e)
-                    ) {
-                        items(DataSourceActivity.spanActivities) { [date, activity] ->
-                            val itemWidth = if (activity != null) Theme.size.cell7 else Theme.size.cell10
-                            val itemBackground = when {
-                                date == today -> Theme.color.secondaryContainer.copy(alpha = 0.75f)
-                                activity != null -> Theme.color.primaryContainer.copy(alpha = 0.5f)
-                                else -> Colors.Transparent
-                            }
-                            val dateStyle = if (date == today || activity == null) Theme.typography.v6.bold else Theme.typography.v7.bold
-                            val itemColor = when {
-                                date == today || activity != null -> Theme.color.onContainer
-                                date < today -> Theme.color.onSurfaceVariant.copy(alpha = 0.5f)
-                                else -> Theme.color.onSurface
-                            }
-                            val borderAlpha = if (date < today && activity == null) 0.5f else 1f
-
-                            Box(
-                                modifier = Modifier.width(itemWidth)
-                                    .height(Theme.size.cell10)
-                                    .clip(shape)
-                                    .background(itemBackground)
-                                    .border(Theme.border.v8, Theme.color.outline.copy(alpha = borderAlpha), shape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (activity == null) {
-                                    SimpleClipText(
-                                        text = date.day.toString(),
-                                        style = dateStyle,
-                                        color = itemColor
-                                    )
-                                }
-                                else {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize().clickable {
-                                            navigate(::ScreenActivityDetails, activity.aid)
-                                        },
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(Theme.padding.v, Alignment.CenterVertically)
-                                    ) {
-                                        SimpleEllipsisText(
-                                            text = activity.shortTitle ?: activity.title ?: "未知活动",
-                                            style = dateStyle,
-                                            color = itemColor
-                                        )
-                                        SimpleEllipsisText(
-                                            text = date.day.toString(),
-                                            style = dateStyle,
-                                            color = itemColor
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            )
         }
     }
 
@@ -466,9 +373,9 @@ class ScreenMain : BasicScreen() {
         ) {
             headerLayout(Modifier.fillMaxWidth())
             bannerLayout(Modifier.fillMaxWidth().aspectRatio(1.77778f).clip(Theme.shape.v7))
-            activityLayout(Modifier.fillMaxWidth())
             musicLayout(Modifier.fillMaxWidth())
             cardLayout(Modifier.fillMaxWidth())
+            activityLayout(Modifier.fillMaxWidth())
         }
     }
 

@@ -24,6 +24,8 @@ rachel {
             commonMain {
                 lib(
                     libs.compose.resources,
+
+                    projects.ylcsModule.compose.components.calendar,
                     ExportLib,
                     projects.ylcsApp.app.global,
                     projects.ylcsApp.app.account,

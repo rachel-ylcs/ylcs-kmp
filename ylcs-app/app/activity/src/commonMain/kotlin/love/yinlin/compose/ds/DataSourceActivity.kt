@@ -4,9 +4,6 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.plus
 import love.yinlin.app
 import love.yinlin.cs.*
 import love.yinlin.data.rachel.activity.Activity
@@ -22,17 +19,12 @@ object DataSourceActivity {
     val activities: List<Activity> field = mutableStateListOf<Activity>()
 
     // 当前展示活动
-    val spanActivities: List<Pair<LocalDate, Activity?>> by derivedStateOf {
-        // 取前5天 + 今天 + 后10天的记录
-        val today = DateEx.Today
-        val activityMap = activities.asSequence().mapNotNull { activity ->
-            val date = activity.ts?.let(DateEx.Formatter.standardDate::parse)
-            if (date != null) date to activity else null
+    val activityEvents by derivedStateOf {
+        activities.asSequence().mapNotNull { (val ts, val shortTitle, val title) ->
+            val date = ts?.let(DateEx.Formatter.standardDate::parse)
+            val actualTitle = shortTitle ?: title
+            if (date != null && actualTitle != null) date.toEpochDays() to actualTitle else null
         }.toMap()
-        (-5 .. 10).map { index ->
-            val date = today.plus(index, DateTimeUnit.DAY)
-            date to activityMap[date]
-        }
     }
 
     suspend fun requestNewActivity() {
