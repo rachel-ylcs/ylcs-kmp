@@ -9,6 +9,7 @@ import androidx.compose.ui.node.ObserverModifierNode
 import androidx.compose.ui.node.currentValueOf
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.observeReads
+import androidx.compose.ui.node.requireLayoutCoordinates
 import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -48,6 +49,9 @@ internal abstract class BlurNode : Modifier.Node(), DrawModifierNode, Compositio
         hostStopped = false
         onObservedReadsChanged()
         attachBlur()
+
+        val currentCoordinates = requireLayoutCoordinates()
+        if (currentCoordinates.isAttached && currentCoordinates.size.width > 0 && currentCoordinates.size.height > 0) coordinates = currentCoordinates
     }
 
     final override fun onObservedReadsChanged() {

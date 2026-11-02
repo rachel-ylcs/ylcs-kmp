@@ -13,9 +13,11 @@ import org.intellij.lang.annotations.Language
 
 @RequiresApi(33)
 @Stable
-internal object AndroidBlurShader {
+internal class AndroidBlurShader {
+    private val shader = RuntimeShader(CODE)
+
     fun create(input: RenderEffect, noise: BitmapShader, noiseFactor: Float, tint: Int): RenderEffect {
-        val shader = RuntimeShader(CODE).apply {
+        shader.apply {
             setInputShader("noise", noise)
             setFloatUniform("noiseAlpha", noiseFactor)
             setColorUniform("tintColor", tint)
@@ -23,8 +25,9 @@ internal object AndroidBlurShader {
         return RenderEffect.createChainEffect(RenderEffect.createRuntimeShaderEffect(shader, "content"), input)
     }
 
-    @Language("AGSL")
-    private const val CODE = """
+    private companion object {
+        @Language("AGSL")
+        const val CODE = """
         
 uniform shader content;
 uniform shader noise;
@@ -72,4 +75,5 @@ half4 main(float2 coord) {
 }
 
 """
+    }
 }

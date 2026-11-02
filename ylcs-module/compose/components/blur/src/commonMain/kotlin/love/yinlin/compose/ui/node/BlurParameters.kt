@@ -20,7 +20,7 @@ import kotlin.math.sqrt
  * @param tintColor 在模糊和噪点后以 SrcOver 叠加的颜色，支持任意已指定颜色和整个透明度范围。
  * 真模糊路径忽略 alpha 小于 0.005 的 tint，与原实现一致。
  * @param noiseFactor Softlight 噪点强度，完整支持 0..1；零值不创建噪点资源。
- * @param qualityFraction 采样质量，完整支持 0..1；采样宽高比例为 sqrt(0.25 + 0.75 * qualityFraction)。
+ * @param qualityFraction 采样质量，完整支持 0..1；目标采样宽高比例为 sqrt(0.25 + 0.75 * qualityFraction)，实际捕获尺寸按整数像素对齐。
  *
  * 构造及 [copy] 均校验参数，越界或未指定的输入抛出 [IllegalArgumentException]。
  */

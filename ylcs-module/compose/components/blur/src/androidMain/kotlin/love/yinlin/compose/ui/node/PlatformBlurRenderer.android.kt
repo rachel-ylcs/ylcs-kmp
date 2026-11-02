@@ -36,6 +36,9 @@ import kotlin.math.abs
 @RequiresApi(31)
 internal class AndroidBlurRenderer(private val context: Context) : BlurRenderer {
     private var noiseTexture: Bitmap? = null
+    private var noiseShader: BitmapShader? = null
+    private var noiseScale: Float = Float.NaN
+    private var combinedShader: AndroidBlurShader? = null
 
     override fun createEffect(blurRadiusPx: Float, tintColor: Color, noiseFactor: Float, inputScale: Float): RenderEffect {
         var effect = if (blurRadiusPx > 0f) {
@@ -46,7 +49,8 @@ internal class AndroidBlurRenderer(private val context: Context) : BlurRenderer 
         if (noiseFactor > 0f) {
             val noise = createNoiseShader(inputScale)
             if (Build.VERSION.SDK_INT >= 33 && tintColor.alpha >= 0.005f) {
-                return AndroidBlurShader.create(effect, noise, noiseFactor, tintColor.toArgb()).asComposeRenderEffect()
+                val shader = combinedShader ?: AndroidBlurShader().also { combinedShader = it }
+                return shader.create(effect, noise, noiseFactor, tintColor.toArgb()).asComposeRenderEffect()
             }
 
             val noiseInput = AndroidRenderEffect.createShaderEffect(noise)
@@ -66,6 +70,8 @@ internal class AndroidBlurRenderer(private val context: Context) : BlurRenderer 
     }
 
     private fun createNoiseShader(inputScale: Float): BitmapShader {
+        noiseShader?.takeIf { noiseScale == inputScale }?.let { return it }
+
         val texture = noiseTexture ?: run {
             val options = BitmapFactory.Options().apply { inScaled = false }
             val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.blur_noise, options)
@@ -79,10 +85,16 @@ internal class AndroidBlurRenderer(private val context: Context) : BlurRenderer 
                     setScale(reciprocal, reciprocal)
                 })
             }
+        }.also {
+            noiseShader = it
+            noiseScale = inputScale
         }
     }
 
     override fun release() {
+        combinedShader = null
+        noiseShader = null
+        noiseScale = Float.NaN
         noiseTexture = null
     }
 }

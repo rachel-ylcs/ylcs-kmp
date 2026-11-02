@@ -114,11 +114,9 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
                 updateEffect(layer, inputScale)
                 layer.renderEffect = renderEffect
                 layer.clip = true
-                val scaledSize = size * inputScale
-                val outputScale = max(size.width / scaledSize.width, size.height / scaledSize.height)
                 clipRect {
                     translate(bounds.left, bounds.top) {
-                        scale(outputScale, pivot = Offset.Zero) {
+                        scale(scaleX = bounds.width / layer.size.width, scaleY = bounds.height / layer.size.height, pivot = Offset.Zero) {
                             drawLayer(layer)
                         }
                     }
@@ -176,11 +174,12 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
             !capturedTransform.values.contentEquals(sourceTransform.values)
 
         if (needsCapture) {
+            if (needsBlurInvalidationWorkaround()) renderEffect = null
             layer.renderEffect = null
             layer.alpha = 1f
             layer.record(size = scaledSize) {
                 drawRect(parameters.backgroundColor)
-                scale(inputScale, pivot = Offset.Zero) {
+                scale(scaleX = scaledSize.width / bounds.width, scaleY = scaledSize.height / bounds.height, pivot = Offset.Zero) {
                     translate(-bounds.left, -bounds.top) {
                         withTransform({ transform(sourceTransform) }) {
                             drawLayer(sourceLayer)
@@ -204,7 +203,7 @@ internal class BlurTargetNode(private var state: BlurState, private var paramete
     private fun ContentDrawScope.updateEffect(layer: GraphicsLayer, inputScale: Float) {
         val radiusPx = (parameters.blurRadius * inputScale).toPx()
         val tint = parameters.effectTint
-        if (renderer == null || effectRadius != radiusPx || effectTint != tint ||
+        if (renderEffect == null || effectRadius != radiusPx || effectTint != tint ||
             effectNoise != parameters.noiseFactor || effectScale != inputScale) {
             layer.renderEffect = null
             val currentRenderer = renderer ?: createBlurRenderer(this@BlurTargetNode).also { renderer = it }
