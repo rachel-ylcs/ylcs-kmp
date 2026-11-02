@@ -37,13 +37,13 @@ internal data class PageItem(
                 ComponentItem("Status", "错误、警告与半透明遮罩，传达不同的反馈状态。"),
                 ComponentItem("Outline / Disabled", "轮廓线与禁用状态的颜色，补齐界面的视觉边界。"),
             ]),
-            PageItem("text", Icons.TextFields, "文本", "Typography & Text", "输入、排版与富文本，让信息既易读，也易于操作。", TextPage, PageGroup.Foundation, [
+            PageItem("text", Icons.TextFields, "文本", "Text", "输入、排版与富文本，让信息既易读，也易于操作。", TextPage, PageGroup.Foundation, [
                 ComponentItem("Input", "试试提示、多行、长度限制、清除按钮、只读与密码输入。", "PasswordInput InputState InputDecoration LengthViewer MaxLength MultiLine"),
                 ComponentItem("Text", "切换加粗、斜体与文字装饰，对照 v1–v10 的中英文排版。"),
                 ComponentItem("StrokeText", "为文字添加描边，观察轮廓与主题色的组合。"),
                 ComponentItem("RichText", "同一段内容包含样式、链接与内联图标，并展示它的编码结果。"),
             ]),
-            PageItem("input", Icons.CheckBox, "输入", "Controls & Input", "点击、选择、拖动，体验控件在可用、禁用和加载时的表现。", InputPage, PageGroup.Interaction, [
+            PageItem("input", Icons.CheckBox, "输入", "Input", "点击、选择、拖动，体验控件在可用、禁用和加载时的表现。", InputPage, PageGroup.Interaction, [
                 ComponentItem("Button", "对照三种按钮层级、图标、文字与禁用状态；加载按钮模拟两秒任务。", "PrimaryButton SecondaryButton TertiaryButton PrimaryLoadingButton PrimaryTextButton PrimaryLoadingTextButton IconButton TextButton LoadingButton"),
                 ComponentItem("Switch", "两个开关共享同一状态，另一个保留禁用状态。"),
                 ComponentItem("Radio / CheckBox", "体验单选、多选和三态选择，并比较禁用选项。", "RadioGroup TriStateCheckBox"),
@@ -52,7 +52,7 @@ internal data class PageItem(
                 ComponentItem("Filter", "体验单选与多选筛选，部分项目携带图标或处于禁用状态。"),
                 ComponentItem("ColorPicker", "拖动颜色选择器，观察颜色、透明度与预览的变化。"),
             ]),
-            PageItem("picture", Icons.GridOn, "图片集", "Icons & Picture", "比较图标大小、提示、操作反馈与九宫格配图排列。", PicturePage, PageGroup.Layout, [
+            PageItem("picture", Icons.GridOn, "图片集", "Picture", "比较图标大小、提示、操作反馈与九宫格配图排列。", PicturePage, PageGroup.Layout, [
                 ComponentItem("Icon", "比较图标大小、悬浮提示、点击、异步加载与带底色的图标。", "LoadingIcon ColorIcon"),
                 ComponentItem("NineGrid", "对照 1–9 张图片、视频标记和超过九张时的展示。", "Image Picture 配图 九宫格 视频"),
             ]),
@@ -68,17 +68,17 @@ internal data class PageItem(
                 ComponentItem("版本与缓存", "比较无版本与附加版本键，观察三个消费者的请求合并、状态重挂载、内存命中与全局缓存清理。", "ResourceFileImage version String? null ImageManager clearCache memoryCacheSize Memory Disk Network LRU 缓存 并发"),
                 ComponentItem("cropImageRegion", "为资源和网络图片附加裁剪选区，拖动自由或固定比例区域并查看原图比例坐标。", "cropImageRegion ResourceFileImage WebImage ImageState CropImageState CropRegion aspectRatio 裁剪 比例"),
             ]),
-            PageItem("blur", Icons.Cloud, "模糊", "Source & Target Blur", "连接背景来源与模糊面板，实时比较半径、颜色、噪点和采样质量。", BlurPage, PageGroup.Layout, [
+            PageItem("blur", Icons.Cloud, "模糊", "Blur", "连接背景来源与模糊面板，实时比较半径、颜色、噪点和采样质量。", BlurPage, PageGroup.Layout, [
                 ComponentItem("Source / Target", "配置 BlurParameters 并通过 copy 调节参数，切换播放页与暂停面板参数，比较透明度、零半径和无噪点。", "BlurState BlurParameters blurSource blurTarget blurRadius backgroundColor tintColor noiseFactor qualityFraction"),
                 ComponentItem("多个 Target", "同一背景连接不同半径和质量的圆角面板，移动面板并缩放窗口检查对齐与边缘。"),
                 ComponentItem("动态与重挂载", "开关动态背景、来源和目标，替换状态并切换页面，检查画面保留与恢复。", "生命周期 KeepLastFrame Android iOS Desktop Web JS Wasm"),
             ]),
-            PageItem("animation", Icons.Animation, "动画", "Motion & Progress", "让等待、进度与展开过程拥有清晰、连贯的视觉反馈。", AnimationPage, PageGroup.Interaction, [
+            PageItem("animation", Icons.Animation, "动画", "Animation", "让等待、进度与展开过程拥有清晰、连贯的视觉反馈。", AnimationPage, PageGroup.Interaction, [
                 ComponentItem("Loading", "观察环形与波浪加载动画，比较不同的等待反馈。", "CircleLoading WaveLoading"),
                 ComponentItem("Progress", "同一份循环进度驱动线性与环形指示器。", "LinearProgress CircleProgress"),
                 ComponentItem("ExpandableContent", "点击按钮展开或收起内容，观察高度与可见性的过渡。"),
             ]),
-            PageItem("container", Icons.Package, "容器", "Surfaces & Layout", "调整表面、状态与内容布局，用真实操作理解容器的能力。", ContainerPage, PageGroup.Layout, [
+            PageItem("container", Icons.Package, "容器", "Container", "调整表面、状态与内容布局，用真实操作理解容器的能力。", ContainerPage, PageGroup.Layout, [
                 ComponentItem("Surface", "调整内边距、圆角、阴影、色调和边框，实时查看表面的变化。"),
                 ComponentItem("OffsetBox", "拖动 x / y 控制器，观察内容相对于原始位置的偏移。"),
                 ComponentItem("StatefulBox", "切换加载、空内容、错误与正常状态，比较容器如何呈现。"),
@@ -89,10 +89,13 @@ internal data class PageItem(
                 ComponentItem("AdaptiveTwoBox", "调整窗口宽度，观察两个不同大小的内容如何重新排列。"),
                 ComponentItem("HorizontalScrollContainer", "在横向列表上使用鼠标滚轮；Row、LazyRow 和 Pager 分别展示滚动方式。", "HorizontalPager"),
             ]),
+            PageItem("layout", Icons.GridOn, "布局", "Layout", "通过轨道、单元格和命名区域，探索结构化的二维布局。", LayoutPage, PageGroup.Layout, [
+                ComponentItem("Grid", "对照官方指南，调节轨道尺寸、间距、放置、跨度和对齐，体验响应式命名区域、重叠与内嵌懒列表。", "GridLayoutBuilder GridLayoutScope x y sx sy s t item Fixed Percentage Float Flex Int Fr Auto MinContent MaxContent MinMax minmax 自动放置 隐式轨道 负索引 跨行 跨列 命名区域 响应式 zIndex LazyColumn intrinsic"),
+            ]),
             PageItem("platform-view", Icons.Package, "原生视图", "Platform View", "嵌入平台原生文本组件，检查参数同步、重挂载和 Compose 内容叠放。", PlatformViewPage, PageGroup.Layout, [
                 ComponentItem("原生组件嵌入", "编辑原生文本，更新外部参数，移除后重新挂载，并点击覆盖在原生区域上的 Compose 按钮。Linux Native 暂未支持。", "PlatformViewState PlatformViewHost rememberPlatformViewState attach detach release HWND Win32 EDIT NSTextField Swing JTextArea HTMLTextAreaElement Windows macOS JVM Web 生命周期 焦点 叠放"),
             ]),
-            PageItem("collection", Icons.GridOn, "集合", "Trees & Tags", "用层级结构与可删除标签整理更多内容。", CollectionPage, PageGroup.Layout, [
+            PageItem("collection", Icons.GridOn, "集合", "Collection", "用层级结构与可删除标签整理更多内容。", CollectionPage, PageGroup.Layout, [
                 ComponentItem("TreeView", "展开层级节点，查看图标、缩进与嵌套的子节点。"),
                 ComponentItem("TagView", "五十个标签按可用宽度换行，点击删除以观察集合更新。"),
             ]),
@@ -108,11 +111,11 @@ internal data class PageItem(
                 ComponentItem("文本拖放", "从其他应用拖入选中的文本，查看内容与字符数；接收区域只接受文本。", "DragFlag.Text DropResult.Text"),
                 ComponentItem("混合接收与开关", "实时开关拖放及文件、文本过滤，检查修改参数后的接收行为和回调次数。", "enabled flag DragFlag or rememberUpdatedState"),
             ]),
-            PageItem("navigation", Icons.Anchor, "导航", "Tabs & Breadcrumbs", "切换当前内容，或者沿着路径回到更上层的位置。", NavigationPage, PageGroup.Interaction, [
+            PageItem("navigation", Icons.Anchor, "导航", "Navigation", "切换当前内容，或者沿着路径回到更上层的位置。", NavigationPage, PageGroup.Interaction, [
                 ComponentItem("TabBar", "切换五个标签，其中一个带图标，另一个处于禁用状态。"),
                 ComponentItem("Breadcrumb", "点击任一上层路径截断导航，重置后可以再次体验完整路径。"),
             ]),
-            PageItem("floating", Icons.Cloud, "浮窗", "Overlays & Feedback", "打开弹窗、抽屉与浮层，体验提示、进度和悬浮操作。", FloatingPage, PageGroup.Interaction, [
+            PageItem("floating", Icons.Cloud, "浮窗", "Floating", "打开弹窗、抽屉与浮层，体验提示、进度和悬浮操作。", FloatingPage, PageGroup.Interaction, [
                 ComponentItem("Dialog", "体验信息、确认、输入、选择、加载与进度弹窗。", "DialogInfo DialogConfirm DialogInput DialogChoice DialogLoading DialogProgress"),
                 ComponentItem("Sheet", "比较普通内容、填满区域、携带参数与独立滚动列表的抽屉。", "SheetContent LazyColumn"),
                 ComponentItem("Flyout", "悬停查看提示，点击打开浮层或菜单，再关闭它们。", "BalloonTip Menus Menu"),

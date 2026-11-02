@@ -30,7 +30,7 @@ abstract class Page {
     abstract fun Content()
 
     @Composable
-    protected fun ComponentColumn(content: @Composable ColumnScope.() -> Unit) {
+    protected fun ComponentColumn(alwaysShowTabs: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
         val compact = LocalGalleryCompact.current
         val components = PageItem.forPage(this@Page)?.components.orEmpty()
         val selectedComponent = rememberSaveable { mutableIntStateOf(0) }
@@ -42,7 +42,7 @@ abstract class Page {
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 PageItem.forPage(this@Page)?.takeIf { it.components.isNotEmpty() }?.let { GalleryPageHeader(it) }
-                if (components.size > 1) {
+                if (components.size > 1 || (alwaysShowTabs && components.isNotEmpty())) {
                     TabBar(
                         size = components.size,
                         index = selectedIndex,
