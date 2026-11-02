@@ -1,6 +1,5 @@
 import groovy.json.JsonSlurper
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 
 plugins {
     `kotlin-dsl`
@@ -64,9 +63,9 @@ for ((taskName, command) in mapOf("checkNativeSources" to "sources", "verifyNati
 val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     destinationFile.set(layout.buildDirectory.file("generated/compatibility/rachel-native-bridge.properties"))
     property("skiko.upstream.version", libs.versions.skiko.get())
-    val nativeSkiko = libs.native.skiko.asProvider().get()
-    property("skiko.port.module", "${nativeSkiko.module.group}:${nativeSkiko.module.name}:${nativeSkiko.versionConstraint.requiredVersion}")
-    property("skiko.skottie.module", libs.native.skiko.skottie.get().toString())
+    val portVersion = "${libs.versions.rachel.get()}-cmp-${libs.versions.cmp.get()}"
+    property("skiko.port.module", "love.yinlin.native.skiko:skiko:$portVersion")
+    property("skiko.skottie.module", "love.yinlin.native.skiko:skiko-skottie:$portVersion")
     property("sdl.version", libs.versions.sdl.get())
     val composeLock = rootProject.file("../native-compose/upstream/compose.json")
     inputs.file(composeLock)
@@ -77,9 +76,10 @@ val writeCompatibility = tasks.register<WriteProperties>("writeCompatibility") {
     property("compose.ui.modules", composeModules.keys.joinToString(","))
     for ((artifact, value) in composeModules) {
         val module = value as Map<*, *>
-        property("compose.$artifact.upstream", "${module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}"}:$artifact")
+        val upstreamGroup = (module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}") as String
+        property("compose.$artifact.upstream", "$upstreamGroup:$artifact")
         property("compose.$artifact.upstream.version", catalog.findVersion((module["versionRef"] ?: "cmp") as String).get().requiredVersion)
-        property("compose.$artifact.module", catalog.findLibrary(module["alias"] as String).get().get().toString())
+        property("compose.$artifact.module", "love.yinlin.native.${upstreamGroup.removePrefix("org.jetbrains.")}:$artifact:$portVersion")
         property("compose.$artifact.targets", (module["redirectTargets"] as List<*>).joinToString(","))
         property("compose.$artifact.metadata.targets", (module["metadataTargets"] as List<*>).joinToString(","))
     }
@@ -129,11 +129,7 @@ publishing {
     }
 }
 
-tasks.withType<PublishToMavenRepository>().configureEach {
-    doFirst {
-        check(repository.url.scheme == "file") { "Native Bridge remote Maven publishing is disabled; use the local verification repository" }
-    }
-}
+tasks.withType<Jar>().matching { it.name == "sourcesJar" }.configureEach { from(settingsSource.allSource) }
 
 // Both entry IDs share one implementation GAV. Settings selects a small
 // classifier and excludes KGP, preserving the repository bootstrap boundary.
@@ -177,6 +173,7 @@ tasks.withType<Test>().configureEach {
     inputs.file(rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template"))
     systemProperty("native.tests.kotlinVersion", libs.versions.kotlin.get())
     systemProperty("native.tests.composeVersion", libs.versions.cmp.get())
+    systemProperty("native.tests.portVersion", "${libs.versions.rachel.get()}-cmp-${libs.versions.cmp.get()}")
     systemProperty("native.tests.composeUiTemplate", rootProject.file("../native-compose/gradle/templates/compose-ui.build.gradle.kts.template").absolutePath)
     systemProperty("native.tests.versionCatalog", rootProject.file("../libs.versions.toml").absolutePath)
     maxParallelForks = 1

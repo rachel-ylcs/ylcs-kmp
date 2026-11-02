@@ -19,7 +19,7 @@ kotlin {
         }
         getByName("nativeMain") {
             dependencies {
-                implementation(libs.native.skiko.asProvider())
+                implementation(nativeBridge.port(libs.skiko))
                 implementation(libs.kotlinx.atomicfu)
             }
         }

@@ -30,13 +30,13 @@ class NativeBridgePlugin : Plugin<Project> {
             upstream.set("org.jetbrains.skiko:skiko")
             upstreamVersion.set(selectedVersion(project, "skiko-core", compatibility.getProperty("skiko.upstream.version")))
             targets.set(setOf("mingw_x64", "linux_x64", "macos_arm64"))
-            module.set(compatibility.getProperty("skiko.port.module").substringBeforeLast(':') + ":" + upstreamVersion.get())
+            module.set(compatibility.getProperty("skiko.port.module"))
         }
         bridge.redirect("skiko-skottie") {
             upstream.set("org.jetbrains.skiko:skiko-skottie")
             upstreamVersion.set(selectedVersion(project, "skiko-skottie", compatibility.getProperty("skiko.upstream.version")))
             targets.set(setOf("mingw_x64", "linux_x64", "macos_arm64"))
-            module.set(compatibility.getProperty("skiko.skottie.module").substringBeforeLast(':') + ":" + upstreamVersion.get())
+            module.set(compatibility.getProperty("skiko.skottie.module"))
         }
         for (artifact in compatibility.getProperty("compose.ui.modules").split(',')) {
             val ruleName = "compose-$artifact"
@@ -45,7 +45,7 @@ class NativeBridgePlugin : Plugin<Project> {
                 upstreamVersion.set(selectedVersion(project, ruleName, compatibility.getProperty("compose.$artifact.upstream.version", compatibility.getProperty("compose.upstream.version"))))
                 targets.set(compatibility.getProperty("compose.$artifact.targets").split(',').toSet())
                 metadataTargets.set(compatibility.getProperty("compose.$artifact.metadata.targets").split(',').toSet())
-                module.set(compatibility.getProperty("compose.$artifact.module").substringBeforeLast(':') + ":" + upstreamVersion.get())
+                module.set(compatibility.getProperty("compose.$artifact.module"))
             }
         }
         val application = project.extensions.create("nativeApplication", NativeApplicationExtension::class.java)
@@ -143,6 +143,13 @@ class NativeBridgePlugin : Plugin<Project> {
                 substitutions.all {
                     val dependency = this
                     val requested = dependency.requested as? ModuleComponentSelector ?: return@all
+                    val portRules = bridge.redirects.filter { it.matchesPort(requested.group, requested.module) }
+                    if (portRules.isNotEmpty()) {
+                        require(portRules.size == 1) { "Ambiguous Native ports for ${requested.displayName}" }
+                        val rule = portRules.single()
+                        NativeVersionSelection.validate(requested, rule.module.get().substringAfterLast(':'), "${rule.name} / published Native port")
+                        return@all
+                    }
                     val target = configuration.attributes.getAttribute(targetAttribute)
                     val platform = configuration.attributes.getAttribute(KotlinPlatformType.attribute)
                     val rules = bridge.redirects.filter { rule ->

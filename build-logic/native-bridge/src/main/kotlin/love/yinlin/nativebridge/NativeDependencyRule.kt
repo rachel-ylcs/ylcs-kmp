@@ -41,4 +41,10 @@ abstract class NativeDependencyRule @Inject constructor(private val ruleName: St
         }
         return artifact == "${coordinate[1]}-$suffix"
     }
+
+    internal fun matchesPort(group: String, artifact: String): Boolean {
+        if (!module.isPresent) return false
+        val coordinate = module.get().split(':')
+        return group == coordinate[0] && (artifact == coordinate[1] || NativeRuntimeAttributes.artifactSuffixes.values.any { artifact == "${coordinate[1]}-$it" })
+    }
 }

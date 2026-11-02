@@ -25,6 +25,7 @@ val modules = sourceLock["modules"] as Map<*, *>
 val dokkaBuild = providers.gradleProperty("rachel.dokka").orNull == "true"
 val buildDirectory = nativeDirectory.resolve(if (dokkaBuild) "vendor/build/dokka/compose-ui" else "vendor/build/compose-ui")
 val composeVersion = extensions.getByType<VersionCatalogsExtension>().named("libs").findVersion("cmp").get().requiredVersion
+val portVersion = extensions.getByType<VersionCatalogsExtension>().named("libs").findVersion("rachel").get().requiredVersion + "-cmp-" + composeVersion
 val hostTarget = when (HostManager.host.name) {
     "mingw_x64" -> "windows"
     "linux_x64" -> "linux"
@@ -38,7 +39,7 @@ subprojects {
     val module = modules[name] as Map<*, *>
     val upstreamGroup = (module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}") as String
     group = upstreamGroup
-    version = module["version"] ?: composeVersion
+    version = portVersion
     layout.buildDirectory.set(buildDirectory.resolve(name))
 
     if (dokkaBuild) {

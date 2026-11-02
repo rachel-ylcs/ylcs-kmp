@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 class NativeBridgeFunctionalTest {
     @Test
     fun explicitNativeResourcesGenerateAccessorsAndRespectAnExplicitOptOut() {
-        val composeVersion = System.getProperty("native.tests.composeVersion")
+        val composeVersion = System.getProperty("native.tests.portVersion")
         for (mode in listOf("auto", "never")) {
             val directory = project()
             directory.resolve("build.gradle.kts").writeText("""
@@ -492,6 +492,45 @@ class NativeBridgeFunctionalTest {
         consumer(project, "mingwX64(\"windows\")", "1.1")
         val output = runner(project, "verifyRouting").buildAndFail().output
         assertContains(output, "outside the tested version 1.0")
+    }
+
+    @Test
+    fun explicitPortsMustMatchTheBridgePublicationVersion() {
+        val project = project()
+        consumer(project, "mingwX64(\"windows\")")
+        project.resolve("build.gradle.kts").appendText("\nkotlin { sourceSets.commonMain.dependencies { implementation(\"test.port:render:0.9-native\") } }\n")
+        val output = runner(project, "verifyRouting").buildAndFail().output
+        assertContains(output, "outside the tested version 1.0-native")
+        assertContains(output, "published Native port")
+    }
+
+    @Test
+    fun catalogAliasesResolvePortsAndValidateTheirUpstreamVersions() {
+        for (version in listOf("1.0", "2.0")) {
+            val project = project()
+            consumer(project, "mingwX64(\"windows\")")
+            project.resolve("gradle").mkdirs()
+            project.resolve("gradle/libs.versions.toml").writeText("""
+                [libraries]
+                render = { module = "test.upstream:render", version = "$version" }
+                render-extra = { module = "test.upstream:render", version = "$version" }
+            """.trimIndent())
+            project.resolve("build.gradle.kts").appendText("""
+
+                val rootPort = nativeBridge.port(libs.render)
+                val leafPort = nativeBridge.port(libs.render.extra)
+                tasks.register("verifyPortAliases") {
+                    doLast {
+                        check(rootPort.get() == "test.port:render:1.0-native")
+                        check(leafPort.get() == rootPort.get())
+                        println("NATIVE_PORT_ALIASES_VERIFIED")
+                    }
+                }
+            """.trimIndent())
+            val runner = runner(project, "verifyPortAliases")
+            if (version == "1.0") assertContains(runner.build().output, "NATIVE_PORT_ALIASES_VERIFIED")
+            else assertContains(runner.buildAndFail().output, "outside the tested version 1.0")
+        }
     }
 
     @Test

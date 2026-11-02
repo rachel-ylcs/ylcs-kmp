@@ -1,3 +1,5 @@
+import org.gradle.api.publish.maven.MavenPublication
+
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
@@ -52,6 +54,12 @@ configurations.create("bootstrapElements") {
 
 tasks.jar {
     from(bootstrap.output)
+}
+
+tasks.withType<Jar>().matching { it.name == "sourcesJar" }.configureEach { from(bootstrap.allSource) }
+
+afterEvaluate {
+    publishing.publications.named<MavenPublication>("pluginMaven") { artifact(bootstrapJar) }
 }
 
 gradlePlugin {

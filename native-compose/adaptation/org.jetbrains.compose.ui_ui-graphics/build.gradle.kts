@@ -16,7 +16,7 @@ kotlin {
             implementation(libs.androidx.collection)
         }
         getByName("nativeMain").dependencies {
-            api(libs.native.skiko.asProvider())
+            api(nativeBridge.port(libs.skiko))
             implementation(libs.kotlinx.atomicfu)
         }
     }

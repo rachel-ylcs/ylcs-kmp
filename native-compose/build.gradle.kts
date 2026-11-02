@@ -14,11 +14,8 @@ val sdlLock = JsonSlurper().parse(file("upstream/sdl.json")) as Map<*, *>
 check(libs.versions.sdl.get() == sdlLock["version"]) {
     "SDL version changed in ../libs.versions.toml; review upstream/sdl.json and run prepareNativeSources."
 }
-val skikoVersion = libs.versions.skiko.get()
 val portGroup = lock["group"] as String
-check(libs.native.skiko.asProvider().get().toString() == "$portGroup:skiko:$skikoVersion") {
-    "Native Skiko coordinates changed in ../libs.versions.toml; review upstream/lock.json."
-}
+check(portGroup == "love.yinlin.native.skiko") { "Review Native Skiko's publication namespace in upstream/lock.json" }
 
 val sourceBuild = gradle.includedBuilds.find { it.name == "skiko" }
 val hostPublication = when (HostManager.host.name) {

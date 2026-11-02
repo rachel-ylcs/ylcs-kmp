@@ -31,20 +31,20 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             if (explicit) {
-                implementation(libs.native.compose.foundation.asProvider())
-                implementation(libs.native.compose.resources)
-                implementation(libs.native.compose.animation.graphics)
-                implementation(libs.native.androidx.navigation3)
-                implementation(libs.native.skiko.skottie)
-                implementation(libs.native.compose.material3.asProvider())
-                implementation(libs.native.compose.material3.windowSizeClass)
-                implementation(libs.native.compose.material3.adaptive.navigation.suite)
-                implementation(libs.native.compose.material3.adaptive.navigation3)
+                implementation(nativeBridge.port(libs.compose.foundation))
+                implementation(nativeBridge.port(libs.compose.resources))
+                implementation(nativeBridge.port(libs.compose.animation.graphics))
+                implementation(nativeBridge.port(libs.androidx.navigation3))
+                implementation(nativeBridge.port(libs.skiko.lottie))
+                implementation(nativeBridge.port(libs.compose.material3))
+                implementation(nativeBridge.port(libs.compose.material3.windowSizeClass))
+                implementation(nativeBridge.port(libs.compose.material3.adaptive.navigation.suite))
+                implementation(nativeBridge.port(libs.compose.material3.adaptive.navigation3))
             }
             else {
                 implementation(libs.compose.foundation)
                 implementation(libs.compose.resources)
-                implementation("org.jetbrains.compose.animation:animation-graphics:${libs.versions.cmp.get()}")
+                implementation(libs.compose.animation.graphics)
                 implementation(libs.androidx.navigation3.asProvider())
                 implementation(libs.skiko.lottie)
                 implementation(libs.compose.material3.asProvider())

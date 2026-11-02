@@ -17,7 +17,6 @@
     },
     "modules": {
         "navigation3-ui": {
-            "alias": "native-androidx-navigation3",
             "family": "navigation3",
             "group": "love.yinlin.native.androidx.navigation3",
             "upstreamGroup": "org.jetbrains.androidx.navigation3",
@@ -49,7 +48,6 @@
             }
         },
         "ui": {
-            "alias": "native-compose-ui",
             "requiresSkiko": true,
             "redirectTargets": [
                 "mingw_x64",
@@ -75,7 +73,6 @@
             }
         },
         "ui-backhandler": {
-            "alias": "native-compose-ui-backhandler",
             "redirectTargets": [
                 "mingw_x64",
                 "linux_x64",
@@ -96,7 +93,6 @@
             }
         },
         "ui-util": {
-            "alias": "native-compose-ui-util",
             "redirectTargets": [
                 "mingw_x64",
                 "linux_x64",
@@ -120,7 +116,6 @@
             }
         },
         "ui-geometry": {
-            "alias": "native-compose-ui-geometry",
             "redirectTargets": [
                 "mingw_x64",
                 "linux_x64",
@@ -138,7 +133,6 @@
             }
         },
         "ui-unit": {
-            "alias": "native-compose-ui-unit",
             "redirectTargets": [
                 "mingw_x64",
                 "linux_x64",
@@ -160,7 +154,6 @@
             }
         },
         "ui-graphics": {
-            "alias": "native-compose-ui-graphics",
             "requiresSkiko": true,
             "redirectTargets": [
                 "mingw_x64",
@@ -184,7 +177,6 @@
             }
         },
         "ui-skiko": {
-            "alias": "native-compose-ui-skiko",
             "requiresSkiko": true,
             "redirectTargets": [
                 "mingw_x64",
@@ -218,7 +210,6 @@
             }
         },
         "ui-text": {
-            "alias": "native-compose-ui-text",
             "requiresSkiko": true,
             "redirectTargets": [
                 "mingw_x64",
@@ -252,7 +243,6 @@
             }
         },
         "foundation-layout": {
-            "alias": "native-compose-foundation-layout",
             "family": "foundation",
             "group": "love.yinlin.native.compose.foundation",
             "requiresSkiko": true,
@@ -279,7 +269,6 @@
             }
         },
         "animation-core": {
-            "alias": "native-compose-animation-core",
             "family": "animation",
             "group": "love.yinlin.native.compose.animation",
             "requiresSkiko": true,
@@ -303,7 +292,6 @@
             }
         },
         "animation": {
-            "alias": "native-compose-animation",
             "family": "animation",
             "group": "love.yinlin.native.compose.animation",
             "requiresSkiko": true,
@@ -328,7 +316,6 @@
             }
         },
         "animation-graphics": {
-            "alias": "native-compose-animation-graphics",
             "family": "animation",
             "group": "love.yinlin.native.compose.animation",
             "requiresSkiko": true,
@@ -352,7 +339,6 @@
             }
         },
         "components-resources": {
-            "alias": "native-compose-resources",
             "family": "components",
             "group": "love.yinlin.native.compose.components",
             "sourceRepository": "resources",
@@ -382,7 +368,6 @@
             }
         },
         "foundation": {
-            "alias": "native-compose-foundation",
             "family": "foundation",
             "group": "love.yinlin.native.compose.foundation",
             "requiresSkiko": true,
@@ -414,7 +399,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3",
             "group": "love.yinlin.native.compose.material3",
             "adaptation": "org.jetbrains.compose.material3_material3",
-            "alias": "native-compose-material3",
             "sourceRepository": "maven",
             "sourcePath": "material3",
             "sourceArchive": {
@@ -462,7 +446,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3",
             "group": "love.yinlin.native.compose.material3",
             "adaptation": "org.jetbrains.compose.material3_material3-ripple",
-            "alias": "native-compose-material3-ripple",
             "sourceRepository": "maven",
             "sourcePath": "material3-ripple",
             "sourceArchive": {
@@ -495,7 +478,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3",
             "group": "love.yinlin.native.compose.material3",
             "adaptation": "org.jetbrains.compose.material3_material3-window-size-class",
-            "alias": "native-compose-material3-windowSizeClass",
             "sourceRepository": "maven",
             "sourcePath": "material3-window-size-class",
             "sourceArchive": {
@@ -531,7 +513,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3",
             "group": "love.yinlin.native.compose.material3",
             "adaptation": "org.jetbrains.compose.material3_material3-adaptive-navigation-suite",
-            "alias": "native-compose-material3-adaptive-navigation-suite",
             "sourceRepository": "maven",
             "sourcePath": "material3-adaptive-navigation-suite",
             "sourceArchive": {
@@ -561,7 +542,6 @@
             "upstreamGroup": "org.jetbrains.compose.material",
             "group": "love.yinlin.native.compose.material",
             "adaptation": "org.jetbrains.compose.material_material-ripple",
-            "alias": "native-compose-material-ripple",
             "sourceRepository": "maven",
             "sourcePath": "material-ripple",
             "sourceArchive": {
@@ -594,7 +574,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive",
-            "alias": "native-compose-material3-adaptive",
             "sourceRepository": "maven",
             "sourcePath": "adaptive",
             "sourceArchive": {
@@ -629,7 +608,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-layout",
-            "alias": "native-compose-material3-adaptive-layout",
             "sourceRepository": "maven",
             "sourcePath": "adaptive-layout",
             "sourceArchive": {
@@ -667,7 +645,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-navigation",
-            "alias": "native-compose-material3-adaptive-navigation",
             "sourceRepository": "maven",
             "sourcePath": "adaptive-navigation",
             "sourceArchive": {
@@ -699,7 +676,6 @@
             "upstreamGroup": "org.jetbrains.compose.material3.adaptive",
             "group": "love.yinlin.native.compose.material3.adaptive",
             "adaptation": "org.jetbrains.compose.material3.adaptive_adaptive-navigation3",
-            "alias": "native-compose-material3-adaptive-navigation3",
             "sourceRepository": "maven",
             "sourcePath": "adaptive-navigation3",
             "sourceArchive": {

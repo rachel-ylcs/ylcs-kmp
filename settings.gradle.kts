@@ -72,7 +72,7 @@ repository {
 
         publishing {
             central = true
-            automaticRelease = true
+            automaticRelease = false
             validateDeployment = false
             sign = true
             inceptionYear = "2025"

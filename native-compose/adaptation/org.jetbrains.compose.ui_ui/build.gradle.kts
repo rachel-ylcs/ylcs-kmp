@@ -17,7 +17,7 @@ kotlin {
             implementation(libs.compose.runtime.asProvider())
             api(libs.compose.runtime.retain)
             api(libs.compose.runtime.saveable)
-            api(libs.native.skiko.asProvider())
+            api(nativeBridge.port(libs.skiko))
             api(libs.androidx.lifecycle)
             api(libs.androidx.savedstate.compose)
             implementation(libs.androidx.collection)

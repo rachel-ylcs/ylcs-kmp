@@ -20,7 +20,7 @@ kotlin {
         }
         getByName("skikoMain").dependencies {
             api(project(":ui-skiko"))
-            implementation(libs.native.skiko)
+            implementation(nativeBridge.port(libs.skiko))
             implementation(libs.kotlinx.atomicfu)
         }
     }

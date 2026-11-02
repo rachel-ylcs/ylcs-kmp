@@ -27,5 +27,6 @@ include(
     "public-plugin",
     "repository-conventions",
     "native-bridge",
-    "native-dokka"
+    "native-dokka",
+    "native-publications"
 )

@@ -23,8 +23,7 @@ class NativeUpstreamSync(directory: File) {
         vendor.mkdirs()
         check(vendor.canonicalFile.parentFile == nativeDirectory && !Files.isSymbolicLink(vendor.toPath())) { "Native vendor directory escapes its repository" }
         check(compose["version"] == catalog.versions["cmp"] && skiko["versions"].sourceObject()["skiko"] == catalog.versions["skiko"]) { "Update the pinned upstream sources before changing CMP/Skiko versions" }
-        val library = catalog.libraries.getValue("native-skiko")
-        check(library.first == "${skiko["group"]}:skiko" && library.second == catalog.versions["skiko"]) { "Native Skiko catalog/lock mismatch" }
+        check(skiko["group"] == "love.yinlin.native.skiko") { "Native Skiko publication namespace mismatch" }
         val spec = patches.manifest["skiko"].sourceObject()
         check(spec["version"] == skiko["versions"].sourceObject()["skiko"] && spec["sources"] == skiko["sources"] && spec["skia"] == skiko["skia"] && spec["skiaAssets"] == skiko["skiaAssets"]) { "Skiko patch provenance does not match the source lock" }
         check(patches.manifest["compose"].sourceObject()["commit"] == compose["commit"] && patches.manifest["resources"].sourceObject()["commit"] == compose["resourceSource"].sourceObject()["commit"] &&
@@ -110,7 +109,8 @@ class NativeUpstreamSync(directory: File) {
             val archive = owner.resolve("skiko-upstream.zip")
             val inputs = inputHashes()
             val inventory = nativeDirectory.resolve("adaptation").listFiles().orEmpty().filter { it.name.startsWith("org.jetbrains.skiko_") }.flatMap { module -> module.resolve("src").walkTopDown().filter { it.isFile }.map { it.relativeTo(nativeDirectory).invariantSeparatorsPath }.toList() }.sorted()
-            val fingerprint = bytesHash(sourceBytes(mapOf("inputs" to inputs, "catalog" to NativeCiInputs(repository).identity(catalog), "inventory" to inventory)))
+            val fingerprint = bytesHash(sourceBytes(mapOf("inputs" to inputs, "catalog" to NativeCiInputs(repository).identity(catalog), "inventory" to inventory,
+                "publicationVersion" to "${catalog.versions.getValue("rachel")}-cmp-${catalog.versions.getValue("cmp")}")))
             val build = owner.resolve("workspace")
             val marker = build.resolve(".rachel-prepared.json")
             val previous = if (marker.isFile) marker.sourceJson() else emptyMap()
@@ -145,7 +145,7 @@ class NativeUpstreamSync(directory: File) {
 
     private fun updateSkikoProfile(directory: File) {
         val properties = directory.resolve("skiko/gradle.properties")
-        val values = linkedMapOf("deploy.version" to catalog.versions.getValue("skiko"), "deploy.group" to skiko["group"].toString(), "dependencies.skia" to skiko["skia"].toString(),
+        val values = linkedMapOf("deploy.version" to "${catalog.versions.getValue("rachel")}-cmp-${catalog.versions.getValue("cmp")}", "deploy.group" to skiko["group"].toString(), "dependencies.skia" to skiko["skia"].toString(),
             "skiko.kotlin.language.version" to catalog.versions.getValue("kotlin").split('.').take(2).joinToString("."), "skiko.kotlin.api.version" to catalog.versions.getValue("kotlin").split('.').take(2).joinToString("."))
         val rootProperties = repository.resolve("gradle.properties").readText()
         Regex("(?m)^(kotlin\\.native\\.(?:ignoreDisabledTargets|jvmArgs))[ \\t]*=[ \\t]*([^\r\n]*)").findAll(rootProperties).forEach { values[it.groupValues[1]] = it.groupValues[2].trim() }

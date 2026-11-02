@@ -5,10 +5,32 @@ on:
     tags:
       - 'maven*'
 
+permissions:
+  contents: read
+
 jobs:
-  windows-native:
-    name: Build Windows Native Libraries
-    runs-on: windows-2025
+  native-libraries:
+    name: Prepare Native Publications / ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            target: mingw_x64
+            workers: 2
+          - runner: ubuntu-24.04
+            target: linux_x64
+            workers: 2
+          - runner: macos-26
+            target: macos_arm64
+            workers: 1
+    defaults:
+      run:
+        shell: bash
+    env:
+      NATIVE_TARGET: ${{ matrix.target }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -21,14 +43,29 @@ jobs:
           msvc: 'true'
           native-tools: 'true'
 
+      - name: Prepare owned host KLIB publications
+        run: |
+          bash ./gradlew :native-compose:publishHost --no-configuration-cache --build-cache \
+            --max-workers=${{ matrix.workers }} --stacktrace \
+            -Dorg.gradle.jvmargs=-Xmx3g -Pkotlin.compiler.execution.strategy=in-process
+
+      - name: Upload owned host publications
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-compose-maven-${{ matrix.target }}
+          path: native-compose/vendor/build/repository/
+          if-no-files-found: error
+
       - name: Build Windows Native Libraries
-        run: >-
-          ./gradlew
-          :ylcs-module:compose:components:media:buildWindowsNative
-          :ylcs-module:compose:components:webview:buildWindowsNative
-          --no-configuration-cache
+        if: runner.os == 'Windows'
+        run: |
+          bash ./gradlew \
+            :ylcs-module:compose:components:media:buildWindowsNative \
+            :ylcs-module:compose:components:webview:buildWindowsNative \
+            --no-configuration-cache --build-cache --max-workers=${{ matrix.workers }}
 
       - name: Upload Windows Native Libraries
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v7
         with:
           name: maven-windows-native
@@ -38,8 +75,8 @@ jobs:
           if-no-files-found: error
 
   publish:
-    name: Publish To Maven Central
-    needs: windows-native
+    name: Upload Libraries and Plugins to Maven Central for Manual Release
+    needs: native-libraries
     runs-on: macos-26
     steps:
       - name: Checkout Code
@@ -48,7 +85,6 @@ jobs:
           submodules: recursive
 
       - name: Setup Build Environment
-        id: check
         uses: ./.github/actions/setup-build
         with:
           android: 'true'
@@ -64,7 +100,34 @@ jobs:
           name: maven-windows-native
           path: ylcs-module/compose/components
 
-      - name: Run publish
+      - name: Download owned host publications
+        uses: actions/download-artifact@v8
+        with:
+          pattern: native-compose-maven-*
+          path: host-publications
+
+      - name: Assemble and verify the complete three-target Native repository
+        run: |
+          bash ./gradlew -p build-logic :native-bridge:assembleNativeRepository \
+            --no-configuration-cache --build-cache --max-workers=1 --stacktrace
+
+      - name: Upload Native Compose and public Gradle plugins
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
+        run: |
+          bash ./gradlew -p build-logic \
+            :native-publications:publishToMavenCentral \
+            :native-bridge:publishToMavenCentral \
+            :public-plugin:publishToMavenCentral \
+            :native-dokka:publishToMavenCentral \
+            -Pnative.publishing.repository=native-compose/vendor/build/assembled-repository \
+            --no-configuration-cache --build-cache --max-workers=1 --stacktrace
+
+      - name: Upload framework libraries
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -76,6 +139,6 @@ jobs:
         run: |
           test -s ylcs-module/compose/components/media/build/nativeCpp/windows/lib/librachel_audio.a
           test -s ylcs-module/compose/components/webview/build/nativeCpp/windows/lib/librachel_webview.a
-          ./gradlew publishToMavenCentral --no-configuration-cache \
+          bash ./gradlew publishToMavenCentral --no-configuration-cache \
             -x :ylcs-module:compose:components:media:buildWindowsNative \
             -x :ylcs-module:compose:components:webview:buildWindowsNative

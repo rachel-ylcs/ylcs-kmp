@@ -26,7 +26,7 @@ kotlin {
         }
         getByName("nativeMain").dependencies {
             implementation(libs.kotlinx.atomicfu)
-            implementation(libs.native.skiko)
+            implementation(nativeBridge.port(libs.skiko))
         }
     }
 }

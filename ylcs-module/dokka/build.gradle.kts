@@ -1,12 +1,12 @@
 import groovy.json.JsonSlurper
 import love.yinlin.repository.C
-import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.jetbrains.dokka.gradle.DokkaPlugin
 
 plugins {
     install(
         libs.plugins.rachel,
         libs.plugins.dokka,
+        libs.plugins.nativeBridge,
     )
 }
 
@@ -22,13 +22,13 @@ if (providers.gradleProperty("rachel.dokka").orNull == "true") {
     val nativeDirectory = rootProject.file("native-compose")
     val compose = JsonSlurper().parse(nativeDirectory.resolve("upstream/compose.json")) as Map<*, *>
     val modules = compose["modules"] as Map<*, *>
-    val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
     dependencies {
-        dokka(libs.native.skiko.asProvider())
-        dokka(libs.native.skiko.skottie)
-        for (module in modules.values) {
-            val alias = (module as Map<*, *>)["alias"] as String
-            dokka(catalog.findLibrary(alias).get())
+        dokka(nativeBridge.port(libs.skiko))
+        dokka(nativeBridge.port(libs.skiko.lottie))
+        for ((artifact, value) in modules) {
+            val module = value as Map<*, *>
+            val upstream = module["upstreamGroup"] ?: "org.jetbrains.compose.${module["family"] ?: "ui"}"
+            dokka(nativeBridge.port("$upstream:$artifact"))
         }
     }
 }

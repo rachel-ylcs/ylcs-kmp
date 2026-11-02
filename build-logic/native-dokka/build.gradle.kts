@@ -3,6 +3,9 @@ plugins {
     `java-gradle-plugin`
 }
 
+group = "love.yinlin.native"
+version = libs.versions.rachel.get()
+
 dependencies {
     implementation(libs.gradle.plugin.dokka)
 }

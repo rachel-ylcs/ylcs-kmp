@@ -11,7 +11,7 @@ kotlin {
         commonMain.dependencies {
             api(project(":ui-graphics"))
             api(project(":ui-text"))
-            api(libs.native.skiko.asProvider())
+            api(nativeBridge.port(libs.skiko))
             implementation(libs.compose.runtime.asProvider())
             implementation(project(":ui-util"))
         }

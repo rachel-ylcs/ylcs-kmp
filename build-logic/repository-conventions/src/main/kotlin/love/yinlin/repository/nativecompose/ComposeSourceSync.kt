@@ -38,9 +38,9 @@ internal class ComposeSourceSync(private val sync: NativeUpstreamSync) {
             check((module["redirectTargets"] as List<*>).toSet() == targets && (module["metadataTargets"] as List<*>).toSet() == targets) { "An owned Compose module omits a desktop Native target: $name" }
             val version = module["version"] as? String ?: lock["version"] as String
             val reference = module["versionRef"] as? String ?: "cmp"
-            val coordinates = sync.catalog.libraries.getValue(module["alias"] as String)
-            check(version == sync.catalog.versions[reference] && coordinates == ("${module["group"] ?: lock["group"]}:$name" to version)) { "Compose Native catalog/lock mismatch: $name" }
+            check(version == sync.catalog.versions[reference]) { "Compose Native catalog/lock mismatch: $name" }
             val upstream = module["upstreamGroup"] as? String ?: "org.jetbrains.compose.$family"
+            check((module["group"] ?: lock["group"]) == "love.yinlin.native.${upstream.removePrefix("org.jetbrains.")}") { "Native publication namespace mismatch: $name" }
             check(Regex("[a-z0-9.]+").matches(upstream))
             val adaptation = adaptation(name, module)
             check(Regex("[a-z0-9.]+_[a-z0-9-]+").matches(adaptation) && nativeDirectory.resolve("adaptation/$adaptation/build.gradle.kts").isFile) { "Missing Compose adaptation: $name" }

@@ -72,9 +72,11 @@ internal class NativePublicationVerification(private val nativeDirectory: File) 
     }
 
     private fun identity(artifact: String): Triple<String, String, String> {
-        if (artifact in setOf("skiko", "skiko-skottie")) return Triple(skiko["group"] as String, skiko["versions"].jsonObject()["skiko"] as String, "org.jetbrains.skiko")
+        val versions = catalogVersions()
+        val version = "${versions.getValue("rachel")}-cmp-${versions.getValue("cmp")}"
+        if (artifact in setOf("skiko", "skiko-skottie")) return Triple(skiko["group"] as String, version, "org.jetbrains.skiko")
         val module = modules.getValue(artifact).jsonObject()
-        return Triple((module["group"] ?: compose["group"]) as String, (module["version"] ?: compose["version"]) as String,
+        return Triple((module["group"] ?: compose["group"]) as String, version,
             module["upstreamGroup"] as? String ?: "org.jetbrains.compose.${module["family"] ?: "ui"}")
     }
 
