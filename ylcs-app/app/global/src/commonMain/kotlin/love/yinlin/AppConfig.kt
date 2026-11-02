@@ -26,7 +26,7 @@ class AppConfig(kv: KV) : Config(kv) {
     // 字体大小
     var fontScale by enumState(FontScaleConfig.STANDARD, version = "20260217")
     // 悬浮提示
-    var enabledTip by booleanState(true)
+    var enabledTip by booleanState(false)
 
     /* ------------------  微博  ------------------ */
 
