@@ -78,19 +78,18 @@ internal data class PageItem(
                 ComponentItem("Progress", "同一份循环进度驱动线性与环形指示器。", "LinearProgress CircleProgress"),
                 ComponentItem("ExpandableContent", "点击按钮展开或收起内容，观察高度与可见性的过渡。"),
             ]),
-            PageItem("container", Icons.Package, "容器", "Container", "调整表面、状态与内容布局，用真实操作理解容器的能力。", ContainerPage, PageGroup.Layout, [
+            PageItem("container", Icons.Package, "容器", "Container", "调整表面与状态，体验内容替换、添加和轮播。", ContainerPage, PageGroup.Layout, [
                 ComponentItem("Surface", "调整内边距、圆角、阴影、色调和边框，实时查看表面的变化。"),
-                ComponentItem("OffsetBox", "拖动 x / y 控制器，观察内容相对于原始位置的偏移。"),
                 ComponentItem("StatefulBox", "切换加载、空内容、错误与正常状态，比较容器如何呈现。"),
                 ComponentItem("ReplaceableBox", "添加内容后点击替换颜色，长按移除内容。"),
                 ComponentItem("AdderBox", "体验添加、替换与删除，最多展示九个项目。"),
                 ComponentItem("Banner", "四张图片每三秒自动切换，展示轮播中的裁剪与布局。"),
-                ComponentItem("ActionScope", "将一组操作排列在容器右侧，观察对齐与间距。"),
-                ComponentItem("AdaptiveTwoBox", "调整窗口宽度，观察两个不同大小的内容如何重新排列。"),
-                ComponentItem("HorizontalScrollContainer", "在横向列表上使用鼠标滚轮；Row、LazyRow 和 Pager 分别展示滚动方式。", "HorizontalPager"),
             ]),
-            PageItem("layout", Icons.GridOn, "布局", "Layout", "通过轨道、单元格和命名区域，探索结构化的二维布局。", LayoutPage, PageGroup.Layout, [
+            PageItem("layout", Icons.GridOn, "布局", "Layout", "探索二维网格、位置偏移、操作对齐与横向滚动。", LayoutPage, PageGroup.Layout, [
                 ComponentItem("Grid", "对照官方指南，调节轨道尺寸、间距、放置、跨度和对齐，体验响应式命名区域、重叠与内嵌懒列表。", "GridLayoutBuilder GridLayoutScope x y sx sy s t item Fixed Percentage Float Flex Int Fr Auto MinContent MaxContent MinMax minmax 自动放置 隐式轨道 负索引 跨行 跨列 命名区域 响应式 zIndex LazyColumn intrinsic"),
+                ComponentItem("OffsetBox", "拖动 x / y 控制器，观察内容相对于原始位置的偏移。"),
+                ComponentItem("ActionScope", "将一组操作排列在容器右侧，观察对齐与间距。"),
+                ComponentItem("HorizontalScrollContainer", "在横向列表上使用鼠标滚轮；Row、LazyRow 和 Pager 分别展示滚动方式。", "HorizontalPager"),
             ]),
             PageItem("platform-view", Icons.Package, "原生视图", "Platform View", "嵌入平台原生文本组件，检查参数同步、重挂载和 Compose 内容叠放。", PlatformViewPage, PageGroup.Layout, [
                 ComponentItem("原生组件嵌入", "编辑原生文本，更新外部参数，移除后重新挂载，并点击覆盖在原生区域上的 Compose 按钮。Linux Native 暂未支持。", "PlatformViewState PlatformViewHost rememberPlatformViewState attach detach release HWND Win32 EDIT NSTextField Swing JTextArea HTMLTextAreaElement Windows macOS JVM Web 生命周期 焦点 叠放"),

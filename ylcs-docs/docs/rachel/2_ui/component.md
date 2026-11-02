@@ -8,7 +8,7 @@
 | --- | --- |
 | `animation` | `CircleLoading`、`WaveLoading`、`ExpandableContent` |
 | `collection` | `TagView`、`TreeView` |
-| `container` | `Surface`、`StatefulBox`、`AdaptiveTwoBox`、`Banner`、`ActionScope` |
+| `container` | `Surface`、`StatefulBox`、`Banner`、`ActionScope` |
 | `floating` | Dialog、Sheet、Tip、FAB、Flyout、Menus、BalloonTip |
 | `image` | `Icon`、`Image`、`NineGrid`、`LoadingIcon` |
 | `input` | Button、Switch、CheckBox、Radio、Slider、ComboBox、Filter、ColorPicker |
@@ -56,7 +56,7 @@ Switch、CheckBox、TriStateCheckBox、Radio、Slider 和 ComboBox 通过参数�
 - `NetworkError`：网络异常。
 - `Loading`：加载状态。
 
-`DefaultStatefulProvider` 提供默认布局，也可实现自己的 Provider。`ReplaceableBox` 用于内容替换，`AdderBox` 用于内容与添加入口组合，`AdaptiveTwoBox` 用于自适应区域布局。
+`DefaultStatefulProvider` 提供默认布局，也可实现自己的 Provider。`ReplaceableBox` 用于内容替换，`AdderBox` 用于内容与添加入口组合。
 
 `Surface` 统一形状、边框、阴影、内容边距及色调层次。组件实现应优先复用这些能力与主题值。
 

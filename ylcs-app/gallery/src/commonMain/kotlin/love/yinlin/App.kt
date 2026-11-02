@@ -35,7 +35,6 @@ import love.yinlin.compose.ui.text.InputDecoration
 import love.yinlin.compose.ui.text.InputState
 import love.yinlin.compose.ui.text.Text
 import love.yinlin.compose.ui.text.rememberInputState
-import love.yinlin.gallery.resources.*
 import love.yinlin.page.OverviewPage
 
 var darkMode: Boolean by mutableStateOf(false)
@@ -61,8 +60,10 @@ fun App() {
             BoxWithConstraints(Modifier.weight(1f).fillMaxHeight()) {
                 CompositionLocalProvider(LocalGalleryCompact provides (maxWidth < 820.dp)) {
                     Column(Modifier.fillMaxSize()) {
-                        GalleryToolbar(selected, wide, filtered, search)
-                        HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
+                        if (!wide) {
+                            GalleryCompactToolbar(selected, filtered, search)
+                            HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
+                        }
                         AnimationContent(
                             state = selected.id,
                             modifier = Modifier.weight(1f).fillMaxWidth(),
@@ -122,6 +123,10 @@ private fun GallerySidebar(selected: PageItem, filtered: List<PageItem>, search:
         }
         Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             HorizontalDivider(color = Theme.color.outline.copy(alpha = 0.25f))
+            TextButton(if (darkMode) "浅色" else "深色", icon = if (darkMode) Icons.LightMode else Icons.DarkMode, modifier = Modifier.fillMaxWidth()) {
+                darkMode = !darkMode
+            }
+            GalleryBadge(galleryPalette.title)
             GalleryCaption("${PageItem.entries.size} 个分类  /  ${PageItem.componentCount} 组展示")
             GalleryActions {
                 GalleryBadge("Desktop")
@@ -170,49 +175,46 @@ private fun GallerySearch(state: InputState) {
 }
 
 @Composable
-private fun GalleryToolbar(selected: PageItem, wide: Boolean, filtered: List<PageItem>, search: InputState) {
+private fun GalleryCompactToolbar(selected: PageItem, filtered: List<PageItem>, search: InputState) {
     Column(
-        Modifier.fillMaxWidth().background(Theme.color.surface).padding(horizontal = if (wide) 28.dp else 16.dp, vertical = 14.dp),
+        Modifier.fillMaxWidth().background(Theme.color.surface).padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            if (!wide) Icon(Icons.Layers, color = Theme.color.primary, modifier = Modifier.size(22.dp))
+            Icon(Icons.Layers, color = Theme.color.primary, modifier = Modifier.size(22.dp))
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(if (wide) "组件库 / ${selected.title}" else "Rachel UI · ${selected.title}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text("Rachel UI · ${selected.title}", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 Text(if (selected.components.isEmpty()) "可交互的 Compose 组件展示" else selected.english,
                     fontSize = 11.sp, color = Theme.color.onSurfaceVariant)
             }
-            if (wide) GalleryBadge(galleryPalette.title)
             TextButton(if (darkMode) "浅色" else "深色", icon = if (darkMode) Icons.LightMode else Icons.DarkMode) {
                 darkMode = !darkMode
             }
         }
-        if (!wide) {
-            GallerySearch(search)
-            if (filtered.isEmpty()) GalleryParagraph("没有匹配的组件，可以修改或清除搜索。")
-            else Row(
-                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                filtered.forEach { item ->
-                    Surface(
-                        modifier = Modifier.semantics {
-                            this.selected = item.id == selected.id
-                            role = Role.Tab
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        tonalLevel = if (item.id == selected.id) 2 else 0,
-                        border = BorderStroke(1.dp, Theme.color.outline.copy(alpha = 0.3f)),
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
-                        onClick = { currentPage = item.page },
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                            Icon(item.icon, color = if (item.id == selected.id) Theme.color.primary else Theme.color.onSurfaceVariant,
-                                modifier = Modifier.size(16.dp))
-                            Text(item.title, fontSize = 12.sp,
-                                color = if (item.id == selected.id) Theme.color.primary else Theme.color.onSurface)
-                        }
+        GallerySearch(search)
+        if (filtered.isEmpty()) GalleryParagraph("没有匹配的组件，可以修改或清除搜索。")
+        else Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            filtered.forEach { item ->
+                Surface(
+                    modifier = Modifier.semantics {
+                        this.selected = item.id == selected.id
+                        role = Role.Tab
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    tonalLevel = if (item.id == selected.id) 2 else 0,
+                    border = BorderStroke(1.dp, Theme.color.outline.copy(alpha = 0.3f)),
+                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
+                    onClick = { currentPage = item.page },
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                        Icon(item.icon, color = if (item.id == selected.id) Theme.color.primary else Theme.color.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp))
+                        Text(item.title, fontSize = 12.sp,
+                            color = if (item.id == selected.id) Theme.color.primary else Theme.color.onSurface)
                     }
                 }
             }
