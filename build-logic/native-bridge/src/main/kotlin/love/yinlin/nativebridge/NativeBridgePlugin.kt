@@ -181,7 +181,13 @@ class NativeBridgePlugin : Plugin<Project> {
                     require(rules.size == 1) { "Ambiguous Native redirects for ${requested.displayName} in ${configuration.name}" }
                     val rule = rules.single()
                     rule.validate()
-                    NativeVersionSelection.validate(requested, rule.upstreamVersion.get(), rule.name)
+                    // Published Native dependencies use the Rachel-upstream composite version.
+                    // Mixed JVM/Native metadata aliases retain it while restoring upstream module names.
+                    val constraint = requested.versionConstraint
+                    val requestedVersion = constraint.strictVersion.ifEmpty { constraint.requiredVersion.ifEmpty { constraint.preferredVersion } }
+                    val portVersion = rule.module.orNull?.substringAfterLast(':')
+                    val selectedVersion = if (requestedVersion == portVersion) portVersion else rule.upstreamVersion.get()
+                    NativeVersionSelection.validate(requested, selectedVersion, rule.name)
                     val sourceSelector = sourceProperty(project, "source", rule.name) as? ComponentSelector
                     val maintainer = project.gradle.extensions.extraProperties.let {
                         it.has("love.yinlin.nativeCompose.maintainer") && it.get("love.yinlin.nativeCompose.maintainer") == true

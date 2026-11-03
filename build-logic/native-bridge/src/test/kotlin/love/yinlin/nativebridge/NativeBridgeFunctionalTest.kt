@@ -272,21 +272,21 @@ class NativeBridgeFunctionalTest {
                         upstream.set("test.upstream:units")
                         upstreamVersion.set("1.0")
                         targets.set(setOf("mingw_x64"))
-                        module.set("test.port:units:1.0")
+                        module.set("test.port:units:1.0-native")
                     }
                 }
                 tasks.named("verifyRouting") {
                     doLast {
                         val graph = configurations.getByName("windowsCompileKlibraries").incoming.resolutionResult
                         val request = graph.allDependencies.map { it.requested.displayName }.single { ":units:" in it }
-                        check(request == "${if (mixed) "test.upstream" else "test.port"}:units:1.0") { request }
-                        check(graph.allComponents.any { it.id.displayName == "test.port:units:1.0" })
+                        check(request == "${if (mixed) "test.upstream:units:1.0" else "test.port:units:1.0-native"}") { request }
+                        check(graph.allComponents.any { it.id.displayName == "test.port:units:1.0-native" })
                         println("METADATA_NAMESPACE_VERIFIED")
                     }
                 }
             """.trimIndent())
-            module(project, "test.port", "1.0-native", dependencies = """{"group":"test.port","module":"units","version":{"requires":"1.0"}}""")
-            module(project, "test.port", "1.0-native", artifact = "render-mingwx64", dependencies = """{"group":"test.port","module":"units","version":{"requires":"1.0"}}""")
+            module(project, "test.port", "1.0-native", dependencies = """{"group":"test.port","module":"units","version":{"requires":"1.0-native"}}""")
+            module(project, "test.port", "1.0-native", artifact = "render-mingwx64", dependencies = """{"group":"test.port","module":"units","version":{"requires":"1.0-native"}}""")
             val rootMetadata = project.resolve("repo/test/port/render/1.0-native/render-1.0-native.module")
             val metadata = groovy.json.JsonSlurper().parse(rootMetadata) as MutableMap<String, Any>
             val variants = metadata["variants"] as List<MutableMap<String, Any>>
@@ -295,7 +295,7 @@ class NativeBridgeFunctionalTest {
                 put("available-at", mapOf("url" to "../../render-mingwx64/1.0-native/render-mingwx64-1.0-native.module", "group" to "test.port", "module" to "render-mingwx64", "version" to "1.0-native"))
             }
             rootMetadata.writeText(groovy.json.JsonOutput.toJson(metadata))
-            module(project, "test.port", "1.0", artifact = "units")
+            module(project, "test.port", "1.0-native", artifact = "units")
             module(project, "test.upstream", "1.0", artifact = "units")
             assertContains(runner(project, "verifyRouting").build().output, "METADATA_NAMESPACE_VERIFIED")
         }
@@ -320,6 +320,7 @@ class NativeBridgeFunctionalTest {
             checkNotNull(NativeBridgePlugin::class.java.classLoader.getResourceAsStream("rachel-native-bridge.properties")).use { load(it) }
         }
         val version = compatibility.getProperty("compose.upstream.version")
+        val portVersion = compatibility.getProperty("compose.ui.module").substringAfterLast(':')
         val artifacts = listOf("ui-util", "ui-geometry", "ui-unit", "ui-graphics", "ui-text", "ui-skiko", "ui-backhandler", "ui")
         for (artifact in artifacts) {
             module(project, "org.jetbrains.compose.ui", version, artifact = artifact)
@@ -331,8 +332,8 @@ class NativeBridgeFunctionalTest {
                 "ui-unit" -> listOf("ui-geometry")
                 else -> emptyList()
             }
-            val dependencies = children.joinToString(",") { """{"group":"love.yinlin.native.compose.ui","module":"$it","version":{"requires":"$version"}}""" }
-            module(project, "love.yinlin.native.compose.ui", version, dependencies = dependencies, artifact = artifact)
+            val dependencies = children.joinToString(",") { """{"group":"love.yinlin.native.compose.ui","module":"$it","version":{"requires":"$portVersion"}}""" }
+            module(project, "love.yinlin.native.compose.ui", portVersion, dependencies = dependencies, artifact = artifact)
         }
         val dependencies = artifacts.joinToString("\n") { "implementation(\"org.jetbrains.compose.ui:$it:$version\")" }
         project.resolve("build.gradle.kts").writeText("""
@@ -367,7 +368,8 @@ class NativeBridgeFunctionalTest {
         for (target in listOf("windows", "linux", "macos", "desktop")) {
             val line = output.lineSequence().first { it.startsWith("COMPOSE_ROUTE $target =") }
             val group = if (target == "desktop") "org.jetbrains.compose.ui" else "love.yinlin.native.compose.ui"
-            for (artifact in artifacts) assertContains(line, "$group:$artifact:$version")
+            val selectedVersion = if (target == "desktop") version else portVersion
+            for (artifact in artifacts) assertContains(line, "$group:$artifact:$selectedVersion")
             if (target == "desktop") assertFalse(line.contains("love.yinlin.native.compose.ui"))
             else assertFalse(line.contains("org.jetbrains.compose.ui"))
         }
