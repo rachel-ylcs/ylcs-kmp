@@ -1,39 +1,47 @@
 package love.yinlin.foundation.picker
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCObjectVar
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.value
 import kotlinx.io.*
-import love.yinlin.coroutines.Coroutines
-import love.yinlin.coroutines.SyncFuture
-import love.yinlin.concurrent.Lock
-import love.yinlin.extension.cleaning
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import love.yinlin.extension.then
-import love.yinlin.extension.toNSData
-import love.yinlin.io.SandboxSource
-import love.yinlin.io.Sources
+import love.yinlin.coroutines.Coroutines
+import love.yinlin.coroutines.SyncFuture
+import love.yinlin.extension.catching
+import love.yinlin.extension.cleaning
 import love.yinlin.foundation.PlatformContextProvider
 import love.yinlin.fs.*
+import love.yinlin.io.SandboxSource
+import love.yinlin.io.Sources
+import love.yinlin.io.safeToSources
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
+import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
+import platform.Foundation.NSUUID
 import platform.Foundation.temporaryDirectory
-import platform.Photos.PHPhotoLibrary
+import platform.Photos.*
 import platform.PhotosUI.*
 import platform.UIKit.*
 import platform.UniformTypeIdentifiers.*
 import platform.darwin.NSObject
 
+@OptIn(ExperimentalForeignApi::class)
 actual class Picker actual constructor(private val context: PlatformContextProvider) : AutoCloseable {
     private val dialogMutex = Mutex()
-    private var closed = false
+    @Volatile private var closed = false
     private var pending: SyncFuture<*>? = null
     private var activeController: UIViewController? = null
 
     actual override fun close() {
+        closed = true
         Coroutines.dispatchUI {
-            closed = true
             pending?.cancel()
             activeController?.dismissViewControllerAnimated(false, null)
             activeController = null
@@ -43,13 +51,14 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         }
     }
 
-    private suspend fun <T> await(block: (SyncFuture<T>) -> Unit): T? = dialogMutex.withLock {
+    private suspend fun <T> await(onCancel: () -> Unit = {}, block: (SyncFuture<T>) -> Unit): T? = dialogMutex.withLock {
         Coroutines.main {
             check(!closed) { "Picker is closed" }
             cleaning({
                 Coroutines.sync { future: SyncFuture<T> ->
                     pending = future
                     future.clean {
+                        onCancel()
                         val controller = activeController
                         Coroutines.dispatchUI { controller?.dismissViewControllerAnimated(false, null) }
                     }
@@ -65,25 +74,31 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         }
     }
 
-    // 全局引用, 避免被gc
+    // Keep UIKit delegates alive until the dialog completes.
     private var phPickerDelegate: PHPickerViewControllerDelegateProtocol? = null
     private var phPickerDismissDelegate: UIAdaptivePresentationControllerDelegateProtocol? = null
     private var documentPickerDelegate: UIDocumentPickerDelegateProtocol? = null
 
-    @OptIn(ExperimentalForeignApi::class)
-    private fun copyToTempDir(url: NSURL?): NSURL? {
+    private fun copyToTempDir(url: NSURL?): File? {
         if (url == null) return null
         val fileManager = NSFileManager.defaultManager
-        val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(url.lastPathComponent) ?: return null
-        val tempUrl = NSURL.fileURLWithPathComponents(tempPath) ?: return null
-        fileManager.removeItemAtURL(tempUrl, null)
-        return if (fileManager.copyItemAtURL(url, tempUrl, null)) tempUrl else null
+        val extension = url.pathExtension?.takeIf { it.isNotEmpty() } ?: "tmp"
+        val tempUrl = fileManager.temporaryDirectory.URLByAppendingPathComponent("picker-" + NSUUID().UUIDString + "." + extension) ?: return null
+        if (!fileManager.copyItemAtURL(url, tempUrl, null)) {
+            fileManager.removeItemAtURL(tempUrl, null)
+            return null
+        }
+        return tempUrl.path?.let(File::invoke) ?: run {
+            fileManager.removeItemAtURL(tempUrl, null)
+            null
+        }
     }
 
     actual suspend fun pickPicture(): Source? = pickPicture(1)?.firstOrNull()
 
     actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.main {
-        await { future ->
+        val pictures = PendingPictures()
+        val selected = await<List<File>>(onCancel = pictures::cancel) { future ->
             future.catching {
                 require(maxNum > 0)
                 val configuration = PHPickerConfiguration(PHPhotoLibrary.sharedPhotoLibrary()).apply {
@@ -92,43 +107,51 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                     filter = PHPickerFilter.imagesFilter()
                 }
                 val picker = PHPickerViewController(configuration)
-                val onImagesPicked: (List<PHPickerResult>) -> Unit = { results ->
+                var didFinish = false
+                val onImagesPicked: (List<PHPickerResult>) -> Unit = onImagesPicked@{ results ->
                     if (results.isEmpty()) {
                         future.send()
+                        return@onImagesPicked
                     }
-                    val resultLock = Lock()
-                    val images: MutableList<File> = []
-                    var processedImages = 0
-                    results.forEach { pickerResult ->
-                        pickerResult.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) { url, _ ->
-                            val tempUrl = copyToTempDir(url)
-                            val completed = resultLock.synchronized {
-                                tempUrl?.path?.then { path -> images += File(path) }
-                                processedImages++
-                                if (processedImages == results.size) images.toList() else null
-                            }
-                            if (completed != null) future.send(completed)
+                    pictures.start(results.size)
+                    results.forEachIndexed { index, result ->
+                        result.itemProvider.loadFileRepresentationForTypeIdentifier(UTTypeImage.identifier) { url, _ ->
+                            val file = copyToTempDir(url)
+                            pictures.complete(index, file)?.let { future.send(it) }
                         }
                     }
                 }
                 phPickerDelegate = object : NSObject(), PHPickerViewControllerDelegateProtocol {
                     override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
+                        if (didFinish) return
+                        didFinish = true
                         picker.dismissViewControllerAnimated(true, null)
                         onImagesPicked(didFinishPicking.filterIsInstance<PHPickerResult>())
                     }
                 }
                 phPickerDismissDelegate = object : NSObject(), UIAdaptivePresentationControllerDelegateProtocol {
                     override fun presentationControllerDidDismiss(presentationController: UIPresentationController) {
-                        onImagesPicked([])
+                        if (!didFinish) future.send()
                     }
                 }
                 picker.delegate = phPickerDelegate
-                picker.presentationController?.delegate = phPickerDismissDelegate
                 val rootViewController = checkNotNull(context.controller ?: UIApplication.sharedApplication.keyWindow?.rootViewController) { "No view controller is available for the picker" }
                 activeController = picker
                 rootViewController.presentViewController(picker, true, null)
+                picker.presentationController?.delegate = phPickerDismissDelegate
             }
-        }?.safeSources()
+        } ?: return@main null
+
+        var transferred = false
+        cleaning({
+            pickerResource {
+                selected.safeToSources { file ->
+                    TemporaryPictureSource(file, file.rawSourceSync()).buffered()
+                }
+            }.also { transferred = it != null }
+        }) {
+            if (!transferred) selected.forEach { file -> catching { file.deleteSync() } }
+        }
     }
 
     private fun openPicker(mimeType: List<String>, filter: List<String>, callback: (NSURL?) -> Unit) {
@@ -137,9 +160,7 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                 .map { it.substringAfterLast(".") }
                 .mapNotNull { UTType.typeWithFilenameExtension(it) }
                 .ifEmpty {
-                    mimeType.mapNotNull {
-                        UTType.typeWithMIMEType(it)
-                    }
+                    mimeType.mapNotNull { UTType.typeWithMIMEType(it) }
                 }
                 .ifEmpty { [UTTypeContent] }
         ).apply {
@@ -160,34 +181,28 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         rootViewController.presentViewController(picker, true, null)
     }
 
-    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.main {
-        await { future ->
-            future.catching {
-                openPicker(mimeType, filter) { url ->
-                    future.send { url?.let(::SandboxSource)?.buffered() }
-                }
-            }
+    private suspend fun selectDocument(mimeType: List<String>, filter: List<String>): NSURL? = await { future ->
+        future.catching {
+            openPicker(mimeType, filter) { url -> future.send(url) }
         }
+    }
+
+    actual suspend fun pickFile(mimeType: List<String>, filter: List<String>): Source? = Coroutines.main {
+        val url = selectDocument(mimeType, filter) ?: return@main null
+        pickerResource { SandboxSource(url).buffered() }
     }
 
     actual suspend fun pickPath(mimeType: List<String>, filter: List<String>): ImplicitUri? = Coroutines.main {
-        await { future ->
-            future.catching {
-                openPicker(mimeType, filter) { url ->
-                    future.send { url?.let(::SandboxUri) }
-                }
-            }
-        }
+        selectDocument(mimeType, filter)?.let(::SandboxUri)
     }
 
     actual suspend fun savePath(filename: String, mimeType: String, filter: String): ImplicitUri? = Coroutines.main {
-        await { future ->
+        val folder = await<NSURL> { future ->
             future.catching {
                 val picker = UIDocumentPickerViewController(forOpeningContentTypes = [UTTypeFolder])
                 documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
                     override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
-                        val fileUrl = didPickDocumentAtURL.URLByAppendingPathComponent(filename)
-                        future.send { fileUrl?.let { SandboxUri(it, didPickDocumentAtURL) } }
+                        future.send(didPickDocumentAtURL)
                     }
 
                     override fun documentPickerWasCancelled(controller: UIDocumentPickerViewController) {
@@ -199,41 +214,64 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                 activeController = picker
                 rootViewController.presentViewController(picker, true, null)
             }
+        } ?: return@main null
+        folder.URLByAppendingPathComponent(filename)?.let { SandboxUri(it, folder) }
+    }
+
+    private suspend fun prepareSave(filename: String, photo: Boolean): Pair<Any, Sink>? = Coroutines.io {
+        val name = filename.replace('\\', '/').substringAfterLast('/')
+        require(name.isNotBlank() && name != "." && name != "..")
+        val suffix = name.substringAfterLast('.', "").takeIf { it.isNotEmpty() && it.length <= 12 && it.all(Char::isLetterOrDigit) } ?: "bin"
+        val url = NSFileManager.defaultManager.temporaryDirectory.URLByAppendingPathComponent("picker-" + NSUUID().UUIDString + "." + suffix) ?: return@io null
+        val file = url.path?.let(File::invoke) ?: return@io null
+        var prepared = false
+        cleaning({
+            val sink = file.bufferedSink()
+            val origin = if (photo) SaveType.Photo(name, url) else SaveType.Video(name, url)
+            prepared = true
+            origin to sink
+        }) {
+            if (!prepared) catching { file.deleteSync() }
         }
     }
 
-    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = SaveType.Photo(filename) to Buffer()
+    actual suspend fun prepareSavePicture(filename: String): Pair<Any, Sink>? = prepareSave(filename, true)
 
-    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? {
-        val fileManager = NSFileManager.defaultManager
-        val tempPath = fileManager.temporaryDirectory.pathComponents?.plus(filename) ?: return null
-        val url = NSURL.fileURLWithPathComponents(tempPath) ?: return null
-        val path = url.path?.let(File::invoke) ?: return null
-        return SaveType.Video(filename, url) to path.bufferedSink()
-    }
+    actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = prepareSave(filename, false)
 
-    @OptIn(InternalIoApi::class, ExperimentalForeignApi::class)
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Coroutines.io {
-        when (origin) {
-            is SaveType.Photo -> {
-                val bytes = sink.buffer.readByteArray()
-                val data = bytes.toNSData()
-                val image = UIImage(data)
-                UIImageWriteToSavedPhotosAlbum(image, null, null, null)
+        val resource = origin as? SaveType ?: return@io
+        cleaning({
+            // Callers may invoke actualSave before closing their buffered sink.
+            sink.flush()
+            memScoped {
+                val error = alloc<ObjCObjectVar<NSError?>>()
+                error.value = null
+                val success = PHPhotoLibrary.sharedPhotoLibrary().performChangesAndWait({
+                    val options = PHAssetResourceCreationOptions().apply {
+                        originalFilename = resource.filename
+                        val extension = resource.filename.substringAfterLast('.', "")
+                        if (extension.isNotEmpty()) {
+                            uniformTypeIdentifier = if (extension.equals("webp", ignoreCase = true)) "org.webmproject.webp"
+                            else UTType.typeWithFilenameExtension(extension)?.identifier
+                        }
+                        shouldMoveFile = false
+                    }
+                    PHAssetCreationRequest.creationRequestForAsset().addResourceWithType(
+                        if (resource is SaveType.Photo) PHAssetResourceTypePhoto else PHAssetResourceTypeVideo,
+                        fileURL = resource.url,
+                        options = options
+                    )
+                }, error.ptr)
+                if (!success) throw IOException(error.value?.localizedDescription ?: "Failed to import " + resource.filename + " into Photos")
             }
-            is SaveType.Video -> {
-                val isCompatible = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(origin.url.path!!)
-                if (isCompatible) {
-                    UISaveVideoAtPathToSavedPhotosAlbum(origin.url.path!!, null, null, null)
-                }
-            }
+        }) {
+            // PhotoKit has finished reading the file, including when import fails.
+            NSFileManager.defaultManager.removeItemAtURL(resource.url, null)
         }
     }
 
-    actual suspend fun cleanSave(origin: Any, result: Boolean) {
-        if (origin is SaveType.Video) {
-            // 此时保存到相册的动作未完成，还不能删除临时文件
-            // origin.url.toPath()?.let { it.delete() }
-        }
+    actual suspend fun cleanSave(origin: Any, result: Boolean) = Coroutines.io {
+        if (origin is SaveType) NSFileManager.defaultManager.removeItemAtURL(origin.url, null)
     }
 }
