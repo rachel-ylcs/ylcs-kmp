@@ -8,6 +8,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 internal object NativeMetadataAliases {
+    private data class Alias(val upstream: String, val portVersion: String, val upstreamVersion: String) {
+        fun normalize(version: String) = if (version == portVersion) upstreamVersion else version
+    }
+
     fun configure(project: Project, kotlin: KotlinMultiplatformExtension, bridge: NativeBridgeExtension) {
         val participants = kotlin.targets.filter { it.platformType != KotlinPlatformType.common }
         val mixed = bridge.redirects.any { rule ->
@@ -18,12 +22,14 @@ internal object NativeMetadataAliases {
         val aliases = buildMap {
             for (rule in bridge.redirects) {
                 if (!rule.module.isPresent) continue
-                val port = rule.module.get().split(':').take(2).joinToString(":")
+                val port = rule.module.get().substringBeforeLast(':')
+                val portVersion = rule.module.get().substringAfterLast(':')
                 val upstream = rule.upstream.get()
-                put(port, upstream)
+                val upstreamVersion = rule.upstreamVersion.get()
+                put(port, Alias(upstream, portVersion, upstreamVersion))
                 for (target in rule.targets.get()) {
                     val suffix = target.replace("_", "")
-                    put("$port-$suffix", "$upstream-$suffix")
+                    put("$port-$suffix", Alias("$upstream-$suffix", portVersion, upstreamVersion))
                 }
             }
         }
@@ -39,17 +45,17 @@ internal object NativeMetadataAliases {
                 withDependencies {
                     val dependencies = this
                     for (dependency in dependencies.toList()) {
-                        val upstream = aliases["${dependency.group}:${dependency.name}"] ?: continue
+                        val alias = aliases["${dependency.group}:${dependency.name}"] ?: continue
                         // Classifier requests are runtime payloads, not Kotlin metadata edges.
                         if (dependency.artifactSelectors.isNotEmpty()) continue
                         val constraint = dependency.versionConstraint
                         dependencies.remove(dependency)
-                        dependencies.add("$upstream:${constraint.requiredVersion}") {
+                        dependencies.add("${alias.upstream}:${alias.normalize(constraint.requiredVersion)}") {
                             val replacement = this
                             replacement.version {
-                                if (constraint.strictVersion.isNotEmpty()) strictly(constraint.strictVersion)
-                                if (constraint.preferredVersion.isNotEmpty()) prefer(constraint.preferredVersion)
-                                if (constraint.rejectedVersions.isNotEmpty()) reject(*constraint.rejectedVersions.toTypedArray())
+                                if (constraint.strictVersion.isNotEmpty()) strictly(alias.normalize(constraint.strictVersion))
+                                if (constraint.preferredVersion.isNotEmpty()) prefer(alias.normalize(constraint.preferredVersion))
+                                if (constraint.rejectedVersions.isNotEmpty()) reject(*constraint.rejectedVersions.map(alias::normalize).toTypedArray())
                                 branch = constraint.branch
                             }
                             dependency.reason?.let(replacement::because)
