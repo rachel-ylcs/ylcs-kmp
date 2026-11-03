@@ -109,6 +109,48 @@ class KotlinNativeCppTest {
     }
 
     @Test
+    fun iosSourcesAccumulateAcrossInteropBlocks() {
+        with(KotlinMultiplatformTemplate()) {
+            interop { ios { cpp("src/nativeMain/cpp") } }
+            interop {
+                ios {
+                    cpp("src/iosMain/cpp")
+                    cpp("src/nativeMain/cpp")
+                }
+            }
+            assertEquals(listOf("src/nativeMain/cpp", "src/iosMain/cpp"), interopSettings.iosSettings.sources.toList())
+        }
+    }
+
+    @Test
+    fun iosCppBuildIsDependencyOfCinteropAndCompilation() {
+        val project = ProjectBuilder.builder().build()
+        project.pluginManager.apply(RachelPlugin::class.java)
+        project.pluginManager.apply("org.jetbrains.kotlin.multiplatform")
+        val kotlin = project.extensions.getByType<KotlinMultiplatformExtension>()
+        val target = kotlin.iosArm64()
+        project.file("src/nativeMain/cpp").apply {
+            mkdirs()
+            resolve("CMakeLists.txt").writeText("cmake_minimum_required(VERSION 3.20)\nproject(test LANGUAGES CXX)\n")
+        }
+        val definition = project.file("src/nativeInterop/cinterop/test.def").apply {
+            parentFile.mkdirs()
+            writeText("headers = test.h\n")
+        }
+        val interop = target.compilations.getByName("main").cinterops.create("test") {
+            definitionFile.set(definition)
+        }
+
+        project.registerNativeCpp(kotlin, listOf("src/nativeMain/cpp"))
+
+        val producer = project.tasks.named("buildIosArm64Native").get()
+        val cinteropTask = project.tasks.named(interop.interopProcessingTaskName).get()
+        val compileTask = target.compilations.getByName("main").compileTaskProvider.get()
+        assertTrue(producer in cinteropTask.taskDependencies.getDependencies(cinteropTask))
+        assertTrue(producer in compileTask.taskDependencies.getDependencies(compileTask))
+    }
+
+    @Test
     fun desktopSourcesAccumulateAcrossInteropBlocks() {
         with(KotlinJvmTemplate()) {
             interop { desktop { cpp("src/nativeMain/cpp") } }

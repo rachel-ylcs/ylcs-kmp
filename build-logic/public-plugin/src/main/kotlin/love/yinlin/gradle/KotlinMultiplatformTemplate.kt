@@ -536,6 +536,6 @@ open class KotlinMultiplatformTemplate : KotlinTemplate<KotlinMultiplatformExten
         configureActions()
         registerDesktopNative(desktopNativeKMPSourceDir, "desktopJar", interopSettings.desktopSettings.sources.toList())
         interopSettings.configureNative(extension)
-        registerNativeCpp(extension)
+        registerNativeCpp(extension, interopSettings.iosSettings.sources.toList())
     }
 }

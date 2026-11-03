@@ -6,7 +6,13 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.apple.swiftimport.SwiftPMImportExt
 
 class IosInterop internal constructor() {
     var discoverClangModulesImplicitly: Boolean = true
+    internal val sources = linkedSetOf<String>()
     private val packages = mutableListOf<SwiftPMImportExtension.(Directory) -> Unit>()
+
+    /** 注册 iOS Native target 的 C/C++ 源码目录，并在 CInterop 处理前构建静态库。 */
+    fun cpp(path: String) {
+        sources += path
+    }
 
     /** 从 src/iosMain/spm/<name> 导入本地 SwiftPM 包。 */
     @OptIn(ExperimentalKotlinGradlePluginApi::class)

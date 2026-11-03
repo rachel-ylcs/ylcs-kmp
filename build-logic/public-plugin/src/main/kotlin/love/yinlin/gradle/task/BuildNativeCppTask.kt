@@ -134,6 +134,15 @@ abstract class BuildNativeCppTask : DefaultTask() {
                 "-DCMAKE_C_COMPILER_EXTERNAL_TOOLCHAIN=${toolchain.invariantSeparatorsPath}", "-DCMAKE_CXX_COMPILER_EXTERNAL_TOOLCHAIN=${toolchain.invariantSeparatorsPath}", "-DCMAKE_SYSROOT=${sysroot.invariantSeparatorsPath}")
         }
         else if (target == "macos_arm64") options += listOf("-DCMAKE_OSX_ARCHITECTURES=arm64", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0")
+        else if (target in setOf("ios_arm64", "ios_simulator_arm64", "ios_x64")) {
+            val simulator = target != "ios_arm64"
+            val architecture = if (target == "ios_x64") "x86_64" else "arm64"
+            options += listOf(
+                "-DCMAKE_SYSTEM_NAME=iOS",
+                "-DCMAKE_OSX_SYSROOT=${if (simulator) "iphonesimulator" else "iphoneos"}",
+                "-DCMAKE_OSX_ARCHITECTURES=$architecture",
+            )
+        }
         else throw GradleException("Unsupported Native C++ target: $target")
         options += cmakeOptions.get().map { (key, value) -> "-D$key=$value" }
         val compilers = options.filter { it.startsWith("-DCMAKE_C_COMPILER=") || it.startsWith("-DCMAKE_CXX_COMPILER=") }
