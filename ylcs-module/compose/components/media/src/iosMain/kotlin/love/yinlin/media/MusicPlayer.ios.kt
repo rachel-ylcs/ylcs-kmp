@@ -2,7 +2,6 @@ package love.yinlin.media
 
 import androidx.compose.runtime.Stable
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

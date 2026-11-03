@@ -1,11 +1,6 @@
 package love.yinlin.foundation.picker
 
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ObjCObjectVar
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.value
+import kotlinx.cinterop.*
 import kotlinx.io.*
 import kotlin.concurrent.Volatile
 import kotlinx.coroutines.sync.Mutex
@@ -21,11 +16,7 @@ import love.yinlin.io.Sources
 import love.yinlin.io.safeToSources
 import love.yinlin.uri.ImplicitUri
 import love.yinlin.uri.SandboxUri
-import platform.Foundation.NSError
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSURL
-import platform.Foundation.NSUUID
-import platform.Foundation.temporaryDirectory
+import platform.Foundation.*
 import platform.Photos.*
 import platform.PhotosUI.*
 import platform.UIKit.*
@@ -54,6 +45,7 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
     private suspend fun <T> await(onCancel: () -> Unit = {}, block: (SyncFuture<T>) -> Unit): T? = dialogMutex.withLock {
         Coroutines.main {
             check(!closed) { "Picker is closed" }
+
             cleaning({
                 Coroutines.sync { future: SyncFuture<T> ->
                     pending = future
@@ -74,7 +66,6 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         }
     }
 
-    // Keep UIKit delegates alive until the dialog completes.
     private var phPickerDelegate: PHPickerViewControllerDelegateProtocol? = null
     private var phPickerDismissDelegate: UIAdaptivePresentationControllerDelegateProtocol? = null
     private var documentPickerDelegate: UIDocumentPickerDelegateProtocol? = null
@@ -83,11 +74,13 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         if (url == null) return null
         val fileManager = NSFileManager.defaultManager
         val extension = url.pathExtension?.takeIf { it.isNotEmpty() } ?: "tmp"
-        val tempUrl = fileManager.temporaryDirectory.URLByAppendingPathComponent("picker-" + NSUUID().UUIDString + "." + extension) ?: return null
+        val tempUrl = fileManager.temporaryDirectory.URLByAppendingPathComponent("picker-${NSUUID().UUIDString}.$extension") ?: return null
+
         if (!fileManager.copyItemAtURL(url, tempUrl, null)) {
             fileManager.removeItemAtURL(tempUrl, null)
             return null
         }
+
         return tempUrl.path?.let(File::invoke) ?: run {
             fileManager.removeItemAtURL(tempUrl, null)
             null
@@ -98,14 +91,17 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
 
     actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.main {
         val pictures = PendingPictures()
+
         val selected = await<List<File>>(onCancel = pictures::cancel) { future ->
             future.catching {
                 require(maxNum > 0)
+
                 val configuration = PHPickerConfiguration(PHPhotoLibrary.sharedPhotoLibrary()).apply {
                     selectionLimit = maxNum.toLong()
                     selection = PHPickerConfigurationSelectionOrdered
                     filter = PHPickerFilter.imagesFilter()
                 }
+
                 val picker = PHPickerViewController(configuration)
                 var didFinish = false
                 val onImagesPicked: (List<PHPickerResult>) -> Unit = onImagesPicked@{ results ->
@@ -121,6 +117,7 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                         }
                     }
                 }
+
                 phPickerDelegate = object : NSObject(), PHPickerViewControllerDelegateProtocol {
                     override fun picker(picker: PHPickerViewController, didFinishPicking: List<*>) {
                         if (didFinish) return
@@ -129,13 +126,17 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                         onImagesPicked(didFinishPicking.filterIsInstance<PHPickerResult>())
                     }
                 }
+
                 phPickerDismissDelegate = object : NSObject(), UIAdaptivePresentationControllerDelegateProtocol {
                     override fun presentationControllerDidDismiss(presentationController: UIPresentationController) {
                         if (!didFinish) future.send()
                     }
                 }
+
                 picker.delegate = phPickerDelegate
-                val rootViewController = checkNotNull(context.controller ?: UIApplication.sharedApplication.keyWindow?.rootViewController) { "No view controller is available for the picker" }
+                val rootViewController = checkNotNull(context.controller ?: UIApplication.sharedApplication.keyWindow?.rootViewController) {
+                    "No view controller is available for the picker"
+                }
                 activeController = picker
                 rootViewController.presentViewController(picker, true, null)
                 picker.presentationController?.delegate = phPickerDismissDelegate
@@ -155,17 +156,14 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
     }
 
     private fun openPicker(mimeType: List<String>, filter: List<String>, callback: (NSURL?) -> Unit) {
-        val picker = UIDocumentPickerViewController(
-            forOpeningContentTypes = filter
-                .map { it.substringAfterLast(".") }
-                .mapNotNull { UTType.typeWithFilenameExtension(it) }
-                .ifEmpty {
-                    mimeType.mapNotNull { UTType.typeWithMIMEType(it) }
-                }
-                .ifEmpty { [UTTypeContent] }
-        ).apply {
-            allowsMultipleSelection = false
-        }
+        val picker = UIDocumentPickerViewController(forOpeningContentTypes = filter
+            .map { it.substringAfterLast(".") }
+            .mapNotNull { UTType.typeWithFilenameExtension(it) }
+            .ifEmpty { mimeType.mapNotNull { UTType.typeWithMIMEType(it) } }
+            .ifEmpty { [UTTypeContent] }
+        )
+        picker.allowsMultipleSelection = false
+
         documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
             override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
                 callback(didPickDocumentAtURL)
@@ -175,8 +173,11 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                 callback(null)
             }
         }
+
         picker.delegate = documentPickerDelegate
-        val rootViewController = checkNotNull(context.controller ?: UIApplication.sharedApplication.keyWindow?.rootViewController) { "No view controller is available for the picker" }
+        val rootViewController = checkNotNull(context.controller ?: UIApplication.sharedApplication.keyWindow?.rootViewController) {
+            "No view controller is available for the picker"
+        }
         activeController = picker
         rootViewController.presentViewController(picker, true, null)
     }
@@ -200,6 +201,7 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         val folder = await<NSURL> { future ->
             future.catching {
                 val picker = UIDocumentPickerViewController(forOpeningContentTypes = [UTTypeFolder])
+
                 documentPickerDelegate = object : NSObject(), UIDocumentPickerDelegateProtocol {
                     override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentAtURL: NSURL) {
                         future.send(didPickDocumentAtURL)
@@ -209,29 +211,41 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                         future.send()
                     }
                 }
+
                 picker.delegate = documentPickerDelegate
-                val rootViewController = checkNotNull(context.controller ?: UIApplication.sharedApplication.keyWindow?.rootViewController) { "No view controller is available for the picker" }
+
+                val rootViewController = checkNotNull(context.controller ?: UIApplication.sharedApplication.keyWindow?.rootViewController) {
+                    "No view controller is available for the picker"
+                }
                 activeController = picker
                 rootViewController.presentViewController(picker, true, null)
             }
         } ?: return@main null
+
         folder.URLByAppendingPathComponent(filename)?.let { SandboxUri(it, folder) }
     }
 
     private suspend fun prepareSave(filename: String, photo: Boolean): Pair<Any, Sink>? = Coroutines.io {
         val name = filename.replace('\\', '/').substringAfterLast('/')
         require(name.isNotBlank() && name != "." && name != "..")
-        val suffix = name.substringAfterLast('.', "").takeIf { it.isNotEmpty() && it.length <= 12 && it.all(Char::isLetterOrDigit) } ?: "bin"
-        val url = NSFileManager.defaultManager.temporaryDirectory.URLByAppendingPathComponent("picker-" + NSUUID().UUIDString + "." + suffix) ?: return@io null
+
+        val suffix = name.substringAfterLast('.', "").takeIf {
+            it.isNotEmpty() && it.length <= 12 && it.all(Char::isLetterOrDigit)
+        } ?: "bin"
+
+        val url = NSFileManager.defaultManager.temporaryDirectory.URLByAppendingPathComponent("picker-${NSUUID().UUIDString}.$suffix") ?: return@io null
         val file = url.path?.let(File::invoke) ?: return@io null
         var prepared = false
+
         cleaning({
             val sink = file.bufferedSink()
             val origin = if (photo) SaveType.Photo(name, url) else SaveType.Video(name, url)
             prepared = true
             origin to sink
         }) {
-            if (!prepared) catching { file.deleteSync() }
+            if (!prepared) {
+                catching { file.delete() }
+            }
         }
     }
 
@@ -239,10 +253,10 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
 
     actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = prepareSave(filename, false)
 
+    @OptIn(BetaInteropApi::class)
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Coroutines.io {
         val resource = origin as? SaveType ?: return@io
         cleaning({
-            // Callers may invoke actualSave before closing their buffered sink.
             sink.flush()
             memScoped {
                 val error = alloc<ObjCObjectVar<NSError?>>()
@@ -257,16 +271,19 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                         }
                         shouldMoveFile = false
                     }
+
                     PHAssetCreationRequest.creationRequestForAsset().addResourceWithType(
                         if (resource is SaveType.Photo) PHAssetResourceTypePhoto else PHAssetResourceTypeVideo,
                         fileURL = resource.url,
                         options = options
                     )
                 }, error.ptr)
-                if (!success) throw IOException(error.value?.localizedDescription ?: "Failed to import " + resource.filename + " into Photos")
+
+                if (!success) {
+                    throw IOException(error.value?.localizedDescription ?: ("Failed to import ${resource.filename} into Photos"))
+                }
             }
         }) {
-            // PhotoKit has finished reading the file, including when import fails.
             NSFileManager.defaultManager.removeItemAtURL(resource.url, null)
         }
     }

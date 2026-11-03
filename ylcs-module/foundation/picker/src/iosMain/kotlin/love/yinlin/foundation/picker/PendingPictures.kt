@@ -3,6 +3,7 @@ package love.yinlin.foundation.picker
 import love.yinlin.concurrent.Lock
 import love.yinlin.extension.catching
 import love.yinlin.fs.File
+
 internal class PendingPictures {
     private val lock = Lock()
     private var files: MutableList<File?>? = null
