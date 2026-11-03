@@ -4,11 +4,12 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.value
 import kotlinx.io.*
 import kotlin.concurrent.Volatile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import love.yinlin.concurrent.Lock
 import love.yinlin.coroutines.Coroutines
 import love.yinlin.coroutines.SyncFuture
 import love.yinlin.extension.catching
@@ -24,12 +25,14 @@ import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
+import platform.Foundation.temporaryDirectory
 import platform.Photos.*
 import platform.PhotosUI.*
 import platform.UIKit.*
 import platform.UniformTypeIdentifiers.*
 import platform.darwin.NSObject
 
+@OptIn(ExperimentalForeignApi::class)
 actual class Picker actual constructor(private val context: PlatformContextProvider) : AutoCloseable {
     private val dialogMutex = Mutex()
     @Volatile private var closed = false
@@ -95,7 +98,7 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
 
     actual suspend fun pickPicture(maxNum: Int): Sources<Source>? = Coroutines.main {
         val pictures = PendingPictures()
-        val selected = await(onCancel = pictures::cancel) { future ->
+        val selected = await<List<File>>(onCancel = pictures::cancel) { future ->
             future.catching {
                 require(maxNum > 0)
                 val configuration = PHPickerConfiguration(PHPhotoLibrary.sharedPhotoLibrary()).apply {
@@ -140,14 +143,13 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         } ?: return@main null
 
         var transferred = false
-        try {
+        cleaning({
             pickerResource {
                 selected.safeToSources { file ->
-                    TemporaryPictureSource(file, file.bufferedSourceSync())
+                    TemporaryPictureSource(file, file.rawSourceSync()).buffered()
                 }
             }.also { transferred = it != null }
-        }
-        finally {
+        }) {
             if (!transferred) selected.forEach { file -> catching { file.deleteSync() } }
         }
     }
@@ -222,14 +224,14 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
         val suffix = name.substringAfterLast('.', "").takeIf { it.isNotEmpty() && it.length <= 12 && it.all(Char::isLetterOrDigit) } ?: "bin"
         val url = NSFileManager.defaultManager.temporaryDirectory.URLByAppendingPathComponent("picker-" + NSUUID().UUIDString + "." + suffix) ?: return@io null
         val file = url.path?.let(File::invoke) ?: return@io null
-        try {
+        var prepared = false
+        cleaning({
             val sink = file.bufferedSink()
             val origin = if (photo) SaveType.Photo(name, url) else SaveType.Video(name, url)
+            prepared = true
             origin to sink
-        }
-        catch (error: Throwable) {
-            catching { file.deleteSync() }
-            throw error
+        }) {
+            if (!prepared) catching { file.deleteSync() }
         }
     }
 
@@ -237,10 +239,9 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
 
     actual suspend fun prepareSaveVideo(filename: String): Pair<Any, Sink>? = prepareSave(filename, false)
 
-    @OptIn(ExperimentalForeignApi::class)
     actual suspend fun actualSave(filename: String, origin: Any, sink: Sink) = Coroutines.io {
         val resource = origin as? SaveType ?: return@io
-        try {
+        cleaning({
             // Callers may invoke actualSave before closing their buffered sink.
             sink.flush()
             memScoped {
@@ -264,8 +265,7 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
                 }, error.ptr)
                 if (!success) throw IOException(error.value?.localizedDescription ?: "Failed to import " + resource.filename + " into Photos")
             }
-        }
-        finally {
+        }) {
             // PhotoKit has finished reading the file, including when import fails.
             NSFileManager.defaultManager.removeItemAtURL(resource.url, null)
         }
@@ -273,57 +273,5 @@ actual class Picker actual constructor(private val context: PlatformContextProvi
 
     actual suspend fun cleanSave(origin: Any, result: Boolean) = Coroutines.io {
         if (origin is SaveType) NSFileManager.defaultManager.removeItemAtURL(origin.url, null)
-    }
-}
-
-private class PendingPictures {
-    private val lock = Lock()
-    private var files: MutableList<File?>? = null
-    private var processed = 0
-    private var cancelled = false
-
-    fun start(size: Int) {
-        lock.synchronized {
-            if (!cancelled) files = MutableList(size) { null }
-        }
-    }
-
-    fun complete(index: Int, file: File?): List<File>? {
-        var orphan: File? = null
-        val completed = lock.synchronized {
-            val entries = files
-            if (cancelled || entries == null) {
-                orphan = file
-                null
-            }
-            else {
-                entries[index] = file
-                processed++
-                if (processed == entries.size) entries.filterNotNull() else null
-            }
-        }
-        orphan?.let { catching { it.deleteSync() } }
-        return completed
-    }
-
-    fun cancel() {
-        val toDelete = lock.synchronized {
-            cancelled = true
-            val remaining = files?.filterNotNull() ?: []
-            files = null
-            remaining
-        }
-        toDelete.forEach { file -> catching { file.deleteSync() } }
-    }
-}
-
-private class TemporaryPictureSource(private val file: File, private val delegate: Source) : Source by delegate {
-    override fun close() {
-        try {
-            delegate.close()
-        }
-        finally {
-            catching { file.deleteSync() }
-        }
     }
 }
