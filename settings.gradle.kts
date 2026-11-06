@@ -8,6 +8,8 @@ plugins {
     id("ylcs.repository")
 }
 
+apply(from = "gradle/environment-check.settings.gradle.kts")
+
 nativeComposeMaintainer()
 
 repository {
