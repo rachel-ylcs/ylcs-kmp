@@ -6,7 +6,7 @@ inputs:
     description: Install Android SDK packages.
     default: 'false'
   msvc:
-    description: Configure the MSVC toolchain on Windows.
+    description: Legacy input; every Windows job initializes MSVC for Native and JNI compatibility.
     default: 'false'
   gtk:
     description: Install GTK development dependencies on Linux.
@@ -57,7 +57,7 @@ runs:
         packages: 'platform-tools platforms;android-37.2'
 
     - name: Setup MSVC
-      if: ${{ inputs.msvc == 'true' && runner.os == 'Windows' }}
+      if: ${{ runner.os == 'Windows' }}
       uses: TheMrMilchmann/setup-msvc-dev@v4
       with:
         arch: x64
