@@ -57,7 +57,7 @@ val android = sdk!!
 
 val vs = if (win) {
     val candidates = listOfNotNull(env["VS_PATH"]?.let(::File), env["SKIKO_VSBT_PATH"]?.let(::File)) +
-        listOf("2022", "2026").flatMap { year -> listOf("Community", "Professional", "Enterprise", "BuildTools").map { File(env["ProgramFiles"].orEmpty(), "Microsoft Visual Studio/$year/$it") } }
+        listOf("18", "2022", "2026").flatMap { year -> listOf("Community", "Professional", "Enterprise", "BuildTools").map { File(env["ProgramFiles"].orEmpty(), "Microsoft Visual Studio/$year/$it") } }
     val found = candidates.firstOrNull { File(it, "VC/Auxiliary/Build/vcvars64.bat").isFile }
     report("Visual Studio C++", found?.absolutePath, "缺少 x64 MSVC C++ Build Tools")
     val vcvars = env["VS_PATH"]?.let { File(it, "VC/Auxiliary/Build/vcvars64.bat") }
@@ -93,7 +93,7 @@ report("Ninja", ninjaVersion?.let { "$it — ${ninja?.absolutePath ?: "当前 Gr
 for ((name, relative) in listOf("MMKV 子模块" to "ylcs-module/foundation/kv/src/nativeMain/cpp/mmkv/Core/CMakeLists.txt",
     "miniaudio 子模块" to "ylcs-module/compose/components/media/src/nativeMain/cpp/miniaudio/miniaudio.c")) {
     val source = settingsDir.resolve(relative)
-    report(name, source.takeIf { it.isFile }?.parentFile?.absolutePath, "缺少 ${source.absolutePath}；执行 git submodule update --init --recursive")
+    report(name, source.takeIf { it.isFile }?.parentFile?.absolutePath, "缺少 ${source.absolutePath}；执行 git submodule update --init --recursive", false)
 }
 val platform = File(android, "platforms/android-37.1")
 report("Android SDK Platform 37.1", platform.takeIf { it.isDirectory }?.absolutePath, "未安装 ${platform.absolutePath}；Android 构建可能需要补装", false)
